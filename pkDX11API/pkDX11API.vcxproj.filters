@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{f4399b38-eb5f-4753-b47e-38c45bb6abd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{0ebb314a-af52-4f81-bc23-fedf8ddb4673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\api">
+      <UniqueIdentifier>{cd744a33-88c4-4d2a-b0b6-51d9df5459b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\api">
+      <UniqueIdentifier>{0808ffef-1846-423a-9788-167698946427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\buffers">
+      <UniqueIdentifier>{267bc775-494f-430b-a2b5-081cd2a06d71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\buffers">
+      <UniqueIdentifier>{0c252440-00f8-4b07-b2bd-b6d0447afaea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\graphics">
+      <UniqueIdentifier>{f199e56f-8e51-45df-8e1b-8998b1c8a3d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics">
+      <UniqueIdentifier>{be83a003-5ebc-496f-a96e-39807072462f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\prerequisites">
+      <UniqueIdentifier>{45519aa5-0a72-4626-9f73-3bce6833affb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\main">
+      <UniqueIdentifier>{47f5c2dd-c8b6-4acf-8121-6e48b031d5ef}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\pkDX11Test.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11DepthStencilView.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11Device.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11InputLayout.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11SamplerState.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11ConstantBuffer.cpp">
+      <Filter>source\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11IndexBuffer.cpp">
+      <Filter>source\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11VertexBuffer.cpp">
+      <Filter>source\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11PixelShader.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11Shader.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11VertexShader.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11GraphicsAPI.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\pkDX11DepthStencilView.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11Device.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11InputLayout.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11SamplerState.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11ConstantBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11IndexBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11VertexBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11GraphicsManager.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11PixelShader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11Shader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11VertexShader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11Prerequisites.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11GraphicsAPI.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

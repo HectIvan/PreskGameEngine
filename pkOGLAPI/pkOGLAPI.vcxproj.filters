@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{825a50b4-e70a-4a56-8625-96d50dc99a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{401af7f4-1e17-4740-adf9-9e67cae58925}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\main">
+      <UniqueIdentifier>{4a493f85-e07d-4448-967f-116910d730a1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\pkOGLMain.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

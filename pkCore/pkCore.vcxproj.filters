@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{7de1478f-0ca5-4dc3-9c80-f63af898d861}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{cd4ee2aa-1941-4dc8-8a5b-2241fd3eae58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\prerequisites">
+      <UniqueIdentifier>{7ba077da-5db2-4a32-a858-b015eb43dce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\window">
+      <UniqueIdentifier>{1979a646-8a9a-405d-bd5e-8ca586364109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\events">
+      <UniqueIdentifier>{2bff4ad3-d17e-4854-90ab-70ae3f7c99e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\geometry">
+      <UniqueIdentifier>{4209ee74-d096-4626-a341-491d65468daa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\window">
+      <UniqueIdentifier>{f5888abd-2600-45db-a79c-985e5ce88a8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\game">
+      <UniqueIdentifier>{a550707c-5b0a-41b8-80b8-aad2a453b543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\buffers">
+      <UniqueIdentifier>{c7ed305e-a1ad-4822-bc75-ab45ea3c85c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\buffers">
+      <UniqueIdentifier>{b9e6cf2a-a519-40be-85f4-fe5175fd70f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\api">
+      <UniqueIdentifier>{adbd355c-db1a-48d9-839a-3639ae7c4011}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\api">
+      <UniqueIdentifier>{d21265f3-ce77-4adf-a873-9ba9efb097c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\shaders">
+      <UniqueIdentifier>{e9347fe0-f8cc-44f1-b1c5-9ec9282ec94e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics">
+      <UniqueIdentifier>{b55ae11e-c59d-4644-b864-bb64e574335d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\camera">
+      <UniqueIdentifier>{56118060-0e7b-45ed-9067-e272e3634412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\camera">
+      <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\pkPrerequisitesCore.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkWindow.h">
+      <Filter>include\window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkWindowDesc.h">
+      <Filter>include\window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkEvent.h">
+      <Filter>include\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkEventQueue.h">
+      <Filter>include\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMouseWheelData.h">
+      <Filter>include\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSimpleVertex.h">
+      <Filter>include\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGameObject.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkIndexBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGraphicsAPI.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPixelShader.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkShader.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkModel.h">
+      <Filter>include\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMesh.h">
+      <Filter>include\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkVertexBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb_image.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkLight.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCamera.h">
+      <Filter>include\camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\pkCoreMain.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32Window.cpp">
+      <Filter>source\window</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkLinuxWindow.cpp">
+      <Filter>source\window</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkIndexBuffer.cpp">
+      <Filter>source\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGraphicsAPI.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkCamera.cpp">
+      <Filter>source\camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{9448b790-8c48-455a-bd6d-e833c2336b09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{c07fcdc8-f6af-4432-9a06-c164618ced29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\math">
+      <UniqueIdentifier>{43d1834e-dde3-4f0b-b322-87827ded20f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\platform">
+      <UniqueIdentifier>{fa356784-0994-4a6b-94b5-326d9cafdcb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\prerequisites">
+      <UniqueIdentifier>{c7253725-1b37-4e69-8e53-abb89c935d5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\util">
+      <UniqueIdentifier>{de555fc1-8770-442a-b808-9a875c6e58c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\figures">
+      <UniqueIdentifier>{f0ab22bc-1e46-451a-b793-974847e939c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\figures">
+      <UniqueIdentifier>{fc2bac5e-ac4a-4b71-a476-77ef262f13d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\math">
+      <UniqueIdentifier>{9f518b92-3aa5-44b7-afc2-9ff0eb31a89d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\platform">
+      <UniqueIdentifier>{6cc4484c-8e9c-4834-bd7b-676f6ce8e80c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\pkModule.h">
+      <Filter>include\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPrerequisitesUtilities.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSTDHeaders.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPlatformDefines.h">
+      <Filter>include\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPlatformMath.h">
+      <Filter>include\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPlatformTypes.h">
+      <Filter>include\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMath.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMatrix4.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkQuaternion.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkVector2.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkVector3.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkVector4.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkAABB.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCapsule.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCube.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkOBB.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPlane.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSphere.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTransform.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\pkPlatformMath.cpp">
+      <Filter>source\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkCapsule.cpp">
+      <Filter>source\figures</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkCube.cpp">
+      <Filter>source\figures</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPlane.cpp">
+      <Filter>source\figures</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkSphere.cpp">
+      <Filter>source\figures</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMatrix4.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkQuaternion.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkVector2.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkVector3.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkVector4.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTransform.cpp">
+      <Filter>source\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

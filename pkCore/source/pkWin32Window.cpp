@@ -27,8 +27,8 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   wcex.style = CS_HREDRAW | CS_VREDRAW;
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
-  wcex.cbWndExtra = sizeof(void*); // The number of extra bytes to allocate following the window instance.
-  wcex.hInstance = reinterpret_cast<HINSTANCE>(&_hInstance);
+  wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
+  wcex.hInstance = &_hInstance;
   HICON loadedIcon = LoadIcon(&m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
   wcex.hIcon = loadedIcon;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
@@ -53,28 +53,49 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   // create the window
   m_windowH = CreateWindowExA(0,
-                         "WindowClass",
-                         _name.c_str(),
-                         WS_OVERLAPPEDWINDOW,
-                         CW_USEDEFAULT,
-                         CW_USEDEFAULT,
-                         rc.right - rc.left,
-                         rc.bottom - rc.top,
-                         nullptr,
-                         nullptr,
-                         &_hInstance,
-                         nullptr);
+                              "WindowClass",
+                              _name.c_str(),
+                              WS_OVERLAPPEDWINDOW,
+                              CW_USEDEFAULT,
+                              CW_USEDEFAULT,
+                              rc.right - rc.left,
+                              rc.bottom - rc.top,
+                              nullptr,
+                              nullptr,
+                              &_hInstance,
+                              nullptr);
 
   /**
-  * Check if creation failed.
+  * Check if creation failed. 
   **/
   if (!m_windowH)
   {
-    auto error = GetLastError();
+    DWORD error = GetLastError();
     return;
   }
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(this));
   ShowWindow(m_windowH, 1);
+}
+
+void
+Window::setSize(uint32 _width, uint32 _height)
+{
+  setWidth(_width);
+  setHeight(_height);
+}
+
+void
+Window::setSize(Vector2 _size)
+{
+  setWidth(static_cast<uint32>(_size.x));
+  setHeight(static_cast<uint32>(_size.y));
+}
+
+Vector2
+Window::getSize() const
+{
+  return Vector2(static_cast<float>(m_width), 
+                 static_cast<float>(m_height));
 }
 
 Vector2

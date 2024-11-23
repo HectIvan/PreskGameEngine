@@ -186,7 +186,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkCamera.cpp" />
-    <ClCompile Include="source\pkCoreMain.cpp" />
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />

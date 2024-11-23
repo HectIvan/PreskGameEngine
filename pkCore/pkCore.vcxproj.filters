@@ -107,9 +107,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkCoreMain.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkWin32Window.cpp">
       <Filter>source\window</Filter>
     </ClCompile>

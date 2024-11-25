@@ -22,24 +22,25 @@
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
 
+#if PK_PLATFORM == PK_PLATFORM_WIN32
 /*********************************************/
 /**
 * #if's
 **/
 /*********************************************/
-#if PK_PLATFORM == PK_PLATFORM_WIN32
 struct HWND__;
 typedef HWND__* HWND;
 using WindowHandle = HWND;
 
 struct HINSTANCE__;
-typedef HINSTANCE__ HINST;
+typedef HINSTANCE__* HINST;
 using InstanceHandle = HINST;
 #endif
 
 namespace pkEngineSDK {
 
-class PKWindowDesc;
+
+class PK_CORE_EXPORT PKWindowDesc;
 
 class Window
 {
@@ -163,7 +164,7 @@ class Window
   * The window handle member.
   **/
   WindowHandle
-  getWindowHandle() { return m_windowH; }
+  getWindowHandle() const { return m_windowH; }
 
   /**
   * Set instance handle.
@@ -185,13 +186,13 @@ class Window
   * The current instance handle.
   **/
   InstanceHandle
-  getInstanceHandle() { return m_hInstance; }
+  getInstanceHandle() const { return m_hInstance; }
 
   /**
   * Get width and height of the client rect for later use
   **/
-  virtual Vector2
-  getClientWidthHeight() = 0;
+  Vector2
+  getClientWidthHeight();
 
  private:
   uint32 m_width;

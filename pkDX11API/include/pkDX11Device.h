@@ -17,11 +17,13 @@
 * Includes
 **/
 /*********************************************/
+#include "pkDevice.h"
 #include "pkDX11Prerequisites.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
-class DX11Device
+class DX11Device : public Device
 {
  public:
   DX11Device() = default;

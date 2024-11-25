@@ -19,7 +19,9 @@
 * Includes
 **/
 /*********************************************/
-#include "assimp\texture.h"
+#include <assimp/texture.h>
+#include<assimp/material.h>
+
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
 #include "pkTransform.h"
@@ -41,7 +43,7 @@ class Mesh
        Vector<Texture> textures);
 
   void
-  Draw(Device* _pDevice);
+  draw(Device* _pDevice);
 
   void
   Clean();
@@ -52,7 +54,7 @@ class Mesh
   // stores the index and vertex info
   Vector<SimpleVertex> m_vertexVector;
   Vector<uint32> m_indexVector;
-  Vector<Texture> mTextures;
+  Vector<Texture> m_textures;
   aiMaterial* mMaterial;
   uint32 mVertexCount;
   uint32 mNumIndex;

@@ -1,38 +1,33 @@
 /************************************************************************/
 /**
-* @pkGraphicsAPI pkGraphicsAPI.h
+* @pkTexture pkTexture.h
 * @Hector Ivan Muñoz Ceballos
-* @date 19/11/2024
-* @Graphics api file for the Presk Game Engine.
+* @date 22/11/2024
+* @Texture file for the Presk Game Engine.
 *
-* Graphics API class for the engine
+* Texture class for the engine
 *
 * @bug No bug known.
 *
-* @HectIvan 19/11/2024
+* @HectIvan 25/11/2024
 * Created the file
 */
 /************************************************************************/
 #pragma once
-
 /*********************************************/
 /**
 * Includes
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT GraphicsAPI
+class PK_CORE_EXPORT Texture
 {
  public:
-  GraphicsAPI() = default;
-  virtual ~GraphicsAPI() = default;
-
-  virtual void
-  init(const WindowHandle& _wHnd) = 0;
+  Texture() = default;
+  virtual ~Texture() = default;
 };
 }

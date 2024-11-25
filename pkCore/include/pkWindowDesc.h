@@ -23,7 +23,7 @@
 
 namespace pkEngineSDK {
 
-struct PKWindowDesc
+struct PK_CORE_EXPORT PKWindowDesc
 {
   uint32 width;
   uint32 height;

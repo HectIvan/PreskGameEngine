@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\pkDX11Texture.cpp" />
     <ClCompile Include="source\pkDX11ConstantBuffer.cpp" />
     <ClCompile Include="source\pkDX11DepthStencilView.cpp" />
     <ClCompile Include="source\pkDX11Device.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="include\pkDX11Prerequisites.h" />
     <ClInclude Include="include\pkDX11SamplerState.h" />
     <ClInclude Include="include\pkDX11Shader.h" />
+    <ClInclude Include="include\pkDX11Texture.h" />
     <ClInclude Include="include\pkDX11VertexBuffer.h" />
     <ClInclude Include="include\pkDX11VertexShader.h" />
   </ItemGroup>

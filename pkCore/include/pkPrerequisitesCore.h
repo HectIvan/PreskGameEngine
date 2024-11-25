@@ -7,6 +7,9 @@
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
 
+// defines
+#include "pkCoreDefines.h"
+
 /*********************************************/
 /**
 * Defines

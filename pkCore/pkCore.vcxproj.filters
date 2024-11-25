@@ -37,9 +37,6 @@
     <Filter Include="source\api">
       <UniqueIdentifier>{d21265f3-ce77-4adf-a873-9ba9efb097c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\shaders">
-      <UniqueIdentifier>{e9347fe0-f8cc-44f1-b1c5-9ec9282ec94e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\graphics">
       <UniqueIdentifier>{b55ae11e-c59d-4644-b864-bb64e574335d}</UniqueIdentifier>
     </Filter>
@@ -81,18 +78,6 @@
     <ClInclude Include="include\pkGraphicsAPI.h">
       <Filter>include\api</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkPixelShader.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkShader.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkModel.h">
-      <Filter>include\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMesh.h">
-      <Filter>include\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkVertexBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
@@ -104,6 +89,27 @@
     </ClInclude>
     <ClInclude Include="include\pkCamera.h">
       <Filter>include\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkModel.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMesh.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBone.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCoreDefines.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDevice.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTexture.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkColor.h">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="source\pkCamera.cpp">
       <Filter>source\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMesh.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

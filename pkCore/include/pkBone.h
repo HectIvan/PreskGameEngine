@@ -1,16 +1,15 @@
 /************************************************************************/
 /**
-* @pkGraphicsAPI pkGraphicsAPI.h
+* @pkBone pkBone.h
 * @Hector Ivan Muñoz Ceballos
-* @date 19/11/2024
-* @Graphics api file for the Presk Game Engine.
+* @date 23/11/2024
+* @Bone file for the Presk Game Engine.
 *
-* Graphics API class for the engine
+* This file will contain the bone used for the engine
 *
 * @bug No bug known.
 *
-* @HectIvan 19/11/2024
-* Created the file
+* @HectIvan 23/11/2024
 */
 /************************************************************************/
 #pragma once
@@ -20,19 +19,18 @@
 * Includes
 **/
 /*********************************************/
+#include <assimp/anim.h>
+
+#include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
-#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT GraphicsAPI
+class Bone
 {
  public:
-  GraphicsAPI() = default;
-  virtual ~GraphicsAPI() = default;
-
-  virtual void
-  init(const WindowHandle& _wHnd) = 0;
+  Bone() = default;
+  virtual ~Bone() = default;
 };
 }

@@ -165,7 +165,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkBone.h" />
     <ClInclude Include="include\pkCamera.h" />
+    <ClInclude Include="include\pkColor.h" />
+    <ClInclude Include="include\pkCoreDefines.h" />
+    <ClInclude Include="include\pkDevice.h" />
     <ClInclude Include="include\pkGameObject.h" />
     <ClInclude Include="include\pkEvent.h" />
     <ClInclude Include="include\pkEventQueue.h" />
@@ -175,10 +179,9 @@
     <ClInclude Include="include\pkMesh.h" />
     <ClInclude Include="include\pkModel.h" />
     <ClInclude Include="include\pkMouseWheelData.h" />
-    <ClInclude Include="include\pkPixelShader.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
-    <ClInclude Include="include\pkShader.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
+    <ClInclude Include="include\pkTexture.h" />
     <ClInclude Include="include\pkVertexBuffer.h" />
     <ClInclude Include="include\pkWindow.h" />
     <ClInclude Include="include\pkWindowDesc.h" />
@@ -189,6 +192,7 @@
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />
+    <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkWin32Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

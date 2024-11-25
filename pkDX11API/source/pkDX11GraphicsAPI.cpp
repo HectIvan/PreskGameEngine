@@ -1,4 +1,5 @@
 #include "pkDX11GraphicsAPI.h"
+#include "pkWindow.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
@@ -6,7 +7,7 @@ namespace pkEngineSDK
 {
 
 void
-DX11GraphicsAPI::init(WindowHandle& _wHnd)
+DX11GraphicsAPI::init(const WindowHandle& _wHnd)
 {
   m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
 

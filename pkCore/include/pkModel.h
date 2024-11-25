@@ -19,10 +19,10 @@
 * Includes
 **/
 /*********************************************/
-#include "assimp\Importer.hpp"
-#include "assimp\postprocess.h"
-#include "assimp\scene.h"
-#include "assimp\mesh.h"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/mesh.h>
 
 #include "pkIndexBuffer.h"
 #include "pkMatrix4.h"
@@ -34,7 +34,7 @@
 namespace pkEngineSDK
 {
 
-class DX11Device;
+class PK_CORE_EXPORT DX11Device;
 
 class Model
 {
@@ -72,6 +72,7 @@ class Model
       _vertex.weights[i] = 0.0f;
     }
   }
+
   void
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
 

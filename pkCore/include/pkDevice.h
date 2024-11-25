@@ -1,15 +1,15 @@
 /************************************************************************/
 /**
-* @pkGraphicsAPI pkGraphicsAPI.h
+* @pkDevice pkDevice.h
 * @Hector Ivan Muñoz Ceballos
-* @date 19/11/2024
-* @Graphics api file for the Presk Game Engine.
+* @date 22/11/2024
+* @Device file for the Presk Game Engine.
 *
-* Graphics API class for the engine
+* Device base class for the engine
 *
 * @bug No bug known.
 *
-* @HectIvan 19/11/2024
+* @HectIvan 25/11/2024
 * Created the file
 */
 /************************************************************************/
@@ -21,18 +21,14 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT GraphicsAPI
+class PK_CORE_EXPORT Device
 {
  public:
-  GraphicsAPI() = default;
-  virtual ~GraphicsAPI() = default;
-
-  virtual void
-  init(const WindowHandle& _wHnd) = 0;
+  Device() = default;
+  virtual ~Device() = default;
 };
 }

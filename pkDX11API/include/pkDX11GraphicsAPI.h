@@ -31,8 +31,11 @@
 #include "pkPrerequisitesCore.h"
 #include "pkVector4.h"
 
+
 namespace pkEngineSDK
 {
+
+using pkEngineSDK::GraphicsAPI;
 
 class DX11GraphicsAPI : public GraphicsAPI
 {
@@ -47,7 +50,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Window handle
   **/
   void 
-  init(WindowHandle& _wHnd) override;
+  init(const WindowHandle& _wHnd) override;
 
   /**
   * Create the device and swap chain.
@@ -153,9 +156,9 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   // constant buffers
   DX11ConstantBuffer m_buffer;
-  DX11ConstantBuffer  m_cBView;
-  DX11ConstantBuffer  m_cBProjection;
-  DX11ConstantBuffer  m_cBWorld;
-  DX11ConstantBuffer  m_LightCB;
+  DX11ConstantBuffer m_cBView;
+  DX11ConstantBuffer m_cBProjection;
+  DX11ConstantBuffer m_cBWorld;
+  DX11ConstantBuffer m_LightCB;
 };
 }

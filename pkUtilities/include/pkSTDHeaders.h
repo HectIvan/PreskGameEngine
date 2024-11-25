@@ -18,7 +18,7 @@ namespace pkEngineSDK
 template <class T>
 using Queue = std::queue<T>;
 
-template<typename T>
+template<class T>
 using SPtr = std::shared_ptr<T>;
 
 template <class T>

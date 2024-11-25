@@ -1,32 +1,36 @@
-/*
+
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11InputLayout.h"
-#include "pkPrerequisitesCore.h"
-#include "pkWindow.h"
-#include "pkModel.h"
 #include "pkLight.h"
+#include "pkModel.h"
+#include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
+#include "pkWindow.h"
+#include "pkWindowDesc.h"
 
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
-using pkEngineSDK::PKWindowDesc;
-using pkEngineSDK::DX11InputLayout;
-using pkEngineSDK::DX11GraphicsAPI;
-using pkEngineSDK::Model;
-using pkEngineSDK::String;
-using pkEngineSDK::Light;
-using pkEngineSDK::uint32;
 using pkEngineSDK::CBView;
 using pkEngineSDK::CBProjection;
 using pkEngineSDK::CBWorld;
+using pkEngineSDK::DX11InputLayout;
+using pkEngineSDK::DX11GraphicsAPI;
+using pkEngineSDK::InstanceHandle;
+using pkEngineSDK::Model;
+using pkEngineSDK::Light;
+using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::String;
+using pkEngineSDK::uint32;
+using pkEngineSDK::Vector2;
+using pkEngineSDK::Window;
+using pkEngineSDK::WindowHandle;
 
-pkEngineSDK::Window g_window;
+Window g_window;
 DX11GraphicsAPI g_api;
 DX11InputLayout g_inputLayout;
 
 Model g_model;
-
 Light g_light;
 
 
@@ -38,7 +42,7 @@ int wWinMain(InstanceHandle hInstance, InstanceHandle hPrevInstance, LPWSTR lpCm
   g_window.create(winDesc, "window DX11 Win32 Test", hInstance);
 
   // initialize api
-  g_api.init(g_window.m_windowH);
+  g_api.init(g_window.getWindowHandle());
 
   // shaders
   g_api.m_pixelShader.compile();
@@ -76,5 +80,4 @@ int wWinMain(InstanceHandle hInstance, InstanceHandle hPrevInstance, LPWSTR lpCm
   Vector2 clientSize = g_window.getClientWidthHeight();
   return 0;
 }
-
-#endif*/
+#endif

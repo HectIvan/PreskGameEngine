@@ -8,7 +8,7 @@ Transform::Transform(Matrix4 _rotation,
                      Matrix4 _translation)
 {
   setRotation(_rotation);
-  setScale(_rotation);
+  setScale(_scale);
   setTranslation(_translation);
 }
 

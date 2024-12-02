@@ -30,5 +30,8 @@ class PK_CORE_EXPORT Device
  public:
   Device() = default;
   virtual ~Device() = default;
+
+  virtual UPtr<Device>
+  getDevice() = 0;
 };
 }

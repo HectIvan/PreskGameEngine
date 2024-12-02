@@ -24,7 +24,7 @@ namespace pkEngineSDK
 
 struct Texture {
   uint32 id;
-  String type;
+  uint32 type;
 };
 
 template<class T>

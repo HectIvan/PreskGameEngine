@@ -28,8 +28,8 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
   wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
-  wcex.hInstance = &_hInstance;
-  HICON loadedIcon = LoadIcon(&m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
+  wcex.hInstance = _hInstance;
+  HICON loadedIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
   wcex.hIcon = loadedIcon;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
@@ -49,7 +49,7 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   m_height = _desc.height;
   m_hInstance = _hInstance;
   // adjust window width and height
-  RECT rc = { 0, 0, _desc.width, _desc.height };
+  RECT rc = { 0, 0, static_cast<LONG>(_desc.width), static_cast<LONG>(_desc.height) };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   // create the window
   m_windowH = CreateWindowExA(0,
@@ -62,7 +62,7 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
                               rc.bottom - rc.top,
                               nullptr,
                               nullptr,
-                              &_hInstance,
+                              _hInstance,
                               nullptr);
 
   /**
@@ -105,7 +105,7 @@ Window::getClientWidthHeight()
   GetClientRect(m_windowH, &rc);
   uint32 width = rc.right - rc.left;
   uint32 height = rc.bottom - rc.top;
-  return Vector2(static_cast<float>(width), static_cast<uint32>(height));
+  return Vector2(static_cast<float>(width), static_cast<float>(height));
 }
 }
 

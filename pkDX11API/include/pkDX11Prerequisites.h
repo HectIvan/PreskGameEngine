@@ -27,4 +27,5 @@ struct CBWorld
   Matrix4 mWorld;
   Vector4 vMeshColor;
 
+};
 }

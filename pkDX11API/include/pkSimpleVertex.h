@@ -12,12 +12,20 @@
 /************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
+#include "pkVector3.h"
+#include "pkVector2.h"
+
 namespace pkEngineSDK {
 
-struct simpleVertex
+struct SimpleVertex
 {
-  // Vector3 pos;
-  // Vector3 normal;
-  // Vector2 Tex;
+  Vector3 pos;
+  Vector3 normal;
+  Vector2 Tex;
 };
 }

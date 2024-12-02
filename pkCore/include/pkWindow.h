@@ -22,12 +22,12 @@
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
 
-#if PK_PLATFORM == PK_PLATFORM_WIN32
 /*********************************************/
 /**
 * #if's
 **/
 /*********************************************/
+#if PK_PLATFORM == PK_PLATFORM_WIN32
 struct HWND__;
 typedef HWND__* HWND;
 using WindowHandle = HWND;

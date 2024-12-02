@@ -21,12 +21,13 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkDX11Device.h"
 
 namespace pkEngineSDK
 {
 
 class DX11Device;
-class Color;
+struct Color;
 
 class DX11Texture
 {
@@ -37,6 +38,23 @@ class DX11Texture
     clear();
   }
 
+  /**
+  * Create the texture.
+  * 
+  * Creates the texture based on DirectX.
+  * 
+  * @param _pDevice
+  * Device that will create the texture.
+  * 
+  * @param _width
+  * Width of the texture.
+  * 
+  * @param _height
+  * Height of the texture.
+  * 
+  * @param _colors
+  * Array of colors that the texture will have.
+  **/
   void
   create(DX11Device* _pDevice,
          uint32 _width,
@@ -53,6 +71,15 @@ class DX11Texture
   getTexture2D() { return m_t2d; }
 
   /**
+  * Set the DirectX texture.
+  * 
+  * @param _t2d
+  * Pointer to the new texture.
+  **/
+  void
+  setTexture2D(ID3D11Texture2D* _t2d) { m_t2d = _t2d; }
+
+  /**
   * Gets a pointer to the shader resource view.
   * 
   * @return
@@ -62,6 +89,15 @@ class DX11Texture
   getSRV() { return m_srv; }
 
   /**
+  * Sets the shader resource view of the texture.
+  * 
+  * @param _srv
+  * New shader resource view.
+  **/
+  void
+  setSRV(ID3D11ShaderResourceView* _srv) { m_srv = _srv; }
+
+  /**
   * Gets the type of the current texture.
   * 
   * @return
@@ -69,6 +105,15 @@ class DX11Texture
   **/
   uint32
   getType() { return m_type; }
+
+  /**
+  * Set the type of the texture.
+  * 
+  * @param _type
+  * What type of texture it will be
+  **/
+  void
+  setType(uint32 _type) { m_type = _type; }
 
   /**
   * Clears all the members of the texture.

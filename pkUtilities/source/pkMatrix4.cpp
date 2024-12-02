@@ -215,16 +215,8 @@ Matrix4
 Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
 {
   Vector4 negEyePosition;
-  Vector4 D0, D1, D2;
   Vector4 R0, R1, R2;
   Matrix4 M;
-
-  // assert(EyeDirection != Vector4D::ZERO);
-  // assert(EyeDirection.IsDifferent(Vector4D::ZERO));
-  // assert(!EyeDirection.IsInfinite());
-  // assert(UpDirection.IsDifferent(Vector4D::ZERO));
-  // assert(!UpDirection.IsInfinite());
-
   // forward vector
   Vector4 eyeDirectionNormalized = _eyeDir;
   eyeDirectionNormalized.normalize();

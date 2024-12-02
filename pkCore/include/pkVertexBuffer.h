@@ -28,10 +28,19 @@ class Device;
 
 class VertexBuffer
 {
+ public:
   VertexBuffer() = default;
   virtual ~VertexBuffer() = default;
 
+  virtual SPtr<VertexBuffer>
+  create(Device* _pDevice,
+         const Vector<SimpleVertex>& _vertex,
+         uint32 _usage) = 0;
+
   virtual void
-  create(Device* _pDevice, Vector<SimpleVertex> _vertex) = 0;
+  set(Device* _pDevice,
+      uint32 _start = 0,
+      uint32 _bufferCount = 1,
+      uint32 _offset = 0) = 0;
 };
 }

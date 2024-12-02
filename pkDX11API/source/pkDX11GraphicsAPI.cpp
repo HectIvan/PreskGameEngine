@@ -1,4 +1,6 @@
 #include "pkDX11GraphicsAPI.h"
+#include "pkDX11Prerequisites.h"
+#include "pkDX11VertexBuffer.h"
 #include "pkWindow.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
@@ -44,7 +46,7 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
 
   createDeviceAndSwapChain(width,
                            height,
-                           m_window.m_windowH,
+                           &m_window.getWindowHandle(),
                            numDriverTypes,
                            driverTypes,
                            createDeviceFlags,
@@ -54,6 +56,52 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
   createRenderTargetView();
   createDepthStencilTexture(width, height);
   setViewport(width, height);
+}
+
+void
+DX11GraphicsAPI::render()
+{
+  static float t = 0.0f;
+  if (*m_pDevice->m_pDriverType == D3D_DRIVER_TYPE_REFERENCE)
+  {
+    t += 3.1416f * 0.0125f;
+  }
+  else
+  {
+    static DWORD dwTimeStart = 0;
+    DWORD dwTimeCur = static_cast<DWORD>(GetTickCount64());
+    if (dwTimeStart == 0)
+      dwTimeStart = dwTimeCur;
+    t = (dwTimeCur - dwTimeStart) / 1000.0f;
+  }
+
+  // Modify the color
+  m_vMeshColor.x = (sinf(t * 1.0f) + 1.0f) * 0.5f;
+  m_vMeshColor.y = (cosf(t * 3.0f) + 1.0f) * 0.5f;
+  m_vMeshColor.z = (sinf(t * 5.0f) + 1.0f) * 0.5f;
+
+  // screen clear color
+  float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
+  // clear the back buffer and the depth buffer
+  clearDepthBackBuffers(clearColor, 1.0f);
+  
+  // update world and light constant buffers
+  CBWorld ef;
+  ef.mWorld = m_world;
+  ef.vMeshColor = m_vMeshColor;
+  m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
+  m_LightCB.updateSubResource(m_pDevice, m_light, (uint32)sizeof(*m_light));
+
+  // Render the model
+  setShaders();
+  setVertexBuffers(m_model);
+  setIndexBuffers(m_model);
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
+  m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &m_pSamplerLinear->m_pSampler);
+  drawIndexed(m_model);
+  // Present our back buffer to our front buffer
+  m_pSwapChain->Present(1, 0);
 }
 
 void
@@ -185,7 +233,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   }
 
   // create depth stencil with the generated 2D texture
-  m_pDepthStencil = std::make_shared<DX11DepthStencilView>();
+  m_pDepthSView = std::make_shared<DX11DepthStencilView>();
   D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
   ZeroMemory(&descDSV, sizeof(descDSV));
   descDSV.Format = descDepth.Format;
@@ -198,6 +246,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   }
   m_pDevice->m_pImmediateContext->OMSetRenderTargets(1, &m_pRTargetView, m_pDepthSView->m_pDepthSV);
 }
+
 void
 DX11GraphicsAPI::setViewport(uint32 _width,
                              uint32 _height)
@@ -211,6 +260,56 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   vp.TopLeftY = 0;
   m_pDevice->m_pImmediateContext->RSSetViewports(1, &vp);
   m_world = Matrix4::IDENTITY;
+}
+
+void
+DX11GraphicsAPI::setVertexBuffers(Model& _model)
+{
+  _model.m_vertexB->set(m_pDevice);
+}
+
+void DX11GraphicsAPI::setIndexBuffers(Model& _model)
+{
+  _model.m_indexB->set();
+}
+
+void
+DX11GraphicsAPI::setShaders()
+{
+  m_pDevice->m_pImmediateContext->VSSetShader(m_vertexShader.m_pShader, nullptr, 0);
+  m_pDevice->m_pImmediateContext->PSSetShader(m_pixelShader.m_pShader, nullptr, 0);
+}
+
+void
+DX11GraphicsAPI::VSSetConstantBuffers()
+{
+  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(3, 1, &m_LightCB.m_pCBuffer);
+}
+
+void
+DX11GraphicsAPI::PSSetConstantBuffers()
+{
+  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(3, 1, &m_LightCB.m_pCBuffer);
+}
+
+void
+DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float depth)
+{
+  m_pDevice->m_pImmediateContext->ClearRenderTargetView(m_pRTargetView, _color);
+  // Clear the depth buffer to 1.0 (max depth)
+  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+}
+
+void
+DX11GraphicsAPI::drawIndexed(Model& model)
+{
 }
 }
 

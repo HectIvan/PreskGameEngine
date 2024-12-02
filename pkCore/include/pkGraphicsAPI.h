@@ -9,8 +9,8 @@
 *
 * @bug No bug known.
 *
-* @HectIvan 19/11/2024
-* Created the file
+* @HectIvan 2/12/2024
+* Added a temporary render function.
 */
 /************************************************************************/
 #pragma once
@@ -20,9 +20,9 @@
 * Includes
 **/
 /*********************************************/
+#include "pkModel.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
-
 namespace pkEngineSDK
 {
 
@@ -32,7 +32,22 @@ class PK_CORE_EXPORT GraphicsAPI
   GraphicsAPI() = default;
   virtual ~GraphicsAPI() = default;
 
+  /**
+  * Initialize the graphic api.
+  * 
+  * @param _wHnd
+  * Handler to the window to be used.
+  **/
   virtual void
   init(const WindowHandle& _wHnd) = 0;
+
+  /**
+  * Render the graphic api result.
+  **/
+  virtual void
+  render() = 0;
+
+public:
+  Model m_model;
 };
 }

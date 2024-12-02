@@ -8,16 +8,8 @@
 
 namespace pkEngineSDK {
 
-DX11ConstantBuffer::DX11ConstantBuffer()
-{
-}
-
-DX11ConstantBuffer::~DX11ConstantBuffer()
-{
-}
-
 HRESULT
-DX11ConstantBuffer::Create(DX11Device* device, uint32 size, const void* pData, uint32 usage)
+DX11ConstantBuffer::create(DX11Device* device, uint32 size, const void* pData, uint32 usage)
 {
   HRESULT hr;
   D3D11_BUFFER_DESC bDesc;
@@ -45,13 +37,13 @@ DX11ConstantBuffer::Create(DX11Device* device, uint32 size, const void* pData, u
 }
 
 void
-DX11ConstantBuffer::UpdateSubResource(DX11Device* device, const void* newData, uint32 size)
+DX11ConstantBuffer::updateSubResource(DX11Device* device, const void* newData, uint32 size)
 {
   device->m_pImmediateContext->UpdateSubresource(m_pCBuffer, 0, nullptr, newData, size, 0);
 }
 
 void
-DX11ConstantBuffer::Clean()
+DX11ConstantBuffer::clean()
 {
   if (m_pCBuffer) m_pCBuffer->Release();
 }

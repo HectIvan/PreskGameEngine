@@ -19,18 +19,19 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkVertexBuffer.h"
 #include "pkSimpleVertex.h"
 
 namespace pkEngineSDK {
 
 class DX11Device;
-class DX11VertexBuffer
+class DX11VertexBuffer : public VertexBuffer
 {
  public:
   DX11VertexBuffer() = default;
   virtual ~DX11VertexBuffer()
   {
-    safeRelease(m_pBuffer);
+    clean();
   }
 
   /**
@@ -48,10 +49,10 @@ class DX11VertexBuffer
   * @return
   * the shared pointer to the vertex buffer
   **/
-  SPtr<DX11VertexBuffer> VertexBuffer
-  create(DX11Device* _pDevice,
-         const vector<simpleVertex>& _vertex,
-         uint32 _usage = D3D11_USAGE_DEFAULT); // int _usage is temporary
+  SPtr<VertexBuffer>
+  create(Device* _pDevice,
+         const Vector<SimpleVertex>& _vertex,
+         uint32 _usage) override; // int _usage is temporary
 
   /**
   * Sets the data of the vertex buffer.
@@ -60,7 +61,16 @@ class DX11VertexBuffer
   * device that will set the buffer
   **/
   void
-  set(DX11Device* _pDevice, uint32 _start = 0, uint32 _bufferCount = 1, uint32 _offset = 0); // int use is temporary
+  set(Device* _pDevice,
+      uint32 _start = 0,
+      uint32 _bufferCount = 1,
+      uint32 _offset = 0);
+
+  /**
+  * Clean the vertex buffer.
+  **/
+  void
+  clean();
 
  public:
   ID3D11Buffer* m_pBuffer = nullptr;

@@ -26,7 +26,7 @@ HRESULT
 DX11PixelShader::create(DX11Device* _pDevice)
 {
   HRESULT hr = S_OK;
-  hr = _pDevice->m_pd3dDevice->CreatePixelShader(m_pSBlob->GetBufferPointer(), m_pSBlob->GetBufferSize(), nullptr, &m_pPixelShader);
+  hr = _pDevice->m_pd3dDevice->CreatePixelShader(m_pSBlob->GetBufferPointer(), m_pSBlob->GetBufferSize(), nullptr, &m_pShader);
   if (FAILED(hr))
   {
     m_pSBlob->Release();
@@ -38,6 +38,6 @@ DX11PixelShader::create(DX11Device* _pDevice)
 void
 DX11PixelShader::clean()
 {
-  safeRelease(m_pPixelShader);
+  safeRelease(m_pShader);
 }
 }

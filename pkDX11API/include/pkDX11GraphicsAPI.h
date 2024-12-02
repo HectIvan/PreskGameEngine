@@ -27,6 +27,7 @@
 #include "pkDX11SamplerState.h"
 #include "pkDX11VertexShader.h"
 #include "pkGraphicsAPI.h"
+#include "pkLight.h"
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector4.h"
@@ -51,6 +52,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   **/
   void 
   init(const WindowHandle& _wHnd) override;
+
+  /**
+  * Render the final result of the api.
+  **/
+  void
+  render() override;
 
   /**
   * Create the device and swap chain.
@@ -124,6 +131,54 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   setViewport(uint32 _width,
               uint32 _height);
+
+  /**
+  * Set the buffer of vertex to the model.
+  **/
+  void
+  setVertexBuffers(Model& _model);
+
+  /**
+  * set the buffer of index to the model
+  **/
+  void
+  setIndexBuffers(Model& _model);
+
+  /****************************/
+  /**
+  * Not part of the API
+  **/
+  /****************************/
+
+  /**
+  * Set the shaders
+  **/
+  void
+  setShaders();
+
+  /**
+  * Set the constant buffers for the vertex shader.
+  **/
+  void
+  VSSetConstantBuffers();
+
+  /**
+  * Set the constant buffers for the pixel shader.
+  **/
+  void
+  PSSetConstantBuffers();
+
+  /**
+  * Clear the depth and back buffers
+  **/
+  void
+  clearDepthBackBuffers(float _color[], float depth);
+
+  /**
+  * Draw the model.
+  **/
+  void
+  drawIndexed(Model& model);
   
   // window
   Window m_window;
@@ -153,6 +208,9 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   // world matrix
   Matrix4 m_world;
+
+  // light source
+  Light* m_light;
 
   // constant buffers
   DX11ConstantBuffer m_buffer;

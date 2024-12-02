@@ -85,7 +85,7 @@ struct PK_CORE_EXPORT Color final
   * The green value as an uint8.
   **/
   void
-  setG(int _g) { _color.G = _g; }
+  setG(uint8 _g) { _color.G = _g; }
 
   /**
   * Gets the blue value of the color.

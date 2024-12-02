@@ -32,14 +32,17 @@ class DX11Device : public Device
     safeRelease(m_pd3dDevice);
     safeRelease(m_pImmediateContext);
   }
+
+  /**
+  * Get the new device as the child class of the parent
+  **/
+  UPtr<Device>
+  getDevice() override;
   
   /**
   * Initialize device.
   * 
   * Initializes the DX11 device.
-  * 
-  * @param _hWnd
-  * handler to the window to use.
   * 
   * @param _pDriverType
   * Type of driver we will be using for the device.
@@ -51,7 +54,7 @@ class DX11Device : public Device
   * What was the end result of the creation
   **/
   HRESULT
-  init(HWND& _hWnd, D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
+  init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
 
   /**
   * Clean Device.

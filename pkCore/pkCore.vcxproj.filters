@@ -46,6 +46,9 @@
     <Filter Include="source\camera">
       <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\game">
+      <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -130,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="source\pkMesh.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGameObject.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkModel.cpp">
+      <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

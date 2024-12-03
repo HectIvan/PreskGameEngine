@@ -22,6 +22,7 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 #include "pkDX11Device.h"
+#include "pkTexture.h"
 
 namespace pkEngineSDK
 {
@@ -29,7 +30,7 @@ namespace pkEngineSDK
 class DX11Device;
 struct Color;
 
-class DX11Texture
+class DX11Texture : public Texture
 {
  public:
   DX11Texture() = default;
@@ -37,6 +38,15 @@ class DX11Texture
   {
     clear();
   }
+
+  /**
+  * Get a unique pointer to the current texture.
+  * 
+  * @return
+  * The new unique pointer as the child class.
+  **/
+  UPtr<Texture>
+  getTexture() override;
 
   /**
   * Create the texture.
@@ -85,7 +95,7 @@ class DX11Texture
   * @return
   * Pointer to the resource.
   **/
-  ID3D11ShaderResourceView*
+  const ID3D11ShaderResourceView*
   getSRV() { return m_srv; }
 
   /**
@@ -103,7 +113,7 @@ class DX11Texture
   * @return
   * Type as an uint32.
   **/
-  uint32
+  const uint32
   getType() { return m_type; }
 
   /**

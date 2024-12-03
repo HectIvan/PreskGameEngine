@@ -92,14 +92,32 @@ DX11GraphicsAPI::render()
   m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
   m_LightCB.updateSubResource(m_pDevice, m_light, (uint32)sizeof(*m_light));
 
-  // Render the model
+  // Render the Game Objects
   setShaders();
-  setVertexBuffers(m_model);
-  setIndexBuffers(m_model);
+  // for each Game Oobject
+  for (uint32 i = 0; i < m_gameObjects.size(); ++i)
+  {
+    // check all their models
+    for (uint32 j = 0; j < m_gameObjects[i].m_models.size(); ++j)
+    {
+      // set the vertex and index buffers of the models
+      setVertexBuffers(*m_gameObjects[i].m_models[j]);
+      setIndexBuffers(*m_gameObjects[i].m_models[j]);
+    }
+  }
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &m_pSamplerLinear->m_pSampler);
-  drawIndexed(m_model);
+  // for each Game Object
+  for (uint32 i = 0; i < m_gameObjects.size(); ++i)
+  {
+    // check all their models
+    for (uint32 j = 0; j < m_gameObjects[i].m_models.size(); ++j)
+    {
+      // draw the model
+      drawIndexed(*m_gameObjects[i].m_models[j]);
+    }
+  }
   // Present our back buffer to our front buffer
   m_pSwapChain->Present(1, 0);
 }

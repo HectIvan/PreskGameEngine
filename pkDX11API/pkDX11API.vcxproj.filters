@@ -72,6 +72,9 @@
     <ClCompile Include="include\pkDX11Texture.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="source\pkDX11Mesh.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkDX11DepthStencilView.h">
@@ -114,6 +117,9 @@
       <Filter>include\api</Filter>
     </ClInclude>
     <ClInclude Include="include\pkDX11Texture.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11Mesh.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>

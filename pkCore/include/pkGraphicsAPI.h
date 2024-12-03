@@ -20,6 +20,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkGameObject.h"
 #include "pkModel.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
@@ -47,7 +48,7 @@ class PK_CORE_EXPORT GraphicsAPI
   virtual void
   render() = 0;
 
-public:
-  Model m_model;
+ public:
+  Vector<GameObject> m_gameObjects;
 };
 }

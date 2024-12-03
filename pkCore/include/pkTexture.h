@@ -29,5 +29,8 @@ class PK_CORE_EXPORT Texture
  public:
   Texture() = default;
   virtual ~Texture() = default;
+
+  virtual UPtr<Texture>
+  getTexture() = 0;
 };
 }

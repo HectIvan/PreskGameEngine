@@ -4,7 +4,11 @@
 
 namespace pkEngineSDK
 {
-
+UPtr<Texture>
+DX11Texture::getTexture()
+{
+  return make_unique<DX11Texture>();
+}
 void
 DX11Texture::create(DX11Device* _pDevice,
                     uint32 _width,

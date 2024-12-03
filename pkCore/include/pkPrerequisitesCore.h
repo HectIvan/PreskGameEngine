@@ -22,10 +22,10 @@
 namespace pkEngineSDK
 {
 
-struct Texture {
-  uint32 id;
-  uint32 type;
-};
+//struct Texture {
+//  uint32 id;
+//  uint32 type;
+//};
 
 template<class T>
 void safeRelease(T* x) { if (x) { x->Release(); x = nullptr; } }

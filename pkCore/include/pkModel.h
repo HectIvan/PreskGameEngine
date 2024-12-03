@@ -24,6 +24,7 @@
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
 
+#include "pkBone.h"
 #include "pkIndexBuffer.h"
 #include "pkMatrix4.h"
 #include "pkMesh.h"
@@ -34,7 +35,7 @@
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT DX11Device;
+class Device;
 
 class Model
 {
@@ -43,7 +44,7 @@ class Model
   virtual ~Model() = default;
 
   void
-  load(String _file, DX11Device* _pDevice);
+  load(String _file);
 
   void
   clean();
@@ -51,7 +52,7 @@ class Model
   void
   processNode(aiNode* _node, const aiScene* _scene);
 
-  Mesh
+  PkMesh
   processMesh(aiMesh* _mesh, const aiScene* _scene);
 
   Matrix4
@@ -77,10 +78,12 @@ class Model
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
 
   void
-  extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex, aiMesh* _mesh, const aiScene* _scene);
+  extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex,
+                               aiMesh* _mesh,
+                               const aiScene* _scene);
 
   void
-  loadMaterial(Mesh& _mesh, const aiScene* _scene, String& _fileName);
+  loadMaterial(PkMesh& _mesh, const aiScene* _scene, String& _fileName);
 
   Vector<SimpleVertex> m_vertex;
   Vector<uint32> m_index;

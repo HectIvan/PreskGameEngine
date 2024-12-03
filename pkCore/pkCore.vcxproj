@@ -189,10 +189,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkCamera.cpp" />
+    <ClCompile Include="source\pkGameObject.cpp" />
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
+    <ClCompile Include="source\pkModel.cpp" />
     <ClCompile Include="source\pkWin32Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

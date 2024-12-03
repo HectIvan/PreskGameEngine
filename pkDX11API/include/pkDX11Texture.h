@@ -95,8 +95,8 @@ class DX11Texture : public Texture
   * @return
   * Pointer to the resource.
   **/
-  const ID3D11ShaderResourceView*
-  getSRV() { return m_srv; }
+  ID3D11ShaderResourceView*
+  getSRV() const { return m_srv; }
 
   /**
   * Sets the shader resource view of the texture.

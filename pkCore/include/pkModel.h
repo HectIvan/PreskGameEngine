@@ -89,7 +89,7 @@ class Model
   Vector<uint32> m_index;
 
   Map<String, Bone> mBoneMap;
-  Vector<Mesh> m_meshes;
+  Vector<PkMesh> m_meshes;
   uint32 mBoneCounter = 0;
   String m_directory;
 

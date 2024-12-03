@@ -140,5 +140,8 @@
     <ClCompile Include="source\pkModel.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
+    <ClCompile Include="source\pkBone.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

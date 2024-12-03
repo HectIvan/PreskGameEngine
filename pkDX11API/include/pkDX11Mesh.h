@@ -26,7 +26,7 @@
 namespace pkEngineSDK
 {
 
-class DX11Mesh : public Mesh
+class DX11Mesh : public PkMesh
 {
   DX11Mesh() = default;
   virtual ~DX11Mesh() = default;

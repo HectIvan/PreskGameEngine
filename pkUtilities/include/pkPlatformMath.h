@@ -28,6 +28,7 @@
 
 namespace pkEngineSDK 
 {
+
 class PK_UTILITY_EXPORT PlatformMath
 {
  public:
@@ -231,6 +232,66 @@ class PK_UTILITY_EXPORT PlatformMath
   **/
   static float
   clamp(const float _t, const float _x, const float _y);
+
+  /**
+  * Lerp between 2 numbers.
+  * 
+  * Gets the lerped number between 2 numbers in a specific timestamp.
+  * 
+  * @param _x
+  * The first number.
+  * 
+  * @param _y
+  * The second number.
+  * 
+  * @param _t
+  * Timestamp.
+  * 
+  * @return
+  * The lerped number.
+  **/
+  static float
+  lerp(const float _x, const float _y, const float _t);
+
+  /**
+  * Lerp between 2 Vector3.
+  *
+  * Gets the lerped number between 2 Vector3 in a specific timestamp.
+  *
+  * @param _x
+  * The first Vector.
+  *
+  * @param _y
+  * The second Vector.
+  *
+  * @param _t
+  * Timestamp.
+  *
+  * @return
+  * The lerped Vector.
+  **/
+  static Vector3
+  lerp3(const Vector3 _x, const Vector3 _y, const float _t);
+
+  /**
+  * Lerp between 2 Vector4.
+  *
+  * Gets the lerped number between 2 Vector4 in a specific timestamp.
+  *
+  * @param _x
+  * The first Vector.
+  *
+  * @param _y
+  * The second Vector.
+  *
+  * @param _t
+  * Timestamp.
+  *
+  * @return
+  * The lerped Vector.
+  **/
+  static Vector4
+  lerp4(const Vector4 _x, const Vector4 _y, const float _t);
 
   /***************************************************************************
   * 

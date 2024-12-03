@@ -129,18 +129,18 @@ Model::extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex,
     if (mBoneMap.find(boneName) == mBoneMap.end())
     {
       Bone newBone;
-      newBone.mID = mBoneCounter;
+      newBone.m_ID = mBoneCounter;
       Transform transform(Matrix4::IDENTITY,
                           Matrix4::IDENTITY,
                           aIMatrixToMatrix(_mesh->mBones[i]->mOffsetMatrix));
-      newBone.mTransform = transform;
+      newBone.m_transform = transform;
       mBoneMap[boneName] = newBone;
       boneID = mBoneCounter;
       ++mBoneCounter;
     }
     else
     {
-      boneID = mBoneMap[boneName].mID;
+      boneID = mBoneMap[boneName].m_ID;
     }
     auto weights = _mesh->mBones[i]->mWeights;
     uint32 numWeight = _mesh->mBones[i]->mNumWeights;

@@ -42,7 +42,7 @@ namespace pkEngineSDK
 
 struct PKWindowDesc;
 
-class Window
+class PK_CORE_EXPORT Window
 {
  public:
   Window() = default;
@@ -58,7 +58,10 @@ class Window
   * Name of the window.
   **/
   void
-  create(PKWindowDesc& _desc, String _name, InstanceHandle& hInstance);
+  create(PKWindowDesc& _desc, String _name);
+
+  int32
+  messageLoop();
   
   /**
   * Set size.

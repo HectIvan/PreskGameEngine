@@ -9,15 +9,9 @@ namespace pkEngineSDK
 {
 
 void
-DX11GraphicsAPI::init(const WindowHandle& _wHnd)
+DX11GraphicsAPI::init(uint32 _width, uint32 _height, const WindowHandle& _wHnd)
 {
   m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
-
-  // coordinates of client's window area
-  RECT rc;
-  GetClientRect(_wHnd, &rc);
-  uint32 width = rc.right - rc.left;
-  uint32 height = rc.bottom - rc.top;
 
   uint32 createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -43,8 +37,8 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
   WindowHandle winHandle = m_window.getWindowHandle();
-  createDeviceAndSwapChain(width,
-                           height,
+  createDeviceAndSwapChain(_width,
+                           _height,
                            winHandle,
                            numDriverTypes,
                            driverTypes,
@@ -53,8 +47,8 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
                            numFeatureLevels);
 
   createRenderTargetView();
-  createDepthStencilTexture(width, height);
-  setViewport(width, height);
+  createDepthStencilTexture(_width, _height);
+  setViewport(_width, _height);
 }
 
 void

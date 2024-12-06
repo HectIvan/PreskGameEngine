@@ -29,7 +29,6 @@
     <ClCompile Include="source\pkDX11PixelShader.cpp" />
     <ClCompile Include="source\pkDX11SamplerState.cpp" />
     <ClCompile Include="source\pkDX11Shader.cpp" />
-    <ClCompile Include="source\pkDX11Test.cpp" />
     <ClCompile Include="source\pkDX11VertexBuffer.cpp" />
     <ClCompile Include="source\pkDX11VertexShader.cpp" />
   </ItemGroup>
@@ -131,7 +130,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>

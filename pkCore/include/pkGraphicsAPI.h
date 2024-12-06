@@ -40,7 +40,7 @@ class PK_CORE_EXPORT GraphicsAPI
   * Handler to the window to be used.
   **/
   virtual void
-  init(const WindowHandle& _wHnd) = 0;
+  init(uint32 _width, uint32 _height, const WindowHandle& _wHnd) = 0;
 
   /**
   * Render the graphic api result.

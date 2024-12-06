@@ -33,9 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkDX11Test.cpp">
-      <Filter>source\main</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkDX11DepthStencilView.cpp">
       <Filter>source\api</Filter>
     </ClCompile>

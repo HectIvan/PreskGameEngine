@@ -19,13 +19,15 @@
 * Includes
 **/
 /*********************************************/
-#include "pkTransform.h"
 #include "pkPrerequisitesCore.h"
+#include "pkTransform.h"
 
 struct aiNodeAnim;
 
 namespace pkEngineSDK
 {
+
+class Matrix4;
 
 class Bone
 {
@@ -175,6 +177,6 @@ class Bone
  private:
   int32 m_ID;
   String m_name;
-  Transform m_transform = Transform(0);
+  Transform m_transform;
 };
 }

@@ -1,4 +1,3 @@
-
 /*********************************************/
 /**
 * Includes
@@ -6,9 +5,9 @@
 /*********************************************/
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
-#include "Windows.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
+#include <Windows.h>
 
 #define IDI_ICON1 "icon.png"
 
@@ -19,7 +18,7 @@ LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void
-Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
+Window::create(PKWindowDesc& _desc, String _name)
 {
   /************************************************************************************/
   WNDCLASSEXA wcex;
@@ -31,14 +30,10 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
   wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
-  wcex.hInstance = _hInstance;
-  HICON loadedIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
-  wcex.hIcon = loadedIcon;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
   wcex.lpszMenuName = nullptr;
   wcex.lpszClassName = "WindowClass";
-  wcex.hIconSm = loadedIcon;
   if (!RegisterClassEx(&wcex))
   {
     return;
@@ -50,7 +45,6 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   **/
   m_width = _desc.width;
   m_height = _desc.height;
-  m_hInstance = _hInstance;
   // adjust window width and height
   RECT rc = { 0, 0, static_cast<LONG>(_desc.width), static_cast<LONG>(_desc.height) };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
@@ -65,7 +59,7 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
                               rc.bottom - rc.top,
                               nullptr,
                               nullptr,
-                              _hInstance,
+                              nullptr,
                               nullptr);
 
   /**
@@ -78,6 +72,22 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   }
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(this));
   ShowWindow(m_windowH, 1);
+}
+
+int32
+Window::messageLoop()
+{
+  MSG msg = { 0 };
+  float time = static_cast<float>(GetTickCount64());
+  while (WM_QUIT != msg.message)
+  {
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
+  }
+  return (int)msg.wParam;
 }
 
 Vector2
@@ -93,10 +103,19 @@ Window::getClientWidthHeight()
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+  PAINTSTRUCT ps;
+  HDC hdc;
   switch (message)
   {
-  case WM_KEYDOWN:
+  case WM_PAINT:
   {
+    hdc = BeginPaint(hWnd, &ps);
+    EndPaint(hWnd, &ps);
+    break;
+  }
+  case WM_DESTROY:
+  {
+    PostQuitMessage(0);
     break;
   }
   default:

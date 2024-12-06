@@ -51,7 +51,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Window handle
   **/
   void 
-  init(const WindowHandle& _wHnd) override;
+  init(uint32 _width, uint32 _height, const WindowHandle& _wHnd) override;
 
   /**
   * Render the final result of the api.

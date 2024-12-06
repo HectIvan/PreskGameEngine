@@ -37,10 +37,10 @@ typedef HINSTANCE__* HINST;
 using InstanceHandle = HINST;
 #endif
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
-
-class PK_CORE_EXPORT PKWindowDesc;
+struct PKWindowDesc;
 
 class Window
 {

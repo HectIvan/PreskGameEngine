@@ -4,9 +4,9 @@
 * Includes
 **/
 /*********************************************/
-#include "Windows.h"
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
+#include "Windows.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
@@ -14,6 +14,9 @@
 
 namespace pkEngineSDK
 {
+
+LRESULT
+CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void
 Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
@@ -70,12 +73,50 @@ Window::create(PKWindowDesc& _desc, String _name, InstanceHandle& _hInstance)
   **/
   if (!m_windowH)
   {
-    DWORD error = GetLastError();
+    // DWORD error = GetLastError();
     return;
   }
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(this));
   ShowWindow(m_windowH, 1);
 }
+
+Vector2
+Window::getClientWidthHeight()
+{
+  RECT rc;
+  GetClientRect(m_windowH, &rc);
+  uint32 width = rc.right - rc.left;
+  uint32 height = rc.bottom - rc.top;
+  return Vector2(static_cast<float>(width), static_cast<float>(height));
+}
+
+LRESULT
+CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch (message)
+  {
+  case WM_KEYDOWN:
+  {
+    break;
+  }
+  default:
+    return DefWindowProc(hWnd, message, wParam, lParam);
+  }
+  return 0;
+}
+}
+
+#endif // PK_PLATFORM_WIN32
+
+// #if PK_PLATFORM == PK_PLATFORM_OSX
+// for a future file specific to IOS
+// #endif // PK_PLATFORM_OSX
+
+/**
+* General function definitions
+**/
+namespace pkEngineSDK
+{
 
 void
 Window::setSize(uint32 _width, uint32 _height)
@@ -97,20 +138,4 @@ Window::getSize() const
   return Vector2(static_cast<float>(m_width), 
                  static_cast<float>(m_height));
 }
-
-Vector2
-Window::getClientWidthHeight()
-{
-  RECT rc;
-  GetClientRect(m_windowH, &rc);
-  uint32 width = rc.right - rc.left;
-  uint32 height = rc.bottom - rc.top;
-  return Vector2(static_cast<float>(width), static_cast<float>(height));
 }
-}
-
-#endif // PK_PLATFORM_WIN32
-
-#if PK_PLATFORM == PK_PLATFORM_OSX
-
-#endif // PK_PLATFORM_OSX

@@ -5,6 +5,7 @@
 /*********************************************/
 #include "pkDX11VertexBuffer.h"
 #include "pkDX11Device.h"
+#include "pkSimpleVertex.h"
 
 namespace pkEngineSDK
 {
@@ -16,9 +17,11 @@ DX11VertexBuffer::create(Device* _pDevice,
 {
   auto spVB = std::make_shared<DX11VertexBuffer>();
 
-  // --------------------------------------------------------------//
-  //          Define and create the buffer
-  // --------------------------------------------------------------//
+  /***************************************************************/
+  /**
+  * Define and create the buffer
+  **/
+  /***************************************************************/
   D3D11_BUFFER_DESC bd;
   memset(&bd, 0, sizeof(bd));
   bd.ByteWidth = static_cast<uint32>(sizeof(SimpleVertex) * _vertex.size()); // size of the buffer

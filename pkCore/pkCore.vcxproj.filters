@@ -111,9 +111,6 @@
     <ClInclude Include="include\pkTexture.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkColor.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

@@ -19,10 +19,10 @@
 * Includes
 **/
 /*********************************************/
-#include <assimp/anim.h>
-
 #include "pkTransform.h"
 #include "pkPrerequisitesCore.h"
+
+struct aiNodeAnim;
 
 namespace pkEngineSDK
 {
@@ -89,7 +89,7 @@ class Bone
   * The new transform matrix.
   **/
   void
-  setLocalTransform(Transform _transform) { m_transform = _transform; }
+  setLocalTransform(const Transform& _transform) { m_transform = _transform; }
 
   /**
   * Gets the local transform of the object.
@@ -163,14 +163,16 @@ class Bone
   getScaleFactor(float _lastTimeStamp,
                  float _nextTimeStamp,
                  float _deltaTime);
+ 
+ public:
+  Vector<KeyPosition> positions;
+  Vector<KeyRotation> rotations;
+  Vector<KeyScale> scales;
+  uint32 numPositions;
+  uint32 numRotations;
+  uint32 numScales;
 
-  Vector<KeyPosition> m_positions;
-  Vector<KeyRotation> m_rotations;
-  Vector<KeyScale> m_scales;
-  uint32 m_numPositions;
-  uint32 m_numRotations;
-  uint32 m_numScales;
-
+ private:
   int32 m_ID;
   String m_name;
   Transform m_transform = Transform(0);

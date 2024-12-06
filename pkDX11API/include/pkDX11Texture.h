@@ -133,7 +133,7 @@ class DX11Texture : public Texture
 
  private:
   ID3D11Texture2D* m_t2d = nullptr;
-  ID3D11ShaderResourceView* m_srv = nullptr;
+  ID3D11ShaderResourceView* m_srv;
   uint32 m_type;
 };
 }

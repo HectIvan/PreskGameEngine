@@ -20,12 +20,12 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
+#include "pkPrerequisitesUtilities.h"
 
 namespace pkEngineSDK
 {
 
-struct PK_CORE_EXPORT Color final
+struct PK_UTILITY_EXPORT Color final
 {
   Color() = default;
   Color(uint8 r, uint8 g, uint8 b, uint8 a = 255)

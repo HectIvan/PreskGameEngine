@@ -163,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="include\pkAABB.h" />
     <ClInclude Include="include\pkCapsule.h" />
+    <ClInclude Include="include\pkColor.h" />
     <ClInclude Include="include\pkCube.h" />
     <ClInclude Include="include\pkMath.h" />
     <ClInclude Include="include\pkMatrix4.h" />

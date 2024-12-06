@@ -8,16 +8,18 @@
 
 namespace pkEngineSDK {
 
-SPtr<DX11IndexBuffer>
-DX11IndexBuffer::create(DX11Device* _pDevice,
+SPtr<IndexBuffer>
+DX11IndexBuffer::create(Device* _pDevice,
                         const Vector<uint32>& _index,
                         uint32 _usage)
 {
   auto spIB = std::make_shared<DX11IndexBuffer>();
 
-  // --------------------------------------------------------------//
-  //          Define and create the buffer
-  // --------------------------------------------------------------//
+  /***************************************************************/
+  /**
+  * Define and create the buffer
+  **/
+  /***************************************************************/
   D3D11_BUFFER_DESC bd;
   memset(&bd, 0, sizeof(bd));
   bd.ByteWidth = sizeof(uint32) * (uint32)_index.size(); // size of the buffer
@@ -31,18 +33,25 @@ DX11IndexBuffer::create(DX11Device* _pDevice,
   memset(&InitData, 0, sizeof(InitData));
   InitData.pSysMem = _index.data(); // pointer to the initialization data
   // InitData.SysMemPitch = (uint32)index.size() * sizeof(uint32); // distance between values
-
-  _pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &spIB->m_pBuffer);
-
+  // convert from parent to child
+  if (DX11Device* deviceX = dynamic_cast<DX11Device*>(_pDevice->getDevice().get()))
+  {
+    deviceX->m_pd3dDevice->CreateBuffer(&bd, &InitData, &spIB->m_pBuffer);
+  }
   return spIB;
 }
 
 void
-DX11IndexBuffer::set(DX11Device* _pDevice,
-                     DXGI_FORMAT _format,
+DX11IndexBuffer::set(Device* _pDevice,
+                     uint32 _format,
                      uint32 _offset)
 {
-  _pDevice->m_pImmediateContext->IASetIndexBuffer(m_pBuffer, _format, _offset);
+  if (DX11Device* deviceX = dynamic_cast<DX11Device*>(_pDevice->getDevice().get()))
+  {
+    deviceX->m_pImmediateContext->IASetIndexBuffer(m_pBuffer,
+                                                   static_cast<DXGI_FORMAT>(_format),
+                                                   _offset);
+  }
 }
 
 void

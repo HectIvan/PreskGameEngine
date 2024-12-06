@@ -13,8 +13,6 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
 {
   m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
 
-  HRESULT hr = S_OK;
-
   // coordinates of client's window area
   RECT rc;
   GetClientRect(_wHnd, &rc);
@@ -44,9 +42,10 @@ DX11GraphicsAPI::init(const WindowHandle& _wHnd)
   uint32 numDriverTypes = ARRAYSIZE(driverTypes);
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
+  WindowHandle winHandle = m_window.getWindowHandle();
   createDeviceAndSwapChain(width,
                            height,
-                           &m_window.getWindowHandle(),
+                           winHandle,
                            numDriverTypes,
                            driverTypes,
                            createDeviceFlags,
@@ -283,12 +282,12 @@ DX11GraphicsAPI::setViewport(uint32 _width,
 void
 DX11GraphicsAPI::setVertexBuffers(Model& _model)
 {
-  _model.m_vertexB->set(m_pDevice);
+  _model.vertexB->set(m_pDevice);
 }
 
 void DX11GraphicsAPI::setIndexBuffers(Model& _model)
 {
-  _model.m_indexB->set();
+  _model.indexB->set(m_pDevice);
 }
 
 void
@@ -317,17 +316,28 @@ DX11GraphicsAPI::PSSetConstantBuffers()
 }
 
 void
-DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float depth)
+DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float _depth)
 {
   m_pDevice->m_pImmediateContext->ClearRenderTargetView(m_pRTargetView, _color);
   // Clear the depth buffer to 1.0 (max depth)
-  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
+  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV, D3D11_CLEAR_DEPTH, _depth, 0);
 }
 
 void
 DX11GraphicsAPI::drawIndexed(Model& model)
 {
+  // offsets
+  uint32 currentVertexOrigin = 0;
+  uint32 currentIndexOrigin = 0;
+  // for each mesh in the model
+  for (uint32 i = 0; i < model.meshes.size(); ++i)
+  {
+    // draw the mesh
+    m_pDevice->m_pImmediateContext->DrawIndexed(static_cast<uint32>(model.meshes[i].numIndex), currentIndexOrigin, currentVertexOrigin);
+    // update the offsets
+    currentIndexOrigin += static_cast<uint32>(model.meshes[i].numIndex);
+    currentVertexOrigin += static_cast<uint32>(model.meshes[i].vertexCount);
+  }
 }
 }
 

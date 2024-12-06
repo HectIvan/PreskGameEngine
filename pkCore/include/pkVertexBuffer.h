@@ -25,6 +25,7 @@ namespace pkEngineSDK
 {
 
 class Device;
+struct SimpleVertex;
 
 class VertexBuffer
 {

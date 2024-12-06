@@ -31,6 +31,9 @@
     <Filter Include="source\platform">
       <UniqueIdentifier>{6cc4484c-8e9c-4834-bd7b-676f6ce8e80c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\graphics">
+      <UniqueIdentifier>{c87d084e-9a34-4eef-a008-302befd2513c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkModule.h">
@@ -89,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="include\pkTransform.h">
       <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkColor.h">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

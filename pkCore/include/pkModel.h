@@ -19,23 +19,14 @@
 * Includes
 **/
 /*********************************************/
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <assimp/mesh.h>
-
 #include "pkBone.h"
 #include "pkIndexBuffer.h"
-#include "pkMatrix4.h"
 #include "pkMesh.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVertexBuffer.h"
 
-
 namespace pkEngineSDK
 {
-
-class Device;
 
 class Model
 {
@@ -43,27 +34,46 @@ class Model
   Model() = default;
   virtual ~Model() = default;
 
+  /**
+  * Load the model from a path.
+  * 
+  * @param _path
+  * File path.
+  **/
   void
-  load(String _file);
+  load(String& _path);
 
+  /**
+  * Clean all data from the model.
+  **/
   void
   clean();
 
-  void
-  processNode(aiNode* _node, const aiScene* _scene);
-
-  PkMesh
-  processMesh(aiMesh* _mesh, const aiScene* _scene);
-
-  Matrix4
-  aIMatrixToMatrix(aiMatrix4x4 _node);
-
+  /**
+  * Get the map of bones assigned to the model.
+  * 
+  * @return
+  * The bone map.
+  **/
   auto&
-  getBoneInfoMap() { return mBoneMap; }
+  getBoneInfoMap() { return boneMap; }
 
+  /**
+  * Get the ammount of bones in the model.
+  * 
+  * @return
+  * The bone count.
+  **/
   uint32
-  getBoneCount() { return mBoneCounter; }
+  getBoneCount() { return boneCounter; }
 
+  /**
+  * Set the data of the vertex to a default
+  * value
+  * 
+  * @param _vertex
+  * Vertex to set to default.
+  **/
   void
   setVertexBoneDataToDefault(SimpleVertex& _vertex)
   {
@@ -74,27 +84,33 @@ class Model
     }
   }
 
+  /**
+  * Assign bone data to a vertex.
+  * 
+  * @param _vertex
+  * Vertex to modify.
+  * 
+  * @param _boneID
+  * What bone id it will have.
+  * 
+  * @param _weight
+  * How much influence will the bone have.
+  **/
   void
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
 
-  void
-  extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex,
-                               aiMesh* _mesh,
-                               const aiScene* _scene);
+ public:
+  // vertex and index data
+  Vector<SimpleVertex> vertex;
+  Vector<uint32> index;
 
-  void
-  loadMaterial(PkMesh& _mesh, const aiScene* _scene, String& _fileName);
-
-  Vector<SimpleVertex> m_vertex;
-  Vector<uint32> m_index;
-
-  Map<String, Bone> mBoneMap;
-  Vector<PkMesh> m_meshes;
-  uint32 mBoneCounter = 0;
-  String m_directory;
+  // skeleton data
+  Map<String, Bone> boneMap;
+  Vector<PkMesh> meshes;
+  uint32 boneCounter = 0;
 
   // buffers for both vectors and index
-  SPtr<VertexBuffer> m_vertexB = nullptr;
-  SPtr<IndexBuffer> m_indexB = nullptr;
+  SPtr<VertexBuffer> vertexB = nullptr;
+  SPtr<IndexBuffer> indexB = nullptr;
 };
 }

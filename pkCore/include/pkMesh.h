@@ -19,9 +19,6 @@
 * Includes
 **/
 /*********************************************/
-#include <assimp/texture.h>
-#include<assimp/material.h>
-
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
 #include "pkTexture.h"
@@ -38,6 +35,24 @@ class PkMesh
   PkMesh() = default;
   virtual ~PkMesh() = default;
 
+  /**
+  * Create the mesh.
+  * 
+  * @param _vertex
+  * Vertex data.
+  * 
+  * @param _index
+  * Index data.
+  * 
+  * @param _vertexcount
+  * How many vertex make up the mesh.
+  * 
+  * @param _numIndex
+  * How many index make up the mesh.
+  * 
+  * @param _textures
+  * Textures data.
+  **/
   PkMesh(Vector<SimpleVertex> _vertex,
          Vector<uint32> _index,
          uint32 _vertexCount,
@@ -45,31 +60,22 @@ class PkMesh
          Vector<Texture*> _textures);
 
   /**
-  * Render the mesh.
-  *
-  * @param _pDevice
-  * Device that will be used to render.
-  **/
-  virtual void
-  render(Device* _pDevice) = 0;
-
-  /**
   * Clean the mesh of any data
   **/
   void
   clean();
 
-  Transform mTransform = Transform(Matrix4(0),
+  Transform transform = Transform(Matrix4(0),
                                    Matrix4(0),
                                    Matrix4(0));
 
  public:
   // stores the index and vertex info
-  Vector<SimpleVertex> m_vertexVector;
-  Vector<uint32> m_indexVector;
-  Vector<Texture*> m_textures;
-  aiMaterial* m_material;
-  uint32 m_vertexCount;
-  uint32 m_numIndex;
+  Vector<SimpleVertex> vertexVector;
+  Vector<uint32> indexVector;
+  Vector<Texture*> textures;
+  // aiMaterial* m_material;
+  uint32 vertexCount;
+  uint32 numIndex;
 };
 }

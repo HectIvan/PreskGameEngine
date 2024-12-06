@@ -1,6 +1,6 @@
 /************************************************************************/
 /**
-* @simpleVertex simpleVertex.h
+* @simpleVertex pkSimpleVertex.h
 * @Hector Ivan Muñoz Ceballos
 * @date 21/10/2024
 * @Simple vertex file for the Presk Game Engine.

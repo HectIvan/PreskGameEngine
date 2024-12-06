@@ -18,14 +18,15 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkIndexBuffer.h"
 
 namespace pkEngineSDK {
 
 class DX11Device;
 
-class DX11IndexBuffer
+class DX11IndexBuffer : public IndexBuffer
 {
-public:
+ public:
   DX11IndexBuffer() = default;
   virtual ~DX11IndexBuffer()
   {
@@ -49,10 +50,10 @@ public:
   * @return
   * Shared pointer of the index buffer.
   **/
-  SPtr<DX11IndexBuffer>
-  create(DX11Device* _pDevice,
+  SPtr<IndexBuffer>
+  create(Device* _pDevice,
          const Vector<uint32>& _index,
-         uint32 _usage = D3D11_USAGE_DEFAULT);
+         uint32 _usage = D3D11_USAGE_DEFAULT) override;
 
   /**
   * Set the index buffer.
@@ -67,8 +68,8 @@ public:
   * Distance between blobs of data.
   **/
   void
-  set(DX11Device* _pDevice,
-      DXGI_FORMAT _format = DXGI_FORMAT_R32_UINT,
+  set(Device* _pDevice,
+      uint32 _format = DXGI_FORMAT_R32_UINT,
       uint32 _offset = 0);
 
   /**

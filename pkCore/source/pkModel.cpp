@@ -1,57 +1,79 @@
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
+#include <assimp/Importer.hpp>
+#include <assimp/mesh.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+#include "pkMatrix4.h"
 #include "pkModel.h"
 
 namespace pkEngineSDK
 {
 
+/*********************************************/
+/**
+* Declarations
+**/
+/*********************************************/
 void
-Model::load(String _file)
+processNode(Model& _model, aiNode* _node, const aiScene* _scene);
+
+PkMesh
+processMesh(aiMesh* _mesh, const aiScene* _scene);
+
+void
+Model::load(String& _path)
 {
-  String modelPath = "models/" + _file;
+  String modelPath = "models/" + _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
   if (scene == nullptr) { return; }
-  processNode(scene->mRootNode, scene);
-  for (uint32 i = 0; i < m_meshes.size(); ++i)
+  processNode(*this, scene->mRootNode, scene);
+  for (uint32 i = 0; i < meshes.size(); ++i)
   {
-    m_vertex.insert(m_vertex.end(),
-                    m_meshes[i].m_vertexVector.begin(),
-                    m_meshes[i].m_vertexVector.end());
+    vertex.insert(vertex.end(),
+                    meshes[i].vertexVector.begin(),
+                    meshes[i].vertexVector.end());
 
-    m_index.insert(m_index.end(),
-                   m_meshes[i].m_indexVector.begin(),
-                   m_meshes[i].m_indexVector.end());
+    index.insert(index.end(),
+                   meshes[i].indexVector.begin(),
+                   meshes[i].indexVector.end());
   }
 }
 
 void
 Model::clean()
 {
-  for (uint32 i = 0; i < m_meshes.size(); ++i)
+  for (uint32 i = 0; i < meshes.size(); ++i)
   {
-    m_meshes[i].Clean();
+    meshes[i].clean();
   }
 }
   
 void
-Model::processNode(aiNode* _node, const aiScene* _scene)
+processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 {
   for (uint32 i = 0; i < _node->mNumMeshes; ++i)
   {
     aiMesh* mesh = _scene->mMeshes[_node->mMeshes[i]];
-    m_meshes.push_back(&processMesh(mesh, _scene));
+    _model.meshes.push_back(processMesh(mesh, _scene));
   }
 
   for (uint32 i = 0; i < _node->mNumChildren; ++i)
   {
-    processNode(_node->mChildren[i], _scene);
+    processNode(_model, _node->mChildren[i], _scene);
   }
 }
 
 PkMesh
-Model::processMesh(aiMesh* _mesh, const aiScene* _scene)
+processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
-  PkMesh meshProcess = new PkMesh();
-  meshProcess.m_vertexCount = _mesh->mNumVertices;
+  PkMesh meshProcess;
+  meshProcess.vertexCount = _mesh->mNumVertices;
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i)
   {
@@ -74,7 +96,7 @@ Model::processMesh(aiMesh* _mesh, const aiScene* _scene)
       sv.Tex.y = _mesh->mTextureCoords[0][i].y;
     }
     else { sv.Tex = Vector2(0.0f); }
-    meshProcess.m_vertexVector.push_back(sv);
+    meshProcess.vertexVector.push_back(sv);
   }
 
   // process index
@@ -82,26 +104,26 @@ Model::processMesh(aiMesh* _mesh, const aiScene* _scene)
   {
     aiFace face = _mesh->mFaces[i];
 
-    meshProcess.m_numIndex += face.mNumIndices;
+    meshProcess.numIndex += face.mNumIndices;
 
     for (uint32 j = 0; j < face.mNumIndices; ++j)
     {
-      meshProcess.m_indexVector.push_back(face.mIndices[j]);
+      meshProcess.indexVector.push_back(face.mIndices[j]);
     }
   }
   for (uint32 i = 0; i < _mesh->mNumBones; ++i)
   {
     // mesh->mBones[i].
   }
-  // for (uint32 i = 0; i < scene->mNumMaterials; ++i)
-  // {
-  //   LoadMaterialTextures(meshProcess, scene->mMaterials[mesh->mMaterialIndex], scene);
-  // }
+  for (uint32 i = 0; i < _scene->mNumMaterials; ++i)
+  {
+    // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
+  }
   return meshProcess;
 }
 
 Matrix4
-Model::aIMatrixToMatrix(aiMatrix4x4 _node)
+aIMatrixToMatrix(aiMatrix4x4 _node)
 {
   return Matrix4(_node.a1, _node.a2, _node.a3, _node.a4,
                  _node.b1, _node.b2, _node.b3, _node.b4,
@@ -112,35 +134,46 @@ Model::aIMatrixToMatrix(aiMatrix4x4 _node)
 void
 Model::setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight)
 {
+  /**
+  * This is done to prevent warnings for the moment, at least until
+  * bones are implemented correctly.
+  **/
+  /**************************/
+  SimpleVertex vertexT = _vertex;
+  vertexT.pos = Vector3(0.0f);
+  _boneId = 0;
+  _weight = 0;
+  /**************************/
   for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i)
   {
   }
 }
 
 void
-Model::extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex,
-                                    aiMesh* _mesh,
-                                    const aiScene* _scene)
+extractBoneWeightForVertices(Model& _model,
+                             // Vector<SimpleVertex>& _vertex,
+                             // const aiScene* _scene,
+                             aiMesh* _mesh)
 {
   for (uint32 i = 0; i < _mesh->mNumBones; ++i)
   {
     int boneID = -1;
     String boneName = _mesh->mBones[i]->mName.C_Str();
-    if (mBoneMap.find(boneName) == mBoneMap.end())
+    if (_model.boneMap.find(boneName) == _model.boneMap.end())
     {
       Bone newBone;
-      newBone.m_ID = mBoneCounter;
+      newBone.setBoneID(_model.boneCounter);
       Transform transform(Matrix4::IDENTITY,
                           Matrix4::IDENTITY,
                           aIMatrixToMatrix(_mesh->mBones[i]->mOffsetMatrix));
-      newBone.m_transform = transform;
-      mBoneMap[boneName] = newBone;
-      boneID = mBoneCounter;
-      ++mBoneCounter;
+      newBone.setLocalTransform(transform);
+      _model.boneMap[boneName] = newBone;
+      boneID = _model.boneCounter;
+      ++_model.boneCounter;
     }
     else
     {
-      boneID = mBoneMap[boneName].m_ID;
+      boneID = _model.boneMap[boneName].getBoneID();
     }
     auto weights = _mesh->mBones[i]->mWeights;
     uint32 numWeight = _mesh->mBones[i]->mNumWeights;
@@ -149,16 +182,16 @@ Model::extractBoneWeightForVertices(Vector<SimpleVertex>& _vertex,
     {
       uint32 vertexID = weights[i].mVertexId;
       float weight = weights[i].mWeight;
-      setVertexBoneData(m_vertex[vertexID], boneID, weight);
+      _model.setVertexBoneData(_model.vertex[vertexID], boneID, weight);
     }
   }
 }
 
 void
-Model::loadMaterial(PkMesh& _mesh, const aiScene* _scene, String& _fileName)
+loadMaterial(const aiScene* _scene)//, String& _fileName) // PkMesh& _mesh, 
 {
-  String texturePath = "textures/" + _fileName;
-  aiReturn ret;
+  // String texturePath = "textures/" + _fileName;
+  // aiReturn ret;
   for (uint32 i = 0; i < _scene->mNumMaterials; ++i)
   {
     const aiMaterial* pMaterial = _scene->mMaterials[i];

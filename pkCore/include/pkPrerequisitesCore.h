@@ -6,6 +6,8 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
+#include "pkVector4.h"
 
 // defines
 #include "pkCoreDefines.h"
@@ -22,10 +24,23 @@
 namespace pkEngineSDK
 {
 
-//struct Texture {
-//  uint32 id;
-//  uint32 type;
-//};
+struct KeyPosition
+{
+  Vector3 position;
+  float timeStamp;
+};
+
+struct KeyRotation
+{
+  Vector4 rotation;
+  float timeStamp;
+};
+
+struct KeyScale
+{
+  Vector3 scale;
+  float timeStamp;
+};
 
 template<class T>
 void safeRelease(T* x) { if (x) { x->Release(); x = nullptr; } }

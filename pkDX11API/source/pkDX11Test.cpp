@@ -16,7 +16,6 @@ using pkEngineSDK::CBProjection;
 using pkEngineSDK::CBWorld;
 using pkEngineSDK::DX11InputLayout;
 using pkEngineSDK::DX11GraphicsAPI;
-using pkEngineSDK::InstanceHandle;
 using pkEngineSDK::Model;
 using pkEngineSDK::Light;
 using pkEngineSDK::PKWindowDesc;
@@ -24,7 +23,6 @@ using pkEngineSDK::String;
 using pkEngineSDK::uint32;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Window;
-using pkEngineSDK::WindowHandle;
 
 Window g_window;
 DX11GraphicsAPI g_api;
@@ -62,9 +60,9 @@ int wWinMain(InstanceHandle hInstance, InstanceHandle hPrevInstance, LPWSTR lpCm
   String modelName = "test";
   String extension = ".fbx";
   String modelPath = modelName + extension;
-  g_model.load(modelPath, g_api.m_pDevice);
-  g_model.m_vertexB = g_model.m_vertexB->create(g_api.m_pDevice, g_model.m_vertex);
-  g_model.m_indexB = g_model.m_indexB->create(g_api.m_pDevice, g_model.m_index, D3D11_USAGE_DEFAULT);
+  g_model.load(modelPath);
+  g_model.vertexB = g_model.vertexB->create(g_api.m_pDevice, g_model.vertex, 1);
+  g_model.indexB = g_model.indexB->create(g_api.m_pDevice, g_model.index, D3D11_USAGE_DEFAULT);
 
   // create constant buffers
   g_light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;

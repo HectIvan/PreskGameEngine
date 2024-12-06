@@ -52,7 +52,7 @@ class DX11VertexBuffer : public VertexBuffer
   SPtr<VertexBuffer>
   create(Device* _pDevice,
          const Vector<SimpleVertex>& _vertex,
-         uint32 _usage) override; // int _usage is temporary
+         uint32 _usage) override;
 
   /**
   * Sets the data of the vertex buffer.

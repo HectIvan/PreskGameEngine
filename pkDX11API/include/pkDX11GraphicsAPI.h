@@ -172,7 +172,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Clear the depth and back buffers
   **/
   void
-  clearDepthBackBuffers(float _color[], float depth);
+  clearDepthBackBuffers(float _color[], float _depth = 1.0f);
 
   /**
   * Draw the model.

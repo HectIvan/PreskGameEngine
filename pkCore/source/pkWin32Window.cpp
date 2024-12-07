@@ -18,10 +18,11 @@ LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void
-Window::create(PKWindowDesc& _desc, String _name)
+Window::create(const PKWindowDesc& _desc, String& _name)
 {
   /************************************************************************************/
   WNDCLASSEXA wcex;
+  InstanceHandle hInstance = InstanceHandle();
   memset(&wcex, 0, sizeof(wcex));
   wcex.cbSize = sizeof(WNDCLASSEX);
   // CS_HREDRAW Redraws the entire window if a movement or size adjustment changes the width of the client area.
@@ -30,6 +31,7 @@ Window::create(PKWindowDesc& _desc, String _name)
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
   wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
+  wcex.hInstance = hInstance;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
   wcex.lpszMenuName = nullptr;
@@ -59,9 +61,9 @@ Window::create(PKWindowDesc& _desc, String _name)
                               rc.bottom - rc.top,
                               nullptr,
                               nullptr,
-                              nullptr,
+                              hInstance,
                               nullptr);
-
+  m_hInstance = hInstance;
   /**
   * Check if creation failed. 
   **/
@@ -87,7 +89,7 @@ Window::messageLoop()
       DispatchMessage(&msg);
     }
   }
-  return (int)msg.wParam;
+  return static_cast<int32>(msg.wParam);
 }
 
 Vector2

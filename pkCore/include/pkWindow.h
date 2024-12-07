@@ -58,7 +58,7 @@ class PK_CORE_EXPORT Window
   * Name of the window.
   **/
   void
-  create(PKWindowDesc& _desc, String _name);
+  create(const PKWindowDesc& _desc, String& _name);
 
   int32
   messageLoop();

@@ -36,6 +36,8 @@
 namespace pkEngineSDK
 {
 
+class Window;
+
 using pkEngineSDK::GraphicsAPI;
 
 class DX11GraphicsAPI : public GraphicsAPI
@@ -51,7 +53,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Window handle
   **/
   void 
-  init(uint32 _width, uint32 _height, const WindowHandle& _wHnd) override;
+  init(const Window& _window) override;
 
   /**
   * Render the final result of the api.

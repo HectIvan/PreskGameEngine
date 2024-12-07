@@ -1,18 +1,47 @@
+#include <functional>
+
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
 #include "pkGraphicsAPI.h"
+#include "pkDllLoader.h"
 
-int main()
+void
+run(std::string _name, pkEngineSDK::Window& _window);
+
+int
+main(int argc, const char** argv)
 {
   
   pkEngineSDK::Window window;
   pkEngineSDK::PKWindowDesc desc;
   desc.width = 1920;
   desc.height = 1080;
-  window.create(desc, "window test");
-  // pkEngineSDK::GraphicsAPI api;
-  // api.init(window.getWidth(), window.getHeight(), window.getWindowHandle());
+  std::string name = "window test";
+  window.create(desc, name);
+
+  std::string abstraction = argv[1];
+
+#ifdef PK_DEBUG_MODE
+  if (abstraction == "DX11API")
+  {
+    run("pkDX11APId", window);
+  }
+#else
+  if (abstraction == "DX11API")
+  {
+    run("pkDX11API", window);
+  }
+#endif
   return window.messageLoop();
+}
+
+void
+run(std::string _name, pkEngineSDK::Window& _window)
+{
+  // pkEngineSDK::DllLoader dll;
+  // dll.init(_name, true);
+  // auto dllSymbol = static_cast<void(*)()>(dll.getMethod("init"));
+  // dllSymbol(_window)
 }
 
 //#if PK_PLATFORM == PK_PLATFORM_WIN32

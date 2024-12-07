@@ -114,6 +114,9 @@
     <ClInclude Include="include\pkTexture.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDllLoader.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="source\pkMain.cpp">
       <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDllLoader.cpp">
+      <Filter>source\api</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

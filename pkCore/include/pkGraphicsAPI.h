@@ -40,7 +40,7 @@ class PK_CORE_EXPORT GraphicsAPI
   * Handler to the window to be used.
   **/
   virtual void
-  init(uint32 _width, uint32 _height, const WindowHandle& _wHnd) = 0;
+  init(const Window& _window) = 0;
 
   /**
   * Render the graphic api result.
@@ -49,6 +49,6 @@ class PK_CORE_EXPORT GraphicsAPI
   render() = 0;
 
  public:
-  Vector<GameObject> m_gameObjects;
+  Vector<GameObject> gameObjects;
 };
 }

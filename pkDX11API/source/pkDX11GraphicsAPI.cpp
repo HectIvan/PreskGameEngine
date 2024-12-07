@@ -9,7 +9,7 @@ namespace pkEngineSDK
 {
 
 void
-DX11GraphicsAPI::init(uint32 _width, uint32 _height, const WindowHandle& _wHnd)
+DX11GraphicsAPI::init(const Window& _window)
 {
   m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
 
@@ -37,8 +37,10 @@ DX11GraphicsAPI::init(uint32 _width, uint32 _height, const WindowHandle& _wHnd)
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
   WindowHandle winHandle = m_window.getWindowHandle();
-  createDeviceAndSwapChain(_width,
-                           _height,
+  uint32 width = static_cast<uint32>(_window.getSize().x);
+  uint32 height = static_cast<uint32>(_window.getSize().y);
+  createDeviceAndSwapChain(width,
+                           height,
                            winHandle,
                            numDriverTypes,
                            driverTypes,
@@ -47,8 +49,8 @@ DX11GraphicsAPI::init(uint32 _width, uint32 _height, const WindowHandle& _wHnd)
                            numFeatureLevels);
 
   createRenderTargetView();
-  createDepthStencilTexture(_width, _height);
-  setViewport(_width, _height);
+  createDepthStencilTexture(width, height);
+  setViewport(width, height);
 }
 
 void
@@ -88,27 +90,27 @@ DX11GraphicsAPI::render()
   // Render the Game Objects
   setShaders();
   // for each Game Oobject
-  for (uint32 i = 0; i < m_gameObjects.size(); ++i)
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
     // check all their models
-    for (uint32 j = 0; j < m_gameObjects[i].m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i].m_models.size(); ++j)
     {
       // set the vertex and index buffers of the models
-      setVertexBuffers(*m_gameObjects[i].m_models[j]);
-      setIndexBuffers(*m_gameObjects[i].m_models[j]);
+      setVertexBuffers(*gameObjects[i].m_models[j]);
+      setIndexBuffers(*gameObjects[i].m_models[j]);
     }
   }
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &m_pSamplerLinear->m_pSampler);
   // for each Game Object
-  for (uint32 i = 0; i < m_gameObjects.size(); ++i)
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
     // check all their models
-    for (uint32 j = 0; j < m_gameObjects[i].m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i].m_models.size(); ++j)
     {
       // draw the model
-      drawIndexed(*m_gameObjects[i].m_models[j]);
+      drawIndexed(*gameObjects[i].m_models[j]);
     }
   }
   // Present our back buffer to our front buffer

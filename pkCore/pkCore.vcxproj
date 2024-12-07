@@ -169,6 +169,7 @@
     <ClInclude Include="include\pkCamera.h" />
     <ClInclude Include="include\pkCoreDefines.h" />
     <ClInclude Include="include\pkDevice.h" />
+    <ClInclude Include="include\pkDllLoader.h" />
     <ClInclude Include="include\pkGameObject.h" />
     <ClInclude Include="include\pkEvent.h" />
     <ClInclude Include="include\pkEventQueue.h" />
@@ -189,6 +190,7 @@
   <ItemGroup>
     <ClCompile Include="source\pkBone.cpp" />
     <ClCompile Include="source\pkCamera.cpp" />
+    <ClCompile Include="source\pkDllLoader.cpp" />
     <ClCompile Include="source\pkGameObject.cpp" />
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />

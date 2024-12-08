@@ -1,6 +1,9 @@
 #include "pkDX11GraphicsAPI.h"
+#include "pkDX11IndexBuffer.h"
 #include "pkDX11Prerequisites.h"
+#include "pkDX11VertexBuffer.h"
 #include "pkWindow.h"
+#include "pkVertexBuffer.h"
 
 #include "pkDX11InputLayout.h"
 #include "pkCamera.h"
@@ -67,11 +70,11 @@ DX11GraphicsAPI::initApi(const Window& _window)
   createDepthStencilTexture(width, height);
   setViewport(width, height);
 
-  /*********************************************/
+  /************************************************/
   /**
   * TEMPORARY, THIS WILL BE SWAPPED TO THE BASE APP
   **/
-  /*********************************************/
+  /************************************************/
 
   m_pixelShader.compile();
   m_pixelShader.create(m_pDevice);
@@ -87,16 +90,17 @@ DX11GraphicsAPI::initApi(const Window& _window)
   Model* model = new Model();
   String modelPath = "D:/Work/visual studio/PreskGameEngine/models/maneater.fbx";
   model->load(modelPath);
-  model->vertexB = model->vertexB->create(m_pDevice, model->vertex);
-  model->indexB = model->indexB->create(m_pDevice, model->index);
+  model->vertexB =  createVertexBuffer(model->vertex);
+  model->indexB = createIndexBuffer(model->index);
 
   GameObject* gameObject = new GameObject();
   gameObject->init(Transform(0.0f));
   gameObject->setScale(Matrix4(1.0f));
   gameObject->insertModel(model);
+  gameObjects.push_back(gameObject);
 
-  m_light->Type = LIGHT_TYPE::kDirectional;
-  m_light->LightDir = Vector3::FORWARD;
+  m_light.Type = LIGHT_TYPE::kDirectional;
+  m_light.LightDir = Vector3::FORWARD;
   m_cBView.create(m_pDevice, static_cast<uint32>(sizeof(CBView)));
   m_cBProjection.create(m_pDevice, static_cast<uint32>(sizeof(CBProjection)));
   m_cBWorld.create(m_pDevice, static_cast<uint32>(sizeof(CBWorld)));
@@ -110,11 +114,21 @@ DX11GraphicsAPI::initApi(const Window& _window)
               3.1416f / 4.0f,
               0.01f,
               1000.0f,
-              Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+              Vector4(0.0f, 10.0f, -5.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
 
   updateCamera();
+  int32 ret = messageLoop();
+}
+
+int32
+DX11GraphicsAPI::messageLoop()
+{
+  while (true)
+  {
+    render();
+  }
 }
 
 void
@@ -177,7 +191,7 @@ DX11GraphicsAPI::render()
   ef.mWorld = m_world;
   ef.vMeshColor = m_vMeshColor;
   m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
-  m_cbLight.updateSubResource(m_pDevice, m_light, (uint32)sizeof(*m_light));
+  m_cbLight.updateSubResource(m_pDevice, &m_light, (uint32)sizeof(Light));
 
   // Render the Game Objects
   setShaders();
@@ -305,6 +319,7 @@ DX11GraphicsAPI::createSamplerState()
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
   // sampler state creation
+  m_pSamplerLinear = new DX11SamplerState();
   uint32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc, &m_pSamplerLinear->m_pSampler);
   if (hr != 0x00000000)
   {
@@ -372,12 +387,12 @@ DX11GraphicsAPI::setViewport(uint32 _width,
 void
 DX11GraphicsAPI::setVertexBuffers(Model& _model)
 {
-  _model.vertexB->set(m_pDevice);
+  setVertexBuffer(_model.vertexB);
 }
 
 void DX11GraphicsAPI::setIndexBuffers(Model& _model)
 {
-  _model.indexB->set(m_pDevice);
+  setIndexBuffer(_model.indexB);
 }
 
 void
@@ -414,6 +429,94 @@ DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float _depth)
                                                         D3D11_CLEAR_DEPTH,
                                                         _depth,
                                                         0);
+}
+
+SPtr<VertexBuffer>
+DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
+                                    uint32 _usage)
+{
+  auto dxVB = std::make_shared<DX11VertexBuffer>();
+
+  /***************************************************************/
+  /**
+  * Define and create the buffer
+  **/
+  /***************************************************************/
+  D3D11_BUFFER_DESC bd;
+  memset(&bd, 0, sizeof(bd));
+  bd.ByteWidth = static_cast<uint32>(sizeof(SimpleVertex) * _vertex.size()); // size of the buffer
+  bd.Usage = static_cast<D3D11_USAGE>(_usage); // how it is expected to be read
+  bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // how it will be binded to the pipeline
+  bd.CPUAccessFlags = 0; // default -> CPU ha no accesss to this
+  bd.MiscFlags = 0;
+  // bd.StructureByteStride = sizeof(SimpleVertex); // size of each element
+
+  D3D11_SUBRESOURCE_DATA InitData; // info descriptor
+  memset(&InitData, 0, sizeof(InitData));
+  InitData.pSysMem = _vertex.data(); // pointer to the initialization data
+  InitData.SysMemPitch = static_cast<uint32>(_vertex.size() * sizeof(SimpleVertex)); // distance between values
+
+  // create the buffer
+  m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->m_pBuffer);
+  return dxVB;
+}
+
+void
+DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+                                 uint32 _start,
+                                 uint32 _bufferCount,
+                                 uint32 _offset)
+{
+  // reinterpret pointer
+  auto dxVB = std::reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  // get the offset
+  uint32 stride = sizeof(SimpleVertex);
+  //set the buffer
+  m_pDevice->m_pImmediateContext->IASetVertexBuffers(_start,
+                                                     _bufferCount,
+                                                     &dxVB->m_pBuffer,
+                                                     &stride,
+                                                     &_offset);
+}
+
+SPtr<IndexBuffer>
+DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
+                                   uint32 _usage)
+{
+  auto dxIB = std::make_shared<DX11IndexBuffer>();
+
+  /***************************************************************/
+  /**
+  * Define and create the buffer
+  **/
+  /***************************************************************/
+  D3D11_BUFFER_DESC bd;
+  memset(&bd, 0, sizeof(bd));
+  bd.ByteWidth = sizeof(uint32) * (uint32)_index.size(); // size of the buffer
+  bd.Usage = static_cast<D3D11_USAGE>(_usage); // how it is expected to be read
+  bd.BindFlags = D3D11_BIND_INDEX_BUFFER; // how it will be binded to the pipeline
+  bd.CPUAccessFlags = 0; // default -> CPU ha no accesss to this
+  bd.MiscFlags = 0;
+
+  D3D11_SUBRESOURCE_DATA InitData; // info descriptor
+  memset(&InitData, 0, sizeof(InitData));
+  InitData.pSysMem = _index.data(); // pointer to the initialization data
+  // InitData.SysMemPitch = (uint32)index.size() * sizeof(uint32); // distance between values
+  // create the buffer
+  m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->m_pBuffer);
+  return dxIB;
+}
+
+void
+DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+                                uint32 _format,
+                                uint32 _offset)
+{
+  // reinterpret pointer
+  auto dxIB = std::reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  m_pDevice->m_pImmediateContext->IASetIndexBuffer(dxIB->m_pBuffer,
+                                                   static_cast<DXGI_FORMAT>(_format),
+                                                   _offset);
 }
 
 void

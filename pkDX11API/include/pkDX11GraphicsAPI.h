@@ -63,6 +63,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   render() override;
 
+  int32
+  messageLoop() override;
+
   /**
   * Create the device and swap chain.
   * 
@@ -178,6 +181,28 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   clearDepthBackBuffers(float _color[], float _depth = 1.0f);
 
+  SPtr<VertexBuffer>
+  createVertexBuffer(const Vector<SimpleVertex>& _vertex,
+                     uint32 _usage = 0);
+
+  void
+  setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+                  uint32 _start = 0,
+                  uint32 _bufferCount = 1,
+                  uint32 _offset = 0);
+
+  /**
+  * Create an IndexBuffer
+  **/
+  SPtr<IndexBuffer>
+  createIndexBuffer(const Vector<uint32>& _index,
+                    uint32 _usage = 0);
+
+  void
+  setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+                 uint32 _format = 42,
+                 uint32 _offset = 0);
+
   /**
   * Draw the model.
   **/
@@ -218,7 +243,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   Matrix4 m_world;
 
   // light source
-  Light* m_light;
+  Light m_light;
 
   // constant buffers
   DX11ConstantBuffer m_buffer;

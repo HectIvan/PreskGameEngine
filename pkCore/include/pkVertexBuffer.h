@@ -32,16 +32,5 @@ class VertexBuffer
  public:
   VertexBuffer() = default;
   virtual ~VertexBuffer() = default;
-
-  virtual VertexBuffer*
-  create(Device* _pDevice,
-         const Vector<SimpleVertex>& _vertex,
-         uint32 _usage = 0) = 0;
-
-  virtual void
-  set(Device* _pDevice,
-      uint32 _start = 0,
-      uint32 _bufferCount = 1,
-      uint32 _offset = 0) = 0;
 };
 }

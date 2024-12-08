@@ -35,26 +35,6 @@ class DX11VertexBuffer : public VertexBuffer
   }
 
   /**
-  * Create the Vertex Buffer
-  * 
-  * @param _pDevice
-  * Device that the buffer will be linked to
-  * 
-  * @param _vertex
-  * Vertex info.
-  * 
-  * @param _usage
-  * The use that is to be given to the buffer
-  * 
-  * @return
-  * the shared pointer to the vertex buffer
-  **/
-  VertexBuffer*
-  create(Device* _pDevice,
-         const Vector<SimpleVertex>& _vertex,
-         uint32 _usage) override;
-
-  /**
   * Sets the data of the vertex buffer.
   * 
   * @param _device

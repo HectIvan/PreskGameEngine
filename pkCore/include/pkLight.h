@@ -36,7 +36,7 @@ namespace LIGHT_TYPE
   };
 }
 
-struct PK_CORE_EXPORT Light
+struct Light
 {
   uint32 Type;
   float SpotCutoff;

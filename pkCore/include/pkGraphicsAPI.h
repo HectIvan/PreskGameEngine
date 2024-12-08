@@ -28,6 +28,10 @@
 namespace pkEngineSDK
 {
 
+class Device;
+class IndexBuffer;
+class VertexBuffer;
+
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
  public:
@@ -49,6 +53,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   render() = 0;
 
+  virtual int32
+  messageLoop() = 0;
+
   /**
   * Insert a new game object to the game objects vector.
   * 
@@ -57,6 +64,40 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   **/
   void
   insertGameObject(GameObject* _gameObject) { gameObjects.push_back(_gameObject); }
+
+  /**
+  * Create a VertexBuffer
+  **/
+  virtual SPtr<VertexBuffer>
+  createVertexBuffer(const Vector<SimpleVertex>& _vertex,
+                     uint32 _usage = 0) = 0;
+
+  virtual void
+  setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+                  uint32 _start = 0,
+                  uint32 _bufferCount = 1,
+                  uint32 _offset = 0) = 0;
+
+  /**
+  * Create an IndexBuffer
+  **/
+  virtual SPtr<IndexBuffer>
+  createIndexBuffer(const Vector<uint32>& _index,
+                     uint32 _usage = 0) = 0;
+
+  /**
+  * Set the index buffer.
+  *
+  * @param _format
+  * What kind of format will the buffer use.
+  *
+  * @param _offset
+  * Distance between blobs of data.
+  **/
+  virtual void
+  setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+                 uint32 _format = 42,
+                 uint32 _offset = 0) = 0;
 
  public:
   Vector<GameObject*> gameObjects;

@@ -110,7 +110,7 @@ class PK_CORE_EXPORT Model
   uint32 boneCounter = 0;
 
   // buffers for both vectors and index
-  VertexBuffer* vertexB;
-  IndexBuffer* indexB;
+  SPtr<VertexBuffer> vertexB;
+  SPtr<IndexBuffer> indexB;
 };
 }

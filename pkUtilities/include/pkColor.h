@@ -44,7 +44,7 @@ struct PK_UTILITY_EXPORT Color final
   {
     _color.fullColor = other;
   }
-  virtual ~Color() = default;
+  virtual ~Color();
 
   operator uint8() const
   {

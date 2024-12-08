@@ -3,7 +3,7 @@
 
 namespace pkEngineSDK
 {
-  PkMesh::PkMesh(Vector<SimpleVertex> _vertex,
+  Mesh::Mesh(Vector<SimpleVertex> _vertex,
                  Vector<uint32> _index,
                  uint32 _vertexCount,
                  uint32 _numIndex,
@@ -17,7 +17,7 @@ namespace pkEngineSDK
   }
 
   void
-  PkMesh::clean()
+  Mesh::clean()
   {
     // Empty the vertex vector
     vertexVector.clear();

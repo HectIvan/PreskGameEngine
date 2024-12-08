@@ -26,7 +26,7 @@
 namespace pkEngineSDK
 {
 
-class GameObject
+class PK_CORE_EXPORT GameObject
 {
  public:
   GameObject() = default;

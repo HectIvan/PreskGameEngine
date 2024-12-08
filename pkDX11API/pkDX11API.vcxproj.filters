@@ -66,7 +66,7 @@
     <ClCompile Include="source\pkDX11GraphicsAPI.cpp">
       <Filter>source\api</Filter>
     </ClCompile>
-    <ClCompile Include="include\pkDX11Texture.cpp">
+    <ClCompile Include="source\pkDX11Texture.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
   </ItemGroup>

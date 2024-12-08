@@ -8,12 +8,17 @@
 
 namespace pkEngineSDK {
 
-SPtr<IndexBuffer>
+IndexBuffer*
 DX11IndexBuffer::create(Device* _pDevice,
                         const Vector<uint32>& _index,
                         uint32 _usage)
 {
-  auto spIB = std::make_shared<DX11IndexBuffer>();
+  DX11IndexBuffer* spIB = new DX11IndexBuffer();
+
+  if (!spIB)
+  {
+    return nullptr;
+  }
 
   /***************************************************************/
   /**
@@ -27,7 +32,6 @@ DX11IndexBuffer::create(Device* _pDevice,
   bd.BindFlags = D3D11_BIND_INDEX_BUFFER; // how it will be binded to the pipeline
   bd.CPUAccessFlags = 0; // default -> CPU ha no accesss to this
   bd.MiscFlags = 0;
-  // bd.StructureByteStride = sizeof(uint32); // size of each element
 
   D3D11_SUBRESOURCE_DATA InitData; // info descriptor
   memset(&InitData, 0, sizeof(InitData));
@@ -38,7 +42,7 @@ DX11IndexBuffer::create(Device* _pDevice,
   {
     deviceX->m_pd3dDevice->CreateBuffer(&bd, &InitData, &spIB->m_pBuffer);
   }
-  return spIB;
+  return static_cast<IndexBuffer*>(spIB);
 }
 
 void

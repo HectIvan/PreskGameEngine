@@ -22,12 +22,13 @@
 /*********************************************/
 #include "pkGameObject.h"
 #include "pkModel.h"
+#include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT GraphicsAPI
+class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
  public:
   GraphicsAPI() = default;
@@ -40,7 +41,7 @@ class PK_CORE_EXPORT GraphicsAPI
   * Handler to the window to be used.
   **/
   virtual void
-  init(const Window& _window) = 0;
+  initApi(const Window& _window) = 0;
 
   /**
   * Render the graphic api result.
@@ -48,7 +49,16 @@ class PK_CORE_EXPORT GraphicsAPI
   virtual void
   render() = 0;
 
+  /**
+  * Insert a new game object to the game objects vector.
+  * 
+  * @param _gameObject
+  * Pointer to the new gameObject.
+  **/
+  void
+  insertGameObject(GameObject* _gameObject) { gameObjects.push_back(_gameObject); }
+
  public:
-  Vector<GameObject> gameObjects;
+  Vector<GameObject*> gameObjects;
 };
 }

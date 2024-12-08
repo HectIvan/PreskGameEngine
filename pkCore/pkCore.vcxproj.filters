@@ -52,6 +52,15 @@
     <Filter Include="source\main">
       <UniqueIdentifier>{c2d7851b-240f-4364-8c9a-93d6cf917382}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\graphics">
+      <UniqueIdentifier>{3444a3f8-f189-4aff-b30c-11eb5b278650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\base app">
+      <UniqueIdentifier>{d4ee8979-e08f-40e5-a7c9-74bafca0d1b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\base app">
+      <UniqueIdentifier>{fe1b7a50-c5a6-4e7b-8d28-f81bce41cab6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -117,6 +126,9 @@
     <ClInclude Include="include\pkDllLoader.h">
       <Filter>include\api</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkBaseApp.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -151,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="source\pkDllLoader.cpp">
       <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBaseApp.cpp">
+      <Filter>source\base app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

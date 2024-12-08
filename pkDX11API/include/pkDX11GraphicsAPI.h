@@ -20,6 +20,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkCamera.h"
 #include "pkDX11ConstantBuffer.h"
 #include "pkDX11DepthStencilView.h"
 #include "pkDX11Device.h"
@@ -44,6 +45,7 @@ class DX11GraphicsAPI : public GraphicsAPI
 {
  public:
   DX11GraphicsAPI() = default;
+  DX11GraphicsAPI(const Window& _window);
   virtual ~DX11GraphicsAPI() = default;
 
   /**
@@ -52,8 +54,8 @@ class DX11GraphicsAPI : public GraphicsAPI
   * @param _wHnd
   * Window handle
   **/
-  void 
-  init(const Window& _window) override;
+  void
+  initApi(const Window& _window) override;
 
   /**
   * Render the final result of the api.
@@ -86,14 +88,14 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Number of feature levels.
   **/
   void
-  createDeviceAndSwapChain(uint32 _width,
-                           uint32 _height,
+  createDeviceAndSwapChain(uint32& _width,
+                           uint32& _height,
                            WindowHandle& _wHnd,
-                           uint32 _numDriverTypes,
+                           uint32& _numDriverTypes,
                            D3D_DRIVER_TYPE _driverTypes[],
-                           uint32 _createDeviceFlags,
+                           uint32& _createDeviceFlags,
                            D3D_FEATURE_LEVEL _featureLevels[],
-                           uint32 _numFeatureLevels);
+                           uint32& _numFeatureLevels);
 
   /**
   * Create the render target view.
@@ -181,9 +183,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   **/
   void
   drawIndexed(Model& model);
+
+  void
+  updateCamera();
   
   // window
   Window m_window;
+  Camera m_camera;
 
   // api device
   DX11Device* m_pDevice;
@@ -219,6 +225,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   DX11ConstantBuffer m_cBView;
   DX11ConstantBuffer m_cBProjection;
   DX11ConstantBuffer m_cBWorld;
-  DX11ConstantBuffer m_LightCB;
+  DX11ConstantBuffer m_cbLight;
 };
 }

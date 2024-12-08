@@ -53,14 +53,10 @@ class PK_CORE_EXPORT DllLoader
   * Name of the file to find.
   * 
   * @param _load
-  * Wether the file will be immediately
-  * loaded.
-  * 
-  * @param _extension
-  * What extension is the file.
+  * Wether the file will be immediately loaded.
   **/
   void
-  init(const String& _name, const bool& _load);
+  init(const String& _name, const bool& _load = true);
 
   /**
   * load the library
@@ -78,7 +74,7 @@ class PK_CORE_EXPORT DllLoader
   * @return
   * Direction of the process.
   **/
-  void
+  void*
   getMethod(const String& _methodName);
 
  public:

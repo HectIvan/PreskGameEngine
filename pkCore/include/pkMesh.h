@@ -29,11 +29,11 @@ namespace pkEngineSDK
 
 class Device;
 
-class PkMesh
+class Mesh
 {
  public:
-  PkMesh() = default;
-  virtual ~PkMesh() = default;
+  Mesh() = default;
+  virtual ~Mesh() = default;
 
   /**
   * Create the mesh.
@@ -53,7 +53,7 @@ class PkMesh
   * @param _textures
   * Textures data.
   **/
-  PkMesh(Vector<SimpleVertex> _vertex,
+  Mesh(Vector<SimpleVertex> _vertex,
          Vector<uint32> _index,
          uint32 _vertexCount,
          uint32 _numIndex,

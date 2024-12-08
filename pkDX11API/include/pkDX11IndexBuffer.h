@@ -50,7 +50,7 @@ class DX11IndexBuffer : public IndexBuffer
   * @return
   * Shared pointer of the index buffer.
   **/
-  SPtr<IndexBuffer>
+  IndexBuffer*
   create(Device* _pDevice,
          const Vector<uint32>& _index,
          uint32 _usage = D3D11_USAGE_DEFAULT) override;

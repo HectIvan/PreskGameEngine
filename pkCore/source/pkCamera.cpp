@@ -3,7 +3,7 @@
 namespace pkEngineSDK
 {
 void
-Camera::Init(uint32 _width,
+Camera::init(uint32 _width,
              uint32 _height,
              float _halfFOV,
              float _nearZ,

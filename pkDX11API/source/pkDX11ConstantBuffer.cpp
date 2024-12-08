@@ -9,26 +9,26 @@
 namespace pkEngineSDK {
 
 HRESULT
-DX11ConstantBuffer::create(DX11Device* device, uint32 size, const void* pData, uint32 usage)
+DX11ConstantBuffer::create(DX11Device* _pDevice, uint32 _size, const void* _pData, uint32 _usage)
 {
   HRESULT hr;
   D3D11_BUFFER_DESC bDesc;
-  bDesc.Usage = static_cast<D3D11_USAGE>(usage);
+  bDesc.Usage = static_cast<D3D11_USAGE>(_usage);
   bDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
   bDesc.MiscFlags = 0;
-  bDesc.ByteWidth = size;
-  bDesc.CPUAccessFlags = usage == D3D10_USAGE_DYNAMIC ?
+  bDesc.ByteWidth = _size;
+  bDesc.CPUAccessFlags = _usage == D3D10_USAGE_DYNAMIC ?
     D3D11_CPU_ACCESS_WRITE : 0;
 
   D3D11_SUBRESOURCE_DATA subData;
-  if (pData)
+  if (_pData)
   {
-    subData.pSysMem = pData;
-    subData.SysMemPitch = size;
+    subData.pSysMem = _pData;
+    subData.SysMemPitch = _size;
     subData.SysMemSlicePitch = 0;
   }
 
-  hr = device->m_pd3dDevice->CreateBuffer(&bDesc, pData ? &subData : nullptr, &m_pCBuffer);
+  hr = _pDevice->m_pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &m_pCBuffer);
   if (FAILED(hr))
   {
     return hr;
@@ -37,9 +37,9 @@ DX11ConstantBuffer::create(DX11Device* device, uint32 size, const void* pData, u
 }
 
 void
-DX11ConstantBuffer::updateSubResource(DX11Device* device, const void* newData, uint32 size)
+DX11ConstantBuffer::updateSubResource(DX11Device* _pDevice, const void* _pNewData, uint32 _size)
 {
-  device->m_pImmediateContext->UpdateSubresource(m_pCBuffer, 0, nullptr, newData, size, 0);
+  _pDevice->m_pImmediateContext->UpdateSubresource(m_pCBuffer, 0, nullptr, _pNewData, _size, 0);
 }
 
 void

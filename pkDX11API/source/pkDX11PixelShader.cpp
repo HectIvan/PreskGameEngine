@@ -13,8 +13,8 @@ HRESULT
 DX11PixelShader::compile()
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"shaders/pkShader.fx", "PS", "ps_5_0", &m_pSBlob);
-  if (FAILED(hr))
+  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl", "PS", "ps_5_0", &m_pSBlob);
+  if (hr != 0x00000000)
   {
     MessageBox(nullptr, "FX file could not be compiled", "Error", MB_OK);
     return hr;

@@ -17,14 +17,11 @@
 * Includes
 **/
 /*********************************************/
-#include <d3dcompiler.h>
 #include "pkDX11Prerequisites.h"
 
 namespace pkEngineSDK {
 
 using std::wstring;
-
-class DX11Device;
 
 class DX11Shaders
 {

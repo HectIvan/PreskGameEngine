@@ -165,6 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkBaseApp.h" />
     <ClInclude Include="include\pkBone.h" />
     <ClInclude Include="include\pkCamera.h" />
     <ClInclude Include="include\pkCoreDefines.h" />
@@ -188,6 +189,7 @@
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkBaseApp.cpp" />
     <ClCompile Include="source\pkBone.cpp" />
     <ClCompile Include="source\pkCamera.cpp" />
     <ClCompile Include="source\pkDllLoader.cpp" />

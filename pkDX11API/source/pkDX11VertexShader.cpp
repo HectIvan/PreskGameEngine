@@ -12,7 +12,7 @@ HRESULT
 DX11VertexShader::compile()
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"shaders/pkShader.fx", "VS", "vs_5_0", &m_pSBlob);
+  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl", "VS", "vs_5_0", &m_pSBlob);
   if (FAILED(hr))
   {
     MessageBox(nullptr, "FX file could not be compiled", "Error", MB_OK);

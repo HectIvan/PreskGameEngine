@@ -22,13 +22,16 @@ namespace pkEngineSDK
 void
 processNode(Model& _model, aiNode* _node, const aiScene* _scene);
 
-PkMesh
+Mesh
 processMesh(aiMesh* _mesh, const aiScene* _scene);
 
 void
 Model::load(String& _path)
 {
-  String modelPath = "models/" + _path;
+  indexB = nullptr;
+  vertexB = nullptr;
+
+  String modelPath = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
   if (scene == nullptr) { return; }
@@ -69,10 +72,10 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
   }
 }
 
-PkMesh
+Mesh
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
-  PkMesh meshProcess;
+  Mesh meshProcess;
   meshProcess.vertexCount = _mesh->mNumVertices;
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i)

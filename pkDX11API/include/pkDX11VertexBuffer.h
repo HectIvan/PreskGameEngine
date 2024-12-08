@@ -49,7 +49,7 @@ class DX11VertexBuffer : public VertexBuffer
   * @return
   * the shared pointer to the vertex buffer
   **/
-  SPtr<VertexBuffer>
+  VertexBuffer*
   create(Device* _pDevice,
          const Vector<SimpleVertex>& _vertex,
          uint32 _usage) override;

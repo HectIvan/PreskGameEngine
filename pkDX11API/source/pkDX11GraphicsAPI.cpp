@@ -1,16 +1,31 @@
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11Prerequisites.h"
-#include "pkDX11VertexBuffer.h"
 #include "pkWindow.h"
 
+#include "pkDX11InputLayout.h"
+#include "pkCamera.h"
+
 #if PK_PLATFORM == PK_PLATFORM_WIN32
+#include <d3dcompiler.h>
 
 namespace pkEngineSDK
 {
 
-void
-DX11GraphicsAPI::init(const Window& _window)
+extern "C" __declspec(dllexport) void
+loadPlugin(const Window& _window)
 {
+  GraphicsAPI::startUp<DX11GraphicsAPI>(_window);
+}
+
+DX11GraphicsAPI::DX11GraphicsAPI(const Window& _window)
+{
+  initApi(_window);
+}
+
+void
+DX11GraphicsAPI::initApi(const Window& _window)
+{
+  m_window = _window;
   m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
 
   uint32 createDeviceFlags = 0;
@@ -51,6 +66,83 @@ DX11GraphicsAPI::init(const Window& _window)
   createRenderTargetView();
   createDepthStencilTexture(width, height);
   setViewport(width, height);
+
+  /*********************************************/
+  /**
+  * TEMPORARY, THIS WILL BE SWAPPED TO THE BASE APP
+  **/
+  /*********************************************/
+
+  m_pixelShader.compile();
+  m_pixelShader.create(m_pDevice);
+  m_vertexShader.compile();
+  m_vertexShader.create(m_pDevice);
+
+  DX11InputLayout input;
+  input.create(m_pDevice, m_vertexShader);
+  input.set(m_pDevice);
+
+  m_pDevice->setPrimitiveTopology();
+
+  Model* model = new Model();
+  String modelPath = "D:/Work/visual studio/PreskGameEngine/models/maneater.fbx";
+  model->load(modelPath);
+  model->vertexB = model->vertexB->create(m_pDevice, model->vertex);
+  model->indexB = model->indexB->create(m_pDevice, model->index);
+
+  GameObject* gameObject = new GameObject();
+  gameObject->init(Transform(0.0f));
+  gameObject->setScale(Matrix4(1.0f));
+  gameObject->insertModel(model);
+
+  m_light->Type = LIGHT_TYPE::kDirectional;
+  m_light->LightDir = Vector3::FORWARD;
+  m_cBView.create(m_pDevice, static_cast<uint32>(sizeof(CBView)));
+  m_cBProjection.create(m_pDevice, static_cast<uint32>(sizeof(CBProjection)));
+  m_cBWorld.create(m_pDevice, static_cast<uint32>(sizeof(CBWorld)));
+  m_cbLight.create(m_pDevice, static_cast<uint32>(sizeof(Light)));
+
+  createSamplerState();
+
+  Camera camera;
+  camera.init(width,
+              height,
+              3.1416f / 4.0f,
+              0.01f,
+              1000.0f,
+              Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+              Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+
+  updateCamera();
+}
+
+void
+DX11GraphicsAPI::updateCamera()
+{
+  //----------------
+  //  UPDATE VIEW
+  //----------------
+  CBView viewBuffer;
+  viewBuffer.mView = m_camera.m_view.getTransposed();
+  m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
+    0,
+    nullptr,
+    &viewBuffer,
+    0,
+    0);
+
+  //-------------------
+  //  UPDATE PROJECTION
+  //-------------------
+  CBProjection projectionBuffer;
+  projectionBuffer.mProjection = m_camera.m_projection.getTransposed();
+  m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
+    0,
+    nullptr,
+    &projectionBuffer,
+    0,
+    0);
 }
 
 void
@@ -85,7 +177,7 @@ DX11GraphicsAPI::render()
   ef.mWorld = m_world;
   ef.vMeshColor = m_vMeshColor;
   m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
-  m_LightCB.updateSubResource(m_pDevice, m_light, (uint32)sizeof(*m_light));
+  m_cbLight.updateSubResource(m_pDevice, m_light, (uint32)sizeof(*m_light));
 
   // Render the Game Objects
   setShaders();
@@ -93,11 +185,11 @@ DX11GraphicsAPI::render()
   for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
     // check all their models
-    for (uint32 j = 0; j < gameObjects[i].m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
     {
       // set the vertex and index buffers of the models
-      setVertexBuffers(*gameObjects[i].m_models[j]);
-      setIndexBuffers(*gameObjects[i].m_models[j]);
+      setVertexBuffers(*gameObjects[i]->m_models[j]);
+      setIndexBuffers(*gameObjects[i]->m_models[j]);
     }
   }
   VSSetConstantBuffers();
@@ -107,10 +199,10 @@ DX11GraphicsAPI::render()
   for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
     // check all their models
-    for (uint32 j = 0; j < gameObjects[i].m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
     {
       // draw the model
-      drawIndexed(*gameObjects[i].m_models[j]);
+      drawIndexed(*gameObjects[i]->m_models[j]);
     }
   }
   // Present our back buffer to our front buffer
@@ -118,14 +210,14 @@ DX11GraphicsAPI::render()
 }
 
 void
-DX11GraphicsAPI::createDeviceAndSwapChain(uint32 _width,
-                                          uint32 _height,
+DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
+                                          uint32& _height,
                                           WindowHandle& _wHnd,
-                                          uint32 _numDriverTypes,
+                                          uint32& _numDriverTypes,
                                           D3D_DRIVER_TYPE _driverTypes[],
-                                          uint32 _createDeviceFlags,
+                                          uint32& _createDeviceFlags,
                                           D3D_FEATURE_LEVEL _featureLevels[],
-                                          uint32 _numFeatureLevels)
+                                          uint32& _numFeatureLevels)
 {
   // initialize device and swap chain
   m_pDevice = new DX11Device();
@@ -152,21 +244,23 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32 _width,
     // try and create the device and swap chain with the current driver type
     m_pDevice->m_pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
     uint32 hr = D3D11CreateDeviceAndSwapChain(nullptr,
-      *m_pDevice->m_pDriverType,
-      nullptr,
-      _createDeviceFlags,
-      _featureLevels,
-      _numFeatureLevels,
-      D3D11_SDK_VERSION,
-      &sd,
-      &m_pSwapChain,
-      &m_pDevice->m_pd3dDevice,
-      &m_pDevice->m_featureLevel,
-      &m_pDevice->m_pImmediateContext);
+                                              *m_pDevice->m_pDriverType,
+                                              nullptr,
+                                              _createDeviceFlags,
+                                              _featureLevels,
+                                              _numFeatureLevels,
+                                              D3D11_SDK_VERSION,
+                                              &sd,
+                                              &m_pSwapChain,
+                                              &m_pDevice->m_pd3dDevice,
+                                              &m_pDevice->m_featureLevel,
+                                              &m_pDevice->m_pImmediateContext);
 
     // if creation was successful
     if (hr == 0x00000000)
     {
+      // auto err(hr);
+      // LPCTSTR errMsg = err.ErrorMessage();
       // end the entire process, no need to continue
       break;
     }
@@ -299,7 +393,7 @@ DX11GraphicsAPI::VSSetConstantBuffers()
   m_pDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
   m_pDevice->m_pImmediateContext->VSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
   m_pDevice->m_pImmediateContext->VSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(3, 1, &m_LightCB.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(3, 1, &m_cbLight.m_pCBuffer);
 }
 
 void
@@ -308,7 +402,7 @@ DX11GraphicsAPI::PSSetConstantBuffers()
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(3, 1, &m_LightCB.m_pCBuffer);
+  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(3, 1, &m_cbLight.m_pCBuffer);
 }
 
 void
@@ -316,7 +410,10 @@ DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float _depth)
 {
   m_pDevice->m_pImmediateContext->ClearRenderTargetView(m_pRTargetView, _color);
   // Clear the depth buffer to 1.0 (max depth)
-  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV, D3D11_CLEAR_DEPTH, _depth, 0);
+  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV,
+                                                        D3D11_CLEAR_DEPTH,
+                                                        _depth,
+                                                        0);
 }
 
 void
@@ -329,7 +426,9 @@ DX11GraphicsAPI::drawIndexed(Model& model)
   for (uint32 i = 0; i < model.meshes.size(); ++i)
   {
     // draw the mesh
-    m_pDevice->m_pImmediateContext->DrawIndexed(static_cast<uint32>(model.meshes[i].numIndex), currentIndexOrigin, currentVertexOrigin);
+    m_pDevice->m_pImmediateContext->DrawIndexed(static_cast<uint32>(model.meshes[i].numIndex),
+                                                                    currentIndexOrigin,
+                                                                    currentVertexOrigin);
     // update the offsets
     currentIndexOrigin += static_cast<uint32>(model.meshes[i].numIndex);
     currentVertexOrigin += static_cast<uint32>(model.meshes[i].vertexCount);

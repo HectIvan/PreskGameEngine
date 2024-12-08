@@ -28,7 +28,7 @@
 namespace pkEngineSDK
 {
 
-class Model
+class PK_CORE_EXPORT Model
 {
  public:
   Model() = default;
@@ -106,11 +106,11 @@ class Model
 
   // skeleton data
   Map<String, Bone> boneMap;
-  Vector<PkMesh> meshes;
+  Vector<Mesh> meshes;
   uint32 boneCounter = 0;
 
   // buffers for both vectors and index
-  SPtr<VertexBuffer> vertexB = nullptr;
-  SPtr<IndexBuffer> indexB = nullptr;
+  VertexBuffer* vertexB;
+  IndexBuffer* indexB;
 };
 }

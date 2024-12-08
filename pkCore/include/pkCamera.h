@@ -23,7 +23,7 @@
 namespace pkEngineSDK
 {
 
-class Camera
+class PK_CORE_EXPORT Camera
 {
  public:
   Camera() = default;
@@ -33,7 +33,7 @@ class Camera
   * Initialize the camera.
   **/
   void
-  Init(uint32 _width,
+  init(uint32 _width,
        uint32 _height,
        float _halfFOV,
        float _nearZ,

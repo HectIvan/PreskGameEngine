@@ -33,10 +33,10 @@ class VertexBuffer
   VertexBuffer() = default;
   virtual ~VertexBuffer() = default;
 
-  virtual SPtr<VertexBuffer>
+  virtual VertexBuffer*
   create(Device* _pDevice,
          const Vector<SimpleVertex>& _vertex,
-         uint32 _usage) = 0;
+         uint32 _usage = 0) = 0;
 
   virtual void
   set(Device* _pDevice,

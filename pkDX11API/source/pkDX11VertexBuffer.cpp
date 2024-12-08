@@ -10,12 +10,17 @@
 namespace pkEngineSDK
 {
 
-SPtr<VertexBuffer>
+VertexBuffer*
 DX11VertexBuffer::create(Device* _pDevice,
                          const Vector<SimpleVertex>& _vertex,
                          uint32 _usage)
 {
-  auto spVB = std::make_shared<DX11VertexBuffer>();
+  DX11VertexBuffer* spVB = new DX11VertexBuffer();
+
+  if (!spVB)
+  {
+    return nullptr;
+  }
 
   /***************************************************************/
   /**
@@ -41,7 +46,7 @@ DX11VertexBuffer::create(Device* _pDevice,
   {
     deviceX->m_pd3dDevice->CreateBuffer(&bd, &InitData, &spVB->m_pBuffer);
   }
-  return spVB;
+  return static_cast<VertexBuffer*>(spVB);
 }
 
 void

@@ -92,6 +92,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
   model->load(modelPath);
   model->vertexB =  createVertexBuffer(model->vertex);
   model->indexB = createIndexBuffer(model->index);
+  setVertexBuffers(*model);
+  setIndexBuffers(*model);
 
   GameObject* gameObject = new GameObject();
   gameObject->init(Transform(0.0f));
@@ -108,16 +110,14 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
   createSamplerState();
 
-  Camera camera;
-  camera.init(width,
-              height,
-              3.1416f / 4.0f,
-              0.01f,
-              1000.0f,
-              Vector4(0.0f, 10.0f, -5.0f, 1.0f), // w is position in 1
-              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-              Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-
+  m_camera.init(width,
+                height,
+                3.1416f / 4.0f,
+                0.01f,
+                1000.0f,
+                Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+                Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+                Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   updateCamera();
   int32 ret = messageLoop();
 }
@@ -134,9 +134,11 @@ DX11GraphicsAPI::messageLoop()
 void
 DX11GraphicsAPI::updateCamera()
 {
-  //----------------
-  //  UPDATE VIEW
-  //----------------
+  /*****************/
+  /**
+  * Update view
+  **/
+  /*****************/
   CBView viewBuffer;
   viewBuffer.mView = m_camera.m_view.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
@@ -146,9 +148,11 @@ DX11GraphicsAPI::updateCamera()
     0,
     0);
 
-  //-------------------
-  //  UPDATE PROJECTION
-  //-------------------
+  /*****************/
+  /**
+  * Update projection
+  **/
+  /*****************/
   CBProjection projectionBuffer;
   projectionBuffer.mProjection = m_camera.m_projection.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
@@ -196,29 +200,10 @@ DX11GraphicsAPI::render()
   // Render the Game Objects
   setShaders();
   // for each Game Oobject
-  for (uint32 i = 0; i < gameObjects.size(); ++i)
-  {
-    // check all their models
-    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
-    {
-      // set the vertex and index buffers of the models
-      setVertexBuffers(*gameObjects[i]->m_models[j]);
-      setIndexBuffers(*gameObjects[i]->m_models[j]);
-    }
-  }
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &m_pSamplerLinear->m_pSampler);
-  // for each Game Object
-  for (uint32 i = 0; i < gameObjects.size(); ++i)
-  {
-    // check all their models
-    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
-    {
-      // draw the model
-      drawIndexed(*gameObjects[i]->m_models[j]);
-    }
-  }
+  renderGameObjects();
   // Present our back buffer to our front buffer
   m_pSwapChain->Present(1, 0);
 }
@@ -449,14 +434,19 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // how it will be binded to the pipeline
   bd.CPUAccessFlags = 0; // default -> CPU ha no accesss to this
   bd.MiscFlags = 0;
-  // bd.StructureByteStride = sizeof(SimpleVertex); // size of each element
 
-  D3D11_SUBRESOURCE_DATA InitData; // info descriptor
+  // info descriptor
+  D3D11_SUBRESOURCE_DATA InitData;
   memset(&InitData, 0, sizeof(InitData));
   InitData.pSysMem = _vertex.data(); // pointer to the initialization data
   InitData.SysMemPitch = static_cast<uint32>(_vertex.size() * sizeof(SimpleVertex)); // distance between values
 
   // create the buffer
+  if (!m_pDevice->m_pd3dDevice)
+  {
+    // if device is null
+    return nullptr;
+  }
   m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->m_pBuffer);
   return dxVB;
 }
@@ -468,7 +458,13 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                                  uint32 _offset)
 {
   // reinterpret pointer
-  auto dxVB = std::reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  auto dxVB = std::dynamic_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  if (!dxVB)
+  {
+    // failed to cast to DX11VertexBuffer
+    return;
+  }
+  
   // get the offset
   uint32 stride = sizeof(SimpleVertex);
   //set the buffer
@@ -513,10 +509,30 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
                                 uint32 _offset)
 {
   // reinterpret pointer
-  auto dxIB = std::reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  auto dxIB = std::dynamic_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  if (!dxIB)
+  {
+    // failed to cast to DX11IndexBuffer
+    return;
+  }
   m_pDevice->m_pImmediateContext->IASetIndexBuffer(dxIB->m_pBuffer,
                                                    static_cast<DXGI_FORMAT>(_format),
                                                    _offset);
+}
+
+void
+DX11GraphicsAPI::renderGameObjects()
+{
+  // for each Game Object
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
+  {
+    // check all their models
+    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
+    {
+      // draw the model
+      drawIndexed(*gameObjects[i]->m_models[j]);
+    }
+  }
 }
 
 void

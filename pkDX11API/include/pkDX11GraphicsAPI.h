@@ -204,6 +204,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                  uint32 _offset = 0);
 
   /**
+  * Render all GameObjects.
+  **/
+  void
+  renderGameObjects();
+
+  /**
   * Draw the model.
   **/
   void

@@ -87,20 +87,6 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
   m_pDevice->setPrimitiveTopology();
 
-  Model* model = new Model();
-  String modelPath = "D:/Work/visual studio/PreskGameEngine/models/maneater.fbx";
-  model->load(modelPath);
-  model->vertexB =  createVertexBuffer(model->vertex);
-  model->indexB = createIndexBuffer(model->index);
-  setVertexBuffers(*model);
-  setIndexBuffers(*model);
-
-  GameObject* gameObject = new GameObject();
-  gameObject->init(Transform(0.0f));
-  gameObject->setScale(Matrix4(1.0f));
-  gameObject->insertModel(model);
-  gameObjects.push_back(gameObject);
-
   m_light.Type = LIGHT_TYPE::kDirectional;
   m_light.LightDir = Vector3::FORWARD;
   m_cBView.create(m_pDevice, static_cast<uint32>(sizeof(CBView)));
@@ -118,21 +104,10 @@ DX11GraphicsAPI::initApi(const Window& _window)
                 Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
                 Vector4(0.0f, 0.0f, 0.0f, 1.0f),
                 Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  updateCamera();
-  int32 ret = messageLoop();
-}
-
-int32
-DX11GraphicsAPI::messageLoop()
-{
-  while (true)
-  {
-    render();
-  }
 }
 
 void
-DX11GraphicsAPI::updateCamera()
+DX11GraphicsAPI::updateCamera(Camera* _pCamera)
 {
   /*****************/
   /**
@@ -140,7 +115,7 @@ DX11GraphicsAPI::updateCamera()
   **/
   /*****************/
   CBView viewBuffer;
-  viewBuffer.mView = m_camera.m_view.getTransposed();
+  viewBuffer.mView = _pCamera->m_view.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
     0,
     nullptr,
@@ -154,7 +129,7 @@ DX11GraphicsAPI::updateCamera()
   **/
   /*****************/
   CBProjection projectionBuffer;
-  projectionBuffer.mProjection = m_camera.m_projection.getTransposed();
+  projectionBuffer.mProjection = _pCamera->m_projection.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
     0,
     nullptr,
@@ -202,10 +177,23 @@ DX11GraphicsAPI::render()
   // for each Game Oobject
   VSSetConstantBuffers();
   PSSetConstantBuffers();
-  m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &m_pSamplerLinear->m_pSampler);
+  setSampler(m_pSamplerLinear);
   renderGameObjects();
   // Present our back buffer to our front buffer
   m_pSwapChain->Present(1, 0);
+}
+
+Model*
+DX11GraphicsAPI::loadModel(String& _path)
+{
+  Model* model = new Model();
+  String modelPath = _path;
+  model->load(modelPath);
+  model->vertexB = createVertexBuffer(model->vertex);
+  model->indexB = createIndexBuffer(model->index);
+  setVertexBuffers(*model);
+  setIndexBuffers(*model);
+  return model;
 }
 
 void
@@ -403,6 +391,12 @@ DX11GraphicsAPI::PSSetConstantBuffers()
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
   m_pDevice->m_pImmediateContext->PSSetConstantBuffers(3, 1, &m_cbLight.m_pCBuffer);
+}
+
+void
+DX11GraphicsAPI::setSampler(DX11SamplerState* _pSampler)
+{
+  m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &_pSampler->m_pSampler);
 }
 
 void

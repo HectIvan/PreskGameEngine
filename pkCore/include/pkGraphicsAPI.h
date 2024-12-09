@@ -9,8 +9,8 @@
 *
 * @bug No bug known.
 *
-* @HectIvan 2/12/2024
-* Added a temporary render function.
+* @HectIvan 09/12/2024
+* changed the render function.
 */
 /************************************************************************/
 #pragma once
@@ -20,6 +20,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkCamera.h"
 #include "pkGameObject.h"
 #include "pkModel.h"
 #include "pkModule.h"
@@ -53,17 +54,26 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   render() = 0;
 
-  virtual int32
-  messageLoop() = 0;
+  /**
+  * Load a model.
+  * 
+  * @param _path
+  * Path of the mesh that the model will have.
+  * 
+  * @return
+  * Pointer to the new model.
+  **/
+  virtual Model*
+  loadModel(String& _path) = 0;
 
   /**
   * Insert a new game object to the game objects vector.
   * 
-  * @param _gameObject
+  * @param _pGameObject
   * Pointer to the new gameObject.
   **/
   void
-  insertGameObject(GameObject* _gameObject) { gameObjects.push_back(_gameObject); }
+  insertGameObject(GameObject* _pGameObject) { gameObjects.push_back(_pGameObject); }
 
   /**
   * Create a VertexBuffer
@@ -99,7 +109,11 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                  uint32 _format = 42,
                  uint32 _offset = 0) = 0;
 
+  virtual void
+  updateCamera(Camera* _pCamera) = 0;
+
  public:
   Vector<GameObject*> gameObjects;
+  Camera m_camera;
 };
 }

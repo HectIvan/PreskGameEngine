@@ -20,7 +20,6 @@
 * Includes
 **/
 /*********************************************/
-#include "pkCamera.h"
 #include "pkDX11ConstantBuffer.h"
 #include "pkDX11DepthStencilView.h"
 #include "pkDX11Device.h"
@@ -63,8 +62,17 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   render() override;
 
-  int32
-  messageLoop() override;
+  /**
+  * Load a model.
+  *
+  * @param _path
+  * Path of the mesh that the model will have.
+  *
+  * @return
+  * Pointer to the new model.
+  **/
+  Model*
+  loadModel(String& _path) override;
 
   /**
   * Create the device and swap chain.
@@ -176,6 +184,15 @@ class DX11GraphicsAPI : public GraphicsAPI
   PSSetConstantBuffers();
 
   /**
+  * Set the sampler state.
+  * 
+  * @param _pSampler
+  * Sampler state to be set.
+  **/
+  void
+  setSampler(DX11SamplerState* _pSampler);
+
+  /**
   * Clear the depth and back buffers
   **/
   void
@@ -216,11 +233,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   drawIndexed(Model& model);
 
   void
-  updateCamera();
+  updateCamera(Camera* _pCamera) override;
   
+ public:
   // window
   Window m_window;
-  Camera m_camera;
 
   // api device
   DX11Device* m_pDevice;

@@ -7,7 +7,8 @@
 *
 * This file will contain the Camera used for the engine
 *
-* @bug No bug known.
+* @bug.
+* Currently unable to move.
 *
 * @HectIvan 30/09/2024
 */

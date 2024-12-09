@@ -17,8 +17,9 @@
 * Includes
 **/
 /*********************************************/
+#include "pkKey.h"
 #include "pkPrerequisitesCore.h"
-#include "pkEvent.h"
+#include "pkVector2.h"
 
 namespace pkEngineSDK {
 
@@ -28,8 +29,27 @@ class EventQueue
   EventQueue() = default;
   ~EventQueue() = default;
 
+  /**
+  * update both key inputs as well
+  * as the mouse position.
+  **/
+  void
+  poll();
+
+  /**
+  * check if the key is being pressed.
+  * 
+  * @param _key
+  * Key to look for.
+  * 
+  * @return
+  * If the key was pressed or not.
+  **/
+  bool
+  iskeyPressed(KEY::E _key);
 
  private:
-  Queue<Event> m_eventQueue;
+  std::unordered_map<uint32, Key> keys;
+  Vector2 mousePosition;
 };
 }

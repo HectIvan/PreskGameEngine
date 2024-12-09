@@ -19,13 +19,22 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
+
+namespace TYPE
+{
+  enum E
+  {
+    kKey = 0,
+    kMouse
+  };
+}
 
 class Event
 {
  public:
   Event() = default;
-  ~Event() = default;
-
+  virtual ~Event() = default;
 };
 }

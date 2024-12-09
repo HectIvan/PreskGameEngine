@@ -101,13 +101,14 @@ PS_INPUT VS(VS_INPUT input)
     output.Pos = mul(float4(input.Pos, 1.0f), World);
     output.Pos = mul(output.Pos, View);
     output.Pos = mul(output.Pos, Projection);
+    output.Tex = input.Tex;
     
     // Light rotates with model
     // output.Normal = input.Normal;
     
     //Static directional light
     output.Normal = mul(float4(input.Normal, 0.0f), World);
-    output.Tex = input.Tex; //UnpackUV(input.Tex.xy);
+    //  output.Tex = input.Tex; //UnpackUV(input.Tex.xy);
     
     return output;
 }
@@ -134,7 +135,7 @@ float4 PS(PS_INPUT input) : SV_Target
     // ----------------------------------------
     //              LIGHT DIRECTION
     // ----------------------------------------
-    float3 lightDir = LightPos; // focus
+    float3 lightDir = LightPos;// focus
     float distToLight = length(lightDir);
     float sqrDistToLight = distToLight * distToLight;
     lightDir = LightDir / distToLight;

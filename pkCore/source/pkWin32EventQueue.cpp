@@ -25,7 +25,8 @@ EventQueue::poll()
   // update cursor position
   POINT curPos;
   GetCursorPos(&curPos);
-  mousePosition = Vector2(curPos.x, curPos.y);
+  mousePosition = Vector2(static_cast<float>(curPos.x),
+                          static_cast<float>(curPos.y));
 }
 
 bool

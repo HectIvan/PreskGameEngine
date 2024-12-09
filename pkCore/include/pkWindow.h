@@ -59,9 +59,6 @@ class PK_CORE_EXPORT Window
   **/
   void
   create(const PKWindowDesc& _desc, String& _name);
-
-  int32
-  messageLoop();
   
   /**
   * Set size.

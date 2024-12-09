@@ -76,22 +76,6 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   ShowWindow(m_windowH, 1);
 }
 
-int32
-Window::messageLoop()
-{
-  MSG msg = { 0 };
-  float time = static_cast<float>(GetTickCount64());
-  while (WM_QUIT != msg.message)
-  {
-    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-    {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
-  }
-  return static_cast<int32>(msg.wParam);
-}
-
 Vector2
 Window::getClientWidthHeight()
 {

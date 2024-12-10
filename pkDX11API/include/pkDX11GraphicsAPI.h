@@ -147,6 +147,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   setViewport(uint32 _width,
               uint32 _height);
 
+  void
+  setGameObjectsBuffers();
+
   /**
   * Set the buffer of vertex to the model.
   **/

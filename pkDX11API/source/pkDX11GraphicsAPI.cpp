@@ -104,6 +104,7 @@ DX11GraphicsAPI::initApi(const Window& _window)
                 Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
                 Vector4(0.0f, 0.0f, 0.0f, 1.0f),
                 Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+  updateCamera(&m_camera);
 }
 
 void
@@ -117,11 +118,11 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   CBView viewBuffer;
   viewBuffer.mView = _pCamera->m_view.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
-    0,
-    nullptr,
-    &viewBuffer,
-    0,
-    0);
+                                                    0,
+                                                    nullptr,
+                                                    &viewBuffer,
+                                                    0,
+                                                    0);
 
   /*****************/
   /**
@@ -131,11 +132,11 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   CBProjection projectionBuffer;
   projectionBuffer.mProjection = _pCamera->m_projection.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
-    0,
-    nullptr,
-    &projectionBuffer,
-    0,
-    0);
+                                                    0,
+                                                    nullptr,
+                                                    &projectionBuffer,
+                                                    0,
+                                                    0);
 }
 
 void
@@ -146,6 +147,9 @@ DX11GraphicsAPI::render()
   {
     t += 3.1416f * 0.0125f;
   }
+  /**
+  * From original graphics 2 project
+  **/
   else
   {
     static DWORD dwTimeStart = 0;
@@ -172,12 +176,15 @@ DX11GraphicsAPI::render()
   m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
   m_cbLight.updateSubResource(m_pDevice, &m_light, (uint32)sizeof(Light));
 
-  // Render the Game Objects
+
   setShaders();
-  // for each Game Oobject
+  // set vertex and pixel buffers
+  setGameObjectsBuffers();
   VSSetConstantBuffers();
   PSSetConstantBuffers();
+  // set the sampler linear
   setSampler(m_pSamplerLinear);
+  // render all gameObjects
   renderGameObjects();
   // Present our back buffer to our front buffer
   m_pSwapChain->Present(1, 0);
@@ -355,6 +362,19 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   vp.TopLeftY = 0;
   m_pDevice->m_pImmediateContext->RSSetViewports(1, &vp);
   m_world = Matrix4::IDENTITY;
+}
+
+void
+DX11GraphicsAPI::setGameObjectsBuffers()
+{
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
+  {
+    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
+    {
+      setVertexBuffers(*gameObjects[i]->m_models[j]);
+      setIndexBuffers(*gameObjects[i]->m_models[j]); ;
+    }
+  }
 }
 
 void

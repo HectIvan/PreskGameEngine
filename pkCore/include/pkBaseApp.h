@@ -7,7 +7,8 @@
 *
 * This file contains the Base App of the engine
 *
-* @bug No bug known.
+* @bug.
+* User input for the camera seems to not process.
 * 
 * @HectIvan 09/12/2024
 * Added a render and messageLoop functions. 
@@ -20,6 +21,8 @@
 * Includes
 **/
 /*********************************************/
+#include <chrono>
+
 #include "pkEventQueue.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
@@ -28,6 +31,9 @@ namespace pkEngineSDK
 {
 
 class GraphicsAPI;
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
 
 class PK_CORE_EXPORT BaseApp
 {
@@ -61,6 +67,15 @@ class PK_CORE_EXPORT BaseApp
   **/
   void
   messageLoop(GraphicsAPI* _api);
+
+  /**
+  * Gets the time elapsed between frames.
+  * 
+  * @return
+  * The deltaTime.
+  **/
+  float
+  getDeltaTime(high_resolution_clock::time_point& _delta);
 
   /**
   * Render the scene.

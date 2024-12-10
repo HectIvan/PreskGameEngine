@@ -132,6 +132,9 @@
     <ClInclude Include="include\pkKey.h">
       <Filter>include\events</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkComponent.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

@@ -21,6 +21,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkMatrix4.h"
+#include "pkComponent.h"
 #include "pkModel.h"
 
 namespace pkEngineSDK
@@ -133,6 +134,7 @@ class PK_CORE_EXPORT GameObject
 
  public:
   Vector<Model*> m_models;
+  Vector<Component*> m_components;
   Transform m_transform;
 };
 }

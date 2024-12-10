@@ -46,6 +46,7 @@ namespace KEY
     kE = 0x45,
     kQ = 0x51,
     kSpace = 0x20,
+    kEsc = 0x1B,
   };
 }
 

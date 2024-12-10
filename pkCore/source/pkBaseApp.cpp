@@ -19,9 +19,6 @@ createGameObject(Model* _model);
 void
 insertGameObject(GameObject* _object, Vector<GameObject*>& _vector);
 
-void
-render();
-
 /*********************************************/
 /**
 * Definitions.
@@ -93,41 +90,60 @@ printVal(Vector4 _val)
 void
 BaseApp::messageLoop(GraphicsAPI* _api)
 {
-  while (true)
+  high_resolution_clock::time_point delta = high_resolution_clock::now();
+  bool run = true;
+  while (run)
   {
+    float deltaTime = getDeltaTime(delta);
+    float camSpeed = cameraSpeed * deltaTime;
+    std::cout << _api->m_camera.m_eye.z << std::endl;
     eventQueue.poll();
     // move forward/backward
     if (eventQueue.iskeyPressed(KEY::kW))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, cameraSpeed));
+      _api->m_camera.move(Vector3(0.0f, 0.0f, camSpeed));
     }
     if (eventQueue.iskeyPressed(KEY::kS))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, -cameraSpeed));
+      _api->m_camera.move(Vector3(0.0f, 0.0f, -camSpeed));
     }
     // move left/right
     if (eventQueue.iskeyPressed(KEY::kA))
     {
-      _api->m_camera.move(Vector3(-cameraSpeed, 0.0f, 0.0f));
+      _api->m_camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kD))
     {
-      _api->m_camera.move(Vector3(cameraSpeed, 0.0f, 0.0f));
+      _api->m_camera.move(Vector3(camSpeed, 0.0f, 0.0f));
     }
     // move up/down
     if (eventQueue.iskeyPressed(KEY::kE))
     {
-      _api->m_camera.move(Vector3(0.0f, cameraSpeed, 0.0f));
+      _api->m_camera.move(Vector3(0.0f, camSpeed, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kQ))
     {
-      _api->m_camera.move(Vector3(0.0f, -cameraSpeed, 0.0f));
+      _api->m_camera.move(Vector3(0.0f, -camSpeed, 0.0f));
+    }
+    // leave the program
+    if (eventQueue.iskeyPressed(KEY::kEsc))
+    {
+      run = false;
     }
     // update camera
     _api->updateCamera(&_api->m_camera);
     // render the scene
     render(_api);
   }
+}
+
+float
+BaseApp::getDeltaTime(high_resolution_clock::time_point& _delta)
+{
+  high_resolution_clock::time_point end = high_resolution_clock::now();
+  float deltaTime = duration<float>(end - _delta).count();
+  _delta = high_resolution_clock::now();
+  return deltaTime;
 }
 
 void
@@ -150,11 +166,5 @@ void
 insertGameObject(GameObject* _object, Vector<GameObject*>& _vector)
 {
   _vector.push_back(_object);
-}
-
-void
-render()
-{
-
 }
 }

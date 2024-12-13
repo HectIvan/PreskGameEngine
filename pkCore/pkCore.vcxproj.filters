@@ -135,6 +135,9 @@
     <ClInclude Include="include\pkComponent.h">
       <Filter>include\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkConstantBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

@@ -5,6 +5,7 @@
 
 namespace pkEngineSDK
 {
+
 void
 DllLoader::init(const String& _name, const bool& _load)
 {

@@ -23,6 +23,8 @@
 /*********************************************/
 #include <chrono>
 
+#include "pkCamera.h"
+#include "pkConstantBuffer.h"
 #include "pkEventQueue.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
@@ -83,9 +85,22 @@ class PK_CORE_EXPORT BaseApp
   void
   render(GraphicsAPI* _api);
 
+  /**
+  * Update the camera buffers.
+  **/
+  void
+  updateCamera(Camera* _pCamera);
+
 public:
   Window window;
+  Camera camera;
   EventQueue eventQueue;
+
+  ConstantBuffer buffer;
+  ConstantBuffer cBView;
+  ConstantBuffer cBProjection;
+  ConstantBuffer cBWorld;
+  ConstantBuffer cbLight;
 
   float cameraSpeed;
 };

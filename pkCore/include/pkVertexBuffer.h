@@ -19,13 +19,9 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
-
-class Device;
-struct SimpleVertex;
 
 class VertexBuffer
 {

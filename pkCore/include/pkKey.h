@@ -19,6 +19,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 
+#if PK_PLATFORM == PK_PLATFORM_WIN32
 namespace pkEngineSDK
 {
 
@@ -49,6 +50,7 @@ namespace KEY
     kEsc = 0x1B,
   };
 }
+#endif
 
 struct Key
 {

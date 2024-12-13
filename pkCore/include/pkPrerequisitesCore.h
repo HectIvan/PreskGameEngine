@@ -24,6 +24,24 @@
 namespace pkEngineSDK
 {
 
+
+struct CBView
+{
+  Matrix4 view;
+};
+
+struct CBProjection
+{
+  Matrix4 projection;
+};
+
+struct CBWorld
+{
+  Matrix4 world;
+  Vector4 vMeshColor;
+
+};
+
 struct KeyPosition
 {
   Vector3 position;

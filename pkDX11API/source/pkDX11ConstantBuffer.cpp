@@ -28,7 +28,7 @@ DX11ConstantBuffer::create(DX11Device* _pDevice, uint32 _size, const void* _pDat
     subData.SysMemSlicePitch = 0;
   }
 
-  hr = _pDevice->m_pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &m_pCBuffer);
+  hr = _pDevice->pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &pCBuffer);
   if (FAILED(hr))
   {
     return hr;
@@ -39,12 +39,12 @@ DX11ConstantBuffer::create(DX11Device* _pDevice, uint32 _size, const void* _pDat
 void
 DX11ConstantBuffer::updateSubResource(DX11Device* _pDevice, const void* _pNewData, uint32 _size)
 {
-  _pDevice->m_pImmediateContext->UpdateSubresource(m_pCBuffer, 0, nullptr, _pNewData, _size, 0);
+  _pDevice->pImmediateContext->UpdateSubresource(pCBuffer, 0, nullptr, _pNewData, _size, 0);
 }
 
 void
 DX11ConstantBuffer::clean()
 {
-  if (m_pCBuffer) m_pCBuffer->Release();
+  if (pCBuffer) pCBuffer->Release();
 }
 }

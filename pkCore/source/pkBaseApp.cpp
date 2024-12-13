@@ -11,7 +11,7 @@ namespace pkEngineSDK
 {
 
 void
-run(String _name, Window& _window);
+run(String& _name, Window& _window);
 
 GameObject*
 createGameObject(Model* _model);
@@ -29,12 +29,20 @@ void
 BaseApp::init(const char** _argv)
 {
   initWindow();
+  camera.init(window.getWidth(),
+              window.getHeight(),
+              3.1416f / 4.0f,
+              0.01f,
+              1000.0f,
+              Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+              Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   initAPI(_argv);
   GraphicsAPI& api = GraphicsAPI::instance();
   String modelPath = "D:/Work/visual studio/PreskGameEngine/models/maneater.fbx";
   Model* model = api.loadModel(modelPath);
   insertGameObject(createGameObject(model), api.gameObjects);
-  cameraSpeed = 100.0f;
+  cameraSpeed = 10000.0f;
   messageLoop(&api);
 }
 
@@ -54,21 +62,14 @@ BaseApp::initAPI(const char** _argv)
   String abstraction = _argv[1];
 
 #ifdef PK_DEBUG_MODE
-  if (abstraction == "DX11API")
-  {
-    run("pkDX11APId", window);
-  }
-#else
-  if (abstraction == "DX11API")
-  {
-    run("pkDX11API", window);
-  }
+  abstraction.append("d");
 #endif
+  run(abstraction, window);
 }
 
 
 void
-run(String _name, Window& _window)
+run(String& _name, Window& _window)
 {
   DllLoader dll;
   dll.init(_name);
@@ -80,14 +81,6 @@ run(String _name, Window& _window)
 }
 
 void
-printVal(Vector4 _val)
-{
-  std::cout << _val.x << std::endl <<
-               _val.y << std::endl <<
-               _val.z << std::endl;
-}
-
-void
 BaseApp::messageLoop(GraphicsAPI* _api)
 {
   high_resolution_clock::time_point delta = high_resolution_clock::now();
@@ -96,34 +89,35 @@ BaseApp::messageLoop(GraphicsAPI* _api)
   {
     float deltaTime = getDeltaTime(delta);
     float camSpeed = cameraSpeed * deltaTime;
-    std::cout << _api->m_camera.m_eye.z << std::endl;
     eventQueue.poll();
     // move forward/backward
     if (eventQueue.iskeyPressed(KEY::kW))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, camSpeed));
+      std::cout << "Moved Forward" << std::endl;
+      camera.move(Vector3(0.0f, 0.0f, camSpeed));
     }
     if (eventQueue.iskeyPressed(KEY::kS))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, -camSpeed));
+      std::cout << "Moved Backwards" << std::endl;
+      camera.move(Vector3(0.0f, 0.0f, -camSpeed));
     }
     // move left/right
     if (eventQueue.iskeyPressed(KEY::kA))
     {
-      _api->m_camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
+      camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kD))
     {
-      _api->m_camera.move(Vector3(camSpeed, 0.0f, 0.0f));
+      camera.move(Vector3(camSpeed, 0.0f, 0.0f));
     }
     // move up/down
     if (eventQueue.iskeyPressed(KEY::kE))
     {
-      _api->m_camera.move(Vector3(0.0f, camSpeed, 0.0f));
+      camera.move(Vector3(0.0f, camSpeed, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kQ))
     {
-      _api->m_camera.move(Vector3(0.0f, -camSpeed, 0.0f));
+      camera.move(Vector3(0.0f, -camSpeed, 0.0f));
     }
     // leave the program
     if (eventQueue.iskeyPressed(KEY::kEsc))
@@ -131,7 +125,7 @@ BaseApp::messageLoop(GraphicsAPI* _api)
       run = false;
     }
     // update camera
-    _api->updateCamera(&_api->m_camera);
+    updateCamera(&camera);
     // render the scene
     render(_api);
   }
@@ -150,6 +144,38 @@ void
 BaseApp::render(GraphicsAPI* _api)
 {
   _api->render();
+}
+
+void
+BaseApp::updateCamera(Camera* _pCamera)
+{
+  /*****************/
+  /**
+  * Update view
+  **/
+  /*****************/
+  CBView viewBuffer = CBView();
+  viewBuffer.view = _pCamera->view.getTransposed();
+  pDevice->pImmediateContext->UpdateSubresource(cBView.pCBuffer,
+                                                0,
+                                                nullptr,
+                                                &viewBuffer,
+                                                0,
+                                                0);
+
+  /*****************/
+  /**
+  * Update projection
+  **/
+  /*****************/
+  CBProjection projectionBuffer = CBProjection();
+  projectionBuffer.projection = _pCamera->projection.getTransposed();
+  pDevice->pImmediateContext->UpdateSubresource(cBProjection.pCBuffer,
+                                                0,
+                                                nullptr,
+                                                &projectionBuffer,
+                                                0,
+                                                0);
 }
 
 GameObject*

@@ -19,7 +19,8 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 using std::wstring;
 
@@ -29,7 +30,7 @@ class DX11Shaders
   DX11Shaders() = default;
   virtual ~DX11Shaders()
   {
-    safeRelease(m_pSBlob);
+    safeRelease(pSBlob);
   }
 
   /**
@@ -58,14 +59,8 @@ class DX11Shaders
                         LPCSTR _szEntryPoint,
                         LPCSTR _szShaderModel,
                         ID3DBlob** _ppBlobOut);
-  
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
 
  public:
-  ID3DBlob* m_pSBlob = nullptr;
+  ID3DBlob* pSBlob = nullptr;
 };
 }

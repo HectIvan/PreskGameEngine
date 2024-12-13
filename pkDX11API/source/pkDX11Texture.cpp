@@ -37,7 +37,7 @@ DX11Texture::create(DX11Device* _pDevice,
 
   // create the texture
   ID3D11Texture2D* tex = nullptr;
-  _pDevice->m_pd3dDevice->CreateTexture2D(&desc, &initData, &tex);
+  _pDevice->pd3dDevice->CreateTexture2D(&desc, &initData, &tex);
 }
 
 void

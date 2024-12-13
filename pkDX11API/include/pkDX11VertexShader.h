@@ -30,7 +30,7 @@ public:
   DX11VertexShader() = default;
   virtual ~DX11VertexShader()
   {
-    safeRelease(m_pSBlob);
+    safeRelease(pSBlob);
   }
   /**
   * Compile.
@@ -57,13 +57,7 @@ public:
   HRESULT
   create(DX11Device* _pDevice);
 
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
-
  public:
-  ID3D11VertexShader* m_pShader = nullptr;
+  ID3D11VertexShader* pShader = nullptr;
 };
 }

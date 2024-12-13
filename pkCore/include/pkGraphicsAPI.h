@@ -19,8 +19,7 @@
 /**
 * Includes
 **/
-/*********************************************/
-#include "pkCamera.h"
+
 #include "pkGameObject.h"
 #include "pkModel.h"
 #include "pkModule.h"
@@ -29,6 +28,7 @@
 namespace pkEngineSDK
 {
 
+class Camera;
 class Device;
 class IndexBuffer;
 class VertexBuffer;
@@ -109,11 +109,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                  uint32 _format = 42,
                  uint32 _offset = 0) = 0;
 
-  virtual void
-  updateCamera(Camera* _pCamera) = 0;
-
  public:
   Vector<GameObject*> gameObjects;
-  Camera m_camera;
 };
 }

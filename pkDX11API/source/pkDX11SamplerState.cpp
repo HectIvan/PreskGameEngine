@@ -7,9 +7,4 @@
 
 namespace pkEngineSDK {
 
-void
-DX11SamplerState::clean()
-{
-  safeRelease(m_pSampler);
-}
 }

@@ -102,7 +102,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   createSamplerState();
 
-
   /**
   * Create the depth stencil texture and view.
   * 
@@ -135,27 +134,79 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   setSampler() override;
 
+  /**
+  * Create the vertex buffer.
+  * 
+  * @param _vertex
+  * Vector with all the vertex data needed.
+  * 
+  * @param _usage
+  * What use will it be given to the buffer.
+  **/
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     uint32 _usage = 0);
+                     uint32 _usage = 0) override;
 
   void
   setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
                   uint32 _bufferCount = 1,
-                  uint32 _offset = 0);
+                  uint32 _offset = 0) override;
 
   /**
   * Create an IndexBuffer
+  * 
+  * @param _index
+  * Vector with all the index data needed.
+  * 
+  * @param _usage
+  * What use will it be given to the buffer.
   **/
   SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    uint32 _usage = 0);
+                    uint32 _usage = 0) override;
 
   void
   setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
                  uint32 _format = 42,
-                 uint32 _offset = 0);
+                 uint32 _offset = 0) override;
+
+  /**
+  * Create the constant buffer.
+  * 
+  * @param _pDevice
+  * What device will create the buffer.
+  * 
+  * @param _size
+  * Size of the constant buffer.
+  * 
+  * @param _pData
+  * What data will the constant buffer store.
+  * 
+  * @param _usage
+  * What usage will be given to the buffer.
+  **/
+  SPtr<ConstantBuffer>
+  createConstantBuffer(uint32 _size,
+                       const void* _pData,
+                       uint32 _usage) override;
+
+  /**
+  * Update the constant buffer.
+  * 
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  * 
+  * @param _pNewData
+  * New data that the buffer will store.
+  * 
+  * @param _size
+  * Size of the data to store.
+  **/
+  void
+  updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       const void* _pNewData,
+                       uint32 _size) override;
 
   /**
   * Draw the indexed data.
@@ -174,9 +225,6 @@ class DX11GraphicsAPI : public GraphicsAPI
               uint32 _startIndexLocation,
               uint32 _baseVertexLocation) override;
 
-  void
-  updateCamera(Camera* _pCamera) override;
-
   /**
   * Clear the render target fiew and fill the
   * screen with a new color.
@@ -194,28 +242,44 @@ class DX11GraphicsAPI : public GraphicsAPI
   clearDepthBuffer(float _depth) override;
 
   /**
-  * Update the light and world constant buffers.
-  **/
-  void
-  updateWorldAndLightCB() override;
-
-  /**
   * Set the shaders of the api.
   **/
   void
   setShaders() override;
 
   /**
-  * Set the Vertex Shader constant buffers.
+  * Set the Vertex Shader constant buffer.
+  * 
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  * 
+  * @param _startSlot
+  * Index into the device's zero-based array.
+  * 
+  * @param _numBuffers
+  * Number of buffers to set.
   **/
   void
-  VSSetConstantBuffers() override;
+  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       uint32 _startSlot,
+                       uint32 _numBuffers) override;
 
   /**
-  * Set the Pixel Shader constant buffers.
+  * Set the Pixel Shader constant buffer.
+  *
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  *
+  * @param _startSlot
+  * Index into the device's zero-based array.
+  *
+  * @param _numBuffers
+  * Number of buffers to set.
   **/
   void
-  PSSetConstantBuffers() override;
+  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       uint32 _startSlot,
+                       uint32 _numBuffers) override;
 
   /**
   * Present the result to the screen.
@@ -253,18 +317,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   // mesh color
   Vector4 vMeshColor;
 
-  // world matrix
-  Matrix4 world;
-
-  // light source
-  Light light;
-
   // constant buffers
-  DX11ConstantBuffer buffer;
-  DX11ConstantBuffer cBView;
-  DX11ConstantBuffer cBProjection;
-  DX11ConstantBuffer cBWorld;
-  DX11ConstantBuffer cbLight;
+  // DX11ConstantBuffer buffer;
+  // DX11ConstantBuffer cBView;
+  // DX11ConstantBuffer cBProjection;
+  // DX11ConstantBuffer cBWorld;
+  // DX11ConstantBuffer cbLight;
 
  private:
   // api device

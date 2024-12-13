@@ -19,13 +19,14 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkConstantBuffer.h"
 
 namespace pkEngineSDK
 {
 
 class DX11Device;
 
-class DX11ConstantBuffer
+class DX11ConstantBuffer : public ConstantBuffer
 {
 public:
   DX11ConstantBuffer() = default;
@@ -33,27 +34,6 @@ public:
   {
     safeRelease(pCBuffer);
   }
-
-  /**
-  * 
-  **/
-  HRESULT
-  create(DX11Device* _pDevice, uint32 _size, const void* _pData = nullptr, uint32 _usage = D3D11_USAGE_DEFAULT); // int _size && int_usage are temporary
-
-  /**
-  * Updates the data inside of the buffer
-  * 
-  * @param _pDevice
-  * Device that we will use.
-  * 
-  * @param _pNewData
-  * New data that the buffer will store.
-  * 
-  * @param _size
-  * Size of the data.
-  **/
-  void
-  updateSubResource(DX11Device* _pDevice, const void* _pNewData, uint32 _size); // int _size is temporary
 
  public:
   ID3D11Buffer* pCBuffer = nullptr;

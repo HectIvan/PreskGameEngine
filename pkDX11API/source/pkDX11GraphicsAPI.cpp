@@ -86,14 +86,52 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
   m_pDevice->setPrimitiveTopology();
 
-  light.Type = LIGHT_TYPE::kDirectional;
-  light.LightDir = Vector3::FORWARD;
-  cBView.create(m_pDevice, static_cast<uint32>(sizeof(CBView)));
-  cBProjection.create(m_pDevice, static_cast<uint32>(sizeof(CBProjection)));
-  cBWorld.create(m_pDevice, static_cast<uint32>(sizeof(CBWorld)));
-  cbLight.create(m_pDevice, static_cast<uint32>(sizeof(Light)));
-
   createSamplerState();
+}
+
+SPtr<ConstantBuffer>
+DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _usage)
+{
+  auto dxCB = std::make_shared<DX11ConstantBuffer>();
+  HRESULT hr;
+  D3D11_BUFFER_DESC bDesc;
+  bDesc.Usage = static_cast<D3D11_USAGE>(_usage);
+  bDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  bDesc.MiscFlags = 0;
+  bDesc.ByteWidth = _size;
+  bDesc.CPUAccessFlags = _usage == D3D10_USAGE_DYNAMIC ?
+    D3D11_CPU_ACCESS_WRITE : 0;
+
+  D3D11_SUBRESOURCE_DATA subData;
+  if (_pData)
+  {
+    subData.pSysMem = _pData;
+    subData.SysMemPitch = _size;
+    subData.SysMemSlicePitch = 0;
+  }
+
+  hr = m_pDevice->pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &dxCB->pCBuffer);
+  if (FAILED(hr))
+  {
+    return nullptr;
+  }
+
+  return dxCB;
+}
+
+void
+DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                                      const void* _pNewData,
+                                      uint32 _size)
+{
+  // cast to DX11ConstantBuffer
+  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  if (!dxCB) // casting failed
+  {
+    return;
+  }
+  // update with the new data
+  m_pDevice->pImmediateContext->UpdateSubresource(dxCB->pCBuffer, 0, nullptr, _pNewData, _size, 0);
 }
 
 void
@@ -101,41 +139,10 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
                              uint32 _startIndexLocation,
                              uint32 _baseVertexLocation)
 {
+  // draw the data
   m_pDevice->pImmediateContext->DrawIndexed(_indexCount,
                                             _startIndexLocation,
                                             _baseVertexLocation);
-}
-
-void
-DX11GraphicsAPI::updateCamera(Camera* _pCamera)
-{
-  /*****************/
-  /**
-  * Update view
-  **/
-  /*****************/
-  CBView viewBuffer = CBView();
-  viewBuffer.view = _pCamera->view.getTransposed();
-  m_pDevice->pImmediateContext->UpdateSubresource(cBView.pCBuffer,
-                                                  0,
-                                                  nullptr,
-                                                  &viewBuffer,
-                                                  0,
-                                                  0);
-
-  /*****************/
-  /**
-  * Update projection
-  **/
-  /*****************/
-  CBProjection projectionBuffer = CBProjection();
-  projectionBuffer.projection = _pCamera->projection.getTransposed();
-  m_pDevice->pImmediateContext->UpdateSubresource(cBProjection.pCBuffer,
-                                                0,
-                                                nullptr,
-                                                &projectionBuffer,
-                                                0,
-                                                0);
 }
 
 void
@@ -152,15 +159,6 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth)
                                                       D3D11_CLEAR_DEPTH,
                                                       _depth,
                                                       0);
-}
-
-void
-DX11GraphicsAPI::updateWorldAndLightCB()
-{
-  CBWorld ef;
-  ef.world = world;
-  cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
-  cbLight.updateSubResource(m_pDevice, &light, (uint32)sizeof(Light));
 }
 
 void
@@ -332,27 +330,29 @@ DX11GraphicsAPI::setShaders()
 }
 
 void
-DX11GraphicsAPI::VSSetConstantBuffers()
+DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                                      uint32 _startSlot,
+                                      uint32 _numBuffers)
 {
-  m_pDevice->pImmediateContext->VSSetConstantBuffers(0, 1, &cBView.pCBuffer);
-  m_pDevice->pImmediateContext->VSSetConstantBuffers(1, 1, &cBProjection.pCBuffer);
-  m_pDevice->pImmediateContext->VSSetConstantBuffers(2, 1, &cBWorld.pCBuffer);
-  m_pDevice->pImmediateContext->VSSetConstantBuffers(3, 1, &cbLight.pCBuffer);
+  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  if (!dxCB) { return; } // casting failed
+  m_pDevice->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void
-DX11GraphicsAPI::PSSetConstantBuffers()
+DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                                      uint32 _startSlot,
+                                      uint32 _numBuffers)
 {
-  m_pDevice->pImmediateContext->PSSetConstantBuffers(0, 1, &cBView.pCBuffer);
-  m_pDevice->pImmediateContext->PSSetConstantBuffers(1, 1, &cBProjection.pCBuffer);
-  m_pDevice->pImmediateContext->PSSetConstantBuffers(2, 1, &cBWorld.pCBuffer);
-  m_pDevice->pImmediateContext->PSSetConstantBuffers(3, 1, &cbLight.pCBuffer);
+  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  if (!dxCB) { return; } // casting failed
+  m_pDevice->pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void
 DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 {
-  pSwapChain->Present(1, 0);
+  pSwapChain->Present(_syncInterval, _flags);
 }
 
 void

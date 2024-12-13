@@ -28,19 +28,20 @@ namespace pkEngineSDK
 {
 
 class Camera;
+class ConstantBuffer;
 class Device;
 class IndexBuffer;
 class VertexBuffer;
 
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
- public:
+public:
   GraphicsAPI() = default;
   virtual ~GraphicsAPI() = default;
 
   /**
   * Initialize the graphic api.
-  * 
+  *
   * @param _wHnd
   * Handler to the window to be used.
   **/
@@ -65,7 +66,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   **/
   virtual SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                     uint32 _usage = 0) = 0;
+                    uint32 _usage = 0) = 0;
 
   /**
   * Set the index buffer.
@@ -82,13 +83,41 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                  uint32 _offset = 0) = 0;
 
   /**
-  * Update the camera buffers.
+  * Create the constant buffer.
+  *
+  * @param _pDevice
+  * What device will create the buffer.
+  *
+  * @param _size
+  * Size of the constant buffer.
+  *
+  * @param _pData
+  * What data will the constant buffer store.
+  *
+  * @param _usage
+  * What usage will be given to the buffer.
+  **/
+  virtual SPtr<ConstantBuffer>
+  createConstantBuffer(uint32 _size,
+                       const void* _pData,
+                       uint32 _usage) = 0;
+
+  /**
+  * Update the constant buffer.
   * 
-  * @param _pCamera
-  * Camera to update.
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  * 
+  * @param _pNewData
+  * New data that the buffer will store.
+  * 
+  * @param _size
+  * Size of the data to store.
   **/
   virtual void
-  updateCamera(Camera* _pCamera) = 0;
+  updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       const void* _pNewData,
+                       uint32 _size) = 0;
 
   /**
   * Draw the indexed data.
@@ -122,12 +151,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   **/
   virtual void
   clearDepthBuffer(float _depth) = 0;
-
-  /**
-  * Update the light and world constant buffers.
-  **/
-  virtual void
-  updateWorldAndLightCB() = 0;
   
   /**
   * Set the shaders of the api.
@@ -136,16 +159,38 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   setShaders() = 0;
 
   /**
-  * Set the Vertex Shader constant buffers.
+  * Set the Vertex Shader constant buffer.
+  *
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  *
+  * @param _startSlot
+  * Index into the device's zero-based array.
+  *
+  * @param _numBuffers
+  * Number of buffers to set.
   **/
   virtual void
-  VSSetConstantBuffers() = 0;
+  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       uint32 _startSlot,
+                       uint32 _numBuffers) = 0;
 
   /**
-  * Set the Pixel Shader constant buffers.
+  * Set the Pixel Shader constant buffer.
+  *
+  * @param _pCBuffer
+  * Pointer to the constant buffer.
+  *
+  * @param _startSlot
+  * Index into the device's zero-based array.
+  *
+  * @param _numBuffers
+  * Number of buffers to set.
   **/
   virtual void
-  PSSetConstantBuffers() = 0;
+  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                       uint32 _startSlot,
+                       uint32 _numBuffers) = 0;
 
   /**
   * Set the sampler state.
@@ -164,5 +209,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   **/
   virtual void
   present(uint32 _syncInterval, uint32 _flags) = 0;
+
+ public:
+  // world matrix
+  Matrix4 world;
 };
 }

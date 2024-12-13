@@ -24,8 +24,10 @@
 #include <chrono>
 
 #include "pkCamera.h"
+#include "pkConstantBuffer.h"
 #include "pkEventQueue.h"
 #include "pkGameObject.h"
+#include "pkLight.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
 
@@ -62,6 +64,12 @@ class PK_CORE_EXPORT BaseApp
   initAPI(const char** _argv);
 
   /**
+  * Create the constant buffers needed.
+  **/
+  void
+  createBuffers();
+
+  /**
   * Event message loop.
   * 
   * @param _api
@@ -80,10 +88,31 @@ class PK_CORE_EXPORT BaseApp
   loadModel(String& _path);
 
   /**
+  * Update the camera.
+  * 
+  * @param _pCamera
+  * Camera to update.
+  **/
+  void
+  updateCamera(Camera* _pCamera);
+
+  /**
   * Set the buffers of each game object.
   **/
   void
   setGameObjectsBuffers();
+
+  /**
+  * Set the Vertex Shader constant buffers
+  **/
+  void
+  VSSetConstantBuffers();
+
+  /**
+  * Set the Pixel Shader constant buffers
+  **/
+  void
+  PSSetConstantBuffers();
 
   /**
   * Gets the time elapsed between frames.
@@ -116,12 +145,25 @@ class PK_CORE_EXPORT BaseApp
   renderModel(Model& _model);
 
  public:
+  // system
   Window window;
   Camera camera;
   EventQueue eventQueue;
 
+  // vector of game objects in the scene
   Vector<GameObject*> gameObjects;
 
+  // light source
+  Light light;
+
+  // constant buffers
+  SPtr<ConstantBuffer> buffer;
+  SPtr<ConstantBuffer> cBView;
+  SPtr<ConstantBuffer> cBProjection;
+  SPtr<ConstantBuffer> cBWorld;
+  SPtr<ConstantBuffer> cbLight;
+
+  // camera movement speed
   float cameraSpeed;
 };
 }

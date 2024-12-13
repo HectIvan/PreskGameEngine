@@ -1,11 +1,13 @@
-#include "pkDllLoader.h"
+#include <iostream>
+
 #include "pkBaseApp.h"
+#include "pkDllLoader.h"
 #include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
+#include "pkLight.h"
 #include "pkModel.h"
+#include "pkPrerequisitesCore.h"
 #include "pkWindowDesc.h"
-
-#include <iostream>
 
 namespace pkEngineSDK
 {
@@ -30,6 +32,7 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
 {
   initWindow();
   initAPI(_argv);
+  createBuffers();
   camera.init(window.getWidth(),
               window.getHeight(),
               3.1416f / 4.0f,
@@ -90,10 +93,18 @@ run(String _name, Window& _window)
 }
 
 void
+BaseApp::createBuffers()
+{
+  GraphicsAPI& api = GraphicsAPI::instance();
+  cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
+  cBProjection = api.createConstantBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
+  cBWorld = api.createConstantBuffer(static_cast<uint32>(sizeof(CBWorld)), nullptr, 0);
+  cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(Light)), nullptr, 0);
+}
+
+void
 BaseApp::messageLoop()
 {
-  // get the api
-  GraphicsAPI& api = GraphicsAPI::instance();
   // get the deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   bool run = true;
@@ -135,7 +146,7 @@ BaseApp::messageLoop()
       run = false;
     }
     // update camera
-    api.updateCamera(&camera);
+    updateCamera(&camera);
     // render the scene
     render();
   }
@@ -158,6 +169,30 @@ BaseApp::loadModel(String& _path)
 }
 
 void
+BaseApp::updateCamera(Camera* _pCamera)
+{
+  GraphicsAPI& api = GraphicsAPI::instance();
+
+  /*****************/
+  /**
+  * Update view
+  **/
+  /*****************/
+  CBView viewBuffer = CBView();
+  viewBuffer.view = _pCamera->view.getTransposed();
+  api.updateConstantBuffer(cBView, &viewBuffer, 0);
+
+  /*****************/
+  /**
+  * Update projection
+  **/
+  /*****************/
+  CBProjection projectionBuffer = CBProjection();
+  projectionBuffer.projection = _pCamera->projection.getTransposed();
+  api.updateConstantBuffer(cBProjection, &projectionBuffer, 0);
+}
+
+void
 BaseApp::setGameObjectsBuffers()
 {
   // get the api
@@ -174,6 +209,32 @@ BaseApp::setGameObjectsBuffers()
       api.setIndexBuffer(gameObjects[i]->models[j]->indexB); ;
     }
   }
+}
+
+void
+BaseApp::VSSetConstantBuffers()
+{
+  // get the api instance
+  GraphicsAPI& api = GraphicsAPI::instance();
+
+  // set the constant buffers
+  api.VSSetConstantBuffer(cBView, 0, 1);
+  api.VSSetConstantBuffer(cBProjection, 1, 1);
+  api.VSSetConstantBuffer(cBWorld, 2, 1);
+  api.VSSetConstantBuffer(cbLight, 3, 1);
+}
+
+void
+BaseApp::PSSetConstantBuffers()
+{
+  // get the api instance
+  GraphicsAPI& api = GraphicsAPI::instance();
+
+  // set the constant buffers
+  api.PSSetConstantBuffer(cBView, 0, 1);
+  api.PSSetConstantBuffer(cBProjection, 1, 1);
+  api.PSSetConstantBuffer(cBWorld, 2, 1);
+  api.PSSetConstantBuffer(cbLight, 3, 1);
 }
 
 float
@@ -194,12 +255,20 @@ BaseApp::render()
   api.clearRenderTargetView(clearColor);
   api.clearDepthBuffer(1.0f);
 
-  api.updateWorldAndLightCB();
+  CBWorld ef;
+  ef.world = api.world;
+  api.updateConstantBuffer(cBWorld, &ef, static_cast<uint32>(sizeof(CBWorld)));
+  api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
 
   api.setShaders();
   setGameObjectsBuffers();
-  api.VSSetConstantBuffers();
-  api.PSSetConstantBuffers();
+
+  light.Type = LIGHT_TYPE::kDirectional;
+  light.LightDir = Vector3::FORWARD;
+
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
+
   api.setSampler();
   renderGameObjects();
   api.present(1, 0);

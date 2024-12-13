@@ -8,6 +8,7 @@
 #include "pkPrerequisitesUtilities.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkMatrix4.h"
 
 // defines
 #include "pkCoreDefines.h"
@@ -23,6 +24,23 @@
 
 namespace pkEngineSDK
 {
+
+
+struct CBView
+{
+  Matrix4 view;
+};
+
+struct CBProjection
+{
+  Matrix4 projection;
+};
+
+struct CBWorld
+{
+  Matrix4 world;
+  Vector4 meshColor;
+};
 
 struct KeyPosition
 {

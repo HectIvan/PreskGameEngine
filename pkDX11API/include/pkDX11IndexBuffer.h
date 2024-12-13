@@ -29,16 +29,10 @@ class DX11IndexBuffer : public IndexBuffer
   DX11IndexBuffer() = default;
   virtual ~DX11IndexBuffer()
   {
-    safeRelease(m_pBuffer);
+    safeRelease(pBuffer);
   }
 
-  /**
-  * Clean the buffer
-  **/
-  void
-  clean();
-
  public:
-  ID3D11Buffer* m_pBuffer = nullptr;
+  ID3D11Buffer* pBuffer = nullptr;
 };
 }

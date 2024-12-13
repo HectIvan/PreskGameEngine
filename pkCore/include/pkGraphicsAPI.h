@@ -109,6 +109,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                  uint32 _format = 42,
                  uint32 _offset = 0) = 0;
 
+  /**
+  * Update the camera buffers.
+  * 
+  * @param _pCamera
+  * Camera to update.
+  **/
   virtual void
   updateCamera(Camera* _pCamera) = 0;
 

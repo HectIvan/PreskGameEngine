@@ -12,7 +12,10 @@ HRESULT
 DX11VertexShader::compile()
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl", "VS", "vs_5_0", &m_pSBlob);
+  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl",
+                             "VS",
+                             "vs_5_0",
+                             &pSBlob);
   if (FAILED(hr))
   {
     MessageBox(nullptr, "FX file could not be compiled", "Error", MB_OK);
@@ -25,18 +28,15 @@ HRESULT
 DX11VertexShader::create(DX11Device* _pDevice)
 {
   HRESULT hr = S_OK;
-  hr = _pDevice->m_pd3dDevice->CreateVertexShader(m_pSBlob->GetBufferPointer(), m_pSBlob->GetBufferSize(), nullptr, &m_pShader);
+  hr = _pDevice->pd3dDevice->CreateVertexShader(pSBlob->GetBufferPointer(),
+                                                pSBlob->GetBufferSize(),
+                                                nullptr,
+                                                &pShader);
   if (FAILED(hr))
   {
-    m_pSBlob->Release();
+    pSBlob->Release();
     return hr;
   }
   return hr;
-}
-
-void
-DX11VertexShader::clean()
-{
-  safeRelease(m_pShader);
 }
 }

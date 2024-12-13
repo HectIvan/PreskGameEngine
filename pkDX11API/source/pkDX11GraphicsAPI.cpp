@@ -28,8 +28,7 @@ DX11GraphicsAPI::DX11GraphicsAPI(const Window& _window)
 void
 DX11GraphicsAPI::initApi(const Window& _window)
 {
-  m_window = _window;
-  m_vMeshColor = Vector4(0.7f, 0.7f, 0.7f, 1.0f);
+  window = _window;
 
   uint32 createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -54,7 +53,7 @@ DX11GraphicsAPI::initApi(const Window& _window)
   uint32 numDriverTypes = ARRAYSIZE(driverTypes);
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
-  WindowHandle winHandle = m_window.getWindowHandle();
+  WindowHandle winHandle = window.getWindowHandle();
   uint32 width = static_cast<uint32>(_window.getSize().x);
   uint32 height = static_cast<uint32>(_window.getSize().y);
   createDeviceAndSwapChain(width,
@@ -76,23 +75,23 @@ DX11GraphicsAPI::initApi(const Window& _window)
   **/
   /************************************************/
 
-  m_pixelShader.compile();
-  m_pixelShader.create(m_pDevice);
-  m_vertexShader.compile();
-  m_vertexShader.create(m_pDevice);
+  pixelShader.compile();
+  pixelShader.create(pDevice);
+  vertexShader.compile();
+  vertexShader.create(pDevice);
 
   DX11InputLayout input;
-  input.create(m_pDevice, m_vertexShader);
-  input.set(m_pDevice);
+  input.create(pDevice, vertexShader);
+  input.set(pDevice);
 
-  m_pDevice->setPrimitiveTopology();
+  pDevice->setPrimitiveTopology();
 
-  m_light.Type = LIGHT_TYPE::kDirectional;
-  m_light.LightDir = Vector3::FORWARD;
-  m_cBView.create(m_pDevice, static_cast<uint32>(sizeof(CBView)));
-  m_cBProjection.create(m_pDevice, static_cast<uint32>(sizeof(CBProjection)));
-  m_cBWorld.create(m_pDevice, static_cast<uint32>(sizeof(CBWorld)));
-  m_cbLight.create(m_pDevice, static_cast<uint32>(sizeof(Light)));
+  light.Type = LIGHT_TYPE::kDirectional;
+  light.LightDir = Vector3::FORWARD;
+  cBView.create(pDevice, static_cast<uint32>(sizeof(CBView)));
+  cBProjection.create(pDevice, static_cast<uint32>(sizeof(CBProjection)));
+  cBWorld.create(pDevice, static_cast<uint32>(sizeof(CBWorld)));
+  cbLight.create(pDevice, static_cast<uint32>(sizeof(Light)));
 
   createSamplerState();
 }
@@ -106,13 +105,13 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   **/
   /*****************/
   CBView viewBuffer = CBView();
-  viewBuffer.mView = _pCamera->view.getTransposed();
-  m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
-                                                    0,
-                                                    nullptr,
-                                                    &viewBuffer,
-                                                    0,
-                                                    0);
+  viewBuffer.view = _pCamera->view.getTransposed();
+  pDevice->pImmediateContext->UpdateSubresource(cBView.pCBuffer,
+                                                0,
+                                                nullptr,
+                                                &viewBuffer,
+                                                0,
+                                                0);
 
   /*****************/
   /**
@@ -120,13 +119,13 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   **/
   /*****************/
   CBProjection projectionBuffer = CBProjection();
-  projectionBuffer.mProjection = _pCamera->projection.getTransposed();
-  m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
-                                                    0,
-                                                    nullptr,
-                                                    &projectionBuffer,
-                                                    0,
-                                                    0);
+  projectionBuffer.projection = _pCamera->projection.getTransposed();
+  pDevice->pImmediateContext->UpdateSubresource(cBProjection.pCBuffer,
+                                                0,
+                                                nullptr,
+                                                &projectionBuffer,
+                                                0,
+                                                0);
 }
 
 void
@@ -139,9 +138,9 @@ DX11GraphicsAPI::render()
   
   // update world and light constant buffers
   CBWorld ef;
-  ef.mWorld = m_world;
-  m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
-  m_cbLight.updateSubResource(m_pDevice, &m_light, (uint32)sizeof(Light));
+  ef.world = world;
+  cBWorld.updateSubResource(pDevice, &ef, (uint32)sizeof(CBWorld));
+  cbLight.updateSubResource(pDevice, &light, (uint32)sizeof(Light));
 
 
   setShaders();
@@ -150,11 +149,11 @@ DX11GraphicsAPI::render()
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   // set the sampler linear
-  setSampler(m_pSamplerLinear);
+  setSampler(pSamplerLinear);
   // render all gameObjects
   renderGameObjects();
   // Present our back buffer to our front buffer
-  m_pSwapChain->Present(1, 0);
+  pSwapChain->Present(1, 0);
 }
 
 Model*
@@ -181,8 +180,8 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                           uint32& _numFeatureLevels)
 {
   // initialize device and swap chain
-  m_pDevice = new DX11Device();
-  m_pSwapChain = nullptr;
+  pDevice = new DX11Device();
+  pSwapChain = nullptr;
 
   /**
   * Create the device and swap chains
@@ -203,19 +202,19 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++)
   {
     // try and create the device and swap chain with the current driver type
-    m_pDevice->m_pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
+    pDevice->pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
     uint32 hr = D3D11CreateDeviceAndSwapChain(nullptr,
-                                              *m_pDevice->m_pDriverType,
+                                              *pDevice->pDriverType,
                                               nullptr,
                                               _createDeviceFlags,
                                               _featureLevels,
                                               _numFeatureLevels,
                                               D3D11_SDK_VERSION,
                                               &sd,
-                                              &m_pSwapChain,
-                                              &m_pDevice->m_pd3dDevice,
-                                              &m_pDevice->m_featureLevel,
-                                              &m_pDevice->m_pImmediateContext);
+                                              &pSwapChain,
+                                              &pDevice->pd3dDevice,
+                                              &pDevice->featureLevel,
+                                              &pDevice->pImmediateContext);
 
     // if creation was successful
     if (hr == 0x00000000)
@@ -232,18 +231,18 @@ void
 DX11GraphicsAPI::createRenderTargetView()
 {
   // initiaize render target view
-  m_pRTargetView = nullptr;
+  pRTargetView = nullptr;
 
   // get buffer data
   ID3D11Texture2D* pBackBuffer = nullptr;
-  uint32 hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+  uint32 hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
   if (hr != 0x00000000)
   {
     return;
   }
 
   // create the render target view
-  hr = m_pDevice->m_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &m_pRTargetView);
+  hr = pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pRTargetView);
   pBackBuffer->Release();
   if (hr != 0x00000000)
   {
@@ -266,8 +265,8 @@ DX11GraphicsAPI::createSamplerState()
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
   // sampler state creation
-  m_pSamplerLinear = new DX11SamplerState();
-  uint32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc, &m_pSamplerLinear->m_pSampler);
+  pSamplerLinear = new DX11SamplerState();
+  uint32 hr = pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamplerLinear->pSampler);
   if (hr != 0x00000000)
   {
     return;
@@ -294,7 +293,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
   descDepth.CPUAccessFlags = 0;
   descDepth.MiscFlags = 0;
-  uint32 hr = m_pDevice->m_pd3dDevice->CreateTexture2D(&descDepth, nullptr, &m_pDepthStencil);
+  uint32 hr = pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
   // if creating the texture failed
   if (hr != 0x00000000)
   {
@@ -302,18 +301,18 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   }
 
   // create depth stencil with the generated 2D texture
-  m_pDepthSView = std::make_shared<DX11DepthStencilView>();
+  pDepthSView = std::make_shared<DX11DepthStencilView>();
   D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
   ZeroMemory(&descDSV, sizeof(descDSV));
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
-  hr = m_pDevice->m_pd3dDevice->CreateDepthStencilView(m_pDepthStencil, &descDSV, &m_pDepthSView->m_pDepthSV);
+  hr = pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil, &descDSV, &pDepthSView->pDepthSV);
   if (hr != 0x00000000)
   {
     return;
   }
-  m_pDevice->m_pImmediateContext->OMSetRenderTargets(1, &m_pRTargetView, m_pDepthSView->m_pDepthSV);
+  pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView, pDepthSView->pDepthSV);
 }
 
 void
@@ -327,8 +326,8 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   vp.MaxDepth = 1.0f;
   vp.TopLeftX = 0;
   vp.TopLeftY = 0;
-  m_pDevice->m_pImmediateContext->RSSetViewports(1, &vp);
-  m_world = Matrix4::IDENTITY;
+  pDevice->pImmediateContext->RSSetViewports(1, &vp);
+  world = Matrix4::IDENTITY;
 }
 
 void
@@ -336,10 +335,10 @@ DX11GraphicsAPI::setGameObjectsBuffers()
 {
   for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
-    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
     {
-      setVertexBuffers(*gameObjects[i]->m_models[j]);
-      setIndexBuffers(*gameObjects[i]->m_models[j]); ;
+      setVertexBuffers(*gameObjects[i]->models[j]);
+      setIndexBuffers(*gameObjects[i]->models[j]); ;
     }
   }
 }
@@ -358,43 +357,43 @@ void DX11GraphicsAPI::setIndexBuffers(Model& _model)
 void
 DX11GraphicsAPI::setShaders()
 {
-  m_pDevice->m_pImmediateContext->VSSetShader(m_vertexShader.m_pShader, nullptr, 0);
-  m_pDevice->m_pImmediateContext->PSSetShader(m_pixelShader.m_pShader, nullptr, 0);
+  pDevice->pImmediateContext->VSSetShader(vertexShader.pShader, nullptr, 0);
+  pDevice->pImmediateContext->PSSetShader(pixelShader.pShader, nullptr, 0);
 }
 
 void
 DX11GraphicsAPI::VSSetConstantBuffers()
 {
-  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->VSSetConstantBuffers(3, 1, &m_cbLight.m_pCBuffer);
+  pDevice->pImmediateContext->VSSetConstantBuffers(0, 1, &cBView.pCBuffer);
+  pDevice->pImmediateContext->VSSetConstantBuffers(1, 1, &cBProjection.pCBuffer);
+  pDevice->pImmediateContext->VSSetConstantBuffers(2, 1, &cBWorld.pCBuffer);
+  pDevice->pImmediateContext->VSSetConstantBuffers(3, 1, &cbLight.pCBuffer);
 }
 
 void
 DX11GraphicsAPI::PSSetConstantBuffers()
 {
-  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &m_cBView.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(1, 1, &m_cBProjection.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(2, 1, &m_cBWorld.m_pCBuffer);
-  m_pDevice->m_pImmediateContext->PSSetConstantBuffers(3, 1, &m_cbLight.m_pCBuffer);
+  pDevice->pImmediateContext->PSSetConstantBuffers(0, 1, &cBView.pCBuffer);
+  pDevice->pImmediateContext->PSSetConstantBuffers(1, 1, &cBProjection.pCBuffer);
+  pDevice->pImmediateContext->PSSetConstantBuffers(2, 1, &cBWorld.pCBuffer);
+  pDevice->pImmediateContext->PSSetConstantBuffers(3, 1, &cbLight.pCBuffer);
 }
 
 void
 DX11GraphicsAPI::setSampler(DX11SamplerState* _pSampler)
 {
-  m_pDevice->m_pImmediateContext->PSSetSamplers(0, 1, &_pSampler->m_pSampler);
+  pDevice->pImmediateContext->PSSetSamplers(0, 1, &_pSampler->pSampler);
 }
 
 void
 DX11GraphicsAPI::clearDepthBackBuffers(float _color[], float _depth)
 {
-  m_pDevice->m_pImmediateContext->ClearRenderTargetView(m_pRTargetView, _color);
+  pDevice->pImmediateContext->ClearRenderTargetView(pRTargetView, _color);
   // Clear the depth buffer to 1.0 (max depth)
-  m_pDevice->m_pImmediateContext->ClearDepthStencilView(m_pDepthSView->m_pDepthSV,
-                                                        D3D11_CLEAR_DEPTH,
-                                                        _depth,
-                                                        0);
+  pDevice->pImmediateContext->ClearDepthStencilView(pDepthSView->pDepthSV,
+                                                    D3D11_CLEAR_DEPTH,
+                                                    _depth,
+                                                    0);
 }
 
 SPtr<VertexBuffer>
@@ -423,12 +422,12 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   InitData.SysMemPitch = static_cast<uint32>(_vertex.size() * sizeof(SimpleVertex)); // distance between values
 
   // create the buffer
-  if (!m_pDevice->m_pd3dDevice)
+  if (!pDevice->pd3dDevice)
   {
     // if device is null
     return nullptr;
   }
-  m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->m_pBuffer);
+  pDevice->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
   return dxVB;
 }
 
@@ -449,11 +448,11 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
   // get the offset
   uint32 stride = sizeof(SimpleVertex);
   //set the buffer
-  m_pDevice->m_pImmediateContext->IASetVertexBuffers(_start,
-                                                     _bufferCount,
-                                                     &dxVB->m_pBuffer,
-                                                     &stride,
-                                                     &_offset);
+  pDevice->pImmediateContext->IASetVertexBuffers(_start,
+                                                 _bufferCount,
+                                                 &dxVB->pBuffer,
+                                                 &stride,
+                                                 &_offset);
 }
 
 SPtr<IndexBuffer>
@@ -480,7 +479,7 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   InitData.pSysMem = _index.data(); // pointer to the initialization data
   // InitData.SysMemPitch = (uint32)index.size() * sizeof(uint32); // distance between values
   // create the buffer
-  m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->m_pBuffer);
+  pDevice->pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
   return dxIB;
 }
 
@@ -496,9 +495,9 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
     // failed to cast to DX11IndexBuffer
     return;
   }
-  m_pDevice->m_pImmediateContext->IASetIndexBuffer(dxIB->m_pBuffer,
-                                                   static_cast<DXGI_FORMAT>(_format),
-                                                   _offset);
+  pDevice->pImmediateContext->IASetIndexBuffer(dxIB->pBuffer,
+                                                 static_cast<DXGI_FORMAT>(_format),
+                                                 _offset);
 }
 
 void
@@ -508,10 +507,10 @@ DX11GraphicsAPI::renderGameObjects()
   for (uint32 i = 0; i < gameObjects.size(); ++i)
   {
     // check all their models
-    for (uint32 j = 0; j < gameObjects[i]->m_models.size(); ++j)
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
     {
       // draw the model
-      drawIndexed(*gameObjects[i]->m_models[j]);
+      drawIndexed(*gameObjects[i]->models[j]);
     }
   }
 }
@@ -526,9 +525,9 @@ DX11GraphicsAPI::drawIndexed(Model& model)
   for (uint32 i = 0; i < model.meshes.size(); ++i)
   {
     // draw the mesh
-    m_pDevice->m_pImmediateContext->DrawIndexed(static_cast<uint32>(model.meshes[i].numIndex),
-                                                                    currentIndexOrigin,
-                                                                    currentVertexOrigin);
+    pDevice->pImmediateContext->DrawIndexed(static_cast<uint32>(model.meshes[i].numIndex),
+                                                                currentIndexOrigin,
+                                                                currentVertexOrigin);
     // update the offsets
     currentIndexOrigin += static_cast<uint32>(model.meshes[i].numIndex);
     currentVertexOrigin += static_cast<uint32>(model.meshes[i].vertexCount);

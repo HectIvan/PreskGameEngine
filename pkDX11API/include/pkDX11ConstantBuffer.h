@@ -20,7 +20,8 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class DX11Device;
 
@@ -30,7 +31,7 @@ public:
   DX11ConstantBuffer() = default;
   virtual ~DX11ConstantBuffer()
   {
-    safeRelease(m_pCBuffer);
+    safeRelease(pCBuffer);
   }
 
   /**
@@ -54,13 +55,7 @@ public:
   void
   updateSubResource(DX11Device* _pDevice, const void* _pNewData, uint32 _size); // int _size is temporary
 
-  /**
-  * Clean the buffer
-  **/
-  void
-  clean();
-
  public:
-  ID3D11Buffer* m_pCBuffer = nullptr;
+  ID3D11Buffer* pCBuffer = nullptr;
 };
 }

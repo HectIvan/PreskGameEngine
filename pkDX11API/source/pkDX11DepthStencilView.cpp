@@ -5,11 +5,6 @@
 /*********************************************/
 #include "pkDX11DepthStencilView.h"
 
-namespace pkEngineSDK {
-
-void
-DX11DepthStencilView::clean()
+namespace pkEngineSDK
 {
-  safeRelease(m_pDepthSV);
-}
 }

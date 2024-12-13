@@ -14,18 +14,18 @@ namespace pkEngineSDK {
 
 struct CBView
 {
-  Matrix4 mView;
+  Matrix4 view;
 };
 
 struct CBProjection
 {
-  Matrix4 mProjection;
+  Matrix4 projection;
 };
 
 struct CBWorld
 {
-  Matrix4 mWorld;
-  Vector4 vMeshColor;
+  Matrix4 world;
+  Vector4 meshColor;
 
 };
 }

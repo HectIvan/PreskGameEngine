@@ -21,7 +21,8 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 struct PK_CORE_EXPORT PKWindowDesc
 {

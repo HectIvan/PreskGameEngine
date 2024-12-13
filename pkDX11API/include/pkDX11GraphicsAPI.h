@@ -240,42 +240,42 @@ class DX11GraphicsAPI : public GraphicsAPI
   
  public:
   // window
-  Window m_window;
+  Window window;
 
   // api device
-  DX11Device* m_pDevice;
+  DX11Device* pDevice;
   
   // shaders
-  DX11PixelShader m_pixelShader;
-  DX11VertexShader m_vertexShader;
+  DX11PixelShader pixelShader;
+  DX11VertexShader vertexShader;
 
   // Render target view
-  ID3D11RenderTargetView* m_pRTargetView;
+  ID3D11RenderTargetView* pRTargetView;
 
   // swap chain
-  IDXGISwapChain* m_pSwapChain;
+  IDXGISwapChain* pSwapChain;
 
   // depth stencil
-  ID3D11Texture2D* m_pDepthStencil;
-  SPtr<DX11DepthStencilView> m_pDepthSView;
+  ID3D11Texture2D* pDepthStencil;
+  SPtr<DX11DepthStencilView> pDepthSView;
 
   // sampler state
-  DX11SamplerState* m_pSamplerLinear;
+  DX11SamplerState* pSamplerLinear;
 
   // mesh color
-  Vector4 m_vMeshColor;
+  Vector4 vMeshColor;
 
   // world matrix
-  Matrix4 m_world;
+  Matrix4 world;
 
   // light source
-  Light m_light;
+  Light light;
 
   // constant buffers
-  DX11ConstantBuffer m_buffer;
-  DX11ConstantBuffer m_cBView;
-  DX11ConstantBuffer m_cBProjection;
-  DX11ConstantBuffer m_cBWorld;
-  DX11ConstantBuffer m_cbLight;
+  DX11ConstantBuffer buffer;
+  DX11ConstantBuffer cBView;
+  DX11ConstantBuffer cBProjection;
+  DX11ConstantBuffer cBWorld;
+  DX11ConstantBuffer cbLight;
 };
 }

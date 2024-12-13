@@ -12,7 +12,8 @@
 /************************************************************************/
 #pragma once
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 struct MouseWheelData
 {

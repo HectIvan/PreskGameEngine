@@ -31,7 +31,7 @@ class DX11InputLayout
   DX11InputLayout() = default;
   virtual ~DX11InputLayout()
   {
-    safeRelease(m_pVertexLayout);
+    safeRelease(pVertexLayout);
   }
 
   /**
@@ -60,14 +60,8 @@ class DX11InputLayout
   void
   set(DX11Device* _pDevice);
 
-  /**
-  * Clean the input layout.
-  **/
-  void
-  clean();
-
  public:
-  uint32 m_numElements = 0;
-  ID3D11InputLayout* m_pVertexLayout = nullptr;
+  uint32 numElements = 0;
+  ID3D11InputLayout* pVertexLayout = nullptr;
 };
 }

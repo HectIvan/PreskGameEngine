@@ -133,8 +133,8 @@ class PK_CORE_EXPORT GameObject
   clear();
 
  public:
-  Vector<Model*> m_models;
-  Vector<Component*> m_components;
-  Transform m_transform;
+  Vector<Model*> models;
+  Vector<Component*> components;
+  Transform transform;
 };
 }

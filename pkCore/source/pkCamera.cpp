@@ -2,6 +2,7 @@
 
 namespace pkEngineSDK
 {
+
 void
 Camera::init(uint32 _width,
              uint32 _height,

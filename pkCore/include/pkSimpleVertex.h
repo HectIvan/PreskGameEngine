@@ -21,7 +21,8 @@
 #include "pkVector2.h"
 #include "pkVector3.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 struct SimpleVertex
 {

@@ -22,7 +22,8 @@
 #include "pkVertexBuffer.h"
 #include "pkSimpleVertex.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class DX11Device;
 class DX11VertexBuffer : public VertexBuffer
@@ -31,28 +32,10 @@ class DX11VertexBuffer : public VertexBuffer
   DX11VertexBuffer() = default;
   virtual ~DX11VertexBuffer()
   {
-    clean();
+    safeRelease(pBuffer);
   }
 
-  /**
-  * Sets the data of the vertex buffer.
-  * 
-  * @param _device
-  * device that will set the buffer
-  **/
-  void
-  set(Device* _pDevice,
-      uint32 _start = 0,
-      uint32 _bufferCount = 1,
-      uint32 _offset = 0);
-
-  /**
-  * Clean the vertex buffer.
-  **/
-  void
-  clean();
-
  public:
-  ID3D11Buffer* m_pBuffer = nullptr;
+  ID3D11Buffer* pBuffer = nullptr;
 };
 }

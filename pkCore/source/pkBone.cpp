@@ -5,6 +5,7 @@
 
 namespace pkEngineSDK
 {
+
 Bone::Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
 {
   setBoneName(_name);

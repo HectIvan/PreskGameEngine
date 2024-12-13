@@ -21,7 +21,8 @@
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class EventQueue
 {

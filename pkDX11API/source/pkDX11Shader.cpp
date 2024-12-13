@@ -46,10 +46,4 @@ DX11Shaders::compileShaderFromFile(wstring _szFileName,
   
   return S_OK;
 }
-
-void
-DX11Shaders::clean()
-{
-  safeRelease(m_pSBlob);
-}
 }

@@ -19,7 +19,8 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class DX11SamplerState
 {
@@ -27,16 +28,10 @@ public:
   DX11SamplerState() = default;
   virtual ~DX11SamplerState()
   {
-    safeRelease(m_pSampler);
+    safeRelease(pSampler);
   }
 
-  /**
-  * Clean the sampler state.
-  **/
-  void
-  clean();
-
  public:
-  ID3D11SamplerState* m_pSampler = nullptr;
+  ID3D11SamplerState* pSampler = nullptr;
 };
 }

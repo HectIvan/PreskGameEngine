@@ -37,9 +37,6 @@
     <Filter Include="source\api">
       <UniqueIdentifier>{d21265f3-ce77-4adf-a873-9ba9efb097c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\shaders">
-      <UniqueIdentifier>{e9347fe0-f8cc-44f1-b1c5-9ec9282ec94e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\graphics">
       <UniqueIdentifier>{b55ae11e-c59d-4644-b864-bb64e574335d}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,21 @@
     </Filter>
     <Filter Include="source\camera">
       <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\game">
+      <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\main">
+      <UniqueIdentifier>{c2d7851b-240f-4364-8c9a-93d6cf917382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\base app">
+      <UniqueIdentifier>{d4ee8979-e08f-40e5-a7c9-74bafca0d1b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\base app">
+      <UniqueIdentifier>{fe1b7a50-c5a6-4e7b-8d28-f81bce41cab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\events">
+      <UniqueIdentifier>{053a5fdf-01ad-42ec-ab31-efd131b12c76}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -81,18 +93,6 @@
     <ClInclude Include="include\pkGraphicsAPI.h">
       <Filter>include\api</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkPixelShader.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkShader.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkModel.h">
-      <Filter>include\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMesh.h">
-      <Filter>include\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkVertexBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
@@ -105,11 +105,41 @@
     <ClInclude Include="include\pkCamera.h">
       <Filter>include\camera</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkModel.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMesh.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBone.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCoreDefines.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDevice.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTexture.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDllLoader.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBaseApp.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkKey.h">
+      <Filter>include\events</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkComponent.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkConstantBuffer.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkCoreMain.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkWin32Window.cpp">
       <Filter>source\window</Filter>
     </ClCompile>
@@ -124,6 +154,33 @@
     </ClCompile>
     <ClCompile Include="source\pkCamera.cpp">
       <Filter>source\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGameObject.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkModel.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBone.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMesh.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMain.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDllLoader.cpp">
+      <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBaseApp.cpp">
+      <Filter>source\base app</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32Event.cpp">
+      <Filter>source\events</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32EventQueue.cpp">
+      <Filter>source\events</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

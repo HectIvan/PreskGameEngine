@@ -4,6 +4,7 @@
 **/
 /*********************************************/
 #include "pkDX11Shader.h"
+#include <d3dcompiler.h>
 
 namespace pkEngineSDK {
 
@@ -33,22 +34,16 @@ DX11Shaders::compileShaderFromFile(wstring _szFileName,
                           0,
                           _ppBlobOut,
                           &pErrorBlob);
-  if (FAILED(hr))
+  if (hr != 0x00000000)
   {
-    if (pErrorBlob != NULL)
+    if (pErrorBlob != nullptr)
     {
-      OutputDebugStringA((char*)pErrorBlob->GetBufferPointer());
+      OutputDebugStringA(static_cast<char*>(pErrorBlob->GetBufferPointer()));
     }
     safeRelease(pErrorBlob);
     return hr;
   }
   
   return S_OK;
-}
-
-void
-DX11Shaders::clean()
-{
-  safeRelease(m_pSBlob);
 }
 }

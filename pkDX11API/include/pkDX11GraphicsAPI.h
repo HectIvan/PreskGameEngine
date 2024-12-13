@@ -27,17 +27,24 @@
 #include "pkDX11SamplerState.h"
 #include "pkDX11VertexShader.h"
 #include "pkGraphicsAPI.h"
+#include "pkLight.h"
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector4.h"
 
+
 namespace pkEngineSDK
 {
+
+class Window;
+
+using pkEngineSDK::GraphicsAPI;
 
 class DX11GraphicsAPI : public GraphicsAPI
 {
  public:
   DX11GraphicsAPI() = default;
+  DX11GraphicsAPI(const Window& _window);
   virtual ~DX11GraphicsAPI() = default;
 
   /**
@@ -46,8 +53,26 @@ class DX11GraphicsAPI : public GraphicsAPI
   * @param _wHnd
   * Window handle
   **/
-  void 
-  init(WindowHandle& _wHnd) override;
+  void
+  initApi(const Window& _window) override;
+
+  /**
+  * Render the final result of the api.
+  **/
+  void
+  render() override;
+
+  /**
+  * Load a model.
+  *
+  * @param _path
+  * Path of the mesh that the model will have.
+  *
+  * @return
+  * Pointer to the new model.
+  **/
+  Model*
+  loadModel(String& _path) override;
 
   /**
   * Create the device and swap chain.
@@ -74,14 +99,14 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Number of feature levels.
   **/
   void
-  createDeviceAndSwapChain(uint32 _width,
-                           uint32 _height,
+  createDeviceAndSwapChain(uint32& _width,
+                           uint32& _height,
                            WindowHandle& _wHnd,
-                           uint32 _numDriverTypes,
+                           uint32& _numDriverTypes,
                            D3D_DRIVER_TYPE _driverTypes[],
-                           uint32 _createDeviceFlags,
+                           uint32& _createDeviceFlags,
                            D3D_FEATURE_LEVEL _featureLevels[],
-                           uint32 _numFeatureLevels);
+                           uint32& _numFeatureLevels);
 
   /**
   * Create the render target view.
@@ -121,41 +146,126 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   setViewport(uint32 _width,
               uint32 _height);
+
+  void
+  setGameObjectsBuffers();
+
+  /**
+  * Set the buffer of vertex to the model.
+  **/
+  void
+  setVertexBuffers(Model& _model);
+
+  /**
+  * set the buffer of index to the model
+  **/
+  void
+  setIndexBuffers(Model& _model);
+
+  /****************************/
+  /**
+  * Not part of the API
+  **/
+  /****************************/
+
+  /**
+  * Set the shaders
+  **/
+  void
+  setShaders();
+
+  /**
+  * Set the constant buffers for the vertex shader.
+  **/
+  void
+  VSSetConstantBuffers();
+
+  /**
+  * Set the constant buffers for the pixel shader.
+  **/
+  void
+  PSSetConstantBuffers();
+
+  /**
+  * Set the sampler state.
+  * 
+  * @param _pSampler
+  * Sampler state to be set.
+  **/
+  void
+  setSampler(DX11SamplerState* _pSampler);
+
+  /**
+  * Clear the depth and back buffers
+  **/
+  void
+  clearDepthBackBuffers(float _color[], float _depth = 1.0f);
+
+  SPtr<VertexBuffer>
+  createVertexBuffer(const Vector<SimpleVertex>& _vertex,
+                     uint32 _usage = 0);
+
+  void
+  setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+                  uint32 _start = 0,
+                  uint32 _bufferCount = 1,
+                  uint32 _offset = 0);
+
+  /**
+  * Create an IndexBuffer
+  **/
+  SPtr<IndexBuffer>
+  createIndexBuffer(const Vector<uint32>& _index,
+                    uint32 _usage = 0);
+
+  void
+  setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+                 uint32 _format = 42,
+                 uint32 _offset = 0);
+
+  /**
+  * Render all GameObjects.
+  **/
+  void
+  renderGameObjects();
+
+  /**
+  * Draw the model.
+  **/
+  void
+  drawIndexed(Model& model);
   
+ public:
   // window
-  Window m_window;
+  Window window;
 
   // api device
-  DX11Device* m_pDevice;
+  DX11Device* pDevice;
   
   // shaders
-  DX11PixelShader m_pixelShader;
-  DX11VertexShader m_vertexShader;
+  DX11PixelShader pixelShader;
+  DX11VertexShader vertexShader;
 
   // Render target view
-  ID3D11RenderTargetView* m_pRTargetView;
+  ID3D11RenderTargetView* pRTargetView;
 
   // swap chain
-  IDXGISwapChain* m_pSwapChain;
+  IDXGISwapChain* pSwapChain;
 
   // depth stencil
-  ID3D11Texture2D* m_pDepthStencil;
-  SPtr<DX11DepthStencilView> m_pDepthSView;
+  ID3D11Texture2D* pDepthStencil;
+  SPtr<DX11DepthStencilView> pDepthSView;
 
   // sampler state
-  DX11SamplerState* m_pSamplerLinear;
+  DX11SamplerState* pSamplerLinear;
 
   // mesh color
-  Vector4 m_vMeshColor;
+  Vector4 vMeshColor;
 
   // world matrix
-  Matrix4 m_world;
+  Matrix4 world;
 
-  // constant buffers
-  DX11ConstantBuffer m_buffer;
-  DX11ConstantBuffer  m_cBView;
-  DX11ConstantBuffer  m_cBProjection;
-  DX11ConstantBuffer  m_cBWorld;
-  DX11ConstantBuffer  m_LightCB;
+  // light source
+  Light light;
 };
 }

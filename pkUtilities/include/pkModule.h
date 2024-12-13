@@ -39,7 +39,7 @@ class Module
      }
 
      if (isDestroyed()) {
-       throw"Trying to access a destroyed module.");
+       throw("Trying to access a destroyed module.");
      }
 
      return *_instance();

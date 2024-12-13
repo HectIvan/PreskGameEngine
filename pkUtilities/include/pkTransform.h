@@ -24,7 +24,7 @@
 namespace pkEngineSDK
 {
 
-class Transform
+class PK_UTILITY_EXPORT Transform
 {
  public:
   Transform() = default;
@@ -100,6 +100,7 @@ class Transform
   void
   setTranslation(Matrix4 _translation);
 
+ public:
   Matrix4 transform;
 };
 }

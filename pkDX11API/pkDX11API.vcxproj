@@ -28,7 +28,7 @@
     <ClCompile Include="source\pkDX11PixelShader.cpp" />
     <ClCompile Include="source\pkDX11SamplerState.cpp" />
     <ClCompile Include="source\pkDX11Shader.cpp" />
-    <ClCompile Include="source\pkDX11Test.cpp" />
+    <ClCompile Include="source\pkDX11Texture.cpp" />
     <ClCompile Include="source\pkDX11VertexBuffer.cpp" />
     <ClCompile Include="source\pkDX11VertexShader.cpp" />
   </ItemGroup>
@@ -44,6 +44,7 @@
     <ClInclude Include="include\pkDX11Prerequisites.h" />
     <ClInclude Include="include\pkDX11SamplerState.h" />
     <ClInclude Include="include\pkDX11Shader.h" />
+    <ClInclude Include="include\pkDX11Texture.h" />
     <ClInclude Include="include\pkDX11VertexBuffer.h" />
     <ClInclude Include="include\pkDX11VertexShader.h" />
   </ItemGroup>
@@ -129,9 +130,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,7 +153,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -167,9 +168,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -190,7 +191,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

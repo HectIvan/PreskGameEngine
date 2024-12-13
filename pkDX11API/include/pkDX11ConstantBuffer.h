@@ -18,19 +18,20 @@
 * Includes
 **/
 /*********************************************/
+#include "pkConstantBuffer.h"
 #include "pkDX11Prerequisites.h"
 
 namespace pkEngineSDK {
 
 class DX11Device;
 
-class DX11ConstantBuffer
+class DX11ConstantBuffer : public ConstantBuffer
 {
-public:
+ public:
   DX11ConstantBuffer() = default;
   virtual ~DX11ConstantBuffer()
   {
-    safeRelease(m_pCBuffer);
+    safeRelease(pCBuffer);
   }
 
   /**
@@ -61,6 +62,6 @@ public:
   clean();
 
  public:
-  ID3D11Buffer* m_pCBuffer = nullptr;
+  ID3D11Buffer* pCBuffer = nullptr;
 };
 }

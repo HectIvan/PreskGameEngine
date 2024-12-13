@@ -411,7 +411,7 @@ class PK_UTILITY_EXPORT Vector4
   * A boolean determining if any value changes.
   **/
   bool
-  isDifferent(Vector4& _other) const;
+  isDifferent(const Vector4& _other) const;
 
   /**
   * Sets all parts of a vector to a single value.
@@ -438,7 +438,7 @@ class PK_UTILITY_EXPORT Vector4
   * The final dot product.
   **/
   FORCEINLINE static float
-  dotProd(const Vector4 _this, const Vector4 _other);
+  dotProd(const Vector4& _this, const Vector4& _other);
 
   float x, y, z, w;
 

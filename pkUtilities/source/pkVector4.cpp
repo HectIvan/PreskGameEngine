@@ -59,9 +59,9 @@ float
 Vector4::distanceTo(const Vector4& _other) const
 {
   return Math::sqrt(Math::pow((_other.x - x), 2) +
-         Math::pow((_other.y - y), 2) +
-         Math::pow((_other.z - z), 2) +
-         Math::pow((_other.w - w), 2));
+                    Math::pow((_other.y - y), 2) +
+                    Math::pow((_other.z - z), 2) +
+                    Math::pow((_other.w - w), 2));
 }
 
 void
@@ -74,7 +74,7 @@ Vector4::clamp(float _x, float _y)
 }
 
 bool
-Vector4::isDifferent(Vector4& _other) const
+Vector4::isDifferent(const Vector4& _other) const
 {
   if ((x != _other.x) ||
       (y != _other.y) ||
@@ -98,7 +98,7 @@ Vector4::vectorSplatValue(float _val)
 }
 
 float
-Vector4::dotProd(const Vector4 _this, const Vector4 _other)
+Vector4::dotProd(const Vector4& _this, const Vector4& _other)
 {
   return (_this.x * _other.x) +
          (_this.y * _other.y) +

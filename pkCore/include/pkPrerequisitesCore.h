@@ -6,6 +6,11 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
+#include "pkVector4.h"
+
+// defines
+#include "pkCoreDefines.h"
 
 /*********************************************/
 /**
@@ -19,9 +24,40 @@
 namespace pkEngineSDK
 {
 
-struct Texture {
-  uint32 id;
-  String type;
+
+struct CBView
+{
+  Matrix4 view;
+};
+
+struct CBProjection
+{
+  Matrix4 projection;
+};
+
+struct CBWorld
+{
+  Matrix4 world;
+  Vector4 vMeshColor;
+
+};
+
+struct KeyPosition
+{
+  Vector3 position;
+  float timeStamp;
+};
+
+struct KeyRotation
+{
+  Vector4 rotation;
+  float timeStamp;
+};
+
+struct KeyScale
+{
+  Vector3 scale;
+  float timeStamp;
 };
 
 template<class T>

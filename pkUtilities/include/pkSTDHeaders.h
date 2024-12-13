@@ -6,20 +6,27 @@
 **/
 /*********************************************/
 #include <map>
+#include <memory>
 #include <optional>
 #include <queue>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace pkEngineSDK
 {
 
+using std::make_unique;
+
 template <class T>
 using Queue = std::queue<T>;
 
-template<typename T>
+template<class T>
 using SPtr = std::shared_ptr<T>;
+
+template<class T>
+using UPtr = std::unique_ptr<T>;
 
 template <class T>
 using Stack = std::stack<T>;

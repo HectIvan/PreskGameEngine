@@ -4,6 +4,8 @@ int
 main(int argc, const char** argv)
 {
   pkEngineSDK::BaseApp app;
-  app.init(argv);
+  std::string modelName = "export3dcoat";
+  std::string extension = "obj";
+  app.init(argv, modelName, extension);
   return 0;
 }

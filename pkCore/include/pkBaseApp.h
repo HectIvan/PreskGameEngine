@@ -23,6 +23,7 @@
 /*********************************************/
 #include <chrono>
 
+#include "pkCamera.h"
 #include "pkEventQueue.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
@@ -45,7 +46,7 @@ class PK_CORE_EXPORT BaseApp
   * Initialize the app.
   **/
   void
-  init(const char** _argv);
+  init(const char** _argv, String& _modelName, String& _extension);
 
   /**
   * Initialize the app window.
@@ -85,6 +86,7 @@ class PK_CORE_EXPORT BaseApp
 
  public:
   Window window;
+  Camera camera;
   EventQueue eventQueue;
 
   float cameraSpeed;

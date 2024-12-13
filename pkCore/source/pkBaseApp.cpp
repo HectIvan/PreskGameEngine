@@ -26,15 +26,26 @@ insertGameObject(GameObject* _object, Vector<GameObject*>& _vector);
 /*********************************************/
 
 void
-BaseApp::init(const char** _argv)
+BaseApp::init(const char** _argv, String& _modelName, String& _extension)
 {
   initWindow();
   initAPI(_argv);
+  camera.init(window.getWidth(),
+              window.getHeight(),
+              3.1416f / 4.0f,
+              0.01f,
+              1000.0f,
+              Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+              Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   GraphicsAPI& api = GraphicsAPI::instance();
-  String modelPath = "D:/Work/visual studio/PreskGameEngine/models/maneater.fbx";
+  String modelPath = "D:/Work/visual studio/PreskGameEngine/models/" +
+                     _modelName +
+                     "." +
+                     _extension;
   Model* model = api.loadModel(modelPath);
   insertGameObject(createGameObject(model), api.gameObjects);
-  cameraSpeed = 100.0f;
+  cameraSpeed = 10.0f;
   messageLoop(&api);
 }
 
@@ -80,14 +91,6 @@ run(String _name, Window& _window)
 }
 
 void
-printVal(Vector4 _val)
-{
-  std::cout << _val.x << std::endl <<
-               _val.y << std::endl <<
-               _val.z << std::endl;
-}
-
-void
 BaseApp::messageLoop(GraphicsAPI* _api)
 {
   high_resolution_clock::time_point delta = high_resolution_clock::now();
@@ -100,29 +103,29 @@ BaseApp::messageLoop(GraphicsAPI* _api)
     // move forward/backward
     if (eventQueue.iskeyPressed(KEY::kW))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, camSpeed));
+      camera.move(Vector3(0.0f, 0.0f, camSpeed));
     }
     if (eventQueue.iskeyPressed(KEY::kS))
     {
-      _api->m_camera.move(Vector3(0.0f, 0.0f, -camSpeed));
+      camera.move(Vector3(0.0f, 0.0f, -camSpeed));
     }
     // move left/right
     if (eventQueue.iskeyPressed(KEY::kA))
     {
-      _api->m_camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
+      camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kD))
     {
-      _api->m_camera.move(Vector3(camSpeed, 0.0f, 0.0f));
+      camera.move(Vector3(camSpeed, 0.0f, 0.0f));
     }
     // move up/down
     if (eventQueue.iskeyPressed(KEY::kE))
     {
-      _api->m_camera.move(Vector3(0.0f, camSpeed, 0.0f));
+      camera.move(Vector3(0.0f, camSpeed, 0.0f));
     }
     if (eventQueue.iskeyPressed(KEY::kQ))
     {
-      _api->m_camera.move(Vector3(0.0f, -camSpeed, 0.0f));
+      camera.move(Vector3(0.0f, -camSpeed, 0.0f));
     }
     // leave the program
     if (eventQueue.iskeyPressed(KEY::kEsc))
@@ -130,7 +133,7 @@ BaseApp::messageLoop(GraphicsAPI* _api)
       run = false;
     }
     // update camera
-    _api->updateCamera(&_api->m_camera);
+    _api->updateCamera(&camera);
     // render the scene
     render(_api);
   }

@@ -95,16 +95,6 @@ DX11GraphicsAPI::initApi(const Window& _window)
   m_cbLight.create(m_pDevice, static_cast<uint32>(sizeof(Light)));
 
   createSamplerState();
-
-  m_camera.init(width,
-                height,
-                3.1416f / 4.0f,
-                0.01f,
-                1000.0f,
-                Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
-                Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-                Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  updateCamera(&m_camera);
 }
 
 void
@@ -142,28 +132,6 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
 void
 DX11GraphicsAPI::render()
 {
-  static float t = 0.0f;
-  if (*m_pDevice->m_pDriverType == D3D_DRIVER_TYPE_REFERENCE)
-  {
-    t += 3.1416f * 0.0125f;
-  }
-  /**
-  * From original graphics 2 project
-  **/
-  else
-  {
-    static DWORD dwTimeStart = 0;
-    DWORD dwTimeCur = static_cast<DWORD>(GetTickCount64());
-    if (dwTimeStart == 0)
-      dwTimeStart = dwTimeCur;
-    t = (dwTimeCur - dwTimeStart) / 1000.0f;
-  }
-
-  // Modify the color
-  m_vMeshColor.x = (sinf(t * 1.0f) + 1.0f) * 0.5f;
-  m_vMeshColor.y = (cosf(t * 3.0f) + 1.0f) * 0.5f;
-  m_vMeshColor.z = (sinf(t * 5.0f) + 1.0f) * 0.5f;
-
   // screen clear color
   float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
   // clear the back buffer and the depth buffer
@@ -172,7 +140,6 @@ DX11GraphicsAPI::render()
   // update world and light constant buffers
   CBWorld ef;
   ef.mWorld = m_world;
-  ef.vMeshColor = m_vMeshColor;
   m_cBWorld.updateSubResource(m_pDevice, &ef, (uint32)sizeof(CBWorld));
   m_cbLight.updateSubResource(m_pDevice, &m_light, (uint32)sizeof(Light));
 

@@ -20,7 +20,6 @@
 * Includes
 **/
 /*********************************************/
-#include "pkGameObject.h"
 #include "pkModel.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
@@ -47,33 +46,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   **/
   virtual void
   initApi(const Window& _window) = 0;
-
-  /**
-  * Render the graphic api result.
-  **/
-  virtual void
-  render() = 0;
-
-  /**
-  * Load a model.
-  * 
-  * @param _path
-  * Path of the mesh that the model will have.
-  * 
-  * @return
-  * Pointer to the new model.
-  **/
-  virtual Model*
-  loadModel(String& _path) = 0;
-
-  /**
-  * Insert a new game object to the game objects vector.
-  * 
-  * @param _pGameObject
-  * Pointer to the new gameObject.
-  **/
-  void
-  insertGameObject(GameObject* _pGameObject) { gameObjects.push_back(_pGameObject); }
 
   /**
   * Create a VertexBuffer
@@ -118,7 +90,79 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   updateCamera(Camera* _pCamera) = 0;
 
- public:
-  Vector<GameObject*> gameObjects;
+  /**
+  * Draw the indexed data.
+  * 
+  * @param _indexCount
+  * The ammount of index to draw.
+  * 
+  * @param _startIndexLocation
+  * Which index will be the starting point.
+  * 
+  * @param _baseVertexLocation
+  * Which vertex will be the starting point.
+  **/
+  virtual void
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) = 0;
+
+  /**
+  * Clear the render target fiew and fill the
+  * screen with a new color.
+  * 
+  * @param _color
+  * New screen color.
+  **/
+  virtual void
+  clearRenderTargetView(float _color[]) = 0;
+
+  /**
+  * clear the depth buffer.
+  **/
+  virtual void
+  clearDepthBuffer(float _depth) = 0;
+
+  /**
+  * Update the light and world constant buffers.
+  **/
+  virtual void
+  updateWorldAndLightCB() = 0;
+  
+  /**
+  * Set the shaders of the api.
+  **/
+  virtual void
+  setShaders() = 0;
+
+  /**
+  * Set the Vertex Shader constant buffers.
+  **/
+  virtual void
+  VSSetConstantBuffers() = 0;
+
+  /**
+  * Set the Pixel Shader constant buffers.
+  **/
+  virtual void
+  PSSetConstantBuffers() = 0;
+
+  /**
+  * Set the sampler state.
+  **/
+  virtual void
+  setSampler() = 0;
+
+  /**
+  * Present the result to the screen.
+  * 
+  * @param _syncInterval
+  * If vertical sync is enabled.
+  * 
+  * @param _flags
+  * Swap chain presentation options.
+  **/
+  virtual void
+  present(uint32 _syncInterval, uint32 _flags) = 0;
 };
 }

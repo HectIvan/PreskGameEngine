@@ -57,24 +57,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   initApi(const Window& _window) override;
 
   /**
-  * Render the final result of the api.
-  **/
-  void
-  render() override;
-
-  /**
-  * Load a model.
-  *
-  * @param _path
-  * Path of the mesh that the model will have.
-  *
-  * @return
-  * Pointer to the new model.
-  **/
-  Model*
-  loadModel(String& _path) override;
-
-  /**
   * Create the device and swap chain.
   * 
   * @param _width
@@ -147,59 +129,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   setViewport(uint32 _width,
               uint32 _height);
 
-  void
-  setGameObjectsBuffers();
-
-  /**
-  * Set the buffer of vertex to the model.
-  **/
-  void
-  setVertexBuffers(Model& _model);
-
-  /**
-  * set the buffer of index to the model
-  **/
-  void
-  setIndexBuffers(Model& _model);
-
-  /****************************/
-  /**
-  * Not part of the API
-  **/
-  /****************************/
-
-  /**
-  * Set the shaders
-  **/
-  void
-  setShaders();
-
-  /**
-  * Set the constant buffers for the vertex shader.
-  **/
-  void
-  VSSetConstantBuffers();
-
-  /**
-  * Set the constant buffers for the pixel shader.
-  **/
-  void
-  PSSetConstantBuffers();
-
   /**
   * Set the sampler state.
-  * 
-  * @param _pSampler
-  * Sampler state to be set.
   **/
   void
-  setSampler(DX11SamplerState* _pSampler);
-
-  /**
-  * Clear the depth and back buffers
-  **/
-  void
-  clearDepthBackBuffers(float _color[], float _depth = 1.0f);
+  setSampler() override;
 
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
@@ -224,26 +158,80 @@ class DX11GraphicsAPI : public GraphicsAPI
                  uint32 _offset = 0);
 
   /**
-  * Render all GameObjects.
+  * Draw the indexed data.
+  * 
+  * @param _indexCount
+  * The ammount of index to draw.
+  * 
+  * @param _startIndexLocation
+  * Which index will be the starting point.
+  * 
+  * @param _baseVertexLocation
+  * Which vertex will be the starting point.
   **/
   void
-  renderGameObjects();
-
-  /**
-  * Draw the model.
-  **/
-  void
-  drawIndexed(Model& model);
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) override;
 
   void
   updateCamera(Camera* _pCamera) override;
+
+  /**
+  * Clear the render target fiew and fill the
+  * screen with a new color.
+  * 
+  * @param _color
+  * New screen color.
+  **/
+  void
+  clearRenderTargetView(float _color[]) override;
+
+  /**
+  * Clear the depth buffer.
+  **/
+  void
+  clearDepthBuffer(float _depth) override;
+
+  /**
+  * Update the light and world constant buffers.
+  **/
+  void
+  updateWorldAndLightCB() override;
+
+  /**
+  * Set the shaders of the api.
+  **/
+  void
+  setShaders() override;
+
+  /**
+  * Set the Vertex Shader constant buffers.
+  **/
+  void
+  VSSetConstantBuffers() override;
+
+  /**
+  * Set the Pixel Shader constant buffers.
+  **/
+  void
+  PSSetConstantBuffers() override;
+
+  /**
+  * Present the result to the screen.
+  * 
+  * @param _syncInterval
+  * If vertical sync is enabled.
+  * 
+  * @param _flags
+  * Swap chain presentation options.
+  **/
+  void
+  present(uint32 _syncInterval, uint32 _flags) override;
   
  public:
   // window
   Window window;
-
-  // api device
-  DX11Device* pDevice;
   
   // shaders
   DX11PixelShader pixelShader;
@@ -277,5 +265,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   DX11ConstantBuffer cBProjection;
   DX11ConstantBuffer cBWorld;
   DX11ConstantBuffer cbLight;
+
+ private:
+  // api device
+  DX11Device* m_pDevice;
 };
 }

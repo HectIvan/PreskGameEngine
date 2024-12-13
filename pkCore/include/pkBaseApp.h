@@ -25,6 +25,7 @@
 
 #include "pkCamera.h"
 #include "pkEventQueue.h"
+#include "pkGameObject.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
 
@@ -67,7 +68,22 @@ class PK_CORE_EXPORT BaseApp
   * API to use.
   **/
   void
-  messageLoop(GraphicsAPI* _api);
+  messageLoop();
+
+  /**
+  * Loads a model from a file.
+  * 
+  * @param _path
+  * File path.
+  **/
+  Model*
+  loadModel(String& _path);
+
+  /**
+  * Set the buffers of each game object.
+  **/
+  void
+  setGameObjectsBuffers();
 
   /**
   * Gets the time elapsed between frames.
@@ -82,12 +98,29 @@ class PK_CORE_EXPORT BaseApp
   * Render the scene.
   **/
   void
-  render(GraphicsAPI* _api);
+  render();
+
+  /**
+  * Render the game objects in scene.
+  **/
+  void
+  renderGameObjects();
+
+  /**
+  * Render the desired model.
+  * 
+  * @param _model
+  * The model to render
+  **/
+  void
+  renderModel(Model& _model);
 
  public:
   Window window;
   Camera camera;
   EventQueue eventQueue;
+
+  Vector<GameObject*> gameObjects;
 
   float cameraSpeed;
 };

@@ -38,15 +38,14 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  GraphicsAPI& api = GraphicsAPI::instance();
   String modelPath = "D:/Work/visual studio/PreskGameEngine/models/" +
                      _modelName +
                      "." +
                      _extension;
-  Model* model = api.loadModel(modelPath);
-  insertGameObject(createGameObject(model), api.gameObjects);
+  Model* model = loadModel(modelPath);
+  insertGameObject(createGameObject(model), gameObjects);
   cameraSpeed = 10.0f;
-  messageLoop(&api);
+  messageLoop();
 }
 
 void
@@ -91,8 +90,11 @@ run(String _name, Window& _window)
 }
 
 void
-BaseApp::messageLoop(GraphicsAPI* _api)
+BaseApp::messageLoop()
 {
+  // get the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // get the deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   bool run = true;
   while (run)
@@ -133,9 +135,44 @@ BaseApp::messageLoop(GraphicsAPI* _api)
       run = false;
     }
     // update camera
-    _api->updateCamera(&camera);
+    api.updateCamera(&camera);
     // render the scene
-    render(_api);
+    render();
+  }
+}
+
+Model*
+BaseApp::loadModel(String& _path)
+{
+  // get the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+
+  Model* model = new Model();
+  String modelPath = _path;
+  model->load(modelPath);
+  model->vertexB = api.createVertexBuffer(model->vertex);
+  model->indexB = api.createIndexBuffer(model->index);
+  api.setIndexBuffer(model->indexB);
+  api.setVertexBuffer(model->vertexB);
+  return model;
+}
+
+void
+BaseApp::setGameObjectsBuffers()
+{
+  // get the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+
+  // fr each game object in the world
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
+  {
+    // for each model in the game object
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
+    {
+      // set its vertex and index buffers
+      api.setVertexBuffer(gameObjects[i]->models[j]->vertexB);
+      api.setIndexBuffer(gameObjects[i]->models[j]->indexB); ;
+    }
   }
 }
 
@@ -149,9 +186,59 @@ BaseApp::getDeltaTime(high_resolution_clock::time_point& _delta)
 }
 
 void
-BaseApp::render(GraphicsAPI* _api)
+BaseApp::render()
 {
-  _api->render();
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // screen clear color
+  float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+  api.clearRenderTargetView(clearColor);
+  api.clearDepthBuffer(1.0f);
+
+  api.updateWorldAndLightCB();
+
+  api.setShaders();
+  setGameObjectsBuffers();
+  api.VSSetConstantBuffers();
+  api.PSSetConstantBuffers();
+  api.setSampler();
+  renderGameObjects();
+  api.present(1, 0);
+}
+
+void
+BaseApp::renderGameObjects()
+{
+  // for each Game Object
+  for (uint32 i = 0; i < gameObjects.size(); ++i)
+  {
+    // check all their models
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
+    {
+      // draw the model
+      renderModel(*gameObjects[i]->models[j]);
+    }
+  }
+}
+
+void
+BaseApp::renderModel(Model& _model)
+{
+  // get a reference from the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // offsets
+  uint32 currentVertexOrigin = 0;
+  uint32 currentIndexOrigin = 0;
+  // for each mesh in the model
+  for (uint32 i = 0; i < _model.meshes.size(); ++i)
+  {
+    // draw the mesh
+    api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
+                                        currentIndexOrigin,
+                                        currentVertexOrigin);
+    // update the offsets
+    currentIndexOrigin += static_cast<uint32>(_model.meshes[i].numIndex);
+    currentVertexOrigin += static_cast<uint32>(_model.meshes[i].vertexCount);
+  }
 }
 
 GameObject*

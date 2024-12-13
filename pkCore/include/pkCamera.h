@@ -111,7 +111,7 @@ class PK_CORE_EXPORT Camera
   * New forward vector.
   **/
   void
-  setForwardVector(Vector4 _vec) { m_forward = _vec; }
+  setForwardVector(Vector4 _vec) { forward = _vec; }
 
   /**
   * Sets the right vector of the camera.
@@ -120,7 +120,7 @@ class PK_CORE_EXPORT Camera
   * New right vector.
   **/
   void
-  setRightVector(Vector4 _vec) { m_right = _vec; }
+  setRightVector(Vector4 _vec) { right = _vec; }
 
   /**
   * Sets the up vector of the camera.
@@ -129,7 +129,7 @@ class PK_CORE_EXPORT Camera
   * New up vector.
   **/
   void
-  setUpVector(Vector4 _vec) { m_up = _vec; }
+  setUpVector(Vector4 _vec) { up = _vec; }
 
   /**
   * Set all the direction vectors.
@@ -138,22 +138,22 @@ class PK_CORE_EXPORT Camera
   updateRotation();
 
   // Camera view
-  Matrix4 m_view;
-  Matrix4 m_projection;
-  uint32 m_width;
-  uint32 m_height;
+  Matrix4 view;
+  Matrix4 projection;
+  uint32 width;
+  uint32 height;
 
   // Camera position
-  Vector4 m_eye;
-  Vector4 m_at;
-  Vector4 m_up;
+  Vector4 eye;
+  Vector4 at;
+  Vector4 up;
 
   // camera vectors
-  Vector4 m_forward;
-  Vector4 m_right;
+  Vector4 forward;
+  Vector4 right;
 
   // camera rotation and start position
-  Vector3 m_rotation = Vector3(0.0f);
-  Vector2 m_startPos = Vector2(0.0f);
+  Vector3 rotation = Vector3(0.0f);
+  Vector2 startPos = Vector2(0.0f);
 };
 }

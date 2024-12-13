@@ -115,8 +115,8 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   * Update view
   **/
   /*****************/
-  CBView viewBuffer;
-  viewBuffer.mView = _pCamera->m_view.getTransposed();
+  CBView viewBuffer = CBView();
+  viewBuffer.mView = _pCamera->view.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBView.m_pCBuffer,
                                                     0,
                                                     nullptr,
@@ -129,8 +129,8 @@ DX11GraphicsAPI::updateCamera(Camera* _pCamera)
   * Update projection
   **/
   /*****************/
-  CBProjection projectionBuffer;
-  projectionBuffer.mProjection = _pCamera->m_projection.getTransposed();
+  CBProjection projectionBuffer = CBProjection();
+  projectionBuffer.mProjection = _pCamera->projection.getTransposed();
   m_pDevice->m_pImmediateContext->UpdateSubresource(m_cBProjection.m_pCBuffer,
                                                     0,
                                                     nullptr,

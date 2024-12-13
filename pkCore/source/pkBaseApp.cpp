@@ -96,7 +96,6 @@ BaseApp::messageLoop(GraphicsAPI* _api)
   {
     float deltaTime = getDeltaTime(delta);
     float camSpeed = cameraSpeed * deltaTime;
-    std::cout << _api->m_camera.m_eye.z << std::endl;
     eventQueue.poll();
     // move forward/backward
     if (eventQueue.iskeyPressed(KEY::kW))

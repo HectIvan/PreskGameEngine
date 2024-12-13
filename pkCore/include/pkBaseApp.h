@@ -83,7 +83,7 @@ class PK_CORE_EXPORT BaseApp
   void
   render(GraphicsAPI* _api);
 
-public:
+ public:
   Window window;
   EventQueue eventQueue;
 

@@ -45,7 +45,15 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
                      _modelName +
                      "." +
                      _extension;
+  // load the model
   Model* model = loadModel(modelPath);
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // create the texture
+  String textureName = "D:\\Work\\visual studio\\PreskGameEngine\\textures\\Emmisive_Eye_Class_Albedo.tga.png";
+  Texture* texture = api.createTextureFromFile(textureName, 8, false, 28);
+  // insert the texture to the material
+  model->material.insertTexture(texture);
+  // insert the game object into the vector of game objects
   insertGameObject(createGameObject(model), gameObjects);
   cameraSpeed = 10.0f;
   messageLoop();
@@ -297,6 +305,11 @@ BaseApp::renderModel(Model& _model)
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
+  // for each texture in the material of the model
+  for (uint32 i = 0; i < _model.material.textures.size(); ++i)
+  {
+    api.setShaderResourceView(_model.material.textures[i]);
+  }
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i)
   {

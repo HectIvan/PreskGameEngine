@@ -20,9 +20,22 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkColor.h"
 
 namespace pkEngineSDK
 {
+
+class Device;
+
+namespace TEXTURE_TYPE
+{
+  enum E
+  {
+    kDiffuse = 0,
+    kNormal,
+    kEmmissive,
+  };
+}
 
 class PK_CORE_EXPORT Texture
 {
@@ -30,7 +43,11 @@ class PK_CORE_EXPORT Texture
   Texture() = default;
   virtual ~Texture() = default;
 
-  virtual UPtr<Texture>
-  getTexture() = 0;
+ public:
+  uint32 id;
+  TEXTURE_TYPE::E type;
+  String path;
+  uint32 width;
+  uint32 height;
 };
 }

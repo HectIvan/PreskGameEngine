@@ -61,6 +61,9 @@
     <Filter Include="source\events">
       <UniqueIdentifier>{053a5fdf-01ad-42ec-ab31-efd131b12c76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\graphics">
+      <UniqueIdentifier>{97698cb5-919b-4d24-b37b-c212942a8975}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -138,6 +141,9 @@
     <ClInclude Include="include\pkConstantBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkMaterial.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -181,6 +187,12 @@
     </ClCompile>
     <ClCompile Include="source\pkWin32EventQueue.cpp">
       <Filter>source\events</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMaterial.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTexture.cpp">
+      <Filter>source\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

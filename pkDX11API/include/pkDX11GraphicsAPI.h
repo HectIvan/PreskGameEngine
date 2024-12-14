@@ -135,6 +135,71 @@ class DX11GraphicsAPI : public GraphicsAPI
   setSampler() override;
 
   /**
+  * Set a texture to the resource view.
+  * 
+  * param _pTexture
+  * Pointer to the texture.
+  * 
+  * @param _start
+  * Where the setting will start.
+  * 
+  * @param _numViews
+  * How many views are there.
+  **/
+  void
+  setShaderResourceView(Texture* _pTexture,
+                        uint32 _start = 0,
+                        uint32 _numViews = 1);
+
+  /**
+  * create a texture from file.
+  * 
+  * @param _fileName
+  * Name of the texture.
+  * 
+  * @param _bindFlags
+  * What kind of binding will it have
+  **/
+  Texture*
+  createTextureFromFile(String& _fileName,
+                        uint32 _bindFlags,
+                        bool _mipLevels,
+                        uint32 _format);
+
+  /**
+  * Create a texture.
+  * 
+  * @param _data
+  * Data of the image loaded.
+  * 
+  * @param _width
+  * How wide is the texture.
+  * 
+  * @param _height
+  * How tall is the texture.
+  * 
+  * @param _format
+  * Format of the texture.
+  * 
+  * @param _usage
+  * What usage will the api give the texture.
+  * 
+  * @param _bindFlags
+  * flag for binding to the pipeline stages.
+  * 
+  * @param _mipLevels
+  * The maximum number of mipmap levels in the texture.
+  **/
+  Texture*
+  createTextureDX(unsigned char* _data,
+                uint32 _width,
+                uint32 _height,
+                uint32 _format,
+                uint32 _usage,
+                uint32 _bindFlags,
+                bool _mipLevels);
+
+  /**
   * Create the vertex buffer.
   * 
   * @param _vertex

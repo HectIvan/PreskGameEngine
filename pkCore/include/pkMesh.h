@@ -21,13 +21,14 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
-#include "pkTexture.h"
+// #include "pkTexture.h"
 #include "pkTransform.h"
 
 namespace pkEngineSDK
 {
 
 class Device;
+class Texture;
 
 class Mesh
 {
@@ -73,7 +74,7 @@ class Mesh
   // stores the index and vertex info
   Vector<SimpleVertex> vertexVector;
   Vector<uint32> indexVector;
-  Vector<Texture*> textures;
+  // Vector<Texture*> textures;
   // aiMaterial* m_material;
   uint32 vertexCount;
   uint32 numIndex;

@@ -180,6 +180,7 @@
     <ClInclude Include="include\pkIndexBuffer.h" />
     <ClInclude Include="include\pkKey.h" />
     <ClInclude Include="include\pkLight.h" />
+    <ClInclude Include="include\pkMaterial.h" />
     <ClInclude Include="include\pkMesh.h" />
     <ClInclude Include="include\pkModel.h" />
     <ClInclude Include="include\pkMouseWheelData.h" />
@@ -201,8 +202,10 @@
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />
     <ClCompile Include="source\pkMain.cpp" />
+    <ClCompile Include="source\pkMaterial.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkModel.cpp" />
+    <ClCompile Include="source\pkTexture.cpp" />
     <ClCompile Include="source\pkWin32Event.cpp" />
     <ClCompile Include="source\pkWin32EventQueue.cpp" />
     <ClCompile Include="source\pkWin32Window.cpp" />

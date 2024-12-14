@@ -36,40 +36,9 @@ class DX11Texture : public Texture
   DX11Texture() = default;
   virtual ~DX11Texture()
   {
-    clear();
+    safeRelease(t2d);
+    safeRelease(srv);
   }
-
-  /**
-  * Get a unique pointer to the current texture.
-  * 
-  * @return
-  * The new unique pointer as the child class.
-  **/
-  UPtr<Texture>
-  getTexture() override;
-
-  /**
-  * Create the texture.
-  * 
-  * Creates the texture based on DirectX.
-  * 
-  * @param _pDevice
-  * Device that will create the texture.
-  * 
-  * @param _width
-  * Width of the texture.
-  * 
-  * @param _height
-  * Height of the texture.
-  * 
-  * @param _colors
-  * Array of colors that the texture will have.
-  **/
-  void
-  create(DX11Device* _pDevice,
-         uint32 _width,
-         uint32 _height,
-         Vector<Color> _colors);
 
   /**
   * Gets a pointer to the DX11 texture.
@@ -78,7 +47,7 @@ class DX11Texture : public Texture
   * Pointer to the resource.
   **/
   ID3D11Texture2D*
-  getTexture2D() { return m_t2d; }
+  getTexture2D() { return t2d; }
 
   /**
   * Set the DirectX texture.
@@ -87,7 +56,7 @@ class DX11Texture : public Texture
   * Pointer to the new texture.
   **/
   void
-  setTexture2D(ID3D11Texture2D* _t2d) { m_t2d = _t2d; }
+  setTexture2D(ID3D11Texture2D* _t2d) { t2d = _t2d; }
 
   /**
   * Gets a pointer to the shader resource view.
@@ -96,7 +65,7 @@ class DX11Texture : public Texture
   * Pointer to the resource.
   **/
   ID3D11ShaderResourceView*
-  getSRV() const { return m_srv; }
+  getSRV() const { return srv; }
 
   /**
   * Sets the shader resource view of the texture.
@@ -105,7 +74,7 @@ class DX11Texture : public Texture
   * New shader resource view.
   **/
   void
-  setSRV(ID3D11ShaderResourceView* _srv) { m_srv = _srv; }
+  setSRV(ID3D11ShaderResourceView* _srv) { srv = _srv; }
 
   /**
   * Gets the type of the current texture.
@@ -125,15 +94,11 @@ class DX11Texture : public Texture
   void
   setType(uint32 _type) { m_type = _type; }
 
-  /**
-  * Clears all the members of the texture.
-  **/
-  void
-  clear();
+ public:
+  ID3D11Texture2D* t2d = nullptr;
+  ID3D11ShaderResourceView* srv;
 
  private:
-  ID3D11Texture2D* m_t2d = nullptr;
-  ID3D11ShaderResourceView* m_srv;
   uint32 m_type;
 };
 }

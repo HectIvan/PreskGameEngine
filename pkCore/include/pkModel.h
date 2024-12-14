@@ -21,6 +21,7 @@
 /*********************************************/
 #include "pkBone.h"
 #include "pkIndexBuffer.h"
+#include "pkMaterial.h"
 #include "pkMesh.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVertexBuffer.h"
@@ -112,5 +113,11 @@ class PK_CORE_EXPORT Model
   // buffers for both vectors and index
   SPtr<VertexBuffer> vertexB;
   SPtr<IndexBuffer> indexB;
+
+  // material
+  Material material;
+
+  // location data
+  String path;
 };
 }

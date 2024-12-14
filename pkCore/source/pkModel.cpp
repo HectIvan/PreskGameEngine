@@ -7,9 +7,12 @@
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <iostream>
 
 #include "pkMatrix4.h"
 #include "pkModel.h"
+#include "pkTexture.h"
+#include "stb_image.h"
 
 namespace pkEngineSDK
 {
@@ -32,6 +35,7 @@ Model::load(String& _path)
   vertexB = nullptr;
 
   String modelPath = _path;
+  path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
   if (scene == nullptr) { return; }
@@ -118,10 +122,20 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
   {
     // mesh->mBones[i].
   }
-  for (uint32 i = 0; i < _scene->mNumMaterials; ++i)
+  if (_mesh->mMaterialIndex >= 0)
   {
+    aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
+    for (uint32 i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
+    {
+      aiString path;
+      material->GetTexture(aiTextureType_DIFFUSE, i, &path);
+      std::cout << "Texture path: " << path.C_Str() << std::endl;
+    }
+    // material->GetTexture(aiTextureType_DIFFUSE);
+    // material->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
   }
+  
   return meshProcess;
 }
 
@@ -200,7 +214,7 @@ loadMaterial(const aiScene* _scene)//, String& _fileName) // PkMesh& _mesh,
     const aiMaterial* pMaterial = _scene->mMaterials[i];
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
     {
-
+      
     }
   }
 }

@@ -120,6 +120,23 @@ public:
                        uint32 _size) = 0;
 
   /**
+  * Set a texture to the resource view.
+  * 
+  * param _pTexture
+  * Pointer to the texture.
+  * 
+  * @param _start
+  * Where the setting will start.
+  * 
+  * @param _numViews
+  * How many views are there.
+  **/
+  virtual void
+  setShaderResourceView(Texture* _pTexture,
+                        uint32 _start = 0,
+                        uint32 _numViews = 1) = 0;
+
+  /**
   * Draw the indexed data.
   * 
   * @param _indexCount
@@ -197,6 +214,21 @@ public:
   **/
   virtual void
   setSampler() = 0;
+
+  /**
+  * create a texture from file.
+  * 
+  * @param _fileName
+  * Name of the texture.
+  * 
+  * @param _bindFlags
+  * What kind of binding will it have
+  **/
+  virtual Texture*
+  createTextureFromFile(String& _fileName,
+                        uint32 _bindFlags,
+                        bool _mipLevels,
+                        uint32 _format) = 0;
 
   /**
   * Present the result to the screen.

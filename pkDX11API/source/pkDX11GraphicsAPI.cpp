@@ -1,7 +1,11 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11Prerequisites.h"
 #include "pkDX11VertexBuffer.h"
+#include "pkDX11Texture.h"
 #include "pkWindow.h"
 #include "pkVertexBuffer.h"
 
@@ -359,6 +363,115 @@ void
 DX11GraphicsAPI::setSampler()
 {
   m_pDevice->pImmediateContext->PSSetSamplers(0, 1, &pSamplerLinear->pSampler);
+}
+
+void
+DX11GraphicsAPI::setShaderResourceView(Texture* _pTexture,
+                                       uint32 _start,
+                                       uint32 _numViews)
+{
+  // cast to a directX texture
+  DX11Texture* dxTX = dynamic_cast<DX11Texture*>(_pTexture);
+
+  // set the shader resource view
+  m_pDevice->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
+}
+
+Texture*
+DX11GraphicsAPI::createTextureFromFile(String& _fileName,
+                                       uint32 _bindFlags,
+                                       bool _mipLevels,
+                                       uint32 _format)
+{
+  // values
+  int32 width, height, bpp, pitch;
+
+  // load the image data into a storage variable
+  unsigned char* data = stbi_load(_fileName.c_str(), &width, &height, &bpp, 4);
+
+  // how wide each line of the texture will be
+  pitch = width * bpp;
+
+  // create a default texture using the received parameters
+  Texture* temptTexture = createTextureDX(data, width, height, _format, 0, _bindFlags, _mipLevels);
+
+  // cast to DX11Texture
+  DX11Texture* dxTX = dynamic_cast<DX11Texture*>(temptTexture);
+
+  // update the texture
+  m_pDevice->pImmediateContext->UpdateSubresource(dxTX->t2d, 0, nullptr, data, pitch, 0);
+
+  // free the texture data
+  stbi_image_free(data);
+
+  // set the path
+  dxTX->path = _fileName;
+
+  // return the texture
+  return dxTX;
+}
+
+Texture*
+DX11GraphicsAPI::createTextureDX(unsigned char* _data,
+                               uint32 _width,
+                               uint32 _height,
+                               uint32 _format,
+                               uint32 _usage,
+                               uint32 _bindFlags,
+                               bool _mipLevels)
+{
+  // texture description
+  D3D11_TEXTURE2D_DESC desc;
+  memset(&desc, 0, sizeof(desc));
+  desc.Width = _width;
+  desc.Height = _height;
+  desc.MipLevels = _mipLevels ? 0 : 1;
+  desc.ArraySize = 1;
+  desc.Format = static_cast<DXGI_FORMAT>(_format);
+  desc.SampleDesc.Count = 1;
+  desc.SampleDesc.Quality = 0;
+  desc.Usage = static_cast<D3D11_USAGE>(_usage);
+  desc.BindFlags = _bindFlags;
+  desc.CPUAccessFlags = 0;
+  desc.MiscFlags = 0;
+
+  // data of the texture
+  D3D11_SUBRESOURCE_DATA initData;
+  initData.pSysMem = _data;
+  initData.SysMemPitch = static_cast<uint32>(_width * 4);
+  initData.SysMemSlicePitch = 0;
+
+  // create the texture
+  DX11Texture* tex = new DX11Texture();
+  m_pDevice->pd3dDevice->CreateTexture2D(&desc, &initData, &tex->t2d);
+
+  if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE)
+  {
+    // Create the shader resource descriptor for the texture
+    D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
+    memset(&sDesc, 0, sizeof(sDesc));
+    sDesc.Format = desc.Format;
+    sDesc.Texture2D.MipLevels = desc.MipLevels;
+    sDesc.Texture2D.MostDetailedMip = 0;
+    sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+    // create the shader resource view
+    m_pDevice->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
+    if (!tex->srv) { return nullptr; } // failed to create shader resource view
+  }
+
+  if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL)
+  {
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+    memset(&dsvDesc, 0, sizeof(dsvDesc));
+    dsvDesc.Format = desc.Format;
+    dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Texture2D.MipSlice = 0;
+    m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &pDepthSView->pDepthSV);
+    if (!pDepthSView->pDepthSV) { return nullptr; }
+  }
+
+  return tex;
 }
 
 SPtr<VertexBuffer>

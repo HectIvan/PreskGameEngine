@@ -14,7 +14,6 @@ Mesh::Mesh(Vector<SimpleVertex> _vertex,
   indexVector = _index;
   vertexCount = _vertexCount;
   numIndex = _numIndex;
-  textures = _textures;
 }
 
 void
@@ -24,9 +23,7 @@ Mesh::clean()
   vertexVector.clear();
   // Empty the index vector
   indexVector.clear();
-  // Empty the textures vector
-  textures.clear();
-  // m_material = nullptr;
+
   vertexCount = 0;
   numIndex = 0;
 }

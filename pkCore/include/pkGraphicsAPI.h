@@ -246,7 +246,8 @@ public:
   * Set the sampler state.
   **/
   virtual void
-  setSampler() = 0;
+  setSampler(uint32 _startSlot = 0,
+             uint32 _numSamplers = 1) = 0;
 
   /**
   * create a texture from file.

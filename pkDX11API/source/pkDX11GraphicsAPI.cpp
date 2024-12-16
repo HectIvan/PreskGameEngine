@@ -249,7 +249,7 @@ DX11GraphicsAPI::createSamplerState()
   // sampler state description
   D3D11_SAMPLER_DESC sampDesc;
   ZeroMemory(&sampDesc, sizeof(sampDesc));
-  sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+  sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR; // D3D11_FILTER_MIN_MAG_MIP_LINEAR
   sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
   sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
   sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -365,9 +365,12 @@ DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 }
 
 void
-DX11GraphicsAPI::setSampler()
+DX11GraphicsAPI::setSampler(uint32 _startSlot,
+                            uint32 _numSamplers)
 {
-  m_pDevice->pImmediateContext->PSSetSamplers(0, 1, &pSamplerLinear->pSampler);
+  m_pDevice->pImmediateContext->PSSetSamplers(_startSlot,
+                                              _numSamplers,
+                                              &pSamplerLinear->pSampler);
 }
 
 void

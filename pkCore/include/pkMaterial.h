@@ -35,7 +35,7 @@ class Material
   * Set the diffuse texture of the material.
   **/
   void
-  setTexture(SPtr<Texture> _pTexture, SPtr<Texture> _pNewTexture);
+  setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
 
  public:
   SPtr<Texture> diffuse;

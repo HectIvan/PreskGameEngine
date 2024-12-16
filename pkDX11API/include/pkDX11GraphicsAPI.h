@@ -126,14 +126,14 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Client height.
   **/
   void
-  setViewport(uint32 _width,
-              uint32 _height);
+  setViewport(uint32 _width, uint32 _height);
 
   /**
   * Set the sampler state.
   **/
   void
-  setSampler() override;
+  setSampler(uint32 _startSlot = 0,
+             uint32 _numSamplers = 1) override;
 
   /**
   * Set a texture to the resource view.

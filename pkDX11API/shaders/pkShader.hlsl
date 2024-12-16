@@ -4,11 +4,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------
-// Constant Buffer Variables
-//--------------------------------------------------------------------------------------
+/***************************************************************************************
+* Constant Buffer Variables
+***************************************************************************************/
 Texture2D txDiffuse : register(t0);
-// Texture2D txBaseColor : register(t0);
 SamplerState samLinear : register(s0);
 
 #define M_PI 3.14159265383
@@ -45,9 +44,9 @@ cbuffer BoneTransform : register(b4)
     float4x4 Transform[100];
 }
 
-//--------------------------------------------------------------------------------------
-//                                  Inputs
-//--------------------------------------------------------------------------------------
+/***********************
+* Inputs
+***********************/
 struct VS_INPUT
 {
     float3 Pos : POSITION0;
@@ -72,17 +71,17 @@ float2 UnpackUV(float2 uv)
     return uv * 8.0f / 32767.0;
 }
 
-// -----------------------------------------------
-//          Lambert for multiple lights
-// -----------------------------------------------
+/***********************
+* Lambert for multiple lights
+***********************/
 float lambertValue(float3 normal, float3 lightDir)
 {
     return max(0.0f, dot(normal, lightDir));
 }
 
-//--------------------------------------------------------------------------------------
-//                              Model parts
-//--------------------------------------------------------------------------------------
+/***********************
+* Model parts
+***********************/
 struct MODEL_VERTEX
 {
     float x;
@@ -92,9 +91,9 @@ struct MODEL_VERTEX
     float v;
 };
 
-//--------------------------------------------------------------------------------------
-// Vertex Shader
-//--------------------------------------------------------------------------------------
+/***********************
+* Vertex Shader
+***********************/
 PS_INPUT VS(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
@@ -108,76 +107,76 @@ PS_INPUT VS(VS_INPUT input)
     
     //Static directional light
     output.Normal = mul(float4(input.Normal, 0.0f), World);
-    output.Tex = input.Tex; //UnpackUV(input.Tex.xy);
+    output.Tex = input.Tex;
     
     return output;
 }
 
 
-//--------------------------------------------------------------------------------------
-// Pixel Shader
-//--------------------------------------------------------------------------------------
-/*
+/***********************
+* Pixel Shader
+***********************/
+
 float4 PS( PS_INPUT input) : SV_Target0
 {
     // PS_Output output;
     // output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
     // return output;
     return txDiffuse.Sample( samLinear, input.Tex );
-} */
+} 
 
-float4 PS(PS_INPUT input) : SV_Target
-{
-    float4 lightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    // Lambert Component
-    float3 LightPos = LightDir;
-    
-    /************************************************************
-    *              LIGHT DIRECTION
-    ************************************************************/
-    float3 lightDir = LightPos;// focus
-    float distToLight = length(lightDir);
-    float sqrDistToLight = distToLight * distToLight;
-    lightDir = LightDir / distToLight;
-    
-    
-    float3 normal = normalize(input.Normal);
-    float lambert = max(0.0f, dot(normal, lightDir)); // lambertValue(normal, lightDir); // 
-    
-    /************************************************************
-    * calculate light attenuation
-    ************************************************************/
-    float AttenuationConstant = 1.0f;
-    float AttenuationLinear = 0.27f;
-    float AttenuationQuadratic = 0.22f;
-    
-    float Attenuation = 1.0f / (AttenuationConstant +
-                                AttenuationLinear * distToLight
-                                + AttenuationQuadratic * sqrDistToLight);
-    
-    
-    float4 DifColor = float4(txDiffuse.Sample(samLinear, input.Tex).xyz, 1.0f);
-    
-    
-    float4 DiffuseValue = lambert * Attenuation * float4(lightColor) * DifColor;
-    
-    /************************************************************
-    * Calculate Specular Reflection Component
-    ************************************************************/
-    float3 viewDir = normalize(ViewPos - input.Pos);
-    float3 halfDir = normalize(LightDir + viewDir);
-    float3 specular = pow(max(0.0f, dot(normal, halfDir)), 2.0f);
-    
-    float3 AmbientColor = float3(0.2f, 0.2f, 0.3f);
-    
-    // BRDF (Bi-Directional Reflectance Distribution Function)
-    
-    // kD + kS + kA
-    // k = Absorbtion Constant - Diffuse (Difusa) = 80%
-    // k = Reflection Specular Constant = 20%
-    // k = Ambien Reflecion Constant = 3-10%
-    
-    float3 fColor = DiffuseValue.xyz + ((1.0f - DifColor.w) * specular) + AmbientColor;
-    
-    return float4(fColor.xyz, GAMMA);
-}
+// float4 PS(PS_INPUT input) : SV_Target
+// {
+//     float4 lightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+//     // Lambert Component
+//     float3 LightPos = LightDir;
+//     
+//     /************************************************************
+//     *              LIGHT DIRECTION
+//     ************************************************************/
+//     float3 lightDir = LightPos;// focus
+//     float distToLight = length(lightDir);
+//     float sqrDistToLight = distToLight * distToLight;
+//     lightDir = LightDir / distToLight;
+//     
+//     
+//     float3 normal = normalize(input.Normal);
+//     float lambert = max(0.0f, dot(normal, lightDir)); // lambertValue(normal, lightDir); // 
+//     
+//     /************************************************************
+//     * calculate light attenuation
+//     ************************************************************/
+//     float AttenuationConstant = 1.0f;
+//     float AttenuationLinear = 0.27f;
+//     float AttenuationQuadratic = 0.22f;
+//     
+//     float Attenuation = 1.0f / (AttenuationConstant +
+//                                 AttenuationLinear * distToLight
+//                                 + AttenuationQuadratic * sqrDistToLight);
+//     
+//     
+//     float4 DifColor = float4(txDiffuse.Sample(samLinear, input.Tex).xyz, 1.0f);
+//     
+//     
+//     float4 DiffuseValue = lambert * Attenuation * float4(lightColor) * DifColor;
+//     
+//     /************************************************************
+//     * Calculate Specular Reflection Component
+//     ************************************************************/
+//     float3 viewDir = normalize(ViewPos - input.Pos);
+//     float3 halfDir = normalize(LightDir + viewDir);
+//     float3 specular = pow(max(0.0f, dot(normal, halfDir)), 2.0f);
+//     
+//     float3 AmbientColor = float3(0.2f, 0.2f, 0.3f);
+//     
+//     // BRDF (Bi-Directional Reflectance Distribution Function)
+//     
+//     // kD + kS + kA
+//     // k = Absorbtion Constant - Diffuse (Difusa) = 80%
+//     // k = Reflection Specular Constant = 20%
+//     // k = Ambien Reflecion Constant = 3-10%
+//     
+//     float3 fColor = DiffuseValue.xyz + ((1.0f - DifColor.w) * specular) + AmbientColor;
+//     
+//     return float4(fColor.xyz, GAMMA);
+// }

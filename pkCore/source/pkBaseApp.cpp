@@ -46,14 +46,14 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  String modelPath = "D:/Work/visual studio/PreskGameEngine/models/" +
+  String modelPath = "models/" +
                      _modelName +
                      "." +
                      _extension;
   // load the model
   SPtr<Model> model = loadModel(modelPath);
   // create the texture
-  String textureName = "D:\\Work\\visual studio\\PreskGameEngine\\textures\\Emmisive_Eye_Class_Albedo.tga.png";
+  String textureName = "textures/Emmisive_Eye_Class_Albedo.png";
   SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
   // insert the texture to the material
   model->material.setTexture(model->material.diffuse, texture);
@@ -297,6 +297,7 @@ BaseApp::renderModel(Model& _model)
   // set the diffuse texture to the resource view
   // for each mesh in the model
   api.setShaderResourceView(_model.material.diffuse);
+  api.setSampler();
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),

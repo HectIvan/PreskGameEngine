@@ -33,6 +33,9 @@ class Device;
 class IndexBuffer;
 class VertexBuffer;
 
+using std::make_shared;
+using std::dynamic_pointer_cast;
+
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
 public:
@@ -47,6 +50,18 @@ public:
   **/
   virtual void
   initApi(const Window& _window) = 0;
+
+  /**
+  * Create the sampler state.
+  **/
+  virtual void
+  createSamplerState() = 0;
+
+  /**
+  * Set input layout
+  **/
+  virtual void
+  setInputLayout() = 0;
 
   /**
   * Create a VertexBuffer
@@ -132,7 +147,7 @@ public:
   * How many views are there.
   **/
   virtual void
-  setShaderResourceView(Texture* _pTexture,
+  setShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
                         uint32 _numViews = 1) = 0;
 
@@ -168,12 +183,30 @@ public:
   **/
   virtual void
   clearDepthBuffer(float _depth) = 0;
+
+  /**
+  * Compile shaders.
+  **/
+  virtual void
+  compileShaders() = 0;
+
+  /**
+  * Create shaders.
+  **/
+  virtual void
+  createShaders() = 0;
   
   /**
   * Set the shaders of the api.
   **/
   virtual void
   setShaders() = 0;
+
+  /**
+  * Create the Input Layout.
+  **/
+  virtual void
+  createInputLayout() = 0;
 
   /**
   * Set the Vertex Shader constant buffer.
@@ -224,7 +257,7 @@ public:
   * @param _bindFlags
   * What kind of binding will it have
   **/
-  virtual Texture*
+  virtual SPtr<Texture>
   createTextureFromFile(String& _fileName,
                         uint32 _bindFlags,
                         bool _mipLevels,
@@ -245,5 +278,6 @@ public:
  public:
   // world matrix
   Matrix4 world;
+  
 };
 }

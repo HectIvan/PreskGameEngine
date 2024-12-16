@@ -101,14 +101,14 @@ PS_INPUT VS(VS_INPUT input)
     output.Pos = mul(float4(input.Pos, 1.0f), World);
     output.Pos = mul(output.Pos, View);
     output.Pos = mul(output.Pos, Projection);
-    output.Tex = input.Tex;
+    // output.Tex = UnpackUV(input.Tex.xy);
     
     // Light rotates with model
     // output.Normal = input.Normal;
     
     //Static directional light
     output.Normal = mul(float4(input.Normal, 0.0f), World);
-    //  output.Tex = input.Tex; //UnpackUV(input.Tex.xy);
+    output.Tex = input.Tex; //UnpackUV(input.Tex.xy);
     
     return output;
 }
@@ -118,13 +118,13 @@ PS_INPUT VS(VS_INPUT input)
 // Pixel Shader
 //--------------------------------------------------------------------------------------
 /*
-PS_Output PS( PS_INPUT input) : SV_Target0
+float4 PS( PS_INPUT input) : SV_Target0
 {
-    PS_Output output;
-    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    return output;
-    // return txDiffuse.Sample( samLinear, input.Tex ) * vMeshColor;
-}*/
+    // PS_Output output;
+    // output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    // return output;
+    return txDiffuse.Sample( samLinear, input.Tex );
+} */
 
 float4 PS(PS_INPUT input) : SV_Target
 {
@@ -132,9 +132,9 @@ float4 PS(PS_INPUT input) : SV_Target
     // Lambert Component
     float3 LightPos = LightDir;
     
-    // ----------------------------------------
-    //              LIGHT DIRECTION
-    // ----------------------------------------
+    /************************************************************
+    *              LIGHT DIRECTION
+    ************************************************************/
     float3 lightDir = LightPos;// focus
     float distToLight = length(lightDir);
     float sqrDistToLight = distToLight * distToLight;
@@ -142,11 +142,11 @@ float4 PS(PS_INPUT input) : SV_Target
     
     
     float3 normal = normalize(input.Normal);
-    float lambert = lambertValue(normal, lightDir); // max(0.0f, dot(normal, lightDir));
+    float lambert = max(0.0f, dot(normal, lightDir)); // lambertValue(normal, lightDir); // 
     
-    // ----------------------------------
-    // calculate light attenuation
-    // ----------------------------------
+    /************************************************************
+    * calculate light attenuation
+    ************************************************************/
     float AttenuationConstant = 1.0f;
     float AttenuationLinear = 0.27f;
     float AttenuationQuadratic = 0.22f;
@@ -161,14 +161,14 @@ float4 PS(PS_INPUT input) : SV_Target
     
     float4 DiffuseValue = lambert * Attenuation * float4(lightColor) * DifColor;
     
-    // ------------------------------------------------------------
-    // Calculate Specular Reflection Component
-    // ------------------------------------------------------------
+    /************************************************************
+    * Calculate Specular Reflection Component
+    ************************************************************/
     float3 viewDir = normalize(ViewPos - input.Pos);
     float3 halfDir = normalize(LightDir + viewDir);
     float3 specular = pow(max(0.0f, dot(normal, halfDir)), 2.0f);
     
-    float3 AmbientColor = float3(0.2f, 0.2f, 0.2f);
+    float3 AmbientColor = float3(0.2f, 0.2f, 0.3f);
     
     // BRDF (Bi-Directional Reflectance Distribution Function)
     
@@ -178,7 +178,6 @@ float4 PS(PS_INPUT input) : SV_Target
     // k = Ambien Reflecion Constant = 3-10%
     
     float3 fColor = DiffuseValue.xyz + ((1.0f - DifColor.w) * specular) + AmbientColor;
-    // fColor = pow(fColor, 1.0f);
     
     return float4(fColor.xyz, GAMMA);
 }

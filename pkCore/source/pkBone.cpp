@@ -14,8 +14,7 @@ Bone::Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
 
   // get all the positions
   numPositions = _channel->mNumPositionKeys;
-  for (uint32 i = 0; i < numPositions; ++i)
-  {
+  for (uint32 i = 0; i < numPositions; ++i) {
     Vector3 position = Vector3(_channel->mPositionKeys[i].mValue.x,
                                _channel->mPositionKeys[i].mValue.y,
                                _channel->mPositionKeys[i].mValue.z);
@@ -28,8 +27,7 @@ Bone::Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
 
   // get all the rotations
   numRotations = _channel->mNumRotationKeys;
-  for (uint32 i = 0; i < numRotations; ++i)
-  {
+  for (uint32 i = 0; i < numRotations; ++i) {
     Vector4 rotation = Vector4(_channel->mRotationKeys[i].mValue.x,
                                _channel->mRotationKeys[i].mValue.y,
                                _channel->mRotationKeys[i].mValue.z,
@@ -43,8 +41,7 @@ Bone::Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
 
   // get all the scales
   numScales = _channel->mNumScalingKeys;
-  for (uint32 i = 0; i < numScales; ++i)
-  {
+  for (uint32 i = 0; i < numScales; ++i) {
     Vector3 scale = Vector3(_channel->mScalingKeys[i].mValue.x,
                             _channel->mScalingKeys[i].mValue.y,
                             _channel->mScalingKeys[i].mValue.z);
@@ -69,8 +66,7 @@ Bone::update(float _deltaTime)
 Matrix4
 Bone::interpolatePosition(float _deltaTime)
 {
-  if (1 == numPositions)
-  {
+  if (1 == numPositions) {
     return Matrix4::translation(positions[0].position);
   }
 
@@ -88,8 +84,7 @@ Bone::interpolatePosition(float _deltaTime)
 Matrix4
 Bone::interpolateRotation(float _deltaTime)
 {
-  if (1 == numRotations)
-  {
+  if (1 == numRotations) {
     Vector4 rotation = rotations[0].rotation;
     rotation.normalize();
     return Matrix4::rotation(rotation.x, rotation.y, rotation.z);
@@ -110,8 +105,7 @@ Bone::interpolateRotation(float _deltaTime)
 Matrix4
 Bone::interpolateScale(float _deltaTime)
 {
-  if (1 == numScales)
-  {
+  if (1 == numScales) {
     return Matrix4::scale(scales[0].scale);
   }
   int p0Index = getScaleIndex(_deltaTime);
@@ -128,10 +122,8 @@ Bone::interpolateScale(float _deltaTime)
 uint32
 Bone::getPositionIndex(float _deltaTime)
 {
-  for (uint32 i = 0; i < numPositions - 1; ++i)
-  {
-    if (_deltaTime < positions[i + 1].timeStamp)
-    {
+  for (uint32 i = 0; i < numPositions - 1; ++i) {
+    if (_deltaTime < positions[i + 1].timeStamp) {
       return i;
     }
   }
@@ -141,10 +133,8 @@ Bone::getPositionIndex(float _deltaTime)
 uint32
 Bone::getRotationIndex(float _deltaTime)
 {
-  for (uint32 i = 0; i < numRotations - 1; ++i)
-  {
-    if (_deltaTime < rotations[i + 1].timeStamp)
-    {
+  for (uint32 i = 0; i < numRotations - 1; ++i) {
+    if (_deltaTime < rotations[i + 1].timeStamp) {
       return i;
     }
   }
@@ -154,10 +144,8 @@ Bone::getRotationIndex(float _deltaTime)
 uint32
 Bone::getScaleIndex(float _deltaTime)
 {
-  for (uint32 i = 0; i < numScales - 1; ++i)
-  {
-    if (_deltaTime < scales[i + 1].timeStamp)
-    {
+  for (uint32 i = 0; i < numScales - 1; ++i) {
+    if (_deltaTime < scales[i + 1].timeStamp) {
       return i;
     }
   }

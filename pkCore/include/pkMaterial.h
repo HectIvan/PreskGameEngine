@@ -32,12 +32,16 @@ class Material
   virtual ~Material() = default;
 
   /**
-  * Insert a new texture to the material.
+  * Set the diffuse texture of the material.
   **/
   void
-  insertTexture(Texture* _texture) { textures.push_back(_texture); }
+  setTexture(SPtr<Texture> _pTexture, SPtr<Texture> _pNewTexture);
 
  public:
-  Vector<Texture*> textures;
+  SPtr<Texture> diffuse;
+  SPtr<Texture> metallic;
+  SPtr<Texture> normal;
+  SPtr<Texture> height;
+  SPtr<Texture> occlusion;
 };
 }

@@ -10,14 +10,12 @@ void
 EventQueue::poll()
 {
   // update key states
-  for (uint32 i = 0; i < 256; ++i)
-  {
+  for (uint32 i = 0; i < 256; ++i) {
     // update the key, if the entry doesnt exist, it creates a new entry
     keys[i].id = i;
     keys[i].pressed = GetAsyncKeyState(i) & 0x8000;
 
-    if (keys[i].pressed)
-    {
+    if (keys[i].pressed) {
       uint32 j = 0;
       j -= 1;
     }

@@ -23,6 +23,7 @@
 #include "pkDX11ConstantBuffer.h"
 #include "pkDX11DepthStencilView.h"
 #include "pkDX11Device.h"
+#include "pkDX11InputLayout.h"
 #include "pkDX11PixelShader.h"
 #include "pkDX11SamplerState.h"
 #include "pkDX11VertexShader.h"
@@ -100,7 +101,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   * Create the sampler state.
   **/
   void
-  createSamplerState();
+  createSamplerState() override;
 
   /**
   * Create the depth stencil texture and view.
@@ -147,9 +148,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   * How many views are there.
   **/
   void
-  setShaderResourceView(Texture* _pTexture,
+  setShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
-                        uint32 _numViews = 1);
+                        uint32 _numViews = 1) override;
 
   /**
   * create a texture from file.
@@ -160,11 +161,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   * @param _bindFlags
   * What kind of binding will it have
   **/
-  Texture*
+  SPtr<Texture>
   createTextureFromFile(String& _fileName,
                         uint32 _bindFlags,
                         bool _mipLevels,
-                        uint32 _format);
+                        uint32 _format) override;
 
   /**
   * Create a texture.
@@ -190,14 +191,21 @@ class DX11GraphicsAPI : public GraphicsAPI
   * @param _mipLevels
   * The maximum number of mipmap levels in the texture.
   **/
-  Texture*
+  SPtr<Texture>
   createTextureDX(unsigned char* _data,
+                uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
                 bool _mipLevels);
+
+  /**
+  * Set input layout
+  **/
+  void
+  setInputLayout() override;
 
   /**
   * Create the vertex buffer.
@@ -307,10 +315,28 @@ class DX11GraphicsAPI : public GraphicsAPI
   clearDepthBuffer(float _depth) override;
 
   /**
+  * Compile shaders.
+  **/
+  void
+  compileShaders() override;
+
+  /**
+  * Create shaders.
+  **/
+  void
+  createShaders() override;
+
+  /**
   * Set the shaders of the api.
   **/
   void
   setShaders() override;
+
+  /**
+  * Create the Input Layout.
+  **/
+  void
+  createInputLayout() override;
 
   /**
   * Set the Vertex Shader constant buffer.
@@ -371,6 +397,9 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   // swap chain
   IDXGISwapChain* pSwapChain;
+
+  // input layout
+  SPtr<DX11InputLayout> pInputL;
 
   // depth stencil
   ID3D11Texture2D* pDepthStencil;

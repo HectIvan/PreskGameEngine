@@ -36,8 +36,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
   wcex.lpszMenuName = nullptr;
   wcex.lpszClassName = "WindowClass";
-  if (!RegisterClassEx(&wcex))
-  {
+  if (!RegisterClassEx(&wcex)) {
     return;
   }
   /************************************************************************************/
@@ -67,8 +66,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   /**
   * Check if creation failed. 
   **/
-  if (!m_windowH)
-  {
+  if (!m_windowH) {
     // DWORD error = GetLastError();
     return;
   }

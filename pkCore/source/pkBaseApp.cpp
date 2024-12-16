@@ -15,11 +15,11 @@ namespace pkEngineSDK
 void
 run(String _name, Window& _window);
 
-GameObject*
-createGameObject(Model* _model);
+SPtr<GameObject>
+createGameObject(SPtr<Model> _model);
 
 void
-insertGameObject(GameObject* _object, Vector<GameObject*>& _vector);
+insertGameObject(SPtr<GameObject> _object, Vector<SPtr<GameObject>>& _vector);
 
 /*********************************************/
 /**
@@ -32,6 +32,11 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
 {
   initWindow();
   initAPI(_argv);
+  GraphicsAPI& api = GraphicsAPI::instance();
+  api.compileShaders();
+  api.createShaders();
+  api.createInputLayout();
+  api.createSamplerState();
   createBuffers();
   camera.init(window.getWidth(),
               window.getHeight(),
@@ -46,13 +51,12 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
                      "." +
                      _extension;
   // load the model
-  Model* model = loadModel(modelPath);
-  GraphicsAPI& api = GraphicsAPI::instance();
+  SPtr<Model> model = loadModel(modelPath);
   // create the texture
   String textureName = "D:\\Work\\visual studio\\PreskGameEngine\\textures\\Emmisive_Eye_Class_Albedo.tga.png";
-  Texture* texture = api.createTextureFromFile(textureName, 8, false, 28);
+  SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
   // insert the texture to the material
-  model->material.insertTexture(texture);
+  model->material.setTexture(model->material.diffuse, texture);
   // insert the game object into the vector of game objects
   insertGameObject(createGameObject(model), gameObjects);
   cameraSpeed = 10.0f;
@@ -75,13 +79,11 @@ BaseApp::initAPI(const char** _argv)
   String abstraction = _argv[1];
 
 #ifdef PK_DEBUG_MODE
-  if (abstraction == "DX11API")
-  {
+  if (abstraction == "DX11API") {
     run("pkDX11APId", window);
   }
 #else
-  if (abstraction == "DX11API")
-  {
+  if (abstraction == "DX11API") {
     run("pkDX11API", window);
   }
 #endif
@@ -94,8 +96,7 @@ run(String _name, Window& _window)
   DllLoader dll;
   dll.init(_name);
   auto dllSymbol = static_cast<void(*)(Window)>(dll.getMethod("loadPlugin"));
-  if (dllSymbol)
-  {
+  if (dllSymbol) {
     dllSymbol(_window);
   }
 }
@@ -113,45 +114,36 @@ BaseApp::createBuffers()
 void
 BaseApp::messageLoop()
 {
-  // get the deltaTime
+  // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
-  bool run = true;
-  while (run)
+  // event loop
+  while (!eventQueue.iskeyPressed(KEY::kEsc))
   {
+    // update the delta time
     float deltaTime = getDeltaTime(delta);
+    // update the camera speed
     float camSpeed = cameraSpeed * deltaTime;
     eventQueue.poll();
     // move forward/backward
-    if (eventQueue.iskeyPressed(KEY::kW))
-    {
+    if (eventQueue.iskeyPressed(KEY::kW)) {
       camera.move(Vector3(0.0f, 0.0f, camSpeed));
     }
-    if (eventQueue.iskeyPressed(KEY::kS))
-    {
+    if (eventQueue.iskeyPressed(KEY::kS)) {
       camera.move(Vector3(0.0f, 0.0f, -camSpeed));
     }
     // move left/right
-    if (eventQueue.iskeyPressed(KEY::kA))
-    {
+    if (eventQueue.iskeyPressed(KEY::kA)) {
       camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
     }
-    if (eventQueue.iskeyPressed(KEY::kD))
-    {
+    if (eventQueue.iskeyPressed(KEY::kD)) {
       camera.move(Vector3(camSpeed, 0.0f, 0.0f));
     }
     // move up/down
-    if (eventQueue.iskeyPressed(KEY::kE))
-    {
+    if (eventQueue.iskeyPressed(KEY::kE)) {
       camera.move(Vector3(0.0f, camSpeed, 0.0f));
     }
-    if (eventQueue.iskeyPressed(KEY::kQ))
-    {
+    if (eventQueue.iskeyPressed(KEY::kQ)) {
       camera.move(Vector3(0.0f, -camSpeed, 0.0f));
-    }
-    // leave the program
-    if (eventQueue.iskeyPressed(KEY::kEsc))
-    {
-      run = false;
     }
     // update camera
     updateCamera(&camera);
@@ -160,25 +152,29 @@ BaseApp::messageLoop()
   }
 }
 
-Model*
+SPtr<Model>
 BaseApp::loadModel(String& _path)
 {
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
-
-  Model* model = new Model();
+  // create the model pointer
+  SPtr<Model> model = make_shared<Model>();
+  // load the model from the path
   String modelPath = _path;
   model->load(modelPath);
+  // create the index and vertex buffers
   model->vertexB = api.createVertexBuffer(model->vertex);
   model->indexB = api.createIndexBuffer(model->index);
   api.setIndexBuffer(model->indexB);
   api.setVertexBuffer(model->vertexB);
+  // return the final model
   return model;
 }
 
 void
 BaseApp::updateCamera(Camera* _pCamera)
 {
+  // get the api instance to work with
   GraphicsAPI& api = GraphicsAPI::instance();
 
   /*****************/
@@ -207,11 +203,9 @@ BaseApp::setGameObjectsBuffers()
   GraphicsAPI& api = GraphicsAPI::instance();
 
   // fr each game object in the world
-  for (uint32 i = 0; i < gameObjects.size(); ++i)
-  {
+  for (uint32 i = 0; i < gameObjects.size(); ++i) {
     // for each model in the game object
-    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
-    {
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
       // set its vertex and index buffers
       api.setVertexBuffer(gameObjects[i]->models[j]->vertexB);
       api.setIndexBuffer(gameObjects[i]->models[j]->indexB); ;
@@ -262,22 +256,19 @@ BaseApp::render()
   float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
   api.clearRenderTargetView(clearColor);
   api.clearDepthBuffer(1.0f);
-
+  // update the world and light buffers
   CBWorld ef;
   ef.world = api.world;
   api.updateConstantBuffer(cBWorld, &ef, static_cast<uint32>(sizeof(CBWorld)));
   api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
-
+  // Set game objects buffers and shaders
   api.setShaders();
   setGameObjectsBuffers();
-
   light.Type = LIGHT_TYPE::kDirectional;
   light.LightDir = Vector3::FORWARD;
-
   VSSetConstantBuffers();
   PSSetConstantBuffers();
-
-  api.setSampler();
+  // render the objects
   renderGameObjects();
   api.present(1, 0);
 }
@@ -286,11 +277,9 @@ void
 BaseApp::renderGameObjects()
 {
   // for each Game Object
-  for (uint32 i = 0; i < gameObjects.size(); ++i)
-  {
+  for (uint32 i = 0; i < gameObjects.size(); ++i) {
     // check all their models
-    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
-    {
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
       // draw the model
       renderModel(*gameObjects[i]->models[j]);
     }
@@ -305,14 +294,10 @@ BaseApp::renderModel(Model& _model)
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
-  // for each texture in the material of the model
-  for (uint32 i = 0; i < _model.material.textures.size(); ++i)
-  {
-    api.setShaderResourceView(_model.material.textures[i]);
-  }
+  // set the diffuse texture to the resource view
   // for each mesh in the model
-  for (uint32 i = 0; i < _model.meshes.size(); ++i)
-  {
+  api.setShaderResourceView(_model.material.diffuse);
+  for (uint32 i = 0; i < _model.meshes.size(); ++i) {
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
                                         currentIndexOrigin,
@@ -323,10 +308,10 @@ BaseApp::renderModel(Model& _model)
   }
 }
 
-GameObject*
-createGameObject(Model* _model)
+SPtr<GameObject>
+createGameObject(SPtr<Model> _model)
 {
-  GameObject* gameObject = new GameObject();
+  SPtr<GameObject> gameObject = make_shared<GameObject>();
   gameObject->init(Transform(0.0f));
   gameObject->setScale(Matrix4(1.0f));
   gameObject->insertModel(_model);
@@ -334,7 +319,7 @@ createGameObject(Model* _model)
 }
 
 void
-insertGameObject(GameObject* _object, Vector<GameObject*>& _vector)
+insertGameObject(SPtr<GameObject> _object, Vector<SPtr<GameObject>>& _vector)
 {
   _vector.push_back(_object);
 }

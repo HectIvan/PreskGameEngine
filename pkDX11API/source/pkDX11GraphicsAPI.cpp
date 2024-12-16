@@ -73,30 +73,13 @@ DX11GraphicsAPI::initApi(const Window& _window)
   createDepthStencilTexture(width, height);
   setViewport(width, height);
 
-  /************************************************/
-  /**
-  * TEMPORARY, THIS WILL BE SWAPPED TO THE BASE APP
-  **/
-  /************************************************/
-
-  pixelShader.compile();
-  pixelShader.create(m_pDevice);
-  vertexShader.compile();
-  vertexShader.create(m_pDevice);
-
-  DX11InputLayout input;
-  input.create(m_pDevice, vertexShader);
-  input.set(m_pDevice);
-
   m_pDevice->setPrimitiveTopology();
-
-  createSamplerState();
 }
 
 SPtr<ConstantBuffer>
 DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _usage)
 {
-  auto dxCB = std::make_shared<DX11ConstantBuffer>();
+  auto dxCB = make_shared<DX11ConstantBuffer>();
   HRESULT hr;
   D3D11_BUFFER_DESC bDesc;
   bDesc.Usage = static_cast<D3D11_USAGE>(_usage);
@@ -129,7 +112,7 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _size)
 {
   // cast to DX11ConstantBuffer
-  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) // casting failed
   {
     return;
@@ -163,6 +146,20 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth)
                                                       D3D11_CLEAR_DEPTH,
                                                       _depth,
                                                       0);
+}
+
+void
+DX11GraphicsAPI::compileShaders()
+{
+  pixelShader.compile();
+  vertexShader.compile();
+}
+
+void
+DX11GraphicsAPI::createShaders()
+{
+  pixelShader.create(m_pDevice);
+  vertexShader.create(m_pDevice);
 }
 
 void
@@ -297,7 +294,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   }
 
   // create depth stencil with the generated 2D texture
-  pDepthSView = std::make_shared<DX11DepthStencilView>();
+  pDepthSView = make_shared<DX11DepthStencilView>();
   D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
   ZeroMemory(&descDSV, sizeof(descDSV));
   descDSV.Format = descDepth.Format;
@@ -334,11 +331,19 @@ DX11GraphicsAPI::setShaders()
 }
 
 void
+DX11GraphicsAPI::createInputLayout()
+{
+  pInputL = make_shared<DX11InputLayout>();
+  pInputL->create(m_pDevice, vertexShader);
+  pInputL->set(m_pDevice);
+}
+
+void
 DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _startSlot,
                                       uint32 _numBuffers)
 {
-  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) { return; } // casting failed
   m_pDevice->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
@@ -348,7 +353,7 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _startSlot,
                                       uint32 _numBuffers)
 {
-  auto dxCB = std::dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) { return; } // casting failed
   m_pDevice->pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
@@ -366,18 +371,19 @@ DX11GraphicsAPI::setSampler()
 }
 
 void
-DX11GraphicsAPI::setShaderResourceView(Texture* _pTexture,
+DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
                                        uint32 _start,
                                        uint32 _numViews)
 {
   // cast to a directX texture
-  DX11Texture* dxTX = dynamic_cast<DX11Texture*>(_pTexture);
-
-  // set the shader resource view
+  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  // if failed to cast to the texture
+  if (!dxTX) { return; }
+  // set the shader resource view 
   m_pDevice->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
 }
 
-Texture*
+SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(String& _fileName,
                                        uint32 _bindFlags,
                                        bool _mipLevels,
@@ -393,10 +399,10 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   pitch = width * bpp;
 
   // create a default texture using the received parameters
-  Texture* temptTexture = createTextureDX(data, width, height, _format, 0, _bindFlags, _mipLevels);
+  SPtr<Texture> temptTexture = createTextureDX(data, bpp, width, height, _format, 0, _bindFlags, _mipLevels);
 
   // cast to DX11Texture
-  DX11Texture* dxTX = dynamic_cast<DX11Texture*>(temptTexture);
+  SPtr<DX11Texture> dxTX = dynamic_pointer_cast<DX11Texture>(temptTexture);
 
   // update the texture
   m_pDevice->pImmediateContext->UpdateSubresource(dxTX->t2d, 0, nullptr, data, pitch, 0);
@@ -411,8 +417,9 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   return dxTX;
 }
 
-Texture*
+SPtr<Texture>
 DX11GraphicsAPI::createTextureDX(unsigned char* _data,
+                               uint32 _bpp,
                                uint32 _width,
                                uint32 _height,
                                uint32 _format,
@@ -438,11 +445,11 @@ DX11GraphicsAPI::createTextureDX(unsigned char* _data,
   // data of the texture
   D3D11_SUBRESOURCE_DATA initData;
   initData.pSysMem = _data;
-  initData.SysMemPitch = static_cast<uint32>(_width * 4);
+  initData.SysMemPitch = static_cast<uint32>(_width * _bpp);
   initData.SysMemSlicePitch = 0;
 
   // create the texture
-  DX11Texture* tex = new DX11Texture();
+  SPtr<DX11Texture> tex = make_shared<DX11Texture>();
   m_pDevice->pd3dDevice->CreateTexture2D(&desc, &initData, &tex->t2d);
 
   if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE)
@@ -474,11 +481,17 @@ DX11GraphicsAPI::createTextureDX(unsigned char* _data,
   return tex;
 }
 
+void
+DX11GraphicsAPI::setInputLayout()
+{
+  pInputL->set(m_pDevice);
+}
+
 SPtr<VertexBuffer>
 DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
                                     uint32 _usage)
 {
-  auto dxVB = std::make_shared<DX11VertexBuffer>();
+  auto dxVB = make_shared<DX11VertexBuffer>();
 
   /***************************************************************/
   /**
@@ -516,7 +529,7 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                                  uint32 _offset)
 {
   // reinterpret pointer
-  auto dxVB = std::dynamic_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  auto dxVB = dynamic_pointer_cast<DX11VertexBuffer>(_pVertexB);
   if (!dxVB)
   {
     // failed to cast to DX11VertexBuffer
@@ -537,7 +550,7 @@ SPtr<IndexBuffer>
 DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
                                    uint32 _usage)
 {
-  auto dxIB = std::make_shared<DX11IndexBuffer>();
+  auto dxIB = make_shared<DX11IndexBuffer>();
 
   /***************************************************************/
   /**
@@ -567,7 +580,7 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
                                 uint32 _offset)
 {
   // reinterpret pointer
-  auto dxIB = std::dynamic_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  auto dxIB = dynamic_pointer_cast<DX11IndexBuffer>(_pIndexB);
   if (!dxIB)
   {
     // failed to cast to DX11IndexBuffer

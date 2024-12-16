@@ -19,12 +19,9 @@ DllLoader::load()
 {
   handler = static_cast<InstanceHandle>(LoadLibraryA(name.c_str()));
 
-  if (!handler)
-  {
-    uint32 var;
-    var = 0;
+  // could not load the dll
+  if (!handler) {
     return;
-    // could not load the dll
   }
 }
 

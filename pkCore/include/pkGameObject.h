@@ -124,7 +124,7 @@ class PK_CORE_EXPORT GameObject
   * Insert the new model.
   **/
   void
-  insertModel(Model* _model);
+  insertModel(SPtr<Model> _pModel);
 
   /**
   * Cleans the GameObject.
@@ -133,7 +133,7 @@ class PK_CORE_EXPORT GameObject
   clear();
 
  public:
-  Vector<Model*> models;
+  Vector<SPtr<Model>> models;
   Vector<Component*> components;
   Transform transform;
 };

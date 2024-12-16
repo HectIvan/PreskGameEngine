@@ -84,7 +84,7 @@ class PK_CORE_EXPORT BaseApp
   * @param _path
   * File path.
   **/
-  Model*
+  SPtr<Model>
   loadModel(String& _path);
 
   /**
@@ -151,7 +151,7 @@ class PK_CORE_EXPORT BaseApp
   EventQueue eventQueue;
 
   // vector of game objects in the scene
-  Vector<GameObject*> gameObjects;
+  Vector<SPtr<GameObject>> gameObjects;
 
   // light source
   Light light;

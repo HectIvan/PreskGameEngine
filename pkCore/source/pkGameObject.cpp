@@ -52,9 +52,9 @@ GameObject::setScale(Matrix4 _scale)
 }
 
 void
-GameObject::insertModel(Model* _model)
+GameObject::insertModel(SPtr<Model> _pModel)
 {
-  models.push_back(_model);
+  models.push_back(_pModel);
 }
 
 void

@@ -24,19 +24,4 @@ DX11PixelShader::compile()
   }
   return hr;
 }
-
-HRESULT
-DX11PixelShader::create(DX11Device* _pDevice)
-{
-  HRESULT hr = S_OK;
-  hr = _pDevice->pd3dDevice->CreatePixelShader(pSBlob->GetBufferPointer(),
-                                               pSBlob->GetBufferSize(),
-                                               nullptr, &pShader);
-  if (FAILED(hr))
-  {
-    pSBlob->Release();
-    return hr;
-  }
-  return hr;
-}
 }

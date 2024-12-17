@@ -53,13 +53,13 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
   // load the model
   SPtr<Model> model = loadModel(modelPath);
   // create the texture
-  String textureName = "textures/Emmisive_Eye_Class_Albedo.png";
+  String textureName = "textures/Grass_Block_TEX.png";
   SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
   // insert the texture to the material
   model->material.setTexture(model->material.diffuse, texture);
   // insert the game object into the vector of game objects
   insertGameObject(createGameObject(model), gameObjects);
-  cameraSpeed = 10.0f;
+  cameraSpeed = 2.0f;
   messageLoop();
 }
 

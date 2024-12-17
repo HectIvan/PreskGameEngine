@@ -25,7 +25,10 @@
 #include "pkDX11Device.h"
 #include "pkDX11InputLayout.h"
 #include "pkDX11PixelShader.h"
+#include "pkDX11RenderTargetView.h"
 #include "pkDX11SamplerState.h"
+#include "pkDX11SwapChain.h"
+#include "pkDX11Texture.h"
 #include "pkDX11VertexShader.h"
 #include "pkGraphicsAPI.h"
 #include "pkLight.h"
@@ -321,6 +324,18 @@ class DX11GraphicsAPI : public GraphicsAPI
   compileShaders() override;
 
   /**
+  * Create the pixel shader
+  **/
+  void
+  createPShader() override;
+
+  /**
+  * Create the vertex shader
+  **/
+  void
+  createVShader() override;
+
+  /**
   * Create shaders.
   **/
   void
@@ -389,37 +404,30 @@ class DX11GraphicsAPI : public GraphicsAPI
   Window window;
   
   // shaders
-  DX11PixelShader pixelShader;
-  DX11VertexShader vertexShader;
+  SPtr<DX11PixelShader> pixelShader;
+  SPtr<DX11VertexShader> vertexShader;
 
   // Render target view
-  ID3D11RenderTargetView* pRTargetView;
+  SPtr<DX11RenderTargetView> pRTargetView;
 
   // swap chain
-  IDXGISwapChain* pSwapChain;
+  SPtr<DX11SwapChain> pSwapChain;
 
   // input layout
   SPtr<DX11InputLayout> pInputL;
 
   // depth stencil
-  ID3D11Texture2D* pDepthStencil;
+  SPtr<DX11Texture> pDepthStencil;
   SPtr<DX11DepthStencilView> pDepthSView;
 
   // sampler state
-  DX11SamplerState* pSamplerLinear;
+  SPtr<DX11SamplerState> pSamplerLinear;
 
   // mesh color
   Vector4 vMeshColor;
 
-  // constant buffers
-  // DX11ConstantBuffer buffer;
-  // DX11ConstantBuffer cBView;
-  // DX11ConstantBuffer cBProjection;
-  // DX11ConstantBuffer cBWorld;
-  // DX11ConstantBuffer cbLight;
-
  private:
   // api device
-  DX11Device* m_pDevice;
+  SPtr<DX11Device> m_pDevice;
 };
 }

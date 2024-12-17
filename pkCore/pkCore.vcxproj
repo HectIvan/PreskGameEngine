@@ -178,6 +178,7 @@
     <ClInclude Include="include\pkEventQueue.h" />
     <ClInclude Include="include\pkGraphicsAPI.h" />
     <ClInclude Include="include\pkIndexBuffer.h" />
+    <ClInclude Include="include\pkInputLayout.h" />
     <ClInclude Include="include\pkKey.h" />
     <ClInclude Include="include\pkLight.h" />
     <ClInclude Include="include\pkMaterial.h" />
@@ -185,9 +186,12 @@
     <ClInclude Include="include\pkModel.h" />
     <ClInclude Include="include\pkMouseWheelData.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
+    <ClInclude Include="include\pkRenderTargetView.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
+    <ClInclude Include="include\pkSwapChain.h" />
     <ClInclude Include="include\pkTexture.h" />
     <ClInclude Include="include\pkVertexBuffer.h" />
+    <ClInclude Include="include\pkShader.h" />
     <ClInclude Include="include\pkWindow.h" />
     <ClInclude Include="include\pkWindowDesc.h" />
     <ClInclude Include="include\stb_image.h" />

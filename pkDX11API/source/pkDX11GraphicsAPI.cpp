@@ -5,7 +5,7 @@
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11Prerequisites.h"
 #include "pkDX11VertexBuffer.h"
-#include "pkDX11Texture.h"
+#include "pkDX11VertexShader.h"
 #include "pkWindow.h"
 #include "pkVertexBuffer.h"
 
@@ -135,7 +135,7 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
 void
 DX11GraphicsAPI::clearRenderTargetView(float _color[])
 {
-  m_pDevice->pImmediateContext->ClearRenderTargetView(pRTargetView, _color);
+  m_pDevice->pImmediateContext->ClearRenderTargetView(pRTargetView->pRtv, _color);
 }
 
 void
@@ -151,15 +151,49 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth)
 void
 DX11GraphicsAPI::compileShaders()
 {
-  pixelShader.compile();
-  vertexShader.compile();
+  pixelShader = make_shared<DX11PixelShader>();
+  pixelShader->compile();
+  vertexShader = make_shared<DX11VertexShader>();
+  vertexShader->compile();
+}
+
+void
+DX11GraphicsAPI::createPShader()
+{
+  uint32 hr;
+  hr = m_pDevice->pd3dDevice->CreatePixelShader(pixelShader->pSBlob->GetBufferPointer(),
+                                                pixelShader->pSBlob->GetBufferSize(),
+                                                nullptr, &pixelShader->pShader);
+  if (hr != 0x00000000)
+  {
+    pixelShader->pSBlob->Release();
+    return;
+  }
+  return;
+}
+
+void
+DX11GraphicsAPI::createVShader()
+{
+  // create the vertex shader
+  uint32 hr;
+  hr = m_pDevice->pd3dDevice->CreateVertexShader(vertexShader->pSBlob->GetBufferPointer(),
+                                                 vertexShader->pSBlob->GetBufferSize(),
+                                                 nullptr,
+                                                 &vertexShader->pShader);
+  if (hr != 0x00000000)
+  {
+    vertexShader->pSBlob->Release();
+    return;
+  }
+  return;
 }
 
 void
 DX11GraphicsAPI::createShaders()
 {
-  pixelShader.create(m_pDevice);
-  vertexShader.create(m_pDevice);
+  createPShader();
+  createVShader();
 }
 
 void
@@ -173,8 +207,8 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                           uint32& _numFeatureLevels)
 {
   // initialize device and swap chain
-  m_pDevice = new DX11Device();
-  pSwapChain = nullptr;
+  m_pDevice = make_shared<DX11Device>();
+  pSwapChain = make_shared<DX11SwapChain>();
 
   /**
   * Create the device and swap chains
@@ -204,7 +238,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                               _numFeatureLevels,
                                               D3D11_SDK_VERSION,
                                               &sd,
-                                              &pSwapChain,
+                                              &pSwapChain->pSch,
                                               &m_pDevice->pd3dDevice,
                                               &m_pDevice->featureLevel,
                                               &m_pDevice->pImmediateContext);
@@ -224,18 +258,18 @@ void
 DX11GraphicsAPI::createRenderTargetView()
 {
   // initiaize render target view
-  pRTargetView = nullptr;
+  pRTargetView = make_shared<DX11RenderTargetView>();
 
   // get buffer data
   ID3D11Texture2D* pBackBuffer = nullptr;
-  uint32 hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+  uint32 hr = pSwapChain->pSch->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
   if (hr != 0x00000000)
   {
     return;
   }
 
   // create the render target view
-  hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pRTargetView);
+  hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pRTargetView->pRtv);
   pBackBuffer->Release();
   if (hr != 0x00000000)
   {
@@ -249,7 +283,7 @@ DX11GraphicsAPI::createSamplerState()
   // sampler state description
   D3D11_SAMPLER_DESC sampDesc;
   ZeroMemory(&sampDesc, sizeof(sampDesc));
-  sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR; // D3D11_FILTER_MIN_MAG_MIP_LINEAR
+  sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
   sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
   sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
   sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -258,7 +292,7 @@ DX11GraphicsAPI::createSamplerState()
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
   // sampler state creation
-  pSamplerLinear = new DX11SamplerState();
+  pSamplerLinear = make_shared<DX11SamplerState>();
   uint32 hr = m_pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamplerLinear->pSampler);
   if (hr != 0x00000000)
   {
@@ -271,8 +305,9 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
                                            uint32 _height)
 {
   /**
-  * Create depth stencil view
+  * Create depth stencil
   **/
+  pDepthStencil = make_shared<DX11Texture>();
   D3D11_TEXTURE2D_DESC descDepth;
   ZeroMemory(&descDepth, sizeof(descDepth));
   descDepth.Width = _width;
@@ -286,7 +321,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
   descDepth.CPUAccessFlags = 0;
   descDepth.MiscFlags = 0;
-  uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
+  uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil->t2d);
   // if creating the texture failed
   if (hr != 0x00000000)
   {
@@ -300,12 +335,12 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
-  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil, &descDSV, &pDepthSView->pDepthSV);
+  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil->t2d, &descDSV, &pDepthSView->pDepthSV);
   if (hr != 0x00000000)
   {
     return;
   }
-  m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView, pDepthSView->pDepthSV);
+  m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView->pRtv, pDepthSView->pDepthSV);
 }
 
 void
@@ -326,15 +361,40 @@ DX11GraphicsAPI::setViewport(uint32 _width,
 void
 DX11GraphicsAPI::setShaders()
 {
-  m_pDevice->pImmediateContext->VSSetShader(vertexShader.pShader, nullptr, 0);
-  m_pDevice->pImmediateContext->PSSetShader(pixelShader.pShader, nullptr, 0);
+  m_pDevice->pImmediateContext->VSSetShader(vertexShader->pShader, nullptr, 0);
+  m_pDevice->pImmediateContext->PSSetShader(pixelShader->pShader, nullptr, 0);
 }
 
 void
 DX11GraphicsAPI::createInputLayout()
 {
+  // make a shared DX11InputLayout pointer
   pInputL = make_shared<DX11InputLayout>();
-  pInputL->create(m_pDevice, vertexShader);
+
+  uint32 hr;
+  // define the input layout
+  D3D11_INPUT_ELEMENT_DESC layout[]
+  {
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+  };
+  uint32 numElem = ARRAYSIZE(layout);
+
+  // create input layout
+  hr = m_pDevice->pd3dDevice->CreateInputLayout(layout,
+                                                numElem,
+                                                vertexShader->pSBlob->GetBufferPointer(),
+                                                vertexShader->pSBlob->GetBufferSize(),
+                                                &pInputL->pVertexLayout);
+  // failed to create the input layout
+  if (hr != 0x00000000)
+  {
+    return;
+  }
+  // already used
+  vertexShader->pSBlob->Release();
+  // set the input layout
   pInputL->set(m_pDevice);
 }
 
@@ -361,7 +421,7 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 void
 DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 {
-  pSwapChain->Present(_syncInterval, _flags);
+  pSwapChain->pSch->Present(_syncInterval, _flags);
 }
 
 void

@@ -31,6 +31,7 @@ class Camera;
 class ConstantBuffer;
 class Device;
 class IndexBuffer;
+class Shader;
 class VertexBuffer;
 
 using std::make_shared;
@@ -189,6 +190,18 @@ public:
   **/
   virtual void
   compileShaders() = 0;
+
+  /**
+  * Create the pixel shader
+  **/
+  virtual void
+  createPShader() = 0;
+
+  /**
+  * Create the vertex shader
+  **/
+  virtual void
+  createVShader() = 0;
 
   /**
   * Create shaders.

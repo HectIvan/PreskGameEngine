@@ -43,26 +43,6 @@ public:
   HRESULT
   compile();
 
-  /**
-  * Create Vertex shader.
-  *
-  * Creates the Vertex shader in the device provided.
-  *
-  * param _pDevice
-  * Device where the shader will be created.
-  *
-  * @return
-  * If the creation was successful or not.
-  **/
-  HRESULT
-  create(DX11Device* _pDevice);
-
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
-
  public:
   ID3D11VertexShader* pShader = nullptr;
 };

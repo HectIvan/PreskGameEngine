@@ -18,13 +18,14 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkShader.h"
 
 namespace pkEngineSDK
 {
 
 using std::wstring;
 
-class DX11Shaders
+class DX11Shaders : public Shader
 {
  public:
   DX11Shaders() = default;

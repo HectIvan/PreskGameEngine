@@ -42,8 +42,10 @@
     <ClInclude Include="include\pkDX11InputLayout.h" />
     <ClInclude Include="include\pkDX11PixelShader.h" />
     <ClInclude Include="include\pkDX11Prerequisites.h" />
+    <ClInclude Include="include\pkDX11RenderTargetView.h" />
     <ClInclude Include="include\pkDX11SamplerState.h" />
     <ClInclude Include="include\pkDX11Shader.h" />
+    <ClInclude Include="include\pkDX11SwapChain.h" />
     <ClInclude Include="include\pkDX11Texture.h" />
     <ClInclude Include="include\pkDX11VertexBuffer.h" />
     <ClInclude Include="include\pkDX11VertexShader.h" />

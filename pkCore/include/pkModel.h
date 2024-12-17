@@ -79,8 +79,8 @@ class PK_CORE_EXPORT Model
   setVertexBoneDataToDefault(SimpleVertex& _vertex)
   {
     for (int i = 0; i < MAX_BONE_WEIGHT; i++) {
-      _vertex.boneIDs[i] = -1;
-      _vertex.weights[i] = 0.0f;
+      // _vertex.boneIDs[i] = -1;
+      // _vertex.weights[i] = 0.0f;
     }
   }
 

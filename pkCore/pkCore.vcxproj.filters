@@ -144,6 +144,18 @@
     <ClInclude Include="include\pkMaterial.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkInputLayout.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkShader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkRenderTargetView.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSwapChain.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

@@ -1,11 +1,11 @@
 /************************************************************************/
 /**
-* @simpleVertex pkSimpleVertex.h
+* @pkInputLayout pkInputLayout.h
 * @Hector Ivan Muñoz Ceballos
-* @date 21/10/2024
-* @Simple vertex file for the Presk Game Engine.
+* @date 17/12/2024
+* @Input Layout file for the Presk Game Engine.
 *
-* This file contains the Simple Vertex struct of the engine
+* This file contains the Input Layout class of the engine
 *
 * @bug No bug known.
 */
@@ -18,19 +18,16 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkVector2.h"
-#include "pkVector3.h"
 
 namespace pkEngineSDK
 {
 
-struct SimpleVertex
-{
-  Vector3 pos;
-  Vector3 normal;
-  Vector2 Tex;
+class Device;
 
-  // int32 boneIDs[MAX_BONE_INFLUENCE];
-  // float weights[MAX_BONE_INFLUENCE];
+class InputLayout
+{
+ public:
+  InputLayout() = default;
+  virtual ~InputLayout() = default;
 };
 }

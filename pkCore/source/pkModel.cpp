@@ -91,7 +91,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     }
     else { sv.normal = Vector3(0.0f); }
 
-    if (_mesh->mTextureCoords[0] != nullptr) {
+    if (_mesh->mTextureCoords[0]) {
       sv.Tex.x = _mesh->mTextureCoords[0][i].x;
       sv.Tex.y = _mesh->mTextureCoords[0][i].y;
     }

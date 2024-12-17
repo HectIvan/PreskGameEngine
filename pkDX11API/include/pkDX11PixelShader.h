@@ -46,20 +46,6 @@ class DX11PixelShader : public DX11Shaders
   HRESULT
   compile();
 
-  /**
-  * Create Pixel shader.
-  * 
-  * Creates the pixel shader in the device provided.
-  * 
-  * param _pDevice
-  * Device where the shader will be created.
-  * 
-  * @return
-  * If the creation was successful or not.
-  **/
-  HRESULT
-  create(DX11Device* _pDevice);
-
  public:
   ID3D11PixelShader* pShader = nullptr;
 };

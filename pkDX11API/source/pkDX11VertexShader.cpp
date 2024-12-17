@@ -23,20 +23,4 @@ DX11VertexShader::compile()
   }
   return hr;
 }
-
-HRESULT
-DX11VertexShader::create(DX11Device* _pDevice)
-{
-  HRESULT hr = S_OK;
-  hr = _pDevice->pd3dDevice->CreateVertexShader(pSBlob->GetBufferPointer(),
-                                                pSBlob->GetBufferSize(),
-                                                nullptr,
-                                                &pShader);
-  if (FAILED(hr))
-  {
-    pSBlob->Release();
-    return hr;
-  }
-  return hr;
-}
 }

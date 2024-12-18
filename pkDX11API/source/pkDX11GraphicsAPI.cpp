@@ -458,14 +458,23 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   // load the image data into a storage variable
   unsigned char* data = stbi_load(_fileName.c_str(), &width, &height, &bpp, 4);
 
+  // check if the texture was found
+  if (!data) { return make_shared<DX11Texture>(); }
+
   // how wide each line of the texture will be
   pitch = width * bpp;
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTextureDX(data, bpp, width, height, _format, 0, _bindFlags, _mipLevels);
 
+  // if creating the texture failed
+  if (!temptTexture) { return make_shared<DX11Texture>(); }
+
   // cast to DX11Texture
   SPtr<DX11Texture> dxTX = dynamic_pointer_cast<DX11Texture>(temptTexture);
+
+  // if casting the texture failed
+  if (!dxTX) { return make_shared<DX11Texture>(); }
 
   // update the texture
   m_pDevice->pImmediateContext->UpdateSubresource(dxTX->t2d, 0, nullptr, data, pitch, 0);

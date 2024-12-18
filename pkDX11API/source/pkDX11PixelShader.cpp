@@ -13,7 +13,7 @@ HRESULT
 DX11PixelShader::compile()
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl",
+  hr = compileShaderFromFile(L"shaders/pkShader.hlsl",
                              "PS",
                              "ps_5_0",
                              &pSBlob);

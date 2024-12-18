@@ -26,6 +26,12 @@ namespace KEY
 {
   enum E
   {
+    // arrows
+    kLeft = 0x25,
+    kUp = 0x26,
+    kRight = 0x27,
+    kDown = 0x28,
+
     // numbers
     k0 = 0x30,
     k1 = 0x31,

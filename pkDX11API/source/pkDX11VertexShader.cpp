@@ -12,7 +12,7 @@ HRESULT
 DX11VertexShader::compile()
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"D:/Work/visual studio/PreskGameEngine/pkDX11API/shaders/pkShader.hlsl",
+  hr = compileShaderFromFile(L"shaders/pkShader.hlsl",
                              "VS",
                              "vs_5_0",
                              &pSBlob);

@@ -9,6 +9,8 @@
 #include "pkPrerequisitesCore.h"
 #include "pkWindowDesc.h"
 
+#include "pkPlatformMath.h"
+
 namespace pkEngineSDK
 {
 
@@ -46,20 +48,11 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  String modelPath = "models/" +
-                     _modelName +
-                     "." +
-                     _extension;
   // load the model
-  SPtr<Model> model = loadModel(modelPath);
-  // create the texture
-  String textureName = "textures/Grass_Block_TEX.png";
-  SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
-  // insert the texture to the material
-  model->material.setTexture(model->material.diffuse, texture);
+  SPtr<Model> model = loadModel(_modelName, _extension);
   // insert the game object into the vector of game objects
   insertGameObject(createGameObject(model), gameObjects);
-  cameraSpeed = 2.0f;
+  cameraSpeed = 5.0f;
   messageLoop();
 }
 
@@ -114,6 +107,9 @@ BaseApp::createBuffers()
 void
 BaseApp::messageLoop()
 {
+  // get api reference
+  GraphicsAPI& api = GraphicsAPI::instance();
+  float rot = 0.0f;
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop
@@ -145,6 +141,23 @@ BaseApp::messageLoop()
     if (eventQueue.iskeyPressed(KEY::kQ)) {
       camera.move(Vector3(0.0f, -camSpeed, 0.0f));
     }
+    // rotate world
+    if (eventQueue.iskeyPressed(KEY::kLeft)) {
+      rot += deltaTime * 10.0f;
+      api.world = Matrix4::rotationY(rot);
+    }
+    if (eventQueue.iskeyPressed(KEY::kRight)) {
+      rot += deltaTime * -10.0f;
+      api.world = Matrix4::rotationY(rot);
+    }
+    if (eventQueue.iskeyPressed(KEY::kDown)) {
+      rot += deltaTime * 10.0f;
+      api.world = Matrix4::rotationX(rot);
+    }
+    if (eventQueue.iskeyPressed(KEY::kUp)) {
+      rot += deltaTime * -10.0f;
+      api.world = Matrix4::rotationX(rot);
+    }
     // update camera
     updateCamera(&camera);
     // render the scene
@@ -153,20 +166,34 @@ BaseApp::messageLoop()
 }
 
 SPtr<Model>
-BaseApp::loadModel(String& _path)
+BaseApp::loadModel(String& _fileName, String& _extension)
 {
+  // create the model path
+  String modelPath = "models/" +
+                      _fileName +
+                      "." +
+                      _extension;
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
   // create the model pointer
   SPtr<Model> model = make_shared<Model>();
   // load the model from the path
-  String modelPath = _path;
   model->load(modelPath);
   // create the index and vertex buffers
   model->vertexB = api.createVertexBuffer(model->vertex);
   model->indexB = api.createIndexBuffer(model->index);
   api.setIndexBuffer(model->indexB);
   api.setVertexBuffer(model->vertexB);
+  // create the texture adress
+  String textureName = "textures/" +
+                       _fileName + 
+                       "_Albedo.png";
+  // create the texture
+  SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
+  // if creating the texture failed, return the model without a texture
+  if (!texture) { return model; }
+  // insert the texture to the material
+  model->material.setTexture(model->material.diffuse, texture);
   // return the final model
   return model;
 }
@@ -261,11 +288,12 @@ BaseApp::render()
   ef.world = api.world;
   api.updateConstantBuffer(cBWorld, &ef, static_cast<uint32>(sizeof(CBWorld)));
   api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
-  // Set game objects buffers and shaders
+  // Set shaders
   api.setShaders();
-  setGameObjectsBuffers();
+  // set light
   light.Type = LIGHT_TYPE::kDirectional;
   light.LightDir = Vector3::FORWARD;
+  // set constant buffers for the pixel and vertex shaders
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   // render the objects

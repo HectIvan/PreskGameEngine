@@ -85,7 +85,7 @@ class PK_CORE_EXPORT BaseApp
   * File path.
   **/
   SPtr<Model>
-  loadModel(String& _path);
+  loadModel(String& _fileName, String& _extension);
 
   /**
   * Update the camera.

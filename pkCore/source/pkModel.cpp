@@ -37,17 +37,19 @@ Model::load(String& _path)
   String modelPath = _path;
   path = _path;
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
+  const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality |
+                                                              aiProcess_RemoveRedundantMaterials |
+                                                              aiProcess_FlipUVs);
   if (scene == nullptr) { return; }
   processNode(*this, scene->mRootNode, scene);
   for (uint32 i = 0; i < meshes.size(); ++i) {
     vertex.insert(vertex.end(),
-                    meshes[i].vertexVector.begin(),
-                    meshes[i].vertexVector.end());
+                  meshes[i].vertexVector.begin(),
+                  meshes[i].vertexVector.end());
 
     index.insert(index.end(),
-                   meshes[i].indexVector.begin(),
-                   meshes[i].indexVector.end());
+                 meshes[i].indexVector.begin(),
+                 meshes[i].indexVector.end());
   }
 }
 
@@ -95,7 +97,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       sv.Tex.x = _mesh->mTextureCoords[0][i].x;
       sv.Tex.y = _mesh->mTextureCoords[0][i].y;
     }
-    else { sv.Tex = Vector2(0.0f); }
+    // else { sv.Tex = Vector2(0.0f); }
     meshProcess.vertexVector.push_back(sv);
   }
 

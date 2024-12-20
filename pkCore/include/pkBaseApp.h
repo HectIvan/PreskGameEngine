@@ -7,11 +7,10 @@
 *
 * This file contains the Base App of the engine
 *
-* @bug.
-* User input for the camera seems to not process.
+* @bug. No known bugs.
 * 
-* @HectIvan 09/12/2024
-* Added a render and messageLoop functions. 
+* @HectIvan 20/12/2024
+* Added a way of getting the material through a get component function.
 */
 /************************************************************************/
 #pragma once

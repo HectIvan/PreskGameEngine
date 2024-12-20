@@ -22,7 +22,7 @@
 namespace pkEngineSDK
 {
 
-class Component
+class PK_CORE_EXPORT Component
 {
 public:
   Component() = default;

@@ -27,7 +27,7 @@ SPtr<GameObject>
 createGameObject()
 {
   SPtr<GameObject> gObject = make_shared<GameObject>();
-  gObject->init(Transform(0.0f));
+  gObject->setTransform(Transform(0.0f));
   gObject->setScale(Matrix4(1.0f));
   return gObject;
 }
@@ -107,8 +107,8 @@ BaseApp::init(const char** _argv)
   SPtr<Material> pMat = createMaterial(texName);
   // insert the game object into the vector of game objects
   SPtr<GameObject> gObject = createGameObject();
-  gObject->insertModel(model);
   gObject->addComponent(pMat);
+  gObject->insertModel(model);
   insertGameObject(gObject, gameObjects);
   cameraSpeed = 5.0f;
   messageLoop();
@@ -309,7 +309,7 @@ BaseApp::render()
   api.clearRenderTargetView(clearColor);
   api.clearDepthBuffer(1.0f);
   // update the world and light buffers
-  CBWorld ef;
+  CBWorld ef = CBWorld();
   ef.world = api.world;
   api.updateConstantBuffer(cBWorld, &ef, static_cast<uint32>(sizeof(CBWorld)));
   api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
@@ -336,9 +336,9 @@ BaseApp::renderGameObjects()
     // set the diffuse texture to the resource view
     api.setShaderResourceView(gameObjects[i]->getComponent<Material>()->diffuse);
     api.setSampler();
-    // check all their models
-    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
-      // draw the model
+    // check for a model and render it
+    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
+    {
       renderModel(*gameObjects[i]->models[j]);
     }
   }

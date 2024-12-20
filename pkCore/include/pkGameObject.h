@@ -7,9 +7,12 @@
 *
 * This file will contain the Game object used by the engine
 *
-* @bug No bug known.
+* @bug.
+* getComponent seems to ignore what type of data it is looking for,
+* returning a true value even tho the returned value is not the
+* one searched for.
 *
-* @HectIvan 13/11/2024
+* @HectIvan 20/12/2024
 */
 /************************************************************************/
 #pragma once
@@ -19,9 +22,8 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
-#include "pkMatrix4.h"
 #include "pkComponent.h"
+#include "pkMatrix4.h"
 #include "pkModel.h"
 
 namespace pkEngineSDK
@@ -40,7 +42,7 @@ class PK_CORE_EXPORT GameObject
   * Transform of the Game Object.
   **/
   void
-  init(Transform _transform);
+  setTransform(Transform _transform);
 
   /**
   * Set the position of the Game Object.
@@ -125,7 +127,7 @@ class PK_CORE_EXPORT GameObject
   **/
   void
   insertModel(SPtr<Model> _pModel);
-
+  
   /**
   * adds a component of type T.
   * 
@@ -144,7 +146,20 @@ class PK_CORE_EXPORT GameObject
   **/
   template <typename T>
   SPtr<T>
-  getComponent();
+  getComponent()
+  {
+    // for each component in the components vector
+    for (auto& comp : components) {
+      // do a conversion to the data type T
+      auto check = reinterpret_pointer_cast<T>(comp);
+      // if the conversion was successful, it means the component was found
+      if (check) {
+        return check;
+      }
+    }
+    // otherwise, the component was not found, return a null pointer
+    return nullptr;
+  }
 
   /**
   * Cleans the GameObject.

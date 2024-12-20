@@ -8,7 +8,6 @@
 * This file will contain the Material class used for the engine
 *
 * @bug No bug known.
-*
 */
 /************************************************************************/
 #pragma once

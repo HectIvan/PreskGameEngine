@@ -10,6 +10,7 @@
 * @bug No bug known.
 *
 * @HectIvan 20/11/2024
+* Improved the way the clean model function operates.
 */
 /************************************************************************/
 #pragma once

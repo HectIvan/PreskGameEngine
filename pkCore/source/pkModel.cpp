@@ -52,14 +52,6 @@ Model::load(String& _path)
                  meshes[i].indexVector.end());
   }
 }
-
-void
-Model::clean()
-{
-  for (uint32 i = 0; i < meshes.size(); ++i) {
-    meshes[i].clean();
-  }
-}
   
 void
 processNode(Model& _model, aiNode* _node, const aiScene* _scene)
@@ -201,5 +193,23 @@ loadMaterial(const aiScene* _scene)//, String& _fileName) // PkMesh& _mesh,
       
     }
   }
+}
+
+void
+Model::clean()
+{
+  vertex.clear();
+  index.clear();
+
+  boneMap.clear();
+  meshes.clear();
+  boneCounter = 0;
+
+  vertexB = make_shared<VertexBuffer>();
+  indexB = make_shared<IndexBuffer>();
+
+  material = Material();
+
+  path = "";
 }
 }

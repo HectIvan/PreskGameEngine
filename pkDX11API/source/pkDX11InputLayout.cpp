@@ -14,7 +14,7 @@ void
 DX11InputLayout::set(SPtr<Device> _pDevice)
 {
   // cast to directX device
-  auto dxDV = dynamic_pointer_cast<DX11Device>(_pDevice);
+  auto dxDV = reinterpret_pointer_cast<DX11Device>(_pDevice);
   // set the input layout
   dxDV->pImmediateContext->IASetInputLayout(pVertexLayout);
 }

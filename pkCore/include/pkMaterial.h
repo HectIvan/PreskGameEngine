@@ -18,14 +18,14 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
+#include "pkComponent.h"
 
 namespace pkEngineSDK
 {
 
 class Texture;
 
-class Material
+class Material : public Component
 {
  public:
   Material() = default;

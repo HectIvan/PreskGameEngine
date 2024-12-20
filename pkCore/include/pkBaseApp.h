@@ -49,7 +49,7 @@ class PK_CORE_EXPORT BaseApp
   * Initialize the app.
   **/
   void
-  init(const char** _argv, String& _modelName, String& _extension);
+  init(const char** _argv);
 
   /**
   * Initialize the app window.
@@ -85,7 +85,7 @@ class PK_CORE_EXPORT BaseApp
   * File path.
   **/
   SPtr<Model>
-  loadModel(String& _fileName, String& _extension);
+  loadModel(String& _fileName);
 
   /**
   * Update the camera.

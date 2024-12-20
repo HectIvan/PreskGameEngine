@@ -112,7 +112,7 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _size)
 {
   // cast to DX11ConstantBuffer
-  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) // casting failed
   {
     return;
@@ -403,7 +403,7 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _startSlot,
                                       uint32 _numBuffers)
 {
-  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) { return; } // casting failed
   m_pDevice->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
@@ -413,7 +413,7 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _startSlot,
                                       uint32 _numBuffers)
 {
-  auto dxCB = dynamic_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   if (!dxCB) { return; } // casting failed
   m_pDevice->pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
@@ -471,7 +471,7 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   if (!temptTexture) { return make_shared<DX11Texture>(); }
 
   // cast to DX11Texture
-  SPtr<DX11Texture> dxTX = dynamic_pointer_cast<DX11Texture>(temptTexture);
+  SPtr<DX11Texture> dxTX = reinterpret_pointer_cast<DX11Texture>(temptTexture);
 
   // if casting the texture failed
   if (!dxTX) { return make_shared<DX11Texture>(); }
@@ -601,7 +601,7 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                                  uint32 _offset)
 {
   // reinterpret pointer
-  auto dxVB = dynamic_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
   if (!dxVB)
   {
     // failed to cast to DX11VertexBuffer
@@ -652,7 +652,7 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
                                 uint32 _offset)
 {
   // reinterpret pointer
-  auto dxIB = dynamic_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
   if (!dxIB)
   {
     // failed to cast to DX11IndexBuffer

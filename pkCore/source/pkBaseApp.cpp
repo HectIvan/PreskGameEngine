@@ -17,11 +17,62 @@ namespace pkEngineSDK
 void
 run(String _name, Window& _window);
 
+/**
+* Create a game object.
+* 
+* @return
+* A game object shared pointer.
+**/
 SPtr<GameObject>
-createGameObject(SPtr<Model> _model);
+createGameObject()
+{
+  SPtr<GameObject> gObject = make_shared<GameObject>();
+  gObject->init(Transform(0.0f));
+  gObject->setScale(Matrix4(1.0f));
+  return gObject;
+}
 
+/**
+* Insert a game object into the vector of the game object.
+* 
+* @param _pObject
+* Object to insert.
+* 
+* @param _vector
+* Vector where the game object will be inserted.
+**/
 void
-insertGameObject(SPtr<GameObject> _object, Vector<SPtr<GameObject>>& _vector);
+insertGameObject(SPtr<GameObject> _pObject, Vector<SPtr<GameObject>>& _vector)
+{
+  _vector.push_back(_pObject);
+}
+
+/**
+* Create a material from a file.
+* 
+* @param _fileName
+* Name of th file to search for.
+* 
+* @return
+* The material Shared pointer.
+**/
+SPtr<Material>
+createMaterial(String& _fileName)
+{
+  // get api instance
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // create the texture adress
+  String textureName = "textures/" + _fileName;
+  // create the texture
+  SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
+  // if creating the texture failed, return the model without a texture
+  if (!texture) { return nullptr; }
+  // create the material component
+  SPtr<Material> pMatComp = make_shared<Material>();
+  pMatComp->setTexture(pMatComp->diffuse, texture);
+  // return the texture
+  return pMatComp;
+}
 
 /*********************************************/
 /**
@@ -30,7 +81,7 @@ insertGameObject(SPtr<GameObject> _object, Vector<SPtr<GameObject>>& _vector);
 /*********************************************/
 
 void
-BaseApp::init(const char** _argv, String& _modelName, String& _extension)
+BaseApp::init(const char** _argv)
 {
   initWindow();
   initAPI(_argv);
@@ -49,9 +100,16 @@ BaseApp::init(const char** _argv, String& _modelName, String& _extension)
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   // load the model
-  SPtr<Model> model = loadModel(_modelName, _extension);
+  String modelName = "rat.fbx";
+  SPtr<Model> model = loadModel(modelName);
+  // create a material
+  String texName = "rat_diffuse.png";
+  SPtr<Material> pMat = createMaterial(texName);
   // insert the game object into the vector of game objects
-  insertGameObject(createGameObject(model), gameObjects);
+  SPtr<GameObject> gObject = createGameObject();
+  gObject->insertModel(model);
+  gObject->addComponent(pMat);
+  insertGameObject(gObject, gameObjects);
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -62,7 +120,7 @@ BaseApp::initWindow()
   PKWindowDesc desc;
   desc.width = 1920;
   desc.height = 1080;
-  std::string name = "window test";
+  std::string name = "Presk Game Engine Window";
   window.create(desc, name);
 }
 
@@ -163,39 +221,6 @@ BaseApp::messageLoop()
     // render the scene
     render();
   }
-}
-
-SPtr<Model>
-BaseApp::loadModel(String& _fileName, String& _extension)
-{
-  // create the model path
-  String modelPath = "models/" +
-                      _fileName +
-                      "." +
-                      _extension;
-  // get the api
-  GraphicsAPI& api = GraphicsAPI::instance();
-  // create the model pointer
-  SPtr<Model> model = make_shared<Model>();
-  // load the model from the path
-  model->load(modelPath);
-  // create the index and vertex buffers
-  model->vertexB = api.createVertexBuffer(model->vertex);
-  model->indexB = api.createIndexBuffer(model->index);
-  api.setIndexBuffer(model->indexB);
-  api.setVertexBuffer(model->vertexB);
-  // create the texture adress
-  String textureName = "textures/" +
-                       _fileName + 
-                       "_Albedo.png";
-  // create the texture
-  SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
-  // if creating the texture failed, return the model without a texture
-  if (!texture) { return model; }
-  // insert the texture to the material
-  model->material.setTexture(model->material.diffuse, texture);
-  // return the final model
-  return model;
 }
 
 void
@@ -304,8 +329,13 @@ BaseApp::render()
 void
 BaseApp::renderGameObjects()
 {
+  // get a reference from the api
+  GraphicsAPI& api = GraphicsAPI::instance();
   // for each Game Object
   for (uint32 i = 0; i < gameObjects.size(); ++i) {
+    // set the diffuse texture to the resource view
+    api.setShaderResourceView(gameObjects[i]->getComponent<Material>()->diffuse);
+    api.setSampler();
     // check all their models
     for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
       // draw the model
@@ -322,10 +352,7 @@ BaseApp::renderModel(Model& _model)
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
-  // set the diffuse texture to the resource view
   // for each mesh in the model
-  api.setShaderResourceView(_model.material.diffuse);
-  api.setSampler();
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
@@ -337,19 +364,23 @@ BaseApp::renderModel(Model& _model)
   }
 }
 
-SPtr<GameObject>
-createGameObject(SPtr<Model> _model)
+SPtr<Model>
+BaseApp::loadModel(String& _fileName)
 {
-  SPtr<GameObject> gameObject = make_shared<GameObject>();
-  gameObject->init(Transform(0.0f));
-  gameObject->setScale(Matrix4(1.0f));
-  gameObject->insertModel(_model);
-  return gameObject;
-}
-
-void
-insertGameObject(SPtr<GameObject> _object, Vector<SPtr<GameObject>>& _vector)
-{
-  _vector.push_back(_object);
+  // create the model path
+  String modelPath = "models/" +  _fileName;
+  // get the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+  // create the model pointer
+  SPtr<Model> model = make_shared<Model>();
+  // load the model from the path
+  model->load(modelPath);
+  // create the index and vertex buffers
+  model->vertexB = api.createVertexBuffer(model->vertex);
+  model->indexB = api.createIndexBuffer(model->index);
+  api.setIndexBuffer(model->indexB);
+  api.setVertexBuffer(model->vertexB);
+  // return the final model
+  return model;
 }
 }

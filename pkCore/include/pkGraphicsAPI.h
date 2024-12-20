@@ -34,9 +34,6 @@ class IndexBuffer;
 class Shader;
 class VertexBuffer;
 
-using std::make_shared;
-using std::dynamic_pointer_cast;
-
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
 public:
@@ -51,6 +48,38 @@ public:
   **/
   virtual void
   initApi(const Window& _window) = 0;
+
+  /* Shaders */
+
+  /**
+  * Compile shaders.
+  **/
+  virtual void
+  compileShaders() = 0;
+
+  /**
+  * Create the pixel shader
+  **/
+  virtual void
+  createPShader() = 0;
+
+  /**
+  * Create the vertex shader
+  **/
+  virtual void
+  createVShader() = 0;
+
+  /**
+  * Create shaders.
+  **/
+  virtual void
+  createShaders() = 0;
+
+  /**
+  * Set the shaders of the api.
+  **/
+  virtual void
+  setShaders() = 0;
 
   /**
   * Create the sampler state.
@@ -71,6 +100,9 @@ public:
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
                      uint32 _usage = 0) = 0;
 
+  /**
+  * Set data to the vertex buffer
+  **/
   virtual void
   setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
@@ -153,23 +185,6 @@ public:
                         uint32 _numViews = 1) = 0;
 
   /**
-  * Draw the indexed data.
-  * 
-  * @param _indexCount
-  * The ammount of index to draw.
-  * 
-  * @param _startIndexLocation
-  * Which index will be the starting point.
-  * 
-  * @param _baseVertexLocation
-  * Which vertex will be the starting point.
-  **/
-  virtual void
-  drawIndexed(uint32 _indexCount,
-              uint32 _startIndexLocation,
-              uint32 _baseVertexLocation) = 0;
-
-  /**
   * Clear the render target fiew and fill the
   * screen with a new color.
   * 
@@ -184,36 +199,6 @@ public:
   **/
   virtual void
   clearDepthBuffer(float _depth) = 0;
-
-  /**
-  * Compile shaders.
-  **/
-  virtual void
-  compileShaders() = 0;
-
-  /**
-  * Create the pixel shader
-  **/
-  virtual void
-  createPShader() = 0;
-
-  /**
-  * Create the vertex shader
-  **/
-  virtual void
-  createVShader() = 0;
-
-  /**
-  * Create shaders.
-  **/
-  virtual void
-  createShaders() = 0;
-  
-  /**
-  * Set the shaders of the api.
-  **/
-  virtual void
-  setShaders() = 0;
 
   /**
   * Create the Input Layout.
@@ -276,6 +261,23 @@ public:
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) = 0;
+
+  /**
+  * Draw the indexed data.
+  * 
+  * @param _indexCount
+  * The ammount of index to draw.
+  * 
+  * @param _startIndexLocation
+  * Which index will be the starting point.
+  * 
+  * @param _baseVertexLocation
+  * Which vertex will be the starting point.
+  **/
+  virtual void
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) = 0;
 
   /**
   * Present the result to the screen.

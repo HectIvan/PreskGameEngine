@@ -127,6 +127,26 @@ class PK_CORE_EXPORT GameObject
   insertModel(SPtr<Model> _pModel);
 
   /**
+  * adds a component of type T.
+  * 
+  * @param _pComponent
+  * Shared pointer of the component to add.
+  **/
+  void
+  addComponent(SPtr<Component> _pComponent);
+
+  /**
+  * Get the component of type T.
+  * 
+  * @return
+  * Returns the shared pointer of type T from the
+  * components of the game object.
+  **/
+  template <typename T>
+  SPtr<T>
+  getComponent();
+
+  /**
   * Cleans the GameObject.
   **/
   void
@@ -134,7 +154,7 @@ class PK_CORE_EXPORT GameObject
 
  public:
   Vector<SPtr<Model>> models;
-  Vector<Component*> components;
+  Vector<SPtr<Component>> components;
   Transform transform;
 };
 }

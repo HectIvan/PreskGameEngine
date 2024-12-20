@@ -63,4 +63,27 @@ GameObject::clear()
   // clean all models
   models.clear();
 }
+
+void
+GameObject::addComponent(SPtr<Component> _pComponent)
+{
+  components.push_back(_pComponent);
+}
+
+template <typename T>
+SPtr<T>
+GameObject::getComponent()
+{
+  // for each component in the components vector
+  for (auto& comp : components) {
+    // do a conversion to the data type T
+    auto check = dynamic_pointer_cast<T>(comp);
+    // if the conversion was successful, it means the component was found
+    if (check) {
+      return check;
+    }
+  }
+  // otherwise, the component was not found, return a null pointer
+  return nullptr;
+}
 }

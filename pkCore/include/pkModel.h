@@ -20,16 +20,16 @@
 **/
 /*********************************************/
 #include "pkBone.h"
+#include "pkComponent.h"
 #include "pkIndexBuffer.h"
 #include "pkMaterial.h"
 #include "pkMesh.h"
-#include "pkPrerequisitesCore.h"
 #include "pkVertexBuffer.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Model
+class PK_CORE_EXPORT Model : public Component
 {
  public:
   Model() = default;
@@ -44,11 +44,6 @@ class PK_CORE_EXPORT Model
   void
   load(String& _path);
 
-  /**
-  * Clean all data from the model.
-  **/
-  void
-  clean();
 
   /**
   * Get the map of bones assigned to the model.
@@ -98,6 +93,12 @@ class PK_CORE_EXPORT Model
   **/
   void
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
+
+  /**
+  * Clean all data from the model.
+  **/
+  void
+  clean();
 
  public:
   // vertex and index data

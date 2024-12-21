@@ -8,6 +8,9 @@
 * This file contains the Component for the engine
 *
 * @bug No bug known.
+* 
+* @HectIvan 21/11/2024
+* added a way to get the current component type.
 */
 /************************************************************************/
 #pragma once
@@ -22,10 +25,23 @@
 namespace pkEngineSDK
 {
 
+namespace COMPONENT_TYPE
+{
+  enum E
+  {
+    kModel = 0,
+    kMaterial,
+    kUnknown,
+  };
+}
+
 class PK_CORE_EXPORT Component
 {
-public:
+ public:
   Component() = default;
   virtual ~Component() = default;
+
+  virtual COMPONENT_TYPE::E
+  getType() = 0;
 };
 }

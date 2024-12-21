@@ -28,9 +28,6 @@
     <Filter Include="include\prerequisites">
       <UniqueIdentifier>{45519aa5-0a72-4626-9f73-3bce6833affb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\main">
-      <UniqueIdentifier>{47f5c2dd-c8b6-4acf-8121-6e48b031d5ef}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkDX11DepthStencilView.cpp">

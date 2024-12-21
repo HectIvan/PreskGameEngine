@@ -190,7 +190,7 @@ loadMaterial(const aiScene* _scene)//, String& _fileName) // PkMesh& _mesh,
   for (uint32 i = 0; i < _scene->mNumMaterials; ++i) {
     const aiMaterial* pMaterial = _scene->mMaterials[i];
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-      
+      pMaterial->GetName();
     }
   }
 }

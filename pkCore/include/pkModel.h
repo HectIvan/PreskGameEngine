@@ -9,8 +9,8 @@
 *
 * @bug No bug known.
 *
-* @HectIvan 20/11/2024
-* Improved the way the clean model function operates.
+* @HectIvan 21/11/2024
+* added a way to get the model current component type.
 */
 /************************************************************************/
 #pragma once
@@ -44,7 +44,6 @@ class PK_CORE_EXPORT Model : public Component
   **/
   void
   load(String& _path);
-
 
   /**
   * Get the map of bones assigned to the model.
@@ -94,6 +93,24 @@ class PK_CORE_EXPORT Model : public Component
   **/
   void
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
+
+  /**
+  * Get the component type of this component.
+  * 
+  * @return
+  * The component type.
+  **/
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kModel; }
+
+  /**
+  * Get the component type of this component.
+  * 
+  * @return
+  * The component type.
+  **/
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kModel; }
 
   /**
   * Clean all data from the model.

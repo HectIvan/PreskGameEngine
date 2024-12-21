@@ -7,12 +7,7 @@
 *
 * This file will contain the Game object used by the engine
 *
-* @bug.
-* getComponent seems to ignore what type of data it is looking for,
-* returning a true value even tho the returned value is not the
-* one searched for.
-*
-* @HectIvan 20/12/2024
+* @bug No known bugs.
 */
 /************************************************************************/
 #pragma once
@@ -150,11 +145,9 @@ class PK_CORE_EXPORT GameObject
   {
     // for each component in the components vector
     for (auto& comp : components) {
-      // do a conversion to the data type T
-      auto check = reinterpret_pointer_cast<T>(comp);
       // if the conversion was successful, it means the component was found
-      if (check) {
-        return check;
+      if (comp->getType() == T::getObjType()) {
+        return reinterpret_pointer_cast<T>(comp);
       }
     }
     // otherwise, the component was not found, return a null pointer

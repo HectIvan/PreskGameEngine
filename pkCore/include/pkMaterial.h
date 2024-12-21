@@ -8,6 +8,9 @@
 * This file will contain the Material class used for the engine
 *
 * @bug No bug known.
+* 
+* @HectIvan 21/11/2024
+* added a way to get the material current component type.
 */
 /************************************************************************/
 #pragma once
@@ -29,6 +32,18 @@ class Material : public Component
  public:
   Material() = default;
   virtual ~Material() = default;
+
+  /**
+  * Get the component type of this component.
+  * 
+  * @return
+  * The component type.
+  **/
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kMaterial; }
+
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kMaterial; }
 
   /**
   * Set the diffuse texture of the material.

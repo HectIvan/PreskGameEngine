@@ -74,6 +74,21 @@ createMaterial(String& _fileName)
   return pMatComp;
 }
 
+void
+BaseApp::newGameObject(String _modelName, String _textureName, Transform _transform)
+{
+  // load the model
+  SPtr<Model> model = loadModel(_modelName);
+  // create a material
+  SPtr<Material> pMat = createMaterial(_textureName);
+  // insert the game object into the vector of game objects
+  SPtr<GameObject> gObject = createGameObject();
+  gObject->addComponent(model);
+  gObject->addComponent(pMat);
+  gObject->setTransform(_transform);
+  insertGameObject(gObject, gameObjects);
+}
+
 /*********************************************/
 /**
 * Definitions.
@@ -99,17 +114,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  // load the model
-  String modelName = "rat.fbx";
-  SPtr<Model> model = loadModel(modelName);
-  // create a material
-  String texName = "rat_diffuse.png";
-  SPtr<Material> pMat = createMaterial(texName);
-  // insert the game object into the vector of game objects
-  SPtr<GameObject> gObject = createGameObject();
-  gObject->addComponent(pMat);
-  gObject->insertModel(model);
-  insertGameObject(gObject, gameObjects);
+  newGameObject("rat.fbx", "rat_diffuse.png", Transform(0));
+  //newGameObject("Grass_Block.obj", "Grass_Block_TEX.png", Transform(0));
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -336,11 +342,8 @@ BaseApp::renderGameObjects()
     // set the diffuse texture to the resource view
     api.setShaderResourceView(gameObjects[i]->getComponent<Material>()->diffuse);
     api.setSampler();
-    // check for a model and render it
-    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j)
-    {
-      renderModel(*gameObjects[i]->models[j]);
-    }
+    // render the model component
+    renderModel(*gameObjects[i]->getComponent<Model>());
   }
 }
 

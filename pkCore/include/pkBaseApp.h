@@ -7,10 +7,11 @@
 *
 * This file contains the Base App of the engine
 *
-* @bug. No known bugs.
+* @bug.
+* Its currently impossible to add multiple game objects without them showing issues.
 * 
-* @HectIvan 20/12/2024
-* Added a way of getting the material through a get component function.
+* @HectIvan 21/12/2024
+* Added a way of adding both materials and models as components.
 */
 /************************************************************************/
 #pragma once
@@ -43,6 +44,9 @@ class PK_CORE_EXPORT BaseApp
  public:
   BaseApp() = default;
   virtual ~BaseApp() = default;
+
+  void
+  newGameObject(String _modelName, String _textureName, Transform _transform);
 
   /**
   * Initialize the app.

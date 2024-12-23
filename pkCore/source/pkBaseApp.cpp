@@ -75,7 +75,10 @@ createMaterial(String& _fileName)
 }
 
 void
-BaseApp::newGameObject(String _modelName, String _textureName, Transform _transform)
+BaseApp::newGameObject(String _modelName,
+                       String _textureName,
+                       Transform _transform,
+                       SPtr<GameObject> _pParent)
 {
   // load the model
   SPtr<Model> model = loadModel(_modelName);
@@ -86,7 +89,10 @@ BaseApp::newGameObject(String _modelName, String _textureName, Transform _transf
   gObject->addComponent(model);
   gObject->addComponent(pMat);
   gObject->setTransform(_transform);
-  insertGameObject(gObject, gameObjects);
+  // if the parent is not a nullptr (there is a parent that will have this game object)
+  if (_pParent) { insertGameObject(gObject, _pParent->children); }
+  // otherwise, the object is part of the scene
+  else { insertGameObject(gObject, gameObjects); }
 }
 
 /*********************************************/
@@ -114,8 +120,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("rat.fbx", "rat_diffuse.png", Transform(0));
-  //newGameObject("Grass_Block.obj", "Grass_Block_TEX.png", Transform(0));
+  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(0));
+  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(0));
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -207,20 +213,16 @@ BaseApp::messageLoop()
     }
     // rotate world
     if (eventQueue.iskeyPressed(KEY::kLeft)) {
-      rot += deltaTime * 10.0f;
-      api.world = Matrix4::rotationY(rot);
+      rotZ += 1.0f * deltaTime;
     }
     if (eventQueue.iskeyPressed(KEY::kRight)) {
-      rot += deltaTime * -10.0f;
-      api.world = Matrix4::rotationY(rot);
+      rotZ -= 1.0f * deltaTime;
     }
     if (eventQueue.iskeyPressed(KEY::kDown)) {
-      rot += deltaTime * 10.0f;
-      api.world = Matrix4::rotationX(rot);
+      rotX += 1.0f * deltaTime;
     }
     if (eventQueue.iskeyPressed(KEY::kUp)) {
-      rot += deltaTime * -10.0f;
-      api.world = Matrix4::rotationX(rot);
+      rotX -= 1.0f * deltaTime;
     }
     // update camera
     updateCamera(&camera);
@@ -310,6 +312,8 @@ void
 BaseApp::render()
 {
   GraphicsAPI& api = GraphicsAPI::instance();
+  // api world matrix
+  api.world = Matrix4::rotation(rotX, rotZ, rotY);
   // screen clear color
   float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
   api.clearRenderTargetView(clearColor);
@@ -328,22 +332,27 @@ BaseApp::render()
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   // render the objects
-  renderGameObjects();
+  renderGameObjects(gameObjects);
   api.present(1, 0);
 }
 
 void
-BaseApp::renderGameObjects()
+BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
 {
   // get a reference from the api
   GraphicsAPI& api = GraphicsAPI::instance();
   // for each Game Object
-  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+  for (uint32 i = 0; i < _gameObjects.size(); ++i) {
     // set the diffuse texture to the resource view
-    api.setShaderResourceView(gameObjects[i]->getComponent<Material>()->diffuse);
+    api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
     api.setSampler();
     // render the model component
-    renderModel(*gameObjects[i]->getComponent<Model>());
+    renderModel(*_gameObjects[i]->getComponent<Model>());
+    // if the game object has children, do the same for them
+    if (!_gameObjects[i]->children.empty())
+    {
+      renderGameObjects(_gameObjects[i]->children);
+    }
   }
 }
 
@@ -352,6 +361,9 @@ BaseApp::renderModel(Model& _model)
 {
   // get a reference from the api
   GraphicsAPI& api = GraphicsAPI::instance();
+  api.setInputLayout();
+  api.setVertexBuffer(_model.vertexB);
+  api.setIndexBuffer(_model.indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;

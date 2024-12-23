@@ -155,6 +155,18 @@ class PK_CORE_EXPORT GameObject
   }
 
   /**
+  * Get a specific child of the game object.
+  * 
+  * @param _index
+  * Position of the desired child.
+  * 
+  * @return
+  * Pointer to the GameObject
+  **/
+  SPtr<GameObject>
+  getChild(uint32 _index = 0);
+
+  /**
   * Cleans the GameObject.
   **/
   void
@@ -163,6 +175,7 @@ class PK_CORE_EXPORT GameObject
  public:
   Vector<SPtr<Model>> models;
   Vector<SPtr<Component>> components;
+  Vector<SPtr<GameObject>> children;
   Transform transform;
 };
 }

@@ -57,6 +57,15 @@ GameObject::insertModel(SPtr<Model> _pModel)
   models.push_back(_pModel);
 }
 
+SPtr<GameObject>
+GameObject::getChild(uint32 _index)
+{
+  if (!children.empty() && _index < children.size())
+  {
+    return children[_index];
+  }
+}
+
 void
 GameObject::clear()
 {

@@ -45,8 +45,27 @@ class PK_CORE_EXPORT BaseApp
   BaseApp() = default;
   virtual ~BaseApp() = default;
 
+  /**
+  * Insert a new game object into the scene or as
+  * a child of another gameObject.
+  * 
+  * @param _modelName
+  * Name of the model file to search for.
+  * 
+  * @param _textureName
+  * Name of the texture file to search for.
+  * 
+  * @param _tranform
+  * Transform of the game object.
+  * 
+  * @param _pParent
+  * If the gameobject will be the child of a game object.
+  **/
   void
-  newGameObject(String _modelName, String _textureName, Transform _transform);
+  newGameObject(String _modelName,
+                String _textureName,
+                Transform _transform,
+                SPtr<GameObject> _pParent = nullptr);
 
   /**
   * Initialize the app.
@@ -136,7 +155,7 @@ class PK_CORE_EXPORT BaseApp
   * Render the game objects in scene.
   **/
   void
-  renderGameObjects();
+  renderGameObjects(Vector<SPtr<GameObject>> _gameObjects);
 
   /**
   * Render the desired model.
@@ -168,5 +187,10 @@ class PK_CORE_EXPORT BaseApp
 
   // camera movement speed
   float cameraSpeed;
+
+  // rotation angles
+  float rotX = 0;
+  float rotY = 0;
+  float rotZ = 0;
 };
 }

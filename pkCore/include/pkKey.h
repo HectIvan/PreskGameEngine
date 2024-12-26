@@ -3,7 +3,7 @@
 * @pkKey pkKey.h
 * @Hector Ivan Muñoz Ceballos
 * @date 09/12/2024
-* @Keye file for the Presk Game Engine.
+* @Key file for the Presk Game Engine.
 *
 * This file contains the Key struct of the engine
 *
@@ -26,6 +26,11 @@ namespace KEY
 {
   enum E
   {
+    // mouse buttons
+    kLButton = 0x01,
+    kRButton = 0x02,
+    kCButton = 0x04,
+
     // arrows
     kLeft = 0x25,
     kUp = 0x26,
@@ -53,6 +58,8 @@ namespace KEY
     kQ = 0x51,
     kSpace = 0x20,
     kEsc = 0x1B,
+    kLControl = 0xA2,
+    kRControl = 0xA3,
   };
 }
 

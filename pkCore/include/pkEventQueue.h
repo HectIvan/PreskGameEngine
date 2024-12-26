@@ -18,7 +18,6 @@
 **/
 /*********************************************/
 #include "pkKey.h"
-#include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
 
 namespace pkEngineSDK
@@ -28,7 +27,7 @@ class EventQueue
 {
  public:
   EventQueue() = default;
-  ~EventQueue() = default;
+  virtual ~EventQueue() = default;
 
   /**
   * update both key inputs as well
@@ -50,7 +49,7 @@ class EventQueue
   iskeyPressed(KEY::E _key);
 
  private:
-  std::unordered_map<uint32, Key> keys;
+  UMap<uint32, Key> keys;
   Vector2 mousePosition;
 };
 }

@@ -120,8 +120,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(0));
-  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(0));
+  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(0.0f));
+  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(0), gameObjects[0]);
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -177,12 +177,9 @@ BaseApp::createBuffers()
 void
 BaseApp::messageLoop()
 {
-  // get api reference
-  GraphicsAPI& api = GraphicsAPI::instance();
-  float rot = 0.0f;
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
-  // event loop
+  // event loop, while the escape key has not been pressed
   while (!eventQueue.iskeyPressed(KEY::kEsc))
   {
     // update the delta time
@@ -205,10 +202,12 @@ BaseApp::messageLoop()
       camera.move(Vector3(camSpeed, 0.0f, 0.0f));
     }
     // move up/down
-    if (eventQueue.iskeyPressed(KEY::kE)) {
+    if (eventQueue.iskeyPressed(KEY::kE) ||
+        eventQueue.iskeyPressed(KEY::kSpace)) {
       camera.move(Vector3(0.0f, camSpeed, 0.0f));
     }
-    if (eventQueue.iskeyPressed(KEY::kQ)) {
+    if (eventQueue.iskeyPressed(KEY::kQ) ||
+        eventQueue.iskeyPressed(KEY::kLControl)) {
       camera.move(Vector3(0.0f, -camSpeed, 0.0f));
     }
     // rotate world
@@ -224,6 +223,10 @@ BaseApp::messageLoop()
     if (eventQueue.iskeyPressed(KEY::kUp)) {
       rotX -= 1.0f * deltaTime;
     }
+    // mouse input
+    if (eventQueue.iskeyPressed(KEY::kLButton)) {}
+    if (eventQueue.iskeyPressed(KEY::kRButton)) {}
+    if (eventQueue.iskeyPressed(KEY::kCButton)) {}
     // update camera
     updateCamera(&camera);
     // render the scene
@@ -302,9 +305,13 @@ BaseApp::PSSetConstantBuffers()
 float
 BaseApp::getDeltaTime(high_resolution_clock::time_point& _delta)
 {
+  // get the current time
   high_resolution_clock::time_point end = high_resolution_clock::now();
+  // subtract the previous time to the current time to get the difference (delta time)
   float deltaTime = duration<float>(end - _delta).count();
+  // previous time is now the current time
   _delta = high_resolution_clock::now();
+  // return the difference
   return deltaTime;
 }
 
@@ -333,6 +340,7 @@ BaseApp::render()
   PSSetConstantBuffers();
   // render the objects
   renderGameObjects(gameObjects);
+  // present the final result to the screen
   api.present(1, 0);
 }
 

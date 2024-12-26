@@ -73,6 +73,30 @@ class PK_CORE_EXPORT GameObject
   setPosition(float _x, float _y, float _z);
 
   /**
+  * Modify the game object translation with a new value.
+  * 
+  * @param _addPos
+  * Vector with the positon increase values.
+  **/
+  void
+  move(Vector3 _addPos);
+
+  /**
+  * Modify the game object translation with a new value.
+  * 
+  * @param _addX
+  * increase in the X axis.
+  * 
+  * @param _addY
+  * Increase in the Y axis.
+  * 
+  * @param _addZ
+  * Increase in the Z axis.
+  **/
+  void
+  move(float _addX, float _addY, float _addZ);
+
+  /**
   * Set the rotation of the GameObject.
   * 
   * @param _rotation

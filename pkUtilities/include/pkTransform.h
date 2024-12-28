@@ -31,6 +31,7 @@ class PK_UTILITY_EXPORT Transform
   Transform(Matrix4 _rotation,
             Matrix4 _scale,
             Matrix4 _translation);
+  explicit Transform(Matrix4 _matrix);
   explicit Transform(float _val);
   virtual ~Transform() = default;
 

@@ -187,10 +187,5 @@ class PK_CORE_EXPORT BaseApp
 
   // camera movement speed
   float cameraSpeed;
-
-  // rotation angles
-  float rotX = 0;
-  float rotY = 0;
-  float rotZ = 0;
 };
 }

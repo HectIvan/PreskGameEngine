@@ -293,7 +293,6 @@ public:
 
  public:
   // world matrix
-  Matrix4 world;
-  
+  // Matrix4 world;
 };
 }

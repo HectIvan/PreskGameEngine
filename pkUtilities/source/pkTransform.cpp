@@ -12,6 +12,11 @@ Transform::Transform(Matrix4 _rotation,
   setTranslation(_translation);
 }
 
+Transform::Transform(Matrix4 _matrix)
+{
+  transform = _matrix;
+}
+
 Transform::Transform(float _val)
 {
   /**

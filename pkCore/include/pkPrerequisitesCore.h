@@ -41,7 +41,7 @@ struct CBProjection
 struct CBWorld
 {
   Matrix4 world;
-  Vector4 meshColor;
+  // Vector4 meshColor;
 };
 
 struct KeyPosition

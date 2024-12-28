@@ -191,6 +191,12 @@ class PK_CORE_EXPORT GameObject
   getChild(uint32 _index = 0);
 
   /**
+  * Get a pointer to the parent
+  **/
+  SPtr<GameObject>
+  getParent() { return parent; }
+
+  /**
   * Cleans the GameObject.
   **/
   void
@@ -200,6 +206,7 @@ class PK_CORE_EXPORT GameObject
   Vector<SPtr<Model>> models;
   Vector<SPtr<Component>> components;
   Vector<SPtr<GameObject>> children;
+  SPtr<GameObject> parent;
   Transform transform;
 };
 }

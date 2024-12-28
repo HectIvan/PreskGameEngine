@@ -86,11 +86,22 @@ BaseApp::newGameObject(String _modelName,
   SPtr<Material> pMat = createMaterial(_textureName);
   // insert the game object into the vector of game objects
   SPtr<GameObject> gObject = createGameObject();
+  // add the components and set the transform
+  gObject->setTransform(_transform);
   gObject->addComponent(model);
   gObject->addComponent(pMat);
-  gObject->setTransform(_transform);
+  /**
+  * set the game objects parent as a null, it will be reassigned if the gameObject is supposed
+  * to have a parent
+  **/
+  gObject->parent = nullptr;
   // if the parent is not a nullptr (there is a parent that will have this game object)
-  if (_pParent) { insertGameObject(gObject, _pParent->children); }
+  if (_pParent) {
+    // insert the current gameObject to the children vector of the parent
+    insertGameObject(gObject, _pParent->children);
+    // set the parent as the parent of the current game Object
+    gObject->parent = _pParent;
+  }
   // otherwise, the object is part of the scene
   else { insertGameObject(gObject, gameObjects); }
 }
@@ -120,8 +131,10 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(0.0f));
-  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(0), gameObjects[0]);
+  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(Matrix4::IDENTITY));
+  gameObjects[0]->move(-10.0f, 0.0f, 0.0f);
+  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(Matrix4::IDENTITY));
+  gameObjects[0]->move(10.0f, 0.0f, 0.0f);
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -212,16 +225,16 @@ BaseApp::messageLoop()
     }
     // rotate world
     if (eventQueue.iskeyPressed(KEY::kLeft)) {
-      rotZ += 1.0f * deltaTime;
+      gameObjects[0]->move(-camSpeed, 0.0f, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kRight)) {
-      rotZ -= 1.0f * deltaTime;
+      gameObjects[0]->move(camSpeed, 0.0f, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kDown)) {
-      rotX += 1.0f * deltaTime;
+      gameObjects[0]->move(0.0f, 0.0f, -camSpeed);
     }
     if (eventQueue.iskeyPressed(KEY::kUp)) {
-      rotX -= 1.0f * deltaTime;
+      gameObjects[0]->move(0.0f, 0.0f, camSpeed);
     }
     // mouse input
     if (eventQueue.iskeyPressed(KEY::kLButton)) {}
@@ -320,24 +333,18 @@ BaseApp::render()
 {
   GraphicsAPI& api = GraphicsAPI::instance();
   // api world matrix
-  api.world = Matrix4::rotation(rotX, rotZ, rotY);
+  // api.world = Matrix4::rotation(rotX, rotZ, rotY);
   // screen clear color
   float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
   api.clearRenderTargetView(clearColor);
   api.clearDepthBuffer(1.0f);
-  // update the world and light buffers
-  CBWorld ef = CBWorld();
-  ef.world = api.world;
-  api.updateConstantBuffer(cBWorld, &ef, static_cast<uint32>(sizeof(CBWorld)));
+  // update the light buffer
   api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
   // Set shaders
   api.setShaders();
   // set light
   light.Type = LIGHT_TYPE::kDirectional;
   light.LightDir = Vector3::FORWARD;
-  // set constant buffers for the pixel and vertex shaders
-  VSSetConstantBuffers();
-  PSSetConstantBuffers();
   // render the objects
   renderGameObjects(gameObjects);
   // present the final result to the screen
@@ -347,10 +354,15 @@ BaseApp::render()
 void
 BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
 {
+  // set constant buffers for the pixel and vertex shaders
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
   // get a reference from the api
   GraphicsAPI& api = GraphicsAPI::instance();
   // for each Game Object
   for (uint32 i = 0; i < _gameObjects.size(); ++i) {
+    // set the current gameObject transform as the world in which the shader will work in
+    api.updateConstantBuffer(cBWorld, &_gameObjects[i]->transform.transform, static_cast<uint32>(sizeof(CBWorld)));
     // set the diffuse texture to the resource view
     api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
     api.setSampler();

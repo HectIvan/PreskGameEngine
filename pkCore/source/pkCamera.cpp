@@ -38,13 +38,13 @@ Camera::move(Vector3 _dist)
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  at = Matrix4::rotation(_x, _y, _z) * at;
+  projection *= Matrix4::rotation(_x, _y, _z);
 }
 
 void
 Camera::rotate(Vector3 _rotate)
 {
-  at = Matrix4::rotation(_rotate.x, _rotate.y, _rotate.z) * at;
+  rotate(_rotate.x, _rotate.y, _rotate.z);
 }
 
 Vector4

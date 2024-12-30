@@ -4,13 +4,36 @@
 **/
 /*********************************************/
 #include "pkMath.h"
-#include "pkVector4.h"
+#include "pkMatrix4.h"
 
 namespace pkEngineSDK {
 
 const Vector4 Vector4::ZERO = Vector4(0);
 
-float 
+const Vector4
+Vector4::operator*(const Matrix4& other) const
+{
+  // new X value
+  float X = (x * other.matrix[0][0]) + 
+            (x * other.matrix[1][0]) + 
+            (x * other.matrix[2][0]);
+  // new Y value
+  float Y = (y * other.matrix[0][1]) + 
+            (y * other.matrix[1][1]) + 
+            (y * other.matrix[2][1]);
+  // new Z value
+  float Z = (z * other.matrix[0][2]) + 
+            (z * other.matrix[1][2]) + 
+            (z * other.matrix[2][2]);
+  // new W value
+  float W = (w * other.matrix[0][3]) + 
+            (w * other.matrix[1][3]) + 
+            (w * other.matrix[2][3]);
+  // return the final vector
+  return Vector4(X, Y, Z, W);
+}
+
+float
 Vector4::dotProd(const Vector4& _other) const
 {
   return (x * _other.x) + (y * _other.y) + (z * _other.z) + (w * _other.w);

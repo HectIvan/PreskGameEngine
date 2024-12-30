@@ -24,6 +24,8 @@
 
 namespace pkEngineSDK {
 
+class Matrix4;
+
 class PK_UTILITY_EXPORT Vector4
 {
  public:
@@ -258,6 +260,9 @@ class PK_UTILITY_EXPORT Vector4
   {
     return !operator==(other);
   }
+
+  const Vector4
+  operator*(const Matrix4& other) const;
   
   /**
   * Calculate the cross product of this vector.

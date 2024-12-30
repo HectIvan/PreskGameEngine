@@ -27,7 +27,7 @@ SPtr<GameObject>
 createGameObject()
 {
   SPtr<GameObject> gObject = make_shared<GameObject>();
-  gObject->setTransform(Transform(0.0f));
+  gObject->setTransform(Matrix4(0.0f));
   gObject->setScale(Matrix4(1.0f));
   return gObject;
 }
@@ -77,7 +77,7 @@ createMaterial(String& _fileName)
 void
 BaseApp::newGameObject(String _modelName,
                        String _textureName,
-                       Transform _transform,
+                       Matrix4 _transform,
                        SPtr<GameObject> _pParent)
 {
   // load the model
@@ -129,12 +129,9 @@ BaseApp::init(const char** _argv)
               0.01f,
               1000.0f,
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
-              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+              Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Transform(Matrix4::IDENTITY));
-  gameObjects[0]->move(-10.0f, 0.0f, 0.0f);
-  newGameObject("bulb_bush.fbx", "Coral_reef_koosh_bush_huge.png", Transform(Matrix4::IDENTITY));
-  gameObjects[0]->move(10.0f, 0.0f, 0.0f);
+  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Matrix4::IDENTITY);
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -225,16 +222,16 @@ BaseApp::messageLoop()
     }
     // rotate world
     if (eventQueue.iskeyPressed(KEY::kLeft)) {
-      gameObjects[0]->move(-camSpeed, 0.0f, 0.0f);
+      camera.rotate(0.0f, -1.0f * deltaTime, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kRight)) {
-      gameObjects[0]->move(camSpeed, 0.0f, 0.0f);
+      camera.rotate(0.0f, 1.0f * deltaTime, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kDown)) {
-      gameObjects[0]->move(0.0f, 0.0f, -camSpeed);
+      camera.rotate(1.0f * deltaTime, 0.0f, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kUp)) {
-      gameObjects[0]->move(0.0f, 0.0f, camSpeed);
+      camera.rotate(-1.0f * deltaTime, 0.0f, 0.0f);
     }
     // mouse input
     if (eventQueue.iskeyPressed(KEY::kLButton)) {}
@@ -253,20 +250,12 @@ BaseApp::updateCamera(Camera* _pCamera)
   // get the api instance to work with
   GraphicsAPI& api = GraphicsAPI::instance();
 
-  /*****************/
-  /**
-  * Update view
-  **/
-  /*****************/
+  // Update view
   CBView viewBuffer = CBView();
   viewBuffer.view = _pCamera->view.getTransposed();
   api.updateConstantBuffer(cBView, &viewBuffer, 0);
 
-  /*****************/
-  /**
-  * Update projection
-  **/
-  /*****************/
+  // Update projection
   CBProjection projectionBuffer = CBProjection();
   projectionBuffer.projection = _pCamera->projection.getTransposed();
   api.updateConstantBuffer(cBProjection, &projectionBuffer, 0);
@@ -278,7 +267,7 @@ BaseApp::setGameObjectsBuffers()
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
 
-  // fr each game object in the world
+  // for each game object in the world
   for (uint32 i = 0; i < gameObjects.size(); ++i) {
     // for each model in the game object
     for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
@@ -331,9 +320,8 @@ BaseApp::getDeltaTime(high_resolution_clock::time_point& _delta)
 void
 BaseApp::render()
 {
+  // get the api instance
   GraphicsAPI& api = GraphicsAPI::instance();
-  // api world matrix
-  // api.world = Matrix4::rotation(rotX, rotZ, rotY);
   // screen clear color
   float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
   api.clearRenderTargetView(clearColor);
@@ -361,16 +349,25 @@ BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
   GraphicsAPI& api = GraphicsAPI::instance();
   // for each Game Object
   for (uint32 i = 0; i < _gameObjects.size(); ++i) {
+    // Get the final matrix by taking into account the parent opjects
+    SPtr<GameObject> parent = _gameObjects[i]->parent;
+    Matrix4 transform = _gameObjects[i]->transform;
+    // while there's a parent
+    while (parent) {
+      // add the parent transform to the current transform matrix
+      transform += parent->transform;
+      // the next parent will be the parent of this parent
+      parent = parent->parent;
+    }
     // set the current gameObject transform as the world in which the shader will work in
-    api.updateConstantBuffer(cBWorld, &_gameObjects[i]->transform.transform, static_cast<uint32>(sizeof(CBWorld)));
+    api.updateConstantBuffer(cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
     // set the diffuse texture to the resource view
     api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
     api.setSampler();
     // render the model component
     renderModel(*_gameObjects[i]->getComponent<Model>());
     // if the game object has children, do the same for them
-    if (!_gameObjects[i]->children.empty())
-    {
+    if (!_gameObjects[i]->children.empty()) {
       renderGameObjects(_gameObjects[i]->children);
     }
   }

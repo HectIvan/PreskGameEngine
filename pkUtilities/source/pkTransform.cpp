@@ -110,6 +110,7 @@ Transform::setScale(Matrix4 _scale)
   transform.matrix[3][1] = _scale.matrix[1][1];
   transform.matrix[3][2] = _scale.matrix[2][2];
 }
+
 void
 Transform::setTranslation(Matrix4 _translation)
 {

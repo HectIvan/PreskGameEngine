@@ -5,13 +5,32 @@
 /*********************************************/
 #include "pkMath.h"
 #include "pkVector3.h"
-#include "pkVector4.h"
+#include "pkMatrix4.h"
 
 namespace pkEngineSDK {
 
 const Vector3 Vector3::FORWARD(0.0f, 0.0f, 1.0f);
 const Vector3 Vector3::RIGHT(1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::UP(0.0f, 1.0f, 0.0f);
+
+const Vector3
+Vector3::operator*(const Matrix4& other) const
+{
+  // new X value
+  float X = (x * other.matrix[0][0]) + 
+            (x * other.matrix[0][1]) + 
+            (x * other.matrix[0][2]);
+  // new Y value
+  float Y = (y * other.matrix[1][0]) + 
+            (y * other.matrix[1][1]) + 
+            (y * other.matrix[1][2]);
+  // new Z value
+  float Z = (z * other.matrix[2][0]) + 
+            (z * other.matrix[2][1]) + 
+            (z * other.matrix[2][2]);
+  // return the final vector
+  return Vector3(X, Y, Z);
+}
 
 float
 Vector3::dotProd(const Vector3& _other) const

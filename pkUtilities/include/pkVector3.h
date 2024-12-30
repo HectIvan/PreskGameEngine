@@ -24,6 +24,7 @@
 
 namespace pkEngineSDK {
 
+class Matrix4;
 class Vector4;
 
 class PK_UTILITY_EXPORT Vector3
@@ -348,6 +349,9 @@ class PK_UTILITY_EXPORT Vector3
             y != other.y ||
             z != other.z);
   }
+
+  const Vector3
+  operator*(const Matrix4& other) const;
 
   /**
   * Calculates the dot product between 2 vectors.

@@ -37,7 +37,7 @@ class PK_CORE_EXPORT GameObject
   * Transform of the Game Object.
   **/
   void
-  setTransform(Transform _transform);
+  setTransform(Matrix4 _transform);
 
   /**
   * Set the position of the Game Object.
@@ -207,6 +207,6 @@ class PK_CORE_EXPORT GameObject
   Vector<SPtr<Component>> components;
   Vector<SPtr<GameObject>> children;
   SPtr<GameObject> parent;
-  Transform transform;
+  Matrix4 transform;
 };
 }

@@ -125,6 +125,16 @@ Matrix4::translation(Vector3& _position)
 }
 
 Matrix4
+Matrix4::getTranslation()
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][3] = matrix[0][3];
+  M.matrix[1][3] = matrix[1][3];
+  M.matrix[2][3] = matrix[2][3];
+  return M;
+}
+
+Matrix4
 Matrix4::scale(Vector3& _scale)
 {
   Matrix4 M = Matrix4::IDENTITY;
@@ -132,6 +142,23 @@ Matrix4::scale(Vector3& _scale)
   M.matrix[3][1] = _scale.y;
   M.matrix[3][2] = _scale.z;
   return M;
+}
+
+Matrix4 Matrix4::getScale()
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][0] = matrix[3][0];
+  M.matrix[1][1] = matrix[3][1];
+  M.matrix[2][2] = matrix[3][2];
+  return M;
+}
+
+void
+Matrix4::setScale(Matrix4 _scale)
+{
+  matrix[3][0] = _scale.matrix[0][0];
+  matrix[3][1] = _scale.matrix[1][1];
+  matrix[3][2] = _scale.matrix[2][2];
 }
 
 Matrix4
@@ -145,9 +172,7 @@ Matrix4::rotation(float& _angleX, float& _angleY, float& _angleZ)
 Matrix4
 Matrix4::rotation(Vector3& _rot)
 {
-  Matrix4 M = Matrix4::IDENTITY;
-  M = rotationX(_rot.x) * rotationY(_rot.y) * rotationZ(_rot.z);
-  return M;
+  return rotation(_rot.x, _rot.y, _rot.z);
 }
 
 Matrix4
@@ -199,6 +224,23 @@ Matrix4::rotationX(float& _angle)
 
   return M;
 }
+
+void
+Matrix4::setRotation(Matrix4 _rotation)
+{
+  matrix[0][0] = _rotation.matrix[0][0];
+  matrix[0][1] = _rotation.matrix[0][1];
+  matrix[0][2] = _rotation.matrix[0][2];
+
+  matrix[1][0] = _rotation.matrix[1][0];
+  matrix[1][1] = _rotation.matrix[1][1];
+  matrix[1][2] = _rotation.matrix[1][2];
+
+  matrix[2][0] = _rotation.matrix[2][0];
+  matrix[2][1] = _rotation.matrix[2][1];
+  matrix[2][2] = _rotation.matrix[2][2];
+}
+
 Matrix4
 Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir)
 {

@@ -191,6 +191,57 @@ class PK_UTILITY_EXPORT Matrix4
   }
 
   /**
+  * Matrix4 *= Matrix4
+  **/
+  Matrix4
+  operator*=(const Matrix4& other)
+  {
+    Matrix4 result;
+    
+    float x = matrix[0][0];
+    float y = matrix[0][1];
+    float z = matrix[0][2];
+    float w = matrix[0][3];
+    // first row
+    matrix[0][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
+    matrix[0][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
+    matrix[0][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
+    matrix[0][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
+    
+    // second row
+    x = matrix[1][0];
+    y = matrix[1][1];
+    z = matrix[1][2];
+    w = matrix[1][3];
+    matrix[1][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
+    matrix[1][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
+    matrix[1][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
+    matrix[1][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
+    
+    // third row
+    x = matrix[2][0];
+    y = matrix[2][1];
+    z = matrix[2][2];
+    w = matrix[2][3];
+    matrix[2][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
+    matrix[2][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
+    matrix[2][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
+    matrix[2][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
+    
+    // fourth row
+    x = matrix[3][0];
+    y = matrix[3][1];
+    z = matrix[3][2];
+    w = matrix[3][3];
+    matrix[3][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
+    matrix[3][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
+    matrix[3][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
+    matrix[3][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
+  
+    return *this;
+  }
+
+  /**
   * transpose matrix.
   *
   * This function returns a copy of the transposed of this matrix.
@@ -256,6 +307,15 @@ class PK_UTILITY_EXPORT Matrix4
   **/
   static Matrix4
   translation(Vector3& _position);
+
+  /**
+  * Get the current matrix translation.
+  * 
+  * @return
+  * The matrix translation.
+  **/
+  Matrix4
+  getTranslation();
   
   /**
   * Translation matrix.
@@ -271,6 +331,24 @@ class PK_UTILITY_EXPORT Matrix4
   **/
   static Matrix4
   scale(Vector3& _scale);
+
+  /**
+  * Get the current scale matrix.
+  * 
+  * @return
+  * The scale matrix.
+  **/
+  Matrix4
+  getScale();
+
+  /**
+  * Set the scale of the matrix.
+  * 
+  * @param _scale
+  * New scale.
+  **/
+  void
+  setScale(Matrix4 _scale);
   
   /**
   * rotation matrix.
@@ -356,6 +434,15 @@ class PK_UTILITY_EXPORT Matrix4
   rotationX(float& _angle);
 
   /**
+  * Set the matrix rotation.
+  * 
+  * @param _rotation
+  * New matrix rotation.
+  **/
+  void
+  setRotation(Matrix4 _rotation);
+
+  /**
   * Look at matrix.
   * 
   * @param _eyePos
@@ -367,8 +454,8 @@ class PK_UTILITY_EXPORT Matrix4
   * @param _upPos
   * Direction of the up vector.
   **/
-  static
-  Matrix4 lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir);
+  static Matrix4
+  lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir);
 
   /**
   * Matrix look to.
@@ -382,8 +469,8 @@ class PK_UTILITY_EXPORT Matrix4
   * @param _upDir
   * Direction of the up vector.
   **/
-  static
-  Matrix4 lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir);
+  static Matrix4
+  lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir);
 
   /**
   * Get the perspective matrix.
@@ -403,12 +490,12 @@ class PK_UTILITY_EXPORT Matrix4
   * @param _farZ
   * Far Z distance.
   **/
-  static
-  Matrix4 perspectiveFOVLH(float _halfFOV,
-                           float _width,
-                           float _height,
-                           float _nearZ,
-                           float _farZ);
+  static Matrix4
+  perspectiveFOVLH(float _halfFOV,
+                   float _width,
+                   float _height,
+                   float _nearZ,
+                   float _farZ);
 
   float matrix[4][4];
   static const Matrix4 IDENTITY;

@@ -64,7 +64,7 @@ class PK_CORE_EXPORT BaseApp
   void
   newGameObject(String _modelName,
                 String _textureName,
-                Transform _transform,
+                Matrix4 _transform,
                 SPtr<GameObject> _pParent = nullptr);
 
   /**

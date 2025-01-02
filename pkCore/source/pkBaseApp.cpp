@@ -187,6 +187,8 @@ BaseApp::createBuffers()
 void
 BaseApp::messageLoop()
 {
+  // last cursor position
+  Vector2 lastCursorPos = eventQueue.mousePosition;
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop, while the escape key has not been pressed
@@ -224,10 +226,10 @@ BaseApp::messageLoop()
     }
     // rotate world
     if (eventQueue.iskeyPressed(KEY::kLeft)) {
-      camera.rotate(0.0f, -1.0f * deltaTime, 0.0f);
+      camera.rotate(0.0f, 1.0f * deltaTime, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kRight)) {
-      camera.rotate(0.0f, 1.0f * deltaTime, 0.0f);
+      camera.rotate(0.0f, -1.0f * deltaTime, 0.0f);
     }
     if (eventQueue.iskeyPressed(KEY::kDown)) {
       camera.rotate(1.0f * deltaTime, 0.0f, 0.0f);
@@ -236,7 +238,11 @@ BaseApp::messageLoop()
       camera.rotate(-1.0f * deltaTime, 0.0f, 0.0f);
     }
     // mouse input
-    if (eventQueue.iskeyPressed(KEY::kLButton)) {}
+    if (eventQueue.iskeyPressed(KEY::kLButton)) {
+      Vector2 posDif = (lastCursorPos - eventQueue.mousePosition) * deltaTime;
+      camera.rotate(-posDif.y, posDif.x, 0.0f);
+      lastCursorPos = eventQueue.mousePosition;
+    }
     if (eventQueue.iskeyPressed(KEY::kRButton)) {}
     if (eventQueue.iskeyPressed(KEY::kCButton)) {}
     // backspace input

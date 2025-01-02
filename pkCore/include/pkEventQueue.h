@@ -57,7 +57,7 @@ class EventQueue
   void
   windowInput();
 
- private:
+ public:
   UMap<uint32, Key> keys;
   Vector2 mousePosition;
 };

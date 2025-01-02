@@ -10,7 +10,8 @@
 * @bug.
 * Currently unable to move.
 *
-* @HectIvan 30/09/2024
+* @HectIvan 02/01/2025
+* Correct camera rotation mathematics
 */
 /************************************************************************/
 #pragma once
@@ -153,6 +154,7 @@ class PK_CORE_EXPORT Camera
   Vector4 right;
 
   // camera rotation and start position
+  Vector3 rotation = Vector3(0.0f);
   Vector2 startPos = Vector2(0.0f);
 };
 }

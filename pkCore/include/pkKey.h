@@ -8,6 +8,9 @@
 * This file contains the Key struct of the engine
 *
 * @bug No bug known.
+* 
+* @HectIvan 02/01/2025
+* Added the backspace enum
 */
 /************************************************************************/
 #pragma once
@@ -30,6 +33,10 @@ namespace KEY
     kLButton = 0x01,
     kRButton = 0x02,
     kCButton = 0x04,
+
+    // text editing buttons
+    kBackSpace = 0x08,
+    kSpace = 0x20,
 
     // arrows
     kLeft = 0x25,
@@ -56,7 +63,7 @@ namespace KEY
     kD = 0x44,
     kE = 0x45,
     kQ = 0x51,
-    kSpace = 0x20,
+    
     kEsc = 0x1B,
     kLControl = 0xA2,
     kRControl = 0xA3,

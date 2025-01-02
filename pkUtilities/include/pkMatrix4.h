@@ -12,9 +12,6 @@
 * the second one is the X coordinate
 *
 * @bug No bug known.
-*
-* @HectIvan 09/09/2024
-* Added comments
 */
 /************************************************************************/
 #pragma once

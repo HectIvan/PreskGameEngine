@@ -35,6 +35,15 @@ EventQueue::iskeyPressed(KEY::E _key)
   // return the state
   return tempKey.pressed;
 }
-}
 
+void
+EventQueue::windowInput()
+{
+  MSG msg = { 0 };
+  if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+}
+}
 #endif

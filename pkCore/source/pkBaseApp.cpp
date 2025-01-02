@@ -192,6 +192,8 @@ BaseApp::messageLoop()
   // event loop, while the escape key has not been pressed
   while (!eventQueue.iskeyPressed(KEY::kEsc))
   {
+    // event window specific input
+    eventQueue.windowInput();
     // update the delta time
     float deltaTime = getDeltaTime(delta);
     // update the camera speed
@@ -237,6 +239,14 @@ BaseApp::messageLoop()
     if (eventQueue.iskeyPressed(KEY::kLButton)) {}
     if (eventQueue.iskeyPressed(KEY::kRButton)) {}
     if (eventQueue.iskeyPressed(KEY::kCButton)) {}
+    // backspace input
+    if (eventQueue.iskeyPressed(KEY::kBackSpace)) {
+      // if the game object pool is not empty
+      if (!gameObjects.empty()) {
+        // pop the last gameobject
+        gameObjects.pop_back();
+      }
+    }
     // update camera
     updateCamera(&camera);
     // render the scene

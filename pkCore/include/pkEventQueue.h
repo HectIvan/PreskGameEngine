@@ -8,6 +8,9 @@
 * This file contains the event queue class of the engine
 *
 * @bug No bug known.
+* 
+* @HectIvan 02/01/2025
+* Added the backspace enum
 */
 /************************************************************************/
 #pragma once
@@ -47,6 +50,12 @@ class EventQueue
   **/
   bool
   iskeyPressed(KEY::E _key);
+
+  /**
+  * Window specific input.
+  **/
+  void
+  windowInput();
 
  private:
   UMap<uint32, Key> keys;

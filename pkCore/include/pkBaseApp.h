@@ -10,8 +10,8 @@
 * @bug.
 * Its currently impossible to add multiple game objects without them showing issues.
 * 
-* @HectIvan 21/12/2024
-* Added a way of adding both materials and models as components.
+* @HectIvan 02/01/2025
+* Added the backspace input as well as allowing for the window to receive new inputs.
 */
 /************************************************************************/
 #pragma once

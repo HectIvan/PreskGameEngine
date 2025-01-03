@@ -24,6 +24,7 @@ Camera::init(uint32 _width,
                                            static_cast<float>(_height),
                                            _nearZ,
                                            _farZ);
+  rotation = Vector3(0.0f);
 }
 
 void
@@ -33,15 +34,13 @@ Camera::move(Vector3 _dist)
   at += Vector4(_dist.x, _dist.y, _dist.z, 0.0f);
   up = getUpVector();
   view = Matrix4::lookAtLH(eye, at, up);
+  rotate(rotation);
 }
 
 void
 Camera::rotate(float _x, float _y, float _z)
 {
   view *= Matrix4::rotation(_x, _y, _z);
-  rotation.x += _x;
-  rotation.y += _y;
-  rotation.z += _z;
 }
 
 void
@@ -80,5 +79,13 @@ Camera::updateRotation()
   setForwardVector(getForwardVector());
   setRightVector(getRightVector());
   setUpVector(getUpVector());
+}
+
+void
+Camera::addRotation(Vector3 _rot)
+{
+  rotation.x += _rot.x;
+  rotation.y += _rot.y;
+  rotation.z += _rot.z;
 }
 }

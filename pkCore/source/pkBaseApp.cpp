@@ -241,6 +241,10 @@ BaseApp::messageLoop()
     if (eventQueue.iskeyPressed(KEY::kLButton)) {
       Vector2 posDif = (lastCursorPos - eventQueue.mousePosition) * deltaTime;
       camera.rotate(-posDif.y, posDif.x, 0.0f);
+      camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
+      lastCursorPos = eventQueue.mousePosition;
+    }
+    else {
       lastCursorPos = eventQueue.mousePosition;
     }
     if (eventQueue.iskeyPressed(KEY::kRButton)) {}

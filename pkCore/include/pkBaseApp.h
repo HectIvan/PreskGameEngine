@@ -7,11 +7,10 @@
 *
 * This file contains the Base App of the engine
 *
-* @bug.
-* Its currently impossible to add multiple game objects without them showing issues.
+* @bug. Game object will have only one material, even when multiple exist.
 * 
-* @HectIvan 02/01/2025
-* Added the backspace input as well as allowing for the window to receive new inputs.
+* @HectIvan 03/01/2025
+* correct mouse position update.
 */
 /************************************************************************/
 #pragma once

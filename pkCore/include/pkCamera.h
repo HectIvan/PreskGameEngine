@@ -8,10 +8,11 @@
 * This file will contain the Camera used for the engine
 *
 * @bug.
-* Currently unable to move.
+* Camera movement not as intended when moving to a certain Z coordinat range.
+* Erratic camera rotation when its performed constantly.
 *
 * @HectIvan 02/01/2025
-* Correct camera rotation mathematics
+* Movement and camera rotation at the same time.
 */
 /************************************************************************/
 #pragma once
@@ -138,6 +139,9 @@ class PK_CORE_EXPORT Camera
   void
   updateRotation();
 
+  void
+  addRotation(Vector3 _rot);
+
   // Camera view
   Matrix4 view;
   Matrix4 projection;
@@ -154,7 +158,7 @@ class PK_CORE_EXPORT Camera
   Vector4 right;
 
   // camera rotation and start position
-  Vector3 rotation = Vector3(0.0f);
+  Vector3 rotation;
   Vector2 startPos = Vector2(0.0f);
 };
 }

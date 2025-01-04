@@ -9,6 +9,7 @@
 #include <assimp/scene.h>
 #include <iostream>
 
+#include "pkGraphicsAPI.h"
 #include "pkMatrix4.h"
 #include "pkModel.h"
 #include "pkTexture.h"
@@ -112,6 +113,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       aiString path;
       material->GetTexture(aiTextureType_DIFFUSE, i, &path);
       std::cout << "Texture path: " << path.C_Str() << std::endl;
+      meshProcess.materialPath = path.C_Str();
     }
     // material->GetTexture(aiTextureType_DIFFUSE);
     // material->Get(AI_MATKEY_COLOR_DIFFUSE, )

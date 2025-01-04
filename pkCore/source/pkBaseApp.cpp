@@ -80,16 +80,23 @@ BaseApp::newGameObject(String _modelName,
                        Matrix4 _transform,
                        SPtr<GameObject> _pParent)
 {
+  // insert the game object into the vector of game objects
+  SPtr<GameObject> gObject = createGameObject();
+  // set the gameObject transform
+  gObject->setTransform(_transform);
   // load the model
   SPtr<Model> model = loadModel(_modelName);
   // create a material
-  SPtr<Material> pMat = createMaterial(_textureName);
-  // insert the game object into the vector of game objects
-  SPtr<GameObject> gObject = createGameObject();
-  // add the components and set the transform
-  gObject->setTransform(_transform);
+  for (uint32 i = 0; i < model->meshes.size(); ++i) {
+    model->meshes[i].material = createMaterial(model->meshes[i].materialPath);
+  }
+  // if the material creation was successful (a default texture was found)
+  SPtr<Material> pMat = make_shared<Material>();
+  if (pMat = createMaterial(_textureName)) {
+    gObject->addComponent(pMat);
+  }
+  // add the components
   gObject->addComponent(model);
-  gObject->addComponent(pMat);
   /**
   * set the game objects parent as a null, it will be reassigned if the gameObject is supposed
   * to have a parent
@@ -131,7 +138,7 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("Shadow_Leviathan_anim.fbx", "Shadow_Leviathan_01.png", Matrix4::IDENTITY);
+  newGameObject("Shadow_Leviathan_anim.fbx");
   cameraSpeed = 5.0f;
   messageLoop();
 }
@@ -381,9 +388,12 @@ BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
     }
     // set the current gameObject transform as the world in which the shader will work in
     api.updateConstantBuffer(cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
-    // set the diffuse texture to the resource view
-    api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
-    api.setSampler();
+    // set the diffuse texture to the resource view if the model has a material
+    if (_gameObjects[i]->getComponent<Material>()) {
+      // set the material texture to the shader
+      api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
+      api.setSampler();
+    }
     // render the model component
     renderModel(*_gameObjects[i]->getComponent<Model>());
     // if the game object has children, do the same for them
@@ -406,6 +416,10 @@ BaseApp::renderModel(Model& _model)
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
+    if (_model.meshes[i].material) {
+      api.setShaderResourceView(_model.meshes[i].material->diffuse);
+      api.setSampler();
+    }
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
                                         currentIndexOrigin,

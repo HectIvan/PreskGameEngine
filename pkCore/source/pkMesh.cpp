@@ -14,6 +14,7 @@ Mesh::Mesh(Vector<SimpleVertex> _vertex,
   indexVector = _index;
   vertexCount = _vertexCount;
   numIndex = _numIndex;
+  materialPath = "";
 }
 
 void
@@ -24,6 +25,7 @@ Mesh::clean()
   // Empty the index vector
   indexVector.clear();
 
+  materialPath = "";
   vertexCount = 0;
   numIndex = 0;
 }

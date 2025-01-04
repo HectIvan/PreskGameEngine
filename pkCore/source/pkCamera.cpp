@@ -41,6 +41,7 @@ void
 Camera::rotate(float _x, float _y, float _z)
 {
   view *= Matrix4::rotation(_x, _y, _z);
+  updateRotation();
 }
 
 void

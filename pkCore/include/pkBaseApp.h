@@ -61,9 +61,9 @@ class PK_CORE_EXPORT BaseApp
   * If the gameobject will be the child of a game object.
   **/
   void
-  newGameObject(String _modelName,
-                String _textureName,
-                Matrix4 _transform,
+  newGameObject(String _modelName = "",
+                String _textureName = "",
+                Matrix4 _transform = Matrix4::IDENTITY,
                 SPtr<GameObject> _pParent = nullptr);
 
   /**

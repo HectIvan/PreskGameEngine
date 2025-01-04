@@ -21,7 +21,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
-// #include "pkTexture.h"
+#include "pkMaterial.h"
 #include "pkTransform.h"
 
 namespace pkEngineSDK
@@ -75,8 +75,10 @@ class Mesh
   Vector<SimpleVertex> vertexVector;
   Vector<uint32> indexVector;
   // Vector<Texture*> textures;
-  // aiMaterial* m_material;
+  SPtr<Material> material;
   uint32 vertexCount;
   uint32 numIndex;
+
+  String materialPath;
 };
 }

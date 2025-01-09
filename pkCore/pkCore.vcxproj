@@ -192,6 +192,7 @@
     <ClInclude Include="include\pkPrerequisitesCore.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
+    <ClInclude Include="include\pkSprite.h" />
     <ClInclude Include="include\pkSwapChain.h" />
     <ClInclude Include="include\pkTexture.h" />
     <ClInclude Include="include\pkVertexBuffer.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="source\pkMaterial.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkModel.cpp" />
+    <ClCompile Include="source\pkSprite.cpp" />
     <ClCompile Include="source\pkTexture.cpp" />
     <ClCompile Include="source\pkWin32Event.cpp" />
     <ClCompile Include="source\pkWin32EventQueue.cpp" />

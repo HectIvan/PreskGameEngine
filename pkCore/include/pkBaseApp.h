@@ -156,15 +156,6 @@ class PK_CORE_EXPORT BaseApp
   void
   renderGameObjects(Vector<SPtr<GameObject>> _gameObjects);
 
-  /**
-  * Render the desired model.
-  * 
-  * @param _model
-  * The model to render
-  **/
-  void
-  renderModel(Model& _model);
-
  public:
   // system
   Window window;

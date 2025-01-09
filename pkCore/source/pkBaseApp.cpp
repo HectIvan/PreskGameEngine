@@ -7,6 +7,7 @@
 #include "pkLight.h"
 #include "pkModel.h"
 #include "pkPrerequisitesCore.h"
+#include "pkSprite.h"
 #include "pkWindowDesc.h"
 
 #include "pkPlatformMath.h"
@@ -138,8 +139,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  newGameObject("Shadow_Leviathan_anim.fbx");
   cameraSpeed = 5.0f;
+  newGameObject("Shadow_Leviathan_anim.fbx");
   messageLoop();
 }
 
@@ -149,7 +150,7 @@ BaseApp::initWindow()
   PKWindowDesc desc;
   desc.width = 1920;
   desc.height = 1080;
-  std::string name = "Presk Game Engine Window";
+  std::string name = "Game Engine Window";
   window.create(desc, name);
 }
 
@@ -360,6 +361,9 @@ BaseApp::render()
   // set light
   light.Type = LIGHT_TYPE::kDirectional;
   light.LightDir = Vector3::FORWARD;
+  // set constant buffers for the pixel and vertex shaders
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
   // render the objects
   renderGameObjects(gameObjects);
   // present the final result to the screen
@@ -367,11 +371,35 @@ BaseApp::render()
 }
 
 void
+renderModel(Model& _model)
+{
+  // get a reference from the api
+  GraphicsAPI& api = GraphicsAPI::instance();
+  api.setInputLayout();
+  api.setVertexBuffer(_model.vertexB);
+  api.setIndexBuffer(_model.indexB);
+  // offsets
+  uint32 currentVertexOrigin = 0;
+  uint32 currentIndexOrigin = 0;
+  // for each mesh in the model
+  for (uint32 i = 0; i < _model.meshes.size(); ++i) {
+    if (_model.meshes[i].material) {
+      api.setShaderResourceView(_model.meshes[i].material->diffuse);
+      api.setSampler();
+    }
+    // draw the mesh
+    api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
+      currentIndexOrigin,
+      currentVertexOrigin);
+    // update the offsets
+    currentIndexOrigin += static_cast<uint32>(_model.meshes[i].numIndex);
+    currentVertexOrigin += static_cast<uint32>(_model.meshes[i].vertexCount);
+  }
+}
+
+void
 BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
 {
-  // set constant buffers for the pixel and vertex shaders
-  VSSetConstantBuffers();
-  PSSetConstantBuffers();
   // get a reference from the api
   GraphicsAPI& api = GraphicsAPI::instance();
   // for each Game Object
@@ -403,33 +431,6 @@ BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
   }
 }
 
-void
-BaseApp::renderModel(Model& _model)
-{
-  // get a reference from the api
-  GraphicsAPI& api = GraphicsAPI::instance();
-  api.setInputLayout();
-  api.setVertexBuffer(_model.vertexB);
-  api.setIndexBuffer(_model.indexB);
-  // offsets
-  uint32 currentVertexOrigin = 0;
-  uint32 currentIndexOrigin = 0;
-  // for each mesh in the model
-  for (uint32 i = 0; i < _model.meshes.size(); ++i) {
-    if (_model.meshes[i].material) {
-      api.setShaderResourceView(_model.meshes[i].material->diffuse);
-      api.setSampler();
-    }
-    // draw the mesh
-    api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
-                                        currentIndexOrigin,
-                                        currentVertexOrigin);
-    // update the offsets
-    currentIndexOrigin += static_cast<uint32>(_model.meshes[i].numIndex);
-    currentVertexOrigin += static_cast<uint32>(_model.meshes[i].vertexCount);
-  }
-}
-
 SPtr<Model>
 BaseApp::loadModel(String& _fileName)
 {
@@ -441,11 +442,13 @@ BaseApp::loadModel(String& _fileName)
   SPtr<Model> model = make_shared<Model>();
   // load the model from the path
   model->load(modelPath);
-  // create the index and vertex buffers
-  model->vertexB = api.createVertexBuffer(model->vertex);
-  model->indexB = api.createIndexBuffer(model->index);
-  api.setIndexBuffer(model->indexB);
-  api.setVertexBuffer(model->vertexB);
+  if (!model->index.empty()) {
+    // create the index and vertex buffers
+    model->vertexB = api.createVertexBuffer(model->vertex);
+    model->indexB = api.createIndexBuffer(model->index);
+    api.setIndexBuffer(model->indexB);
+    api.setVertexBuffer(model->vertexB);
+  }
   // return the final model
   return model;
 }

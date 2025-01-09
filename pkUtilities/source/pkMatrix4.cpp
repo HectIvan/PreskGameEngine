@@ -319,4 +319,17 @@ Matrix4::perspectiveFOVLH(float _halfFOV, float _width, float _height, float _ne
 
   return M;
 }
+
+Matrix4
+Matrix4::orthographicFOVLH(float _width, float _height, float _nearZ, float _farZ)
+{
+  float fRange = 1.0f / (_farZ - _nearZ);
+
+  Matrix4 M(0.0f);
+  M.matrix[0][0] = 2.0f / _width;
+  M.matrix[1][1] = 2.0f / _height;
+  M.matrix[2][2] = fRange;
+  M.matrix[3][2] = -fRange * _nearZ;
+  return M;
+}
 }

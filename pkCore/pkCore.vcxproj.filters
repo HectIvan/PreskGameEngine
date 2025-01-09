@@ -156,6 +156,9 @@
     <ClInclude Include="include\pkSwapChain.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkSprite.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="source\pkTexture.cpp">
       <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkSprite.cpp">
+      <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -494,6 +494,12 @@ class PK_UTILITY_EXPORT Matrix4
                    float _nearZ,
                    float _farZ);
 
+  static Matrix4
+  orthographicFOVLH(float _width,
+                    float _height,
+                    float _nearZ,
+                    float _farZ);
+
   float matrix[4][4];
   static const Matrix4 IDENTITY;
   static const Matrix4 ZERO;

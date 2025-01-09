@@ -41,15 +41,13 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
 
   // graphics api (do not store)
-  D3D_DRIVER_TYPE driverTypes[] =
-  {
+  D3D_DRIVER_TYPE driverTypes[] = {
     D3D_DRIVER_TYPE_HARDWARE,
     D3D_DRIVER_TYPE_WARP,
     D3D_DRIVER_TYPE_REFERENCE,
   };
 
-  D3D_FEATURE_LEVEL featureLevels[] =
-  {
+  D3D_FEATURE_LEVEL featureLevels[] = {
     D3D_FEATURE_LEVEL_11_0,
     D3D_FEATURE_LEVEL_10_1,
     D3D_FEATURE_LEVEL_10_0,
@@ -90,16 +88,14 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
     D3D11_CPU_ACCESS_WRITE : 0;
 
   D3D11_SUBRESOURCE_DATA subData;
-  if (_pData)
-  {
+  if (_pData) {
     subData.pSysMem = _pData;
     subData.SysMemPitch = _size;
     subData.SysMemSlicePitch = 0;
   }
 
   hr = m_pDevice->pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &dxCB->pCBuffer);
-  if (FAILED(hr))
-  {
+  if (FAILED(hr)) {
     return nullptr;
   }
 
@@ -113,8 +109,8 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 {
   // cast to DX11ConstantBuffer
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
-  if (!dxCB) // casting failed
-  {
+  // casting failed
+  if (!dxCB) {
     return;
   }
   // update with the new data
@@ -164,8 +160,7 @@ DX11GraphicsAPI::createPShader()
   hr = m_pDevice->pd3dDevice->CreatePixelShader(pixelShader->pSBlob->GetBufferPointer(),
                                                 pixelShader->pSBlob->GetBufferSize(),
                                                 nullptr, &pixelShader->pShader);
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     pixelShader->pSBlob->Release();
     return;
   }
@@ -181,8 +176,7 @@ DX11GraphicsAPI::createVShader()
                                                  vertexShader->pSBlob->GetBufferSize(),
                                                  nullptr,
                                                  &vertexShader->pShader);
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     vertexShader->pSBlob->Release();
     return;
   }
@@ -226,8 +220,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   sd.SampleDesc.Count = 1;
   sd.SampleDesc.Quality = 0;
   sd.Windowed = true;
-  for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++)
-  {
+  for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++) {
     // try and create the device and swap chain with the current driver type
     m_pDevice->pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
     uint32 hr = D3D11CreateDeviceAndSwapChain(nullptr,
@@ -244,10 +237,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                               &m_pDevice->pImmediateContext);
 
     // if creation was successful
-    if (hr == 0x00000000)
-    {
-      // auto err(hr);
-      // LPCTSTR errMsg = err.ErrorMessage();
+    if (hr == 0x00000000) {
       // end the entire process, no need to continue
       break;
     }
@@ -263,16 +253,14 @@ DX11GraphicsAPI::createRenderTargetView()
   // get buffer data
   ID3D11Texture2D* pBackBuffer = nullptr;
   uint32 hr = pSwapChain->pSch->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
 
   // create the render target view
   hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pRTargetView->pRtv);
   pBackBuffer->Release();
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
 }
@@ -294,8 +282,7 @@ DX11GraphicsAPI::createSamplerState()
   // sampler state creation
   pSamplerLinear = make_shared<DX11SamplerState>();
   uint32 hr = m_pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamplerLinear->pSampler);
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
 }
@@ -323,8 +310,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDepth.MiscFlags = 0;
   uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil->t2d);
   // if creating the texture failed
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
 
@@ -336,8 +322,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
   hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil->t2d, &descDSV, &pDepthSView->pDepthSV);
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
   m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView->pRtv, pDepthSView->pDepthSV);
@@ -355,7 +340,7 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   vp.TopLeftX = 0;
   vp.TopLeftY = 0;
   m_pDevice->pImmediateContext->RSSetViewports(1, &vp);
-  world = Matrix4::IDENTITY;
+  // world = Matrix4::IDENTITY;
 }
 
 void
@@ -388,8 +373,7 @@ DX11GraphicsAPI::createInputLayout()
                                                 vertexShader->pSBlob->GetBufferSize(),
                                                 &pInputL->pVertexLayout);
   // failed to create the input layout
-  if (hr != 0x00000000)
-  {
+  if (hr != 0x00000000) {
     return;
   }
   // already used
@@ -491,13 +475,13 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
 
 SPtr<Texture>
 DX11GraphicsAPI::createTextureDX(unsigned char* _data,
-                               uint32 _bpp,
-                               uint32 _width,
-                               uint32 _height,
-                               uint32 _format,
-                               uint32 _usage,
-                               uint32 _bindFlags,
-                               bool _mipLevels)
+                                 uint32 _bpp,
+                                 uint32 _width,
+                                 uint32 _height,
+                                 uint32 _format,
+                                 uint32 _usage,
+                                 uint32 _bindFlags,
+                                 bool _mipLevels)
 {
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -524,8 +508,7 @@ DX11GraphicsAPI::createTextureDX(unsigned char* _data,
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
   m_pDevice->pd3dDevice->CreateTexture2D(&desc, &initData, &tex->t2d);
 
-  if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE)
-  {
+  if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE) {
     // Create the shader resource descriptor for the texture
     D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
     memset(&sDesc, 0, sizeof(sDesc));
@@ -539,8 +522,7 @@ DX11GraphicsAPI::createTextureDX(unsigned char* _data,
     if (!tex->srv) { return nullptr; } // failed to create shader resource view
   }
 
-  if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL)
-  {
+  if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL) {
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     memset(&dsvDesc, 0, sizeof(dsvDesc));
     dsvDesc.Format = desc.Format;
@@ -584,10 +566,8 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   InitData.pSysMem = _vertex.data(); // pointer to the initialization data
   InitData.SysMemPitch = static_cast<uint32>(_vertex.size() * sizeof(SimpleVertex)); // distance between values
 
-  // create the buffer
-  if (!m_pDevice->pd3dDevice)
-  {
-    // if device is null
+  // if the device creation failed
+  if (!m_pDevice->pd3dDevice) {
     return nullptr;
   }
   m_pDevice->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
@@ -602,9 +582,8 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
 {
   // reinterpret pointer
   auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
-  if (!dxVB)
-  {
-    // failed to cast to DX11VertexBuffer
+  // if failed to cast to DX11VertexBuffer
+  if (!dxVB) {
     return;
   }
   
@@ -653,9 +632,8 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
 {
   // reinterpret pointer
   auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
-  if (!dxIB)
-  {
-    // failed to cast to DX11IndexBuffer
+  // if failed to cast to DX11IndexBuffer
+  if (!dxIB) {
     return;
   }
   m_pDevice->pImmediateContext->IASetIndexBuffer(dxIB->pBuffer,

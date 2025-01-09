@@ -196,13 +196,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   **/
   SPtr<Texture>
   createTextureDX(unsigned char* _data,
-                uint32 _bpp,
-                uint32 _width,
-                uint32 _height,
-                uint32 _format,
-                uint32 _usage,
-                uint32 _bindFlags,
-                bool _mipLevels);
+                  uint32 _bpp,
+                  uint32 _width,
+                  uint32 _height,
+                  uint32 _format,
+                  uint32 _usage,
+                  uint32 _bindFlags,
+                  bool _mipLevels);
 
   /**
   * Set input layout

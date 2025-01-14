@@ -15,5 +15,19 @@
     <ClCompile Include="source\pkCoreTest.cpp">
       <Filter>source\main</Filter>
     </ClCompile>
+    <ClCompile Include="source\testApp.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Player.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\testApp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Player.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

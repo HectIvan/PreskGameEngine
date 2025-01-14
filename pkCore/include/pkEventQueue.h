@@ -26,7 +26,7 @@
 namespace pkEngineSDK
 {
 
-class EventQueue
+class PK_CORE_EXPORT EventQueue
 {
  public:
   EventQueue() = default;

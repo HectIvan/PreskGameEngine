@@ -20,6 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkCoreTest.cpp" />
+    <ClCompile Include="source\Player.cpp" />
+    <ClCompile Include="source\testApp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\testApp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

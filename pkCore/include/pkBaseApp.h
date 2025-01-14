@@ -45,6 +45,57 @@ class PK_CORE_EXPORT BaseApp
   virtual ~BaseApp() = default;
 
   /**
+  * Initialize the app.
+  **/
+  void
+  init(const char** _argv);
+
+  /**
+  * On initializing the app.
+  **/
+  virtual void
+  onInit() {}
+
+  /**
+  * Initialize the app window.
+  **/
+  void
+  initWindow();
+
+  /**
+  * Initialize the api.
+  **/
+  void
+  initAPI(const char** _argv);
+
+  /**
+  * Event message loop.
+  * 
+  * @param _api
+  * API to use.
+  **/
+  void
+  messageLoop();
+
+  /**
+  * update function for any child class of this base app
+  **/
+  virtual void
+  onUpdate(float _deltaTime) {}
+
+  /**
+  * Render the scene.
+  **/
+  void
+  render();
+
+  /**
+  * render function for any child class of this base class
+  **/
+  virtual void
+  onRender() {}
+
+  /**
   * Insert a new game object into the scene or as
   * a child of another gameObject.
   * 
@@ -66,38 +117,15 @@ class PK_CORE_EXPORT BaseApp
                 Matrix4 _transform = Matrix4::IDENTITY,
                 SPtr<GameObject> _pParent = nullptr);
 
+ private:
   /**
-  * Initialize the app.
-  **/
-  void
-  init(const char** _argv);
-
-  /**
-  * Initialize the app window.
-  **/
-  void
-  initWindow();
-
-  /**
-  * Initialize the api.
-  **/
-  void
-  initAPI(const char** _argv);
-
-  /**
-  * Create the constant buffers needed.
-  **/
-  void
-  createBuffers();
-
-  /**
-  * Event message loop.
+  * Update the camera.
   * 
-  * @param _api
-  * API to use.
+  * @param _pCamera
+  * Camera to update.
   **/
   void
-  messageLoop();
+  updateCamera(Camera* _pCamera);
 
   /**
   * Loads a model from a file.
@@ -109,13 +137,10 @@ class PK_CORE_EXPORT BaseApp
   loadModel(String& _fileName);
 
   /**
-  * Update the camera.
-  * 
-  * @param _pCamera
-  * Camera to update.
+  * Create the constant buffers needed.
   **/
   void
-  updateCamera(Camera* _pCamera);
+  createBuffers();
 
   /**
   * Set the buffers of each game object.
@@ -134,22 +159,6 @@ class PK_CORE_EXPORT BaseApp
   **/
   void
   PSSetConstantBuffers();
-
-  /**
-  * Gets the time elapsed between frames.
-  * 
-  * @return
-  * The deltaTime.
-  **/
-  float
-  getDeltaTime(high_resolution_clock::time_point& _delta);
-
-  /**
-  * Render the scene.
-  **/
-  void
-  render();
-
   /**
   * Render the game objects in scene.
   **/

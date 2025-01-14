@@ -139,9 +139,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+  onInit();
   cameraSpeed = 5.0f;
-  newGameObject("Shadow_Leviathan_anim.fbx");
-  messageLoop();
 }
 
 void
@@ -192,6 +191,20 @@ BaseApp::createBuffers()
   cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(Light)), nullptr, 0);
 }
 
+
+float
+getDeltaTime(high_resolution_clock::time_point& _delta)
+{
+  // get the current time
+  high_resolution_clock::time_point end = high_resolution_clock::now();
+  // subtract the previous time to the current time to get the difference (delta time)
+  float deltaTime = duration<float>(end - _delta).count();
+  // previous time is now the current time
+  _delta = high_resolution_clock::now();
+  // return the difference
+  return deltaTime;
+}
+
 void
 BaseApp::messageLoop()
 {
@@ -206,45 +219,10 @@ BaseApp::messageLoop()
     eventQueue.windowInput();
     // update the delta time
     float deltaTime = getDeltaTime(delta);
-    // update the camera speed
-    float camSpeed = cameraSpeed * deltaTime;
+    // child class update
+    onUpdate(deltaTime);
+    // event queue
     eventQueue.poll();
-    // move forward/backward
-    if (eventQueue.iskeyPressed(KEY::kW)) {
-      camera.move(Vector3(0.0f, 0.0f, camSpeed));
-    }
-    if (eventQueue.iskeyPressed(KEY::kS)) {
-      camera.move(Vector3(0.0f, 0.0f, -camSpeed));
-    }
-    // move left/right
-    if (eventQueue.iskeyPressed(KEY::kA)) {
-      camera.move(Vector3(-camSpeed, 0.0f, 0.0f));
-    }
-    if (eventQueue.iskeyPressed(KEY::kD)) {
-      camera.move(Vector3(camSpeed, 0.0f, 0.0f));
-    }
-    // move up/down
-    if (eventQueue.iskeyPressed(KEY::kE) ||
-        eventQueue.iskeyPressed(KEY::kSpace)) {
-      camera.move(Vector3(0.0f, camSpeed, 0.0f));
-    }
-    if (eventQueue.iskeyPressed(KEY::kQ) ||
-        eventQueue.iskeyPressed(KEY::kLControl)) {
-      camera.move(Vector3(0.0f, -camSpeed, 0.0f));
-    }
-    // rotate world
-    if (eventQueue.iskeyPressed(KEY::kLeft)) {
-      camera.rotate(0.0f, 1.0f * deltaTime, 0.0f);
-    }
-    if (eventQueue.iskeyPressed(KEY::kRight)) {
-      camera.rotate(0.0f, -1.0f * deltaTime, 0.0f);
-    }
-    if (eventQueue.iskeyPressed(KEY::kDown)) {
-      camera.rotate(1.0f * deltaTime, 0.0f, 0.0f);
-    }
-    if (eventQueue.iskeyPressed(KEY::kUp)) {
-      camera.rotate(-1.0f * deltaTime, 0.0f, 0.0f);
-    }
     // mouse input
     if (eventQueue.iskeyPressed(KEY::kLButton)) {
       Vector2 posDif = (lastCursorPos - eventQueue.mousePosition) * deltaTime;
@@ -257,14 +235,6 @@ BaseApp::messageLoop()
     }
     if (eventQueue.iskeyPressed(KEY::kRButton)) {}
     if (eventQueue.iskeyPressed(KEY::kCButton)) {}
-    // backspace input
-    if (eventQueue.iskeyPressed(KEY::kBackSpace)) {
-      // if the game object pool is not empty
-      if (!gameObjects.empty()) {
-        // pop the last gameobject
-        gameObjects.pop_back();
-      }
-    }
     // update camera
     updateCamera(&camera);
     // render the scene
@@ -332,22 +302,11 @@ BaseApp::PSSetConstantBuffers()
   api.PSSetConstantBuffer(cbLight, 3, 1);
 }
 
-float
-BaseApp::getDeltaTime(high_resolution_clock::time_point& _delta)
-{
-  // get the current time
-  high_resolution_clock::time_point end = high_resolution_clock::now();
-  // subtract the previous time to the current time to get the difference (delta time)
-  float deltaTime = duration<float>(end - _delta).count();
-  // previous time is now the current time
-  _delta = high_resolution_clock::now();
-  // return the difference
-  return deltaTime;
-}
-
 void
 BaseApp::render()
 {
+  // on render child specific function call
+  onRender();
   // get the api instance
   GraphicsAPI& api = GraphicsAPI::instance();
   // screen clear color

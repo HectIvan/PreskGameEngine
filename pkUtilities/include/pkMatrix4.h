@@ -193,8 +193,6 @@ class PK_UTILITY_EXPORT Matrix4
   Matrix4
   operator*=(const Matrix4& other)
   {
-    Matrix4 result;
-    
     float x = matrix[0][0];
     float y = matrix[0][1];
     float z = matrix[0][2];

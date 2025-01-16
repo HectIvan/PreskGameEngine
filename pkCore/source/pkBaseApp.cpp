@@ -48,22 +48,13 @@ insertGameObject(SPtr<GameObject> _pObject, Vector<SPtr<GameObject>>& _vector)
   _vector.push_back(_pObject);
 }
 
-/**
-* Create a material from a file.
-* 
-* @param _fileName
-* Name of th file to search for.
-* 
-* @return
-* The material Shared pointer.
-**/
 SPtr<Material>
-createMaterial(String& _fileName)
+BaseApp::newMaterial(String _textureName)
 {
   // get api instance
   GraphicsAPI& api = GraphicsAPI::instance();
   // create the texture adress
-  String textureName = "textures/" + _fileName;
+  String textureName = "textures/" + _textureName;
   // create the texture
   SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
   // if creating the texture failed, return the model without a texture
@@ -76,33 +67,13 @@ createMaterial(String& _fileName)
 }
 
 void
-BaseApp::newGameObject(String _modelName,
-                       String _textureName,
-                       Matrix4 _transform,
+BaseApp::newGameObject(Matrix4 _transform,
                        SPtr<GameObject> _pParent)
 {
   // insert the game object into the vector of game objects
   SPtr<GameObject> gObject = createGameObject();
   // set the gameObject transform
   gObject->setTransform(_transform);
-  // load the model
-  SPtr<Model> model = loadModel(_modelName);
-  // create a material
-  for (uint32 i = 0; i < model->meshes.size(); ++i) {
-    model->meshes[i].material = createMaterial(model->meshes[i].materialPath);
-  }
-  // if the material creation was successful (a default texture was found)
-  SPtr<Material> pMat = make_shared<Material>();
-  if (pMat = createMaterial(_textureName)) {
-    gObject->addComponent(pMat);
-  }
-  // add the components
-  gObject->addComponent(model);
-  /**
-  * set the game objects parent as a null, it will be reassigned if the gameObject is supposed
-  * to have a parent
-  **/
-  gObject->parent = nullptr;
   // if the parent is not a nullptr (there is a parent that will have this game object)
   if (_pParent) {
     // insert the current gameObject to the children vector of the parent
@@ -112,6 +83,18 @@ BaseApp::newGameObject(String _modelName,
   }
   // otherwise, the object is part of the scene
   else { insertGameObject(gObject, gameObjects); }
+}
+
+SPtr<Model>
+BaseApp::newModel(String _modelName)
+{
+  // load the model
+  SPtr<Model> model = loadModel(_modelName);
+  // create a material
+  for (uint32 i = 0; i < model->meshes.size(); ++i) {
+    model->meshes[i].material = newMaterial(model->meshes[i].materialPath);
+  }
+  return model;
 }
 
 /*********************************************/
@@ -139,8 +122,8 @@ BaseApp::init(const char** _argv)
               Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  onInit();
   cameraSpeed = 5.0f;
+  onInit();
 }
 
 void

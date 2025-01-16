@@ -112,10 +112,32 @@ class PK_CORE_EXPORT BaseApp
   * If the gameobject will be the child of a game object.
   **/
   void
-  newGameObject(String _modelName = "",
-                String _textureName = "",
-                Matrix4 _transform = Matrix4::IDENTITY,
+  newGameObject(Matrix4 _transform = Matrix4::IDENTITY,
                 SPtr<GameObject> _pParent = nullptr);
+
+  /**
+  * Create a new model component.
+  * 
+  * @param _modelName
+  * Name of the model file to load.
+  * 
+  * @return
+  * Pointer to the new model object.
+  **/
+  SPtr<Model>
+  newModel(String _modelName = "");
+
+  /**
+  * Create a new Material component.
+  * 
+  * @param _textureName
+  * Nameof the texture file to load.
+  * 
+  * @return
+  * Pointer to the new material object.
+  **/
+  SPtr<Material>
+  newMaterial(String _textureName = "");
 
  private:
   /**

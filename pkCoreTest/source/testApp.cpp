@@ -7,8 +7,13 @@ using pkEngineSDK::Key;
 void
 TestApp::onInit()
 {
+  // create the player.
   player = new Player();
-  newGameObject("sprite.fbx", "circle.png");
+  // create a new game object.
+  newGameObject();
+  // assign a new model component to the game object.
+  gameObjects[0]->addComponent(newModel("Shadow_Leviathan_anim.fbx"));
+  // add the game object to the player.
   player->gameObject = gameObjects[0];
 }
 
@@ -37,7 +42,7 @@ TestApp::onUpdate(float _deltaTime)
     camera.move(Vector3(0.0f, camSpeed, 0.0f));
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
-    eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
+      eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
     camera.move(Vector3(0.0f, -camSpeed, 0.0f));
   }
   // rotate world

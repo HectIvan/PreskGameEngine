@@ -15,6 +15,9 @@ TestApp::onInit()
   gameObjects[0]->addComponent(newModel("Shadow_Leviathan_anim.fbx"));
   // add the game object to the player.
   player->gameObject = gameObjects[0];
+
+  player->speed = 5.0f;
+  player->friction = 0.1f;
 }
 
 void
@@ -47,17 +50,24 @@ TestApp::onUpdate(float _deltaTime)
   }
   // rotate world
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    player->move(_deltaTime, Vector3( -5.0f, 0.0f, 0.0f));
+    player->innertia += player->speed * _deltaTime;
+    player->move(_deltaTime, Vector3(-player->innertia, 0.0f, 0.0f));
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    player->move(_deltaTime, Vector3(5.0f, 0.0f, 0.0f));
+    player->innertia += player->speed * _deltaTime;
+    player->move(_deltaTime, Vector3(player->innertia, 0.0f, 0.0f));
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    player->move(_deltaTime, Vector3(0.0f, -5.0f, 0.0f));
+    player->innertia += player->speed * _deltaTime;
+    player->move(_deltaTime, Vector3(0.0f, -player->innertia, 0.0f));
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    player->move(_deltaTime, Vector3(0.0f, 5.0f, 0.0f));
+    player->innertia += player->speed * _deltaTime;
+    player->move(_deltaTime, Vector3(0.0f, player->innertia, 0.0f));
   }
+  if (player->innertia > player->speed) { player->innertia = player->speed; }
+  player->innertia -= player->friction * _deltaTime;
+  if (player->innertia < 0) { player->innertia = 0.0f; }
   // backspace input
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kBackSpace)) {
     // if the game object pool is not empty

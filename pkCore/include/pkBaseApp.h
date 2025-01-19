@@ -139,6 +139,38 @@ class PK_CORE_EXPORT BaseApp
   SPtr<Material>
   newMaterial(String _textureName = "");
 
+  /**
+  * Find a game object by name.
+  * 
+  * @param _objectName
+  * Name of the object.
+  * 
+  * @return
+  * Pointer to the game object.
+  **/
+  SPtr<GameObject>
+  gameObjectFind(String _objectName);
+
+  /**
+  * Get a game object with a specific component.
+  * 
+  * @return
+  * A pointer to the game object.
+  **/
+  template<typename T>
+  SPtr<GameObject>
+  getGameObjectWithComponent();
+
+  /**
+  * Get a vector with all game objects with a specific component.
+  *
+  * @return
+  * A vector of game objects.
+  **/
+  template<typename T>
+  Vector<SPtr<GameObject>>
+  getAllGameObjectsWithComponent();
+
  private:
   /**
   * Update the camera.

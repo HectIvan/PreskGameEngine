@@ -9,15 +9,24 @@ using pkEngineSDK::SPtr;
 
 class Player
 {
-public:
+ public:
   Player() = default;
   virtual ~Player() = default;
 
+  /**
+  * Move the player.
+  * 
+  * @param _deltaTime
+  * Time between the previous frame and the current one.
+  * 
+  * @param _direction
+  * Direction in which the player will move.
+  **/
   void
   move(float _deltaTime, Vector3 _direction);
 
   float speed;
-  float acceleration;
+  float innertia;
   float friction;
   Vector3 position;
   SPtr<GameObject> gameObject;

@@ -208,5 +208,6 @@ class PK_CORE_EXPORT GameObject
   Vector<SPtr<GameObject>> children;
   SPtr<GameObject> parent;
   Matrix4 transform;
+  String name;
 };
 }

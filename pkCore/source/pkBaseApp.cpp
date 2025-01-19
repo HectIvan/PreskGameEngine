@@ -72,6 +72,8 @@ BaseApp::newGameObject(Matrix4 _transform,
 {
   // insert the game object into the vector of game objects
   SPtr<GameObject> gObject = createGameObject();
+  // set the gameObject name
+  gObject->name = "";
   // set the gameObject transform
   gObject->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this game object)
@@ -223,6 +225,53 @@ BaseApp::messageLoop()
     // render the scene
     render();
   }
+}
+
+SPtr<GameObject>
+BaseApp::gameObjectFind(String _objectName)
+{
+  // for each game object in the list
+  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+    // check if the name is the one we're looking for
+    if (gameObjects[i]->name == _objectName) {
+      return gameObjects[i];
+    }
+  }
+  // if no game object fits the name
+  return nullptr;
+}
+
+template<typename T>
+SPtr<GameObject>
+BaseApp::getGameObjectWithComponent()
+{
+  // check each game object
+  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+    // check if the data type return is not null
+    SPtr<T> check = gameObjects[i]->getComponent<T>();
+    if (check) {
+      // if its not null, return the final value
+      return gameObjects[i];
+    }
+  }
+}
+
+template<typename T>
+Vector<SPtr<GameObject>>
+BaseApp::getAllGameObjectsWithComponent()
+{
+  // game object list
+  Vector<SPtr<GameObject>> list;
+  // check each game object
+  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+    // check if the data type return is not null
+    SPtr<T> check = gameObjects[i]->getComponent<T>();
+    if (check) {
+      // if its not null, return the final value
+      list.push_back(gameObjects[i]);
+    }
+  }
+  return list;
 }
 
 void

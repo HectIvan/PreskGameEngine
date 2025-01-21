@@ -26,8 +26,9 @@ class Player
   move(float _deltaTime, Vector3 _direction);
 
   float speed;
+  float maxSpeed;
   float innertia;
-  float friction;
+  float acceleration;
   Vector3 position;
   SPtr<GameObject> gameObject;
 };

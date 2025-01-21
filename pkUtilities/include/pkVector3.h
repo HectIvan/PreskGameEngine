@@ -431,6 +431,21 @@ class PK_UTILITY_EXPORT Vector3
   clamp(float _x, float _y);
 
   /**
+  * Gets the reflected vector off a normal.
+  * 
+  * @param _direction
+  * The vector to reflect.
+  * 
+  * @param _normal
+  * The normal of the surface collision.
+  * 
+  * @return
+  * The reflected vector.
+  **/
+  FORCEINLINE Vector3
+  reflect(Vector3 _direction, Vector3 _normal);
+
+  /**
   * Calculate the dot product of one vector with this one.
   * 
   * @param _this

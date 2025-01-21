@@ -402,6 +402,7 @@ BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
     while (parent) {
       // add the parent transform to the current transform matrix
       transform += parent->transform;
+      std::cout << transform.getTranslationVector().x << std::endl;
       // the next parent will be the parent of this parent
       parent = parent->parent;
     }

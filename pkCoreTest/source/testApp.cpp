@@ -1,7 +1,10 @@
 #include "testApp.h"
 #include "pkVector3.h"
+#include "pkVector2.h"
 
 using pkEngineSDK::Vector3;
+using pkEngineSDK::Vector2;
+using pkEngineSDK::Matrix4;
 using pkEngineSDK::Key;
 
 void
@@ -17,13 +20,49 @@ TestApp::onInit()
   player->gameObject = gameObjects[0];
 
   player->speed = 5.0f;
-  player->friction = 0.1f;
+  player->acceleration = 0.1f;
 }
 
 void
 TestApp::onUpdate(float _deltaTime)
 {
-  // update the camera speed
+  Vector2 axis(0);
+  // rotate world
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
+    axis.x = -1.0f;
+  }
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+    axis.x = 1.0f;
+  }
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+    axis.y = -1.0f;
+  }
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+    axis.y = 1.0f;
+  }
+
+  float move = axis.x;
+  float rotate = -axis.y;
+
+  // manage innertia
+  if (move > 0) { player->speed += player->acceleration * _deltaTime; }
+  else { player->speed -= player->acceleration * _deltaTime; }
+
+  // clamp speed
+  if (player->speed > player->maxSpeed) { player->speed = player->maxSpeed; }
+  if (player->speed < 0) { player->speed = 0; }
+
+  // move forward
+  // Vector3 newPos = transform.right * (speed * Time.deltaTime);
+  // player->gameObject->transform.setTransation() += player->gameObject->transform.getTranslation()
+
+  // object rotation
+  // transform.Rotate(new Vector3(0, 0, rotSpeed * Time.deltaTime * rotate));
+  // UpdateWindow();
+}
+
+/**
+// update the camera speed
   float camSpeed = cameraSpeed * _deltaTime;
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
@@ -48,32 +87,4 @@ TestApp::onUpdate(float _deltaTime)
       eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
     camera.move(Vector3(0.0f, -camSpeed, 0.0f));
   }
-  // rotate world
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    player->innertia += player->speed * _deltaTime;
-    player->move(_deltaTime, Vector3(-player->innertia, 0.0f, 0.0f));
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    player->innertia += player->speed * _deltaTime;
-    player->move(_deltaTime, Vector3(player->innertia, 0.0f, 0.0f));
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    player->innertia += player->speed * _deltaTime;
-    player->move(_deltaTime, Vector3(0.0f, -player->innertia, 0.0f));
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    player->innertia += player->speed * _deltaTime;
-    player->move(_deltaTime, Vector3(0.0f, player->innertia, 0.0f));
-  }
-  if (player->innertia > player->speed) { player->innertia = player->speed; }
-  player->innertia -= player->friction * _deltaTime;
-  if (player->innertia < 0) { player->innertia = 0.0f; }
-  // backspace input
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kBackSpace)) {
-    // if the game object pool is not empty
-    if (!gameObjects.empty()) {
-      // pop the last gameobject
-      gameObjects.pop_back();
-    }
-  }
-}
+**/

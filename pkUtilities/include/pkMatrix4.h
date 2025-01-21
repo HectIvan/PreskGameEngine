@@ -303,6 +303,9 @@ class PK_UTILITY_EXPORT Matrix4
   static Matrix4
   translation(Vector3& _position);
 
+  void
+  setTransation(Vector3 _pos);
+
   /**
   * Get the current matrix translation.
   * 
@@ -311,6 +314,15 @@ class PK_UTILITY_EXPORT Matrix4
   **/
   Matrix4
   getTranslation();
+
+  /**
+  * Get the current translation in a Vector3
+  * 
+  * @return
+  * The translation Vector.
+  **/
+  Vector3
+  getTranslationVector();
   
   /**
   * Translation matrix.
@@ -493,8 +505,10 @@ class PK_UTILITY_EXPORT Matrix4
                    float _farZ);
 
   static Matrix4
-  orthographicFOVLH(float _width,
-                    float _height,
+  orthographicFOVLH(float _left,
+                    float _right,
+                    float _top,
+                    float _bottom,
                     float _nearZ,
                     float _farZ);
 

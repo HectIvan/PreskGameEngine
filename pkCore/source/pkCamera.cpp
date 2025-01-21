@@ -19,15 +19,17 @@ Camera::init(uint32 _width,
   at = _at;
   up = _up;
   view = Matrix4::lookAtLH(eye, at, up);
-  // projection = Matrix4::orthographicFOVLH(static_cast<float>(_width),
-  //                                         static_cast<float>(_height),
-  //                                         _nearZ,
-  //                                         _farZ);
-  projection = Matrix4::perspectiveFOVLH(_halfFOV,
-                                         static_cast<float>(_width),
-                                         static_cast<float>(_height),
-                                         _nearZ,
-                                         _farZ);
+   projection = Matrix4::orthographicFOVLH(static_cast<float>(width) * -0.5f,
+                                           static_cast<float>(width) * 0.5f,
+                                           static_cast<float>(height) * -0.5f,
+                                           static_cast<float>(height) * 0.5f,
+                                           _nearZ,
+                                           _farZ);
+  // projection = Matrix4::perspectiveFOVLH(_halfFOV,
+  //                                        static_cast<float>(_width),
+  //                                        static_cast<float>(_height),
+  //                                        _nearZ,
+  //                                        _farZ);
   rotation = Vector3(0.0f);
 }
 

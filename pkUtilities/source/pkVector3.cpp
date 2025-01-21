@@ -76,6 +76,12 @@ Vector3::clamp(float _x, float _y)
   z = Math::clamp(z, _x, _y);
 }
 
+Vector3
+Vector3::reflect(Vector3 _direction, Vector3 _normal)
+{
+  return _direction + _normal * (-2.0f * (Vector3::dotProd(_direction, _normal)));
+}
+
 float
 Vector3::dotProd(const Vector3 _this, const Vector3 _other)
 {

@@ -124,6 +124,14 @@ Matrix4::translation(Vector3& _position)
   return M;
 }
 
+void
+Matrix4::setTransation(Vector3 _pos)
+{
+  matrix[0][3] = _pos.x;
+  matrix[1][3] = _pos.y;
+  matrix[2][3] = _pos.z;
+}
+
 Matrix4
 Matrix4::getTranslation()
 {
@@ -132,6 +140,12 @@ Matrix4::getTranslation()
   M.matrix[1][3] = matrix[1][3];
   M.matrix[2][3] = matrix[2][3];
   return M;
+}
+
+Vector3
+Matrix4::getTranslationVector()
+{
+  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
 
 Matrix4
@@ -321,15 +335,22 @@ Matrix4::perspectiveFOVLH(float _halfFOV, float _width, float _height, float _ne
 }
 
 Matrix4
-Matrix4::orthographicFOVLH(float _width, float _height, float _nearZ, float _farZ)
+Matrix4::orthographicFOVLH(float _left,
+                           float _right,
+                           float _top,
+                           float _bottom,
+                           float _nearZ,
+                           float _farZ)
 {
-  float fRange = 1.0f / (_farZ - _nearZ);
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][0] = 2.0f / (_right - _left);
+  M.matrix[0][3] = -(_right + _left) / (_right - _left);
 
-  Matrix4 M(0.0f);
-  M.matrix[0][0] = 2.0f / _width;
-  M.matrix[1][1] = 2.0f / _height;
-  M.matrix[2][2] = fRange;
-  M.matrix[3][2] = -fRange * _nearZ;
+  M.matrix[1][1] = 2.0f / (_top - _bottom);
+  M.matrix[1][3] = -(_top + _bottom) / (_top - _bottom);
+
+  M.matrix[2][2] = 1.0f / (_farZ - _nearZ);
+  M.matrix[2][3] = -_nearZ / (_farZ - _nearZ);
   return M;
 }
 }

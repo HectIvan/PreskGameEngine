@@ -1,8 +1,10 @@
 #pragma once
+#include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkGameObject.h"
 #include "pkPrerequisitesCore.h"
 
+using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::GameObject;
 using pkEngineSDK::SPtr;
@@ -25,10 +27,12 @@ class Player
   void
   move(float _deltaTime, Vector3 _direction);
 
-  float speed;
-  float maxSpeed;
-  float innertia;
-  float acceleration;
-  Vector3 position;
-  SPtr<GameObject> gameObject;
+ public:
+  float m_speed;
+  float m_maxSpeed;
+  float m_innertia;
+  float m_acceleration;
+  Vector3 m_position;
+  Vector2 m_direction;
+  SPtr<GameObject> m_gameObject;
 };

@@ -52,6 +52,9 @@ class Material : public Component
   setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
 
  public:
+  String m_name;
+  bool m_castShadow;
+  bool m_receiveShadows;
   SPtr<Texture> diffuse;
   SPtr<Texture> metallic;
   SPtr<Texture> normal;

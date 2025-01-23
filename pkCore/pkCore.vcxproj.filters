@@ -159,6 +159,9 @@
     <ClInclude Include="include\pkSprite.h">
       <Filter>include\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkFrustum.h">
+      <Filter>include\camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

@@ -304,7 +304,7 @@ class PK_UTILITY_EXPORT Matrix4
   translation(Vector3& _position);
 
   void
-  setTransation(Vector3 _pos);
+  setTranslation(Vector3 _pos);
 
   /**
   * Get the current matrix translation.
@@ -356,6 +356,15 @@ class PK_UTILITY_EXPORT Matrix4
   **/
   void
   setScale(Matrix4 _scale);
+
+  /**
+  * Set the scale of the matrix.
+  * 
+  * @param _scale
+  * New scale.
+  **/
+  void
+  setScale(Vector3 _scale);
   
   /**
   * rotation matrix.

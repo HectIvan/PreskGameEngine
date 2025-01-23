@@ -125,7 +125,7 @@ Matrix4::translation(Vector3& _position)
 }
 
 void
-Matrix4::setTransation(Vector3 _pos)
+Matrix4::setTranslation(Vector3 _pos)
 {
   matrix[0][3] = _pos.x;
   matrix[1][3] = _pos.y;
@@ -173,6 +173,14 @@ Matrix4::setScale(Matrix4 _scale)
   matrix[3][0] = _scale.matrix[0][0];
   matrix[3][1] = _scale.matrix[1][1];
   matrix[3][2] = _scale.matrix[2][2];
+}
+
+void
+Matrix4::setScale(Vector3 _scale)
+{
+  matrix[3][0] = _scale.x;
+  matrix[3][1] = _scale.y;
+  matrix[3][2] = _scale.z;
 }
 
 Matrix4

@@ -88,7 +88,7 @@ class PK_UTILITY_EXPORT Transform
   * The desired scale matrix.
   **/
   void
-  setScale(Matrix4 _scale);
+  setScale(Vector3 _scale);
 
   /**
   * Set translation
@@ -99,9 +99,12 @@ class PK_UTILITY_EXPORT Transform
   * The desired translation matrix.
   **/
   void
-  setTranslation(Matrix4 _translation);
+  setTranslation(Vector3 _translation);
 
  public:
+  Vector3 position;
+  Vector3 scale;
+  Vector3 rotation;
   Matrix4 transform;
 };
 }

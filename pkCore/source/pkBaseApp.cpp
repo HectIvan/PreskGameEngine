@@ -121,7 +121,7 @@ BaseApp::init(const char** _argv)
               3.1416f / 4.0f,
               0.01f,
               1000.0f,
-              Vector4(0.0f, 10.0f, -30.0f, 1.0f), // w is position in 1
+              Vector4(0.0f, 0.0f, -30.0f, 1.0f), // w is position in 1
               Vector4(0.0f, 1.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   cameraSpeed = 5.0f;
@@ -209,6 +209,31 @@ BaseApp::messageLoop()
     // event queue
     eventQueue.poll();
     // mouse input
+    // update the camera m_speed
+    float camm_speed = cameraSpeed * deltaTime;
+    // move forward/backward
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
+      camera.move(Vector3(0.0f, 0.0f, camm_speed));
+    }
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
+      camera.move(Vector3(0.0f, 0.0f, -camm_speed));
+    }
+    // move left/right
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
+      camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
+    }
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
+      camera.move(Vector3(camm_speed, 0.0f, 0.0f));
+    }
+    // move up/down
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
+      eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
+      camera.move(Vector3(0.0f, camm_speed, 0.0f));
+    }
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
+      eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
+      camera.move(Vector3(0.0f, -camm_speed, 0.0f));
+    }
     if (eventQueue.iskeyPressed(KEY::kLButton)) {
       Vector2 posDif = (lastCursorPos - eventQueue.mousePosition) * deltaTime;
       camera.rotate(-posDif.y, posDif.x, 0.0f);
@@ -374,10 +399,10 @@ renderModel(Model& _model)
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
-    if (_model.meshes[i].material) {
-      api.setShaderResourceView(_model.meshes[i].material->diffuse);
-      api.setSampler();
-    }
+    // if (_model.meshes[i].material) {
+    //   api.setShaderResourceView(_model.meshes[i].material->diffuse);
+    //   api.setSampler();
+    // }
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
       currentIndexOrigin,

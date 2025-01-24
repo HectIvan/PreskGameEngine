@@ -45,177 +45,153 @@ class PK_CORE_EXPORT BaseApp
   virtual ~BaseApp() = default;
 
   /**
-  * Initialize the app.
-  **/
+   * @brief Initialize the app.
+   */
   void
   init(const char** _argv);
 
   /**
-  * On initializing the app.
-  **/
+   * @brief On initializing the app.
+   */
   virtual void
   onInit() {}
 
   /**
-  * Initialize the app window.
-  **/
+   * @brief Initialize the app window.
+   */
   void
   initWindow();
 
   /**
-  * Initialize the api.
-  **/
+   * @brief Initialize the api.
+   */
   void
   initAPI(const char** _argv);
 
   /**
-  * Event message loop.
-  * 
-  * @param _api
-  * API to use.
-  **/
+   * @brief Event message loop.
+   * @param _api API to use.
+   */
   void
   messageLoop();
 
   /**
-  * update function for any child class of this base app
-  **/
+   * @brief Update function for any child class of this base app
+   */
   virtual void
   onUpdate(float _deltaTime) {}
 
   /**
-  * Render the scene.
-  **/
+   * @brief Fixed update of the engine
+   */
+  virtual void
+  fixedUpdate(float _baseDelta) {}
+
+  /**
+   * @brief Render the scene.
+   */
   void
   render();
 
   /**
-  * render function for any child class of this base class
-  **/
+   * @brief Render function for any child class of this base class
+   */
   virtual void
   onRender() {}
 
   /**
-  * Insert a new game object into the scene or as
-  * a child of another gameObject.
-  * 
-  * @param _modelName
-  * Name of the model file to search for.
-  * 
-  * @param _textureName
-  * Name of the texture file to search for.
-  * 
-  * @param _tranform
-  * Transform of the game object.
-  * 
-  * @param _pParent
-  * If the gameobject will be the child of a game object.
-  **/
+   * @brief Insert a new game object into the scene or as
+   * a child of another gameObject.
+   * @param _modelName Name of the model file to search for.
+   * @param _textureName Name of the texture file to search for.
+   * @param _tranform Transform of the game object.
+   * @param _pParent If the gameobject will be the child of a game object.
+   */
   void
   newGameObject(Matrix4 _transform = Matrix4::IDENTITY,
                 SPtr<GameObject> _pParent = nullptr);
 
   /**
-  * Create a new model component.
-  * 
-  * @param _modelName
-  * Name of the model file to load.
-  * 
-  * @return
-  * Pointer to the new model object.
-  **/
+   * @brief Create a new model component.
+   * @param _modelName Name of the model file to load.
+   * @return Pointer to the new model object.
+   */
   SPtr<Model>
   newModel(String _modelName = "");
 
   /**
-  * Create a new Material component.
-  * 
-  * @param _textureName
-  * Nameof the texture file to load.
-  * 
-  * @return
-  * Pointer to the new material object.
-  **/
+   * @brief Create a new Material component.
+   * @param _textureName Name of the texture file to load.
+   * @return Pointer to the new material object.
+   */
   SPtr<Material>
   newMaterial(String _textureName = "");
 
   /**
-  * Find a game object by name.
-  * 
-  * @param _objectName
-  * Name of the object.
-  * 
-  * @return
-  * Pointer to the game object.
-  **/
+   * @brief Find a game object by name.
+   * @param _objectName Name of the object.
+   * @return Pointer to the game object.
+   */
   SPtr<GameObject>
   gameObjectFind(String _objectName);
 
   /**
-  * Get a game object with a specific component.
-  * 
-  * @return
-  * A pointer to the game object.
-  **/
+   * @brief Get a game object with a specific component.
+   * @return A pointer to the game object.
+   */
   template<typename T>
   SPtr<GameObject>
   getGameObjectWithComponent();
 
   /**
-  * Get a vector with all game objects with a specific component.
-  *
-  * @return
-  * A vector of game objects.
-  **/
+   * @brief Get a vector with all game objects with a specific component.
+   * @return A vector of game objects.
+   */
   template<typename T>
   Vector<SPtr<GameObject>>
   getAllGameObjectsWithComponent();
 
  private:
   /**
-  * Update the camera.
-  * 
-  * @param _pCamera
-  * Camera to update.
-  **/
+   * @brief Update the camera.
+   * @param _pCamera Camera to update.
+   */
   void
   updateCamera(Camera* _pCamera);
 
   /**
-  * Loads a model from a file.
-  * 
-  * @param _path
-  * File path.
-  **/
+   * @brief Loads a model from a file.
+   * @param _path File path.
+   */
   SPtr<Model>
   loadModel(String& _fileName);
 
   /**
-  * Create the constant buffers needed.
-  **/
+   * @brief Create the constant buffers needed.
+   */
   void
   createBuffers();
 
   /**
-  * Set the buffers of each game object.
-  **/
+   * @brief Set the buffers of each game object.
+   */
   void
   setGameObjectsBuffers();
 
   /**
-  * Set the Vertex Shader constant buffers
-  **/
+   * @brief Set the Vertex Shader constant buffers
+   */
   void
   VSSetConstantBuffers();
 
   /**
-  * Set the Pixel Shader constant buffers
-  **/
+   * @brief Set the Pixel Shader constant buffers
+   */
   void
   PSSetConstantBuffers();
   /**
-  * Render the game objects in scene.
-  **/
+   * @brief Render the game objects in scene.
+   */
   void
   renderGameObjects(Vector<SPtr<GameObject>> _gameObjects);
 

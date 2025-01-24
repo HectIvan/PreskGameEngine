@@ -116,9 +116,11 @@ class PK_UTILITY_EXPORT Matrix4
     return result;
   }
   
-  // --------------------------------------------------------------//
-  // Matrix4 * Vector4
-  // --------------------------------------------------------------//
+  /**
+   * @brief Multiply a Vector by a Matrix
+   * @param other The vector to multiply
+   * @return
+   */
   FORCEINLINE Vector4
   operator*(const Vector4& other)
   {
@@ -139,9 +141,11 @@ class PK_UTILITY_EXPORT Matrix4
                    matrix[0][2] + matrix[1][2] + matrix[2][2],
                    other.w);
   }
-  // --------------------------------------------------------------//
-  // Matrix4 * Matrix4
-  // --------------------------------------------------------------//
+  /**
+   * @brief Multiply a matrix with another.
+   * @param Other The other matrix.
+   * @return The new matrix.
+   */
   Matrix4
   operator*(const Matrix4& other) const
   {
@@ -188,8 +192,10 @@ class PK_UTILITY_EXPORT Matrix4
   }
 
   /**
-  * Matrix4 *= Matrix4
-  **/
+   * @brief Multiply this matrix by another matrix.
+   * @brief other The other matrix.
+   * @return This matrix multiplied.
+   */
   Matrix4
   operator*=(const Matrix4& other)
   {
@@ -237,69 +243,39 @@ class PK_UTILITY_EXPORT Matrix4
   }
 
   /**
-  * transpose matrix.
-  *
-  * This function returns a copy of the transposed of this matrix.
-  *
-  * @return
-  * This matrix transposed.
-  **/
+   * @brief The transposed of this matrix.
+   * @return This matrix transposed.
+   */
   Matrix4
   getTransposed();
   
   /**
-  * scale matrix.
-  *
-  * This function scales a matrix to the desired scales.
-  * 
-  * @param _scaleX
-  * The scale on the X coordinate.
-  * 
-  * @param _scaleY
-  * The scale on the Y coordinate.
-  * 
-  * @param _scaleZ
-  * The scale on the Z coordinate.
-  *
-  * @return
-  * This matrix transposed.
-  **/
+   * @brief Scale a matrix to the desired scales.
+   * @param _scaleX The scale on the X coordinate.
+   * @param _scaleY The scale on the Y coordinate.
+   * @param _scaleZ The scale on the Z coordinate.
+   * @return This matrix transposed.
+   */
   static Matrix4
   matrixScaling(float& _scaleX, float& _scaleY, float& _scaleZ);
   
   /**
-  * Translation matrix.
-  *
-  * This function returns the translation matrix that is created from
-  * the 3 coordinates given to it.
-  * 
-  * @param offsetX
-  * coordinate at X
-  * 
-  * @param offsetY
-  * coordinate at Y
-  * 
-  * @param offsetZ
-  * coordinate at Z
-  *
-  * @return
-  * The translation matrix at the position given to it.
-  **/
+   * @brief The translation matrix that is created from
+   * the 3 coordinates given to it.
+   * @param offsetX Coordinate at X.
+   * @param offsetY Coordinate at Y.
+   * @param offsetZ Coordinate at Z.
+   * @return The translation matrix at the position given to it.
+   */
   static Matrix4
   translation(float& _offsetX, float& _offsetY, float& _offsetZ);
   
   /**
-  * Translation matrix.
-  *
-  * This function returns the translation matrix that is created from
-  * the Vector3 given to it.
-  *
-  * @param _position
-  * vector position
-  *
-  * @return
-  * The translation matrix at the position given to it.
-  **/
+   * @brief The translation matrix that is created from
+   * the Vector3 given to it.
+   * @param _position vector position.
+   * @return The translation matrix at the position given to it.
+   */
   static Matrix4
   translation(Vector3& _position);
 
@@ -307,205 +283,138 @@ class PK_UTILITY_EXPORT Matrix4
   setTranslation(Vector3 _pos);
 
   /**
-  * Get the current matrix translation.
-  * 
-  * @return
-  * The matrix translation.
-  **/
+   * @brief Get the current matrix translation.
+   * @return The matrix translation.
+   */
   Matrix4
   getTranslation();
 
   /**
-  * Get the current translation in a Vector3
-  * 
-  * @return
-  * The translation Vector.
-  **/
+   * @brief Get the current Vector3 translation.
+   * @return The Vector translation.
+   */
+  Vector3
+  getTranslation3();
+
+  /**
+   * @brief Get the current translation in a Vector3.
+   * @return The translation Vector.
+   */
   Vector3
   getTranslationVector();
   
   /**
-  * Translation matrix.
-  *
-  * This function returns the translation matrix that is created from
-  * the Vector3 given to it.
-  *
-  * @param _position
-  * vector position
-  *
-  * @return
-  * The translation matrix at the position given to it.
-  **/
+   * @brief The translation matrix that is created from
+   * the Vector3 given to it.
+   * @param _position Vector position.
+   * @return The translation matrix at the position given to it.
+   */
   static Matrix4
   scale(Vector3& _scale);
 
   /**
-  * Get the current scale matrix.
-  * 
-  * @return
-  * The scale matrix.
-  **/
+   * @brief Get the current scale matrix.
+   * @return The scale matrix.
+   */
   Matrix4
   getScale();
 
   /**
-  * Set the scale of the matrix.
-  * 
-  * @param _scale
-  * New scale.
-  **/
+   * @brief Set the scale of the matrix.
+   * @param _scale New scale.
+   */
   void
   setScale(Matrix4 _scale);
 
   /**
-  * Set the scale of the matrix.
-  * 
-  * @param _scale
-  * New scale.
-  **/
+   * @brief Set the scale of the matrix.
+   * @param _scale New scale.
+   */
   void
   setScale(Vector3 _scale);
   
   /**
-  * rotation matrix.
-  *
-  * This function returns the rotation matrix that is created from
-  * the Vector3 given to it.
-  *
-  * @param _angleX
-  * angle at X
-  * 
-  * @param _angleY
-  * angle at Y
-  *
-  * @param _angleZ
-  * angle at Z
-  *
-  * @return
-  * The rotation matrix at the rotations given to it.
-  **/
+   * @brief The rotation matrix that is created from
+   * the Vector3 given to it.
+   * @param _angleX Angle at X.
+   * @param _angleY Angle at Y.
+   * @param _angleZ Angle at Z.
+   * @return The rotation matrix at the rotations given to it.
+   */
   static Matrix4
   rotation(float& _angleX,
            float& _angleY,
            float& _angleZ);
 
   /**
-  * rotation matrix.
-  *
-  * This function returns the rotation matrix that is created from
-  * the Vector3 given to it.
-  *
-  * @param _rot
-  * vector rotations
-  *
-  * @return
-  * The rotation matrix at the rotations given to it.
-  **/
+   * @brief The rotation matrix that is created from
+   * the Vector3 given to it.
+   * @param _rot Vector rotations.
+   * @return The rotation matrix at the rotations given to it.
+   */
   static Matrix4
   rotation(Vector3& _rot);
   
   /**
-  * rotation matrix at Z.
-  *
-  * This function returns the rotation matrix at the z coordinate
-  * created from the angle given to it.
-  *
-  * @param angle
-  * angle to rotate
-  *
-  * @return
-  * The rotation matrix at z with the rotation given to it.
-  **/
+   * @brief The rotation matrix at the z coordinate.
+   * created from the angle given to it.
+   * @param angle angle to rotate.
+   * @return The rotation matrix at z with the rotation given to it.
+   */
   FORCEINLINE static Matrix4
   rotationZ(float& _angle);
   
   /**
-  * rotation matrix at Y.
-  *
-  * This function returns the rotation matrix at the y coordinate
-  * created from the angle given to it.
-  *
-  * @param angle
-  * angle to rotate
-  *
-  * @return
-  * The rotation matrix at y with the rotation given to it.
-  **/
+   * @brief The rotation matrix at the y coordinate.
+   * created from the angle given to it.
+   * @param angle angle to rotate.
+   * @return The rotation matrix at y with the rotation given to it.
+   */
   FORCEINLINE static Matrix4
   rotationY(float& _angle);
   
   /**
-  * rotation matrix at X.
-  *
-  * This function returns the rotation matrix at the x coordinate
-  * created from the angle given to it.
-  *
-  * @param angle
-  * angle to rotate
-  *
-  * @return
-  * The rotation matrix at x with the rotation given to it.
-  **/
+   * @brief The rotation matrix at the x coordinate.
+   * created from the angle given to it.
+   * @param angle angle to rotate.
+   * @return The rotation matrix at x with the rotation given to it.
+   */
   static Matrix4
   rotationX(float& _angle);
 
   /**
-  * Set the matrix rotation.
-  * 
-  * @param _rotation
-  * New matrix rotation.
-  **/
+   * @brief Set the matrix rotation.
+   * @param _rotation New matrix rotation.
+   */
   void
   setRotation(Matrix4 _rotation);
 
   /**
-  * Look at matrix.
-  * 
-  * @param _eyePos
-  * Value of the eye vector.
-  * 
-  * @param _atPos
-  * Value of the at vector.
-  * 
-  * @param _upPos
-  * Direction of the up vector.
-  **/
+   * @brief Look at matrix.
+   * @param _eyePos Value of the eye vector.
+   * @param _atPos Value of the at vector.
+   * @param _upPos Direction of the up vector.
+   */
   static Matrix4
   lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir);
 
   /**
-  * Matrix look to.
-  * 
-  * @param _eyePos
-  * Position of the eye.
-  * 
-  * @param _eyeDir
-  * Direction where its looking at.
-  * 
-  * @param _upDir
-  * Direction of the up vector.
-  **/
+   * @brief Matrix look to.
+   * @param _eyePos Position of the eye.
+   * @param _eyeDir Direction where its looking at.
+   * @param _upDir Direction of the up vector.
+   */
   static Matrix4
   lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir);
 
   /**
-  * Get the perspective matrix.
-  * 
-  * @param _halfFOV
-  * Half value of the field of view.
-  * 
-  * @param _width
-  * Width of the camera view.
-  * 
-  * @param _height
-  * Height of the camera view.
-  * 
-  * @param _nearZ
-  * Near Z distance.
-  * 
-  * @param _farZ
-  * Far Z distance.
-  **/
+   * @brief Get the perspective matrix.
+   * @param _halfFOV Half value of the field of view.
+   * @param _width Width of the camera view.
+   * @param _height Height of the camera view.
+   * @param _nearZ Near Z distance.
+   * @param _farZ Far Z distance.
+   */
   static Matrix4
   perspectiveFOVLH(float _halfFOV,
                    float _width,

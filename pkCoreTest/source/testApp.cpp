@@ -1,6 +1,7 @@
 #include "testApp.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
+#include "pkModel.h"
 
 #include <iostream>
 
@@ -8,6 +9,7 @@ using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Key;
+using pkEngineSDK::Model;
 
 void
 TestApp::onInit()
@@ -17,10 +19,16 @@ TestApp::onInit()
   // create a new game object.
   newGameObject();
   // assign a new model component to the game object.
-  gameObjects[0]->addComponent(newModel("Grass_Block.obj  "));
-  gameObjects[0]->addComponent(newMaterial("cube_Circle.png"));
+  gameObjects[0]->addComponent(newModel("sprite.fbx"));
+  gameObjects[0]->addComponent(newMaterial("circle.png"));
   // add the game object to the player.
   player->m_gameObject = gameObjects[0];
+
+  newGameObject(Matrix4::IDENTITY, gameObjects[0]);
+  player->m_gameObject->children[0]->addComponent(gameObjects[0]->getComponent<Model>());
+  player->m_gameObject->children[0]->addComponent(newMaterial("arrowRed.png"));
+  player->m_gameObject->children[0]->move(Vector3(-5.0f, 0.0f, 0.0f));
+  // player->m_gameObject->children[0]->setRotation(Vector3(0.0f, 0.0f, 3.14159f));
 
   player->m_speed = 0.0f;
   player->m_maxSpeed = 10.0f;
@@ -35,6 +43,7 @@ TestApp::onUpdate(float _deltaTime)
   // rotate world
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     player->m_direction.x += -1.0f * _deltaTime;
+    player->m_gameObject->children[0]->setRotation(Vector3(0.0f, 0.0f, -90.0f));
     input = true;
   }
   else {
@@ -42,6 +51,7 @@ TestApp::onUpdate(float _deltaTime)
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     player->m_direction.x += 1.0f * _deltaTime;
+    player->m_gameObject->children[0]->setRotation(Vector3(0.0f, 0.0f, 90.0f));
     input = true;
   }
   else {
@@ -49,6 +59,7 @@ TestApp::onUpdate(float _deltaTime)
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
     player->m_direction.y += 1.0f * _deltaTime;
+    player->m_gameObject->children[0]->setRotation(Vector3(0.0f, 0.0f, -180.0f));
     input = true;
   }
   else {
@@ -56,6 +67,7 @@ TestApp::onUpdate(float _deltaTime)
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     player->m_direction.y += -1.0f * _deltaTime;
+    player->m_gameObject->children[0]->setRotation(Vector3(0.0f, 0.0f, 180.0f));
     input = true;
   }
   else {
@@ -76,23 +88,10 @@ TestApp::onUpdate(float _deltaTime)
 
   player->move(_deltaTime, Vector3(player->m_direction.x * player->m_speed, player->m_direction.y * player->m_speed, 0.0f));
 
-  // manage innertia
-  // if (move > 0) { player->m_speed += player->m_acceleration * _deltaTime; }
-  // else { player->m_speed -= player->m_acceleration * _deltaTime; }
+  player->screenBounce(30, 17);
 
-  // clamp m_speed
   if (player->m_speed > player->m_maxSpeed) { player->m_speed = player->m_maxSpeed; }
   if (player->m_speed < 0) { player->m_speed = 0; }
 
-  // move forward
-  // Vector3 newPos = transform.right * (m_speed * Time.deltaTime);
-  // player->gameObject->transform.setTransation() += player->gameObject->transform.getTranslation()
-
-  // object rotation
-  // transform.Rotate(new Vector3(0, 0, rotm_speed * Time.deltaTime * rotate));
-  // UpdateWindow();
+  
 }
-
-/**
-
-**/

@@ -116,13 +116,13 @@ BaseApp::init(const char** _argv)
   api.createInputLayout();
   api.createSamplerState();
   createBuffers();
-  camera.init(window.getWidth(),
-              window.getHeight(),
+  camera.init(30, // window.getWidth(),
+              17, // window.getHeight(),
               3.1416f / 4.0f,
               0.01f,
               1000.0f,
               Vector4(0.0f, 0.0f, -30.0f, 1.0f), // w is position in 1
-              Vector4(0.0f, 1.0f, 0.0f, 1.0f),
+              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
               Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   cameraSpeed = 5.0f;
   onInit();
@@ -427,7 +427,6 @@ BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
     while (parent) {
       // add the parent transform to the current transform matrix
       transform += parent->transform;
-      std::cout << transform.getTranslationVector().x << std::endl;
       // the next parent will be the parent of this parent
       parent = parent->parent;
     }

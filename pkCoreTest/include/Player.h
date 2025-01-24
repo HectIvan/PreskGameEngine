@@ -27,6 +27,9 @@ class Player
   void
   move(float _deltaTime, Vector3 _direction);
 
+  void
+  screenBounce(float _width, float _height);
+
  public:
   float m_speed;
   float m_maxSpeed;

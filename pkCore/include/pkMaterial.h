@@ -34,11 +34,9 @@ class Material : public Component
   virtual ~Material() = default;
 
   /**
-  * Get the component type of this component.
-  * 
-  * @return
-  * The component type.
-  **/
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
   COMPONENT_TYPE::E
   getType() override { return COMPONENT_TYPE::kMaterial; }
 
@@ -46,8 +44,8 @@ class Material : public Component
   getObjType() { return COMPONENT_TYPE::kMaterial; }
 
   /**
-  * Set the diffuse texture of the material.
-  **/
+   * @brief Set the diffuse texture of the material.
+   */
   void
   setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
 

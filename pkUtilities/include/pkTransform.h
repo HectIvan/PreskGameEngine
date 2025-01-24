@@ -91,13 +91,13 @@ class PK_UTILITY_EXPORT Transform
   setScale(Vector3 _scale);
 
   /**
-  * Set translation
-  *
-  * Sets the desired transform translation.
-  *
-  * @param _translation
-  * The desired translation matrix.
-  **/
+   * Set translation
+   *
+   * Sets the desired transform translation.
+   *
+   * @param _translation
+   * The desired translation matrix.
+   */
   void
   setTranslation(Vector3 _translation);
 

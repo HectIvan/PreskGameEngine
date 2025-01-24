@@ -143,6 +143,12 @@ Matrix4::getTranslation()
 }
 
 Vector3
+Matrix4::getTranslation3()
+{
+  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
+}
+
+Vector3
 Matrix4::getTranslationVector()
 {
   return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);

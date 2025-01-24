@@ -50,16 +50,10 @@ class PK_UTILITY_EXPORT Vector3
   }
 
   /**
-  * multiplies a float to this Vector.
-  *
-  * This operator multiplies a float to this vector.
-  *
-  * @param other
-  * float with which the multiplication will be made.
-  *
-  * @return
-  * This vector with the multiplication done.
-  **/
+   * @brief Multiply a float to this vector.
+   * @param other float with which the multiplication will be made.
+   * @return This vector with the multiplication done.
+   */
   FORCEINLINE Vector3&
   operator*=(const float other)
   {

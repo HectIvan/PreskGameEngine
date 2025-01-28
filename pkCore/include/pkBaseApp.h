@@ -7,10 +7,12 @@
 *
 * This file contains the Base App of the engine
 *
-* @bug. Game object will have only one material, even when multiple exist.
+* @bug. Children will not follow their parent transform correctly.
 * 
-* @HectIvan 03/01/2025
-* correct mouse position update.
+* @HectIvan 27/01/2025
+* @brief Changed the children transform inheritance.
+* @brief Added a new function that allows to convert any actor into any class,
+* the value returned will depend on wether the cast was successful or not.
 */
 /************************************************************************/
 #pragma once
@@ -100,16 +102,14 @@ class PK_CORE_EXPORT BaseApp
   onRender() {}
 
   /**
-   * @brief Insert a new game object into the scene or as
-   * a child of another gameObject.
-   * @param _modelName Name of the model file to search for.
-   * @param _textureName Name of the texture file to search for.
-   * @param _tranform Transform of the game object.
-   * @param _pParent If the gameobject will be the child of a game object.
+   * @brief Insert a new actor into the scene or as
+   * a child of another actor.
+   * @param _tranform Transform of the actor.
+   * @param _pParent If the actor will be the child of another actor.
    */
   void
-  newGameObject(Matrix4 _transform = Matrix4::IDENTITY,
-                SPtr<GameObject> _pParent = nullptr);
+  instantiate(Matrix4 _transform = Matrix4::IDENTITY,
+              SPtr<Actor> _pParent = nullptr);
 
   /**
    * @brief Create a new model component.
@@ -128,28 +128,28 @@ class PK_CORE_EXPORT BaseApp
   newMaterial(String _textureName = "");
 
   /**
-   * @brief Find a game object by name.
-   * @param _objectName Name of the object.
-   * @return Pointer to the game object.
+   * @brief Find an actor by name.
+   * @param _actorName Name of the actor.
+   * @return Pointer to the actor.
    */
-  SPtr<GameObject>
-  gameObjectFind(String _objectName);
+  SPtr<Actor>
+  actorFind(String _actorName);
 
   /**
    * @brief Get a game object with a specific component.
    * @return A pointer to the game object.
    */
   template<typename T>
-  SPtr<GameObject>
-  getGameObjectWithComponent();
+  SPtr<Actor>
+  getActorWithComponent();
 
   /**
    * @brief Get a vector with all game objects with a specific component.
    * @return A vector of game objects.
    */
   template<typename T>
-  Vector<SPtr<GameObject>>
-  getAllGameObjectsWithComponent();
+  Vector<SPtr<Actor>>
+  getAllActorsWithComponent();
 
  private:
   /**
@@ -189,32 +189,42 @@ class PK_CORE_EXPORT BaseApp
    */
   void
   PSSetConstantBuffers();
+
+  /**
+   * @brief Converts the actor to a game object pointer.
+   * @param _subject Actor to convert.
+   * @return Pointer to the game object
+   */
+  template<typename T>
+  SPtr<T>
+  actorToClass(SPtr<Actor>& _subject);
+
   /**
    * @brief Render the game objects in scene.
    */
   void
-  renderGameObjects(Vector<SPtr<GameObject>> _gameObjects);
+  renderActors(Vector<SPtr<Actor>> _gameActors);
 
  public:
   // system
-  Window window;
-  Camera camera;
-  EventQueue eventQueue;
+  Window m_window;
+  Camera m_camera;
+  EventQueue m_eventQueue;
 
   // vector of game objects in the scene
-  Vector<SPtr<GameObject>> gameObjects;
+  Vector<SPtr<Actor>> m_gameActors;
 
   // light source
   Light light;
 
   // constant buffers
-  SPtr<ConstantBuffer> buffer;
-  SPtr<ConstantBuffer> cBView;
-  SPtr<ConstantBuffer> cBProjection;
-  SPtr<ConstantBuffer> cBWorld;
-  SPtr<ConstantBuffer> cbLight;
+  SPtr<ConstantBuffer> m_buffer;
+  SPtr<ConstantBuffer> m_cBView;
+  SPtr<ConstantBuffer> m_cBProjection;
+  SPtr<ConstantBuffer> m_cBWorld;
+  SPtr<ConstantBuffer> m_cbLight;
 
   // camera movement speed
-  float cameraSpeed;
+  float m_cameraSpeed;
 };
 }

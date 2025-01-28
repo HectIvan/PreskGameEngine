@@ -3,13 +3,13 @@
 void
 Player::move(float _deltaTime, Vector3 _direction)
 {
-  m_gameObject->move(_direction * _deltaTime);
+  m_actor->move(_direction * _deltaTime);
 }
 
 void
 Player::screenBounce(float _width, float _height)
 {
-  Vector3 direction = m_gameObject->transform.getTranslation3();
+  Vector3 direction = m_actor->m_transform.getTranslation3();
   if (direction.x < -_width * 0.5f ||
       direction.x > _width * 0.5f) {
     m_direction.x *= -1.0f;

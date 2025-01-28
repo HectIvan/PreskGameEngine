@@ -1,13 +1,15 @@
 #pragma once
+#include "pkActor.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkGameObject.h"
 #include "pkPrerequisitesCore.h"
 
-using pkEngineSDK::Vector2;
-using pkEngineSDK::Vector3;
+using pkEngineSDK::Actor;
 using pkEngineSDK::GameObject;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::Vector2;
+using pkEngineSDK::Vector3;
 
 class Player
 {
@@ -37,5 +39,5 @@ class Player
   float m_acceleration;
   Vector3 m_position;
   Vector2 m_direction;
-  SPtr<GameObject> m_gameObject;
+  SPtr<Actor> m_actor;
 };

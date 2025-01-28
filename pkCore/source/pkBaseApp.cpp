@@ -24,13 +24,13 @@ run(String _name, Window& _window);
 * @return
 * A game object shared pointer.
 **/
-SPtr<GameObject>
-createGameObject()
+SPtr<Actor>
+createActor()
 {
-  SPtr<GameObject> gObject = make_shared<GameObject>();
-  gObject->setTransform(Matrix4(0.0f));
-  gObject->setScale(Matrix4(1.0f));
-  return gObject;
+  SPtr<Actor> gActor = make_shared<Actor>();
+  gActor->setTransform(Matrix4(0.0f));
+  gActor->setScale(Matrix4(1.0f));
+  return gActor;
 }
 
 /**
@@ -43,9 +43,9 @@ createGameObject()
 * Vector where the game object will be inserted.
 **/
 void
-insertGameObject(SPtr<GameObject> _pObject, Vector<SPtr<GameObject>>& _vector)
+insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
 {
-  _vector.push_back(_pObject);
+  _vector.push_back(_pActor);
 }
 
 SPtr<Material>
@@ -67,24 +67,24 @@ BaseApp::newMaterial(String _textureName)
 }
 
 void
-BaseApp::newGameObject(Matrix4 _transform,
-                       SPtr<GameObject> _pParent)
+BaseApp::instantiate(Matrix4 _transform,
+                     SPtr<Actor> _pParent)
 {
   // insert the game object into the vector of game objects
-  SPtr<GameObject> gObject = createGameObject();
+  SPtr<Actor> gObject = createActor();
   // set the gameObject name
-  gObject->name = "";
+  gObject->m_name = "";
   // set the gameObject transform
   gObject->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this game object)
   if (_pParent) {
     // insert the current gameObject to the children vector of the parent
-    insertGameObject(gObject, _pParent->children);
+    insertActor(gObject, _pParent->m_children);
     // set the parent as the parent of the current game Object
-    gObject->parent = _pParent;
+    gObject->m_parent = _pParent;
   }
   // otherwise, the object is part of the scene
-  else { insertGameObject(gObject, gameObjects); }
+  else { insertActor(gObject, m_gameActors); }
 }
 
 SPtr<Model>
@@ -116,15 +116,15 @@ BaseApp::init(const char** _argv)
   api.createInputLayout();
   api.createSamplerState();
   createBuffers();
-  camera.init(30, // window.getWidth(),
-              17, // window.getHeight(),
-              3.1416f / 4.0f,
-              0.01f,
-              1000.0f,
-              Vector4(0.0f, 0.0f, -30.0f, 1.0f), // w is position in 1
-              Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-              Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-  cameraSpeed = 5.0f;
+  m_camera.init(30, // window.getWidth(),
+                17, // window.getHeight(),
+                3.1416f / 4.0f,
+                0.01f,
+                1000.0f,
+                Vector4(0.0f, 0.0f, -30.0f, 1.0f), // w is position in 1
+                Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+                Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+  m_cameraSpeed = 5.0f;
   onInit();
 }
 
@@ -135,7 +135,7 @@ BaseApp::initWindow()
   desc.width = 1920;
   desc.height = 1080;
   std::string name = "Game Engine Window";
-  window.create(desc, name);
+  m_window.create(desc, name);
 }
 
 void
@@ -145,11 +145,11 @@ BaseApp::initAPI(const char** _argv)
 
 #ifdef PK_DEBUG_MODE
   if (abstraction == "DX11API") {
-    run("pkDX11APId", window);
+    run("pkDX11APId", m_window);
   }
 #else
   if (abstraction == "DX11API") {
-    run("pkDX11API", window);
+    run("pkDX11API", m_window);
   }
 #endif
 }
@@ -170,10 +170,10 @@ void
 BaseApp::createBuffers()
 {
   GraphicsAPI& api = GraphicsAPI::instance();
-  cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  cBProjection = api.createConstantBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  cBWorld = api.createConstantBuffer(static_cast<uint32>(sizeof(CBWorld)), nullptr, 0);
-  cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(Light)), nullptr, 0);
+  m_cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
+  m_cBProjection = api.createConstantBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
+  m_cBWorld = api.createConstantBuffer(static_cast<uint32>(sizeof(CBWorld)), nullptr, 0);
+  m_cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(Light)), nullptr, 0);
 }
 
 
@@ -194,72 +194,72 @@ void
 BaseApp::messageLoop()
 {
   // last cursor position
-  Vector2 lastCursorPos = eventQueue.mousePosition;
+  Vector2 lastCursorPos = m_eventQueue.mousePosition;
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop, while the escape key has not been pressed
-  while (!eventQueue.iskeyPressed(KEY::kEsc))
+  while (!m_eventQueue.iskeyPressed(KEY::kEsc))
   {
     // event window specific input
-    eventQueue.windowInput();
+    m_eventQueue.windowInput();
     // update the delta time
     float deltaTime = getDeltaTime(delta);
     // child class update
     onUpdate(deltaTime);
     // event queue
-    eventQueue.poll();
+    m_eventQueue.poll();
     // mouse input
     // update the camera m_speed
-    float camm_speed = cameraSpeed * deltaTime;
+    float camm_speed = m_cameraSpeed * deltaTime;
     // move forward/backward
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-      camera.move(Vector3(0.0f, 0.0f, camm_speed));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
+      m_camera.move(Vector3(0.0f, 0.0f, camm_speed));
     }
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-      camera.move(Vector3(0.0f, 0.0f, -camm_speed));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
+      m_camera.move(Vector3(0.0f, 0.0f, -camm_speed));
     }
     // move left/right
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-      camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
+      m_camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
     }
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-      camera.move(Vector3(camm_speed, 0.0f, 0.0f));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
+      m_camera.move(Vector3(camm_speed, 0.0f, 0.0f));
     }
     // move up/down
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
-      eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
-      camera.move(Vector3(0.0f, camm_speed, 0.0f));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
+        m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
+      m_camera.move(Vector3(0.0f, camm_speed, 0.0f));
     }
-    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
-      eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
-      camera.move(Vector3(0.0f, -camm_speed, 0.0f));
+    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
+        m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
+      m_camera.move(Vector3(0.0f, -camm_speed, 0.0f));
     }
-    if (eventQueue.iskeyPressed(KEY::kLButton)) {
-      Vector2 posDif = (lastCursorPos - eventQueue.mousePosition) * deltaTime;
-      camera.rotate(-posDif.y, posDif.x, 0.0f);
-      camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
-      lastCursorPos = eventQueue.mousePosition;
+    if (m_eventQueue.iskeyPressed(KEY::kLButton)) {
+      Vector2 posDif = (lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
+      m_camera.rotate(-posDif.y, posDif.x, 0.0f);
+      m_camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
+      lastCursorPos = m_eventQueue.mousePosition;
     }
     else {
-      lastCursorPos = eventQueue.mousePosition;
+      lastCursorPos = m_eventQueue.mousePosition;
     }
-    if (eventQueue.iskeyPressed(KEY::kRButton)) {}
-    if (eventQueue.iskeyPressed(KEY::kCButton)) {}
+    if (m_eventQueue.iskeyPressed(KEY::kRButton)) {}
+    if (m_eventQueue.iskeyPressed(KEY::kCButton)) {}
     // update camera
-    updateCamera(&camera);
+    updateCamera(&m_camera);
     // render the scene
     render();
   }
 }
 
-SPtr<GameObject>
-BaseApp::gameObjectFind(String _objectName)
+SPtr<Actor>
+BaseApp::actorFind(String _objectName)
 {
   // for each game object in the list
-  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
     // check if the name is the one we're looking for
-    if (gameObjects[i]->name == _objectName) {
-      return gameObjects[i];
+    if (m_gameActors[i]->m_name == _objectName) {
+      return m_gameActors[i];
     }
   }
   // if no game object fits the name
@@ -267,33 +267,33 @@ BaseApp::gameObjectFind(String _objectName)
 }
 
 template<typename T>
-SPtr<GameObject>
-BaseApp::getGameObjectWithComponent()
+SPtr<Actor>
+BaseApp::getActorWithComponent()
 {
   // check each game object
-  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = gameObjects[i]->getComponent<T>();
+    SPtr<T> check = m_gameActors[i]->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      return gameObjects[i];
+      return m_gameActors[i];
     }
   }
 }
 
 template<typename T>
-Vector<SPtr<GameObject>>
-BaseApp::getAllGameObjectsWithComponent()
+Vector<SPtr<Actor>>
+BaseApp::getAllActorsWithComponent()
 {
   // game object list
   Vector<SPtr<GameObject>> list;
   // check each game object
-  for (uint32 i = 0; i < gameObjects.size(); ++i) {
+  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = gameObjects[i]->getComponent<T>();
+    SPtr<T> check = m_gameActors[i]->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      list.push_back(gameObjects[i]);
+      list.push_back(m_gameActors[i]);
     }
   }
   return list;
@@ -308,12 +308,12 @@ BaseApp::updateCamera(Camera* _pCamera)
   // Update view
   CBView viewBuffer = CBView();
   viewBuffer.view = _pCamera->view.getTransposed();
-  api.updateConstantBuffer(cBView, &viewBuffer, 0);
+  api.updateConstantBuffer(m_cBView, &viewBuffer, 0);
 
   // Update projection
   CBProjection projectionBuffer = CBProjection();
   projectionBuffer.projection = _pCamera->projection.getTransposed();
-  api.updateConstantBuffer(cBProjection, &projectionBuffer, 0);
+  api.updateConstantBuffer(m_cBProjection, &projectionBuffer, 0);
 }
 
 void
@@ -322,13 +322,19 @@ BaseApp::setGameObjectsBuffers()
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
 
-  // for each game object in the world
-  for (uint32 i = 0; i < gameObjects.size(); ++i) {
-    // for each model in the game object
-    for (uint32 j = 0; j < gameObjects[i]->models.size(); ++j) {
-      // set its vertex and index buffers
-      api.setVertexBuffer(gameObjects[i]->models[j]->vertexB);
-      api.setIndexBuffer(gameObjects[i]->models[j]->indexB); ;
+  // for each actor in the world
+  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
+    /**
+     * Cast to a gameObject, if it fails, do none of the following process
+     */
+    SPtr<GameObject> gameObject = actorToClass<GameObject>(m_gameActors[i]);
+    if (gameObject) {
+      // for each model in the game object
+      for (uint32 j = 0; j < gameObject->models.size(); ++j) {
+        // set its vertex and index buffers
+        api.setVertexBuffer(gameObject->models[j]->vertexB);
+        api.setIndexBuffer(gameObject->models[j]->indexB); ;
+      }
     }
   }
 }
@@ -340,10 +346,10 @@ BaseApp::VSSetConstantBuffers()
   GraphicsAPI& api = GraphicsAPI::instance();
 
   // set the constant buffers
-  api.VSSetConstantBuffer(cBView, 0, 1);
-  api.VSSetConstantBuffer(cBProjection, 1, 1);
-  api.VSSetConstantBuffer(cBWorld, 2, 1);
-  api.VSSetConstantBuffer(cbLight, 3, 1);
+  api.VSSetConstantBuffer(m_cBView, 0, 1);
+  api.VSSetConstantBuffer(m_cBProjection, 1, 1);
+  api.VSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.VSSetConstantBuffer(m_cbLight, 3, 1);
 }
 
 void
@@ -353,10 +359,10 @@ BaseApp::PSSetConstantBuffers()
   GraphicsAPI& api = GraphicsAPI::instance();
 
   // set the constant buffers
-  api.PSSetConstantBuffer(cBView, 0, 1);
-  api.PSSetConstantBuffer(cBProjection, 1, 1);
-  api.PSSetConstantBuffer(cBWorld, 2, 1);
-  api.PSSetConstantBuffer(cbLight, 3, 1);
+  api.PSSetConstantBuffer(m_cBView, 0, 1);
+  api.PSSetConstantBuffer(m_cBProjection, 1, 1);
+  api.PSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.PSSetConstantBuffer(m_cbLight, 3, 1);
 }
 
 void
@@ -371,7 +377,7 @@ BaseApp::render()
   api.clearRenderTargetView(clearColor);
   api.clearDepthBuffer(1.0f);
   // update the light buffer
-  api.updateConstantBuffer(cbLight, &light, static_cast<uint32>(sizeof(Light)));
+  api.updateConstantBuffer(m_cbLight, &light, static_cast<uint32>(sizeof(Light)));
   // Set shaders
   api.setShaders();
   // set light
@@ -381,7 +387,7 @@ BaseApp::render()
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   // render the objects
-  renderGameObjects(gameObjects);
+  renderActors(m_gameActors);
   // present the final result to the screen
   api.present(1, 0);
 }
@@ -399,10 +405,6 @@ renderModel(Model& _model)
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
-    // if (_model.meshes[i].material) {
-    //   api.setShaderResourceView(_model.meshes[i].material->diffuse);
-    //   api.setSampler();
-    // }
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
       currentIndexOrigin,
@@ -413,36 +415,55 @@ renderModel(Model& _model)
   }
 }
 
+template<typename T>
+SPtr<T>
+BaseApp::actorToClass(SPtr<Actor>& _subject)
+{
+  // cast to a game actor
+  SPtr<T> aTC = reinterpret_pointer_cast<T>(_subject);
+  // casting was successful
+  if (aTC) { return aTC; }
+  // casting failed
+  return nullptr;
+}
+
 void
-BaseApp::renderGameObjects(Vector<SPtr<GameObject>> _gameObjects)
+BaseApp::renderActors(Vector<SPtr<Actor>> _gameActors)
 {
   // get a reference from the api
   GraphicsAPI& api = GraphicsAPI::instance();
-  // for each Game Object
-  for (uint32 i = 0; i < _gameObjects.size(); ++i) {
-    // Get the final matrix by taking into account the parent opjects
-    SPtr<GameObject> parent = _gameObjects[i]->parent;
-    Matrix4 transform = _gameObjects[i]->transform;
+  // for each actor
+  for (uint32 i = 0; i < _gameActors.size(); ++i) {
+    // Get the final matrix by taking into account the parent actors
+    SPtr<Actor> parent = _gameActors[i]->m_parent;
+    Matrix4 transform = _gameActors[i]->m_transform;
     // while there's a parent
     while (parent) {
       // add the parent transform to the current transform matrix
-      transform += parent->transform;
+      transform *= parent->m_transform;
       // the next parent will be the parent of this parent
-      parent = parent->parent;
+      parent = parent->m_parent;
     }
-    // set the current gameObject transform as the world in which the shader will work in
-    api.updateConstantBuffer(cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
-    // set the diffuse texture to the resource view if the model has a material
-    if (_gameObjects[i]->getComponent<Material>()) {
-      // set the material texture to the shader
-      api.setShaderResourceView(_gameObjects[i]->getComponent<Material>()->diffuse);
-      api.setSampler();
+    // set the current actor transform as the world in which the shader will work in
+    api.updateConstantBuffer(m_cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
+
+    /**
+     * Recast to a gameobject. If it fails, do none of this
+     */
+    SPtr<GameObject> gameObject = actorToClass<GameObject>(_gameActors[i]);
+    if (gameObject) {
+      // set the diffuse texture to the resource view if the model has a material
+      if (gameObject->getComponent<Material>()) {
+        // set the material texture to the shader
+        api.setShaderResourceView(gameObject->getComponent<Material>()->diffuse);
+        api.setSampler();
+      }
+      // render the model component
+      renderModel(*gameObject->getComponent<Model>());
     }
-    // render the model component
-    renderModel(*_gameObjects[i]->getComponent<Model>());
-    // if the game object has children, do the same for them
-    if (!_gameObjects[i]->children.empty()) {
-      renderGameObjects(_gameObjects[i]->children);
+     // if the actor has children, do the same for them
+    if (!_gameActors[i]->m_children.empty()) {
+      renderActors(_gameActors[i]->m_children);
     }
   }
 }

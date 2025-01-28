@@ -162,6 +162,9 @@
     <ClInclude Include="include\pkFrustum.h">
       <Filter>include\camera</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkActor.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -213,6 +216,9 @@
       <Filter>source\graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\pkSprite.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkActor.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>

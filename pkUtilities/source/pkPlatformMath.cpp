@@ -239,4 +239,10 @@ PlatformMath::intersectCubePoint(Cube& _cube, const Vector3& _other)
   }
   return false;
 }
+
+bool
+PlatformMath::isNan(float _x)
+{
+  return std::isnan(_x);
+}
 }

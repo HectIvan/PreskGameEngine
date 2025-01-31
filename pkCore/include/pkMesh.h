@@ -34,7 +34,10 @@ class Mesh
 {
  public:
   Mesh() = default;
-  virtual ~Mesh() = default;
+  virtual ~Mesh()
+  {
+    clean();
+  }
 
   /**
   * Create the mesh.

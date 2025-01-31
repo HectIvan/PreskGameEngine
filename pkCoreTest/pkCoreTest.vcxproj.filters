@@ -15,18 +15,24 @@
     <ClCompile Include="source\pkCoreTest.cpp">
       <Filter>source\main</Filter>
     </ClCompile>
-    <ClCompile Include="source\testApp.cpp">
+    <ClCompile Include="source\PhysicsApp.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\Player.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\shaderTest.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\testApp.h">
+    <ClInclude Include="include\PhysicsApp.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Player.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaderTest.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

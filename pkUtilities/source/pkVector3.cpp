@@ -4,14 +4,18 @@
 **/
 /*********************************************/
 #include "pkMath.h"
-#include "pkVector3.h"
 #include "pkMatrix4.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
 
+const Vector3 Vector3::ZERO(0.0f, 0.0f, 0.0f);
 const Vector3 Vector3::FORWARD(0.0f, 0.0f, 1.0f);
+const Vector3 Vector3::BACK(0.0f, 0.0f, -1.0f);
+const Vector3 Vector3::LEFT(-1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::RIGHT(1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::UP(0.0f, 1.0f, 0.0f);
+const Vector3 Vector3::DOWN(0.0f, -1.0f, 0.0f);
 
 const Vector3
 Vector3::operator*(const Matrix4& other) const
@@ -30,6 +34,20 @@ Vector3::operator*(const Matrix4& other) const
             (z * other.matrix[2][2]);
   // return the final vector
   return Vector3(X, Y, Z);
+}
+
+const Vector3
+Vector3::operator^(const Vector3& other) const
+{
+  return cross(other);
+}
+
+Vector3
+Vector3::cross(const Vector3& _other) const
+{
+  return Vector3((y * _other.z) - (z * _other.y),
+                 (z * _other.x) - (x * _other.z),
+                 (x * _other.y) - (y * _other.x));
 }
 
 float
@@ -51,13 +69,38 @@ Vector3::magnitude() const
 }
 
 void
-Vector3::normalize()
+Vector3::safeNormalize()
 {
   float mag = magnitude();
+  if (mag == 0.0f) {
+    x = 0.0f;
+    y = 0.0f;
+    z = 0.0f;
+    return;
+  }
   mag = 1.0f / mag;
   x *= mag;
   y *= mag;
   z *= mag;
+}
+
+void
+Vector3::normalize()
+{
+  float mag = magnitude();
+  mag = 1.0f / mag;
+  mag = Math::abs(mag);
+  x *= mag;
+  y *= mag;
+  z *= mag;
+}
+
+const Vector3
+Vector3::normalized() const
+{
+  float mag = magnitude();
+  mag = 1.0f / mag;
+  return Vector3(x * mag, y * mag, z * mag);
 }
 
 float
@@ -92,5 +135,23 @@ float
 Vector3::dotProd(const Vector3 _this, const Vector4 _other)
 {
   return (_this.x * _other.x) + (_this.y * _other.y) + (_this.z * _other.z);
+}
+
+bool
+Vector3::isZero()
+{
+  if (!(x == 0.0f)) { return false; }
+  if (!(y == 0.0f)) { return false; }
+  if (!(z == 0.0f)) { return false; }
+  return true;
+}
+
+bool
+Vector3::hasNan()
+{
+  if (Math::isNan(x)) { return true; }
+  if (Math::isNan(y)) { return true; }
+  if (Math::isNan(z)) { return true; }
+  return false;
 }
 }

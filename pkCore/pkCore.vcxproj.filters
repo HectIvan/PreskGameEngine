@@ -64,6 +64,9 @@
     <Filter Include="source\graphics">
       <UniqueIdentifier>{97698cb5-919b-4d24-b37b-c212942a8975}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\imgui">
+      <UniqueIdentifier>{cc33b101-0a66-4e8c-b246-3fc51bf3136e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="include\pkActor.h">
       <Filter>include\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkScene.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -219,6 +225,9 @@
       <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkActor.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pkScene.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>

@@ -27,7 +27,10 @@ class PK_CORE_EXPORT GameObject : public Actor
 {
  public:
   GameObject() = default;
-  virtual ~GameObject() = default;
+  virtual ~GameObject()
+  {
+    clear();
+  }
 
   /**
    * @brief Inserts a new model into the model vector.

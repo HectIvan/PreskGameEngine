@@ -29,6 +29,7 @@
 **/
 
 namespace pkEngineSDK {
+
 using std::uint8_t;
 using std::uint16_t;
 using std::uint32_t;

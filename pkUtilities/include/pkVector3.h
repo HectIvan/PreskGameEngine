@@ -253,6 +253,17 @@ class PK_UTILITY_EXPORT Vector3
   const Vector3
   operator*(const Matrix4& other) const;
 
+  FORCEINLINE const Vector3
+  operator^(const Vector3& other) const;
+
+  /**
+   * @brief Get the cross product between this vector and another.
+   * @param _other The other vector.
+   * @return The cross Vector.
+   */
+  Vector3
+  cross(const Vector3& _other) const;
+
   /**
    * @brief This function calculates the dot product between this vector
    * and the vector parameter.
@@ -278,10 +289,23 @@ class PK_UTILITY_EXPORT Vector3
   magnitude() const;
 
   /**
+   * @brief This function normalizes this vector by setting it in a range between 1 and 0,
+   * making sure that 0 is not done.
+   */
+  void
+  safeNormalize();
+
+  /**
    * @brief This function normalizes this vector by setting it in a range between 1 and 0.
    */
   void 
   normalize();
+
+  /**
+   * @brief Return the normalized vector.
+   */
+  const Vector3
+  normalized() const;
 
   /**
    * @Brief This function gets the distance between this vector and
@@ -326,6 +350,20 @@ class PK_UTILITY_EXPORT Vector3
   FORCEINLINE static float
   dotProd(const Vector3 _this, const Vector4 _other);
 
+  /**
+   * @brief Check if the vector is a zero vector.
+   * @return Wether the vector is 0 or not.
+   */
+  FORCEINLINE bool
+  isZero();
+
+  /**
+   * @brief Check if the vector has a non number.
+   * @return wether the vector has or does not have a nan.
+   */
+  FORCEINLINE bool
+  hasNan();
+
  public:
   float x;
   float y;
@@ -335,8 +373,14 @@ class PK_UTILITY_EXPORT Vector3
 
   static const Vector3 FORWARD;
 
+  static const Vector3 BACK;
+
   static const Vector3 RIGHT;
 
+  static const Vector3 LEFT;
+
   static const Vector3 UP;
+
+  static const Vector3 DOWN;
 };
 }

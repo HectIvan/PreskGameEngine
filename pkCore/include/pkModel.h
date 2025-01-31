@@ -34,7 +34,10 @@ class PK_CORE_EXPORT Model : public Component
 {
  public:
   Model() = default;
-  virtual ~Model() = default;
+  virtual ~Model()
+  {
+    clean();
+  }
 
   /**
   * Load the model from a path.

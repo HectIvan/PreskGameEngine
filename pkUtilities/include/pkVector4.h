@@ -21,6 +21,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
 
@@ -31,6 +32,7 @@ class PK_UTILITY_EXPORT Vector4
  public:
   Vector4() = default;
   FORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
+  FORCEINLINE Vector4(Vector3 _vec, float _w);
   FORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
   ~Vector4() = default;
 
@@ -111,6 +113,20 @@ class PK_UTILITY_EXPORT Vector4
   }
 
   /**
+   * @brief Adds a Vector3 to a Vector4.
+   * @param other Vector with which the addition will be made.
+   * @return A vector with the addition done.
+   */
+  FORCEINLINE Vector4&
+  operator+=(const Vector3& other)
+  {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+  }
+
+  /**
   * add a Vector to this Vector.
   *
   * This operator adds another vector to this vector.
@@ -146,6 +162,17 @@ class PK_UTILITY_EXPORT Vector4
   operator+(const Vector4& other) const
   {
     return Vector4(x + other.x, y + other.y, z + other.z, w + other.w);
+  }
+
+  /**
+  * @brief Adds a Vector3 to a Vector4.
+  * @param other Vector with which the addition will be made.
+  * @return A vector with the addition done.
+  **/
+  FORCEINLINE const Vector4
+  operator+(const Vector3& other) const
+  {
+    return Vector4(x + other.x, y + other.y, z + other.z, w);
   }
 
   /**
@@ -372,6 +399,12 @@ class PK_UTILITY_EXPORT Vector4
   **/
   void
   normalize();
+
+  /**
+   * @brief returns a copy of this normalized vector.
+   */
+  Vector4
+  normalized();
 
   /**
   * Gets the distance between this vector and another.

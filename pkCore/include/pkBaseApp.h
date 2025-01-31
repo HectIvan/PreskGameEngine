@@ -30,6 +30,7 @@
 #include "pkGameObject.h"
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"
+#include "pkScene.h"
 #include "pkWindow.h"
 
 namespace pkEngineSDK
@@ -87,7 +88,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Fixed update of the engine
    */
   virtual void
-  fixedUpdate(float _baseDelta) {}
+  fixedUpdate() {}
 
   /**
    * @brief Render the scene.
@@ -100,16 +101,6 @@ class PK_CORE_EXPORT BaseApp
    */
   virtual void
   onRender() {}
-
-  /**
-   * @brief Insert a new actor into the scene or as
-   * a child of another actor.
-   * @param _tranform Transform of the actor.
-   * @param _pParent If the actor will be the child of another actor.
-   */
-  void
-  instantiate(Matrix4 _transform = Matrix4::IDENTITY,
-              SPtr<Actor> _pParent = nullptr);
 
   /**
    * @brief Create a new model component.
@@ -176,7 +167,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Set the buffers of each game object.
    */
   void
-  setGameObjectsBuffers();
+  setActorsBuffers();
 
   /**
    * @brief Set the Vertex Shader constant buffers
@@ -212,7 +203,7 @@ class PK_CORE_EXPORT BaseApp
   EventQueue m_eventQueue;
 
   // vector of game objects in the scene
-  Vector<SPtr<Actor>> m_gameActors;
+  Scene m_scene;
 
   // light source
   Light light;
@@ -226,5 +217,9 @@ class PK_CORE_EXPORT BaseApp
 
   // camera movement speed
   float m_cameraSpeed;
+
+  // fixed update
+  float m_fixedTimer = 0.0f;
+  float m_fixedDeltaTime = 0.016f;
 };
 }

@@ -6,11 +6,10 @@
 #include "pkGraphicsAPI.h"
 #include "pkLight.h"
 #include "pkModel.h"
+#include "pkMath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkSprite.h"
 #include "pkWindowDesc.h"
-
-#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -18,81 +17,30 @@ namespace pkEngineSDK
 void
 run(String _name, Window& _window);
 
-/**
-* Create a game object.
-* 
-* @return
-* A game object shared pointer.
-**/
-SPtr<Actor>
-createActor()
-{
-  SPtr<Actor> gActor = make_shared<Actor>();
-  gActor->setTransform(Matrix4(0.0f));
-  gActor->setScale(Matrix4(1.0f));
-  return gActor;
-}
-
-/**
-* Insert a game object into the vector of the game object.
-* 
-* @param _pObject
-* Object to insert.
-* 
-* @param _vector
-* Vector where the game object will be inserted.
-**/
-void
-insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
-{
-  _vector.push_back(_pActor);
-}
-
 SPtr<Material>
 BaseApp::newMaterial(String _textureName)
 {
-  // get api instance
+  // get api instance.
   GraphicsAPI& api = GraphicsAPI::instance();
-  // create the texture adress
+  // create the texture adress.
   String textureName = "textures/" + _textureName;
-  // create the texture
+  // create the texture.
   SPtr<Texture> texture = api.createTextureFromFile(textureName, 8, false, 28);
-  // if creating the texture failed, return the model without a texture
+  // if creating the texture failed, return the model without a texture.
   if (!texture) { return nullptr; }
-  // create the material component
+  // create the material component.
   SPtr<Material> pMatComp = make_shared<Material>();
   pMatComp->setTexture(pMatComp->diffuse, texture);
-  // return the texture
+  // return the texture.
   return pMatComp;
-}
-
-void
-BaseApp::instantiate(Matrix4 _transform,
-                     SPtr<Actor> _pParent)
-{
-  // insert the game object into the vector of game objects
-  SPtr<Actor> gObject = createActor();
-  // set the gameObject name
-  gObject->m_name = "";
-  // set the gameObject transform
-  gObject->setTransform(_transform);
-  // if the parent is not a nullptr (there is a parent that will have this game object)
-  if (_pParent) {
-    // insert the current gameObject to the children vector of the parent
-    insertActor(gObject, _pParent->m_children);
-    // set the parent as the parent of the current game Object
-    gObject->m_parent = _pParent;
-  }
-  // otherwise, the object is part of the scene
-  else { insertActor(gObject, m_gameActors); }
 }
 
 SPtr<Model>
 BaseApp::newModel(String _modelName)
 {
-  // load the model
+  // load the model.
   SPtr<Model> model = loadModel(_modelName);
-  // create a material
+  // create a material.
   for (uint32 i = 0; i < model->meshes.size(); ++i) {
     model->meshes[i].material = newMaterial(model->meshes[i].materialPath);
   }
@@ -116,14 +64,6 @@ BaseApp::init(const char** _argv)
   api.createInputLayout();
   api.createSamplerState();
   createBuffers();
-  m_camera.init(30, // window.getWidth(),
-                17, // window.getHeight(),
-                3.1416f / 4.0f,
-                0.01f,
-                1000.0f,
-                Vector4(0.0f, 0.0f, -30.0f, 1.0f), // w is position in 1
-                Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-                Vector4(0.0f, 1.0f, 0.0f, 0.0f));
   m_cameraSpeed = 5.0f;
   onInit();
 }
@@ -193,8 +133,6 @@ getDeltaTime(high_resolution_clock::time_point& _delta)
 void
 BaseApp::messageLoop()
 {
-  // last cursor position
-  Vector2 lastCursorPos = m_eventQueue.mousePosition;
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop, while the escape key has not been pressed
@@ -204,47 +142,18 @@ BaseApp::messageLoop()
     m_eventQueue.windowInput();
     // update the delta time
     float deltaTime = getDeltaTime(delta);
+    // fixed update timer count.
+    m_fixedTimer += deltaTime;
     // child class update
     onUpdate(deltaTime);
+    if (m_fixedTimer > 0.016f) {
+      std::cout << "updated on: " << m_fixedTimer << std::endl;
+      // fixed update
+      fixedUpdate();
+      m_fixedTimer = 0;
+    }
     // event queue
     m_eventQueue.poll();
-    // mouse input
-    // update the camera m_speed
-    float camm_speed = m_cameraSpeed * deltaTime;
-    // move forward/backward
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-      m_camera.move(Vector3(0.0f, 0.0f, camm_speed));
-    }
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-      m_camera.move(Vector3(0.0f, 0.0f, -camm_speed));
-    }
-    // move left/right
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-      m_camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
-    }
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-      m_camera.move(Vector3(camm_speed, 0.0f, 0.0f));
-    }
-    // move up/down
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
-        m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
-      m_camera.move(Vector3(0.0f, camm_speed, 0.0f));
-    }
-    if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
-        m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
-      m_camera.move(Vector3(0.0f, -camm_speed, 0.0f));
-    }
-    if (m_eventQueue.iskeyPressed(KEY::kLButton)) {
-      Vector2 posDif = (lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
-      m_camera.rotate(-posDif.y, posDif.x, 0.0f);
-      m_camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
-      lastCursorPos = m_eventQueue.mousePosition;
-    }
-    else {
-      lastCursorPos = m_eventQueue.mousePosition;
-    }
-    if (m_eventQueue.iskeyPressed(KEY::kRButton)) {}
-    if (m_eventQueue.iskeyPressed(KEY::kCButton)) {}
     // update camera
     updateCamera(&m_camera);
     // render the scene
@@ -256,10 +165,10 @@ SPtr<Actor>
 BaseApp::actorFind(String _objectName)
 {
   // for each game object in the list
-  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
+  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
     // check if the name is the one we're looking for
-    if (m_gameActors[i]->m_name == _objectName) {
-      return m_gameActors[i];
+    if (m_scene.m_actors[i]->m_name == _objectName) {
+      return m_scene.m_actors[i];
     }
   }
   // if no game object fits the name
@@ -271,12 +180,12 @@ SPtr<Actor>
 BaseApp::getActorWithComponent()
 {
   // check each game object
-  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
+  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = m_gameActors[i]->getComponent<T>();
+    SPtr<T> check = m_scene.m_actors[i]->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      return m_gameActors[i];
+      return m_scene.m_actors[i];
     }
   }
 }
@@ -288,12 +197,12 @@ BaseApp::getAllActorsWithComponent()
   // game object list
   Vector<SPtr<GameObject>> list;
   // check each game object
-  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
+  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = m_gameActors[i]->getComponent<T>();
+    SPtr<T> check = m_scene.m_actors[i]->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      list.push_back(m_gameActors[i]);
+      list.push_back(m_scene.m_actors[i]);
     }
   }
   return list;
@@ -317,17 +226,17 @@ BaseApp::updateCamera(Camera* _pCamera)
 }
 
 void
-BaseApp::setGameObjectsBuffers()
+BaseApp::setActorsBuffers()
 {
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
 
   // for each actor in the world
-  for (uint32 i = 0; i < m_gameActors.size(); ++i) {
+  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
     /**
      * Cast to a gameObject, if it fails, do none of the following process
      */
-    SPtr<GameObject> gameObject = actorToClass<GameObject>(m_gameActors[i]);
+    SPtr<GameObject> gameObject = actorToClass<GameObject>(m_scene.m_actors[i]);
     if (gameObject) {
       // for each model in the game object
       for (uint32 j = 0; j < gameObject->models.size(); ++j) {
@@ -387,7 +296,7 @@ BaseApp::render()
   VSSetConstantBuffers();
   PSSetConstantBuffers();
   // render the objects
-  renderActors(m_gameActors);
+  renderActors(m_scene.m_actors);
   // present the final result to the screen
   api.present(1, 0);
 }
@@ -434,6 +343,9 @@ BaseApp::renderActors(Vector<SPtr<Actor>> _gameActors)
   GraphicsAPI& api = GraphicsAPI::instance();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
+    if (!_gameActors[i]->m_active) {
+      break;
+    }
     // Get the final matrix by taking into account the parent actors
     SPtr<Actor> parent = _gameActors[i]->m_parent;
     Matrix4 transform = _gameActors[i]->m_transform;

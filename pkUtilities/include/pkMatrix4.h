@@ -115,9 +115,34 @@ class PK_UTILITY_EXPORT Matrix4
     }
     return result;
   }
-  
+
   /**
-   * @brief Multiply a Vector by a Matrix
+   * @brief Multiply a Vector3 by a Matrix
+   * @param other The vector to multiply
+   * @return
+   */
+  Vector3
+  operator*(const Vector3& other)
+  {
+    matrix[0][0] *= other.x;
+    matrix[1][0] *= other.x;
+    matrix[2][0] *= other.x;
+
+    matrix[0][1] *= other.y;
+    matrix[1][1] *= other.y;
+    matrix[2][1] *= other.y;
+
+    matrix[0][2] *= other.z;
+    matrix[1][2] *= other.z;
+    matrix[2][2] *= other.z;
+
+    return Vector3(matrix[0][0] + matrix[1][0] + matrix[2][0],
+                   matrix[0][1] + matrix[1][1] + matrix[1][1],
+                   matrix[0][2] + matrix[1][2] + matrix[2][2]);
+  }
+
+  /**
+   * @brief Multiply a Vector4 by a Matrix
    * @param other The vector to multiply
    * @return
    */
@@ -141,6 +166,7 @@ class PK_UTILITY_EXPORT Matrix4
                    matrix[0][2] + matrix[1][2] + matrix[2][2],
                    other.w);
   }
+
   /**
    * @brief Multiply a matrix with another.
    * @param Other The other matrix.
@@ -332,6 +358,13 @@ class PK_UTILITY_EXPORT Matrix4
    */
   void
   setScale(Vector3 _scale);
+
+  /**
+   * Get a matrix rotation from an axis and an angle
+   * 
+   */
+  static Matrix4
+  MatrixRotationAxis(Vector3 _axis, float _angle);
   
   /**
    * @brief The rotation matrix that is created from
@@ -396,7 +429,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _upPos Direction of the up vector.
    */
   static Matrix4
-  lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir);
+  lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector3 _upDir);
 
   /**
    * @brief Matrix look to.

@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClCompile Include="source\pkCoreTest.cpp" />
     <ClCompile Include="source\Player.cpp" />
-    <ClCompile Include="source\testApp.cpp" />
+    <ClCompile Include="source\shaderTest.cpp" />
+    <ClCompile Include="source\PhysicsApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Player.h" />
-    <ClInclude Include="include\testApp.h" />
+    <ClInclude Include="include\shaderTest.h" />
+    <ClInclude Include="include\PhysicsApp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

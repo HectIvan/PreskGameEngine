@@ -412,6 +412,13 @@ class PK_UTILITY_EXPORT PlatformMath
   intersectCubePoint(Cube& _cube, const Vector3& _other);
 
   /**
+   * @brief Check if the value is nan.
+   * @param _x Value to check.
+   */
+  static bool
+  isNan(float _x);
+
+  /**
    * Static variables
   **/
   static const float PI;
@@ -424,4 +431,6 @@ class PK_UTILITY_EXPORT PlatformMath
 
   static const float DEG2RAD;
 };
+
+using Math = PlatformMath;
 }

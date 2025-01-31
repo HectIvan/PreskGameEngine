@@ -1,7 +1,7 @@
 #include <assimp/anim.h>
 
 #include "pkBone.h"
-#include "pkPlatformMath.h"
+#include "pkMath.h"
 
 namespace pkEngineSDK
 {
@@ -75,7 +75,7 @@ Bone::interpolatePosition(float _deltaTime)
   float scaleFactor = getScaleFactor(positions[p0Index].timeStamp,
                                      positions[p1Index].timeStamp,
                                      _deltaTime);
-  Vector3 finalPosition = PlatformMath::lerp3(positions[p0Index].position,
+  Vector3 finalPosition = Math::lerp3(positions[p0Index].position,
                                               positions[p1Index].position,
                                               scaleFactor);
   return Matrix4::translation(finalPosition);
@@ -95,7 +95,7 @@ Bone::interpolateRotation(float _deltaTime)
   float scaleFactor = getScaleFactor(rotations[p0Index].timeStamp,
                                      rotations[p1Index].timeStamp,
                                      _deltaTime);
-  Vector4 finalRotation = PlatformMath::lerp4(rotations[p0Index].rotation,
+  Vector4 finalRotation = Math::lerp4(rotations[p0Index].rotation,
                                               rotations[p1Index].rotation,
                                               scaleFactor);
   finalRotation.normalize();
@@ -113,7 +113,7 @@ Bone::interpolateScale(float _deltaTime)
   float scaleFactor = getScaleFactor(scales[p0Index].timeStamp,
                                      scales[p1Index].timeStamp,
                                      _deltaTime);
-  Vector3 finalScale = PlatformMath::lerp3(scales[p0Index].scale,
+  Vector3 finalScale = Math::lerp3(scales[p0Index].scale,
                                            scales[p1Index].scale,
                                            scaleFactor);
   return Matrix4::scale(finalScale);

@@ -5,6 +5,7 @@
 * Includes
 **/
 /*********************************************/
+#include <cassert>
 #include <map>
 #include <memory>
 #include <optional>

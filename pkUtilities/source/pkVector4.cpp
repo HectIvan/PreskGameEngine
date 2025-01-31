@@ -10,6 +10,14 @@ namespace pkEngineSDK {
 
 const Vector4 Vector4::ZERO = Vector4(0);
 
+Vector4::Vector4(Vector3 _vec, float _w)
+{
+  x = _vec.x;
+  y = _vec.y;
+  z = _vec.z;
+  w = _w;
+}
+
 const Vector4
 Vector4::operator*(const Matrix4& other) const
 {
@@ -76,6 +84,15 @@ Vector4::normalize()
   y *= mag;
   z *= mag;
   w *= mag;
+}
+
+Vector4
+Vector4::normalized()
+{
+  float mag = magnitude();
+  if (mag == 0.0f) { return Vector4(0.0f); }
+  mag = 1.0f / mag;
+  return Vector4(x * mag, y * mag, z * mag, w * mag);
 }
 
 float

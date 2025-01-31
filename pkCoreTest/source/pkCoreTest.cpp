@@ -1,9 +1,10 @@
-#include "testApp.h"
+#include "PhysicsApp.h"
+#include "shaderTest.h"
 
 int
 main(int argc, const char** argv)
 {
-  TestApp app;
+  PhysicsApp app;
   app.init(argv);
   app.messageLoop();
   return 0;

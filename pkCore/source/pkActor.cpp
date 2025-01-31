@@ -70,6 +70,18 @@ Actor::setScale(Matrix4 _scale)
   m_transform.setScale(_scale);
 }
 
+void
+Actor::setScale(Vector3 _scale)
+{
+  m_transform.setScale(_scale);
+}
+
+void
+Actor::setScale(float _x, float _y, float _z)
+{
+  setScale(Vector3(_x, _y, _z));
+}
+
 SPtr<Actor>
 Actor::getChild(uint32 _index)
 {
@@ -78,6 +90,16 @@ Actor::getChild(uint32 _index)
     return m_children[_index];
   }
   return nullptr;
+}
+
+void
+Actor::clear()
+{
+  m_components.clear();
+  m_children.clear();
+  m_parent->clear();
+  m_transform = Matrix4::IDENTITY;
+  m_name = "";
 }
 
 void

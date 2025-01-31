@@ -17,14 +17,29 @@
 /************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
 
+
 namespace pkEngineSDK
 {
+
+namespace CAMERA_PROJ
+{
+  enum E : uint32
+  {
+    kPerspective = 0,
+    kOrthographic,
+  };
+}
 
 class PK_CORE_EXPORT Camera
 {
@@ -41,10 +56,17 @@ class PK_CORE_EXPORT Camera
        float _halfFOV,
        float _nearZ,
        float _farZ,
-       Vector4 _eye,
-       Vector4 _at,
-       Vector4 _up
+       Vector3 _eye,
+       Vector3 _at,
+       Vector3 _up,
+       CAMERA_PROJ::E _camMode = CAMERA_PROJ::kPerspective
   );
+
+  /**
+   * @brief Set the view matrix data
+   */
+  void
+  setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up);
   
   /**
   * Move the camera to a new position.
@@ -85,8 +107,8 @@ class PK_CORE_EXPORT Camera
   * @return
   * The forward vector as a vector4.
   **/
-  Vector4
-  getForwardVector();
+  Vector3
+  getForward();
 
   /**
   * Gets the right vector of the camera.
@@ -94,8 +116,8 @@ class PK_CORE_EXPORT Camera
   * @return
   * The right vector as a vector4.
   **/
-  Vector4
-  getRightVector();
+  Vector3
+  getRight();
 
   /**
   * Gets the up vector of the camera.
@@ -103,8 +125,8 @@ class PK_CORE_EXPORT Camera
   * @return
   * The up vector as a vector4.
   **/
-  Vector4
-  getUpVector();
+  Vector3
+  getUp();
 
   /**
   * Sets the forward vector of the camera.
@@ -113,7 +135,7 @@ class PK_CORE_EXPORT Camera
   * New forward vector.
   **/
   void
-  setForwardVector(Vector4 _vec) { forward = _vec; }
+  setForward(Vector3 _vec) { forward = _vec; }
 
   /**
   * Sets the right vector of the camera.
@@ -122,7 +144,7 @@ class PK_CORE_EXPORT Camera
   * New right vector.
   **/
   void
-  setRightVector(Vector4 _vec) { right = _vec; }
+  setRight(Vector3 _vec) { right = _vec; }
 
   /**
   * Sets the up vector of the camera.
@@ -131,7 +153,7 @@ class PK_CORE_EXPORT Camera
   * New up vector.
   **/
   void
-  setUpVector(Vector4 _vec) { up = _vec; }
+  setUp(Vector3 _vec) { up = _vec; }
 
   /**
   * Set all the direction vectors.
@@ -151,11 +173,11 @@ class PK_CORE_EXPORT Camera
   // Camera position
   Vector4 eye;
   Vector4 at;
-  Vector4 up;
+  Vector3 up;
 
   // camera vectors
-  Vector4 forward;
-  Vector4 right;
+  Vector3 forward;
+  Vector3 right;
 
   // camera rotation and start position
   Vector3 rotation;

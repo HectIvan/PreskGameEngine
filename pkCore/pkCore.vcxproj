@@ -193,6 +193,7 @@
     <ClInclude Include="include\pkMouseWheelData.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
+    <ClInclude Include="include\pkScene.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
     <ClInclude Include="include\pkSprite.h" />
     <ClInclude Include="include\pkSwapChain.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\pkScene.cpp" />
     <ClCompile Include="source\pkActor.cpp" />
     <ClCompile Include="source\pkBaseApp.cpp" />
     <ClCompile Include="source\pkBone.cpp" />

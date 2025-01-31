@@ -31,7 +31,10 @@ class PK_CORE_EXPORT Actor
 {
  public:
   Actor() = default;
-  virtual ~Actor() = default;
+  virtual ~Actor()
+  {
+    clear();
+  }
 
   /**
    * @brief Set the actor transform.
@@ -110,6 +113,22 @@ class PK_CORE_EXPORT Actor
   setScale(Matrix4 _scale);
 
   /**
+   * @brief Set the scale of the Actor.
+   * @param _scale Scale Vector.
+   */
+  void
+  setScale(Vector3 _scale);
+
+  /**
+   * @brief Set the scale of the Actor.
+   * @param _x Scale in the x.
+   * @param _x Scale in the y.
+   * @param _x Scale in the z.
+   */
+  void
+  setScale(float _x, float _y, float _z);
+
+  /**
    * @brief adds a component of type T.
    * @param _pComponent Pointer of the component to add.
    */
@@ -150,7 +169,21 @@ class PK_CORE_EXPORT Actor
   SPtr<Actor>
   getParent() { return m_parent; }
 
+  /**
+   * @brief Sets wether the object is active or not.
+   * @param _active State of the actor.
+   */
+  void
+  setActive(bool _active) { m_active; }
+
+  /**
+   * @brief Clears all the data linked to the actor
+   */
+  void
+  clear();
+
  public:
+  bool m_active = true;
   Vector<SPtr<Component>> m_components;
   Vector<SPtr<Actor>> m_children;
   SPtr<Actor> m_parent;

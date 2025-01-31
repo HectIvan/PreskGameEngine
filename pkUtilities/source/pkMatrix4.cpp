@@ -3,6 +3,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkMath.h"
 #include "pkMatrix4.h"
 
 namespace pkEngineSDK {
@@ -181,6 +182,41 @@ Matrix4::setScale(Matrix4 _scale)
   matrix[3][2] = _scale.matrix[2][2];
 }
 
+Matrix4
+Matrix4::MatrixRotationAxis(Vector3 _axis, float _angle)
+{
+  PK_ASSERT(!_axis.isZero());
+  PK_ASSERT(!_axis.hasNan());
+
+  _axis.normalize();
+  
+  //Compute rotation matrix from axis and angle
+  float s = Math::sin(_angle);
+  float c = Math::cos(_angle);
+  float t = 1.0f - c;
+
+  float x = _axis.x;  float y = _axis.y;  float z = _axis.z;
+
+  float tx = t * x;  float ty = t * y;  float tz = t * z;
+  float txy = tx * y;  float txz = tx * z;  float tyz = ty * z;
+  float sx = s * x;  float sy = s * y;  float sz = s * z;
+
+  Matrix4 Result = Matrix4::IDENTITY;
+  Result.matrix[0][0] = tx * x + c;
+  Result.matrix[0][1] = txy + sz;
+  Result.matrix[0][2] = txz - sy;
+
+  Result.matrix[1][0] = txy - sz;
+  Result.matrix[1][1] = ty * y + c;
+  Result.matrix[1][2] = tyz + sx;
+
+  Result.matrix[2][0] = txz + sy;
+  Result.matrix[2][1] = tyz - sx;
+  Result.matrix[2][2] = tz * z + c;
+
+  return Result;
+}
+
 void
 Matrix4::setScale(Vector3 _scale)
 {
@@ -270,13 +306,14 @@ Matrix4::setRotation(Matrix4 _rotation)
 }
 
 Matrix4
-Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir)
+Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector3 _upDir)
 {
   Vector4 EyeDirection;
   Matrix4 M;
 
   EyeDirection = _atPos - _eyePos;
-  M = lookToLH(_eyePos, EyeDirection, _upDir);
+  Vector4 upDir = Vector4(_upDir, 0.0f);
+  M = lookToLH(_eyePos, EyeDirection, upDir);
 
   return M;
 }
@@ -286,7 +323,7 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
 {
   Vector4 negEyePosition;
   Vector4 R0, R1, R2;
-  Matrix4 M;
+  Matrix4 M = Matrix4::IDENTITY;
   // forward vector
   Vector4 eyeDirectionNormalized = _eyeDir;
   eyeDirectionNormalized.normalize();
@@ -303,7 +340,7 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
   R1CrossProduct = R2 ^ R0;
   R1 = R1CrossProduct;
 
-  negEyePosition = -_eyePos;
+  negEyePosition = _eyePos * -1.0f;
 
   // get the rows dot product
   float R0Dot = Vector4::dotProd(negEyePosition, R0);
@@ -314,22 +351,18 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
   M.matrix[0][0] = R0.x;
   M.matrix[0][1] = R1.x;
   M.matrix[0][2] = R2.x;
-  M.matrix[0][3] = 0.0f;
 
   M.matrix[1][0] = R0.y;
   M.matrix[1][1] = R1.y;
   M.matrix[1][2] = R2.y;
-  M.matrix[1][3] = 0.0f;
 
   M.matrix[2][0] = R0.z;
   M.matrix[2][1] = R1.z;
   M.matrix[2][2] = R2.z;
-  M.matrix[2][3] = 0.0f;
 
   M.matrix[3][0] = R0Dot;
   M.matrix[3][1] = R1Dot;
   M.matrix[3][2] = R2Dot;
-  M.matrix[3][3] = 1.0f;
 
   return M;
 }

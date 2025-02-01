@@ -154,6 +154,9 @@ class PK_CORE_EXPORT Actor
     return nullptr;
   }
 
+  virtual void
+  update(float _deltaTime) {}
+
   /**
    * @brief Get a specific child of the actor.
    * @param _index Position of the desired child.

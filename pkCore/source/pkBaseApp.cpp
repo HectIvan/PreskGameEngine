@@ -131,6 +131,25 @@ getDeltaTime(high_resolution_clock::time_point& _delta)
 }
 
 void
+updateActor(SPtr<Actor>& _pActor, float _deltaTime)
+{
+  _pActor->update(_deltaTime);
+  for (uint32 i = 0; i < _pActor->m_children.size(); ++i) {
+    updateActor(_pActor->m_children[i], _deltaTime);
+  }
+}
+
+void
+update(Scene& _scene, float _deltaTime)
+{
+  for (uint32 i = 0; _scene.m_actors.size(); ++i) {
+    if (_scene.m_actors[i]->m_active) {
+      updateActor(_scene.m_actors[i], _deltaTime);
+    }
+  }
+}
+
+void
 BaseApp::messageLoop()
 {
   // get the starting deltaTime
@@ -144,8 +163,10 @@ BaseApp::messageLoop()
     float deltaTime = getDeltaTime(delta);
     // fixed update timer count.
     m_fixedTimer += deltaTime;
-    // child class update
+    // child class app update
     onUpdate(deltaTime);
+    // update game objects
+    update(m_scene, deltaTime);
     if (m_fixedTimer > 0.016f) {
       std::cout << "updated on: " << m_fixedTimer << std::endl;
       // fixed update

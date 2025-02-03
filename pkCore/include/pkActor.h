@@ -30,7 +30,7 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Actor
 {
  public:
-  Actor() = default;
+  Actor();
   virtual ~Actor()
   {
     clear();
@@ -177,7 +177,7 @@ class PK_CORE_EXPORT Actor
    * @param _active State of the actor.
    */
   void
-  setActive(bool _active) { m_active; }
+  setActive(bool _active) { m_active = _active; }
 
   /**
    * @brief Clears all the data linked to the actor

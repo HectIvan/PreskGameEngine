@@ -2,7 +2,12 @@
 
 namespace pkEngineSDK
 {
-  
+
+Actor::Actor()
+{
+  setActive(true);
+}
+
 void
 Actor::setTransform(Matrix4 _transform)
 {

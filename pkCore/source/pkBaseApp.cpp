@@ -142,7 +142,7 @@ updateActor(SPtr<Actor>& _pActor, float _deltaTime)
 void
 update(Scene& _scene, float _deltaTime)
 {
-  for (uint32 i = 0; _scene.m_actors.size(); ++i) {
+  for (uint32 i = 0; i < _scene.m_actors.size(); ++i) {
     if (_scene.m_actors[i]->m_active) {
       updateActor(_scene.m_actors[i], _deltaTime);
     }
@@ -168,7 +168,6 @@ BaseApp::messageLoop()
     // update game objects
     update(m_scene, deltaTime);
     if (m_fixedTimer > 0.016f) {
-      std::cout << "updated on: " << m_fixedTimer << std::endl;
       // fixed update
       fixedUpdate();
       m_fixedTimer = 0;
@@ -365,7 +364,7 @@ BaseApp::renderActors(Vector<SPtr<Actor>> _gameActors)
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
     if (!_gameActors[i]->m_active) {
-      break;
+      continue;
     }
     // Get the final matrix by taking into account the parent actors
     SPtr<Actor> parent = _gameActors[i]->m_parent;

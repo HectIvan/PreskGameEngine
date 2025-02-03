@@ -47,14 +47,9 @@ PhysicsApp::onInit()
   canon->setPosition(Vector3(-13.0f, 7.0f, -1.0f));
   canon->setRotation(0.0f, 0.0f, -1.5708f);
 
-  // parameter assignation.
-  player->m_speed = 30.0f;
-  player->m_maxSpeed = 30.0f;
-  player->m_bounceFactor = 0.9f;
-  player->m_acceleration = 3.0f;
-  player->m_direction = Vector2(0);
-  player->m_gravity = 1.0f;
-  player->m_fired = false;
+  player->start();
+
+  m_fireDirection = Vector2(0.0f);
 }
 
 void
@@ -62,18 +57,28 @@ PhysicsApp::fixedUpdate()
 {
   SPtr<Actor> canon = m_scene.m_actors[1];
   // clamping the direction of the player
-  player->m_direction.clamp(-1.0f, 1.0f);
+  // player->m_direction.clamp(-1.0f, 1.0f);
 
+  // fire the projectile
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF))
   {
     Vector3 newPos = canon->m_transform.getTranslation3();
     newPos.z += 1.0f;
-    player->m_actor->m_transform.setTranslation(newPos);
-    player->m_direction.x = 1.0f;
-    player->m_direction.y = -1.0f;
-    player->m_fired = true;
-    player->m_actor->setActive(false);
+    player->fire(newPos, m_fireDirection);
+    std::cout << player->m_speed << std::endl;
   }
+  // move left or right
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
+  {
+    m_fireDirection.x -= 1.0f * m_fixedDeltaTime;
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
+  {
+    m_fireDirection.x += 1.0f * m_fixedDeltaTime;
+  }
+
+  m_fireDirection.y = -1.0f + player->m_direction.x;
+
 
   if (player->m_fired) {
     player->gravity(m_fixedDeltaTime);
@@ -81,8 +86,9 @@ PhysicsApp::fixedUpdate()
 
   // move and bounce the player
   player->move(m_fixedDeltaTime, Vector3(player->m_direction.x * player->m_speed,
-    player->m_direction.y * player->m_speed,
-    0.0f));
+                                         player->m_direction.y * player->m_speed,
+                                         0.0f));
+
   player->screenBounce(30, 17);
   // clamp the player speed
   player->m_speed = Math::clamp(player->m_speed, 0, player->m_maxSpeed);

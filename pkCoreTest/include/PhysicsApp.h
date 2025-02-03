@@ -28,4 +28,5 @@ class PhysicsApp : public BaseApp
   fixedUpdate() override;
   
   Player* player;
+  Vector2 m_fireDirection;
 };

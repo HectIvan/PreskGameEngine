@@ -67,6 +67,12 @@
     <Filter Include="include\imgui">
       <UniqueIdentifier>{cc33b101-0a66-4e8c-b246-3fc51bf3136e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\debug">
+      <UniqueIdentifier>{2f4fc196-7749-4980-8965-a42c527517eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\debug">
+      <UniqueIdentifier>{f27c31e5-d2cc-4ff7-b281-9d8ed159169b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -171,6 +177,9 @@
     <ClInclude Include="include\pkScene.h">
       <Filter>include\game</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDebug.h">
+      <Filter>include\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -229,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="include\pkScene.cpp">
       <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDebug.cpp">
+      <Filter>source\debug</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

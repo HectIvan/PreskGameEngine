@@ -45,7 +45,6 @@ void
 Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 {
   view = Matrix4::lookAtLH(_eye, _at, _up);
-  std::cout << _at.x << "  " << _at.y << "  " << _at.z << std::endl;
 
   forward = Vector3(view.matrix[0][2], view.matrix[1][2], view.matrix[2][2]);
   right = Vector3(view.matrix[0][0], view.matrix[1][0], view.matrix[2][0]);

@@ -1,8 +1,7 @@
-#include <iostream>
 #include "ShaderTest.h"
+#include "pkDebug.h"
 
-using std::cout;
-using std::endl;
+using pkEngineSDK::Debug;
 
 void
 ShaderTest::onInit()
@@ -54,7 +53,7 @@ ShaderTest::onUpdate(float _deltaTime)
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
     Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
     m_camera.rotate(-posDif.y, posDif.x, 0.0f);
-    // m_camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
+    Debug::print(posDif);
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
   else {

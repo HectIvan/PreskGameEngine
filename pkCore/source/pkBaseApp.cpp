@@ -1,6 +1,5 @@
-#include <iostream>
-
 #include "pkBaseApp.h"
+#include "pkDebug.h"
 #include "pkDllLoader.h"
 #include "pkGameObject.h"
 #include "pkGraphicsAPI.h"

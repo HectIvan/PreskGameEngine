@@ -44,31 +44,33 @@ Camera::init(uint32 _width,
 void
 Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 {
-  
+  view = Matrix4::lookAtLH(_eye, _at, _up);
+  std::cout << _at.x << "  " << _at.y << "  " << _at.z << std::endl;
+
+  forward = Vector3(view.matrix[0][2], view.matrix[1][2], view.matrix[2][2]);
+  right = Vector3(view.matrix[0][0], view.matrix[1][0], view.matrix[2][0]);
+  up = Vector3(view.matrix[0][1], view.matrix[1][1], view.matrix[2][1]);
 }
 
 void
 Camera::move(Vector3 _dist)
 {
-  std::cout << getForward().x << "  " << getForward().y << "  " << getForward().z << std::endl;
   Vector3 offset = getRight() * _dist.x + Vector3::UP * _dist.y + getForward() * _dist.z;
-  eye += offset;  
-  at = eye + offset;
+  eye += offset;
+  at += offset;
   view = Matrix4::lookAtLH(eye, at, up);
 }
 
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  // view *= Matrix4::rotation(_x, _y, _z);
-  // updateRotation();
-  // Matrix4 rotation = Matrix4::rotation(_x, _y, _z);
-  // Vector4 newForward = (rotation * newForward).normalized();
-  // 
-  // setView(eye, eye - newForward, Vector3::UP);
-
   Matrix4 rotRight = Matrix4::MatrixRotationAxis(getRight(), _y);
   Matrix4 rotUp = Matrix4::MatrixRotationAxis(Vector3::UP, _x);
+  Matrix4 rot = rotRight * rotUp;
+
+  Vector3 newForward = (rot * forward).normalized();
+
+  setView(eye, eye + newForward, Vector3::UP);
 }
 
 void

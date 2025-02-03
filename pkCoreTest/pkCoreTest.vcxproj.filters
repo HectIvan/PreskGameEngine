@@ -21,7 +21,7 @@
     <ClCompile Include="source\Player.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\shaderTest.cpp">
+    <ClCompile Include="source\ShaderTest.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,7 +32,7 @@
     <ClInclude Include="include\Player.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\shaderTest.h">
+    <ClInclude Include="include\ShaderTest.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

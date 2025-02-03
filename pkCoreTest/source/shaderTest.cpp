@@ -1,4 +1,8 @@
-#include "shaderTest.h"
+#include <iostream>
+#include "ShaderTest.h"
+
+using std::cout;
+using std::endl;
 
 void
 ShaderTest::onInit()
@@ -21,7 +25,7 @@ void
 ShaderTest::onUpdate(float _deltaTime)
 {
   // last cursor position
-  Vector2 lastCursorPos = m_eventQueue.mousePosition;
+  // Vector2 lastCursorPos = m_eventQueue.mousePosition;
   // update the camera m_speed
   float camm_speed = m_cameraSpeed * _deltaTime;
   // move forward/backward
@@ -33,10 +37,10 @@ ShaderTest::onUpdate(float _deltaTime)
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
+    m_camera.move(Vector3(camm_speed, 0.0f, 0.0f));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera.move(Vector3(camm_speed, 0.0f, 0.0f));
+    m_camera.move(Vector3(-camm_speed, 0.0f, 0.0f));
   }
   // move up/down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
@@ -48,12 +52,12 @@ ShaderTest::onUpdate(float _deltaTime)
     m_camera.move(Vector3(0.0f, -camm_speed, 0.0f));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
-    Vector2 posDif = (lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
+    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
     m_camera.rotate(-posDif.y, posDif.x, 0.0f);
-    m_camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
-    lastCursorPos = m_eventQueue.mousePosition;
+    // m_camera.addRotation(Vector3(-posDif.y, posDif.x, 0.0f));
+    m_lastCursorPos = m_eventQueue.mousePosition;
   }
   else {
-    lastCursorPos = m_eventQueue.mousePosition;
+    m_lastCursorPos = m_eventQueue.mousePosition;
   }
 }

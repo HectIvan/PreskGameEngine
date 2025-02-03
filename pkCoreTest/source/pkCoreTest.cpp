@@ -1,10 +1,10 @@
 #include "PhysicsApp.h"
-#include "shaderTest.h"
+#include "ShaderTest.h"
 
 int
 main(int argc, const char** argv)
 {
-  PhysicsApp app;
+  ShaderTest app;
   app.init(argv);
   app.messageLoop();
   return 0;

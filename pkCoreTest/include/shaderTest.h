@@ -23,4 +23,5 @@ public:
   onUpdate(float _deltaTime) override;
 
   Actor* m_actor;
+  Vector2 m_lastCursorPos;
 };

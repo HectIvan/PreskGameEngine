@@ -28,6 +28,12 @@
     <Filter Include="include\prerequisites">
       <UniqueIdentifier>{45519aa5-0a72-4626-9f73-3bce6833affb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\ImGui">
+      <UniqueIdentifier>{31335b74-185c-4936-9a0b-e3750f9b34f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ImGui">
+      <UniqueIdentifier>{18cb06ed-4109-47f3-9b29-20bb64810de6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkDX11DepthStencilView.cpp">
@@ -65,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="source\pkDX11Texture.cpp">
       <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11ImGui.cpp">
+      <Filter>source\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

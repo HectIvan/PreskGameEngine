@@ -145,11 +145,16 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth)
 }
 
 void
-DX11GraphicsAPI::compileShaders()
+DX11GraphicsAPI::makeShaders()
 {
   pixelShader = make_shared<DX11PixelShader>();
-  pixelShader->compile();
   vertexShader = make_shared<DX11VertexShader>();
+}
+
+void
+DX11GraphicsAPI::compileShaders()
+{
+  pixelShader->compile();
   vertexShader->compile();
 }
 

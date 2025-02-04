@@ -268,6 +268,13 @@ class DX11GraphicsAPI : public GraphicsAPI
                        uint32 _usage) override;
 
   /**
+   * @brief Get the device pointer.
+   * @return Return te pointer to the device.
+   */
+  SPtr<DX11Device>
+  getDevice() { return m_pDevice; }
+
+  /**
   * Update the constant buffer.
   * 
   * @param _pCBuffer
@@ -318,8 +325,14 @@ class DX11GraphicsAPI : public GraphicsAPI
   clearDepthBuffer(float _depth) override;
 
   /**
-  * Compile shaders.
-  **/
+   * @brief Create shaders.
+   */
+  void
+  makeShaders() override;
+
+  /**
+   * @brief Compile shaders.
+   */
   void
   compileShaders() override;
 

@@ -32,7 +32,7 @@ PhysicsApp::onInit()
   SPtr<Actor> projectile = m_scene.m_actors[0];
   // assign a new model component to the game object.
   projectile->addComponent(newModel("sprite.fbx"));
-  projectile->addComponent(newMaterial("circle.png"));
+  projectile->addComponent(createMaterial("circle.png"));
   // add the game object to the player.
   player->m_actor = projectile;
 
@@ -40,7 +40,7 @@ PhysicsApp::onInit()
   m_scene.instantiate();
   SPtr<Actor> canon = m_scene.m_actors[1];
   canon->addComponent(m_scene.m_actors[0]->getComponent<Model>());
-  canon->addComponent(newMaterial("Canon.png"));
+  canon->addComponent(createMaterial("Canon.png"));
   canon->move(Vector3(-2.0f, 0.0f, 0.0f));
   canon->setPosition(Vector3(-13.0f, 7.0f, 0.0f));
   projectile->setPosition(canon->m_transform.getTranslation3());

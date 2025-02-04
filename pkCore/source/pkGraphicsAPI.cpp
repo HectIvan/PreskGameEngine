@@ -9,6 +9,11 @@
 namespace pkEngineSDK
 {
 
+PK_CORE_EXPORT GraphicsAPI&
+g_GraphicAPI()
+{
+  return GraphicsAPI::instance();
+}
 }
 
 #endif

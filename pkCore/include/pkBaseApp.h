@@ -22,24 +22,20 @@
 * Includes
 **/
 /*********************************************/
-#include <chrono>
-
 #include "pkCamera.h"
-#include "pkConstantBuffer.h"
 #include "pkEventQueue.h"
 #include "pkGameObject.h"
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"
-#include "pkScene.h"
+#include "pkRendererManager.h"
+#include "pkResourceManager.h"
+#include "pkTimeManager.h"
 #include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-class GraphicsAPI;
-
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
+class Camera;
 
 class PK_CORE_EXPORT BaseApp
 {
@@ -91,16 +87,17 @@ class PK_CORE_EXPORT BaseApp
   fixedUpdate() {}
 
   /**
-   * @brief Render the scene.
-   */
-  void
-  render();
-
-  /**
    * @brief Render function for any child class of this base class
    */
   virtual void
   onRender() {}
+
+  /**
+   * @brief Create a material from a texture.
+   * @param _path Path of the texture.
+   */
+  SPtr<Material>
+  createMaterial(String _path);
 
   /**
    * @brief Create a new model component.
@@ -109,14 +106,6 @@ class PK_CORE_EXPORT BaseApp
    */
   SPtr<Model>
   newModel(String _modelName = "");
-
-  /**
-   * @brief Create a new Material component.
-   * @param _textureName Name of the texture file to load.
-   * @return Pointer to the new material object.
-   */
-  SPtr<Material>
-  newMaterial(String _textureName = "");
 
   /**
    * @brief Find an actor by name.
@@ -143,58 +132,12 @@ class PK_CORE_EXPORT BaseApp
   getAllActorsWithComponent();
 
  private:
-  /**
-   * @brief Update the camera.
-   * @param _pCamera Camera to update.
-   */
-  void
-  updateCamera(Camera* _pCamera);
-
-  /**
-   * @brief Loads a model from a file.
-   * @param _path File path.
-   */
-  SPtr<Model>
-  loadModel(String& _fileName);
 
   /**
    * @brief Create the constant buffers needed.
    */
   void
   createBuffers();
-
-  /**
-   * @brief Set the buffers of each game object.
-   */
-  void
-  setActorsBuffers();
-
-  /**
-   * @brief Set the Vertex Shader constant buffers
-   */
-  void
-  VSSetConstantBuffers();
-
-  /**
-   * @brief Set the Pixel Shader constant buffers
-   */
-  void
-  PSSetConstantBuffers();
-
-  /**
-   * @brief Converts the actor to a game object pointer.
-   * @param _subject Actor to convert.
-   * @return Pointer to the game object
-   */
-  template<typename T>
-  SPtr<T>
-  actorToClass(SPtr<Actor>& _subject);
-
-  /**
-   * @brief Render the game objects in scene.
-   */
-  void
-  renderActors(Vector<SPtr<Actor>> _gameActors);
 
  public:
   // system
@@ -205,20 +148,11 @@ class PK_CORE_EXPORT BaseApp
   // vector of game objects in the scene
   Scene m_scene;
 
-  // light source
-  Light light;
-
-  // constant buffers
-  SPtr<ConstantBuffer> m_buffer;
-  SPtr<ConstantBuffer> m_cBView;
-  SPtr<ConstantBuffer> m_cBProjection;
-  SPtr<ConstantBuffer> m_cBWorld;
-  SPtr<ConstantBuffer> m_cbLight;
-
   // camera movement speed
   float m_cameraSpeed;
 
   // fixed update
+  float m_deltaTime = 0.0f;
   float m_fixedTimer = 0.0f;
   float m_fixedDeltaTime = 0.016f;
 };

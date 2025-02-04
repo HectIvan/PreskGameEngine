@@ -17,14 +17,12 @@ ShaderTest::onInit()
 
   m_scene.instantiate();
   m_scene.m_actors[0]->addComponent(newModel("drakefire_pistol_low.obj"));
-  m_scene.m_actors[0]->addComponent(newMaterial("base_albedo.png"));
+  m_scene.m_actors[0]->addComponent(createMaterial("base_albedo.png"));
 }
 
 void
 ShaderTest::onUpdate(float _deltaTime)
 {
-  // last cursor position
-  // Vector2 lastCursorPos = m_eventQueue.mousePosition;
   // update the camera m_speed
   float camm_speed = m_cameraSpeed * _deltaTime;
   // move forward/backward

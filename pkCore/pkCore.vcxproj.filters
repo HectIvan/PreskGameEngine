@@ -73,6 +73,9 @@
     <Filter Include="source\debug">
       <UniqueIdentifier>{f27c31e5-d2cc-4ff7-b281-9d8ed159169b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\imgui">
+      <UniqueIdentifier>{a18d7496-f355-4cef-be71-660a483699d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -180,6 +183,36 @@
     <ClInclude Include="include\pkDebug.h">
       <Filter>include\debug</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkImGui.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imconfig.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_internal.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_rectpack.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_textedit.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_truetype.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkRendererManager.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkResourceManager.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTimeManager.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -241,6 +274,33 @@
     </ClCompile>
     <ClCompile Include="source\pkDebug.cpp">
       <Filter>source\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_demo.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_draw.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_tables.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_widgets.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkRendererManager.cpp">
+      <Filter>source\base app</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkResourceManager.cpp">
+      <Filter>source\base app</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTimeManager.cpp">
+      <Filter>source\base app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

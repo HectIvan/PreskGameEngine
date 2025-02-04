@@ -52,8 +52,14 @@ public:
   /* Shaders */
 
   /**
-  * Compile shaders.
-  **/
+   * @brief Create shaders.
+   */
+  virtual void
+  makeShaders() = 0;
+
+  /**
+   * @brief Compile shaders.
+   */
   virtual void
   compileShaders() = 0;
 
@@ -295,4 +301,7 @@ public:
   // world matrix
   // Matrix4 world;
 };
+
+PK_CORE_EXPORT GraphicsAPI&
+g_GraphicAPI();
 }

@@ -11,11 +11,11 @@ using pkEngineSDK::SPtr;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 
-class Player
+class Projectile
 {
  public:
-  Player() = default;
-  virtual ~Player() = default;
+   Projectile() = default;
+  virtual ~Projectile() = default;
 
   /**
    * @brief Start the projectile.
@@ -24,9 +24,9 @@ class Player
   start();
 
   /**
-   * @brief Move the player.
+   * @brief Move the Projectile.
    * @param _deltaTime Time between the previous frame and the current one.
-   * @param _direction Direction in which the player will move.
+   * @param _direction Direction in which the Projectile will move.
    */
   void
   move(float _deltaTime, Vector3 _direction);
@@ -39,6 +39,9 @@ class Player
   void
   fire(Vector3 _startPos, Vector2 _direction);
 
+  void
+  projTimer(float _deltaTime);
+
   /**
    * @brief bounce the projectile on the walls of the screen.
    * @param _width Width of the screen.
@@ -48,7 +51,7 @@ class Player
   screenBounce(float _width, float _height);
 
   /**
-   * @brief Apply gravity to the player direction.
+   * @brief Apply gravity to the Projectile direction.
    * @param _deltaTime Delta Time of the frames.
    */
   void
@@ -63,4 +66,6 @@ class Player
   Vector2 m_direction;
   SPtr<Actor> m_actor;
   bool m_fired;
+  float m_lifeTime = 0.0f;
+  float m_lifeTimer;
 };

@@ -131,8 +131,7 @@ BaseApp::messageLoop()
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop, while the escape key has not been pressed
-  while (!m_eventQueue.iskeyPressed(KEY::kEsc))
-  {
+  while (!m_eventQueue.iskeyPressed(KEY::kEsc)) {
     // event window specific input
     m_eventQueue.windowInput();
     // update the delta time

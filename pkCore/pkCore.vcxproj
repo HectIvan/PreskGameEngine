@@ -199,6 +199,7 @@
     <ClInclude Include="include\pkMesh.h" />
     <ClInclude Include="include\pkModel.h" />
     <ClInclude Include="include\pkMouseWheelData.h" />
+    <ClInclude Include="include\pkPass.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
     <ClInclude Include="include\pkRendererManager.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="source\pkDllLoader.cpp" />
     <ClCompile Include="source\pkGameObject.cpp" />
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
+    <ClCompile Include="source\pkImGui_win32.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />
     <ClCompile Include="source\pkMain.cpp" />

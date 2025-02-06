@@ -18,7 +18,7 @@
     <ClCompile Include="source\PhysicsApp.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\Player.cpp">
+    <ClCompile Include="source\Projectile.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\ShaderTest.cpp">
@@ -29,10 +29,13 @@
     <ClInclude Include="include\PhysicsApp.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Player.h">
+    <ClInclude Include="include\Projectile.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ShaderTest.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Cannon.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

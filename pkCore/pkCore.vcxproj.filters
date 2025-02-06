@@ -213,6 +213,9 @@
     <ClInclude Include="include\pkTimeManager.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkPass.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -301,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="source\pkTimeManager.cpp">
       <Filter>source\base app</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui_win32.cpp">
+      <Filter>source\imgui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

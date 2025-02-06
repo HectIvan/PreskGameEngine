@@ -57,15 +57,17 @@ namespace KEY
     k9 = 0x39,
 
     // used keybinds
-    kW = 0x57,
     kA = 0x41,
-    kS = 0x53,
+    kB = 0x42,
+    kC = 0x43,
     kD = 0x44,
     kE = 0x45,
     kF = 0x46,
     kG = 0x47,
     kH = 0x48,
     kQ = 0x51,
+    kS = 0x53,
+    kW = 0x57,
     
     kEsc = 0x1B,
     kLControl = 0xA2,

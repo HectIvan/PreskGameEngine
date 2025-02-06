@@ -2,6 +2,7 @@
 #include "pkDebug.h"
 
 using pkEngineSDK::Debug;
+using pkEngineSDK::Matrix4;
 
 void
 ShaderTest::onInit()
@@ -56,5 +57,16 @@ ShaderTest::onUpdate(float _deltaTime)
   }
   else {
     m_lastCursorPos = m_eventQueue.mousePosition;
+  }
+
+  float rot = 1.0f * m_deltaTime;
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft))
+  {
+    rot *= -1.0f;
+    m_scene.m_actors[0]->m_transform *= Matrix4::rotationY(rot);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight))
+  {
+    m_scene.m_actors[0]->m_transform *= Matrix4::rotationY(rot);
   }
 }

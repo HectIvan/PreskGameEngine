@@ -180,6 +180,13 @@ class PK_CORE_EXPORT Actor
   setActive(bool _active) { m_active = _active; }
 
   /**
+   * @brief If the actor is active or not.
+   * @return A true or false value of the actor activity.
+   */
+  bool
+  isActive() { return m_active; }
+
+  /**
    * @brief Clears all the data linked to the actor
    */
   void

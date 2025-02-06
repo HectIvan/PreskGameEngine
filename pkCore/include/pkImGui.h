@@ -3,9 +3,6 @@
 #include "externals/imgui.h"
 #include "pkPrerequisitesCore.h"
 #include "pkWindow.h"
-#if PK_PLATFORM == PK_PLATFORM_WIN32
-
-#endif
 
 namespace pkEngineSDK
 {
@@ -21,11 +18,5 @@ public:
    */
   void
   init(WindowHandle& _hWnd);
-
-  /**
-   * Init aPI specific ImGui
-   */
-  // void
-  // APIInit();
 };
 }

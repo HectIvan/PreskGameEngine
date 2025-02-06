@@ -1,17 +1,21 @@
 #include "PhysicsApp.h"
+#include "pkDebug.h"
+#include "pkMath.h"
+#include "pkModel.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
-#include "pkModel.h"
-#include "pkMath.h"
 
 #include <iostream>
 
+using pkEngineSDK::Debug;
+using pkEngineSDK::Math;
+using pkEngineSDK::Model;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Key;
-using pkEngineSDK::Math;
-using pkEngineSDK::Model;
+
+using std::make_shared;
 
 void
 PhysicsApp::onInit()
@@ -25,71 +29,145 @@ PhysicsApp::onInit()
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f), // up vector
                 pkEngineSDK::CAMERA_PROJ::kOrthographic);
-  // create the bullet.
-  player = new Player();
-  // create a new game object.
-  m_scene.instantiate();
-  SPtr<Actor> projectile = m_scene.m_actors[0];
-  // assign a new model component to the game object.
-  projectile->addComponent(newModel("sprite.fbx"));
-  projectile->addComponent(createMaterial("circle.png"));
-  // add the game object to the player.
-  player->m_actor = projectile;
 
-  // canon creation.
-  m_scene.instantiate();
-  SPtr<Actor> canon = m_scene.m_actors[1];
-  canon->addComponent(m_scene.m_actors[0]->getComponent<Model>());
-  canon->addComponent(createMaterial("Canon.png"));
-  canon->move(Vector3(-2.0f, 0.0f, 0.0f));
-  canon->setPosition(Vector3(-13.0f, 7.0f, 0.0f));
-  projectile->setPosition(canon->m_transform.getTranslation3());
-  canon->setPosition(Vector3(-13.0f, 7.0f, -1.0f));
-  canon->setRotation(0.0f, 0.0f, -1.5708f);
+  m_type = PHYSICS_TYPE::kEuler;
 
-  player->start();
+  // create one model instance
+  m_projectileCount = 100;
+  m_projDuration = 10.0f;
+  float projSpeed = 80.0f;
+  m_spriteModel = newModel("sprite.fbx");
+  m_projectileMaterial = createMaterial("circle.png");
+
+  /**
+   * Cannon creation
+   */
+  m_scene.instantiate();
+  m_cannon = std::make_shared<Cannon>();
+  m_cannon->m_actor = m_scene.m_actors[0];
+  m_cannon->m_actor->addComponent(m_spriteModel);
+  m_cannon->m_actor->addComponent(createMaterial("Canon.png"));
+  m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
+  m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
+  m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
+
+  for (uint32_t i = 0; i < m_projectileCount; ++i) {
+    // instantiate an actor
+    m_scene.instantiate();
+    // make new instance of a projectile
+    SPtr<Projectile> proj = make_shared<Projectile>();
+    // get the last instance
+    proj->m_actor = m_scene.m_actors[m_scene.m_actors.size() - 1];
+    // start the projectile
+    proj->start();
+    // set projectile speed
+    proj->m_speed = projSpeed;
+    proj->m_maxSpeed = projSpeed;
+    // set the projectile lifetime
+    proj->m_lifeTimer = m_projDuration;
+    // assign a new model component to the game object.
+    proj->m_actor->addComponent(m_spriteModel);
+    proj->m_actor->addComponent(m_projectileMaterial);
+    // add the game object to the vector of projectiles
+    m_projectiles.push_back(proj);
+  }
 
   m_fireDirection = Vector2(0.0f);
+}
+
+
+void
+PhysicsApp::onUpdate(float _deltaTime)
+{
+  if (m_type == PHYSICS_TYPE::kEuler) {
+    physics(_deltaTime);
+  }
 }
 
 void
 PhysicsApp::fixedUpdate()
 {
-  SPtr<Actor> canon = m_scene.m_actors[1];
-  // clamping the direction of the player
-  // player->m_direction.clamp(-1.0f, 1.0f);
+  if (m_type == PHYSICS_TYPE::kVerlet) {
+    physics(m_fixedDeltaTime);
+  }
+}
 
+void
+PhysicsApp::physics(float _deltaTime)
+{
   // fire the projectile
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF))
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
+    !m_firing)
   {
-    Vector3 newPos = canon->m_transform.getTranslation3();
-    newPos.z += 1.0f;
-    player->fire(newPos, m_fireDirection);
-    std::cout << player->m_speed << std::endl;
+    fireProjectile();
+    m_firing = true;
+  }
+  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF))
+  {
+    m_firing = false;
   }
   // move left or right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
   {
-    m_fireDirection.x -= 1.0f * m_fixedDeltaTime;
+    m_fireDirection.x -= 1.0f * _deltaTime;
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
   {
-    m_fireDirection.x += 1.0f * m_fixedDeltaTime;
+    m_fireDirection.x += 1.0f * _deltaTime;
   }
-
-  m_fireDirection.y = -1.0f + player->m_direction.x;
-
-
-  if (player->m_fired) {
-    player->gravity(m_fixedDeltaTime);
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
+      !m_changingType) {
+    m_changingType = true;
+    // change simulation type
+    if (m_type == PHYSICS_TYPE::kEuler) {
+      m_type = PHYSICS_TYPE::kVerlet;
+      Debug::print("Verlet integration active");
+    }
+    else {
+      m_type = PHYSICS_TYPE::kEuler;
+      Debug::print("Euler integration active");
+    }
   }
+  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
+    m_changingType = false;
+  }
+  // calculate the Y direction of the fire direction
+  m_fireDirection.y = -1.0f + Math::abs(m_fireDirection.x);
+  m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
+  m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
-  // move and bounce the player
-  player->move(m_fixedDeltaTime, Vector3(player->m_direction.x * player->m_speed,
-                                         player->m_direction.y * player->m_speed,
-                                         0.0f));
+  // apply gravity to every projectile
+  for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
+    if (m_projectiles[i]->m_fired) {
+      m_projectiles[i]->gravity(_deltaTime);
+    }
+    // move and bounce the player
+    m_projectiles[i]->move(_deltaTime, Vector3(m_projectiles[i]->m_direction.x *
+                                                     m_projectiles[i]->m_speed,
+                                                     m_projectiles[i]->m_direction.y *
+                                                     m_projectiles[i]->m_speed,
+                                                     0.0f));
+    m_projectiles[i]->screenBounce(30, 17);
+    // clamp the projectile speed
+    m_projectiles[i]->m_speed = Math::clamp(m_projectiles[i]->m_speed,
+                                            0,
+                                            m_projectiles[i]->m_maxSpeed);
+    if (m_projectiles[i]->m_actor->isActive()) {
+      m_projectiles[i]->projTimer(_deltaTime);
+    }
+  }
+}
 
-  player->screenBounce(30, 17);
-  // clamp the player speed
-  player->m_speed = Math::clamp(player->m_speed, 0, player->m_maxSpeed);
+void
+PhysicsApp::fireProjectile()
+{
+  Vector3 newPos = m_cannon->m_actor->m_transform.getTranslation3();
+  newPos.z += 1.0f;
+  for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
+    if (!m_projectiles[i]->m_actor->isActive())
+    {
+      m_projectiles[i]->fire(newPos, m_fireDirection);
+      return;
+    }
+  }
 }

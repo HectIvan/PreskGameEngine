@@ -17,9 +17,15 @@ void
 run(String _name, Window& _window);
 
 SPtr<Material>
-BaseApp::createMaterial(String _path)
+BaseApp::createMaterial()
 {
-  return g_ResourceManager().newMaterial(_path);
+  return g_ResourceManager().newMaterial();
+}
+
+SPtr<Texture>
+BaseApp::createTexture(String _name)
+{
+  return g_ResourceManager().newTexture(_name);
 }
 
 SPtr<Model>
@@ -29,7 +35,8 @@ BaseApp::newModel(String _modelName)
   SPtr<Model> model = g_ResourceManager().loadModel(_modelName);
   // create a material.
   for (uint32 i = 0; i < model->meshes.size(); ++i) {
-    model->meshes[i].material = g_ResourceManager().newMaterial(model->meshes[i].materialPath);
+    model->meshes[i].material = createMaterial();
+    model->meshes[i].material->diffuse = createTexture(model->meshes[i].materialPath);
   }
   return model;
 }

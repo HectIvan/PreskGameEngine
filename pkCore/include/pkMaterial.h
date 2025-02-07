@@ -9,8 +9,8 @@
 *
 * @bug No bug known.
 * 
-* @HectIvan 21/11/2024
-* added a way to get the material current component type.
+* @HectIvan 06/02/2025
+* added functions to set each texture in the material
 */
 /************************************************************************/
 #pragma once
@@ -44,10 +44,47 @@ class Material : public Component
   getObjType() { return COMPONENT_TYPE::kMaterial; }
 
   /**
-   * @brief Set the diffuse texture of the material.
+   * @brief Set a texture of the material.
+   * @param _pTexture Texture to change.
+   * @param _pNewTexture New texture.
    */
   void
   setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
+
+  /**
+   * @brief Set the diffuse texture.
+   * @param _pTexture New diffuse texture.
+   */
+  FORCEINLINE void
+  setDiffuse(SPtr<Texture> _pTexture) { diffuse = _pTexture; }
+
+  /**
+   * @brief Set the metallic texture.
+   * @param _pTexture New metallic texture.
+   */
+  FORCEINLINE void
+  setMetallic(SPtr<Texture> _pTexture) { metallic = _pTexture; }
+
+  /**
+   * @brief Set the normal texture.
+   * @param _pTexture New normal texture.
+   */
+  FORCEINLINE void
+  setNormal(SPtr<Texture> _pTexture) { normal = _pTexture; }
+
+  /**
+   * @brief Set the height texture.
+   * @param _pTexture New height texture.
+   */
+  FORCEINLINE void
+  setHeight(SPtr<Texture> _pTexture) { height = _pTexture; }
+
+  /**
+   * @brief Set the occlusion texture.
+   * @param _pTexture New occlusion texture.
+   */
+  FORCEINLINE void
+  setOcclusion(SPtr<Texture> _pTexture) { occlusion = _pTexture; }
 
  public:
   String m_name;

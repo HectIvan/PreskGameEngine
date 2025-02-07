@@ -9,10 +9,8 @@
 *
 * @bug. Children will not follow their parent transform correctly.
 * 
-* @HectIvan 27/01/2025
-* @brief Changed the children transform inheritance.
-* @brief Added a new function that allows to convert any actor into any class,
-* the value returned will depend on wether the cast was successful or not.
+* @HectIvan 06/02/2025
+* @brief Changed the Create Material function and added a new create Texture function.
 */
 /************************************************************************/
 #pragma once
@@ -94,10 +92,18 @@ class PK_CORE_EXPORT BaseApp
 
   /**
    * @brief Create a material from a texture.
-   * @param _path Path of the texture.
+   * @return The material pointer.
    */
   SPtr<Material>
-  createMaterial(String _path);
+  createMaterial();
+
+  /**
+   * @brief Create a new Texture.
+   * @param _name Texture Name.
+   * @return The texture pointer.
+   */
+  SPtr<Texture>
+  createTexture(String _name);
 
   /**
    * @brief Create a new model component.

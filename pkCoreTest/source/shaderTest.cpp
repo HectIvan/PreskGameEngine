@@ -3,6 +3,8 @@
 
 using pkEngineSDK::Debug;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::SPtr;
+using pkEngineSDK::Material;
 
 void
 ShaderTest::onInit()
@@ -18,7 +20,8 @@ ShaderTest::onInit()
 
   m_scene.instantiate();
   m_scene.m_actors[0]->addComponent(newModel("drakefire_pistol_low.obj"));
-  m_scene.m_actors[0]->addComponent(createMaterial("base_albedo.png"));
+  m_scene.m_actors[0]->addComponent(createMaterial());
+  m_scene.m_actors[0]->getComponent<Material>()->setDiffuse(createTexture("base_albedo.png"));
 }
 
 void
@@ -52,21 +55,20 @@ ShaderTest::onUpdate(float _deltaTime)
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
     Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
     m_camera.rotate(-posDif.y, posDif.x, 0.0f);
-    Debug::print(posDif);
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
   else {
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
 
+  SPtr<Actor> actor = m_scene.m_actors[0];
+
   float rot = 1.0f * m_deltaTime;
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft))
-  {
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     rot *= -1.0f;
-    m_scene.m_actors[0]->m_transform *= Matrix4::rotationY(rot);
+    actor->m_transform *= Matrix4::rotationY(rot);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight))
-  {
-    m_scene.m_actors[0]->m_transform *= Matrix4::rotationY(rot);
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+    actor->m_transform *= Matrix4::rotationY(rot);
   }
 }

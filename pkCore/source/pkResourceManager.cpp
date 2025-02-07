@@ -5,19 +5,20 @@ namespace pkEngineSDK
 {
 
 SPtr<Material>
-ResourceManager::newMaterial(String _textureName)
+ResourceManager::newMaterial()
 {
-  // create the texture adress.
-  String textureName = "textures/" + _textureName;
-  // create the texture.
-  SPtr<Texture> texture = g_GraphicAPI().createTextureFromFile(textureName, 8, false, 28);
-  // if creating the texture failed, return the model without a texture.
-  if (!texture) { return nullptr; }
   // create the material component.
   SPtr<Material> pMatComp = make_shared<Material>();
-  pMatComp->setTexture(pMatComp->diffuse, texture);
-  // return the texture.
+  // return the material.
   return pMatComp;
+}
+
+SPtr<Texture>
+ResourceManager::newTexture(String _name)
+{
+  // create the texture adress.
+  String textureName = "textures/" + _name;
+  return g_GraphicAPI().createTextureFromFile(textureName, 8, false, 28);
 }
 
 SPtr<Model>

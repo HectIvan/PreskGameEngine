@@ -37,7 +37,8 @@ PhysicsApp::onInit()
   m_projDuration = 10.0f;
   float projSpeed = 80.0f;
   m_spriteModel = newModel("sprite.fbx");
-  m_projectileMaterial = createMaterial("circle.png");
+  m_projectileMaterial = createMaterial();
+  m_projectileMaterial->setDiffuse(createTexture("circle.png"));
 
   /**
    * Cannon creation
@@ -46,7 +47,8 @@ PhysicsApp::onInit()
   m_cannon = std::make_shared<Cannon>();
   m_cannon->m_actor = m_scene.m_actors[0];
   m_cannon->m_actor->addComponent(m_spriteModel);
-  m_cannon->m_actor->addComponent(createMaterial("Canon.png"));
+  m_cannon->m_actor->addComponent(createMaterial());
+  m_cannon->m_actor->getComponent<Material>()->setDiffuse(createTexture("Canon.png"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);

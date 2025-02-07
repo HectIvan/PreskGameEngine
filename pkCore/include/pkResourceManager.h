@@ -9,8 +9,9 @@
 *
 * @bug No current function.
 *
-* @HectIvan 04/02/20245
-* File Creation.
+* @HectIvan 06/02/20245
+* @brief Added a newMaterial function that creates a material pointer.
+* @brief Added a newTexture function that creates a texture pointer.
 */
 /************************************************************************/
 #pragma once
@@ -39,7 +40,15 @@ class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
    * @return Pointer to the new material object.
    */
   SPtr<Material>
-  newMaterial(String _textureName);
+  newMaterial();
+
+  /**
+   * @brief Create a new Texture.
+   * @param _name Texture Name.
+   * @return The texture pointer.
+   */
+  SPtr<Texture>
+  newTexture(String _name);
 
   /**
    * @brief Loads a model from a file.

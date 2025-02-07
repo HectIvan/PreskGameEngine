@@ -124,8 +124,14 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
     if (gameObject) {
       // set the diffuse texture to the resource view if the model has a material
       if (gameObject->getComponent<Material>()) {
-        // set the material texture to the shader
-        g_GraphicAPI().setShaderResourceView(gameObject->getComponent<Material>()->diffuse);
+        // get the material
+        SPtr<Material> material = gameObject->getComponent<Material>();
+        // set the material textures to the shader
+        g_GraphicAPI().setShaderResourceView(material->diffuse, 0);
+        g_GraphicAPI().setShaderResourceView(material->normal, 1);
+        g_GraphicAPI().setShaderResourceView(material->height, 2);
+        g_GraphicAPI().setShaderResourceView(material->metallic, 3);
+        g_GraphicAPI().setShaderResourceView(material->occlusion, 4);
         g_GraphicAPI().setSampler();
       }
       // render the model component
@@ -143,7 +149,7 @@ void
 RendererManager::renderModel(Model& _model)
 {
   // get a reference from the api
-  GraphicsAPI& api = GraphicsAPI::instance();
+  // GraphicsAPI& api = GraphicsAPI::instance();
   g_GraphicAPI().setInputLayout();
   g_GraphicAPI().setVertexBuffer(_model.vertexB);
   g_GraphicAPI().setIndexBuffer(_model.indexB);

@@ -90,6 +90,16 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       sv.Tex.x = _mesh->mTextureCoords[0][i].x;
       sv.Tex.y = _mesh->mTextureCoords[0][i].y;
     }
+
+    if (_mesh->HasTangentsAndBitangents()) {
+      sv.tangent.x = _mesh->mTangents[i].x;
+      sv.tangent.y = _mesh->mTangents[i].y;
+      sv.tangent.z = _mesh->mTangents[i].z;
+
+      sv.bitangent.x = _mesh->mBitangents[i].x;
+      sv.bitangent.y = _mesh->mBitangents[i].y;
+      sv.bitangent.z = _mesh->mBitangents[i].z;
+    }
     // else { sv.Tex = Vector2(0.0f); }
     meshProcess.vertexVector.push_back(sv);
   }

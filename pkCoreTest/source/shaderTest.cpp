@@ -19,9 +19,14 @@ ShaderTest::onInit()
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
   m_scene.instantiate();
-  m_scene.m_actors[0]->addComponent(newModel("drakefire_pistol_low.obj"));
-  m_scene.m_actors[0]->addComponent(createMaterial());
-  m_scene.m_actors[0]->getComponent<Material>()->setDiffuse(createTexture("base_albedo.png"));
+  SPtr<Actor> pistol = m_scene.m_actors[0];
+  pistol->addComponent(newModel("drakefire_pistol_low.obj"));
+  pistol->addComponent(createMaterial());
+  SPtr<Material> pMaterial = pistol->getComponent<Material>();
+  pMaterial->setDiffuse(createTexture("drakePistol/base_albedo.png"));
+  pMaterial->setOcclusion(createTexture("drakePistol/base_AO.png"));
+  pMaterial->setMetallic(createTexture("drakePistol/base_metallic.png"));
+  pMaterial->setNormal(createTexture("drakePistol/base_normal.png"));
 }
 
 void

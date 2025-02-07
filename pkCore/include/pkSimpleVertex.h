@@ -29,6 +29,8 @@ struct SimpleVertex
   Vector3 pos;
   Vector3 normal;
   Vector2 Tex;
+  Vector3 tangent;
+  Vector3 bitangent;
 
   // int32 boneIDs[MAX_BONE_INFLUENCE];
   // float weights[MAX_BONE_INFLUENCE];

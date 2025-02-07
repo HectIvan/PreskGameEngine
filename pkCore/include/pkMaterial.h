@@ -59,13 +59,6 @@ class Material : public Component
   setDiffuse(SPtr<Texture> _pTexture) { diffuse = _pTexture; }
 
   /**
-   * @brief Set the metallic texture.
-   * @param _pTexture New metallic texture.
-   */
-  FORCEINLINE void
-  setMetallic(SPtr<Texture> _pTexture) { metallic = _pTexture; }
-
-  /**
    * @brief Set the normal texture.
    * @param _pTexture New normal texture.
    */
@@ -80,6 +73,13 @@ class Material : public Component
   setHeight(SPtr<Texture> _pTexture) { height = _pTexture; }
 
   /**
+   * @brief Set the metallic texture.
+   * @param _pTexture New metallic texture.
+   */
+  FORCEINLINE void
+  setMetallic(SPtr<Texture> _pTexture) { metallic = _pTexture; }
+
+  /**
    * @brief Set the occlusion texture.
    * @param _pTexture New occlusion texture.
    */
@@ -91,9 +91,9 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   SPtr<Texture> diffuse;
-  SPtr<Texture> metallic;
   SPtr<Texture> normal;
   SPtr<Texture> height;
+  SPtr<Texture> metallic;
   SPtr<Texture> occlusion;
 };
 }

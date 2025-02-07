@@ -5,10 +5,10 @@ namespace pkEngineSDK
 {
 
 Mesh::Mesh(Vector<SimpleVertex> _vertex,
-               Vector<uint32> _index,
-               uint32 _vertexCount,
-               uint32 _numIndex,
-               Vector<Texture*> _textures)
+           Vector<uint32> _index,
+           uint32 _vertexCount,
+           uint32 _numIndex,
+           Vector<Texture*> _textures)
 {
   vertexVector = _vertex;
   indexVector = _index;

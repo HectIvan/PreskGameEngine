@@ -139,31 +139,23 @@ class DX11GraphicsAPI : public GraphicsAPI
              uint32 _numSamplers = 1) override;
 
   /**
-  * Set a texture to the resource view.
-  * 
-  * param _pTexture
-  * Pointer to the texture.
-  * 
-  * @param _start
-  * Where the setting will start.
-  * 
-  * @param _numViews
-  * How many views are there.
-  **/
+   * @brief Set a texture to the resource view.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
   void
   setShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
                         uint32 _numViews = 1) override;
 
   /**
-  * create a texture from file.
-  * 
-  * @param _fileName
-  * Name of the texture.
-  * 
-  * @param _bindFlags
-  * What kind of binding will it have
-  **/
+   * @brief Create a texture from file.
+   * @param _fileName Name of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @param _format What format will the texture be.
+   */
   SPtr<Texture>
   createTextureFromFile(String& _fileName,
                         uint32 _bindFlags,

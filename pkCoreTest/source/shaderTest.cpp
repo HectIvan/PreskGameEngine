@@ -1,10 +1,21 @@
 #include "ShaderTest.h"
 #include "pkDebug.h"
+#include "pkGraphicsAPI.h"
+#include "pkGraphicTypes.h"
+#include "pkRendererManager.h"
+#include "pkScene.h"
+#include "pkGraphicsAPI.h"
 
 using pkEngineSDK::Debug;
-using pkEngineSDK::Matrix4;
-using pkEngineSDK::SPtr;
+using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::Light;
 using pkEngineSDK::Material;
+using pkEngineSDK::Matrix4;
+using pkEngineSDK::Scene;
+using pkEngineSDK::SPtr;
+using pkEngineSDK::TEXTURE_FORMATS::kPK_FORMAT_R32G32B32_FLOAT;
+using pkEngineSDK::uint32;
 
 void
 ShaderTest::onInit()
@@ -17,6 +28,15 @@ ShaderTest::onInit()
                 Vector3(0.0f, 0.0f, -30.0f), // position
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
+
+  // m_pRTDepth = g_GraphicAPI().createTexture(nullptr,
+  //                                           4,
+  //                                           m_window.getWidth(),
+  //                                           m_window.getHeight(),
+  //                                           kPK_FORMAT_R32G32B32_FLOAT,
+  //                                           0,
+  //                                           64,
+  //                                           false);
 
   m_scene.instantiate();
   SPtr<Actor> pistol = m_scene.m_actors[0];
@@ -76,4 +96,30 @@ ShaderTest::onUpdate(float _deltaTime)
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     actor->m_transform *= Matrix4::rotationY(rot);
   }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+    rot *= -1.0f;
+    actor->m_transform *= Matrix4::rotationX(rot);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+    actor->m_transform *= Matrix4::rotationX(rot);
+  }
+}
+
+void
+ShaderTest::onRender(Scene& _scene)
+{
+  // update the light buffer
+  g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
+                                      &g_RenderManager().light,
+                                      static_cast<uint32>(sizeof(Light)));
+  // Set shaders
+  g_GraphicAPI().setShaders();
+  // set light
+  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  g_RenderManager().light.LightDir = Vector3::FORWARD;
+  // set constant buffers for the pixel and vertex shaders
+  g_RenderManager().VSSetConstantBuffers();
+  g_RenderManager().PSSetConstantBuffers();
+  // render the objects
+  g_RenderManager().renderActors(_scene.m_actors);
 }

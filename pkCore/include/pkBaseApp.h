@@ -85,10 +85,17 @@ class PK_CORE_EXPORT BaseApp
   fixedUpdate() {}
 
   /**
+   * @brief Base app render function.
+   * @param _scene Scene to render.
+   */
+  void
+  render(Scene& _scene);
+
+  /**
    * @brief Render function for any child class of this base class
    */
   virtual void
-  onRender() {}
+  onRender(Scene& _scene) {}
 
   /**
    * @brief Create a material from a texture.

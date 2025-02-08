@@ -216,6 +216,12 @@
     <ClInclude Include="include\pkPass.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDepthStencilView.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGraphicTypes.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

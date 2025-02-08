@@ -96,6 +96,11 @@ class DX11Texture : public Texture
 
  public:
   ID3D11Texture2D* t2d = nullptr;
+
+  ID3D11RenderTargetView* m_rTV;
+
+  ID3D11DepthStencilView* m_dSV;
+
   ID3D11ShaderResourceView* srv;
 
  private:

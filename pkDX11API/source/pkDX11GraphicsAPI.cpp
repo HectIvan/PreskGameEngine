@@ -273,6 +273,17 @@ DX11GraphicsAPI::createRenderTargetView()
 }
 
 void
+DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets)
+{
+  Vector<SPtr<DX11Texture>> txVector;
+  for (uint32 i = 0; i < _rTargets.size(); ++i) {
+    SPtr<DX11Texture> dxTx = reinterpret_pointer_cast<DX11Texture>(_rTargets[i]);
+    txVector.push_back(dxTx);
+  }
+  m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView->pRtv, pDepthSView->pDepthSV);
+}
+
+void
 DX11GraphicsAPI::createSamplerState()
 {
   // sampler state description
@@ -328,11 +339,15 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
-  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil->t2d, &descDSV, &pDepthSView->pDepthSV);
+  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil->t2d,
+                                                     &descDSV,
+                                                     &pDepthSView->pDepthSV);
   if (hr != 0x00000000) {
     return;
   }
-  m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView->pRtv, pDepthSView->pDepthSV);
+  m_pDevice->pImmediateContext->OMSetRenderTargets(1,
+                                                   &pRTargetView->pRtv,
+                                                   pDepthSView->pDepthSV);
 }
 
 void
@@ -458,7 +473,7 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   pitch = width * bpp;
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTextureDX(data, bpp, width, height, _format, 0, _bindFlags, _mipLevels);
+  SPtr<Texture> temptTexture = createTexture(data, bpp, width, height, _format, 0, _bindFlags, _mipLevels);
 
   // if creating the texture failed
   if (!temptTexture) { return make_shared<DX11Texture>(); }
@@ -483,14 +498,14 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTextureDX(unsigned char* _data,
-                                 uint32 _bpp,
-                                 uint32 _width,
-                                 uint32 _height,
-                                 uint32 _format,
-                                 uint32 _usage,
-                                 uint32 _bindFlags,
-                                 bool _mipLevels)
+DX11GraphicsAPI::createTexture(unsigned char* _data,
+                               uint32 _bpp,
+                               uint32 _width,
+                               uint32 _height,
+                               uint32 _format,
+                               uint32 _usage,
+                               uint32 _bindFlags,
+                               bool _mipLevels)
 {
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -539,6 +554,15 @@ DX11GraphicsAPI::createTextureDX(unsigned char* _data,
     dsvDesc.Texture2D.MipSlice = 0;
     m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &pDepthSView->pDepthSV);
     if (!pDepthSView->pDepthSV) { return nullptr; }
+  }
+
+  if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
+    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+    memset(&rtvDesc, 0, sizeof(rtvDesc));
+    rtvDesc.Format = desc.Format;
+    rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    rtvDesc.Texture2D.MipSlice = 0;
+    m_pDevice->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
   }
 
   return tex;

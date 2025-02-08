@@ -159,11 +159,23 @@ BaseApp::messageLoop()
     m_eventQueue.poll();
     // update camera
     g_RenderManager().updateCamera(&m_camera);
-    // on render child specific function call
-    onRender();
     // render the scene
-    g_RenderManager().render(m_scene);
+    render(m_scene);
+    // g_RenderManager().render(m_scene);
   }
+}
+
+void
+BaseApp::render(Scene& _scene)
+{
+  // screen clear color
+  float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+  g_GraphicAPI().clearRenderTargetView(clearColor);
+  g_GraphicAPI().clearDepthBuffer(1.0f);
+  // on scene specific app render
+  onRender(m_scene);
+  // present the final result to the screen
+  g_GraphicAPI().present(1, 0);
 }
 
 SPtr<Actor>

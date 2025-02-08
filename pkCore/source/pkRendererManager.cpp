@@ -74,29 +74,6 @@ RendererManager::setActorsBuffers(Scene& _scene)
 }
 
 void
-RendererManager::render(Scene& _scene)
-{
-  // screen clear color
-  float clearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
-  g_GraphicAPI().clearRenderTargetView(clearColor);
-  g_GraphicAPI().clearDepthBuffer(1.0f);
-  // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(m_cbLight, &light, static_cast<uint32>(sizeof(Light)));
-  // Set shaders
-  g_GraphicAPI().setShaders();
-  // set light
-  light.Type = LIGHT_TYPE::kDirectional;
-  light.LightDir = Vector3::FORWARD;
-  // set constant buffers for the pixel and vertex shaders
-  VSSetConstantBuffers();
-  PSSetConstantBuffers();
-  // render the objects
-  renderActors(_scene.m_actors);
-  // present the final result to the screen
-  g_GraphicAPI().present(1, 0);
-}
-
-void
 RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
 {
   // for each actor

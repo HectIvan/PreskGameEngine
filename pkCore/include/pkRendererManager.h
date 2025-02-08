@@ -72,13 +72,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   setActorsBuffers(Scene& _scene);
 
   /**
-   * @brief Render the scene.
-   * @param _scene Scene to render.
-   */
-  void
-  render(Scene& _scene);
-
-  /**
    * @brief Render a list of actors.
    * @param _gameActors The actors to render.
    */
@@ -102,6 +95,8 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   SPtr<ConstantBuffer> m_cBProjection;
   SPtr<ConstantBuffer> m_cBWorld;
   SPtr<ConstantBuffer> m_cbLight;
+
+  //
 };
 
 PK_CORE_EXPORT RendererManager&

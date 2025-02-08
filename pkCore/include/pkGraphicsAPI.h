@@ -88,6 +88,26 @@ public:
   setShaders() = 0;
 
   /**
+  * @brief Create a texture.
+  * @param _data Data of the image loaded.
+  * @param _width How wide is the texture.
+  * @param _height How tall is the texture.
+  * @param _format Format of the texture.
+  * @param _usage What usage will the api give the texture.
+  * @param _bindFlags flag for binding to the pipeline stages.
+  * @param _mipLevels The maximum number of mipmap levels in the texture.
+  **/
+  virtual SPtr<Texture>
+  createTexture(unsigned char* _data,
+                uint32 _bpp,
+                uint32 _width,
+                uint32 _height,
+                uint32 _format,
+                uint32 _usage,
+                uint32 _bindFlags,
+                bool _mipLevels) = 0;
+
+  /**
   * Create the sampler state.
   **/
   virtual void
@@ -189,6 +209,12 @@ public:
   setShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
                         uint32 _numViews = 1) = 0;
+
+  /**
+   * @brief Set the render targets to the device.
+   */
+  virtual void
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets) = 0;
 
   /**
   * Clear the render target fiew and fill the

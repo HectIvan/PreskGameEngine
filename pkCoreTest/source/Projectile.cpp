@@ -5,6 +5,7 @@ void Projectile::start()
   // parameter assignation.
   m_speed = 40.0f;
   m_maxSpeed = 40.0f;
+  m_radius = 1.0f;
   m_bounceFactor = 0.9f;
   m_direction = Vector2(0);
   m_gravity = 1.0f;
@@ -41,27 +42,31 @@ void
 Projectile::screenBounce(float _width, float _height)
 {
   Vector3 pos = m_actor->m_transform.getTranslation3();
-  if (pos.x < -_width * 0.5f ||
-    pos.x > _width * 0.5f) {
+  float left = -_width * 0.5f + m_radius;
+  float right = _width * 0.5f - m_radius;
+  float top = -_height * 0.5f + m_radius;
+  float bottom = _height * 0.5f - m_radius;
+  if (pos.x < left  ||
+    pos.x > right) {
     m_direction.x *= -1.0f;
     m_direction *= m_bounceFactor;
 
-    if (pos.x < -_width * 0.5f) {
-      m_actor->setPosition(-_width * 0.5f, pos.y, pos.z);
+    if (pos.x < left) {
+      m_actor->setPosition(left, pos.y, pos.z);
     }
-    if (pos.x > _width * 0.5f) {
-      m_actor->setPosition(_width * 0.5f, pos.y, pos.z);
+    if (pos.x > right) {
+      m_actor->setPosition(right, pos.y, pos.z);
     }
   }
-  if (pos.y < -_height * 0.5f ||
-    pos.y > _height * 0.5f) {
+  if (pos.y < top ||
+      pos.y > bottom) {
     m_direction.y *= -1.0f;
     m_direction *= m_bounceFactor;
-    if (pos.y < -_height * 0.5f) {
-      m_actor->setPosition(pos.x, -_height * 0.5f, pos.z);
+    if (pos.y < top) {
+      m_actor->setPosition(pos.x, top, pos.z);
     }
-    if (pos.y > _height * 0.5f) {
-      m_actor->setPosition(pos.x, _height * 0.5f, pos.z);
+    if (pos.y > bottom) {
+      m_actor->setPosition(pos.x,bottom, pos.z);
     }
   }
 }

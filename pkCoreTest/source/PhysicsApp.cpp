@@ -1,15 +1,21 @@
+#include <iostream>
+
 #include "PhysicsApp.h"
 #include "pkDebug.h"
+#include "pkGraphicsAPI.h"
 #include "pkMath.h"
 #include "pkModel.h"
+#include "pkRendererManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
 
-#include <iostream>
-
 using pkEngineSDK::Debug;
+using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
+using pkEngineSDK::uint32;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
@@ -172,4 +178,23 @@ PhysicsApp::fireProjectile()
       return;
     }
   }
+}
+
+void
+PhysicsApp::onRender(Scene& _scene)
+{
+  // update the light buffer
+  g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
+    &g_RenderManager().light,
+    static_cast<uint32>(sizeof(Light)));
+  // Set shaders
+  g_GraphicAPI().setShaders();
+  // set light
+  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  g_RenderManager().light.LightDir = Vector3::FORWARD;
+  // set constant buffers for the pixel and vertex shaders
+  g_RenderManager().VSSetConstantBuffers();
+  g_RenderManager().PSSetConstantBuffers();
+  // render the objects
+  g_RenderManager().renderActors(_scene.m_actors);
 }

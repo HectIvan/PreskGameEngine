@@ -11,14 +11,16 @@
 #pragma once
 
 #include "Cannon.h"
+#include "pkBaseApp.h"
 #include "pkMaterial.h"
 #include "pkModel.h"
-#include "pkBaseApp.h"
+#include "pkScene.h"
 #include "Projectile.h"
 
 using pkEngineSDK::BaseApp;
 using pkEngineSDK::Material;
 using pkEngineSDK::Model;
+using pkEngineSDK::Scene;
 using pkEngineSDK::Vector;
 
 namespace PHYSICS_TYPE
@@ -50,6 +52,9 @@ class PhysicsApp : public BaseApp
 
   void
   fireProjectile();
+
+  void
+  onRender(Scene& _scene);
   
  public:
   PHYSICS_TYPE::E m_type;

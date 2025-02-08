@@ -58,6 +58,7 @@ class Projectile
   gravity(float _deltaTime);
 
  public:
+  float m_radius;
   float m_gravity;
   float m_speed;
   float m_maxSpeed;

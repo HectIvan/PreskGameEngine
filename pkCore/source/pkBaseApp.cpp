@@ -169,7 +169,7 @@ void
 BaseApp::render(Scene& _scene)
 {
   // screen clear color
-  float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
   g_GraphicAPI().clearRenderTargetView(clearColor);
   g_GraphicAPI().clearDepthBuffer(1.0f);
   // on scene specific app render

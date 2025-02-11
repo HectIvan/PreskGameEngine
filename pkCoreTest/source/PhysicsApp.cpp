@@ -80,28 +80,20 @@ PhysicsApp::onInit()
     m_projectiles.push_back(proj);
   }
 
+  m_scene.instantiate();
+  SPtr<Actor> obst = m_scene.m_actors[m_scene.m_actors.size() - 1];
+  obst->m_transform = Matrix4::IDENTITY;
+  obstacle.start(Vector3(0), 1, 0.9f, obst);
+  obstacle.m_actor->addComponent(m_spriteModel);
+  obstacle.m_actor->addComponent(createMaterial());
+  obstacle.m_actor->getComponent<Material>()->setDiffuse(createTexture("obstacle.png"));
+
   m_fireDirection = Vector2(0.0f);
 }
 
 
 void
 PhysicsApp::onUpdate(float _deltaTime)
-{
-  if (m_type == PHYSICS_TYPE::kEuler) {
-    physics(_deltaTime);
-  }
-}
-
-void
-PhysicsApp::fixedUpdate()
-{
-  if (m_type == PHYSICS_TYPE::kVerlet) {
-    physics(m_fixedDeltaTime);
-  }
-}
-
-void
-PhysicsApp::physics(float _deltaTime)
 {
   // fire the projectile
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
@@ -124,7 +116,7 @@ PhysicsApp::physics(float _deltaTime)
     m_fireDirection.x += 1.0f * _deltaTime;
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
-      !m_changingType) {
+    !m_changingType) {
     m_changingType = true;
     // change simulation type
     if (m_type == PHYSICS_TYPE::kEuler) {
@@ -139,6 +131,22 @@ PhysicsApp::physics(float _deltaTime)
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
   }
+  if (m_type == PHYSICS_TYPE::kEuler) {
+    physics(_deltaTime);
+  }
+}
+
+void
+PhysicsApp::fixedUpdate()
+{
+  if (m_type == PHYSICS_TYPE::kVerlet) {
+    physics(m_fixedDeltaTime);
+  }
+}
+
+void
+PhysicsApp::physics(float _deltaTime)
+{
   // calculate the Y direction of the fire direction
   m_fireDirection.y = -1.0f + Math::abs(m_fireDirection.x);
   m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
@@ -164,6 +172,8 @@ PhysicsApp::physics(float _deltaTime)
       m_projectiles[i]->projTimer(_deltaTime);
     }
   }
+
+  checkObstacles();
 }
 
 void
@@ -181,12 +191,33 @@ PhysicsApp::fireProjectile()
 }
 
 void
+PhysicsApp::checkObstacles()
+{
+  for (uint32 i = 0; i < m_projectiles.size(); ++i) {
+    // get the sphere component of the projectile
+    Vector3 pos = m_projectiles[i]->m_actor->m_transform.getTranslationVector();
+    Sphere projSphere = Sphere(pos, m_projectiles[i]->m_radius);
+    // check collision between projectiles and obstacles1
+    if (Math::intersectSphereSphere(projSphere, obstacle.m_sphere)) {
+      // get the reflected vector
+      Vector3 normal = pos - obstacle.m_actor->m_transform.getTranslationVector();
+      Vector3 dir = Vector3(m_projectiles[i]->m_direction.x,
+                                              m_projectiles[i]->m_direction.y,
+                                              1.0f);
+      Vector3 reflect = Vector3::reflect(dir, normal);
+      reflect.normalize();
+      m_projectiles[i]->m_direction = Vector2(reflect.x, reflect.y);
+    }
+  }
+}
+
+void
 PhysicsApp::onRender(Scene& _scene)
 {
   // update the light buffer
   g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
-    &g_RenderManager().light,
-    static_cast<uint32>(sizeof(Light)));
+                                      &g_RenderManager().light,
+                                      static_cast<uint32>(sizeof(Light)));
   // Set shaders
   g_GraphicAPI().setShaders();
   // set light

@@ -1,3 +1,13 @@
+/*****************************************************************************/
+/**
+ * @file    pkProjectile.h
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    10/01/2025
+ * @brief
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 #include "pkActor.h"
 #include "pkVector2.h"

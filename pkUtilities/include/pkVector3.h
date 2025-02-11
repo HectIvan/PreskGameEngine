@@ -330,7 +330,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _normal The normal of the surface collision.
    * @return The reflected vector.
    */
-  FORCEINLINE Vector3
+  FORCEINLINE static Vector3
   reflect(Vector3 _direction, Vector3 _normal);
 
   /**

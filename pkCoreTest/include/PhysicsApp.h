@@ -22,6 +22,7 @@
 #include "pkModel.h"
 #include "pkScene.h"
 #include "Projectile.h"
+#include "Spring.h"
 
 using pkEngineSDK::BaseApp;
 using pkEngineSDK::Material;
@@ -42,7 +43,7 @@ class PhysicsApp : public BaseApp
 {
  public:
   PhysicsApp() = default;
-  ~PhysicsApp() = default;
+  virtual ~PhysicsApp() = default;
 
   /**
    * @brief On initializing the app.
@@ -64,18 +65,37 @@ class PhysicsApp : public BaseApp
   fixedUpdate() override;
 
   /**
+   * @brief Initialize a spring.
+   * @param _pos Position of the spring.
+   * @param _length Length of the spring.
+   * @param _stiffness How stiff the spring will be.
+   */
+  void
+  initSpring(Vector3 _pos, float _length, float _stiffness);
+
+  /**
    * @brief Simulate physics.
    * @param _deltaTime Time between frames.
    */
   void
   physics(float _deltaTime);
 
+  /**
+   * @brief Fire a projectile from the pool.
+   */
   void
   fireProjectile();
 
+  /**
+   * @brief Check obstacle collissions with projectiles.
+   */
   void
-    checkObstacles();
+  checkObstacles();
 
+  /**
+   * @brief Render the app.
+   * @param _scene Scene to render.
+   */
   void
   onRender(Scene& _scene);
   
@@ -91,9 +111,9 @@ class PhysicsApp : public BaseApp
   bool m_changingType = false;
 
   SPtr<Cannon> m_cannon;
+  SPtr<Spring> m_spring;
   Vector<SPtr<Projectile>> m_projectiles;
 
-  SPtr<Model> m_spriteModel;
   SPtr<Material> m_projectileMaterial;
   Vector2 m_fireDirection;
 };

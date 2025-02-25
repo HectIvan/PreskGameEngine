@@ -1,6 +1,14 @@
 #include "Projectile.h"
+#include "pkDebug.h"
+#include "pkPlatformMath.h"
+#include "pkSphere.h"
 
-void Projectile::start()
+using pkEngineSDK::Debug;
+using pkEngineSDK::Sphere;
+using pkEngineSDK::Math;
+
+void
+Projectile::start()
 {
   // parameter assignation.
   m_speed = 40.0f;
@@ -68,6 +76,46 @@ Projectile::screenBounce(float _width, float _height)
     if (pos.y > bottom) {
       m_actor->setPosition(pos.x,bottom, pos.z);
     }
+  }
+}
+
+void
+Projectile::obstacleBounce(Vector3 _obstaclePos, float _obstacleRadius)
+{
+  // Final position.
+  // Difference = |((R1 + R2) - (P1 - P2).magnitude)|
+  // P1 += normal * Difference
+  //
+  // P1 Projectile position.
+  // R1 Projectile radius.
+  // R2 Obstacle radius
+  // Pi Intersection point.
+  // Get the projectile position
+  Vector3 projectilePos = Vector3(m_actor->m_transform.getTranslation3());
+
+  // Create spheres of obstacle and projectile
+  Sphere projSphere(projectilePos, m_radius);
+  Sphere obsSphere(_obstaclePos, _obstacleRadius);
+
+  // check for a collission
+  if (Math::intersectSphereSphere(projSphere, obsSphere)) {
+    // get the reflected vector
+    Vector3 normal = (projectilePos - _obstaclePos).normalized();
+    Vector3 dir = Vector3(m_direction.x, m_direction.y, projectilePos.z);
+    Vector3 reflect = Vector3::reflect(dir, normal);
+    // likely cause of one of the problems (normalize would make a vector lower than 1 magnitude
+    // to be set back to a magnitude of 1)
+    // reflect.clamp(-1.0f, 1-0f);
+    reflect.normalize(); 
+    m_direction = Vector2(reflect.x, reflect.y);
+
+    /**
+    * Position reset
+    */
+    float difference = Math::abs((_obstacleRadius + m_radius) -
+                                 (projectilePos - _obstaclePos).magnitude());
+    projectilePos += normal * difference;
+    m_actor->m_transform.setTranslation(projectilePos);
   }
 }
 

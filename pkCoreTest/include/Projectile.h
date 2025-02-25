@@ -1,14 +1,20 @@
 /*****************************************************************************/
 /**
- * @file    pkProjectile.h
+ * @file    Projectile.h
  * @author  Héctor  Iván Muñoz Ceballos
  * @date    10/01/2025
  * @brief
  *
- * @bug    No known bugs.
+ * @bug    Projectile collision with obstacles is scuffed
  */
  /*****************************************************************************/
 #pragma once
+
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkActor.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
@@ -59,6 +65,14 @@ class Projectile
    */
   void
   screenBounce(float _width, float _height);
+
+  /**
+   * @brief reset te position to the correct location.
+   * @param _P2 Position of the obstacle.
+   * @param _R2 Radius of the obstacle.
+   */
+  void
+  obstacleBounce(Vector3 _P2, float _R2);
 
   /**
    * @brief Apply gravity to the Projectile direction.

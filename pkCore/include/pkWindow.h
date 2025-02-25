@@ -96,7 +96,7 @@ class PK_CORE_EXPORT Window
   * Width that the window will hold.
   **/
   void
-  setWidth(uint32 _width) { m_width = _width; }
+  setWidth(uint32 _width);
 
   /**
   * Set Height.
@@ -109,7 +109,7 @@ class PK_CORE_EXPORT Window
   * Height that the window will hold.
   **/
   void
-  setHeight(uint32 _height) { m_height = _height; }
+  setHeight(uint32 _height);
 
   /**
   * Get size.

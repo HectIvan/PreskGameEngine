@@ -1,5 +1,20 @@
+/*****************************************************************************/
+/**
+ * @file    pkShaderTest.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    13/01/2025
+ * @brief   Shader specific derived class.
+ *
+ * @bug    No known bugs.
+ */
+/*****************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkActor.h"
 #include "pkBaseApp.h"
 #include "pkScene.h"
@@ -21,18 +36,30 @@ class ShaderTest : public BaseApp
   ShaderTest() = default;
   virtual ~ShaderTest() = default;
 
+  /**
+   * @brief Initialize the shader test.
+   */
   void
   onInit() override;
 
+  /**
+   * @brief Update the shader test.
+   * @param _deltatime Time between frames.
+   */
   void
   onUpdate(float _deltaTime) override;
 
+  /**
+   * @brief On render specific app render function.
+   * @param _scene Scene to render
+   */
   void
   onRender(Scene& _scene) override;
 
+ public:
   Actor* m_actor;
   Vector2 m_lastCursorPos;
-
+  // render targets
   SPtr<Texture> m_pRTDepth;
   SPtr<Texture> m_pRTNormal;
   SPtr<Texture> m_pRTColor;

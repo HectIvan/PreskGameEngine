@@ -133,6 +133,14 @@ Matrix4::setTranslation(Vector3 _pos)
   matrix[2][3] = _pos.z;
 }
 
+void
+Matrix4::setTranslation(float _x, float _y, float _z)
+{
+  matrix[0][3] = _x;
+  matrix[1][3] = _y;
+  matrix[2][3] = _z;
+}
+
 Matrix4
 Matrix4::getTranslation()
 {

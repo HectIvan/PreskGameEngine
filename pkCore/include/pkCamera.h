@@ -28,7 +28,6 @@
 #include "pkVector3.h"
 #include "pkVector4.h"
 
-
 namespace pkEngineSDK
 {
 
@@ -160,9 +159,6 @@ class PK_CORE_EXPORT Camera
   **/
   void
   updateRotation();
-
-  void
-  addRotation(Vector3 _rot);
 
   // Camera view
   Matrix4 view;

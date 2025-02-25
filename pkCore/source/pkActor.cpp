@@ -102,7 +102,7 @@ Actor::clear()
 {
   m_components.clear();
   m_children.clear();
-  m_parent->clear();
+  if (m_parent) { m_parent->clear(); }
   m_transform = Matrix4::IDENTITY;
   m_name = "";
 }

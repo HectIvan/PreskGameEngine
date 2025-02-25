@@ -27,6 +27,9 @@
     <ClCompile Include="source\pkObstacle.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\Spring.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\PhysicsApp.h">
@@ -42,6 +45,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Obstacle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Spring.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

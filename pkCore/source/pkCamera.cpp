@@ -113,12 +113,4 @@ Camera::updateRotation()
   setRight(getRight());
   setUp(getUp());
 }
-
-void
-Camera::addRotation(Vector3 _rot)
-{
-  rotation.x += _rot.x;
-  rotation.y += _rot.y;
-  rotation.z += _rot.z;
-}
 }

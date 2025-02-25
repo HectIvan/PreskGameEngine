@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkPass.h
+ * @file    pkScriptManager.cpp
  * @author  Héctor  Iván Muñoz Ceballos
- * @date    07/02/2025
- * @brief   
+ * @date    11/02/2025
+ * @brief   cpp file for reading lua scripts
  *
  * @bug    No known bugs.
  */
@@ -15,15 +15,21 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
+#include "pkScriptManager.h"
 
 namespace pkEngineSDK
 {
 
-class Pass
+ScriptManager::ScriptManager()
 {
-public:
-  Pass() = default;
-  virtual ~Pass() = default;
-};
+  m_state.open_libraries(
+    lib::base
+  );
+}
+
+PK_CORE_EXPORT ScriptManager&
+g_ScriptManager()
+{
+  return ScriptManager::instance();
+}
 }

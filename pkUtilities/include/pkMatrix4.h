@@ -305,8 +305,19 @@ class PK_UTILITY_EXPORT Matrix4
   static Matrix4
   translation(Vector3& _position);
 
+  /**
+   * @brief Set the translation
+   * @param _pos vector position.
+   */
   void
   setTranslation(Vector3 _pos);
+
+  /**
+   * @brief Set the translation
+   * @param _pos vector position.
+   */
+  void
+  setTranslation(float _x, float _y, float _z);
 
   /**
    * @brief Get the current matrix translation.

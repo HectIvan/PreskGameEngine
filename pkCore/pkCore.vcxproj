@@ -95,15 +95,15 @@
       <PreprocessorDefinitions>PK_CORE_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;$(DEVLIBS)sol2\include\;$(DEVLIBS)lua-5.4.7\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration);$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;assimp-vc143-mtd.lib;User32.lib;kernel32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilitiesd.lib;assimp-vc143-mtd.lib;User32.lib;kernel32.lib;libluad.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +115,7 @@
       <PreprocessorDefinitions>PK_CORE_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;$(DEVLIBS)sol2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -123,9 +123,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration);$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;assimp-vc143-mt.lib;User32.lib;kernel32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilities.lib;assimp-vc143-mt.lib;User32.lib;kernel32.lib;liblua.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,15 +135,15 @@
       <PreprocessorDefinitions>PK_CORE_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;$(DEVLIBS)sol2\include\;$(DEVLIBS)lua-5.4.7\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration);$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;assimp-vc143-mtd.lib;User32.lib;kernel32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilitiesd.lib;assimp-vc143-mtd.lib;User32.lib;kernel32.lib;libluad.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>PK_CORE_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;$(DEVLIBS)ASSIMP\include\;./include/externals/;$(DEVLIBS)sol2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -163,9 +163,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)ASSIMP/lib/$(PlatformTarget)/$(Configuration);$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;assimp-vc143-mt.lib;User32.lib;kernel32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>pkUtilities.lib;assimp-vc143-mt.lib;User32.lib;kernel32.lib;liblua.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -207,6 +207,7 @@
     <ClInclude Include="include\pkRenderTargetView.h" />
     <ClInclude Include="include\pkResourceManager.h" />
     <ClInclude Include="include\pkScene.h" />
+    <ClInclude Include="include\pkScriptManager.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
     <ClInclude Include="include\pkSprite.h" />
     <ClInclude Include="include\pkSwapChain.h" />
@@ -219,7 +220,6 @@
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\pkScene.cpp" />
     <ClCompile Include="source\externals\imgui.cpp" />
     <ClCompile Include="source\externals\imgui_demo.cpp" />
     <ClCompile Include="source\externals\imgui_draw.cpp" />
@@ -242,6 +242,8 @@
     <ClCompile Include="source\pkModel.cpp" />
     <ClCompile Include="source\pkRendererManager.cpp" />
     <ClCompile Include="source\pkResourceManager.cpp" />
+    <ClCompile Include="source\pkScene.cpp" />
+    <ClCompile Include="source\pkScriptManager.cpp" />
     <ClCompile Include="source\pkSprite.cpp" />
     <ClCompile Include="source\pkTexture.cpp" />
     <ClCompile Include="source\pkTimeManager.cpp" />

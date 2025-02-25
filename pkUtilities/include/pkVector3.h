@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkVector3 pkVector3.h
-* @Hector Ivan Muñoz Ceballos
-* @date 06/09/2024
-* @Vector3 file for the Presk Game Engine.
-*
-* This file contains the Vector3 class of the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 09/09/2024
-* Added comments and missing functions
-*/
-/************************************************************************/
+ * @file    pkVector3.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/09/2024
+ * @brief   Vector3 class of the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

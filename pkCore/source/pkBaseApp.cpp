@@ -25,12 +25,35 @@ BaseApp::createMaterial()
 SPtr<Texture>
 BaseApp::createTexture(String _name)
 {
-  return g_ResourceManager().newTexture(_name);
+  // search if the texture has been stored before
+  for (uint32 i = 0; i < m_textures.size(); ++i) {
+    if (m_textures[i]->name == _name) {
+      return m_textures[i]->texture;
+    }
+  }
+
+  // create the texture
+  SPtr<Texture> texture = g_ResourceManager().newTexture(_name);
+
+  // store the new texture in the memory
+  SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();
+  newTexture->name = _name;
+  newTexture->texture = texture;
+  m_textures.push_back(newTexture);
+
+  // return the final texture
+  return texture;
 }
 
 SPtr<Model>
 BaseApp::newModel(String _modelName)
 {
+  // search if the model has been stored before
+  for (uint32 i = 0; i < m_models.size(); ++i) {
+    if (m_models[i]->name == _modelName) {
+      return m_models[i]->model;
+    }
+  }
   // load the model.
   SPtr<Model> model = g_ResourceManager().loadModel(_modelName);
   // create a material.
@@ -38,6 +61,13 @@ BaseApp::newModel(String _modelName)
     model->meshes[i].material = createMaterial();
     model->meshes[i].material->diffuse = createTexture(model->meshes[i].materialPath);
   }
+  // insetr the new model to the model memory.
+  SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
+  newModelMem->name = _modelName;
+  newModelMem->model = model;
+  m_models.push_back(newModelMem);
+
+  // return the model
   return model;
 }
 
@@ -82,7 +112,7 @@ BaseApp::initAPI(const char** _argv)
 {
   String abstraction = _argv[1];
 
-#ifdef PK_DEBUG_MODE
+#if PK_DEBUG_MODE
   if (abstraction == "DX11API") {
     run("pkDX11APId", m_window);
   }
@@ -161,7 +191,6 @@ BaseApp::messageLoop()
     g_RenderManager().updateCamera(&m_camera);
     // render the scene
     render(m_scene);
-    // g_RenderManager().render(m_scene);
   }
 }
 
@@ -173,7 +202,7 @@ BaseApp::render(Scene& _scene)
   g_GraphicAPI().clearRenderTargetView(clearColor);
   g_GraphicAPI().clearDepthBuffer(1.0f);
   // on scene specific app render
-  onRender(m_scene);
+  onRender(_scene);
   // present the final result to the screen
   g_GraphicAPI().present(1, 0);
 }

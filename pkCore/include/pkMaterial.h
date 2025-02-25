@@ -25,12 +25,38 @@
 namespace pkEngineSDK
 {
 
+struct MaterialProps
+{
+  uint32 m_hasDiffuse : 1;
+  uint32 m_hasSpecular : 1;
+  uint32 m_hasNormal : 1;
+  uint32 m_opaque : 1;
+  uint32 m_hasAlphaTest : 1;
+  uint32 m_alphaBlend : 1;
+  uint32 m_doubleSided : 1;
+  uint32 m_wireFrame : 1;
+  uint32 m_castShadow : 1;
+  uint32 m_receiveShadow : 1;
+  uint32 unused : 22;
+};
+
+// check the bit in question in hex
+// bool hasDiffuse(uint32 _props) {
+//   return (_props & 0x1) != 0;
+// }
+
 class Texture;
 
 class Material : public Component
 {
  public:
+  /**
+   * @brief Default material constructor.
+   */
   Material() = default;
+  /**
+   * @brief Default material destructor.
+   */
   virtual ~Material() = default;
 
   /**
@@ -40,6 +66,10 @@ class Material : public Component
   COMPONENT_TYPE::E
   getType() override { return COMPONENT_TYPE::kMaterial; }
 
+  /**
+   * @brief Get the component type of this class.
+   * @return The class type.
+   */
   static COMPONENT_TYPE::E
   getObjType() { return COMPONENT_TYPE::kMaterial; }
 
@@ -90,6 +120,7 @@ class Material : public Component
   String m_name;
   bool m_castShadow;
   bool m_receiveShadows;
+  MaterialProps m_properties;
   SPtr<Texture> diffuse;
   SPtr<Texture> normal;
   SPtr<Texture> height;

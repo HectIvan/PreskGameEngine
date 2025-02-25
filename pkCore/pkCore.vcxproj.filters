@@ -76,6 +76,12 @@
     <Filter Include="source\imgui">
       <UniqueIdentifier>{a18d7496-f355-4cef-be71-660a483699d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\script">
+      <UniqueIdentifier>{4bccd719-0cdb-4e48-9088-54fe53d235e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\script">
+      <UniqueIdentifier>{ad061113-2507-41f7-a44a-811483fad56a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -222,6 +228,9 @@
     <ClInclude Include="include\pkGraphicTypes.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkScriptManager.h">
+      <Filter>include\script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -278,9 +287,6 @@
     <ClCompile Include="source\pkActor.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
-    <ClCompile Include="include\pkScene.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkDebug.cpp">
       <Filter>source\debug</Filter>
     </ClCompile>
@@ -313,6 +319,12 @@
     </ClCompile>
     <ClCompile Include="source\pkImGui_win32.cpp">
       <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkScriptManager.cpp">
+      <Filter>source\script</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkScene.cpp">
+      <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -24,6 +24,31 @@ using pkEngineSDK::Key;
 using std::make_shared;
 
 void
+PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
+{
+  m_scene.instantiate();
+  SPtr<Actor> anchor = m_scene.getLastActor();
+  anchor->addComponent(newModel("sprite.fbx"));
+  anchor->addComponent(createMaterial());
+  anchor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+  m_scene.instantiate();
+  SPtr<Actor> weight = m_scene.getLastActor();
+  weight->addComponent(newModel("sprite.fbx"));
+  weight->addComponent(createMaterial());
+  weight->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+
+  m_spring = make_shared<Spring>();
+  m_spring->m_anchor = anchor;
+  m_spring->m_weight = weight;
+  m_spring->m_elasticity = _stiffness;
+  m_spring->m_length = _length;
+  m_spring->m_mass = 1.0f;
+
+  anchor->setPosition(_pos);
+  weight->setPosition(_pos.x, _pos.y + _length, _pos.y);
+}
+
+void
 PhysicsApp::onInit()
 {
   m_camera.init(30,
@@ -42,7 +67,6 @@ PhysicsApp::onInit()
   m_projectileCount = 100;
   m_projDuration = 10.0f;
   float projSpeed = 80.0f;
-  m_spriteModel = newModel("sprite.fbx");
   m_projectileMaterial = createMaterial();
   m_projectileMaterial->setDiffuse(createTexture("circle.png"));
 
@@ -52,7 +76,7 @@ PhysicsApp::onInit()
   m_scene.instantiate();
   m_cannon = std::make_shared<Cannon>();
   m_cannon->m_actor = m_scene.m_actors[0];
-  m_cannon->m_actor->addComponent(m_spriteModel);
+  m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
   m_cannon->m_actor->addComponent(createMaterial());
   m_cannon->m_actor->getComponent<Material>()->setDiffuse(createTexture("Canon.png"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
@@ -74,7 +98,7 @@ PhysicsApp::onInit()
     // set the projectile lifetime
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
-    proj->m_actor->addComponent(m_spriteModel);
+    proj->m_actor->addComponent(newModel("sprite.fbx"));
     proj->m_actor->addComponent(m_projectileMaterial);
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
@@ -84,9 +108,11 @@ PhysicsApp::onInit()
   SPtr<Actor> obst = m_scene.m_actors[m_scene.m_actors.size() - 1];
   obst->m_transform = Matrix4::IDENTITY;
   obstacle.start(Vector3(0), 1, 0.9f, obst);
-  obstacle.m_actor->addComponent(m_spriteModel);
+  obstacle.m_actor->addComponent(newModel("sprite.fbx"));
   obstacle.m_actor->addComponent(createMaterial());
   obstacle.m_actor->getComponent<Material>()->setDiffuse(createTexture("obstacle.png"));
+
+  initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
 
   m_fireDirection = Vector2(0.0f);
 }
@@ -152,6 +178,8 @@ PhysicsApp::physics(float _deltaTime)
   m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
   m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
+  m_spring->move(_deltaTime, Vector3(0.0f, 1.0f, 0.0f));
+
   // apply gravity to every projectile
   for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
     if (m_projectiles[i]->m_fired) {
@@ -194,35 +222,16 @@ void
 PhysicsApp::checkObstacles()
 {
   for (uint32 i = 0; i < m_projectiles.size(); ++i) {
-    // get the sphere component of the projectile
-    Vector3 pos = m_projectiles[i]->m_actor->m_transform.getTranslationVector();
-    Sphere projSphere = Sphere(pos, m_projectiles[i]->m_radius);
-    // check collision between projectiles and obstacles1
-    if (Math::intersectSphereSphere(projSphere, obstacle.m_sphere)) {
-      // get the reflected vector
-      Vector3 normal = pos - obstacle.m_actor->m_transform.getTranslationVector();
-      Vector3 dir = Vector3(m_projectiles[i]->m_direction.x,
-                                              m_projectiles[i]->m_direction.y,
-                                              1.0f);
-      Vector3 reflect = Vector3::reflect(dir, normal);
-      reflect.normalize();
-      m_projectiles[i]->m_direction = Vector2(reflect.x, reflect.y);
-    }
+    m_projectiles[i]->obstacleBounce(obstacle.m_actor->m_transform.getTranslation3(), 
+                                     obstacle.m_sphere.m_radius);
   }
 }
 
 void
 PhysicsApp::onRender(Scene& _scene)
 {
-  // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
-                                      &g_RenderManager().light,
-                                      static_cast<uint32>(sizeof(Light)));
   // Set shaders
   g_GraphicAPI().setShaders();
-  // set light
-  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  g_RenderManager().light.LightDir = Vector3::FORWARD;
   // set constant buffers for the pixel and vertex shaders
   g_RenderManager().VSSetConstantBuffers();
   g_RenderManager().PSSetConstantBuffers();

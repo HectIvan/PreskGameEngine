@@ -33,6 +33,21 @@
 namespace pkEngineSDK
 {
 
+/**
+ * Memory structures used to store already loaded data and call it when needed.
+ */
+struct ModelMemory
+{
+  String name;
+  SPtr<Model> model;
+};
+
+struct TextureMemory
+{
+  String name;
+  SPtr<Texture> texture;
+};
+
 class Camera;
 
 class PK_CORE_EXPORT BaseApp
@@ -168,5 +183,14 @@ class PK_CORE_EXPORT BaseApp
   float m_deltaTime = 0.0f;
   float m_fixedTimer = 0.0f;
   float m_fixedDeltaTime = 0.016f;
+
+ protected:
+  /**
+  * Used to store an object that is loaded from memory. once loaded, it will be stored
+  * in here, if the same object is asked to be loaded, it will first be searched here,if
+  * its found, the loaded object will be returned, instead of loading it again.
+  */
+  Vector<SPtr<ModelMemory>> m_models;
+  Vector<SPtr<TextureMemory>> m_textures;
 };
 }

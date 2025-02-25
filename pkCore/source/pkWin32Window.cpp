@@ -135,6 +135,22 @@ Window::setSize(Vector2 _size)
   setHeight(static_cast<uint32>(_size.y));
 }
 
+void
+Window::setWidth(uint32 _width)
+{
+  m_width = _width;
+  RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
+  AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
+}
+
+void
+Window::setHeight(uint32 _height)
+{
+  m_height = _height;
+  RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
+  AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
+}
+
 Vector2
 Window::getSize() const
 {

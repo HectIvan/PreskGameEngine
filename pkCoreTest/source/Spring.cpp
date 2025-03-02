@@ -4,35 +4,23 @@
 using pkEngineSDK::Math;
 
 void
-Spring::applyForce(float _force, Vector3 _direction)
+Spring::move(float _deltaTime)
 {
-  // m_length += hookeLaw(_force);
-}
-
-void
-Spring::move(float _deltaTime, Vector3 _direction)
-{
+  // get the positions
   Vector3 weightPos = m_weight->m_transform.getTranslation3();
   Vector3 anchorPos = m_anchor->m_transform.getTranslation3();
-
-  Vector3 direction = (anchorPos - weightPos).normalized();
-
- //  weightPos += hookeLaw();
-
-  m_weight->m_transform.setTranslation(weightPos + direction * _deltaTime);
-}
-
-void
-Spring::gravity(float _gravity, float _deltaTime)
-{
-}
-
-float
-Spring::hookeLaw(float _force)
-{
-  // X = F/K
-  // X is the distance traveled
-  // F is the force applied
-  // K is the elasticity constant
-  return _force / m_elasticity;
+  
+  // get the directional vector between the 2 points
+  Vector3 direction = (weightPos - anchorPos);
+  
+  // get the length of the direction
+  float length = direction.magnitude();
+  
+  // force to be applied
+  float force = Math::hookeLaw(m_elasticity, length - m_length) * _deltaTime;
+  
+  // as the force decreases, so does the influence of the stretch
+  Vector2 newPos = Vector2(weightPos.x, weightPos.y) - force;
+  // set the new position
+  m_weight->m_transform.setTranslation(Vector3(newPos.x, newPos.y, 0.0f));
 }

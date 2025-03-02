@@ -1,15 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkDX11PixelShader pkDX11PixelShader.h
-* @Hector Ivan Muñoz Ceballos
-* @date 11/11/2024
-* @DirectX Pixel Shader file for the Presk Game Engine.
-*
-* This file contains the Pixel Shader class using DirectX11 of the engine
-*
-* @bug No bug known.
-*/
-/************************************************************************/
+ * @file    pkDX11PixelShader.h
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    11/11/2024
+ * @brief   This file contains the Pixel Shader class using DirectX11 of the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -44,7 +42,7 @@ class DX11PixelShader : public DX11Shaders
   * If the compilation was successful or not.
   **/
   HRESULT
-  compile();
+  compile(wstring _fileName, const char* _entryPoint, const char* _model);
 
  public:
   ID3D11PixelShader* pShader = nullptr;

@@ -46,9 +46,6 @@
     <Filter Include="source\camera">
       <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\game">
-      <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\main">
       <UniqueIdentifier>{c2d7851b-240f-4364-8c9a-93d6cf917382}</UniqueIdentifier>
     </Filter>
@@ -81,6 +78,9 @@
     </Filter>
     <Filter Include="source\script">
       <UniqueIdentifier>{ad061113-2507-41f7-a44a-811483fad56a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\events\game">
+      <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -249,13 +249,13 @@
       <Filter>source\camera</Filter>
     </ClCompile>
     <ClCompile Include="source\pkGameObject.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkModel.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkBone.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkMesh.cpp">
       <Filter>source\api</Filter>
@@ -282,10 +282,10 @@
       <Filter>source\graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\pkSprite.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkActor.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkDebug.cpp">
       <Filter>source\debug</Filter>
@@ -324,7 +324,7 @@
       <Filter>source\script</Filter>
     </ClCompile>
     <ClCompile Include="source\pkScene.cpp">
-      <Filter>source\game</Filter>
+      <Filter>source\events\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

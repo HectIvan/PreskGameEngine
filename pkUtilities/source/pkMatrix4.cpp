@@ -173,21 +173,52 @@ Matrix4::scale(Vector3& _scale)
   return M;
 }
 
-Matrix4 Matrix4::getScale()
+Matrix4
+Matrix4::getScale()
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][0] = matrix[3][0];
-  M.matrix[1][1] = matrix[3][1];
-  M.matrix[2][2] = matrix[3][2];
+  M.matrix[3][0] = matrix[3][0];
+  M.matrix[3][1] = matrix[3][1];
+  M.matrix[3][2] = matrix[3][2];
   return M;
+}
+
+Vector3
+Matrix4::getScale3()
+{
+  return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
+}
+
+void
+Matrix4::setScale(Vector3 _scale)
+{
+  matrix[3][0] = _scale.x;
+  matrix[3][1] = _scale.y;
+  matrix[3][2] = _scale.z;
 }
 
 void
 Matrix4::setScale(Matrix4 _scale)
 {
-  matrix[3][0] = _scale.matrix[0][0];
-  matrix[3][1] = _scale.matrix[1][1];
-  matrix[3][2] = _scale.matrix[2][2];
+  matrix[3][0] = _scale.matrix[3][0];
+  matrix[3][1] = _scale.matrix[3][1];
+  matrix[3][2] = _scale.matrix[3][2];
+}
+
+void
+Matrix4::setScale(float _x, float _y, float _z)
+{
+  matrix[3][0] = _x;
+  matrix[3][1] = _y;
+  matrix[3][2] = _z;
+}
+
+void
+Matrix4::setScale(float _val)
+{
+  matrix[3][0] = _val;
+  matrix[3][1] = _val;
+  matrix[3][2] = _val;
 }
 
 Matrix4
@@ -225,12 +256,22 @@ Matrix4::MatrixRotationAxis(Vector3 _axis, float _angle)
   return Result;
 }
 
-void
-Matrix4::setScale(Vector3 _scale)
+Matrix4
+Matrix4::getRotation()
 {
-  matrix[3][0] = _scale.x;
-  matrix[3][1] = _scale.y;
-  matrix[3][2] = _scale.z;
+  Matrix4 rot = Matrix4::IDENTITY;
+  rot.matrix[0][0] = matrix[0][0];
+  rot.matrix[0][1] = matrix[0][1];
+  rot.matrix[0][2] = matrix[0][2];
+
+  rot.matrix[1][0] = matrix[1][0];
+  rot.matrix[1][1] = matrix[1][1];
+  rot.matrix[1][2] = matrix[1][2];
+
+  rot.matrix[2][0] = matrix[2][0];
+  rot.matrix[2][1] = matrix[2][1];
+  rot.matrix[2][2] = matrix[2][2];
+  return rot;
 }
 
 Matrix4

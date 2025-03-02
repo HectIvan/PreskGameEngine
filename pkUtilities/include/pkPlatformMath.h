@@ -293,6 +293,15 @@ class PK_UTILITY_EXPORT PlatformMath
   static Vector4
   lerp4(const Vector4 _x, const Vector4 _y, const float _t);
 
+  /**
+   * @brief Hooke's law of elasticity.
+   * @param _elasticity Elasticity to use.
+   * @param _displacement Difference in distance.
+   * @return The force applied.
+   */
+  static float
+  hookeLaw(float _elasticity, float _displacement);
+
   /***************************************************************************
   * 
   * Shapes

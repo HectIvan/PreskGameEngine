@@ -10,12 +10,12 @@ namespace pkEngineSDK
 {
 
 HRESULT
-DX11PixelShader::compile()
+DX11PixelShader::compile(wstring _fileName, const char* _entryPoint, const char* _model)
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"shaders/pkShader.hlsl",
-                             "PS",
-                             "ps_5_0",
+  hr = compileShaderFromFile(_fileName,
+                             _entryPoint,
+                             _model,
                              &pSBlob);
   if (hr != 0x00000000)
   {

@@ -139,6 +139,14 @@ PlatformMath::lerp4(const Vector4 _x, const Vector4 _y, const float _t)
   return Vector4(x, y, z, w);
 }
 
+float
+PlatformMath::hookeLaw(float _elasticity, float _displacement)
+{
+  // @source: https://www.britannica.com/science/Hookes-law
+  // F = KX
+  return _elasticity * _displacement;
+}
+
 /**
  * Sphere
 **/
@@ -164,6 +172,7 @@ PlatformMath::intersectSpherePoint(Sphere& _sphere, const Vector3& _other)
 bool
 PlatformMath::intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other)
 {
+  _capsule = _capsule;
   return false;
 }
 

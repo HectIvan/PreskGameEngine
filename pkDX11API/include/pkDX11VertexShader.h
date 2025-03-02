@@ -32,16 +32,13 @@ public:
   {
     safeRelease(pSBlob);
   }
+
   /**
-  * Compile.
-  * 
-  * Compiles the vertex shader.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  **/
+   * @brief Compiles the vertex shader.
+   * @return If the compilation was successful or not.
+   */
   HRESULT
-  compile();
+  compile(wstring _fileName, const char* _entryPoint, const char* _model);
 
  public:
   ID3D11VertexShader* pShader = nullptr;

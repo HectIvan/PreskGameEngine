@@ -1,19 +1,16 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkMatrix4 pkMatrix4.h
-* @Hector Ivan Muñoz Ceballos
-* @date 06/09/2024
-* @Matrix4 file for the Presk Game Engine.
-*
-* This file contains the Matrix4 class of the engine
-* 
-* The Matrix4 is row major, meaning that the first value
-* when searching in the matrix is the Y coordinate, while
-* the second one is the X coordinate
-*
-* @bug No bug known.
-*/
-/************************************************************************/
+ * @file    pkMatrix4.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/09/2024
+ * @brief   This file contains the Matrix4 class of the engine.
+ *          The Matrix4 is row major, meaning that the first value
+ *          when searching in the matrix is the Y coordinate, while
+ *          the second one is the X coordinate
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -357,6 +354,13 @@ class PK_UTILITY_EXPORT Matrix4
   getScale();
 
   /**
+   * @brief Get the current scale vector.
+   * @return The scale vector.
+   */
+  Vector3
+  getScale3();
+
+  /**
    * @brief Set the scale of the matrix.
    * @param _scale New scale.
    */
@@ -371,11 +375,34 @@ class PK_UTILITY_EXPORT Matrix4
   setScale(Vector3 _scale);
 
   /**
+   * @brief Set the scale of the matrix.
+   * @param _x Scale in x.
+   * @param _y Scale in y.
+   * @param _z Scale in z.
+   */
+  void
+  setScale(float _x, float _y, float _z);
+
+  /**
+   * @brief Set the scale of the matrix.
+   * @param _val Value of the scale.
+   */
+  void
+  setScale(float _val);
+
+  /**
    * Get a matrix rotation from an axis and an angle
    * 
    */
   static Matrix4
   MatrixRotationAxis(Vector3 _axis, float _angle);
+
+  /**
+   * @brief Get the rotation matrix.
+   * @return The rotation matrix.
+   */
+  Matrix4
+  getRotation();
   
   /**
    * @brief The rotation matrix that is created from
@@ -458,6 +485,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _height Height of the camera view.
    * @param _nearZ Near Z distance.
    * @param _farZ Far Z distance.
+   * @return The return matrix.
    */
   static Matrix4
   perspectiveFOVLH(float _halfFOV,
@@ -466,6 +494,16 @@ class PK_UTILITY_EXPORT Matrix4
                    float _nearZ,
                    float _farZ);
 
+  /**
+   * @brief Get the orthographic matrix.
+   * @param _left Most left point of the view.
+   * @param _right Most right point of the view.
+   * @param _top Most top point of the view.
+   * @param _bottom Most bottom point of the view.
+   * @param _nearZ Near Z distance.
+   * @param _farZ Far Z distance.
+   * @return The orthographic matrix.
+   */
   static Matrix4
   orthographicFOVLH(float _left,
                     float _right,

@@ -29,17 +29,8 @@ ShaderTest::onInit()
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
-  // m_pRTDepth = g_GraphicAPI().createTexture(nullptr,
-  //                                           4,
-  //                                           m_window.getWidth(),
-  //                                           m_window.getHeight(),
-  //                                           kPK_FORMAT_R32G32B32_FLOAT,
-  //                                           0,
-  //                                           64,
-  //                                           false);
-
   m_scene.instantiate();
-  SPtr<Actor> pistol = m_scene.m_actors[0];
+  SPtr<Actor> pistol = m_scene.getLastActor();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
   pistol->addComponent(createMaterial());
   SPtr<Material> pMaterial = pistol->getComponent<Material>();
@@ -113,7 +104,8 @@ ShaderTest::onRender(Scene& _scene)
                                       &g_RenderManager().light,
                                       static_cast<uint32>(sizeof(Light)));
   // Set shaders
-  g_GraphicAPI().setShaders();
+  g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());
+  g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
   // set light
   g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   g_RenderManager().light.LightDir = Vector3::FORWARD;
@@ -122,4 +114,6 @@ ShaderTest::onRender(Scene& _scene)
   g_RenderManager().PSSetConstantBuffers();
   // render the objects
   g_RenderManager().renderActors(_scene.m_actors);
+
+  // turn the render target view into a texture.  
 }

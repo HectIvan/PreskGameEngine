@@ -1,9 +1,27 @@
+/*****************************************************************************/
+/**
+ * @file    pkDX11GraphicsAPI.cpp
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    19/11/2024
+ * @brief   API file using DirectX 11 for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #define STB_IMAGE_IMPLEMENTATION
+
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include <stb_image.h>
 
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11IndexBuffer.h"
+#include "pkDX11PixelShader.h"
 #include "pkDX11Prerequisites.h"
+#include "pkDX11RenderTargetView.h"
 #include "pkDX11VertexBuffer.h"
 #include "pkDX11VertexShader.h"
 #include "pkWindow.h"
@@ -67,8 +85,36 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            featureLevels,
                            numFeatureLevels);
 
+  Vector<SPtr<Texture>> rTVector;
+
+  m_pRTargetView = make_shared<Texture>();
+  m_pDepthRT = make_shared<Texture>();
+  m_pNormalRT = make_shared<Texture>();
   createRenderTargetView();
+
+  m_pDepthRT = createTexture(nullptr,
+                             4,
+                             window.getWidth(),
+                             window.getHeight(),
+                             DXGI_FORMAT_R32G32B32A32_FLOAT,
+                             D3D11_USAGE_DEFAULT,
+                             D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
+                             false);
+
+  m_pNormalRT = createTexture(nullptr,
+                             4,
+                             window.getWidth(),
+                             window.getHeight(),
+                             DXGI_FORMAT_R32G32B32A32_FLOAT,
+                             D3D11_USAGE_DEFAULT,
+                             D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
+                             false);
+  
+  rTVector.push_back(m_pRTargetView);
+  rTVector.push_back(m_pNormalRT);
+  rTVector.push_back(m_pDepthRT);
   createDepthStencilTexture(width, height);
+  setRenderTargets(rTVector);
   setViewport(width, height);
 
   m_pDevice->setPrimitiveTopology();
@@ -131,7 +177,10 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
 void
 DX11GraphicsAPI::clearRenderTargetView(float _color[])
 {
-  m_pDevice->pImmediateContext->ClearRenderTargetView(pRTargetView->pRtv, _color);
+  // texture to dx texture
+  SPtr<DX11Texture> dxRTV = reinterpret_pointer_cast<DX11Texture>(m_pRTargetView);
+  // clear the render target
+  m_pDevice->pImmediateContext->ClearRenderTargetView(dxRTV->m_rTV, _color);
 }
 
 void
@@ -147,42 +196,53 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth)
 void
 DX11GraphicsAPI::makeShaders()
 {
-  pixelShader = make_shared<DX11PixelShader>();
-  vertexShader = make_shared<DX11VertexShader>();
+  m_vertexShader = make_shared<DX11VertexShader>();
+  m_pixelShader = make_shared<DX11PixelShader>();
+  m_blurPSShader = make_shared<DX11PixelShader>();
+  // m_AOShader = make_shared<DX11PixelShader>();
 }
 
 void
-DX11GraphicsAPI::compileShaders()
+DX11GraphicsAPI::compileShaders() 
 {
-  pixelShader->compile();
-  vertexShader->compile();
+  m_vertexShader->compile(L"shaders/pkShader.hlsl", "VS", "vs_5_0");
+  m_pixelShader->compile(L"shaders/pkShader.hlsl", "PS", "ps_5_0");
+  m_blurPSShader->compile(L"shaders/pkBlurPSShader.hlsl", "PS", "ps_5_0");
+  // m_AOShader->compile(L"shaders/pkPSAOshader.hlsl", "PS_main", "ps_5_0");
 }
 
 void
-DX11GraphicsAPI::createPShader()
+DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
 {
+  // convert from shader to dx pixel shader
+  SPtr<DX11PixelShader> dxPShader = reinterpret_pointer_cast<DX11PixelShader>(_pShader);
   uint32 hr;
-  hr = m_pDevice->pd3dDevice->CreatePixelShader(pixelShader->pSBlob->GetBufferPointer(),
-                                                pixelShader->pSBlob->GetBufferSize(),
-                                                nullptr, &pixelShader->pShader);
+  // create the pixel shader
+  hr = m_pDevice->pd3dDevice->CreatePixelShader(dxPShader->pSBlob->GetBufferPointer(),
+                                                dxPShader->pSBlob->GetBufferSize(),
+                                                nullptr, &dxPShader->pShader);
+  // check if the creation was successful
   if (hr != 0x00000000) {
-    pixelShader->pSBlob->Release();
+    dxPShader->pSBlob->Release();
     return;
   }
   return;
 }
 
 void
-DX11GraphicsAPI::createVShader()
+DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
 {
+  // convert from shader to dx vertex shader
+  SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
   // create the vertex shader
   uint32 hr;
-  hr = m_pDevice->pd3dDevice->CreateVertexShader(vertexShader->pSBlob->GetBufferPointer(),
-                                                 vertexShader->pSBlob->GetBufferSize(),
+  hr = m_pDevice->pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
+                                                 dxVShader->pSBlob->GetBufferSize(),
                                                  nullptr,
-                                                 &vertexShader->pShader);
+                                                 &dxVShader->pShader);
+  // check if the creation was successful
   if (hr != 0x00000000) {
-    vertexShader->pSBlob->Release();
+    dxVShader->pSBlob->Release();
     return;
   }
   return;
@@ -191,8 +251,10 @@ DX11GraphicsAPI::createVShader()
 void
 DX11GraphicsAPI::createShaders()
 {
-  createPShader();
-  createVShader();
+  createVShader(m_vertexShader);
+  createPShader(m_pixelShader);
+  // createPShader(m_AOShader);
+  createPShader(m_blurPSShader);
 }
 
 void
@@ -252,8 +314,8 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
 void
 DX11GraphicsAPI::createRenderTargetView()
 {
-  // initiaize render target view
-  pRTargetView = make_shared<DX11RenderTargetView>();
+  // reinterpret as a directX texture
+  auto dxRenderTarget = reinterpret_pointer_cast<DX11Texture>(m_pRTargetView);
 
   // get buffer data
   ID3D11Texture2D* pBackBuffer = nullptr;
@@ -265,7 +327,10 @@ DX11GraphicsAPI::createRenderTargetView()
   }
 
   // create the render target view
-  hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pRTargetView->pRtv);
+  hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer,
+                                                     nullptr,
+                                                     &dxRenderTarget->m_rTV);
+                                                     // &m_pRTargetView->pRtv);
   pBackBuffer->Release();
   if (hr != 0x00000000) {
     return;
@@ -275,12 +340,23 @@ DX11GraphicsAPI::createRenderTargetView()
 void
 DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets)
 {
+  // get a texture vector for DX11 textures
   Vector<SPtr<DX11Texture>> txVector;
-  for (uint32 i = 0; i < _rTargets.size(); ++i) {
+  // render target vector
+  Vector<ID3D11RenderTargetView*> rTVector;
+  // get the vector size
+  uint32 RTCount = _rTargets.size();
+  // reinterpret each of the targets as a DX11 texture and store in the texture vector
+  for (uint32 i = 0; i < RTCount; ++i) {
     SPtr<DX11Texture> dxTx = reinterpret_pointer_cast<DX11Texture>(_rTargets[i]);
+    // store the render target and the texture
+    if (dxTx->m_rTV) { rTVector.push_back(dxTx->m_rTV); }
     txVector.push_back(dxTx);
   }
-  m_pDevice->pImmediateContext->OMSetRenderTargets(1, &pRTargetView->pRtv, pDepthSView->pDepthSV);
+  // set the render targets
+  m_pDevice->pImmediateContext->OMSetRenderTargets(rTVector.size(),
+                                                   rTVector.data(),
+                                                   pDepthSView->pDepthSV);
 }
 
 void
@@ -312,7 +388,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   /**
   * Create depth stencil
   **/
-  pDepthStencil = make_shared<DX11Texture>();
+  m_pDepthRT = make_shared<DX11Texture>();
   D3D11_TEXTURE2D_DESC descDepth;
   ZeroMemory(&descDepth, sizeof(descDepth));
   descDepth.Width = _width;
@@ -326,7 +402,11 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
   descDepth.CPUAccessFlags = 0;
   descDepth.MiscFlags = 0;
-  uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil->t2d);
+
+  // reinterpret as a directX texture
+  SPtr<DX11Texture> dxDepthTx = reinterpret_pointer_cast<DX11Texture>(m_pDepthRT);
+
+  uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &dxDepthTx->t2d);
   // if creating the texture failed
   if (hr != 0x00000000) {
     return;
@@ -339,15 +419,16 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDSV.Format = descDepth.Format;
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
-  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(pDepthStencil->t2d,
+
+  hr = m_pDevice->pd3dDevice->CreateDepthStencilView(dxDepthTx->t2d,
                                                      &descDSV,
                                                      &pDepthSView->pDepthSV);
   if (hr != 0x00000000) {
     return;
   }
-  m_pDevice->pImmediateContext->OMSetRenderTargets(1,
+  /*m_pDevice->pImmediateContext->OMSetRenderTargets(1,
                                                    &pRTargetView->pRtv,
-                                                   pDepthSView->pDepthSV);
+                                                   pDepthSView->pDepthSV);*/
 }
 
 void
@@ -366,10 +447,34 @@ DX11GraphicsAPI::setViewport(uint32 _width,
 }
 
 void
-DX11GraphicsAPI::setShaders()
+DX11GraphicsAPI::setPSShader(SPtr<Shader> _pShader)
 {
-  m_pDevice->pImmediateContext->VSSetShader(vertexShader->pShader, nullptr, 0);
-  m_pDevice->pImmediateContext->PSSetShader(pixelShader->pShader, nullptr, 0);
+  // reinterpret as a DirectX pixel shader
+  SPtr<DX11PixelShader> dxPShader = reinterpret_pointer_cast<DX11PixelShader>(_pShader);
+  // set the shader
+  m_pDevice->pImmediateContext->PSSetShader(dxPShader->pShader, nullptr, 0);
+}
+
+void
+DX11GraphicsAPI::setVSShader(SPtr<Shader> _pShader)
+{
+  // reinterpret as a DirectX vertex shader
+  SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
+  // set the shader
+  m_pDevice->pImmediateContext->VSSetShader(dxVShader->pShader, nullptr, 0);
+}
+
+SPtr<Texture>
+DX11GraphicsAPI::RTVToTexture(SPtr<RenderTargetView> _pRTV)
+{
+  // reinterpret from base RTV to DirectX RTV
+  SPtr<DX11RenderTargetView> dxRTV = reinterpret_pointer_cast<DX11RenderTargetView>(_pRTV);
+  // create the texture
+  SPtr<DX11Texture> texture = make_shared<DX11Texture>();
+
+  // dxRTV->pRtv
+  // texture->setSRV()
+  return SPtr<Texture>();
 }
 
 void
@@ -393,15 +498,15 @@ DX11GraphicsAPI::createInputLayout()
   // create input layout
   hr = m_pDevice->pd3dDevice->CreateInputLayout(layout,
                                                 numElem,
-                                                vertexShader->pSBlob->GetBufferPointer(),
-                                                vertexShader->pSBlob->GetBufferSize(),
+                                                m_vertexShader->pSBlob->GetBufferPointer(),
+                                                m_vertexShader->pSBlob->GetBufferSize(),
                                                 &pInputL->pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {
     return;
   }
   // already used
-  vertexShader->pSBlob->Release();
+  m_vertexShader->pSBlob->Release();
   // set the input layout
   pInputL->set(m_pDevice);
 }
@@ -523,14 +628,17 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
   desc.MiscFlags = 0;
 
   // data of the texture
-  D3D11_SUBRESOURCE_DATA initData;
-  initData.pSysMem = _data;
-  initData.SysMemPitch = static_cast<uint32>(_width * _bpp);
-  initData.SysMemSlicePitch = 0;
+  D3D11_SUBRESOURCE_DATA* initData = nullptr;
+  if (_data) {
+    initData = new D3D11_SUBRESOURCE_DATA();
+    initData->pSysMem = _data;
+    initData->SysMemPitch = static_cast<uint32>(_width * _bpp);
+    initData->SysMemSlicePitch = 0;
+  }
 
   // create the texture
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
-  m_pDevice->pd3dDevice->CreateTexture2D(&desc, &initData, &tex->t2d);
+  m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
 
   if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE) {
     // Create the shader resource descriptor for the texture
@@ -553,7 +661,7 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
     m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &pDepthSView->pDepthSV);
-    if (!pDepthSView->pDepthSV) { return nullptr; }
+    // if (!pDepthSView->pDepthSV) { return nullptr; }
   }
 
   if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
@@ -624,10 +732,10 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
   uint32 stride = sizeof(SimpleVertex);
   //set the buffer
   m_pDevice->pImmediateContext->IASetVertexBuffers(_start,
-                                                 _bufferCount,
-                                                 &dxVB->pBuffer,
-                                                 &stride,
-                                                 &_offset);
+                                                   _bufferCount,
+                                                   &dxVB->pBuffer,
+                                                   &stride,
+                                                   &_offset);
 }
 
 SPtr<IndexBuffer>

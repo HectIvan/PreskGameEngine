@@ -3,7 +3,7 @@
  * @file    pkScene.h
  * @author  Héctor  Iván Muñoz Ceballos
  * @date    2025/01/29
- * @brief
+ * @brief   Engine Scene.
  *
  * @bug    No known bugs.
  */

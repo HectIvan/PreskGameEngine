@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkGraphicsAPI pkGraphicsAPI.h
-* @Hector Ivan Muñoz Ceballos
-* @date 19/11/2024
-* @Graphics api file for the Presk Game Engine.
-*
-* Graphics API class for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 09/12/2024
-* changed the render function.
-*/
-/************************************************************************/
+ * @file    pkGraphicsAPI.h
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    19/11/2024
+ * @brief   Graphics API class for the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -23,7 +18,11 @@
 #include "pkModel.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
+#include "pkRenderTargetView.h"
+#include "pkTexture.h"
+#include "pkShader.h"
 #include "pkWindow.h"
+
 namespace pkEngineSDK
 {
 
@@ -67,13 +66,13 @@ public:
   * Create the pixel shader
   **/
   virtual void
-  createPShader() = 0;
+  createPShader(SPtr<Shader> _pShader) = 0;
 
   /**
   * Create the vertex shader
   **/
   virtual void
-  createVShader() = 0;
+  createVShader(SPtr<Shader> _pShader) = 0;
 
   /**
   * Create shaders.
@@ -82,10 +81,54 @@ public:
   createShaders() = 0;
 
   /**
-  * Set the shaders of the api.
-  **/
+   * @brief Set the pixel shader to use.
+   * @param _pShader Shader to set.
+   */
   virtual void
-  setShaders() = 0;
+  setPSShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Set the vertex shader to use.
+   * @param _pShader Shader to set.
+   */
+  virtual void
+  setVSShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Get the vertex shader.
+   * @return The shader pointer.
+   */
+  virtual SPtr<Shader>
+  getVSShader() = 0;
+
+  /**
+   * @brief Get the pixel shader.
+   * @return The shader pointer.
+   */
+  virtual SPtr<Shader>
+  getPSShader() = 0;
+
+  /**
+   * @brief Get the blur pixel shader.
+   * @return The shader pointer.
+   */
+  virtual SPtr<Shader>
+  getBlurPSShader() = 0;
+
+  /**
+   * @brief Convert a render target view into a texture.
+   * @param _pRTV Render target view to convert.
+   * @return The final texture.
+   */
+  virtual SPtr<Texture>
+  RTVToTexture(SPtr<RenderTargetView> _pRTV) = 0;
+
+  /**
+   * @brief Get the render target View.
+   * @return The RTV pointer.
+   */
+  virtual SPtr<Texture>
+  getRenderTargetView() = 0;
 
   /**
   * @brief Create a texture.

@@ -32,37 +32,16 @@ class Spring
   virtual ~Spring() = default;
 
   /**
-   * @brief Apply a force in a direction.
-   * @param _force Force to apply.
-   * @param _direction Direction to apply the force to.
+   * @brief Move the weight of the string.
+   * @param _deltaTime Time between frames.
    */
   void
-  applyForce(float _force, Vector3 _direction);
-
-  /**
-   * Move the weight of the string
-   */
-  void
-  move(float _deltaTime, Vector3 _direction);
-
-  /**
-  * @brief Apply gravity to the spring.
-  * @param _gravity Force of the gravity.
-  */
-  void
-  gravity(float _gravity, float _deltaTime);
-
-  /**
-   * @brief Get the distance that a spring is moved.
-   * @param _force How much force is applied.
-   * @return The length difference.
-   */
-  float
-  hookeLaw(float _force);
+  move(float _deltaTime);
 
  public:
   Vector2 m_direction;
-  Vector2 m_accumulatedForce = Vector2(0);
+  float m_maxDistance;
+  float m_minDistance;
   float m_length;
   float m_elasticity;
   float m_mass;

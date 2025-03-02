@@ -475,7 +475,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The final dot product.
   **/
-  FORCEINLINE static float
+  static float
   dotProd(const Vector4& _this, const Vector4& _other);
 
   float x, y, z, w;

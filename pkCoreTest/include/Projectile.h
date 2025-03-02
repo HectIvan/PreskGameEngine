@@ -3,7 +3,7 @@
  * @file    Projectile.h
  * @author  Héctor  Iván Muñoz Ceballos
  * @date    10/01/2025
- * @brief
+ * @brief   Projectile for physics gravity and collision testing.
  *
  * @bug    Projectile collision with obstacles is scuffed
  */

@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkDX11GraphicsAPI pkDX11GraphicsAPI.h
-* @Hector Ivan Muñoz Ceballos
-* @date 19/11/2024
-* @Graphics api file using DirectX 11 for the Presk Game Engine.
-*
-* Graphics API class using DirectX 11 for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 19/11/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkDX11GraphicsAPI.h
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    19/11/2024
+ * @brief   API file using DirectX 11 for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -52,38 +47,22 @@ class DX11GraphicsAPI : public GraphicsAPI
   virtual ~DX11GraphicsAPI() = default;
 
   /**
-  * Initialize the api.
-  * 
-  * @param _wHnd
-  * Window handle
-  **/
+   * @brief Initialize the api.
+   * @param _wHnd Window handle.
+   */
   void
   initApi(const Window& _window) override;
 
   /**
-  * Create the device and swap chain.
-  * 
-  * @param _width
-  * Client width.
-  * 
-  * @param _height
-  * Client height.
-  * 
-  * @param _wHnd
-  * Handler to the window.
-  * 
-  * @param _numDriverTypes
-  * Number of available types of driver.
-  * 
-  * @param _createDeviceFlags
-  * Flags that can be used in the creation of the device.
-  * 
-  * @param _featureLevels
-  * Levels that can be used.
-  * 
-  * @param _numFeatureLevels
-  * Number of feature levels.
-  **/
+   * @brief Create the device and swap chain.
+   * @param _width Client width.
+   * @param _height Client height.
+   * @param _wHnd Handler to the window.
+   * @param _numDriverTypes Number of available types of driver.
+   * @param _createDeviceFlags Flags that can be used in the creation of the device.
+   * @param _featureLevels Levels that can be used.
+   * @param _numFeatureLevels Number of feature levels.
+   */
   void
   createDeviceAndSwapChain(uint32& _width,
                            uint32& _height,
@@ -95,8 +74,8 @@ class DX11GraphicsAPI : public GraphicsAPI
                            uint32& _numFeatureLevels);
 
   /**
-  * Create the render target view.
-  **/
+   * @brief Create the render target view.
+   */
   void
   createRenderTargetView();
 
@@ -107,39 +86,31 @@ class DX11GraphicsAPI : public GraphicsAPI
   setRenderTargets(Vector<SPtr<Texture>> _rTargets) override;
 
   /**
-  * Create the sampler state.
-  **/
+   * @brief Create the sampler state.
+   */
   void
   createSamplerState() override;
 
   /**
-  * Create the depth stencil texture and view.
-  * 
-  * @param _width
-  * Client width.
-  * 
-  * @param _height
-  * Client height.
-  **/
+   * @brief Create the depth stencil texture and view.
+   * @param _width Client width.
+   * @param _height Client height.
+   */
   void
   createDepthStencilTexture(uint32 _width,
                             uint32 _height);
 
   /**
-  * Set the Client viewport.
-  *
-  * @param _width
-  * Client width.
-  *
-  * @param _height
-  * Client height.
-  **/
+   * @brief Set the Client viewport.
+   * @param _width Client width.
+   * @param _height Client height.
+   */
   void
   setViewport(uint32 _width, uint32 _height);
 
   /**
-  * Set the sampler state.
-  **/
+   * Set the sampler state.
+   */
   void
   setSampler(uint32 _startSlot = 0,
              uint32 _numSamplers = 1) override;
@@ -169,15 +140,15 @@ class DX11GraphicsAPI : public GraphicsAPI
                         uint32 _format) override;
 
   /**
-  * @brief Create a texture.
-  * @param _data Data of the image loaded.
-  * @param _width How wide is the texture.
-  * @param _height How tall is the texture.
-  * @param _format Format of the texture.
-  * @param _usage What usage will the api give the texture.
-  * @param _bindFlags flag for binding to the pipeline stages.
-  * @param _mipLevels The maximum number of mipmap levels in the texture.
-  **/
+   * @brief Create a texture.
+   * @param _data Data of the image loaded.
+   * @param _width How wide is the texture.
+   * @param _height How tall is the texture.
+   * @param _format Format of the texture.
+   * @param _usage What usage will the api give the texture.
+   * @param _bindFlags flag for binding to the pipeline stages.
+   * @param _mipLevels The maximum number of mipmap levels in the texture.
+   */
   SPtr<Texture>
   createTexture(unsigned char* _data,
                 uint32 _bpp,
@@ -189,24 +160,27 @@ class DX11GraphicsAPI : public GraphicsAPI
                 bool _mipLevels) override;
 
   /**
-  * Set input layout
-  **/
+   * @brief Set input layout
+   */
   void
   setInputLayout() override;
 
   /**
-  * Create the vertex buffer.
-  * 
-  * @param _vertex
-  * Vector with all the vertex data needed.
-  * 
-  * @param _usage
-  * What use will it be given to the buffer.
-  **/
+   * @brief Create the vertex buffer.
+   * @param _vertex Vector with all the vertex data needed.
+   * @param _usage What use will it be given to the buffer.
+   */
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
                      uint32 _usage = 0) override;
 
+  /**
+   * @brief Set data to the vertex buffer.
+   * @param _pVertexB Vertex buffer.
+   * @param _start Start slot of the buffer.
+   * @param _bufferCount How many buffers will be set.
+   * @param _offset buffer offsets.
+   */
   void
   setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
@@ -214,14 +188,10 @@ class DX11GraphicsAPI : public GraphicsAPI
                   uint32 _offset = 0) override;
 
   /**
-  * Create an IndexBuffer
-  * 
-  * @param _index
-  * Vector with all the index data needed.
-  * 
-  * @param _usage
-  * What use will it be given to the buffer.
-  **/
+   * @brief Create an IndexBuffer.
+   * @param _index Vector with all the index data needed.
+   * @param _usage What use will it be given to the buffer.
+   */
   SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
                     uint32 _usage = 0) override;
@@ -232,20 +202,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                  uint32 _offset = 0) override;
 
   /**
-  * Create the constant buffer.
-  * 
-  * @param _pDevice
-  * What device will create the buffer.
-  * 
-  * @param _size
-  * Size of the constant buffer.
-  * 
-  * @param _pData
-  * What data will the constant buffer store.
-  * 
-  * @param _usage
-  * What usage will be given to the buffer.
-  **/
+   * @brief Create the constant buffer.
+   * @param _pDevice What device will create the buffer.
+   * @param _size Size of the constant buffer.
+   * @param _pData What data will the constant buffer store.
+   * @param _usage What usage will be given to the buffer.
+   */
   SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
                        const void* _pData,
@@ -259,52 +221,37 @@ class DX11GraphicsAPI : public GraphicsAPI
   getDevice() { return m_pDevice; }
 
   /**
-  * Update the constant buffer.
-  * 
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  * 
-  * @param _pNewData
-  * New data that the buffer will store.
-  * 
-  * @param _size
-  * Size of the data to store.
-  **/
+   * @brief Update the constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _pNewData New data that the buffer will store.
+   * @param _size Size of the data to store.
+   */
   void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
                        uint32 _size) override;
 
   /**
-  * Draw the indexed data.
-  * 
-  * @param _indexCount
-  * The ammount of index to draw.
-  * 
-  * @param _startIndexLocation
-  * Which index will be the starting point.
-  * 
-  * @param _baseVertexLocation
-  * Which vertex will be the starting point.
-  **/
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   * @param _baseVertexLocation Which vertex will be the starting point.
+   */
   void
   drawIndexed(uint32 _indexCount,
               uint32 _startIndexLocation,
               uint32 _baseVertexLocation) override;
 
   /**
-  * Clear the render target fiew and fill the
-  * screen with a new color.
-  * 
-  * @param _color
-  * New screen color.
-  **/
+   * @brief Clear the render target fiew and fill the screen with a new color.
+   * @param _color New screen color.
+   */
   void
   clearRenderTargetView(float _color[]) override;
 
   /**
-  * Clear the depth buffer.
-  **/
+   * @brief Clear the depth buffer.
+   */
   void
   clearDepthBuffer(float _depth) override;
 
@@ -321,78 +268,101 @@ class DX11GraphicsAPI : public GraphicsAPI
   compileShaders() override;
 
   /**
-  * Create the pixel shader
-  **/
+   * @brief Create the pixel shader
+   */
   void
-  createPShader() override;
+  createPShader(SPtr<Shader> _pShader) override;
 
   /**
-  * Create the vertex shader
-  **/
+   * @brief Create the vertex shader
+   */
   void
-  createVShader() override;
+  createVShader(SPtr<Shader> _pShader) override;
 
   /**
-  * Create shaders.
-  **/
+   * @brief Create shaders.
+   */
   void
   createShaders() override;
 
   /**
-  * Set the shaders of the api.
-  **/
+   * @brief Set the pixel shader to use.
+   */
   void
-  setShaders() override;
+  setPSShader(SPtr<Shader> _pShader) override;
 
   /**
-  * Create the Input Layout.
-  **/
+   * @brief Set the vertex shader to use.
+   */
+  void
+  setVSShader(SPtr<Shader> _pShader) override;
+
+  /**
+   * @brief Get the vertex shader.
+   */
+  SPtr<Shader>
+  getVSShader() override { return m_vertexShader; }
+
+  /**
+   * @brief Get the pixel shader.
+   */
+  SPtr<Shader>
+  getPSShader() override { return m_pixelShader; }
+
+  /**
+   * @brief Get the blur pixel shader.
+   */
+  SPtr<Shader>
+  getBlurPSShader() override { return m_blurPSShader; }
+
+  /**
+   * @brief Get the render target View.
+   * @return The RTV pointer.
+   */
+  SPtr<Texture>
+  getRenderTargetView() override { return m_pRTargetView; }
+
+  /**
+   * @brief Convert a render target view into a texture.
+   * @param _pRTV Render target view to convert.
+   * @return The final texture.
+   */
+  SPtr<Texture>
+  RTVToTexture(SPtr<RenderTargetView> _pRTV) override;
+
+  /**
+   * @brief Create the Input Layout.
+   */
   void
   createInputLayout() override;
 
   /**
-  * Set the Vertex Shader constant buffer.
-  * 
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  * 
-  * @param _startSlot
-  * Index into the device's zero-based array.
-  * 
-  * @param _numBuffers
-  * Number of buffers to set.
-  **/
+   * @brief Set the Vertex Shader constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
   void
   VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
                        uint32 _numBuffers) override;
 
   /**
-  * Set the Pixel Shader constant buffer.
-  *
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  *
-  * @param _startSlot
-  * Index into the device's zero-based array.
-  *
-  * @param _numBuffers
-  * Number of buffers to set.
-  **/
+   * @brief Set the Pixel Shader constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
   void
   PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
                        uint32 _numBuffers) override;
 
   /**
-  * Present the result to the screen.
-  * 
-  * @param _syncInterval
-  * If vertical sync is enabled.
-  * 
-  * @param _flags
-  * Swap chain presentation options.
-  **/
+   * @brief Present the result to the screen.
+   * @param _syncInterval If vertical sync is enabled.
+   * @param _flags Swap chain presentation options.
+   */
   void
   present(uint32 _syncInterval, uint32 _flags) override;
   
@@ -401,11 +371,15 @@ class DX11GraphicsAPI : public GraphicsAPI
   Window window;
   
   // shaders
-  SPtr<DX11PixelShader> pixelShader;
-  SPtr<DX11VertexShader> vertexShader;
+  SPtr<DX11VertexShader> m_vertexShader;
+  SPtr<DX11PixelShader> m_pixelShader;
+  SPtr<DX11PixelShader> m_AOShader;
+  SPtr<DX11PixelShader> m_blurPSShader;
 
   // Render target view
-  SPtr<DX11RenderTargetView> pRTargetView;
+  // SPtr<DX11RenderTargetView> m_pRTargetView;
+  SPtr<Texture> m_pRTargetView;
+  SPtr<Texture> m_pNormalRT;
 
   // swap chain
   SPtr<DX11SwapChain> pSwapChain;
@@ -414,7 +388,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   SPtr<DX11InputLayout> pInputL;
 
   // depth stencil
-  SPtr<DX11Texture> pDepthStencil;
+  SPtr<Texture> m_pDepthRT;
   SPtr<DX11DepthStencilView> pDepthSView;
 
   // sampler state

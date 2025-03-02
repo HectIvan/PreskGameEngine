@@ -101,12 +101,9 @@ Projectile::obstacleBounce(Vector3 _obstaclePos, float _obstacleRadius)
   if (Math::intersectSphereSphere(projSphere, obsSphere)) {
     // get the reflected vector
     Vector3 normal = (projectilePos - _obstaclePos).normalized();
-    Vector3 dir = Vector3(m_direction.x, m_direction.y, projectilePos.z);
+    Vector3 dir = Vector3(m_direction.x, m_direction.y, 0.0f);
+    dir.normalize();
     Vector3 reflect = Vector3::reflect(dir, normal);
-    // likely cause of one of the problems (normalize would make a vector lower than 1 magnitude
-    // to be set back to a magnitude of 1)
-    // reflect.clamp(-1.0f, 1-0f);
-    reflect.normalize(); 
     m_direction = Vector2(reflect.x, reflect.y);
 
     /**

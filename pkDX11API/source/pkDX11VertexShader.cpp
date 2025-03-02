@@ -9,12 +9,12 @@
 namespace pkEngineSDK {
 
 HRESULT
-DX11VertexShader::compile()
+DX11VertexShader::compile(wstring _fileName, const char* _entryPoint, const char* _model)
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(L"shaders/pkShader.hlsl",
-                             "VS",
-                             "vs_5_0",
+  hr = compileShaderFromFile(_fileName,
+                             _entryPoint,
+                             _model,
                              &pSBlob);
   if (FAILED(hr))
   {

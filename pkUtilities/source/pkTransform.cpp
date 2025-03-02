@@ -8,18 +8,20 @@ Transform::Transform(Matrix4 _rotation,
                      Matrix4 _translation)
 {
   setRotation(_rotation);
-  // setScale(_scale);
-  // setTranslation(_translation);
+  setScale(_scale.getScale3());
+  setTranslation(_translation.getTranslation3());
 }
 
 Transform::Transform(Matrix4 _matrix)
 {
-  
+  setRotation(_matrix.getScale());
+  setTranslation(_matrix.getTranslation3());
+  setScale(_matrix.getScale3());
 }
 
 Transform::Transform(float _val)
 {
-  
+  Transform(Matrix4(_val));
 }
 
 Matrix4
@@ -43,7 +45,7 @@ Transform::getTranslation()
 void
 Transform::setRotation(Matrix4 _rotation)
 {
-  
+  transform.setRotation(_rotation);
 }
 
 void

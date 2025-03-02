@@ -154,6 +154,20 @@ PhysicsApp::onUpdate(float _deltaTime)
       Debug::print("Euler integration active");
     }
   }
+  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+  float strength = 10.0f;
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * _deltaTime * strength);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * _deltaTime * strength);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * _deltaTime * strength);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * _deltaTime * strength);
+  }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
   }
@@ -178,7 +192,7 @@ PhysicsApp::physics(float _deltaTime)
   m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
   m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
-  m_spring->move(_deltaTime, Vector3(0.0f, 1.0f, 0.0f));
+  m_spring->move(_deltaTime);
 
   // apply gravity to every projectile
   for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
@@ -231,7 +245,8 @@ void
 PhysicsApp::onRender(Scene& _scene)
 {
   // Set shaders
-  g_GraphicAPI().setShaders();
+  g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
+  g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());
   // set constant buffers for the pixel and vertex shaders
   g_RenderManager().VSSetConstantBuffers();
   g_RenderManager().PSSetConstantBuffers();

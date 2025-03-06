@@ -87,11 +87,12 @@ BaseApp::init(const char** _argv)
   initWindow();
   initAPI(_argv);
 
-  g_GraphicAPI().makeShaders();
+  g_RenderManager().createPasses();
+  /*g_GraphicAPI().makeShaders();
   g_GraphicAPI().compileShaders();
   g_GraphicAPI().createShaders();
-  g_GraphicAPI().createInputLayout();
-  g_GraphicAPI().createSamplerState();
+  g_GraphicAPI().createInputLayoutFromVShader();
+  g_GraphicAPI().createSamplerState();*/
   createBuffers();
   m_cameraSpeed = 5.0f;
   onInit();
@@ -188,7 +189,7 @@ BaseApp::messageLoop()
     // event queue
     m_eventQueue.poll();
     // update camera
-    g_RenderManager().updateCamera(&m_camera);
+    g_RenderManager().updateCameraBuffers(&m_camera);
     // render the scene
     render(m_scene);
   }

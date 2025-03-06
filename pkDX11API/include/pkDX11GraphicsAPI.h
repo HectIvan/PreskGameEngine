@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /**
  * @file    pkDX11GraphicsAPI.h
- * @author  Héctor  Iván Muñoz Ceballos
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    19/11/2024
  * @brief   API file using DirectX 11 for the Presk Game Engine.
  *
@@ -19,12 +19,7 @@
 #include "pkDX11DepthStencilView.h"
 #include "pkDX11Device.h"
 #include "pkDX11InputLayout.h"
-#include "pkDX11PixelShader.h"
-#include "pkDX11RenderTargetView.h"
-#include "pkDX11SamplerState.h"
-#include "pkDX11SwapChain.h"
 #include "pkDX11Texture.h"
-#include "pkDX11VertexShader.h"
 #include "pkGraphicsAPI.h"
 #include "pkLight.h"
 #include "pkMatrix4.h"
@@ -51,7 +46,13 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _wHnd Window handle.
    */
   void
-  initApi(const Window& _window) override;
+  initApi(Window& _window) override;
+
+  /**
+   * @brief Create the render target view.
+   */
+  SPtr<Texture>
+  createRenderTargetView() override;
 
   /**
    * @brief Create the device and swap chain.
@@ -76,29 +77,28 @@ class DX11GraphicsAPI : public GraphicsAPI
   /**
    * @brief Create the render target view.
    */
-  void
-  createRenderTargetView();
+  SPtr<Texture>
+  createRenderTargetView() override;
 
   /**
    * @brief Set the render targets to the device.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets) override;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) override;
 
   /**
    * @brief Create the sampler state.
    */
-  void
-  createSamplerState() override;
+  SPtr<SamplerState>
+  createSamplerState(const uint32 _mode, const uint32 _filter) override;
 
   /**
    * @brief Create the depth stencil texture and view.
    * @param _width Client width.
    * @param _height Client height.
    */
-  void
-  createDepthStencilTexture(uint32 _width,
-                            uint32 _height);
+  SPtr<DepthStencilView>
+  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) override;
 
   /**
    * @brief Set the Client viewport.
@@ -163,7 +163,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Set input layout
    */
   void
-  setInputLayout() override;
+  setInputLayout(SPtr<InputLayout> _pInputLayout) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -247,94 +247,66 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _color New screen color.
    */
   void
-  clearRenderTargetView(float _color[]) override;
+  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) override;
 
   /**
    * @brief Clear the depth buffer.
    */
   void
-  clearDepthBuffer(float _depth) override;
+  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) override;
 
   /**
-   * @brief Create shaders.
+   * @brief Create the blend state.
+   * @return Blend state pointer
+   */
+  SPtr<BlendState>
+  createBlendState() override;
+
+  /**
+   * @brief Set the blend state.
+   * @param _pBlendState Blend state to set.
    */
   void
-  makeShaders() override;
+  setBlendState(SPtr<BlendState> _pBlendState) override;
 
   /**
-   * @brief Compile shaders.
-   */
-  void
-  compileShaders() override;
-
-  /**
-   * @brief Create the pixel shader
-   */
-  void
-  createPShader(SPtr<Shader> _pShader) override;
-
-  /**
-   * @brief Create the vertex shader
+   * @brief Create a vertex shader.
+   * @param _pShader Shader to create
    */
   void
   createVShader(SPtr<Shader> _pShader) override;
 
   /**
-   * @brief Create shaders.
+   * @brief Create a pixel shader.
+   * @param _pShader Shader to create
    */
   void
-  createShaders() override;
+  createPShader(SPtr<Shader> _pShader) override;
 
   /**
-   * @brief Set the pixel shader to use.
-   */
-  void
-  setPSShader(SPtr<Shader> _pShader) override;
-
-  /**
-   * @brief Set the vertex shader to use.
+   * @brief Set the vertex shader to the device context.
    */
   void
   setVSShader(SPtr<Shader> _pShader) override;
 
   /**
-   * @brief Get the vertex shader.
+   * @brief Set the pixel shader to the device context.
    */
-  SPtr<Shader>
-  getVSShader() override { return m_vertexShader; }
+  void
+  setPSShader(SPtr<Shader> _pShader) override;
 
   /**
-   * @brief Get the pixel shader.
+   * @brief Create the input layout based on the shader.
+   * @param _pShader Shader to use.
    */
-  SPtr<Shader>
-  getPSShader() override { return m_pixelShader; }
-
-  /**
-   * @brief Get the blur pixel shader.
-   */
-  SPtr<Shader>
-  getBlurPSShader() override { return m_blurPSShader; }
-
-  /**
-   * @brief Get the render target View.
-   * @return The RTV pointer.
-   */
-  SPtr<Texture>
-  getRenderTargetView() override { return m_pRTargetView; }
-
-  /**
-   * @brief Convert a render target view into a texture.
-   * @param _pRTV Render target view to convert.
-   * @return The final texture.
-   */
-  SPtr<Texture>
-  RTVToTexture(SPtr<RenderTargetView> _pRTV) override;
+  SPtr<InputLayout>
+  createInputLayoutFromVShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Create the Input Layout.
    */
-  void
-  createInputLayout() override;
+  SPtr<InputLayout>
+  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) override;
 
   /**
    * @brief Set the Vertex Shader constant buffer.
@@ -367,29 +339,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   present(uint32 _syncInterval, uint32 _flags) override;
   
  public:
-  // window
-  Window window;
-  
-  // shaders
-  SPtr<DX11VertexShader> m_vertexShader;
-  SPtr<DX11PixelShader> m_pixelShader;
-  SPtr<DX11PixelShader> m_AOShader;
-  SPtr<DX11PixelShader> m_blurPSShader;
-
-  // Render target view
-  // SPtr<DX11RenderTargetView> m_pRTargetView;
-  SPtr<Texture> m_pRTargetView;
-  SPtr<Texture> m_pNormalRT;
-
-  // swap chain
-  SPtr<DX11SwapChain> pSwapChain;
 
   // input layout
   SPtr<DX11InputLayout> pInputL;
-
-  // depth stencil
-  SPtr<Texture> m_pDepthRT;
-  SPtr<DX11DepthStencilView> pDepthSView;
 
   // sampler state
   SPtr<DX11SamplerState> pSamplerLinear;

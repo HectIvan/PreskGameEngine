@@ -18,11 +18,12 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkDepthStencilView.h"
 
 namespace pkEngineSDK
 {
 
-class DX11DepthStencilView
+class DX11DepthStencilView : public DepthStencilView
 {
  public:
   DX11DepthStencilView() = default;

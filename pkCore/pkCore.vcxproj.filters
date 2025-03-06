@@ -79,7 +79,7 @@
     <Filter Include="source\script">
       <UniqueIdentifier>{ad061113-2507-41f7-a44a-811483fad56a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\events\game">
+    <Filter Include="source\game">
       <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -231,6 +231,15 @@
     <ClInclude Include="include\pkScriptManager.h">
       <Filter>include\script</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkInputLayoutDesc.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSamplerState.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBlendState.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -249,13 +258,13 @@
       <Filter>source\camera</Filter>
     </ClCompile>
     <ClCompile Include="source\pkGameObject.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkModel.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkBone.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkMesh.cpp">
       <Filter>source\api</Filter>
@@ -282,10 +291,10 @@
       <Filter>source\graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\pkSprite.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkActor.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkDebug.cpp">
       <Filter>source\debug</Filter>
@@ -324,7 +333,10 @@
       <Filter>source\script</Filter>
     </ClCompile>
     <ClCompile Include="source\pkScene.cpp">
-      <Filter>source\events\game</Filter>
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPass.cpp">
+      <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

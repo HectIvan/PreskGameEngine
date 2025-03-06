@@ -29,37 +29,22 @@ class DX11Shaders : public Shader
 {
  public:
   DX11Shaders() = default;
-  virtual ~DX11Shaders()
-  {
+  virtual ~DX11Shaders() {
     safeRelease(pSBlob);
   }
 
   /**
-  * Compile.
-  * 
-  * Compile the shader from a file.
-  * 
-  * @param _szFileName
-  * Name of the shader.
-  * 
-  * @param _szEntryPoint
-  * What section will we compile.
-  * 
-  * @param _szShaderModel
-  * What model of the shader is compiled.
-  * 
-  * @param _ppBlobOut
-  * Blob info.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  * 
-  **/
-  HRESULT
+   * @brief Compile the shader from a file.
+   * @param _szFileName Name of the shader.
+   * @param _szEntryPoint What section will we compile.
+   * @param _szShaderModel What model of the shader is compiled.
+   * @param _ppBlobOut Blob info.
+   * @return If the compilation was successful or not.
+   */
+  uint32
   compileShaderFromFile(wstring _szFileName,
-                        LPCSTR _szEntryPoint,
-                        LPCSTR _szShaderModel,
-                        ID3DBlob** _ppBlobOut);
+                        const char* _szEntryPoint,
+                        const char* _szShaderModel) override;
 
  public:
   ID3DBlob* pSBlob = nullptr;

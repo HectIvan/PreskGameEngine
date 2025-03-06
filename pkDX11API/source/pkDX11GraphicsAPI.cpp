@@ -17,11 +17,14 @@
 /*********************************************/
 #include <stb_image.h>
 
+#include "pkDX11BlendState.h"
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11PixelShader.h"
 #include "pkDX11Prerequisites.h"
 #include "pkDX11RenderTargetView.h"
+#include "pkDX11SamplerState.h"
+#include "pkDX11SwapChain.h"
 #include "pkDX11VertexBuffer.h"
 #include "pkDX11VertexShader.h"
 #include "pkWindow.h"
@@ -35,6 +38,12 @@
 
 namespace pkEngineSDK
 {
+FORCEINLINE void
+throwIfFailed(HRESULT hr) {
+  if (FAILED(hr)) {
+    PK_ASSERT(false && "Error in creation");
+  }
+}
 
 extern "C" __declspec(dllexport) void
 loadPlugin(const Window& _window)
@@ -48,10 +57,8 @@ DX11GraphicsAPI::DX11GraphicsAPI(const Window& _window)
 }
 
 void
-DX11GraphicsAPI::initApi(const Window& _window)
+DX11GraphicsAPI::initApi(Window& _window)
 {
-  window = _window;
-
   uint32 createDeviceFlags = 0;
 #ifdef _DEBUG
   createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -73,7 +80,7 @@ DX11GraphicsAPI::initApi(const Window& _window)
   uint32 numDriverTypes = ARRAYSIZE(driverTypes);
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
-  WindowHandle winHandle = window.getWindowHandle();
+  WindowHandle winHandle = _window.getWindowHandle();
   uint32 width = static_cast<uint32>(_window.getSize().x);
   uint32 height = static_cast<uint32>(_window.getSize().y);
   createDeviceAndSwapChain(width,
@@ -94,8 +101,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
   m_pDepthRT = createTexture(nullptr,
                              4,
-                             window.getWidth(),
-                             window.getHeight(),
+                             _window.getWidth(),
+                             _window.getHeight(),
                              DXGI_FORMAT_R32G32B32A32_FLOAT,
                              D3D11_USAGE_DEFAULT,
                              D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
@@ -103,8 +110,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
 
   m_pNormalRT = createTexture(nullptr,
                              4,
-                             window.getWidth(),
-                             window.getHeight(),
+                             _window.getWidth(),
+                             _window.getHeight(),
                              DXGI_FORMAT_R32G32B32A32_FLOAT,
                              D3D11_USAGE_DEFAULT,
                              D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
@@ -113,7 +120,7 @@ DX11GraphicsAPI::initApi(const Window& _window)
   rTVector.push_back(m_pRTargetView);
   rTVector.push_back(m_pNormalRT);
   rTVector.push_back(m_pDepthRT);
-  createDepthStencilTexture(width, height);
+  createDepthStencilView(width, height);
   setRenderTargets(rTVector);
   setViewport(width, height);
 
@@ -175,40 +182,23 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
 }
 
 void
-DX11GraphicsAPI::clearRenderTargetView(float _color[])
+DX11GraphicsAPI::clearRenderTargetView(float _color[], SPtr<Texture> _rtv)
 {
   // texture to dx texture
-  SPtr<DX11Texture> dxRTV = reinterpret_pointer_cast<DX11Texture>(m_pRTargetView);
+  SPtr<DX11Texture> dxRTV = reinterpret_pointer_cast<DX11Texture>(_rtv);
   // clear the render target
   m_pDevice->pImmediateContext->ClearRenderTargetView(dxRTV->m_rTV, _color);
 }
 
 void
-DX11GraphicsAPI::clearDepthBuffer(float _depth)
+DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _depthSV)
 {
+  SPtr<DX11Texture> dxDSV = reinterpret_pointer_cast<DX11Texture>(_depthSV);
   // Clear the depth buffer to 1.0 (max depth)
-  m_pDevice->pImmediateContext->ClearDepthStencilView(pDepthSView->pDepthSV,
+  m_pDevice->pImmediateContext->ClearDepthStencilView(dxDSV->m_dSV,
                                                       D3D11_CLEAR_DEPTH,
                                                       _depth,
                                                       0);
-}
-
-void
-DX11GraphicsAPI::makeShaders()
-{
-  m_vertexShader = make_shared<DX11VertexShader>();
-  m_pixelShader = make_shared<DX11PixelShader>();
-  m_blurPSShader = make_shared<DX11PixelShader>();
-  // m_AOShader = make_shared<DX11PixelShader>();
-}
-
-void
-DX11GraphicsAPI::compileShaders() 
-{
-  m_vertexShader->compile(L"shaders/pkShader.hlsl", "VS", "vs_5_0");
-  m_pixelShader->compile(L"shaders/pkShader.hlsl", "PS", "ps_5_0");
-  m_blurPSShader->compile(L"shaders/pkBlurPSShader.hlsl", "PS", "ps_5_0");
-  // m_AOShader->compile(L"shaders/pkPSAOshader.hlsl", "PS_main", "ps_5_0");
 }
 
 void
@@ -249,15 +239,6 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
 }
 
 void
-DX11GraphicsAPI::createShaders()
-{
-  createVShader(m_vertexShader);
-  createPShader(m_pixelShader);
-  // createPShader(m_AOShader);
-  createPShader(m_blurPSShader);
-}
-
-void
 DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                           uint32& _height,
                                           WindowHandle& _wHnd,
@@ -269,7 +250,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
 {
   // initialize device and swap chain
   m_pDevice = make_shared<DX11Device>();
-  pSwapChain = make_shared<DX11SwapChain>();
+  SPtr<DX11SwapChain> pSwapChain = make_shared<DX11SwapChain>();
 
   /**
   * Create the device and swap chains
@@ -306,40 +287,44 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
     // if creation was successful
     if (hr == 0x00000000) {
       // end the entire process, no need to continue
+      m_pSwapChain = pSwapChain;
       break;
     }
   }
 }
 
-void
+SPtr<Texture>
 DX11GraphicsAPI::createRenderTargetView()
 {
   // reinterpret as a directX texture
-  auto dxRenderTarget = reinterpret_pointer_cast<DX11Texture>(m_pRTargetView);
+  SPtr<DX11Texture> rTargetView = make_shared<DX11Texture>();
 
   // get buffer data
   ID3D11Texture2D* pBackBuffer = nullptr;
-  uint32 hr = pSwapChain->pSch->GetBuffer(0,
-                                          __uuidof(ID3D11Texture2D),
-                                          (LPVOID*)&pBackBuffer);
+  // reinterpret the swap chain to a DirectX swap chain
+  SPtr<DX11SwapChain> dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
+  uint32 hr = dxSCh->pSch->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+  // if the buffer is not correct
   if (hr != 0x00000000) {
-    return;
+    return nullptr;
   }
 
   // create the render target view
   hr = m_pDevice->pd3dDevice->CreateRenderTargetView(pBackBuffer,
                                                      nullptr,
-                                                     &dxRenderTarget->m_rTV);
-                                                     // &m_pRTargetView->pRtv);
-  pBackBuffer->Release();
+                                                     &rTargetView->m_rTV);
+  // if the creation was not successful
   if (hr != 0x00000000) {
-    return;
+    return nullptr;
   }
+  return rTargetView;
 }
 
 void
-DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets)
+DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV)
 {
+  // reinterpret the depth stencil view to a DirectX texture
+  auto pDSV = reinterpret_pointer_cast<DX11Texture>(_DepthSV);
   // get a texture vector for DX11 textures
   Vector<SPtr<DX11Texture>> txVector;
   // render target vector
@@ -356,39 +341,41 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets)
   // set the render targets
   m_pDevice->pImmediateContext->OMSetRenderTargets(rTVector.size(),
                                                    rTVector.data(),
-                                                   pDepthSView->pDepthSV);
+                                                   pDSV->m_dSV);
 }
 
-void
-DX11GraphicsAPI::createSamplerState()
+SPtr<SamplerState>
+DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
 {
+  // sampler state creation
+  SPtr<DX11SamplerState> pSamState = make_shared<DX11SamplerState>();
   // sampler state description
   D3D11_SAMPLER_DESC sampDesc;
   ZeroMemory(&sampDesc, sizeof(sampDesc));
-  sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-  sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-  sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-  sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampDesc.Filter = static_cast<D3D11_FILTER>(_filter);
+  sampDesc.AddressU = static_cast<D3D11_TEXTURE_ADDRESS_MODE>(_mode);
+  sampDesc.AddressV = static_cast<D3D11_TEXTURE_ADDRESS_MODE>(_mode);
+  sampDesc.AddressW = static_cast<D3D11_TEXTURE_ADDRESS_MODE>(_mode);
   sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
   sampDesc.MinLOD = 0;
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-  // sampler state creation
-  pSamplerLinear = make_shared<DX11SamplerState>();
-  uint32 hr = m_pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamplerLinear->pSampler);
+  uint32 hr = m_pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->pSampler);
   if (hr != 0x00000000) {
     return;
   }
+  return pSamState;
 }
 
-void
-DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
-                                           uint32 _height)
+SPtr<DepthStencilView>
+DX11GraphicsAPI::createDepthStencilView(uint32 _width,
+                                           uint32 _height,
+                                           SPtr<Texture> _depthRT)
 {
   /**
   * Create depth stencil
   **/
-  m_pDepthRT = make_shared<DX11Texture>();
+  _depthRT = make_shared<DX11Texture>();
   D3D11_TEXTURE2D_DESC descDepth;
   ZeroMemory(&descDepth, sizeof(descDepth));
   descDepth.Width = _width;
@@ -404,7 +391,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   descDepth.MiscFlags = 0;
 
   // reinterpret as a directX texture
-  SPtr<DX11Texture> dxDepthTx = reinterpret_pointer_cast<DX11Texture>(m_pDepthRT);
+  SPtr<DX11Texture> dxDepthTx = reinterpret_pointer_cast<DX11Texture>(_depthRT);
 
   uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &dxDepthTx->t2d);
   // if creating the texture failed
@@ -413,7 +400,7 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   }
 
   // create depth stencil with the generated 2D texture
-  pDepthSView = make_shared<DX11DepthStencilView>();
+  SPtr<DX11DepthStencilView> pDepthSView = make_shared<DX11DepthStencilView>();
   D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
   ZeroMemory(&descDSV, sizeof(descDSV));
   descDSV.Format = descDepth.Format;
@@ -423,12 +410,12 @@ DX11GraphicsAPI::createDepthStencilTexture(uint32 _width,
   hr = m_pDevice->pd3dDevice->CreateDepthStencilView(dxDepthTx->t2d,
                                                      &descDSV,
                                                      &pDepthSView->pDepthSV);
+  // if the creation was not succesful
   if (hr != 0x00000000) {
-    return;
+    return nullptr;
   }
-  /*m_pDevice->pImmediateContext->OMSetRenderTargets(1,
-                                                   &pRTargetView->pRtv,
-                                                   pDepthSView->pDepthSV);*/
+  // return the final value
+  return pDepthSView;
 }
 
 void
@@ -464,51 +451,191 @@ DX11GraphicsAPI::setVSShader(SPtr<Shader> _pShader)
   m_pDevice->pImmediateContext->VSSetShader(dxVShader->pShader, nullptr, 0);
 }
 
-SPtr<Texture>
-DX11GraphicsAPI::RTVToTexture(SPtr<RenderTargetView> _pRTV)
+SPtr<BlendState>
+DX11GraphicsAPI::createBlendState()
 {
-  // reinterpret from base RTV to DirectX RTV
-  SPtr<DX11RenderTargetView> dxRTV = reinterpret_pointer_cast<DX11RenderTargetView>(_pRTV);
-  // create the texture
-  SPtr<DX11Texture> texture = make_shared<DX11Texture>();
+  // create the blend state
+  SPtr<DX11BlendState> pBlendState = make_shared<DX11BlendState>();
 
-  // dxRTV->pRtv
-  // texture->setSRV()
-  return SPtr<Texture>();
+  // Create the description
+  D3D11_BLEND_DESC blendDesc = {};
+  blendDesc.AlphaToCoverageEnable = FALSE;
+
+  for (int i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+    blendDesc.RenderTarget[i].BlendEnable = true;
+    blendDesc.RenderTarget[i].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blendDesc.RenderTarget[i].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blendDesc.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ZERO;
+    blendDesc.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+  }
+
+  m_pDevice->pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
+  return pBlendState;
 }
 
 void
-DX11GraphicsAPI::createInputLayout()
+DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
+{
+  // Reinterpret to a DirectX Blend State
+  SPtr<DX11BlendState> dxBS = reinterpret_pointer_cast<DX11BlendState>(_pBlendState);
+  // Set the blend state
+  m_pDevice->pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
+}
+
+SPtr<InputLayout>
+DX11GraphicsAPI::createInputLayoutFromVShader(SPtr<Shader> _pShader)
+{
+  // create the input layout pointer
+  SPtr<DX11InputLayout> pLayout = make_shared<DX11InputLayout>();
+  // reinterpret to a DirectX vertex shader
+  SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
+
+  ID3D11ShaderReflection* pVShaderReflection = nullptr;
+  throwIfFailed(D3DReflect(dxVShader->pSBlob->GetBufferPointer(),
+                           dxVShader->pSBlob->GetBufferSize(),
+                           __uuidof(ID3D11ShaderReflection),
+                           reinterpret_cast<void**>(&pVShaderReflection)));
+
+  // shader data
+  D3D11_SHADER_DESC vShaderDesc;
+  pVShaderReflection->GetDesc(&vShaderDesc);
+
+  Vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
+  for (uint32 i = 0; i < vShaderDesc.InputParameters; ++i) {
+    D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+    pVShaderReflection->GetInputParameterDesc(i, &paramDesc);
+
+    // fill out input element
+    D3D11_INPUT_ELEMENT_DESC elemDesc;
+    elemDesc.SemanticIndex = paramDesc.SemanticIndex;
+    elemDesc.SemanticName = paramDesc.SemanticName;
+    elemDesc.InputSlot = 0;
+    elemDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+    elemDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    elemDesc.InstanceDataStepRate = 0;
+
+    // Red channel
+    if (paramDesc.Mask == 1) {
+      if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32_UINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32_SINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+        elemDesc.Format = DXGI_FORMAT_R32_FLOAT;
+      }
+    }
+    // Red Green channels
+    else if (paramDesc.Mask <= 3) {
+      if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32_UINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32_SINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+      }
+    }
+    // Red Green Blue Channels
+    else if (paramDesc.Mask <= 7) {
+      if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32_UINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32_SINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+      }
+    }
+    // Red Green Blue Alpha Channels
+    else if (paramDesc.Mask <= 15) {
+      if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32A32_SINT;
+      }
+      else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+        elemDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+      }
+    }
+
+    inputLayoutDesc.push_back(elemDesc);
+  }
+
+  m_pDevice->pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
+                                           inputLayoutDesc.size(),
+                                           dxVShader->pSBlob->GetBufferPointer(),
+                                           dxVShader->pSBlob->GetBufferSize(),
+                                           &pLayout->pVertexLayout);
+  return pLayout;
+}
+
+SPtr<InputLayout>
+DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
+                                   const SPtr<Shader> _pVShader)
 {
   // make a shared DX11InputLayout pointer
-  pInputL = make_shared<DX11InputLayout>();
-
+  SPtr<DX11InputLayout> pInputL = make_shared<DX11InputLayout>();
+  SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pVShader);
+  
   uint32 hr;
   // define the input layout
-  D3D11_INPUT_ELEMENT_DESC layout[]
-  {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-  };
-  uint32 numElem = ARRAYSIZE(layout);
+  Vector<D3D11_INPUT_ELEMENT_DESC> dxLayout;
+  dxLayout.resize(_vDesc.size());
+
+  uint32 offset = 0;
+
+  for (uint32 i = 0; i < _vDesc.size(); ++i) {
+    auto& element = dxLayout[i];
+    memset(&element, 0, sizeof(D3D11_INPUT_ELEMENT_DESC));
+    element.Format = static_cast<DXGI_FORMAT>(_vDesc[i].format);
+    element.SemanticIndex = 0;
+    element.InputSlot = 0;
+    element.AlignedByteOffset = offset;
+    element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    element.InstanceDataStepRate = 0;
+
+    offset += _vDesc[i].size;
+
+    if (_vDesc[i].type == INPUT_LAYOUT::kPosition) {
+      element.SemanticName = "POSITION";
+    }
+    if (_vDesc[i].type == INPUT_LAYOUT::kNormal) {
+      element.SemanticName = "NORMAL";
+    }
+    if (_vDesc[i].type == INPUT_LAYOUT::kTexCoord) {
+      element.SemanticName = "TEXCOORD";
+    }
+    if (_vDesc[i].type == INPUT_LAYOUT::kTangent) {
+      element.SemanticName = "TANGENT";
+    }
+    if (_vDesc[i].type == INPUT_LAYOUT::kBinormal) {
+      element.SemanticName = "BINORMAL";
+    }
+    if (_vDesc[i].type == INPUT_LAYOUT::kColor) {
+      element.SemanticName = "COLOR";
+    }
+  }
 
   // create input layout
-  hr = m_pDevice->pd3dDevice->CreateInputLayout(layout,
-                                                numElem,
-                                                m_vertexShader->pSBlob->GetBufferPointer(),
-                                                m_vertexShader->pSBlob->GetBufferSize(),
+  hr = m_pDevice->pd3dDevice->CreateInputLayout(dxLayout.data(),
+                                                dxLayout.size(),
+                                                dxVShader->pSBlob->GetBufferPointer(),
+                                                dxVShader->pSBlob->GetBufferSize(),
                                                 &pInputL->pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {
     return;
   }
-  // already used
-  m_vertexShader->pSBlob->Release();
-  // set the input layout
-  pInputL->set(m_pDevice);
+
+  return pInputL;
 }
 
 void
@@ -534,7 +661,10 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 void
 DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 {
-  pSwapChain->pSch->Present(_syncInterval, _flags);
+  // reinterpret the swap chain to a DirectX swap chain
+  auto dxSwapChain = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
+  // use the swap chain to present the result
+  dxSwapChain->pSch->Present(_syncInterval, _flags);
 }
 
 void
@@ -660,7 +790,7 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     dsvDesc.Format = desc.Format;
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
-    m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &pDepthSView->pDepthSV);
+    m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &tex->m_dSV);
     // if (!pDepthSView->pDepthSV) { return nullptr; }
   }
 
@@ -677,9 +807,12 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
 }
 
 void
-DX11GraphicsAPI::setInputLayout()
+DX11GraphicsAPI::setInputLayout(SPtr<InputLayout> _pInputLayout)
 {
-  pInputL->set(m_pDevice);
+  // reinterpret to a DirectX input layout
+  SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
+  // set the device
+  dxIL->set(m_pDevice);
 }
 
 SPtr<VertexBuffer>

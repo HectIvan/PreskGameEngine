@@ -74,6 +74,14 @@ class PK_CORE_EXPORT Actor
   move(Vector3 _addPos);
 
   /**
+   * @brief Move the actor using the verlet integration.
+   * @param _direction Direction in which the object will move.
+   * @param _force Force that the object will move with.
+   */
+  void
+  moveVerlet(Vector3 _direction, float _force);
+
+  /**
    * @brief Modify the actor translation with a new value.
    * @param _addX Increase in the X axis.
    * @param _addY Increase in the Y axis.
@@ -198,6 +206,7 @@ class PK_CORE_EXPORT Actor
   Vector<SPtr<Actor>> m_children;
   SPtr<Actor> m_parent;
   Matrix4 m_transform;
+  Matrix4 m_prevTransform;
   String m_name;
 };
 }

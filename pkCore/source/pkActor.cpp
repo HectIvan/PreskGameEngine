@@ -39,6 +39,13 @@ Actor::move(Vector3 _addPos)
 }
 
 void
+Actor::moveVerlet(Vector3 _direction, float _force)
+{
+  m_transform.setTranslation((m_transform.getTranslation3() * 2) -
+                              m_prevTransform.getTranslation3() + (_direction * _force));
+}
+
+void
 Actor::move(float _addX, float _addY, float _addZ)
 {
   // get the current transform matrix

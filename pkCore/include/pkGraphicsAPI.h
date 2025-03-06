@@ -15,11 +15,16 @@
 * Includes
 **/
 /*********************************************/
+#include "pkBlendState.h"
+#include "pkInputLayout.h"
+#include "pkInputLayoutDesc.h"
 #include "pkModel.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkRenderTargetView.h"
 #include "pkTexture.h"
+#include "pkSwapChain.h"
+#include "pkSamplerState.h"
 #include "pkShader.h"
 #include "pkWindow.h"
 
@@ -46,89 +51,67 @@ public:
   * Handler to the window to be used.
   **/
   virtual void
-  initApi(const Window& _window) = 0;
-
-  /* Shaders */
+  initApi(Window& _window) = 0;
 
   /**
-   * @brief Create shaders.
+   * @brief Create the render target view.
+   */
+  virtual SPtr<Texture>
+  createRenderTargetView() = 0;
+
+  /**
+   * @brief Set the render targets to the device.
    */
   virtual void
-  makeShaders() = 0;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) = 0;
 
   /**
-   * @brief Compile shaders.
+   * @brief Create the blend state.
+   * @return Blend state pointer
+   */
+  virtual SPtr<BlendState>
+  createBlendState() = 0;
+
+  /**
+   * @brief Set the blend state.
+   * @param _pBlendState Blend state to set.
    */
   virtual void
-  compileShaders() = 0;
+  setBlendState(SPtr<BlendState> _pBlendState) = 0;
 
   /**
-  * Create the pixel shader
-  **/
-  virtual void
-  createPShader(SPtr<Shader> _pShader) = 0;
-
-  /**
-  * Create the vertex shader
-  **/
+   * @brief Create a vertex shader.
+   * @param _pShader Shader to create
+   */
   virtual void
   createVShader(SPtr<Shader> _pShader) = 0;
 
   /**
-  * Create shaders.
-  **/
-  virtual void
-  createShaders() = 0;
-
-  /**
-   * @brief Set the pixel shader to use.
-   * @param _pShader Shader to set.
+   * @brief Create a pixel shader.
+   * @param _pShader Shader to create
    */
   virtual void
-  setPSShader(SPtr<Shader> _pShader) = 0;
+  createPShader(SPtr<Shader> _pShader) = 0;
 
   /**
-   * @brief Set the vertex shader to use.
-   * @param _pShader Shader to set.
+   * @brief Set the vertex shader to the device context.
    */
   virtual void
   setVSShader(SPtr<Shader> _pShader) = 0;
 
   /**
-   * @brief Get the vertex shader.
-   * @return The shader pointer.
+   * @brief Set the pixel shader to the device context.
    */
-  virtual SPtr<Shader>
-  getVSShader() = 0;
+  virtual void
+  setPSShader(SPtr<Shader> _pShader) = 0;
 
   /**
-   * @brief Get the pixel shader.
-   * @return The shader pointer.
+   * @brief Create the input layout based on the shader.
+   * @param _pShader Shader to use.
+   * @return Input layout pointer
    */
-  virtual SPtr<Shader>
-  getPSShader() = 0;
-
-  /**
-   * @brief Get the blur pixel shader.
-   * @return The shader pointer.
-   */
-  virtual SPtr<Shader>
-  getBlurPSShader() = 0;
-
-  /**
-   * @brief Convert a render target view into a texture.
-   * @param _pRTV Render target view to convert.
-   * @return The final texture.
-   */
-  virtual SPtr<Texture>
-  RTVToTexture(SPtr<RenderTargetView> _pRTV) = 0;
-
-  /**
-   * @brief Get the render target View.
-   * @return The RTV pointer.
-   */
-  virtual SPtr<Texture>
-  getRenderTargetView() = 0;
+  virtual SPtr<InputLayout>
+  createInputLayoutFromVShader(SPtr<Shader> _pShader) = 0;
 
   /**
   * @brief Create a texture.
@@ -153,14 +136,22 @@ public:
   /**
   * Create the sampler state.
   **/
-  virtual void
-  createSamplerState() = 0;
+  virtual SPtr<SamplerState>
+  createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
+
+  /**
+   * @brief Create the depth stencil texture and view.
+   * @param _width Client width.
+   * @param _height Client height.
+   */
+  virtual SPtr<DepthStencilView>
+  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) = 0;
 
   /**
   * Set input layout
   **/
   virtual void
-  setInputLayout() = 0;
+  setInputLayout(SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
   * Create a VertexBuffer
@@ -267,19 +258,19 @@ public:
   * New screen color.
   **/
   virtual void
-  clearRenderTargetView(float _color[]) = 0;
+  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) = 0;
 
   /**
   * clear the depth buffer.
   **/
   virtual void
-  clearDepthBuffer(float _depth) = 0;
+  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) = 0;
 
   /**
   * Create the Input Layout.
   **/
-  virtual void
-  createInputLayout() = 0;
+  virtual SPtr<InputLayout>
+  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
 
   /**
   * Set the Vertex Shader constant buffer.
@@ -369,6 +360,9 @@ public:
  public:
   // world matrix
   // Matrix4 world;
+  
+  // swap chain
+  SPtr<SwapChain> m_pSwapChain;
 };
 
 PK_CORE_EXPORT GraphicsAPI&

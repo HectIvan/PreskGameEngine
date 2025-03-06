@@ -17,6 +17,7 @@
 /*********************************************/
 #include "pkActor.h"
 #include "pkBaseApp.h"
+#include "pkPass.h"
 #include "pkScene.h"
 #include "pkTexture.h"
 #include "pkVector2.h"
@@ -24,6 +25,7 @@
 
 using pkEngineSDK::Actor;
 using pkEngineSDK::BaseApp;
+using pkEngineSDK::Pass;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Texture;
@@ -63,4 +65,6 @@ class ShaderTest : public BaseApp
   SPtr<Texture> m_pRTDepth;
   SPtr<Texture> m_pRTNormal;
   SPtr<Texture> m_pRTColor;
+
+  SPtr<Pass> m_basicPass;
 };

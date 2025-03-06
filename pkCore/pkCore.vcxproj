@@ -177,6 +177,7 @@
     <ClInclude Include="include\externals\imstb_truetype.h" />
     <ClInclude Include="include\pkActor.h" />
     <ClInclude Include="include\pkBaseApp.h" />
+    <ClInclude Include="include\pkBlendState.h" />
     <ClInclude Include="include\pkBone.h" />
     <ClInclude Include="include\pkCamera.h" />
     <ClInclude Include="include\pkComponent.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="include\pkImGui.h" />
     <ClInclude Include="include\pkIndexBuffer.h" />
     <ClInclude Include="include\pkInputLayout.h" />
+    <ClInclude Include="include\pkInputLayoutDesc.h" />
     <ClInclude Include="include\pkKey.h" />
     <ClInclude Include="include\pkLight.h" />
     <ClInclude Include="include\pkMaterial.h" />
@@ -217,6 +219,7 @@
     <ClInclude Include="include\pkShader.h" />
     <ClInclude Include="include\pkWindow.h" />
     <ClInclude Include="include\pkWindowDesc.h" />
+    <ClInclude Include="include\pkSamplerState.h" />
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +243,7 @@
     <ClCompile Include="source\pkMaterial.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkModel.cpp" />
+    <ClCompile Include="source\pkPass.cpp" />
     <ClCompile Include="source\pkRendererManager.cpp" />
     <ClCompile Include="source\pkResourceManager.cpp" />
     <ClCompile Include="source\pkScene.cpp" />

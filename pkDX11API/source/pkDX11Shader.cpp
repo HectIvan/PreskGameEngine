@@ -8,11 +8,10 @@
 
 namespace pkEngineSDK {
 
-HRESULT
+uint32
 DX11Shaders::compileShaderFromFile(wstring _szFileName,
-                                   LPCSTR _szEntryPoint,
-                                   LPCSTR _szShaderModel,
-                                   ID3DBlob** _ppBlobOut)
+                                   const char* _szEntryPoint,
+                                   const char* _szShaderModel)
 {
   HRESULT hr = S_OK;
 
@@ -32,13 +31,13 @@ DX11Shaders::compileShaderFromFile(wstring _szFileName,
                           _szShaderModel,
                           dwShaderFlags,
                           0,
-                          _ppBlobOut,
+                          &pSBlob,
                           &pErrorBlob);
   if (hr != 0x00000000)
   {
     if (pErrorBlob != nullptr)
     {
-      OutputDebugStringA(static_cast<char*>(pErrorBlob->GetBufferPointer()));
+      String errText(reinterpret_cast<char*>(pErrorBlob->GetBufferPointer()));
     }
     safeRelease(pErrorBlob);
     return hr;

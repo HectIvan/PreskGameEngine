@@ -48,6 +48,14 @@ class Projectile
   move(float _deltaTime, Vector3 _direction);
 
   /**
+   * @brief Move the projectile using the verlet integration.
+   * @param _dir Direction to move the projectile at.
+   * @param _force Force to use to move it.
+   */
+  void
+  moveVerlet(Vector3 _dir, float _force);
+
+  /**
    * @brief Fire the projectile.
    * @param _startPos Start point of the projectile.
    * @param _direction Direction of the projectile.

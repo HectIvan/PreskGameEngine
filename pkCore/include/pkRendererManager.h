@@ -1,19 +1,15 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkRendererManager pkRendererManager.h
-* @Hector Ivan Muñoz Ceballos
-* @date 04/02/2025
-* @Render Manager file for the Presk Game Engine.
-*
-* This file will contain the Render Manager used for the engine
-*
-* @bug No current function.
-*
-* @HectIvan 04/02/20245
-* File Creation.
-*/
-/************************************************************************/
+ * @file    pkRendererManager.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    04/02/2025
+ * @brief   This file will contain the Render Manager used for the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
+
 /*********************************************/
 /**
 * Includes
@@ -21,8 +17,10 @@
 /*********************************************/
 #include "pkActor.h"
 #include "pkConstantBuffer.h"
+#include "pkDepthStencilView.h"
 #include "pkLight.h"
 #include "pkModule.h"
+#include "pkPass.h"
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
 
@@ -38,11 +36,17 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   virtual ~RendererManager() = default;
 
   /**
+   * @brief Create the passes needed for the renderer.
+   */
+  void
+  createPasses();
+
+  /**
    * @brief Update the camera.
    * @param _pCamera Camera to update.
    */
   void
-  updateCamera(Camera* _pCamera);
+  updateCameraBuffers(Camera* _pCamera);
 
   /**
    * @brief Converts the actor to a game object pointer.
@@ -96,7 +100,16 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   SPtr<ConstantBuffer> m_cBWorld;
   SPtr<ConstantBuffer> m_cbLight;
 
-  //
+  // render targets
+  SPtr<Texture> m_pRTargetView;
+  SPtr<Texture> m_pNormalRT;
+  SPtr<Texture> m_pDepthRT;
+
+  // depth stencil
+  SPtr<DepthStencilView> pDepthSView;
+
+  // passes
+  Map<uint32, SPtr<Pass>> m_passes;
 };
 
 PK_CORE_EXPORT RendererManager&

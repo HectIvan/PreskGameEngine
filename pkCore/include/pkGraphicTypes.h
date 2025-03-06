@@ -6,7 +6,7 @@ namespace pkEngineSDK
 
 namespace TEXTURE_FORMATS
 {
-  enum E
+  enum PK_CORE_EXPORT E
   {
     kPK_FORMAT_UNKNOWN = 0,
     kPK_FORMAT_R32G32B32A32_TYPELESS = 1,

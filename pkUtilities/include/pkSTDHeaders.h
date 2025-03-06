@@ -34,6 +34,8 @@ using Stack = std::stack<T>;
 
 using String = std::string;
 
+using WString = std::wstring;
+
 template<class _Kty, class _Ty>
 using UMap = std::unordered_map<_Kty, _Ty>;
 

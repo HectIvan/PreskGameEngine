@@ -125,5 +125,8 @@
     <ClInclude Include="include\pkDX11SwapChain.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDX11BlendState.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

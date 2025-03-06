@@ -219,6 +219,41 @@ PhysicsApp::physics(float _deltaTime)
 }
 
 void
+PhysicsApp::verletMove()
+{
+  float delta = pkEngineSDK::g_TimeManager().m_fixedDeltaTime;
+  // calculate the Y direction of the fire direction
+  m_fireDirection.y = -1.0f + Math::abs(m_fireDirection.x);
+  m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
+  m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
+
+  m_spring->move(delta);
+
+  // apply gravity to every projectile
+  for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
+    if (m_projectiles[i]->m_fired) {
+      m_projectiles[i]->gravity(delta);
+    }
+    // move and bounce the player
+    Vector3 direction = Vector3(m_projectiles[i]->m_direction.x,
+                                m_projectiles[i]->m_direction.y,
+                                0.0f);
+    m_projectiles[i]->moveVerlet(direction, m_projectiles[i]->m_speed);
+    m_projectiles[i]->screenBounce(30, 17);
+    // clamp the projectile speed
+    m_projectiles[i]->m_speed = Math::clamp(m_projectiles[i]->m_speed,
+      0,
+      m_projectiles[i]->m_maxSpeed);
+    if (m_projectiles[i]->m_actor->isActive()) {
+      m_projectiles[i]->projTimer(delta);
+    }
+    m_projectiles[i]->m_actor->m_prevTransform = m_projectiles[i]->m_actor->m_transform;
+  }
+
+  checkObstacles();
+}
+
+void
 PhysicsApp::fireProjectile()
 {
   Vector3 newPos = m_cannon->m_actor->m_transform.getTranslation3();

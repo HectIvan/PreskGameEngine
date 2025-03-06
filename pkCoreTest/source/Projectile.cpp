@@ -28,6 +28,12 @@ Projectile::move(float _deltaTime, Vector3 _direction)
 }
 
 void
+Projectile::moveVerlet(Vector3 _dir, float _force)
+{
+  m_actor->moveVerlet(_dir, _force);
+}
+
+void
 Projectile::fire(Vector3 _startPos, Vector2 _direction)
 {
   m_fired = true;

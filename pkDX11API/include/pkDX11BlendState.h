@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkDX11SamplerState.h
+ * @file    pkBlendState.h
  * @author  Héctor Iván Muñoz Ceballos
- * @date    11/11/2024
- * @brief   DirectX Sampler State file for the Presk Game Engine.
+ * @date    04/03/2025
+ * @brief   Blend State file for the Presk Game Engine.
  *
  * @bug    No known bugs.
  */
@@ -15,21 +15,21 @@
 * Includes
 **/
 /*********************************************/
-#include "pkSamplerState.h"
+#include "pkBlendState.h"
 #include "pkDX11Prerequisites.h"
 
 namespace pkEngineSDK
 {
 
-class DX11SamplerState : public SamplerState
+class DX11BlendState : public BlendState
 {
  public:
-  DX11SamplerState() = default;
-  virtual ~DX11SamplerState() {
-    safeRelease(pSampler);
+  DX11BlendState() = default;
+  virtual ~DX11BlendState() {
+    safeRelease(m_pBlendState);
   }
 
  public:
-  ID3D11SamplerState* pSampler = nullptr;
+  ID3D11BlendState* m_pBlendState;
 };
 }

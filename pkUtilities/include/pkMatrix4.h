@@ -81,6 +81,7 @@ class PK_UTILITY_EXPORT Matrix4
     }
     return result;
   }
+
   // --------------------------------------------------------------//
   // Matrix4 += Matrix4
   // --------------------------------------------------------------//
@@ -96,6 +97,63 @@ class PK_UTILITY_EXPORT Matrix4
     }
     return *this;
   }
+  /**
+   * @brief Subtract a float to the matrix4.
+   * @param other The float to use.
+   * @return The subtracted matrix.
+   */
+  FORCEINLINE Matrix4
+  operator-(const float& other)
+  {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        result.matrix[i][j] = matrix[i][j] - other;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @brief Subtract a float to the matrix4.
+   * @param other The float to use.
+   * @return The subtracted matrix.
+   */
+  FORCEINLINE Matrix4
+  operator-(float& other)
+  {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        result.matrix[i][j] = matrix[i][j] - other;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @brief Subtract a matrix4 to the matrix4.
+   * @param other The matrix to use.
+   * @return The subtracted matrix.
+   */
+  FORCEINLINE Matrix4
+  operator-(Matrix4& other)
+  {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        result.matrix[i][j] = matrix[i][j] - other.matrix[i][j];
+      }
+    }
+    return result;
+  }
+
   // --------------------------------------------------------------//
   // Matrix4 * float
   // --------------------------------------------------------------//
@@ -136,6 +194,42 @@ class PK_UTILITY_EXPORT Matrix4
     return Vector3(matrix[0][0] + matrix[1][0] + matrix[2][0],
                    matrix[0][1] + matrix[1][1] + matrix[1][1],
                    matrix[0][2] + matrix[1][2] + matrix[2][2]);
+  }
+
+  /**
+   * @brief Multiply the Matrix by a float.
+   * @param other The float to use.
+   */
+  FORCEINLINE Matrix4
+  operator*(const float& other)
+  {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        result.matrix[i][j] = matrix[i][j] * other;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @brief Multiply the Matrix by a float.
+   * @param other The float to use.
+   */
+  FORCEINLINE Matrix4
+  operator*(float& other)
+  {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i)
+    {
+      for (int j = 0; j < 4; ++j)
+      {
+        result.matrix[i][j] = matrix[i][j] * other;
+      }
+    }
+    return result;
   }
 
   /**

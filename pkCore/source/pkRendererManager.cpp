@@ -2,12 +2,33 @@
 #include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
 #include "pkRendererManager.h"
+#include "pkSamplerState.h"
 
 namespace pkEngineSDK
 {
+void
+RendererManager::createPasses()
+{
+  /**
+   * Create the base pass.
+   */
+  SPtr<Pass> basePass;
+  basePass->create();
+  // set the data for the shaders to be compiled, and compile.
+  basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
+  basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
+  basePass->compileShaders();
+  // create the vertex shader input layout && sampler state.
+  basePass->createInputLayout();
+  basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
+                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  basePass->setInputLayout();
+  // insert to the pass map.
+  m_passes.insert({ 0, basePass });
+}
 
 void
-RendererManager::updateCamera(Camera* _pCamera)
+RendererManager::updateCameraBuffers(Camera* _pCamera)
 {
   // get the api instance to work with
   GraphicsAPI& api = GraphicsAPI::instance();
@@ -127,7 +148,7 @@ RendererManager::renderModel(Model& _model)
 {
   // get a reference from the api
   // GraphicsAPI& api = GraphicsAPI::instance();
-  g_GraphicAPI().setInputLayout();
+  // g_GraphicAPI().createInputLayoutFromVShader();
   g_GraphicAPI().setVertexBuffer(_model.vertexB);
   g_GraphicAPI().setIndexBuffer(_model.indexB);
   // offsets

@@ -81,6 +81,12 @@ class PhysicsApp : public BaseApp
   physics(float _deltaTime);
 
   /**
+   * @brief Moevemnts based on the verlet integration.
+   */
+  void
+  verletMove();
+
+  /**
    * @brief Fire a projectile from the pool.
    */
   void

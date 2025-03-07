@@ -24,8 +24,6 @@
 namespace pkEngineSDK
 {
 
-// class Shader;
-
 class Pass
 {
 public:
@@ -121,7 +119,7 @@ public:
   /**
    * Shader pointers
    */
-  SPtr<Shader> m_pVShader = nullptr;
+  SPtr<Shader> m_pVShader;
   SPtr<Shader> m_pPShader;
 
   SPtr<InputLayout> m_pInputLayout;

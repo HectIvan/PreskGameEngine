@@ -279,12 +279,13 @@ PhysicsApp::checkObstacles()
 void
 PhysicsApp::onRender(Scene& _scene)
 {
-  // Set shaders
-  g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
-  g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());
-  // set constant buffers for the pixel and vertex shaders
-  g_RenderManager().VSSetConstantBuffers();
-  g_RenderManager().PSSetConstantBuffers();
-  // render the objects
-  g_RenderManager().renderActors(_scene.m_actors);
+  g_RenderManager().render(_scene);
+  // // Set shaders
+  // g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
+  // g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());
+  // // set constant buffers for the pixel and vertex shaders
+  // g_RenderManager().VSSetConstantBuffers();
+  // g_RenderManager().PSSetConstantBuffers();
+  // // render the objects
+  // g_RenderManager().renderActors(_scene.m_actors);
 }

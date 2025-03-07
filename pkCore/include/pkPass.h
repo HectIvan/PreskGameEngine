@@ -24,7 +24,9 @@
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Pass
+// class Shader;
+
+class Pass
 {
 public:
   Pass() = default;
@@ -55,6 +57,13 @@ public:
   createSamplerState(uint32 _mode, uint32 _filter);
 
   /**
+   * @brief Get the sampler state of this pass.
+   * @return Pointer to the sampler state.
+   */
+  SPtr<SamplerState>
+  getSamplerState() { return m_pSamplerState; }
+
+  /**
    * @brief Set the data for the compilation of the vertex shader.
    *        used for when we need to recompile, so that the parameters dont
    *        need to be sent every time.
@@ -69,6 +78,12 @@ public:
    */
   void
   setPSData(WString _fileName, const char* _entryPoint, const char* _model);
+
+  /**
+   * @brief Create the shaders from tehir blobs
+   */
+  void
+  createShaders();
 
   /**
    * @brief Compile both pixel and vertex shaders;
@@ -88,11 +103,25 @@ public:
   void
   compilePShader();
 
+  /**
+   * @brief Get the vertex shader.
+   * @return The pointer to the vertex shader.
+   */
+  SPtr<Shader>
+  getVShader() { return m_pVShader; }
+
+  /**
+   * @brief Get the pixel shader.
+   * @return The pointer to the pixel shader.
+   */
+  SPtr<Shader>
+  getPShader() { return m_pPShader; }
+
  private:
   /**
    * Shader pointers
    */
-  SPtr<Shader> m_pVShader;
+  SPtr<Shader> m_pVShader = nullptr;
   SPtr<Shader> m_pPShader;
 
   SPtr<InputLayout> m_pInputLayout;

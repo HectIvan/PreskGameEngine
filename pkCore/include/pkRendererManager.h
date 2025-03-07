@@ -16,6 +16,7 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkCamera.h"
 #include "pkConstantBuffer.h"
 #include "pkDepthStencilView.h"
 #include "pkLight.h"
@@ -23,6 +24,8 @@
 #include "pkPass.h"
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
+#include "pkTexture.h"
+#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
@@ -34,6 +37,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
  public:
   RendererManager() = default;
   virtual ~RendererManager() = default;
+
+  /**
+   * @brief Initialize the render manager
+   */
+  void
+  init(Window& _window);
 
   /**
    * @brief Create the passes needed for the renderer.
@@ -76,6 +85,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   setActorsBuffers(Scene& _scene);
 
   /**
+   * @brief Render a scene
+   */
+  void
+  render(Scene& _scene);
+
+  /**
    * @brief Render a list of actors.
    * @param _gameActors The actors to render.
    */
@@ -106,7 +121,8 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   SPtr<Texture> m_pDepthRT;
 
   // depth stencil
-  SPtr<DepthStencilView> pDepthSView;
+  SPtr<DepthStencilView> m_pDepthSView;
+  // SPtr<Texture> m_pDepthSView;
 
   // passes
   Map<uint32, SPtr<Pass>> m_passes;

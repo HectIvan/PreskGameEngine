@@ -173,6 +173,7 @@ bool
 PlatformMath::intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other)
 {
   _capsule = _capsule;
+  _capsule = _other;
   return false;
 }
 

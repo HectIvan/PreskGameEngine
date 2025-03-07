@@ -14,23 +14,22 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPass.h"
 #include "pkGraphicsAPI.h"
+#include "pkPass.h"
+// #include "pkShader.h"
+
+#include <iostream>
 
 namespace pkEngineSDK
 {
 
-void Pass::create()
+void
+Pass::create()
 {
-  // create all pointers
   m_pVShader = make_shared<Shader>();
   m_pPShader = make_shared<Shader>();
   m_pInputLayout = make_shared<InputLayout>();
   m_pSamplerState = make_shared<SamplerState>();
-
-  // create the shaders
-  g_GraphicAPI().createVShader(m_pVShader);
-  g_GraphicAPI().createPShader(m_pPShader);
 }
 
 void
@@ -68,6 +67,14 @@ Pass::setPSData(WString _fileName, const char* _entryPoint, const char* _model)
 }
 
 void
+Pass::createShaders()
+{
+  // create the shaders
+  g_GraphicAPI().createVShader(m_pVShader);
+  g_GraphicAPI().createPShader(m_pPShader);
+}
+
+void
 Pass::compileShaders()
 {
   compileVShader();
@@ -77,11 +84,18 @@ Pass::compileShaders()
 void
 Pass::compileVShader()
 {
-  m_pVShader->compileShaderFromFile(m_VShaderDirectory, m_VSEntryPoint, m_VSModel);
+  g_GraphicAPI().compileShaderFromFile(m_VShaderDirectory,
+                                       m_VSEntryPoint,
+                                       m_VSModel,
+                                       m_pVShader);
 }
 
 void
 Pass::compilePShader()
 {
-  m_pPShader->compileShaderFromFile(m_PShaderDirectory, m_PSEntryPoint, m_PSModel);
+  g_GraphicAPI().compileShaderFromFile(m_PShaderDirectory,
+                                       m_PSEntryPoint,
+                                       m_PSModel,
+                                       m_pPShader);
+}
 }

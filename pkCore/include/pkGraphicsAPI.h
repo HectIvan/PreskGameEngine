@@ -16,6 +16,7 @@
 **/
 /*********************************************/
 #include "pkBlendState.h"
+#include "pkDepthStencilView.h"
 #include "pkInputLayout.h"
 #include "pkInputLayoutDesc.h"
 #include "pkModel.h"
@@ -31,11 +32,9 @@
 namespace pkEngineSDK
 {
 
-class Camera;
 class ConstantBuffer;
 class Device;
 class IndexBuffer;
-class Shader;
 class VertexBuffer;
 
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
@@ -51,7 +50,7 @@ public:
   * Handler to the window to be used.
   **/
   virtual void
-  initApi(Window& _window) = 0;
+  initApi(const Window& _window) = 0;
 
   /**
    * @brief Create the render target view.
@@ -63,7 +62,7 @@ public:
    * @brief Set the render targets to the device.
    */
   virtual void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) = 0;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<DepthStencilView> _DepthSV) = 0;
 
   /**
    * @brief Create the blend state.
@@ -104,6 +103,19 @@ public:
    */
   virtual void
   setPSShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Compile a shader from a specific file.
+   * @param _szFileName What file we will get.
+   * @param _szEntryPoint Main function of the shader.
+   * @param _szShaderModel What kind of model is the shader.
+   * @param _pTargetShader Shader to store the data in.
+   */
+  virtual void
+  compileShaderFromFile(WString _szFileName,
+                        const char* _szEntryPoint,
+                        const char* _szShaderModel,
+                        SPtr<Shader> _pTargetShader) = 0;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -247,8 +259,8 @@ public:
   /**
    * @brief Set the render targets to the device.
    */
-  virtual void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets) = 0;
+  // virtual void
+  // setRenderTargets(Vector<SPtr<Texture>> _rTargets) = 0;
 
   /**
   * Clear the render target fiew and fill the
@@ -264,7 +276,7 @@ public:
   * clear the depth buffer.
   **/
   virtual void
-  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) = 0;
+  clearDepthBuffer(float _depth, SPtr<DepthStencilView> _depthSV) = 0;
 
   /**
   * Create the Input Layout.
@@ -310,7 +322,8 @@ public:
   * Set the sampler state.
   **/
   virtual void
-  setSampler(uint32 _startSlot = 0,
+  setSampler(SPtr<SamplerState> _pSamLinear,
+             uint32 _startSlot = 0,
              uint32 _numSamplers = 1) = 0;
 
   /**
@@ -360,9 +373,6 @@ public:
  public:
   // world matrix
   // Matrix4 world;
-  
-  // swap chain
-  SPtr<SwapChain> m_pSwapChain;
 };
 
 PK_CORE_EXPORT GraphicsAPI&

@@ -87,13 +87,13 @@ BaseApp::init(const char** _argv)
   initWindow();
   initAPI(_argv);
 
-  g_RenderManager().createPasses();
+  createBuffers();
+  g_RenderManager().init(m_window);
   /*g_GraphicAPI().makeShaders();
   g_GraphicAPI().compileShaders();
   g_GraphicAPI().createShaders();
   g_GraphicAPI().createInputLayoutFromVShader();
   g_GraphicAPI().createSamplerState();*/
-  createBuffers();
   m_cameraSpeed = 5.0f;
   onInit();
 }
@@ -198,10 +198,7 @@ BaseApp::messageLoop()
 void
 BaseApp::render(Scene& _scene)
 {
-  // screen clear color
-  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  g_GraphicAPI().clearRenderTargetView(clearColor);
-  g_GraphicAPI().clearDepthBuffer(1.0f);
+  g_RenderManager().render(_scene);
   // on scene specific app render
   onRender(_scene);
   // present the final result to the screen

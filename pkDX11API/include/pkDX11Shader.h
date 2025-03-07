@@ -33,19 +33,6 @@ class DX11Shaders : public Shader
     safeRelease(pSBlob);
   }
 
-  /**
-   * @brief Compile the shader from a file.
-   * @param _szFileName Name of the shader.
-   * @param _szEntryPoint What section will we compile.
-   * @param _szShaderModel What model of the shader is compiled.
-   * @param _ppBlobOut Blob info.
-   * @return If the compilation was successful or not.
-   */
-  uint32
-  compileShaderFromFile(wstring _szFileName,
-                        const char* _szEntryPoint,
-                        const char* _szShaderModel) override;
-
  public:
   ID3DBlob* pSBlob = nullptr;
 };

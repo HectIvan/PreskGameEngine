@@ -338,5 +338,8 @@
     <ClCompile Include="source\pkPass.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
+    <ClCompile Include="source\pkShader.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

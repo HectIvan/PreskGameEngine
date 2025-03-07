@@ -13,9 +13,9 @@ HRESULT
 DX11PixelShader::compile(wstring _fileName, const char* _entryPoint, const char* _model)
 {
   HRESULT hr = S_OK;
-  hr = compileShaderFromFile(_fileName,
-                             _entryPoint,
-                             _model);
+  // hr = compileShaderFromFile(_fileName,
+  //                            _entryPoint,
+  //                            _model);
   if (hr != 0x00000000)
   {
     MessageBox(nullptr, "FX file could not be compiled", "Error", MB_OK);

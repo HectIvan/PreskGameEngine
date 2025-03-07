@@ -4,20 +4,62 @@
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
 
+using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+using PK_USAGE::kPK_USAGE_DEFAULT;
+using PK_BIND_FLAG::kPK_BIND_DEPTH_STENCIL;
+using PK_BIND_FLAG::kPK_BIND_RENDER_TARGET;
+using PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
+
 namespace pkEngineSDK
 {
+void RendererManager::init(Window& _window)
+{
+  // create the render targets and depth stencil view
+  m_pRTargetView = g_GraphicAPI().createRenderTargetView();
+  m_pDepthRT = g_GraphicAPI().createTexture(nullptr,
+                                            4,
+                                            _window.getWidth(),
+                                            _window.getHeight(),
+                                            kPK_FORMAT_R32G32B32A32_FLOAT,
+                                            kPK_USAGE_DEFAULT,
+                                            kPK_BIND_RENDER_TARGET | kPK_BIND_DEPTH_STENCIL,
+                                            false);
+
+  m_pNormalRT = g_GraphicAPI().createTexture(nullptr,
+                                             4,
+                                             _window.getWidth(),
+                                             _window.getHeight(),
+                                             kPK_FORMAT_R32G32B32A32_FLOAT,
+                                             kPK_USAGE_DEFAULT,
+                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                             false);
+  m_pDepthSView = g_GraphicAPI().createDepthStencilView(_window.getHeight(),
+                                                        _window.getHeight(),
+                                                        m_pDepthRT);
+  Vector<SPtr<Texture>> rTVector;
+  rTVector.push_back(m_pRTargetView);
+  rTVector.push_back(m_pNormalRT);
+  rTVector.push_back(m_pDepthRT);
+  // set the render targets
+  g_GraphicAPI().setRenderTargets(rTVector, m_pDepthSView);
+  // create the passes needed
+  createPasses();
+}
+
 void
 RendererManager::createPasses()
 {
   /**
    * Create the base pass.
    */
-  SPtr<Pass> basePass;
+  SPtr<Pass> basePass = make_shared<Pass>();
+  // create all pointers
   basePass->create();
   // set the data for the shaders to be compiled, and compile.
   basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
   basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
   basePass->compileShaders();
+  basePass->createShaders();
   // create the vertex shader input layout && sampler state.
   basePass->createInputLayout();
   basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
@@ -95,6 +137,35 @@ RendererManager::setActorsBuffers(Scene& _scene)
 }
 
 void
+RendererManager::render(Scene& _scene)
+{
+  // screen clear color
+  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
+  g_GraphicAPI().clearRenderTargetView(clearColor, m_pRTargetView);
+  g_GraphicAPI().clearDepthBuffer(1.0f, m_pDepthSView);
+
+  // update the light buffer
+  g_GraphicAPI().updateConstantBuffer(m_cbLight,
+                                      &light,
+                                      static_cast<uint32>(sizeof(Light)));
+
+  Map<uint32, SPtr<Pass>>::iterator it;
+  for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+    // Set shaders
+    g_GraphicAPI().setPSShader(it->second->getPShader());
+    g_GraphicAPI().setVSShader(it->second->getVShader());
+  }
+  // set light
+  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  g_RenderManager().light.LightDir = Vector3::FORWARD;
+  // set constant buffers for the pixel and vertex shaders
+  g_RenderManager().VSSetConstantBuffers();
+  g_RenderManager().PSSetConstantBuffers();
+  // render the objects
+  g_RenderManager().renderActors(_scene.m_actors);
+}
+
+void
 RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
 {
   // for each actor
@@ -130,7 +201,12 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
         g_GraphicAPI().setShaderResourceView(material->height, 2);
         g_GraphicAPI().setShaderResourceView(material->metallic, 3);
         g_GraphicAPI().setShaderResourceView(material->occlusion, 4);
-        g_GraphicAPI().setSampler();
+
+        Map<uint32, SPtr<Pass>>::iterator it;
+        for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+          // Set sampler
+          g_GraphicAPI().setSampler(it->second->getSamplerState());
+        }
       }
       // render the model component
       renderModel(*gameObject->getComponent<Model>());

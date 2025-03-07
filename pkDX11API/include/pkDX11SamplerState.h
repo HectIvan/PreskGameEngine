@@ -26,10 +26,10 @@ class DX11SamplerState : public SamplerState
  public:
   DX11SamplerState() = default;
   virtual ~DX11SamplerState() {
-    safeRelease(pSampler);
+    safeRelease(m_pSampler);
   }
 
  public:
-  ID3D11SamplerState* pSampler = nullptr;
+  ID3D11SamplerState* m_pSampler = nullptr;
 };
 }

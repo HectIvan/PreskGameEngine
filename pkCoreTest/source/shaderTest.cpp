@@ -99,21 +99,22 @@ ShaderTest::onUpdate(float _deltaTime)
 void
 ShaderTest::onRender(Scene& _scene)
 {
+  g_RenderManager().render(_scene);
   // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
-                                      &g_RenderManager().light,
-                                      static_cast<uint32>(sizeof(Light)));
-  // Set shaders
-  g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());
-  g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
-  // set light
-  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  g_RenderManager().light.LightDir = Vector3::FORWARD;
-  // set constant buffers for the pixel and vertex shaders
-  g_RenderManager().VSSetConstantBuffers();
-  g_RenderManager().PSSetConstantBuffers();
-  // render the objects
-  g_RenderManager().renderActors(_scene.m_actors);
+  // g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
+  //                                     &g_RenderManager().light,
+  //                                     static_cast<uint32>(sizeof(Light)));
+  // // Set shaders
+  // g_GraphicAPI().setPSShader(g_RenderManager().getPSShader());
+  // g_GraphicAPI().setVSShader(g_RenderManager().getVSShader());
+  // // set light
+  // g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  // g_RenderManager().light.LightDir = Vector3::FORWARD;
+  // // set constant buffers for the pixel and vertex shaders
+  // g_RenderManager().VSSetConstantBuffers();
+  // g_RenderManager().PSSetConstantBuffers();
+  // // render the objects
+  // g_RenderManager().renderActors(_scene.m_actors);
 
   // turn the render target view into a texture.  
 }

@@ -80,7 +80,7 @@ public:
   setPSData(WString _fileName, const char* _entryPoint, const char* _model);
 
   /**
-   * @brief Create the shaders from tehir blobs
+   * @brief Create the shaders from their blobs
    */
   void
   createShaders();

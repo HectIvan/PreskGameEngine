@@ -43,6 +43,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
   m_spring->m_elasticity = _stiffness;
   m_spring->m_length = _length;
   m_spring->m_mass = 1.0f;
+  m_spring->m_gravity = 9.81f;
 
   anchor->setPosition(_pos);
   weight->setPosition(_pos.x, _pos.y + _length, _pos.y);
@@ -180,7 +181,7 @@ void
 PhysicsApp::fixedUpdate()
 {
   if (m_type == PHYSICS_TYPE::kVerlet) {
-    physics(m_fixedDeltaTime);
+    verletMove();
   }
 }
 
@@ -193,6 +194,7 @@ PhysicsApp::physics(float _deltaTime)
   m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
   m_spring->move(_deltaTime);
+  m_spring->applyForce(Vector3::UP, m_spring->m_gravity, _deltaTime);
 
   // apply gravity to every projectile
   for (uint32_t i = 0; i < m_projectiles.size(); ++i) {

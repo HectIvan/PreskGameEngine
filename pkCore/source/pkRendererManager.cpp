@@ -16,13 +16,14 @@ void RendererManager::init(Window& _window)
 {
   // create the render targets and depth stencil view
   m_pRTargetView = g_GraphicAPI().createRenderTargetView();
+
   m_pDepthRT = g_GraphicAPI().createTexture(nullptr,
                                             4,
                                             _window.getWidth(),
                                             _window.getHeight(),
                                             kPK_FORMAT_R32G32B32A32_FLOAT,
                                             kPK_USAGE_DEFAULT,
-                                            kPK_BIND_RENDER_TARGET | kPK_BIND_DEPTH_STENCIL,
+                                            kPK_BIND_DEPTH_STENCIL,
                                             false);
 
   m_pNormalRT = g_GraphicAPI().createTexture(nullptr,

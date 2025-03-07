@@ -18,9 +18,19 @@ Spring::move(float _deltaTime)
   
   // force to be applied
   float force = Math::hookeLaw(m_elasticity, length - m_length) * _deltaTime;
+
+  Vector2 directionForce = Vector2(direction.x * force,
+                                   direction.y * force);
   
   // as the force decreases, so does the influence of the stretch
-  Vector2 newPos = Vector2(weightPos.x, weightPos.y) - force;
+  Vector2 newPos = Vector2(weightPos.x, weightPos.y) - directionForce;
   // set the new position
   m_weight->m_transform.setTranslation(Vector3(newPos.x, newPos.y, 0.0f));
+}
+
+void
+Spring::applyForce(Vector3 _dir, float _force, float _deltaTime)
+{
+  Vector3 pos = m_weight->m_transform.getTranslation3();
+  m_weight->m_transform.setTranslation(pos + _dir * _deltaTime * _force);
 }

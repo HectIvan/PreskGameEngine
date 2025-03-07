@@ -343,32 +343,9 @@ DX11GraphicsAPI::createDepthStencilView(uint32 _width,
                                         uint32 _height,
                                         SPtr<Texture> _depthRT)
 {
-  /**
-  * Create depth stencil
-  **/
-  // _depthRT = make_shared<DX11Texture>();
-  // D3D11_TEXTURE2D_DESC descDepth;
-  // ZeroMemory(&descDepth, sizeof(descDepth));
-  // descDepth.Width = _width;
-  // descDepth.Height = _height;
-  // descDepth.MipLevels = 1;
-  // descDepth.ArraySize = 1;
-  // descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-  // descDepth.SampleDesc.Count = 1;
-  // descDepth.SampleDesc.Quality = 0;
-  // descDepth.Usage = D3D11_USAGE_DEFAULT;
-  // descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-  // descDepth.CPUAccessFlags = 0;
-  // descDepth.MiscFlags = 0;
-
-  // reinterpret as a directX texture
+  //// reinterpret as a directX texture
   SPtr<DX11Texture> dxDepthTx = reinterpret_pointer_cast<DX11Texture>(_depthRT);
-  // 
-  // uint32 hr = m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &dxDepthTx->t2d);
-  // if creating the texture failed
-  // if (hr != 0x00000000) {
-  //   return nullptr;
-  // }
+
   uint32 hr;
   // create depth stencil with the generated 2D texture
   SPtr<DX11DepthStencilView> pDepthSView = make_shared<DX11DepthStencilView>();
@@ -783,7 +760,6 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
 
   // create the texture
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
-  m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
 
   if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE) {
     // Create the shader resource descriptor for the texture
@@ -794,19 +770,35 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
+    m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
     // create the shader resource view
     m_pDevice->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
     // if (!tex->srv) { return nullptr; } // failed to create shader resource view
   }
 
   if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL) {
-    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-    memset(&dsvDesc, 0, sizeof(dsvDesc));
-    dsvDesc.Format = desc.Format;
-    dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    dsvDesc.Texture2D.MipSlice = 0;
-    m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &tex->m_dSV);
+    // D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+    // memset(&dsvDesc, 0, sizeof(dsvDesc));
+    // dsvDesc.Format = desc.Format;
+    // dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    // dsvDesc.Texture2D.MipSlice = 0;
+    // m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &tex->m_dSV);
     // if (!pDepthSView->pDepthSV) { return nullptr; }
+
+    D3D11_TEXTURE2D_DESC descDepth;
+    ZeroMemory(&descDepth, sizeof(descDepth));
+    descDepth.Width = _width;
+    descDepth.Height = _height;
+    descDepth.MipLevels = 1;
+    descDepth.ArraySize = 1;
+    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    descDepth.SampleDesc.Count = 1;
+    descDepth.SampleDesc.Quality = 0;
+    descDepth.Usage = D3D11_USAGE_DEFAULT;
+    descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    descDepth.CPUAccessFlags = 0;
+    descDepth.MiscFlags = 0;
+    m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
   }
 
   if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
@@ -815,6 +807,7 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     rtvDesc.Format = desc.Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
+    m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
     m_pDevice->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
   }
 

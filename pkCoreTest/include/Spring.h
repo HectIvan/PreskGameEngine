@@ -38,6 +38,15 @@ class Spring
   void
   move(float _deltaTime);
 
+  /**
+   * @brief Apply Force in a direction.
+   * @param _dir Direction to apply the force to.
+   * @param _force How much force to apply.
+   * @param _deltaTime time between frames.
+   */
+  void
+  applyForce(Vector3 _dir, float _force, float _deltaTime);
+
  public:
   Vector2 m_direction;
   float m_maxDistance;

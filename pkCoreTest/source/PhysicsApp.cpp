@@ -12,6 +12,7 @@
 using pkEngineSDK::Debug;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
@@ -52,6 +53,8 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
+  Debug::print("Entered init app");
+  std::cin;
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -120,8 +123,9 @@ PhysicsApp::onInit()
 
 
 void
-PhysicsApp::onUpdate(float _deltaTime)
+PhysicsApp::onUpdate()
 {
+  float deltaTime = g_TimeManager().m_deltaTime;
   // fire the projectile
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
     !m_firing)
@@ -136,11 +140,12 @@ PhysicsApp::onUpdate(float _deltaTime)
   // move left or right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
   {
-    m_fireDirection.x -= 1.0f * _deltaTime;
+    m_fireDirection.x -= 1.0f * deltaTime;
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
   {
-    m_fireDirection.x += 1.0f * _deltaTime;
+    m_fireDirection.x += 1.0f * deltaTime;
+    std::cout << m_fireDirection.x << std::endl;
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
     !m_changingType) {
@@ -158,22 +163,22 @@ PhysicsApp::onUpdate(float _deltaTime)
   Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
   float strength = 10.0f;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * _deltaTime * strength);
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * _deltaTime * strength);
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * _deltaTime * strength);
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * _deltaTime * strength);
+    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
   }
   if (m_type == PHYSICS_TYPE::kEuler) {
-    physics(_deltaTime);
+    physics(deltaTime);
   }
 }
 

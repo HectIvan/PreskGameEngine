@@ -91,7 +91,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Update function for any child class of this base app
    */
   virtual void
-  onUpdate(float _deltaTime) {}
+  onUpdate() {}
 
   /**
    * @brief Fixed update of the engine

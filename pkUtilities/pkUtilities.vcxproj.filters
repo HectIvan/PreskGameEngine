@@ -102,9 +102,6 @@
     <ClInclude Include="include\pkColor.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkScriptManager.h">
-      <Filter>include\util</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPlatformMath.cpp">
@@ -142,9 +139,6 @@
     </ClCompile>
     <ClCompile Include="source\pkColor.cpp">
       <Filter>source\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkScriptManager.cpp">
-      <Filter>source\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

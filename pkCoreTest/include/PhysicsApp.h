@@ -56,7 +56,7 @@ class PhysicsApp : public BaseApp
    * @param _deltaTime Time between frames.
    */
   void
-  onUpdate(float _deltaTime) override;
+  onUpdate() override;
 
   /**
    * @brief Update on a fixed timer.

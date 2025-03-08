@@ -91,7 +91,6 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            numFeatureLevels);
   
   setViewport(width, height);
-
   m_pDevice->setPrimitiveTopology();
 }
 

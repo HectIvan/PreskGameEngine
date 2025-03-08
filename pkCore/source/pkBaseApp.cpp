@@ -10,6 +10,8 @@
 #include "pkSprite.h"
 #include "pkWindowDesc.h"
 
+#include <iostream>
+
 namespace pkEngineSDK
 {
 
@@ -83,7 +85,7 @@ BaseApp::init(const char** _argv)
   RendererManager::startUp();
   ResourceManager::startUp();
   TimeManager::startUp();
-  
+
   initWindow();
   initAPI(_argv);
 
@@ -111,7 +113,7 @@ BaseApp::initWindow()
 void
 BaseApp::initAPI(const char** _argv)
 {
-  String abstraction = _argv[1];
+  String abstraction = "DX11API";//  _argv[1];
 
 #if PK_DEBUG_MODE
   if (abstraction == "DX11API") {
@@ -173,14 +175,14 @@ BaseApp::messageLoop()
     // event window specific input
     m_eventQueue.windowInput();
     // update the delta time
-    m_deltaTime = g_TimeManager().getDeltaTime(delta);
+    // m_deltaTime = g_TimeManager().getDeltaTime(delta);
     g_TimeManager().m_deltaTime = g_TimeManager().getDeltaTime(delta);
     // fixed update timer count.
-    m_fixedTimer += m_deltaTime;
+    m_fixedTimer += g_TimeManager().m_deltaTime;
     // child class app update
-    onUpdate(m_deltaTime);
+    onUpdate();
     // update game objects
-    update(m_scene, m_deltaTime);
+    update(m_scene, g_TimeManager().m_deltaTime);
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();

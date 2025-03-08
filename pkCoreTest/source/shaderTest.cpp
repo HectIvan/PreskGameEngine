@@ -4,11 +4,13 @@
 #include "pkGraphicTypes.h"
 #include "pkRendererManager.h"
 #include "pkScene.h"
+#include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
 using pkEngineSDK::Debug;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
@@ -41,10 +43,11 @@ ShaderTest::onInit()
 }
 
 void
-ShaderTest::onUpdate(float _deltaTime)
+ShaderTest::onUpdate()
 {
+  float deltaTime = g_TimeManager().m_deltaTime;
   // update the camera m_speed
-  float camm_speed = m_cameraSpeed * _deltaTime;
+  float camm_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
     m_camera.move(Vector3(0.0f, 0.0f, camm_speed));
@@ -69,7 +72,7 @@ ShaderTest::onUpdate(float _deltaTime)
     m_camera.move(Vector3(0.0f, -camm_speed, 0.0f));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
-    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
+    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
     m_camera.rotate(-posDif.y, posDif.x, 0.0f);
     m_lastCursorPos = m_eventQueue.mousePosition;
   }

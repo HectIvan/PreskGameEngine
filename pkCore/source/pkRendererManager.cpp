@@ -3,6 +3,7 @@
 #include "pkGraphicsAPI.h"
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
+#include "pkScene.h"
 
 using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
 using PK_USAGE::kPK_USAGE_DEFAULT;
@@ -34,9 +35,8 @@ void RendererManager::init(Window& _window)
                                              kPK_USAGE_DEFAULT,
                                              kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
                                              false);
-  m_pDepthSView = g_GraphicAPI().createDepthStencilView(_window.getHeight(),
-                                                        _window.getHeight(),
-                                                        m_pDepthRT);
+
+  m_pDepthSView = g_GraphicAPI().createDepthStencilView(m_pDepthRT);
   Vector<SPtr<Texture>> rTVector;
   rTVector.push_back(m_pRTargetView);
   rTVector.push_back(m_pNormalRT);
@@ -58,7 +58,7 @@ RendererManager::createPasses()
   basePass->create();
   // set the data for the shaders to be compiled, and compile.
   basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
+  basePass->setPSData(L"shaders/pkVShader.hlsl", "PS", "ps_5_0");
   basePass->compileShaders();
   basePass->createShaders();
   // create the vertex shader input layout && sampler state.
@@ -120,12 +120,13 @@ RendererManager::PSSetConstantBuffers()
 }
 
 void
-RendererManager::setActorsBuffers(Scene& _scene)
+RendererManager::setActorsBuffers()
 {
   // for each actor in the world
-  for (uint32 i = 0; i < _scene.m_actors.size(); ++i) {
+  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
     // Cast to a gameObject, if it fails, do none of the following process
-    SPtr<GameObject> gameObject = actorToClass<GameObject>(_scene.m_actors[i]);
+    SPtr<Actor> actor = g_sceneManager().getActor(i);
+    SPtr<GameObject> gameObject = actorToClass<GameObject>(actor);
     if (gameObject) {
       // for each model in the game object
       for (uint32 j = 0; j < gameObject->models.size(); ++j) {
@@ -138,17 +139,13 @@ RendererManager::setActorsBuffers(Scene& _scene)
 }
 
 void
-RendererManager::render(Scene& _scene)
+RendererManager::render()
 {
   // screen clear color
   float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
   g_GraphicAPI().clearRenderTargetView(clearColor, m_pRTargetView);
   g_GraphicAPI().clearDepthBuffer(1.0f, m_pDepthSView);
 
-  // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(m_cbLight,
-                                      &light,
-                                      static_cast<uint32>(sizeof(Light)));
 
   Map<uint32, SPtr<Pass>>::iterator it;
   for (it = m_passes.begin(); it != m_passes.end(); ++it) {
@@ -159,11 +156,16 @@ RendererManager::render(Scene& _scene)
   // set light
   g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   g_RenderManager().light.LightDir = Vector3::FORWARD;
+  g_RenderManager().light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
+  // update the light buffer
+  g_GraphicAPI().updateConstantBuffer(m_cbLight,
+                                      &light,
+                                      static_cast<uint32>(sizeof(Light)));
   // set constant buffers for the pixel and vertex shaders
   g_RenderManager().VSSetConstantBuffers();
   g_RenderManager().PSSetConstantBuffers();
   // render the objects
-  g_RenderManager().renderActors(_scene.m_actors);
+  g_RenderManager().renderActors(g_sceneManager().getAllActors());
 }
 
 void

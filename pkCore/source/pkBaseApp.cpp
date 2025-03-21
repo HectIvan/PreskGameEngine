@@ -1,5 +1,5 @@
 #include "pkBaseApp.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkDllLoader.h"
 #include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
@@ -9,8 +9,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkSprite.h"
 #include "pkWindowDesc.h"
-
-#include <iostream>
+#include "pkTimeManager.h"
 
 namespace pkEngineSDK
 {
@@ -82,6 +81,8 @@ BaseApp::newModel(String _modelName)
 void
 BaseApp::init(const char** _argv)
 {
+  Scene::startUp();
+  Logger::startUp();
   RendererManager::startUp();
   ResourceManager::startUp();
   TimeManager::startUp();
@@ -156,11 +157,12 @@ updateActor(SPtr<Actor>& _pActor, float _deltaTime)
 }
 
 void
-update(Scene& _scene, float _deltaTime)
+update(float _deltaTime)
 {
-  for (uint32 i = 0; i < _scene.m_actors.size(); ++i) {
-    if (_scene.m_actors[i]->m_active) {
-      updateActor(_scene.m_actors[i], _deltaTime);
+  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
+    if (g_sceneManager().getActor(i)->m_active) {
+      SPtr<Actor> actor = g_sceneManager().getActor(i);
+      updateActor(actor, _deltaTime);
     }
   }
 }
@@ -182,7 +184,7 @@ BaseApp::messageLoop()
     // child class app update
     onUpdate();
     // update game objects
-    update(m_scene, g_TimeManager().m_deltaTime);
+    update(g_TimeManager().m_deltaTime);
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();
@@ -193,16 +195,16 @@ BaseApp::messageLoop()
     // update camera
     g_RenderManager().updateCameraBuffers(&m_camera);
     // render the scene
-    render(m_scene);
+    render();
   }
 }
 
 void
-BaseApp::render(Scene& _scene)
+BaseApp::render()
 {
-  g_RenderManager().render(_scene);
+  g_RenderManager().render();
   // on scene specific app render
-  onRender(_scene);
+  onRender();
   // present the final result to the screen
   g_GraphicAPI().present(1, 0);
 }
@@ -211,10 +213,10 @@ SPtr<Actor>
 BaseApp::actorFind(String _objectName)
 {
   // for each game object in the list
-  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
+  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
     // check if the name is the one we're looking for
-    if (m_scene.m_actors[i]->m_name == _objectName) {
-      return m_scene.m_actors[i];
+    if (g_sceneManager().getActor(i)->m_name == _objectName) {
+      return g_sceneManager().getActor(i);
     }
   }
   // if no game object fits the name
@@ -226,12 +228,12 @@ SPtr<Actor>
 BaseApp::getActorWithComponent()
 {
   // check each game object
-  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
+  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = m_scene.m_actors[i]->getComponent<T>();
+    SPtr<T> check = g_sceneManager().getActor(i)->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      return m_scene.m_actors[i];
+      return g_sceneManager().getActor(i);
     }
   }
 }
@@ -243,12 +245,12 @@ BaseApp::getAllActorsWithComponent()
   // game object list
   Vector<SPtr<GameObject>> list;
   // check each game object
-  for (uint32 i = 0; i < m_scene.m_actors.size(); ++i) {
+  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = m_scene.m_actors[i]->getComponent<T>();
+    SPtr<T> check = g_sceneManager().getActor(i)->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      list.push_back(m_scene.m_actors[i]);
+      list.push_back(g_sceneManager().getActor(i));
     }
   }
   return list;

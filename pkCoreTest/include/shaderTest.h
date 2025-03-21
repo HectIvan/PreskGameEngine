@@ -56,7 +56,7 @@ class ShaderTest : public BaseApp
    * @param _scene Scene to render
    */
   void
-  onRender(Scene& _scene) override;
+  onRender() override;
 
  public:
   Actor* m_actor;

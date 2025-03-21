@@ -152,7 +152,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _height Client height.
    */
   SPtr<DepthStencilView>
-  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) override;
+  createDepthStencilView(SPtr<Texture> _depthRT) override;
 
   /**
    * @brief Set input layout
@@ -292,8 +292,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Get the device pointer.
    * @return Return te pointer to the device.
    */
-  SPtr<DX11Device>
-  getDevice() { return m_pDevice; }
+  SPtr<Device>
+  getDevice() override { return m_pDevice; }
 
   /**
    * @brief Draw the indexed data.
@@ -365,6 +365,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
  private:
   // api device
-  SPtr<DX11Device> m_pDevice;
+  SPtr<Device> m_pDevice;
 };
 }

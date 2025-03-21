@@ -175,6 +175,7 @@
     <ClInclude Include="include\externals\imstb_rectpack.h" />
     <ClInclude Include="include\externals\imstb_textedit.h" />
     <ClInclude Include="include\externals\imstb_truetype.h" />
+    <ClInclude Include="include\imgui_impl_win32.h" />
     <ClInclude Include="include\pkActor.h" />
     <ClInclude Include="include\pkBaseApp.h" />
     <ClInclude Include="include\pkBlendState.h" />
@@ -183,7 +184,9 @@
     <ClInclude Include="include\pkComponent.h" />
     <ClInclude Include="include\pkConstantBuffer.h" />
     <ClInclude Include="include\pkCoreDefines.h" />
-    <ClInclude Include="include\pkDebug.h" />
+    <ClInclude Include="include\pkGravityComponent.h" />
+    <ClInclude Include="include\pkInverseKinematics.h" />
+    <ClInclude Include="include\pkLogger.h" />
     <ClInclude Include="include\pkDepthStencilView.h" />
     <ClInclude Include="include\pkDevice.h" />
     <ClInclude Include="include\pkDllLoader.h" />
@@ -228,11 +231,14 @@
     <ClCompile Include="source\externals\imgui_draw.cpp" />
     <ClCompile Include="source\externals\imgui_tables.cpp" />
     <ClCompile Include="source\externals\imgui_widgets.cpp" />
+    <ClCompile Include="source\imgui_impl_win32.cpp" />
     <ClCompile Include="source\pkActor.cpp" />
     <ClCompile Include="source\pkBaseApp.cpp" />
     <ClCompile Include="source\pkBone.cpp" />
     <ClCompile Include="source\pkCamera.cpp" />
-    <ClCompile Include="source\pkDebug.cpp" />
+    <ClCompile Include="source\pkGravityComponent.cpp" />
+    <ClCompile Include="source\pkInverseKinematics.cpp" />
+    <ClCompile Include="source\pkLogger.cpp" />
     <ClCompile Include="source\pkDllLoader.cpp" />
     <ClCompile Include="source\pkGameObject.cpp" />
     <ClCompile Include="source\pkGraphicsAPI.cpp" />

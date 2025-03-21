@@ -157,7 +157,7 @@ public:
    * @param _height Client height.
    */
   virtual SPtr<DepthStencilView>
-  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) = 0;
+  createDepthStencilView(SPtr<Texture> _depthRT) = 0;
 
   /**
   * Set input layout
@@ -340,6 +340,13 @@ public:
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) = 0;
+
+  /**
+   * @brief Get the api device.
+   * @return The Pointer to the device
+   */
+  virtual SPtr<Device>
+  getDevice() = 0;
 
   /**
   * Draw the indexed data.

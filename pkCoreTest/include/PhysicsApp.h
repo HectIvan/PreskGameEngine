@@ -103,7 +103,7 @@ class PhysicsApp : public BaseApp
    * @param _scene Scene to render.
    */
   void
-  onRender(Scene& _scene);
+  onRender() override;
   
  public:
   PHYSICS_TYPE::E m_type;

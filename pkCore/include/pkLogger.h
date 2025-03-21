@@ -7,15 +7,16 @@
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
+#include "pkModule.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Debug
+class PK_CORE_EXPORT Logger : public Module<Logger>
 {
  public:
-  Debug() = default;
-  virtual ~Debug() = default;
+   Logger() = default;
+  virtual ~Logger() = default;
 
   /**
    * @brief Print a string.
@@ -59,4 +60,6 @@ class PK_CORE_EXPORT Debug
   static void
   print(Matrix4 _matrix);
 };
+PK_CORE_EXPORT Logger&
+g_Logger();
 }

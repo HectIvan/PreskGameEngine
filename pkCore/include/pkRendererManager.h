@@ -82,13 +82,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Set the buffers of each game object.
    */
   void
-  setActorsBuffers(Scene& _scene);
+  setActorsBuffers();
 
   /**
    * @brief Render a scene
    */
   void
-  render(Scene& _scene);
+  render();
 
   /**
    * @brief Render a list of actors.

@@ -58,4 +58,9 @@ Scene::instantiate(Matrix4 _transform,
   // otherwise, the object is part of the scene
   else { insertActor(gObject, m_actors); }
 }
+PK_CORE_EXPORT Scene&
+g_sceneManager()
+{
+  return Scene::instance();
+}
 }

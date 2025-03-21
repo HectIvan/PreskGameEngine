@@ -1,5 +1,5 @@
 #include "ShaderTest.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
 #include "pkRendererManager.h"
@@ -7,10 +7,11 @@
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
-using pkEngineSDK::Debug;
+using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::g_sceneManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
@@ -31,8 +32,8 @@ ShaderTest::onInit()
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
-  m_scene.instantiate();
-  SPtr<Actor> pistol = m_scene.getLastActor();
+  g_sceneManager().instantiate();
+  SPtr<Actor> pistol = g_sceneManager().getLastActor();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
   pistol->addComponent(createMaterial());
   SPtr<Material> pMaterial = pistol->getComponent<Material>();
@@ -80,9 +81,9 @@ ShaderTest::onUpdate()
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
 
-  SPtr<Actor> actor = m_scene.m_actors[0];
+  SPtr<Actor> actor = g_sceneManager().getActor(0);
 
-  float rot = 1.0f * m_deltaTime;
+  float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     rot *= -1.0f;
     actor->m_transform *= Matrix4::rotationY(rot);
@@ -100,9 +101,9 @@ ShaderTest::onUpdate()
 }
 
 void
-ShaderTest::onRender(Scene& _scene)
+ShaderTest::onRender()
 {
-  g_RenderManager().render(_scene);
+  g_RenderManager().render();
   // update the light buffer
   // g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
   //                                     &g_RenderManager().light,

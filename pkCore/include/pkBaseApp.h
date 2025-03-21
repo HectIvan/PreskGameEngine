@@ -101,16 +101,15 @@ class PK_CORE_EXPORT BaseApp
 
   /**
    * @brief Base app render function.
-   * @param _scene Scene to render.
    */
   void
-  render(Scene& _scene);
+  render();
 
   /**
    * @brief Render function for any child class of this base class
    */
   virtual void
-  onRender(Scene& _scene) {}
+  onRender() {}
 
   /**
    * @brief Create a material from a texture.
@@ -174,7 +173,7 @@ class PK_CORE_EXPORT BaseApp
   EventQueue m_eventQueue;
 
   // vector of game objects in the scene
-  Scene m_scene;
+  // Scene m_scene;
 
   // camera movement speed
   float m_cameraSpeed;

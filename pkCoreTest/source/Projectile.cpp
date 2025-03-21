@@ -1,9 +1,9 @@
 #include "Projectile.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkPlatformMath.h"
 #include "pkSphere.h"
 
-using pkEngineSDK::Debug;
+using pkEngineSDK::Logger;
 using pkEngineSDK::Sphere;
 using pkEngineSDK::Math;
 

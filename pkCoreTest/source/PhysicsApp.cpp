@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "PhysicsApp.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkMath.h"
 #include "pkModel.h"
@@ -9,10 +9,11 @@
 #include "pkVector3.h"
 #include "pkVector2.h"
 
-using pkEngineSDK::Debug;
+using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::g_sceneManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
@@ -27,13 +28,13 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
-  m_scene.instantiate();
-  SPtr<Actor> anchor = m_scene.getLastActor();
+  g_sceneManager().instantiate();
+  SPtr<Actor> anchor = g_sceneManager().getLastActor();
   anchor->addComponent(newModel("sprite.fbx"));
   anchor->addComponent(createMaterial());
   anchor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
-  m_scene.instantiate();
-  SPtr<Actor> weight = m_scene.getLastActor();
+  g_sceneManager().instantiate();
+  SPtr<Actor> weight = g_sceneManager().getLastActor();
   weight->addComponent(newModel("sprite.fbx"));
   weight->addComponent(createMaterial());
   weight->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
@@ -53,8 +54,6 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
-  Debug::print("Entered init app");
-  std::cin;
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -77,9 +76,9 @@ PhysicsApp::onInit()
   /**
    * Cannon creation
    */
-  m_scene.instantiate();
+  g_sceneManager().instantiate();
   m_cannon = std::make_shared<Cannon>();
-  m_cannon->m_actor = m_scene.m_actors[0];
+  m_cannon->m_actor = g_sceneManager().getActor(0);
   m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
   m_cannon->m_actor->addComponent(createMaterial());
   m_cannon->m_actor->getComponent<Material>()->setDiffuse(createTexture("Canon.png"));
@@ -89,11 +88,11 @@ PhysicsApp::onInit()
 
   for (uint32_t i = 0; i < m_projectileCount; ++i) {
     // instantiate an actor
-    m_scene.instantiate();
+    g_sceneManager().instantiate();
     // make new instance of a projectile
     SPtr<Projectile> proj = make_shared<Projectile>();
     // get the last instance
-    proj->m_actor = m_scene.m_actors[m_scene.m_actors.size() - 1];
+    proj->m_actor = g_sceneManager().getLastActor();
     // start the projectile
     proj->start();
     // set projectile speed
@@ -108,8 +107,8 @@ PhysicsApp::onInit()
     m_projectiles.push_back(proj);
   }
 
-  m_scene.instantiate();
-  SPtr<Actor> obst = m_scene.m_actors[m_scene.m_actors.size() - 1];
+  g_sceneManager().instantiate();
+  SPtr<Actor> obst = g_sceneManager().getLastActor();
   obst->m_transform = Matrix4::IDENTITY;
   obstacle.start(Vector3(0), 1, 0.9f, obst);
   obstacle.m_actor->addComponent(newModel("sprite.fbx"));
@@ -145,7 +144,6 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
   {
     m_fireDirection.x += 1.0f * deltaTime;
-    std::cout << m_fireDirection.x << std::endl;
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
     !m_changingType) {
@@ -153,11 +151,9 @@ PhysicsApp::onUpdate()
     // change simulation type
     if (m_type == PHYSICS_TYPE::kEuler) {
       m_type = PHYSICS_TYPE::kVerlet;
-      Debug::print("Verlet integration active");
     }
     else {
       m_type = PHYSICS_TYPE::kEuler;
-      Debug::print("Euler integration active");
     }
   }
   Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
@@ -284,9 +280,9 @@ PhysicsApp::checkObstacles()
 }
 
 void
-PhysicsApp::onRender(Scene& _scene)
+PhysicsApp::onRender()
 {
-  g_RenderManager().render(_scene);
+  g_RenderManager().render();
   // // Set shaders
   // g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
   // g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());

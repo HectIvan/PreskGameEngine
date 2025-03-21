@@ -28,21 +28,9 @@ class DX11PixelShader : public DX11Shaders
 {
  public:
   DX11PixelShader() = default;
-  virtual ~DX11PixelShader()
-  {
+  virtual ~DX11PixelShader() {
     safeRelease(pShader);
   }
-
-  /**
-  * Compile pixel shader.
-  * 
-  * Compiles the pixel shader.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  **/
-  HRESULT
-  compile(wstring _fileName, const char* _entryPoint, const char* _model);
 
  public:
   ID3D11PixelShader* pShader = nullptr;

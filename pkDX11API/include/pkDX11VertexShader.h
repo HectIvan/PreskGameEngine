@@ -28,17 +28,9 @@ class DX11VertexShader : public DX11Shaders
 {
 public:
   DX11VertexShader() = default;
-  virtual ~DX11VertexShader()
-  {
+  virtual ~DX11VertexShader() {
     safeRelease(pSBlob);
   }
-
-  /**
-   * @brief Compiles the vertex shader.
-   * @return If the compilation was successful or not.
-   */
-  HRESULT
-  compile(wstring _fileName, const char* _entryPoint, const char* _model);
 
  public:
   ID3D11VertexShader* pShader = nullptr;

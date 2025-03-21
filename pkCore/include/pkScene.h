@@ -16,12 +16,13 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Scene
+class PK_CORE_EXPORT Scene : public Module<Scene>
 {
  public:
   Scene() = default;
@@ -45,6 +46,13 @@ class PK_CORE_EXPORT Scene
   getLastActor() { return m_actors[m_actors.size() - 1]; }
 
   /**
+   * @brief Get all the actors in the scene.
+   * @return A vector with all the actors.
+   */
+  Vector<SPtr<Actor>>
+  getAllActors() { return m_actors; }
+
+  /**
    * @brief Get the actor in the index of the scene.
    * @param _index Actor position in the list.
    * @return The actor in the index.
@@ -55,4 +63,7 @@ class PK_CORE_EXPORT Scene
  public:
   Vector<SPtr<Actor>> m_actors;
 };
+
+PK_CORE_EXPORT Scene&
+g_sceneManager();
 }

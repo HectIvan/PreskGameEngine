@@ -186,7 +186,7 @@
     <ClInclude Include="include\pkScene.h">
       <Filter>include\game</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkDebug.h">
+    <ClInclude Include="include\pkLogger.h">
       <Filter>include\debug</Filter>
     </ClInclude>
     <ClInclude Include="include\pkImGui.h">
@@ -239,6 +239,15 @@
     </ClInclude>
     <ClInclude Include="include\pkBlendState.h">
       <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGravityComponent.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkInverseKinematics.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_win32.h">
+      <Filter>include\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -296,7 +305,7 @@
     <ClCompile Include="source\pkActor.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkDebug.cpp">
+    <ClCompile Include="source\pkLogger.cpp">
       <Filter>source\debug</Filter>
     </ClCompile>
     <ClCompile Include="source\pkImGui.cpp">
@@ -340,6 +349,15 @@
     </ClCompile>
     <ClCompile Include="source\pkShader.cpp">
       <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGravityComponent.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkInverseKinematics.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_impl_win32.cpp">
+      <Filter>source\imgui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

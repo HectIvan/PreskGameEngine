@@ -22,8 +22,8 @@ SPtr<Actor>
 createActor()
 {
   SPtr<Actor> gActor = make_shared<Actor>();
-  gActor->setTransform(Matrix4(0.0f));
-  gActor->setScale(Matrix4(1.0f));
+  gActor->setTransform(Matrix4::IDENTITY);
+  gActor->m_name = "";
   return gActor;
 }
 
@@ -38,14 +38,11 @@ insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
   _vector.push_back(_pActor);
 }
 
-void
-Scene::instantiate(Matrix4 _transform,
-  SPtr<Actor> _pParent)
+SPtr<Actor>
+Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
 {
   // insert the game object into the vector of game objects
   SPtr<Actor> gObject = createActor();
-  // set the gameObject name
-  gObject->m_name = "";
   // set the gameObject transform
   gObject->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this game object)
@@ -57,6 +54,8 @@ Scene::instantiate(Matrix4 _transform,
   }
   // otherwise, the object is part of the scene
   else { insertActor(gObject, m_actors); }
+  // return the object created.
+  return gObject;
 }
 PK_CORE_EXPORT Scene&
 g_sceneManager()

@@ -75,9 +75,6 @@
     <ClCompile Include="source\pkDX11ImGui.cpp">
       <Filter>source\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="source\imgui_impl_dx11.cpp">
-      <Filter>source\ImGui</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkDX11DepthStencilView.h">
@@ -130,9 +127,6 @@
     </ClInclude>
     <ClInclude Include="include\pkDX11BlendState.h">
       <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\imgui_impl_dx11.h">
-      <Filter>include\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

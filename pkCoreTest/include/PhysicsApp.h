@@ -18,6 +18,7 @@
 #include "Cannon.h"
 #include "Obstacle.h"
 #include "pkBaseApp.h"
+#include "pkInverseKinematics.h"
 #include "pkMaterial.h"
 #include "pkModel.h"
 #include "pkScene.h"
@@ -25,6 +26,7 @@
 #include "Spring.h"
 
 using pkEngineSDK::BaseApp;
+using pkEngineSDK::InverseKinematics;
 using pkEngineSDK::Material;
 using pkEngineSDK::Model;
 using pkEngineSDK::Scene;
@@ -119,7 +121,7 @@ class PhysicsApp : public BaseApp
   SPtr<Cannon> m_cannon;
   SPtr<Spring> m_spring;
   Vector<SPtr<Projectile>> m_projectiles;
+  SPtr<InverseKinematics> m_ik;
 
-  SPtr<Material> m_projectileMaterial;
   Vector2 m_fireDirection;
 };

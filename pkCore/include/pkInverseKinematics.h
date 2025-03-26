@@ -16,12 +16,21 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkVector3.h"
 #include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
 
-class InverseKinematics
+struct IKBone
+{
+  Vector3 iniPos;
+  SPtr<Actor> actorIni = nullptr;
+  Vector3 finalPos;
+  float distance;
+};
+
+class PK_CORE_EXPORT InverseKinematics
 {
  public:
   InverseKinematics() = default;
@@ -49,14 +58,27 @@ class InverseKinematics
    * @brief delete a specific node.
    * @param _index Index of the node to delete
    */
-  FORCEINLINE void
-  deleteNode(uint32 _index) { m_nodes.erase(m_nodes.begin() + _index); };
+  void
+  deleteNode(uint32 _index);
+
+  /**
+   * @brief delete a specific bone.
+   * @param _index Index of the bone to delete
+   */
+  void
+  deleteBone(uint32 _index);
 
   /**
    * @brief delete the last node in the chain.
    */
-  FORCEINLINE void
-  deleteLastNode() { m_nodes.pop_back(); }
+  void
+  deleteLastNode();
+
+  /**
+   * @brief delete the last bone in the chain.
+   */
+  void
+  deleteLastBone();
 
   /**
    * @brief Set a node to a desired actor.
@@ -66,7 +88,37 @@ class InverseKinematics
   FORCEINLINE void
   setNode(SPtr<Actor> _pActor, uint32 _index) { m_nodes[_index] = _pActor; }
 
+  /**
+   * @brief Set a bone actor to a desired actor.
+   * @param _pActor The desired actor.
+   * @param _index Position of the bone
+   */
+  FORCEINLINE void
+  setBone(SPtr<Actor> _pActor, uint32 _index) { m_bones[_index]->actorIni = _pActor; }
+
+  /**
+   * @brief Get the last node of the list.
+   * @return The last node.
+   */
+  FORCEINLINE SPtr<Actor>
+  getLastNode() { return m_nodes[m_nodes.size() - 1]; }
+
+  /**
+   * @brief Get the last bone of the list.
+   * @return The last bone.
+   */
+  FORCEINLINE SPtr<IKBone>
+  getLastBone() { return m_bones[m_bones.size() - 1]; }
+
+  /**
+   * @brief
+   */
+  void
+  fabrik(Vector3 _target);
+
  public:
   Vector<SPtr<Actor>> m_nodes;
+
+  Vector<SPtr<IKBone>> m_bones;
 };
 }

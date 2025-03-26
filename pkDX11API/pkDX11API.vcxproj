@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\imgui_impl_dx11.cpp" />
     <ClCompile Include="source\pkDX11ConstantBuffer.cpp" />
     <ClCompile Include="source\pkDX11DepthStencilView.cpp" />
     <ClCompile Include="source\pkDX11Device.cpp" />
@@ -35,7 +34,6 @@
     <ClCompile Include="source\pkDX11VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\imgui_impl_dx11.h" />
     <ClInclude Include="include\pkDX11BlendState.h" />
     <ClInclude Include="include\pkDX11ConstantBuffer.h" />
     <ClInclude Include="include\pkDX11DepthStencilView.h" />

@@ -70,8 +70,6 @@ PhysicsApp::onInit()
   m_projectileCount = 100;
   m_projDuration = 10.0f;
   float projSpeed = 80.0f;
-  m_projectileMaterial = createMaterial();
-  m_projectileMaterial->setDiffuse(createTexture("circle.png"));
 
   /**
    * Cannon creation
@@ -102,20 +100,41 @@ PhysicsApp::onInit()
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
     proj->m_actor->addComponent(newModel("sprite.fbx"));
-    proj->m_actor->addComponent(m_projectileMaterial);
+    proj->m_actor->addComponent(createMaterial());
+    proj->m_actor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
 
-  g_sceneManager().instantiate();
-  SPtr<Actor> obst = g_sceneManager().getLastActor();
+  /**
+   * Instantiate obstacle
+   */
+  SPtr<Actor> obst = g_sceneManager().instantiate();;
   obst->m_transform = Matrix4::IDENTITY;
-  obstacle.start(Vector3(0), 1, 0.9f, obst);
+  obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
   obstacle.m_actor->addComponent(newModel("sprite.fbx"));
   obstacle.m_actor->addComponent(createMaterial());
   obstacle.m_actor->getComponent<Material>()->setDiffuse(createTexture("obstacle.png"));
 
-  initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
+  /**
+   * Instantiate spring
+   */
+  // initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
+
+  /**
+   * @brief Create IK
+   */
+  m_ik = make_shared<InverseKinematics>();
+  for (uint32 i = 0; i < 4; ++i)
+  {
+    SPtr<Actor> ikRoot = g_sceneManager().instantiate();
+    ikRoot->addComponent(newModel("sprite.fbx"));
+    ikRoot->addComponent(createMaterial());
+    ikRoot->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+
+    m_ik->insertNodeLocal(Vector3(i * 2, 0, 0), ikRoot);
+  }
+
 
   m_fireDirection = Vector2(0.0f);
 }
@@ -156,19 +175,19 @@ PhysicsApp::onUpdate()
       m_type = PHYSICS_TYPE::kEuler;
     }
   }
-  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+//  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
   float strength = 10.0f;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
@@ -194,8 +213,8 @@ PhysicsApp::physics(float _deltaTime)
   m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
   m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
-  m_spring->move(_deltaTime);
-  m_spring->applyForce(Vector3::UP, m_spring->m_gravity, _deltaTime);
+  //m_spring->move(_deltaTime);
+  //m_spring->applyForce(Vector3::UP, m_spring->m_gravity, _deltaTime);
 
   // apply gravity to every projectile
   for (uint32_t i = 0; i < m_projectiles.size(); ++i) {
@@ -230,7 +249,7 @@ PhysicsApp::verletMove()
   m_fireDirection.y = Math::clamp(m_fireDirection.y, -1.0f, 0.0f);
   m_fireDirection.x = Math::clamp(m_fireDirection.x, -1.0f, 1.0f);
 
-  m_spring->move(delta);
+  //m_spring->move(delta);
 
   // apply gravity to every projectile
   for (uint32_t i = 0; i < m_projectiles.size(); ++i) {

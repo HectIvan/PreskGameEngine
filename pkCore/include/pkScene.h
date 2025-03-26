@@ -33,8 +33,9 @@ class PK_CORE_EXPORT Scene : public Module<Scene>
    * a child of another actor.
    * @param _tranform Transform of the actor.
    * @param _pParent If the actor will be the child of another actor.
+   * @return The actor created.
    */
-  void
+  SPtr<Actor>
   instantiate(Matrix4 _transform = Matrix4::IDENTITY,
               SPtr<Actor> _pParent = nullptr);
 

@@ -44,5 +44,7 @@ struct Light
   Vector3 LightDir = Vector3::FORWARD;
   Vector3 LightPos;
   Vector3 LightColor = Vector3(1.0f);
+  Vector2 unused1 = Vector2(0.0f);
+  Vector2 unused2 = Vector2(0.0f);
 };
 }

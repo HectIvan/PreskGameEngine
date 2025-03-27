@@ -138,6 +138,6 @@ InverseKinematics::fabrik(Vector3 _target)
   }
 
   m_bones[4]->finalPos = _target;
-  fabrik
+  // fabrik()
 }
 }

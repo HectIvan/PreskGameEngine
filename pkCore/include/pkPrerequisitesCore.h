@@ -44,6 +44,12 @@ struct CBWorld
   // Vector4 meshColor;
 };
 
+struct CBCamera
+{
+  Vector4 eye;
+  Vector3 forward;
+};
+
 struct KeyPosition
 {
   Vector3 position;

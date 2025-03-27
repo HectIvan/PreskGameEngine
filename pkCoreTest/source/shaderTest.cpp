@@ -81,6 +81,10 @@ ShaderTest::onUpdate()
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
 
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
+    g_RenderManager().compileShaders();
+  }
+
   SPtr<Actor> actor = g_sceneManager().getActor(0);
 
   float rot = 1.0f * deltaTime;

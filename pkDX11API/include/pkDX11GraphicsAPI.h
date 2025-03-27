@@ -240,6 +240,28 @@ class DX11GraphicsAPI : public GraphicsAPI
                         uint32 _numViews = 1) override;
 
   /**
+   * @brief Set a texture to the resource view of a pixel shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  void
+  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) override;
+
+  /**
+   * @brief Set a texture to the resource view of a vertex shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  void
+  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) override;
+
+  /**
    * @brief Create the device and swap chain.
    * @param _width Client width.
    * @param _height Client height.

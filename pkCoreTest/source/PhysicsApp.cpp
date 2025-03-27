@@ -175,6 +175,9 @@ PhysicsApp::onUpdate()
       m_type = PHYSICS_TYPE::kEuler;
     }
   }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
+    g_RenderManager().compileShaders();
+  }
 //  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
   float strength = 10.0f;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {

@@ -1,6 +1,7 @@
 #include "pkCamera.h"
 #include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
+#include "pkLogger.h"
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
 #include "pkScene.h"
@@ -71,6 +72,18 @@ RendererManager::createPasses()
 }
 
 void
+RendererManager::compileShaders()
+{
+  Map<uint32, SPtr<Pass>>::iterator it;
+  for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+    // Compile shaders
+    it->second->compileShaders();
+    it->second->createShaders();
+    g_Logger().print("recompiled shaders.");
+  }
+}
+
+void
 RendererManager::updateCameraBuffers(Camera* _pCamera)
 {
   // get the api instance to work with
@@ -85,6 +98,12 @@ RendererManager::updateCameraBuffers(Camera* _pCamera)
   CBProjection projectionBuffer = CBProjection();
   projectionBuffer.projection = _pCamera->projection.getTransposed();
   api.updateConstantBuffer(m_cBProjection, &projectionBuffer, 0);
+
+  // update camera
+  CBCamera cameraBuffer = CBCamera();
+  cameraBuffer.eye = _pCamera->eye;
+  cameraBuffer.forward = _pCamera->getForward();
+  api.updateConstantBuffer(m_cbCamera, &cameraBuffer, 0);
 }
 
 template<typename T>
@@ -102,21 +121,25 @@ RendererManager::actorToClass(SPtr<Actor>& _subject)
 void
 RendererManager::VSSetConstantBuffers()
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
-  g_GraphicAPI().VSSetConstantBuffer(m_cBView, 0, 1);
-  g_GraphicAPI().VSSetConstantBuffer(m_cBProjection, 1, 1);
-  g_GraphicAPI().VSSetConstantBuffer(m_cBWorld, 2, 1);
-  g_GraphicAPI().VSSetConstantBuffer(m_cbLight, 3, 1);
+  api.VSSetConstantBuffer(m_cBView, 0, 1);
+  api.VSSetConstantBuffer(m_cBProjection, 1, 1);
+  api.VSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.VSSetConstantBuffer(m_cbLight, 3, 1);
+  api.VSSetConstantBuffer(m_cbCamera, 4, 1);
 }
 
 void
 RendererManager::PSSetConstantBuffers()
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
-  g_GraphicAPI().PSSetConstantBuffer(m_cBView, 0, 1);
-  g_GraphicAPI().PSSetConstantBuffer(m_cBProjection, 1, 1);
-  g_GraphicAPI().PSSetConstantBuffer(m_cBWorld, 2, 1);
-  g_GraphicAPI().PSSetConstantBuffer(m_cbLight, 3, 1);
+  api.PSSetConstantBuffer(m_cBView, 0, 1);
+  api.PSSetConstantBuffer(m_cBProjection, 1, 1);
+  api.PSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.PSSetConstantBuffer(m_cbLight, 3, 1);
+  api.PSSetConstantBuffer(m_cbCamera, 4, 1);
 }
 
 void
@@ -143,29 +166,35 @@ RendererManager::render()
 {
   // screen clear color
   float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  g_GraphicAPI().clearRenderTargetView(clearColor, m_pRTargetView);
-  g_GraphicAPI().clearDepthBuffer(1.0f, m_pDepthSView);
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& renderer = g_RenderManager().instance();
+
+  api.clearRenderTargetView(clearColor, m_pRTargetView);
+  api.clearDepthBuffer(1.0f, m_pDepthSView);
 
 
   Map<uint32, SPtr<Pass>>::iterator it;
   for (it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Set shaders
-    g_GraphicAPI().setPSShader(it->second->getPShader());
-    g_GraphicAPI().setVSShader(it->second->getVShader());
+    api.setPSShader(it->second->getPShader());
+    api.setVSShader(it->second->getVShader());
   }
   // set light
-  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  g_RenderManager().light.LightDir = Vector3::FORWARD;
-  g_RenderManager().light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
+  renderer.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  renderer.light.SpotCutoff = 1.0f;
+  renderer.light.SpotExponent = 32.0f;
+  renderer.light.LightDir = Vector3::FORWARD;
+  renderer.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
+  renderer.light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
   // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(m_cbLight,
-                                      &light,
-                                      static_cast<uint32>(sizeof(Light)));
+  api.updateConstantBuffer(m_cbLight,
+                           &light,
+                           static_cast<uint32>(sizeof(Light)));
   // set constant buffers for the pixel and vertex shaders
-  g_RenderManager().VSSetConstantBuffers();
-  g_RenderManager().PSSetConstantBuffers();
+  renderer.VSSetConstantBuffers();
+  renderer.PSSetConstantBuffers();
   // render the objects
-  g_RenderManager().renderActors(g_sceneManager().getAllActors());
+  renderer.renderActors(g_sceneManager().getAllActors());
 }
 
 void
@@ -199,17 +228,19 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
         // get the material
         SPtr<Material> material = gameObject->getComponent<Material>();
         // set the material textures to the shader
-        g_GraphicAPI().setShaderResourceView(material->diffuse, 0);
-        g_GraphicAPI().setShaderResourceView(material->normal, 1);
-        g_GraphicAPI().setShaderResourceView(material->height, 2);
-        g_GraphicAPI().setShaderResourceView(material->metallic, 3);
-        g_GraphicAPI().setShaderResourceView(material->occlusion, 4);
+        g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
+        g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
+        g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
+        g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
+        g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
 
-        Map<uint32, SPtr<Pass>>::iterator it;
-        for (it = m_passes.begin(); it != m_passes.end(); ++it) {
-          // Set sampler
-          g_GraphicAPI().setSampler(it->second->getSamplerState());
-        }
+        // get the basic bass sampler and set it to the pixel shader
+        g_GraphicAPI().setSampler(m_passes.begin()->second->getSamplerState());
+        // Map<uint32, SPtr<Pass>>::iterator it;
+        // for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+        //   // Set sampler
+        //   g_GraphicAPI().setSampler(it->second->getSamplerState());
+        // }
       }
       // render the model component
       renderModel(*gameObject->getComponent<Model>());

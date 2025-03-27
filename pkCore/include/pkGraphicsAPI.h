@@ -257,6 +257,28 @@ public:
                         uint32 _numViews = 1) = 0;
 
   /**
+   * @brief Set a texture to the resource view of a pixel shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  virtual void
+  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) = 0;
+
+  /**
+   * @brief Set a texture to the resource view of a vertex shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  virtual void
+  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) = 0;
+
+  /**
    * @brief Set the render targets to the device.
    */
   // virtual void

@@ -242,9 +242,9 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
     g_Logger().print("Failed to utilize the DX device in the");
   }
   hr = device->pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
-                                                 dxVShader->pSBlob->GetBufferSize(),
-                                                 nullptr,
-                                                 &dxVShader->pShader);
+                                              dxVShader->pSBlob->GetBufferSize(),
+                                              nullptr,
+                                              &dxVShader->pShader);
   // check if the creation was successful
   if (hr != 0x00000000) {
     g_Logger().print("Failed to create vertex shader. Error code: " + hr);
@@ -747,8 +747,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
 
 void
 DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                                      uint32 _startSlot,
-                                      uint32 _numBuffers)
+                                     uint32 _startSlot,
+                                     uint32 _numBuffers)
 {
   // Recast to a DirectX Constant buffer
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
@@ -765,8 +765,8 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 
 void
 DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                                      uint32 _startSlot,
-                                      uint32 _numBuffers)
+                                     uint32 _startSlot,
+                                     uint32 _numBuffers)
 {
   // Recast to a DirectX Constant buffer.
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
@@ -812,8 +812,8 @@ DX11GraphicsAPI::setSampler(SPtr<SamplerState> _pSamLinear,
     g_Logger().print("Failed to utilize the DX device in the setting of a sampler.");
   }
   device->pImmediateContext->PSSetSamplers(_startSlot,
-                                              _numSamplers,
-                                              &dxSS->m_pSampler);
+                                           _numSamplers,
+                                           &dxSS->m_pSampler);
 }
 
 void
@@ -833,6 +833,40 @@ DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
     g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
   }
   device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
+}
+
+void
+DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews)
+{
+  // cast to a directX texture
+  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  // if failed to cast to the texture
+  if (!dxTX) {
+    return;
+  }
+  // set the shader resource view 
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
+  }
+  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
+}
+
+void
+DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews)
+{
+  // cast to a directX texture
+  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  // if failed to cast to the texture
+  if (!dxTX) {
+    return;
+  }
+  // set the shader resource view 
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
+  }
+  device->pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->srv);
 }
 
 SPtr<Texture>
@@ -881,8 +915,8 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   }
   device->pImmediateContext->UpdateSubresource(dxTX->t2d, 0, nullptr, data, pitch, 0);
 
-  // free the texture data
-  stbi_image_free(data);
+  // free the texture data if there's data to release
+  if (data) { stbi_image_free(data); }
 
   // set the path
   dxTX->path = _fileName;

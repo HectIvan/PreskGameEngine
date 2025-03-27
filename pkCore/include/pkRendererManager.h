@@ -51,6 +51,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   createPasses();
 
   /**
+   * @brief Compile the shaders of all passes.
+   */
+  void
+  compileShaders();
+
+  /**
    * @brief Update the camera.
    * @param _pCamera Camera to update.
    */
@@ -109,11 +115,11 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   Light light;
 
   // constant buffers
-  SPtr<ConstantBuffer> m_buffer;
   SPtr<ConstantBuffer> m_cBView;
   SPtr<ConstantBuffer> m_cBProjection;
   SPtr<ConstantBuffer> m_cBWorld;
   SPtr<ConstantBuffer> m_cbLight;
+  SPtr<ConstantBuffer> m_cbCamera;
 
   // render targets
   SPtr<Texture> m_pRTargetView;

@@ -201,13 +201,12 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
   // SPtr<DX11VertexShader> dxVShader = make_shared<DX11VertexShader>();
   // create the vertex shader
-  uint32 hr;
+  int32 hr;
   hr = m_pDevice->pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
                                                  dxVShader->pSBlob->GetBufferSize(),
                                                  nullptr,
                                                  &dxVShader->pShader);
   // check if the creation was successful
-  int32 hr;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the");
@@ -925,6 +924,7 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
 
   int32 hr;
   hr = device->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
+
   // if the creation failed
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);

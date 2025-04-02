@@ -6,6 +6,7 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkRendererManager.h"
+#include "pkScene.h"
 #include "pkTextureManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
@@ -184,6 +185,7 @@ PhysicsApp::onUpdate(float _deltaTime)
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
     g_RenderManager().compileShaders();
+  }
   float strength = 10.0f;
   float spd = 3;
   Vector3 ikLastPos = m_ik->getLastBone()->actorIni->m_transform.getTranslation3();
@@ -203,7 +205,7 @@ PhysicsApp::onUpdate(float _deltaTime)
     m_ik->fabrik(ikLastPos + speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    Vector3 speed = Vector3(0.0f, -spd, 0.0f) * g_TimeManager().m_deltaTime;
+    Vector3 speed = Vector3(-spd, 0.0f, 0.0f) * g_TimeManager().m_deltaTime;
     m_ik->fabrik(ikLastPos + speed);
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {

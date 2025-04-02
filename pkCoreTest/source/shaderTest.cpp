@@ -6,7 +6,6 @@
 #include "pkScene.h"
 #include "pkGraphicsAPI.h"
 
-using pkEngineSDK::Debug;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::Light;

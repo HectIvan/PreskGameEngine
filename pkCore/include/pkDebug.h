@@ -29,6 +29,9 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   Logger() = default;
   virtual ~Logger() = default;
 
+  static String
+  getMessageError(int32 _hr);
+
   /**
    * @brief Get the message error of a HRESULT.
    * @param _hr RESULT message.

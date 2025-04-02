@@ -60,6 +60,12 @@ class Material : public Component
   virtual ~Material() = default;
 
   /**
+   * @brief Initialize the material on defaults.
+   */
+  void
+  init();
+
+  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */

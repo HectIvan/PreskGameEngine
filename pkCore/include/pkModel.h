@@ -129,7 +129,7 @@ class PK_CORE_EXPORT Model : public Component
 
   // skeleton data
   Map<String, Bone> boneMap;
-  Vector<Mesh> meshes;
+  Vector<SPtr<Mesh>> meshes;
   uint32 boneCounter = 0;
 
   // buffers for both vectors and index

@@ -6,15 +6,23 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkRendererManager.h"
+#include "pkTextureManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
 
 using pkEngineSDK::Debug;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
+<<<<<<< Updated upstream
+=======
+using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::g_sceneManager;
+using pkEngineSDK::g_TextureManager;
+>>>>>>> Stashed changes
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
+using pkEngineSDK::TextureManager;
 using pkEngineSDK::uint32;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
@@ -26,6 +34,7 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
+<<<<<<< Updated upstream
   m_scene.instantiate();
   SPtr<Actor> anchor = m_scene.getLastActor();
   anchor->addComponent(newModel("sprite.fbx"));
@@ -33,9 +42,20 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
   anchor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
   m_scene.instantiate();
   SPtr<Actor> weight = m_scene.getLastActor();
+=======
+  // get the texture manager
+  TextureManager& tm = g_TextureManager().instance();
+  g_sceneManager().instantiate();
+  SPtr<Actor> anchor = g_sceneManager().getLastActor();
+  anchor->addComponent(newModel("sprite.fbx"));
+  anchor->addComponent(createMaterial());
+  anchor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
+  g_sceneManager().instantiate();
+  SPtr<Actor> weight = g_sceneManager().getLastActor();
+>>>>>>> Stashed changes
   weight->addComponent(newModel("sprite.fbx"));
   weight->addComponent(createMaterial());
-  weight->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+  weight->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
   m_spring = make_shared<Spring>();
   m_spring->m_anchor = anchor;
@@ -52,6 +72,8 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
+  // get the texture manager
+  TextureManager& tm = g_TextureManager().instance();
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -79,7 +101,7 @@ PhysicsApp::onInit()
   m_cannon->m_actor = m_scene.m_actors[0];
   m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
   m_cannon->m_actor->addComponent(createMaterial());
-  m_cannon->m_actor->getComponent<Material>()->setDiffuse(createTexture("Canon.png"));
+  m_cannon->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("Canon.png"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
@@ -100,7 +122,12 @@ PhysicsApp::onInit()
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
     proj->m_actor->addComponent(newModel("sprite.fbx"));
+<<<<<<< Updated upstream
     proj->m_actor->addComponent(m_projectileMaterial);
+=======
+    proj->m_actor->addComponent(createMaterial());
+    proj->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
+>>>>>>> Stashed changes
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -111,9 +138,30 @@ PhysicsApp::onInit()
   obstacle.start(Vector3(0), 1, 0.9f, obst);
   obstacle.m_actor->addComponent(newModel("sprite.fbx"));
   obstacle.m_actor->addComponent(createMaterial());
-  obstacle.m_actor->getComponent<Material>()->setDiffuse(createTexture("obstacle.png"));
+  obstacle.m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("obstacle.png"));
 
+<<<<<<< Updated upstream
   initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
+=======
+  /**
+   * Instantiate spring
+   */
+  // initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
+
+  /**
+   * @brief Create IK
+   */
+  m_ik = make_shared<InverseKinematics>();
+  for (uint32 i = 0; i < 4; ++i)
+  {
+    SPtr<Actor> ikRoot = g_sceneManager().instantiate();
+    ikRoot->addComponent(newModel("sprite.fbx"));
+    ikRoot->addComponent(createMaterial());
+    ikRoot->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
+
+    m_ik->insertNodeLocal(Vector3(i * 2, i * g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+  }
+>>>>>>> Stashed changes
 
   m_fireDirection = Vector2(0.0f);
 }
@@ -155,9 +203,21 @@ PhysicsApp::onUpdate(float _deltaTime)
       Debug::print("Euler integration active");
     }
   }
+<<<<<<< Updated upstream
   Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+=======
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
+    g_RenderManager().compileShaders();
+  }
+>>>>>>> Stashed changes
   float strength = 10.0f;
+  float spd = 3;
+  Vector3 ikLastPos = m_ik->getLastBone()->actorIni->m_transform.getTranslation3();
+  /**
+   * Inverse kinematics input
+   */
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+<<<<<<< Updated upstream
     m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * _deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
@@ -168,6 +228,22 @@ PhysicsApp::onUpdate(float _deltaTime)
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * _deltaTime * strength);
+=======
+    Vector3 speed = Vector3(0.0f, -spd, 0.0f) * g_TimeManager().m_deltaTime;
+    m_ik->fabrik(ikLastPos + speed);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+    Vector3 speed = Vector3(0.0f, spd, 0.0f) * g_TimeManager().m_deltaTime;
+    m_ik->fabrik(ikLastPos + speed);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+    Vector3 speed = Vector3(spd, 0.0f, 0.0f) * g_TimeManager().m_deltaTime;
+    m_ik->fabrik(ikLastPos + speed);
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
+    Vector3 speed = Vector3(-spd, 0.0f, 0.0f) * g_TimeManager().m_deltaTime;
+    m_ik->fabrik(ikLastPos + speed);;
+>>>>>>> Stashed changes
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;

@@ -240,6 +240,21 @@
     <ClInclude Include="include\pkBlendState.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+<<<<<<< Updated upstream
+=======
+    <ClInclude Include="include\pkGravityComponent.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkInverseKinematics.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_win32.h">
+      <Filter>include\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTextureManager.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -341,5 +356,20 @@
     <ClCompile Include="source\pkShader.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
+<<<<<<< Updated upstream
+=======
+    <ClCompile Include="source\pkGravityComponent.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkInverseKinematics.cpp">
+      <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_impl_win32.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTextureManager.cpp">
+      <Filter>source\base app</Filter>
+    </ClCompile>
+>>>>>>> Stashed changes
   </ItemGroup>
 </Project>

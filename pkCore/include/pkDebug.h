@@ -1,4 +1,15 @@
+/*****************************************************************************/
+/**
+ * @file    pkLogger.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    07/03/2025
+ * @brief   Engine Logger used for logging in text to the console.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
+
 /*********************************************/
 /**
 * Includes
@@ -14,8 +25,16 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Debug
 {
  public:
+<<<<<<< Updated upstream:pkCore/include/pkDebug.h
   Debug() = default;
   virtual ~Debug() = default;
+=======
+  Logger() = default;
+  virtual ~Logger() = default;
+>>>>>>> Stashed changes:pkCore/include/pkLogger.h
+
+  static String
+  getMessageError(int32 _hr);
 
   /**
    * @brief Print a string.

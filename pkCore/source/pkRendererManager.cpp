@@ -68,6 +68,21 @@ RendererManager::createPasses()
   basePass->setInputLayout();
   // insert to the pass map.
   m_passes.insert({ 0, basePass });
+
+  /**
+   * Ambient Occlusion pass
+   */
+  // SPtr<Pass> aOPass = make_shared<Pass>();
+  // aOPass->create();
+  // aOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  // aOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
+  // aOPass->compileShaders();
+  // aOPass->createShaders();
+  // aOPass->createInputLayout();
+  // aOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+  //                            SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  // aOPass->setInputLayout();
+  // m_passes.insert({ 1, aOPass });
 }
 
 void
@@ -157,13 +172,35 @@ RendererManager::render(Scene& _scene)
     g_GraphicAPI().setVSShader(it->second->getVShader());
   }
   // set light
+<<<<<<< Updated upstream
   g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   g_RenderManager().light.LightDir = Vector3::FORWARD;
+=======
+  renderer.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  renderer.light.SpotCutoff = 20.0f;
+  renderer.light.SpotExponent = 8.0f;
+  renderer.light.LightDir = Vector3::FORWARD;
+  renderer.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
+  renderer.light.LightColor = Vector3(1.0f, 0.0f, 0.0f);
+  // update the light buffer
+  api.updateConstantBuffer(m_cbLight,
+                           &light,
+                           static_cast<uint32>(sizeof(Light)));
+>>>>>>> Stashed changes
   // set constant buffers for the pixel and vertex shaders
   g_RenderManager().VSSetConstantBuffers();
   g_RenderManager().PSSetConstantBuffers();
   // render the objects
+<<<<<<< Updated upstream
   g_RenderManager().renderActors(_scene.m_actors);
+=======
+  renderer.renderActors(g_sceneManager().getAllActors());
+
+  /**
+   * Deferred rendering
+   */
+  // m_passes;
+>>>>>>> Stashed changes
 }
 
 void
@@ -187,6 +224,7 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
     // set the current actor transform as the world in which the shader will work in
     g_GraphicAPI().updateConstantBuffer(m_cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
 
+<<<<<<< Updated upstream
     /**
      * Recast to a gameobject. If it fails, do none of this
      */
@@ -212,6 +250,12 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
       // render the model component
       renderModel(*gameObject->getComponent<Model>());
     }
+=======
+    // set the sampler to the pixel shader
+    g_GraphicAPI().setSampler(m_passes.find(0)->second->getSamplerState());
+    // render the model component
+    renderModel(*_gameActors[i]->getComponent<Model>());
+>>>>>>> Stashed changes
     // if the actor has children, do the same for them
     if (!_gameActors[i]->m_children.empty()) {
       renderActors(_gameActors[i]->m_children);
@@ -234,12 +278,20 @@ RendererManager::renderModel(Model& _model)
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
     // draw the mesh
-    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
+    SPtr<Material> material = _model.meshes[i]->material;
+    // set the material textures to the shader
+    g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
+    g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
+    g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
+    g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
+    g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
+    // draw model
+    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,
                                currentVertexOrigin);
     // update the offsets
-    currentIndexOrigin += static_cast<uint32>(_model.meshes[i].numIndex);
-    currentVertexOrigin += static_cast<uint32>(_model.meshes[i].vertexCount);
+    currentIndexOrigin += static_cast<uint32>(_model.meshes[i]->numIndex);
+    currentVertexOrigin += static_cast<uint32>(_model.meshes[i]->vertexCount);
   }
 }
 PK_CORE_EXPORT RendererManager&

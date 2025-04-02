@@ -32,12 +32,10 @@ ShaderTest::onInit()
   m_scene.instantiate();
   SPtr<Actor> pistol = m_scene.getLastActor();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
-  pistol->addComponent(createMaterial());
-  SPtr<Material> pMaterial = pistol->getComponent<Material>();
-  pMaterial->setDiffuse(createTexture("drakePistol/base_albedo.png"));
-  pMaterial->setOcclusion(createTexture("drakePistol/base_AO.png"));
-  pMaterial->setMetallic(createTexture("drakePistol/base_metallic.png"));
-  pMaterial->setNormal(createTexture("drakePistol/base_normal.png"));
+
+  //g_sceneManager().instantiate();
+  //SPtr<Actor> room = g_sceneManager().getLastActor();
+  //room->addComponent(newModel("sponza.obj"));
 }
 
 void
@@ -99,6 +97,7 @@ ShaderTest::onUpdate(float _deltaTime)
 void
 ShaderTest::onRender(Scene& _scene)
 {
+<<<<<<< Updated upstream
   g_RenderManager().render(_scene);
   // update the light buffer
   // g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_cbLight,
@@ -117,4 +116,7 @@ ShaderTest::onRender(Scene& _scene)
   // g_RenderManager().renderActors(_scene.m_actors);
 
   // turn the render target view into a texture.  
+=======
+  g_RenderManager().render();
+>>>>>>> Stashed changes
 }

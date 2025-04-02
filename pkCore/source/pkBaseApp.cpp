@@ -8,6 +8,7 @@
 #include "pkMath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkSprite.h"
+#include "pkTextureManager.h"
 #include "pkWindowDesc.h"
 
 namespace pkEngineSDK
@@ -22,32 +23,11 @@ BaseApp::createMaterial()
   return g_ResourceManager().newMaterial();
 }
 
-SPtr<Texture>
-BaseApp::createTexture(String _name)
-{
-  // search if the texture has been stored before
-  for (uint32 i = 0; i < m_textures.size(); ++i) {
-    if (m_textures[i]->name == _name) {
-      return m_textures[i]->texture;
-    }
-  }
-
-  // create the texture
-  SPtr<Texture> texture = g_ResourceManager().newTexture(_name);
-
-  // store the new texture in the memory
-  SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();
-  newTexture->name = _name;
-  newTexture->texture = texture;
-  m_textures.push_back(newTexture);
-
-  // return the final texture
-  return texture;
-}
-
 SPtr<Model>
 BaseApp::newModel(String _modelName)
 {
+  // get the texture manager
+  TextureManager& tm = g_TextureManager().instance();
   // search if the model has been stored before
   for (uint32 i = 0; i < m_models.size(); ++i) {
     if (m_models[i]->name == _modelName) {
@@ -58,8 +38,8 @@ BaseApp::newModel(String _modelName)
   SPtr<Model> model = g_ResourceManager().loadModel(_modelName);
   // create a material.
   for (uint32 i = 0; i < model->meshes.size(); ++i) {
-    model->meshes[i].material = createMaterial();
-    model->meshes[i].material->diffuse = createTexture(model->meshes[i].materialPath);
+    model->meshes[i]->material = createMaterial();
+    model->meshes[i]->material->diffuse = tm.createTexture(model->meshes[i]->materialPath);
   }
   // insetr the new model to the model memory.
   SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
@@ -83,7 +63,12 @@ BaseApp::init(const char** _argv)
   RendererManager::startUp();
   ResourceManager::startUp();
   TimeManager::startUp();
+<<<<<<< Updated upstream
   
+=======
+  TextureManager::startUp();
+
+>>>>>>> Stashed changes
   initWindow();
   initAPI(_argv);
 

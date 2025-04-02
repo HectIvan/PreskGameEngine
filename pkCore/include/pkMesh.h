@@ -34,8 +34,7 @@ class Mesh
 {
  public:
   Mesh() = default;
-  virtual ~Mesh()
-  {
+  virtual ~Mesh() {
     clean();
   }
 
@@ -70,8 +69,8 @@ class Mesh
   clean();
 
   Transform transform = Transform(Matrix4(0),
-                                   Matrix4(0),
-                                   Matrix4(0));
+                                  Matrix4(0),
+                                  Matrix4(0));
 
  public:
   // stores the index and vertex info

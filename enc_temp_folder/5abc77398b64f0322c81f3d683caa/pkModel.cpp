@@ -135,12 +135,12 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       meshProcess->material = make_shared<Material>();
       meshProcess->material->init();
       meshProcess->material->m_name = name;
-      meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png","textures/default/"));
-      meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
+      meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
+      meshProcess->material->setHeight(tm.createTexture("FlatHeight.png", "textures/default/"));
       meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
                                                           "textures/default/"));
-      meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
-      meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png","textures/default/"));
+      meshProcess->material->setNormal(tm.createTexture("FlatNormal.png", "textures/default/"));
+      meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
     }
     for (uint32 i = 0; i < textureCount; ++i) {
       aiString path;

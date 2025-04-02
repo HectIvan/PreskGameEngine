@@ -63,7 +63,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
   m_spring->m_elasticity = _stiffness;
   m_spring->m_length = _length;
   m_spring->m_mass = 1.0f;
-  m_spring->m_gravity = 3.0f;
+  m_spring->m_gravity = 9.81f;
 
   anchor->setPosition(_pos);
   weight->setPosition(_pos.x, _pos.y + _length, _pos.y);

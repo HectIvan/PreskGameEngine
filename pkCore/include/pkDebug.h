@@ -33,14 +33,6 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   getMessageError(int32 _hr);
 
   /**
-   * @brief Get the message error of a HRESULT.
-   * @param _hr RESULT message.
-   * @return The error message.
-   */
-  static String
-  getMessageError(int32 _hr);
-
-  /**
    * @brief Print a string.
    * @param _text Text to print to the console.
    */

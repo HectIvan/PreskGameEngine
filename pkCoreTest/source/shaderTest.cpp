@@ -1,13 +1,17 @@
 #include "ShaderTest.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
 #include "pkRendererManager.h"
 #include "pkScene.h"
+#include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
+using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::g_sceneManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
@@ -28,8 +32,8 @@ ShaderTest::onInit()
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
-  m_scene.instantiate();
-  SPtr<Actor> pistol = m_scene.getLastActor();
+  g_sceneManager().instantiate();
+  SPtr<Actor> pistol = g_sceneManager().getLastActor();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
   //g_sceneManager().instantiate();
@@ -38,10 +42,11 @@ ShaderTest::onInit()
 }
 
 void
-ShaderTest::onUpdate(float _deltaTime)
+ShaderTest::onUpdate()
 {
+  float deltaTime = g_TimeManager().m_deltaTime;
   // update the camera m_speed
-  float camm_speed = m_cameraSpeed * _deltaTime;
+  float camm_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
     m_camera.move(Vector3(0.0f, 0.0f, camm_speed));
@@ -66,7 +71,7 @@ ShaderTest::onUpdate(float _deltaTime)
     m_camera.move(Vector3(0.0f, -camm_speed, 0.0f));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
-    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * _deltaTime;
+    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
     m_camera.rotate(-posDif.y, posDif.x, 0.0f);
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
@@ -74,9 +79,13 @@ ShaderTest::onUpdate(float _deltaTime)
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
 
-  SPtr<Actor> actor = m_scene.m_actors[0];
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
+    g_RenderManager().compileShaders();
+  }
 
-  float rot = 1.0f * m_deltaTime;
+  SPtr<Actor> actor = g_sceneManager().getActor(0);
+
+  float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     rot *= -1.0f;
     actor->m_transform *= Matrix4::rotationY(rot);
@@ -94,7 +103,7 @@ ShaderTest::onUpdate(float _deltaTime)
 }
 
 void
-ShaderTest::onRender(Scene& _scene)
+ShaderTest::onRender()
 {
-  g_RenderManager().render(_scene);
+  g_RenderManager().render();
 }

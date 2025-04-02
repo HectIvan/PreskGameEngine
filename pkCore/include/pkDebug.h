@@ -18,21 +18,22 @@
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
+#include "pkModule.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Debug
+class PK_CORE_EXPORT Logger : public Module<Logger>
 {
  public:
-<<<<<<< Updated upstream:pkCore/include/pkDebug.h
-  Debug() = default;
-  virtual ~Debug() = default;
-=======
   Logger() = default;
   virtual ~Logger() = default;
->>>>>>> Stashed changes:pkCore/include/pkLogger.h
 
+  /**
+   * @brief Get the message error of a HRESULT.
+   * @param _hr RESULT message.
+   * @return The error message.
+   */
   static String
   getMessageError(int32 _hr);
 
@@ -78,4 +79,6 @@ class PK_CORE_EXPORT Debug
   static void
   print(Matrix4 _matrix);
 };
+PK_CORE_EXPORT Logger&
+g_Logger();
 }

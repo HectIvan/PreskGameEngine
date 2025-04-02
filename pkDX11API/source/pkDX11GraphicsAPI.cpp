@@ -29,6 +29,8 @@
 #include "pkDX11VertexShader.h"
 #include "pkVertexBuffer.h"
 
+#include "pkDebug.h"
+
 #include "pkDX11InputLayout.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
@@ -117,11 +119,8 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
 
   hr = m_pDevice->pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &dxCB->pCBuffer);
   if (FAILED(hr)) {
-<<<<<<< Updated upstream
-=======
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create the constant buffer. Error Code: " + errMsg);
->>>>>>> Stashed changes
     return nullptr;
   }
 
@@ -137,10 +136,7 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   // casting failed
   if (!dxCB) {
-<<<<<<< Updated upstream
-=======
     g_Logger().print("Failed to reinterpret CB to DX11CB for update.");
->>>>>>> Stashed changes
     return;
   }
   // update with the new data
@@ -190,11 +186,8 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
                                                 nullptr, &dxPShader->pShader);
   // check if the creation was successful
   if (hr != 0x00000000) {
-<<<<<<< Updated upstream
-=======
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create pixel shader. Error code: " + errMsg);
->>>>>>> Stashed changes
     dxPShader->pSBlob->Release();
     return;
   }
@@ -208,15 +201,12 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
   // SPtr<DX11VertexShader> dxVShader = make_shared<DX11VertexShader>();
   // create the vertex shader
-<<<<<<< Updated upstream
   uint32 hr;
   hr = m_pDevice->pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
                                                  dxVShader->pSBlob->GetBufferSize(),
                                                  nullptr,
                                                  &dxVShader->pShader);
   // check if the creation was successful
-  if (hr != 0x00000000) {
-=======
   int32 hr;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -230,7 +220,6 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create vertex shader. Error code: " + errMsg);
->>>>>>> Stashed changes
     dxVShader->pSBlob->Release();
     return;
   }
@@ -315,11 +304,8 @@ DX11GraphicsAPI::createRenderTargetView()
                                                      &rTargetView->m_rTV);
   // if the creation was not successful
   if (hr != 0x00000000) {
-<<<<<<< Updated upstream
-=======
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a render target view. Error code: " + errMsg);
->>>>>>> Stashed changes
     return nullptr;
   }
   return rTargetView;
@@ -345,11 +331,6 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
     txVector.push_back(dxTx);
   }
   // set the render targets
-<<<<<<< Updated upstream
-  m_pDevice->pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
-                                                   rTVector.data(),
-                                                   pDSV->pDepthSV);
-=======
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of the render targets.");
@@ -357,7 +338,6 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   device->pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
                                                 rTVector.data(),
                                                 pDSV->pDepthSV);
->>>>>>> Stashed changes
 }
 
 SPtr<SamplerState>
@@ -376,10 +356,6 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   sampDesc.MinLOD = 0;
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-<<<<<<< Updated upstream
-  uint32 hr = m_pDevice->pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->m_pSampler);
-  if (hr != 0x00000000) {
-=======
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the sampler state creation.");
@@ -388,7 +364,6 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a sampler state. Error code: " + errMsg);
->>>>>>> Stashed changes
     return nullptr;
   }
   return pSamState;
@@ -416,11 +391,8 @@ DX11GraphicsAPI::createDepthStencilView(uint32 _width,
                                                      &pDepthSView->pDepthSV);
   // if the creation was not succesful
   if (hr != 0x00000000) {
-<<<<<<< Updated upstream
-=======
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a depth stencil. Error code: " + errMsg);
->>>>>>> Stashed changes
     return nullptr;
   }
   // return the final value
@@ -481,9 +453,6 @@ DX11GraphicsAPI::createBlendState()
     blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
   }
 
-<<<<<<< Updated upstream
-  m_pDevice->pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
-=======
   // Create the blend state.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -496,7 +465,6 @@ DX11GraphicsAPI::createBlendState()
     g_Logger().print("Failed to create Blend state. Error code: " + errMsg);
     return nullptr;
   }
->>>>>>> Stashed changes
   return pBlendState;
 }
 
@@ -696,11 +664,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                                 &pInputL->pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {
-<<<<<<< Updated upstream
-=======
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create the input layout. Error Message: " + errMsg);
->>>>>>> Stashed changes
     return nullptr;
   }
 
@@ -713,10 +678,6 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       uint32 _numBuffers)
 {
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
-<<<<<<< Updated upstream
-  if (!dxCB) { return; } // casting failed
-  m_pDevice->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
-=======
   if (!dxCB) {
     g_Logger().print("Failed to reinterpret CB to DX11CB for setting.");
     return;
@@ -726,7 +687,6 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex CBuffer.");
   }
   device->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
->>>>>>> Stashed changes
 }
 
 void
@@ -855,6 +815,8 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
   int32 hr;
 
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+
   if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE) {
     // Create the shader resource descriptor for the texture
     D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
@@ -866,16 +828,11 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
 
     m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
     // create the shader resource view
-<<<<<<< Updated upstream
-    m_pDevice->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
-    // if (!tex->srv) { return nullptr; } // failed to create shader resource view
-=======
     hr = device->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
     if (!tex->srv) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a shader resource view. Error Code: " + errMsg);
     } // failed to create shader resource view
->>>>>>> Stashed changes
   }
 
   if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL) {
@@ -900,16 +857,12 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     descDepth.CPUAccessFlags = 0;
     descDepth.MiscFlags = 0;
-<<<<<<< Updated upstream
-    m_pDevice->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
-=======
 
     hr = device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
     if (!tex->t2d) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create the depth stencil." + errMsg);
     }
->>>>>>> Stashed changes
   }
 
   if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
@@ -918,17 +871,12 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     rtvDesc.Format = desc.Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
-<<<<<<< Updated upstream
-    m_pDevice->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
-    m_pDevice->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
-=======
     device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
     hr = device->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
     if (!tex->m_rTV) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a render target view. Error Code: " + errMsg);
     }
->>>>>>> Stashed changes
   }
 
   return tex;
@@ -968,23 +916,20 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   InitData.pSysMem = _vertex.data(); // pointer to the initialization data
   InitData.SysMemPitch = static_cast<uint32>(_vertex.size() * sizeof(SimpleVertex)); // distance between values
 
-  // if the device creation failed
-  if (!m_pDevice->pd3dDevice) {
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  // if the device reinterpret failed
+  if (!device) {
+    g_logger().print("Failed to reinterpret device to DXDevice in a vertex buffer creation.");
     return nullptr;
   }
-<<<<<<< Updated upstream
-  m_pDevice->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
-=======
 
   int32 hr;
   hr = device->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
-
   // if the creation failed
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a vertex buffer. Error code: " + errMsg);
   }
->>>>>>> Stashed changes
   return dxVB;
 }
 
@@ -1004,13 +949,6 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
   // get the offset
   uint32 stride = sizeof(SimpleVertex);
   //set the buffer
-<<<<<<< Updated upstream
-  m_pDevice->pImmediateContext->IASetVertexBuffers(_start,
-                                                   _bufferCount,
-                                                   &dxVB->pBuffer,
-                                                   &stride,
-                                                   &_offset);
-=======
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex buffer.");
@@ -1020,7 +958,6 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                                                 &dxVB->pBuffer,
                                                 &stride,
                                                 &_offset);
->>>>>>> Stashed changes
 }
 
 SPtr<IndexBuffer>
@@ -1047,9 +984,6 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   InitData.pSysMem = _index.data(); // pointer to the initialization data
   // InitData.SysMemPitch = (uint32)index.size() * sizeof(uint32); // distance between values
   // create the buffer
-<<<<<<< Updated upstream
-  m_pDevice->pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
-=======
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of an index buffer.");
@@ -1061,7 +995,6 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create an Index Buffer. Error code: " + errMsg);
   }
->>>>>>> Stashed changes
   return dxIB;
 }
 

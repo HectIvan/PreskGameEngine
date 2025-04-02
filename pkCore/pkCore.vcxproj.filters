@@ -1,196 +1,223 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{7de1478f-0ca5-4dc3-9c80-f63af898d861}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source">
-      <UniqueIdentifier>{cd4ee2aa-1941-4dc8-8a5b-2241fd3eae58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\prerequisites">
-      <UniqueIdentifier>{7ba077da-5db2-4a32-a858-b015eb43dce3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\window">
-      <UniqueIdentifier>{1979a646-8a9a-405d-bd5e-8ca586364109}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\events">
-      <UniqueIdentifier>{2bff4ad3-d17e-4854-90ab-70ae3f7c99e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\geometry">
-      <UniqueIdentifier>{4209ee74-d096-4626-a341-491d65468daa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\window">
-      <UniqueIdentifier>{f5888abd-2600-45db-a79c-985e5ce88a8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\game">
-      <UniqueIdentifier>{a550707c-5b0a-41b8-80b8-aad2a453b543}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\buffers">
-      <UniqueIdentifier>{c7ed305e-a1ad-4822-bc75-ab45ea3c85c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\buffers">
-      <UniqueIdentifier>{b9e6cf2a-a519-40be-85f4-fe5175fd70f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\api">
-      <UniqueIdentifier>{adbd355c-db1a-48d9-839a-3639ae7c4011}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\api">
-      <UniqueIdentifier>{d21265f3-ce77-4adf-a873-9ba9efb097c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics">
-      <UniqueIdentifier>{b55ae11e-c59d-4644-b864-bb64e574335d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\camera">
-      <UniqueIdentifier>{56118060-0e7b-45ed-9067-e272e3634412}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\camera">
-      <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\main">
-      <UniqueIdentifier>{c2d7851b-240f-4364-8c9a-93d6cf917382}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\base app">
-      <UniqueIdentifier>{d4ee8979-e08f-40e5-a7c9-74bafca0d1b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\base app">
-      <UniqueIdentifier>{fe1b7a50-c5a6-4e7b-8d28-f81bce41cab6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\events">
-      <UniqueIdentifier>{053a5fdf-01ad-42ec-ab31-efd131b12c76}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\graphics">
-      <UniqueIdentifier>{97698cb5-919b-4d24-b37b-c212942a8975}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\imgui">
-      <UniqueIdentifier>{cc33b101-0a66-4e8c-b246-3fc51bf3136e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\debug">
-      <UniqueIdentifier>{2f4fc196-7749-4980-8965-a42c527517eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\debug">
-      <UniqueIdentifier>{f27c31e5-d2cc-4ff7-b281-9d8ed159169b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\imgui">
-      <UniqueIdentifier>{a18d7496-f355-4cef-be71-660a483699d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\script">
-      <UniqueIdentifier>{4bccd719-0cdb-4e48-9088-54fe53d235e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\script">
-      <UniqueIdentifier>{ad061113-2507-41f7-a44a-811483fad56a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\game">
-      <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="source\pkBaseApp.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBone.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkCamera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDebug.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDllLoader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGameObject.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGraphicsAPI.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkIndexBuffer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkLinuxWindow.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMain.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMaterial.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMesh.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkModel.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPass.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkScene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkShader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkSprite.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTexture.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_demo.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_draw.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_tables.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_widgets.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkActor.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui_win32.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui.cpp">
+      <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32Window.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32Event.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkWin32EventQueue.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkRendererManager.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkResourceManager.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkScriptManager.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTextureManager.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTimeManager.cpp">
+      <Filter>source\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pkPrerequisitesCore.h">
-      <Filter>include\prerequisites</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkWindow.h">
-      <Filter>include\window</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkWindowDesc.h">
-      <Filter>include\window</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkEvent.h">
-      <Filter>include\events</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkEventQueue.h">
-      <Filter>include\events</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMouseWheelData.h">
-      <Filter>include\events</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkSimpleVertex.h">
-      <Filter>include\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkGameObject.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkIndexBuffer.h">
-      <Filter>include\buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkGraphicsAPI.h">
-      <Filter>include\api</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkVertexBuffer.h">
-      <Filter>include\buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\stb_image.h">
-      <Filter>include\api</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkLight.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkCamera.h">
-      <Filter>include\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkModel.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMesh.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkBone.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkCoreDefines.h">
-      <Filter>include\prerequisites</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkDevice.h">
-      <Filter>include\api</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkTexture.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkDllLoader.h">
-      <Filter>include\api</Filter>
+    <ClInclude Include="include\pkBlendState.h">
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\pkBaseApp.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkKey.h">
-      <Filter>include\events</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkComponent.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkConstantBuffer.h">
-      <Filter>include\buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMaterial.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkInputLayout.h">
-      <Filter>include\api</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkShader.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkRenderTargetView.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkSwapChain.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkSprite.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkFrustum.h">
-      <Filter>include\camera</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\pkActor.h">
-      <Filter>include\game</Filter>
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkScene.h">
-      <Filter>include\game</Filter>
+    <ClInclude Include="include\pkBone.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCamera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkComponent.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkConstantBuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCoreDefines.h">
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\pkDebug.h">
-      <Filter>include\debug</Filter>
+      <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkImGui.h">
-      <Filter>include\imgui</Filter>
+    <ClInclude Include="include\pkDepthStencilView.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDevice.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDllLoader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkEvent.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkEventQueue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkFrustum.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGameObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGraphicTypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkIndexBuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkInputLayout.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkInputLayoutDesc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkKey.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkLight.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMaterial.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkModel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMouseWheelData.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPass.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSamplerState.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkScene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkShader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSimpleVertex.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSprite.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSwapChain.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTexture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkVertexBuffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkWindow.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkWindowDesc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb_image.h">
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\externals\imconfig.h">
       <Filter>include\imgui</Filter>
@@ -210,166 +237,64 @@
     <ClInclude Include="include\externals\imstb_truetype.h">
       <Filter>include\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkRendererManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkResourceManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkTimeManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkPass.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkDepthStencilView.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkGraphicTypes.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkScriptManager.h">
-      <Filter>include\script</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkInputLayoutDesc.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkSamplerState.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkBlendState.h">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
-<<<<<<< Updated upstream
-=======
-    <ClInclude Include="include\pkGravityComponent.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkInverseKinematics.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\imgui_impl_win32.h">
+    <ClInclude Include="include\pkImGui.h">
       <Filter>include\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkTextureManager.h">
-      <Filter>include\base app</Filter>
+    <ClInclude Include="include\pkRendererManager.h">
+      <Filter>include\managers</Filter>
     </ClInclude>
->>>>>>> Stashed changes
+    <ClInclude Include="include\pkRenderTargetView.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkResourceManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkScriptManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTextureManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTimeManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGraphicsAPI.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPrerequisitesCore.h">
+      <Filter>include\prerequisites</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkWin32Window.cpp">
-      <Filter>source\window</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkLinuxWindow.cpp">
-      <Filter>source\window</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkIndexBuffer.cpp">
-      <Filter>source\buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkGraphicsAPI.cpp">
-      <Filter>source\api</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkCamera.cpp">
-      <Filter>source\camera</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkGameObject.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkModel.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkBone.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkMesh.cpp">
-      <Filter>source\api</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkMain.cpp">
-      <Filter>source\main</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkDllLoader.cpp">
-      <Filter>source\api</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkBaseApp.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkWin32Event.cpp">
-      <Filter>source\events</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkWin32EventQueue.cpp">
-      <Filter>source\events</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkMaterial.cpp">
-      <Filter>source\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkTexture.cpp">
-      <Filter>source\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkSprite.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkActor.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkDebug.cpp">
-      <Filter>source\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkImGui.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_demo.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_draw.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_tables.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_widgets.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkRendererManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkResourceManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkTimeManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkImGui_win32.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkScriptManager.cpp">
-      <Filter>source\script</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkScene.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkPass.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkShader.cpp">
-      <Filter>source\graphics</Filter>
-    </ClCompile>
-<<<<<<< Updated upstream
-=======
-    <ClCompile Include="source\pkGravityComponent.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkInverseKinematics.cpp">
-      <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\imgui_impl_win32.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkTextureManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
->>>>>>> Stashed changes
+    <Filter Include="include">
+      <UniqueIdentifier>{4a3f2d1f-cd47-4d15-b651-cdefeb773edd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{432de3eb-231e-4be3-8d86-159ee2bdd0ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\imgui">
+      <UniqueIdentifier>{1f199d49-3986-4433-ac2a-a5b574e69838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\windows">
+      <UniqueIdentifier>{4ea0806f-0b50-4dfa-b68c-85ff29affbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\managers">
+      <UniqueIdentifier>{f5ebe4c6-3388-4728-9840-3912c305267b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\linux">
+      <UniqueIdentifier>{7e43b211-fe5c-411d-9505-7b9f1494bd53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\imgui">
+      <UniqueIdentifier>{d6c47391-30fa-4fd4-8347-7aac8a1b2a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\managers">
+      <UniqueIdentifier>{65f31a21-950e-41b8-8b80-d4cd6de36da6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\api">
+      <UniqueIdentifier>{5865160c-99c1-49a4-a702-a56981910123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\prerequisites">
+      <UniqueIdentifier>{e0ae948d-50e4-4b92-950f-be0cba1e1e60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

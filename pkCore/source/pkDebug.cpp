@@ -49,31 +49,31 @@ Debug::print(String _text)
 }
 
 void
-Debug::print(float _num)
+Logger::print(float _num)
 {
   cout << _num << endl << endl;
 }
 
 void
-Debug::print(Vector2 _vec)
+Logger::print(Vector2 _vec)
 {
   cout << _vec.x << " " << _vec.y << endl << endl;
 }
 
 void
-Debug::print(Vector3 _vec)
+Logger::print(Vector3 _vec)
 {
   cout << _vec.x << " " << _vec.y << " " << _vec.z << endl << endl;
 }
 
 void
-Debug::print(Vector4 _vec)
+Logger::print(Vector4 _vec)
 {
   cout << _vec.x << " " << _vec.y << " " << _vec.z << " " << _vec.w << endl << endl;
 }
 
 void
-Debug::print(Matrix4 _matrix)
+Logger::print(Matrix4 _matrix)
 {
   // First row.
   cout << _matrix.matrix[0][0] << " "
@@ -95,5 +95,11 @@ Debug::print(Matrix4 _matrix)
        << _matrix.matrix[3][1] << " "
        << _matrix.matrix[3][2] << " "
        << _matrix.matrix[3][3] << " " << endl << endl;
+}
+
+PK_CORE_EXPORT Logger&
+g_Logger()
+{
+  return Logger::instance();
 }
 }

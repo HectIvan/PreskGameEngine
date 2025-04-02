@@ -3,6 +3,7 @@
 #include "pkGraphicsAPI.h"
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
+#include "pkScene.h"
 
 using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
 using PK_USAGE::kPK_USAGE_DEFAULT;
@@ -155,27 +156,25 @@ RendererManager::setActorsBuffers(Scene& _scene)
 void
 RendererManager::render(Scene& _scene)
 {
+  RendererManager& renderer = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // screen clear color
   float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  g_GraphicAPI().clearRenderTargetView(clearColor, m_pRTargetView);
-  g_GraphicAPI().clearDepthBuffer(1.0f, m_pDepthSView);
+  api.clearRenderTargetView(clearColor, m_pRTargetView);
+  api.clearDepthBuffer(1.0f, m_pDepthSView);
 
   // update the light buffer
-  g_GraphicAPI().updateConstantBuffer(m_cbLight,
+  api.updateConstantBuffer(m_cbLight,
                                       &light,
                                       static_cast<uint32>(sizeof(Light)));
 
   Map<uint32, SPtr<Pass>>::iterator it;
   for (it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Set shaders
-    g_GraphicAPI().setPSShader(it->second->getPShader());
-    g_GraphicAPI().setVSShader(it->second->getVShader());
+    api.setPSShader(it->second->getPShader());
+    api.setVSShader(it->second->getVShader());
   }
   // set light
-<<<<<<< Updated upstream
-  g_RenderManager().light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  g_RenderManager().light.LightDir = Vector3::FORWARD;
-=======
   renderer.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   renderer.light.SpotCutoff = 20.0f;
   renderer.light.SpotExponent = 8.0f;
@@ -186,21 +185,16 @@ RendererManager::render(Scene& _scene)
   api.updateConstantBuffer(m_cbLight,
                            &light,
                            static_cast<uint32>(sizeof(Light)));
->>>>>>> Stashed changes
   // set constant buffers for the pixel and vertex shaders
   g_RenderManager().VSSetConstantBuffers();
   g_RenderManager().PSSetConstantBuffers();
   // render the objects
-<<<<<<< Updated upstream
-  g_RenderManager().renderActors(_scene.m_actors);
-=======
   renderer.renderActors(g_sceneManager().getAllActors());
 
   /**
    * Deferred rendering
    */
   // m_passes;
->>>>>>> Stashed changes
 }
 
 void
@@ -224,38 +218,10 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
     // set the current actor transform as the world in which the shader will work in
     g_GraphicAPI().updateConstantBuffer(m_cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
 
-<<<<<<< Updated upstream
-    /**
-     * Recast to a gameobject. If it fails, do none of this
-     */
-    SPtr<GameObject> gameObject = actorToClass<GameObject>(_gameActors[i]);
-    if (gameObject) {
-      // set the diffuse texture to the resource view if the model has a material
-      if (gameObject->getComponent<Material>()) {
-        // get the material
-        SPtr<Material> material = gameObject->getComponent<Material>();
-        // set the material textures to the shader
-        g_GraphicAPI().setShaderResourceView(material->diffuse, 0);
-        g_GraphicAPI().setShaderResourceView(material->normal, 1);
-        g_GraphicAPI().setShaderResourceView(material->height, 2);
-        g_GraphicAPI().setShaderResourceView(material->metallic, 3);
-        g_GraphicAPI().setShaderResourceView(material->occlusion, 4);
-
-        Map<uint32, SPtr<Pass>>::iterator it;
-        for (it = m_passes.begin(); it != m_passes.end(); ++it) {
-          // Set sampler
-          g_GraphicAPI().setSampler(it->second->getSamplerState());
-        }
-      }
-      // render the model component
-      renderModel(*gameObject->getComponent<Model>());
-    }
-=======
     // set the sampler to the pixel shader
     g_GraphicAPI().setSampler(m_passes.find(0)->second->getSamplerState());
     // render the model component
     renderModel(*_gameActors[i]->getComponent<Model>());
->>>>>>> Stashed changes
     // if the actor has children, do the same for them
     if (!_gameActors[i]->m_children.empty()) {
       renderActors(_gameActors[i]->m_children);

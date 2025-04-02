@@ -63,12 +63,8 @@ BaseApp::init(const char** _argv)
   RendererManager::startUp();
   ResourceManager::startUp();
   TimeManager::startUp();
-<<<<<<< Updated upstream
-  
-=======
   TextureManager::startUp();
 
->>>>>>> Stashed changes
   initWindow();
   initAPI(_argv);
 

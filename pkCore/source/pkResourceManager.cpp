@@ -14,10 +14,10 @@ ResourceManager::newMaterial()
 }
 
 SPtr<Texture>
-ResourceManager::newTexture(String _name)
+ResourceManager::newTexture(String _name, String _directory)
 {
   // create the texture adress.
-  String textureName = "textures/" + _name;
+  String textureName = _directory + _name;
   return g_GraphicAPI().createTextureFromFile(textureName, 8, false, 28);
 }
 

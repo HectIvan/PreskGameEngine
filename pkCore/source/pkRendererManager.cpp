@@ -235,13 +235,8 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
         g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
 
         // get the basic bass sampler and set it to the pixel shader
-        g_GraphicAPI().setSampler(m_passes.begin()->second->getSamplerState());
-        // Map<uint32, SPtr<Pass>>::iterator it;
-        // for (it = m_passes.begin(); it != m_passes.end(); ++it) {
-        //   // Set sampler
-        //   g_GraphicAPI().setSampler(it->second->getSamplerState());
-        // }
       }
+      g_GraphicAPI().setSampler(m_passes.find(0)->second->getSamplerState());
       // render the model component
       renderModel(*gameObject->getComponent<Model>());
     }
@@ -266,13 +261,21 @@ RendererManager::renderModel(Model& _model)
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
   for (uint32 i = 0; i < _model.meshes.size(); ++i) {
+    // get the material
+    SPtr<Material> material = _model.meshes[i]->material;
+    // set the material textures to the shader
+    g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
+    g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
+    g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
+    g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
+    g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
     // draw the mesh
-    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i].numIndex),
+    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,
                                currentVertexOrigin);
     // update the offsets
-    currentIndexOrigin += static_cast<uint32>(_model.meshes[i].numIndex);
-    currentVertexOrigin += static_cast<uint32>(_model.meshes[i].vertexCount);
+    currentIndexOrigin += static_cast<uint32>(_model.meshes[i]->numIndex);
+    currentVertexOrigin += static_cast<uint32>(_model.meshes[i]->vertexCount);
   }
 }
 PK_CORE_EXPORT RendererManager&

@@ -13,6 +13,7 @@
 #include "pkMatrix4.h"
 #include "pkModel.h"
 #include "pkTexture.h"
+#include "pkTextureManager.h"
 #include "stb_image.h"
 
 namespace pkEngineSDK
@@ -26,7 +27,7 @@ namespace pkEngineSDK
 void
 processNode(Model& _model, aiNode* _node, const aiScene* _scene);
 
-Mesh
+SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene);
 
 void
@@ -45,12 +46,12 @@ Model::load(String& _path)
   processNode(*this, scene->mRootNode, scene);
   for (uint32 i = 0; i < meshes.size(); ++i) {
     vertex.insert(vertex.end(),
-                  meshes[i].vertexVector.begin(),
-                  meshes[i].vertexVector.end());
+                  meshes[i]->vertexVector.begin(),
+                  meshes[i]->vertexVector.end());
 
     index.insert(index.end(),
-                 meshes[i].indexVector.begin(),
-                 meshes[i].indexVector.end());
+                 meshes[i]->indexVector.begin(),
+                 meshes[i]->indexVector.end());
   }
 }
   
@@ -67,11 +68,12 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
   }
 }
 
-Mesh
+SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
-  Mesh meshProcess;
-  meshProcess.vertexCount = _mesh->mNumVertices;
+  TextureManager& tm = g_TextureManager().instance();
+  SPtr<Mesh> meshProcess = make_shared<Mesh>();
+  meshProcess->vertexCount = _mesh->mNumVertices;
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i) {
     SimpleVertex sv;
@@ -101,17 +103,17 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       sv.bitangent.z = _mesh->mBitangents[i].z;
     }
     // else { sv.Tex = Vector2(0.0f); }
-    meshProcess.vertexVector.push_back(sv);
+    meshProcess->vertexVector.push_back(sv);
   }
 
   // process index
   for (uint32 i = 0; i < _mesh->mNumFaces; ++i) {
     aiFace face = _mesh->mFaces[i];
 
-    meshProcess.numIndex += face.mNumIndices;
+    meshProcess->numIndex += face.mNumIndices;
 
     for (uint32 j = 0; j < face.mNumIndices; ++j) {
-      meshProcess.indexVector.push_back(face.mIndices[j]);
+      meshProcess->indexVector.push_back(face.mIndices[j]);
     }
   }
   for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
@@ -119,11 +121,20 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
   }
   if (_mesh->mMaterialIndex >= 0) {
     aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
-    for (uint32 i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++) {
+    uint32 textureCount = material->GetTextureCount(aiTextureType_DIFFUSE);
+    if (textureCount < 1) {
+      meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
+      meshProcess->material->setNormal(tm.createTexture("FlatNormal.png", "textures/default/"));
+      meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
+      meshProcess->material->setHeight(tm.createTexture("FlatHeight.png", "textures/default/"));
+      meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
+                                                         "textures/default/"));
+    }
+    for (uint32 i = 0; i < textureCount; i++) {
       aiString path;
       material->GetTexture(aiTextureType_DIFFUSE, i, &path);
       std::cout << "Texture path: " << path.C_Str() << std::endl;
-      meshProcess.materialPath = path.C_Str();
+      meshProcess->materialPath = path.C_Str();
     }
     // material->GetTexture(aiTextureType_DIFFUSE);
     // material->Get(AI_MATKEY_COLOR_DIFFUSE, )

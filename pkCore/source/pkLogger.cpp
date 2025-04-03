@@ -1,9 +1,58 @@
+/*****************************************************************************/
+/**
+ * @file    pkLogger.cpp
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    03/03/2025
+ * @brief   Logger used for printing messages in the console.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
+
+ /*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include <iostream>
 
 #include "pkLogger.h"
 
 using std::cout;
 using std::endl;
+
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+#include <Windows.h>
+
+namespace pkEngineSDK
+{
+String
+Logger::getMessageError(int32 _hr)
+{
+  // error log
+  char* errorMsg = nullptr;
+
+  // convert from int32 to HRESULT
+  HRESULT hr = static_cast<HRESULT>(_hr);
+
+  // get the error message
+  FormatMessageA(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    nullptr,
+    hr,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPSTR)&errorMsg,
+    0,
+    nullptr);
+
+  // if no message is found, set the string to unknown error
+  String message = (errorMsg) ? errorMsg : "Unknown Error.";
+  LocalFree(errorMsg);
+
+  return message;
+}
+}
+#endif
 
 namespace pkEngineSDK
 {

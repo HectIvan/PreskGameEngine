@@ -45,10 +45,11 @@ class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
   /**
    * @brief Create a new Texture.
    * @param _name Texture Name.
+   * @param _directory Directory to look for.
    * @return The texture pointer.
    */
   SPtr<Texture>
-  newTexture(String _name);
+  newTexture(String _name, String _directory);
 
   /**
    * @brief Loads a model from a file.

@@ -42,12 +42,6 @@ struct ModelMemory
   SPtr<Model> model;
 };
 
-struct TextureMemory
-{
-  String name;
-  SPtr<Texture> texture;
-};
-
 class Camera;
 
 class PK_CORE_EXPORT BaseApp
@@ -119,14 +113,6 @@ class PK_CORE_EXPORT BaseApp
   createMaterial();
 
   /**
-   * @brief Create a new Texture.
-   * @param _name Texture Name.
-   * @return The texture pointer.
-   */
-  SPtr<Texture>
-  createTexture(String _name);
-
-  /**
    * @brief Create a new model component.
    * @param _modelName Name of the model file to load.
    * @return Pointer to the new model object.
@@ -190,6 +176,5 @@ class PK_CORE_EXPORT BaseApp
   * its found, the loaded object will be returned, instead of loading it again.
   */
   Vector<SPtr<ModelMemory>> m_models;
-  Vector<SPtr<TextureMemory>> m_textures;
 };
 }

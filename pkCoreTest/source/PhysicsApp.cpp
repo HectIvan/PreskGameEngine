@@ -6,6 +6,7 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkRendererManager.h"
+#include "pkTextureManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
 
@@ -14,10 +15,12 @@ using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_sceneManager;
+using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
 using pkEngineSDK::uint32;
+using pkEngineSDK::TextureManager;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
@@ -28,16 +31,17 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
+  TextureManager& tm = g_TextureManager().instance();
   g_sceneManager().instantiate();
   SPtr<Actor> anchor = g_sceneManager().getLastActor();
   anchor->addComponent(newModel("sprite.fbx"));
   anchor->addComponent(createMaterial());
-  anchor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+  anchor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
   g_sceneManager().instantiate();
   SPtr<Actor> weight = g_sceneManager().getLastActor();
   weight->addComponent(newModel("sprite.fbx"));
   weight->addComponent(createMaterial());
-  weight->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+  weight->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
   m_spring = make_shared<Spring>();
   m_spring->m_anchor = anchor;
@@ -54,6 +58,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
+  TextureManager& tm = g_TextureManager().instance();
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -79,7 +84,7 @@ PhysicsApp::onInit()
   m_cannon->m_actor = g_sceneManager().getActor(0);
   m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
   m_cannon->m_actor->addComponent(createMaterial());
-  m_cannon->m_actor->getComponent<Material>()->setDiffuse(createTexture("Canon.png"));
+  m_cannon->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("Canon.png"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
@@ -101,7 +106,7 @@ PhysicsApp::onInit()
     // assign a new model component to the game object.
     proj->m_actor->addComponent(newModel("sprite.fbx"));
     proj->m_actor->addComponent(createMaterial());
-    proj->m_actor->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+    proj->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -114,7 +119,7 @@ PhysicsApp::onInit()
   obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
   obstacle.m_actor->addComponent(newModel("sprite.fbx"));
   obstacle.m_actor->addComponent(createMaterial());
-  obstacle.m_actor->getComponent<Material>()->setDiffuse(createTexture("obstacle.png"));
+  obstacle.m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("obstacle.png"));
 
   /**
    * Instantiate spring
@@ -130,7 +135,7 @@ PhysicsApp::onInit()
     SPtr<Actor> ikRoot = g_sceneManager().instantiate();
     ikRoot->addComponent(newModel("sprite.fbx"));
     ikRoot->addComponent(createMaterial());
-    ikRoot->getComponent<Material>()->setDiffuse(createTexture("circle.png"));
+    ikRoot->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
     m_ik->insertNodeLocal(Vector3(i * 2, 0, 0), ikRoot);
   }

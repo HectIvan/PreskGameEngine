@@ -1,4 +1,15 @@
+/*****************************************************************************/
+/**
+ * @file    pkLogger.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    03/03/2025
+ * @brief   Logger used for printing messages in the console.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
+
 /*********************************************/
 /**
 * Includes
@@ -15,8 +26,16 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Logger : public Module<Logger>
 {
  public:
-   Logger() = default;
+  Logger() = default;
   virtual ~Logger() = default;
+
+  /**
+   * @brief Get the error message from a HRESULT.
+   * @param _hr HRESULT to pass.
+   * @return The error message.
+   */
+  String
+  getMessageError(int32 _hr);
 
   /**
    * @brief Print a string.

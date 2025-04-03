@@ -48,6 +48,7 @@ struct CBCamera
 {
   Vector4 eye;
   Vector3 forward;
+  float unused;
 };
 
 struct KeyPosition

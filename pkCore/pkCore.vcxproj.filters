@@ -249,6 +249,9 @@
     <ClInclude Include="include\imgui_impl_win32.h">
       <Filter>include\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkTextureManager.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="source\imgui_impl_win32.cpp">
       <Filter>source\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTextureManager.cpp">
+      <Filter>source\base app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

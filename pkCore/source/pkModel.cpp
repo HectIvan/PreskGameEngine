@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "pkGraphicsAPI.h"
+#include "pkLogger.h"
 #include "pkMatrix4.h"
 #include "pkModel.h"
 #include "pkTexture.h"
@@ -120,24 +121,67 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     // mesh->mBones[i].
   }
   if (_mesh->mMaterialIndex >= 0) {
-    aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
-    uint32 textureCount = material->GetTextureCount(aiTextureType_DIFFUSE);
-    if (textureCount < 1) {
-      meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
-      meshProcess->material->setNormal(tm.createTexture("FlatNormal.png", "textures/default/"));
-      meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
-      meshProcess->material->setHeight(tm.createTexture("FlatHeight.png", "textures/default/"));
-      meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
-                                                         "textures/default/"));
+    aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
+    meshProcess->material = make_shared<Material>();
+    String meshName = _mesh->mName.C_Str();
+    meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
+    meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
+    meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
+    meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
+    meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
+                                                       "textures/default/"));
+
+    uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
+    // if no diffuse texture is found.
+    if (diffCount < 1) {
+      String matName = materialA->GetName().C_Str();
+      g_Logger().print("WARNING: Cound not find diffuse texture of material " + matName);
     }
-    for (uint32 i = 0; i < textureCount; i++) {
+    // if there are diffuse textures.
+    for (uint32 i = 0; i < diffCount; ++i) {
       aiString path;
-      material->GetTexture(aiTextureType_DIFFUSE, i, &path);
-      std::cout << "Texture path: " << path.C_Str() << std::endl;
-      meshProcess->materialPath = path.C_Str();
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
+      }
     }
-    // material->GetTexture(aiTextureType_DIFFUSE);
-    // material->Get(AI_MATKEY_COLOR_DIFFUSE, )
+
+    // get all normal maps of the mesh
+    uint32 normCount = materialA->GetTextureCount(aiTextureType_NORMALS);
+    for (uint32 i = 0; i < normCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_NORMALS, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
+      }
+    }
+    /*
+    for (uint32 i = 0; i < textureCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
+      }
+      // normals texture loading.
+      if (materialA->GetTexture(aiTextureType_NORMALS, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
+      }
+      // metallic texture loading.
+      else if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setMetallic(tm.createTexture(path.C_Str(), ""));
+      }
+      // occlussion texture lodaing.
+      else if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setOcclusion(tm.createTexture(path.C_Str(), ""));
+      }
+      // height texture lodaing.
+      else if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setOcclusion(tm.createTexture(path.C_Str(), ""));
+      }
+      meshProcess->materialPath = path.C_Str();
+    }*/
+    // materialA->GetTexture(aiTextureType_DIFFUSE);
+    // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
   }
   

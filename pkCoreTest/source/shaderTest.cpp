@@ -31,20 +31,16 @@ ShaderTest::onInit()
                 m_window.getHeight(),
                 3.1416f / 4.0f,
                 0.01f,
-                1000.0f,
+                2000.0f,
                 Vector3(0.0f, 0.0f, -30.0f), // position
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
-  g_sceneManager().instantiate();
-  SPtr<Actor> pistol = g_sceneManager().getLastActor();
+  SPtr<Actor> pistol = g_sceneManager().instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
-  pistol->addComponent(createMaterial());
-  SPtr<Material> pMaterial = pistol->getComponent<Material>();
-  pMaterial->setDiffuse(tm.createTexture("drakePistol/base_albedo.png"));
-  pMaterial->setOcclusion(tm.createTexture("drakePistol/base_AO.png"));
-  pMaterial->setMetallic(tm.createTexture("drakePistol/base_metallic.png"));
-  pMaterial->setNormal(tm.createTexture("drakePistol/base_normal.png"));
+
+  SPtr<Actor> sponza = g_sceneManager().instantiate(Matrix4::IDENTITY, pistol);
+  sponza->addComponent(newModel("sponza.obj"));
 }
 
 void

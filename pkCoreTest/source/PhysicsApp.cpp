@@ -184,18 +184,22 @@ PhysicsApp::onUpdate()
     g_RenderManager().compileShaders();
   }
 //  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
-  float strength = 10.0f;
+  float strength = 1.0f;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
+    m_ik->getLastBone()->actorIni->m_transform.setTranslation(Vector3::DOWN * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
+    m_ik->getLastBone()->actorIni->m_transform.setTranslation(Vector3::UP * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
+    m_ik->getLastBone()->actorIni->m_transform.setTranslation(Vector3::RIGHT * deltaTime * strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
+    m_ik->getLastBone()->actorIni->m_transform.setTranslation(Vector3::LEFT * deltaTime * strength);
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;

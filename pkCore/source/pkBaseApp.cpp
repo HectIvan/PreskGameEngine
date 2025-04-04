@@ -66,7 +66,7 @@ BaseApp::init(const char** _argv)
 
   createBuffers();
   g_RenderManager().init(m_window);
-  m_cameraSpeed = 5.0f;
+  m_cameraSpeed = 50.0f;
   onInit();
 }
 

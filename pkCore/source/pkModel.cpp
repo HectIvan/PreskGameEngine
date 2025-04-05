@@ -147,39 +147,14 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     }
 
     // get all normal maps of the mesh
-    uint32 normCount = materialA->GetTextureCount(aiTextureType_NORMALS);
+    uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
       // diffuse texture loading.
-      if (materialA->GetTexture(aiTextureType_NORMALS, i, &path) == AI_SUCCESS) {
+      if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
         meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
       }
     }
-    /*
-    for (uint32 i = 0; i < textureCount; ++i) {
-      aiString path;
-      // diffuse texture loading.
-      if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
-      }
-      // normals texture loading.
-      if (materialA->GetTexture(aiTextureType_NORMALS, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
-      }
-      // metallic texture loading.
-      else if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setMetallic(tm.createTexture(path.C_Str(), ""));
-      }
-      // occlussion texture lodaing.
-      else if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setOcclusion(tm.createTexture(path.C_Str(), ""));
-      }
-      // height texture lodaing.
-      else if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setOcclusion(tm.createTexture(path.C_Str(), ""));
-      }
-      meshProcess->materialPath = path.C_Str();
-    }*/
     // materialA->GetTexture(aiTextureType_DIFFUSE);
     // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);

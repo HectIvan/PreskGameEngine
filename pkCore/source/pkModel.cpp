@@ -154,7 +154,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
         meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
       }
-    }
+    } 
     // materialA->GetTexture(aiTextureType_DIFFUSE);
     // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);

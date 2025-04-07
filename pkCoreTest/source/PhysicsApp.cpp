@@ -184,34 +184,30 @@ PhysicsApp::onUpdate()
     g_RenderManager().compileShaders();
   }
 //  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
-  float strength = 1.0f;
-  Vector3 posIK = m_ik->getLastBone()->actorIni->m_transform.getTranslation3();
+  float strength = 1.0f * deltaTime;
+  Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
     m_ik->fabrik(posIK +
                  Vector3::DOWN *
-                 deltaTime *
                  strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
     m_ik->fabrik(posIK + 
                  Vector3::UP *
-                 deltaTime *
                  strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
     m_ik->fabrik(posIK +
                  Vector3::RIGHT *
-                 deltaTime *
                  strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
     m_ik->fabrik(posIK + 
-                 Vector3::DOWN *
-                 deltaTime *
+                 Vector3::LEFT *
                  strength);
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {

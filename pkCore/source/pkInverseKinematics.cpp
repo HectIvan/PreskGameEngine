@@ -9,6 +9,7 @@
  */
 /*****************************************************************************/
 #include "pkInverseKinematics.h"
+#include "pkLogger.h"
 
 // Algorithms to make:
 // 
@@ -36,9 +37,9 @@ InverseKinematics::insertNodeLocal(Vector3 _position, SPtr<Actor> _pActor)
   SPtr<IKBone> bone = make_shared<IKBone>();
 
   // if there are nodes in the chain.
-  if (!m_nodes.empty()) {
+  if (!m_bones.empty()) {
     // get the previous node transform.
-    Matrix4 rootTransform = m_nodes[m_nodes.size() - 1]->m_transform;
+    Matrix4 rootTransform = m_bones[m_bones.size() - 1]->actorIni->m_transform;
     actor->m_transform *= rootTransform;
     // fill the bone with data
     bone->iniPos = actor->m_transform.getTranslation3();
@@ -115,28 +116,57 @@ InverseKinematics::deleteLastBone()
 void
 InverseKinematics::fabrik(Vector3 _target)
 {
+  g_Logger().print(_target);
   // gte the max distance the arm can reach
   float maxDistance = 0;
   for (uint32 i = 0; i < m_bones.size(); ++i) {
     maxDistance += m_bones[i]->distance;
   }
   // distance between the target and the root
-  float dist = _target.distanceTo(m_bones[0]->iniPos);
+  float dist = _target.distanceTo(m_bones[0]->actorIni->getPosition3());
+  // bone count
+  uint32 bCount = m_bones.size();
+  // root position
+  Vector3 iniPos = m_bones[0]->actorIni->getPosition3();
   // if the distance calculated is more than the max distance of the arm
   if (dist > maxDistance) {
     // set the target to the max direction
-    Vector3 dir = (m_bones[0]->iniPos - getLastBone()->iniPos).normalized();
-    dir *= maxDistance;
-    _target = dir;
-    getLastBone()->actorIni->m_transform.setTranslation(dir);
+    Vector3 direction = (iniPos - _target).normalized();
+    // set all joints to one direction
+    for (uint32 i = 1; i < m_bones.size(); ++i) {
+      Vector3 prevPos = m_bones[i - 1]->actorIni->getPosition3();
+      Vector3 newPos = prevPos + direction * m_bones[i - 1]->distance;
+      m_bones[i]->actorIni->setPosition(newPos);
+    }
   }
+  // if the target is inside the range of the arm
+  else {
+    // forward iteration
+    Vector3 target = _target;
+    for (uint32 i = bCount - 1; i > 0; --i)
+    {
+      m_bones[i]->actorIni->setPosition(target);
+      target = (m_bones[i]->actorIni->getPosition3() +
+                target - m_bones[i]->actorIni->getPosition3()).normalized() *
+                m_bones[i]->distance;
+    }
 
-  // loop backwards on the chain
-  for (uint32 i = m_bones.size() - 1; i < 0; ++i) {
-    m_bones[i]->finalPos = _target;
+    // backward iteration
 
+    for (uint32 i = 1; i < bCount - 1; ++i) {
+      target = (m_bones[i]->actorIni->getPosition3() +
+                target - m_bones[i]->actorIni->getPosition3()).normalized() *
+                m_bones[i]->distance;
+      m_bones[i]->actorIni->setPosition(target);
+    }
   }
-
-  // m_bones[4]->finalPos = _target;
+  // forward chain loop
+  // for (uint32 i = m_bones.size() - 1; i > 0; --i) {
+  //   if (i - 1 > 0) {
+  //     Vector3 prevPos = m_bones[i - 1]->actorIni->getPosition3();
+  //     Vector3 newPos = ((_target - prevPos).normalized()) * m_bones[i - 1]->distance;
+  //     m_bones[i]->actorIni->setPosition(newPos);
+  //   }
+  // }
 }
 }

@@ -29,7 +29,7 @@ Actor::setPosition(Matrix4 _translation)
 void
 Actor::setPosition(Vector3 _position)
 {
-  m_transform = Matrix4::translation(_position);
+  m_transform.setTranslation(_position);
 }
 
 void

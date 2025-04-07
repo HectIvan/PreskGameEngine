@@ -88,6 +88,13 @@ class PK_CORE_EXPORT Actor
    */
   void
   move(float _addX, float _addY, float _addZ);
+  
+  /**
+   * @brief Get the actor position.
+   * @return The vector position.
+   */
+  Vector3
+  getPosition3() { return m_transform.getTranslation3(); }
 
   /**
    * @brief Set the rotation of the GameObject.

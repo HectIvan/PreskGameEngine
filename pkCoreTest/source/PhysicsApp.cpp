@@ -12,10 +12,11 @@
 
 using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_sceneManager;
 using pkEngineSDK::g_TextureManager;
+using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
@@ -32,16 +33,12 @@ void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
   TextureManager& tm = g_TextureManager().instance();
-  g_sceneManager().instantiate();
-  SPtr<Actor> anchor = g_sceneManager().getLastActor();
+  
+  SPtr<Actor> anchor = g_sceneManager().instantiate();
   anchor->addComponent(newModel("sprite.fbx"));
-  anchor->addComponent(createMaterial());
-  anchor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
-  g_sceneManager().instantiate();
-  SPtr<Actor> weight = g_sceneManager().getLastActor();
+  
+  SPtr<Actor> weight = g_sceneManager().instantiate();
   weight->addComponent(newModel("sprite.fbx"));
-  weight->addComponent(createMaterial());
-  weight->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
   m_spring = make_shared<Spring>();
   m_spring->m_anchor = anchor;
@@ -58,7 +55,6 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
-  TextureManager& tm = g_TextureManager().instance();
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -79,23 +75,19 @@ PhysicsApp::onInit()
   /**
    * Cannon creation
    */
-  g_sceneManager().instantiate();
+  
   m_cannon = std::make_shared<Cannon>();
-  m_cannon->m_actor = g_sceneManager().getActor(0);
+  m_cannon->m_actor = g_sceneManager().instantiate();
   m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
-  m_cannon->m_actor->addComponent(createMaterial());
-  m_cannon->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("Canon.png"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
 
   for (uint32_t i = 0; i < m_projectileCount; ++i) {
-    // instantiate an actor
-    g_sceneManager().instantiate();
     // make new instance of a projectile
     SPtr<Projectile> proj = make_shared<Projectile>();
     // get the last instance
-    proj->m_actor = g_sceneManager().getLastActor();
+    proj->m_actor = g_sceneManager().instantiate();
     // start the projectile
     proj->start();
     // set projectile speed
@@ -105,8 +97,6 @@ PhysicsApp::onInit()
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
     proj->m_actor->addComponent(newModel("sprite.fbx"));
-    proj->m_actor->addComponent(createMaterial());
-    proj->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -114,12 +104,10 @@ PhysicsApp::onInit()
   /**
    * Instantiate obstacle
    */
-  SPtr<Actor> obst = g_sceneManager().instantiate();;
+  SPtr<Actor> obst = g_sceneManager().instantiate();
   obst->m_transform = Matrix4::IDENTITY;
   obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
   obstacle.m_actor->addComponent(newModel("sprite.fbx"));
-  obstacle.m_actor->addComponent(createMaterial());
-  obstacle.m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("obstacle.png"));
 
   /**
    * Instantiate spring
@@ -130,14 +118,11 @@ PhysicsApp::onInit()
    * @brief Create IK
    */
   m_ik = make_shared<InverseKinematics>();
-  for (uint32 i = 0; i < 4; ++i)
-  {
+  for (uint32 i = 0; i < 4; ++i) {
     SPtr<Actor> ikRoot = g_sceneManager().instantiate();
     ikRoot->addComponent(newModel("sprite.fbx"));
-    ikRoot->addComponent(createMaterial());
-    ikRoot->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
-    m_ik->insertNodeLocal(Vector3(i * 2, 0, 0), ikRoot);
+    m_ik->insertNodeLocal(Vector3(i * 2, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
   }
 
 

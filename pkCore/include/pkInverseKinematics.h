@@ -24,9 +24,7 @@ namespace pkEngineSDK
 
 struct IKBone
 {
-  Vector3 iniPos;
   SPtr<Actor> actorIni = nullptr;
-  Vector3 finalPos;
   float distance;
 };
 

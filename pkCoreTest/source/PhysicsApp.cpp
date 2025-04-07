@@ -78,7 +78,7 @@ PhysicsApp::onInit()
   
   m_cannon = std::make_shared<Cannon>();
   m_cannon->m_actor = g_sceneManager().instantiate();
-  m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
+  m_cannon->m_actor->addComponent(newModel("sphere.obj"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
@@ -96,7 +96,7 @@ PhysicsApp::onInit()
     // set the projectile lifetime
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
-    proj->m_actor->addComponent(newModel("sprite.fbx"));
+    proj->m_actor->addComponent(newModel("sphere.obj"));
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -107,7 +107,7 @@ PhysicsApp::onInit()
   SPtr<Actor> obst = g_sceneManager().instantiate();
   obst->m_transform = Matrix4::IDENTITY;
   obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
-  obstacle.m_actor->addComponent(newModel("sprite.fbx"));
+  obstacle.m_actor->addComponent(newModel("sphere.obj"));
 
   /**
    * Instantiate spring
@@ -120,7 +120,7 @@ PhysicsApp::onInit()
   m_ik = make_shared<InverseKinematics>();
   for (uint32 i = 0; i < 4; ++i) {
     SPtr<Actor> ikRoot = g_sceneManager().instantiate();
-    ikRoot->addComponent(newModel("sprite.fbx"));
+    ikRoot->addComponent(newModel("sphere.obj"));
 
     m_ik->insertNodeLocal(Vector3(i * 2, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
   }
@@ -169,7 +169,7 @@ PhysicsApp::onUpdate()
     g_RenderManager().compileShaders();
   }
 //  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
-  float strength = 1.0f * deltaTime;
+  float strength = 5.0f * deltaTime;
   Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);

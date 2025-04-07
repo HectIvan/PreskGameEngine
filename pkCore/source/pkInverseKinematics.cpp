@@ -38,19 +38,14 @@ InverseKinematics::insertNodeLocal(Vector3 _position, SPtr<Actor> _pActor)
 
   // if there are nodes in the chain.
   if (!m_bones.empty()) {
-    // fill the bone with data
-    bone->iniPos = _position;
+    // fill the bone with data 
     bone->actorIni = actor;
     SPtr<IKBone> lastBone = getLastBone();
-    // bone->distance = lastBone->iniPos.distanceTo(bone->iniPos);
-    // previous bone final position is the start of this new bone
-    lastBone->finalPos = bone->iniPos;
     // fill the previous bone with data
-    lastBone->distance = lastBone->iniPos.distanceTo(_position);
+    lastBone->distance = lastBone->actorIni->getPosition3().distanceTo(_position);
   }
   // if there are no nodes in the chain
   else {
-    bone->iniPos = _position;
     bone->actorIni = actor;
   }
   // m_nodes.push_back(actor);

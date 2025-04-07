@@ -5,8 +5,7 @@
  * @date    20/03/2025
  * @brief
  *
- * @bug    Distance between root and first node will not apply if the
- *         IK is not fully extended.
+ * @bug    No known bugs.
  */
 /*****************************************************************************/
 #pragma once

@@ -143,7 +143,8 @@ public:
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
-                bool _mipLevels) = 0;
+                bool _mipLevels,
+                uint32 _shaderResourceFormat) = 0;
 
   /**
   * Create the sampler state.

@@ -48,6 +48,8 @@ struct CBCamera
 {
   Vector4 eye;
   Vector3 forward;
+  Matrix4 view;
+  Matrix4 projection;
   float unused;
 };
 

@@ -117,7 +117,7 @@ InverseKinematics::fabrik(Vector3 _target)
   // distance between the target and the root
   float dist = _target.distanceTo(m_bones[0]->actorIni->getPosition3());
   // bone count
-  uint32 bCount = m_bones.size();
+  uint32 bCount = static_cast<uint32>(m_bones.size());
   // root position
   Vector3 iniPos = m_bones[0]->actorIni->getPosition3();
   // if the distance calculated is more than the max distance of the arm

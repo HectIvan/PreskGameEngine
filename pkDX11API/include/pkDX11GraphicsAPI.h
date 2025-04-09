@@ -138,7 +138,8 @@ class DX11GraphicsAPI : public GraphicsAPI
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
-                bool _mipLevels) override;
+                bool _mipLevels,
+                uint32 _shaderResourceFormat) override;
 
   /**
    * @brief Create the sampler state.

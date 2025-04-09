@@ -17,6 +17,7 @@ using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::RendererManager;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::TEXTURE_FORMATS::kPK_FORMAT_R32G32B32_FLOAT;
@@ -26,7 +27,6 @@ using pkEngineSDK::uint32;
 void
 ShaderTest::onInit()
 {
-  TextureManager& tm = g_TextureManager().instance();
   m_camera.init(m_window.getWidth(),
                 m_window.getHeight(),
                 3.1416f / 4.0f,
@@ -89,18 +89,18 @@ ShaderTest::onUpdate()
 
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationY(rot);
+    m_camera.view *= Matrix4::rotationY(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    actor->m_transform *= Matrix4::rotationY(rot);
+    rot *= -1.0f;
+    m_camera.view *= Matrix4::rotationY(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationX(rot);
+    m_camera.view *= Matrix4::rotationX(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    actor->m_transform *= Matrix4::rotationX(rot);
+    m_camera.view *= Matrix4::rotationX(rot);
   }
 }
 

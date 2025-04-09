@@ -39,12 +39,6 @@ Pass::createInputLayout()
 }
 
 void
-Pass::setInputLayout()
-{
-  g_GraphicAPI().setInputLayout(m_pInputLayout);
-}
-
-void
 Pass::createSamplerState(uint32 _mode, uint32 _filter)
 {
   m_pSamplerState = g_GraphicAPI().createSamplerState(_mode, _filter);

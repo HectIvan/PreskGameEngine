@@ -422,7 +422,7 @@ DX11GraphicsAPI::createDepthStencilView(SPtr<Texture> _depthRT)
   SPtr<DX11DepthStencilView> pDepthSView = make_shared<DX11DepthStencilView>();
   D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
   ZeroMemory(&descDSV, sizeof(descDSV));
-  descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+  descDSV.Format = DXGI_FORMAT_D32_FLOAT; // DXGI_FORMAT_D24_UNORM_S8_UINT;
   descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
   descDSV.Texture2D.MipSlice = 0;
 
@@ -576,12 +576,13 @@ DX11GraphicsAPI::compileShaderFromFile(WString _szFileName,
                           0,
                           &dxShader->pSBlob,
                           &pErrorBlob);
-  if (hr != 0x00000000)
+  if (FAILED(hr))
   {
     if (pErrorBlob != nullptr)
     {
-      String errText(reinterpret_cast<char*>(pErrorBlob->GetBufferPointer()));
-      g_Logger().print("Failed to compile shader: " + errText);
+      // String errText(reinterpret_cast<char*>(pErrorBlob->GetBufferPointer()));
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to compile shader: " + errMsg);
     }
     safeRelease(pErrorBlob);
     return;
@@ -902,7 +903,15 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   pitch = width * bpp;
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(data, bpp, width, height, _format, 0, _bindFlags, _mipLevels);
+  SPtr<Texture> temptTexture = createTexture(data,
+                                             bpp,
+                                             width,
+                                             height,
+                                             _format,
+                                             0,
+                                             _bindFlags,
+                                             _mipLevels,
+                                             _format);
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -944,7 +953,8 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
                                uint32 _format,
                                uint32 _usage,
                                uint32 _bindFlags,
-                               bool _mipLevels)
+                               bool _mipLevels,
+                               uint32 _shaderResourceFormat)
 {
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -977,37 +987,47 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a texture.");
   }
+  // hresult
+  int32 hr = 0;
+  /**
+   * Set shader resource.
+   */
   if ((_bindFlags & D3D11_BIND_SHADER_RESOURCE) == D3D11_BIND_SHADER_RESOURCE) {
     // Create the shader resource descriptor for the texture
     D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
     memset(&sDesc, 0, sizeof(sDesc));
-    sDesc.Format = desc.Format;
+    sDesc.Format = static_cast<DXGI_FORMAT>(_shaderResourceFormat); // desc.Format; // DXGI_FORMAT_R32_FLOAT
     sDesc.Texture2D.MipLevels = desc.MipLevels;
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-    device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
+    // create the texture
+    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
+    // if texture creation failed
+    if (FAILED(hr)) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create a texture. Error: " + errMsg);
+    }
     // create the shader resource view
-    device->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
-    if (!tex->srv) { g_Logger().print("Failed to create a shader resource view"); } // failed to create shader resource view
+    hr = device->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
+    // if failed to create shader resource view
+    if (FAILED(hr)) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create a shader resource view. Error: " + errMsg);
+    }
   }
-
+  /**
+   * Set Depth stencil
+   */
   if ((_bindFlags & D3D11_BIND_DEPTH_STENCIL) == D3D11_BIND_DEPTH_STENCIL) {
-    // D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-    // memset(&dsvDesc, 0, sizeof(dsvDesc));
-    // dsvDesc.Format = desc.Format;
-    // dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    // dsvDesc.Texture2D.MipSlice = 0;
-    // m_pDevice->pd3dDevice->CreateDepthStencilView(tex->t2d, &dsvDesc, &tex->m_dSV);
-    // if (!pDepthSView->pDepthSV) { return nullptr; }
-
+    // texture description
     D3D11_TEXTURE2D_DESC descDepth;
     ZeroMemory(&descDepth, sizeof(descDepth));
     descDepth.Width = _width;
     descDepth.Height = _height;
     descDepth.MipLevels = 1;
     descDepth.ArraySize = 1;
-    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    descDepth.Format = DXGI_FORMAT_D32_FLOAT; // DXGI_FORMAT_D24_UNORM_S8_UINT;
     descDepth.SampleDesc.Count = 1;
     descDepth.SampleDesc.Quality = 0;
     descDepth.Usage = D3D11_USAGE_DEFAULT;
@@ -1015,19 +1035,36 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     descDepth.CPUAccessFlags = 0;
     descDepth.MiscFlags = 0;
 
-    device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
-    if (!tex->t2d) { g_Logger().print("Failed to create the depth stencil."); }
+    // create the texture
+    hr = device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
+    if (!tex->t2d) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create the depth stencil. Error: " + errMsg);
+    }
   }
-
+  /**
+   * Set render target
+   */
   if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
+    // render target description
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
     memset(&rtvDesc, 0, sizeof(rtvDesc));
     rtvDesc.Format = desc.Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
-    device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
-    device->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
-    if (!tex->m_rTV) { g_Logger().print("Failed to create a render target view."); }
+
+    // create the render target texture
+    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
+    if (FAILED(hr)) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create RT texture. Error: " + errMsg);
+    }
+    // create the render target itself
+    hr = device->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
+    if (FAILED(hr)) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create a render target view. Error: " + errMsg);
+    }
   }
   return tex;
 }

@@ -110,7 +110,7 @@ class PhysicsApp : public BaseApp
  public:
   PHYSICS_TYPE::E m_type;
 
-  Obstacle obstacle;
+  Vector<SPtr<Obstacle>> obstacles;
 
   uint32_t m_projectileCount;
   float m_projDuration;

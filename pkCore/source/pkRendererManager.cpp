@@ -5,6 +5,7 @@
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
 #include "pkScene.h"
+#include "pkTextureManager.h"
 
 using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
 using PK_USAGE::kPK_USAGE_DEFAULT;
@@ -16,34 +17,52 @@ namespace pkEngineSDK
 {
 void RendererManager::init(Window& _window)
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // create the render targets and depth stencil view
-  m_pRTargetView = g_GraphicAPI().createRenderTargetView();
+  m_pRTargetView = api.createRenderTargetView();
 
-  m_pDepthRT = g_GraphicAPI().createTexture(nullptr,
-                                            4,
-                                            _window.getWidth(),
-                                            _window.getHeight(),
-                                            kPK_FORMAT_R32G32B32A32_FLOAT,
-                                            kPK_USAGE_DEFAULT,
-                                            kPK_BIND_DEPTH_STENCIL,
-                                            false);
+  m_pDepthRT = api.createTexture(nullptr,
+                                 4,
+                                 _window.getWidth(),
+                                 _window.getHeight(),
+                                 TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
+                                 kPK_USAGE_DEFAULT,
+                                 kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL,
+                                 false,
+                                 TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
 
-  m_pNormalRT = g_GraphicAPI().createTexture(nullptr,
-                                             4,
-                                             _window.getWidth(),
-                                             _window.getHeight(),
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false);
+  m_pNormalRT = api.createTexture(nullptr,
+                                  4,
+                                  _window.getWidth(),
+                                  _window.getHeight(),
+                                  kPK_FORMAT_R32G32B32A32_FLOAT,
+                                  kPK_USAGE_DEFAULT,
+                                  kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                  false,
+                                  kPK_FORMAT_R32G32B32A32_FLOAT);
 
-  m_pDepthSView = g_GraphicAPI().createDepthStencilView(m_pDepthRT);
+  m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
+
+  // create shadow mapping
+  m_pShadowDepth = api.createTexture(nullptr,
+                                     4,
+                                     _window.getWidth(),
+                                     _window.getHeight(),
+                                     TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
+                                     kPK_USAGE_DEFAULT,
+                                     kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL,
+                                     false,
+                                     TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+
+  m_pShadowDepthSV = api.createDepthStencilView(m_pShadowDepth);
+
   Vector<SPtr<Texture>> rTVector;
   rTVector.push_back(m_pRTargetView);
   rTVector.push_back(m_pNormalRT);
   rTVector.push_back(m_pDepthRT);
+
   // set the render targets
-  g_GraphicAPI().setRenderTargets(rTVector, m_pDepthSView);
+  api.setRenderTargets(rTVector, m_pDepthSView);// m_pDepthSView);
   // create the passes needed
   createPasses();
 }
@@ -66,9 +85,34 @@ RendererManager::createPasses()
   basePass->createInputLayout();
   basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  basePass->setInputLayout();
+  g_GraphicAPI().setInputLayout(basePass->getInputLayout());
   // insert to the pass map.
   m_passes.insert({ 0, basePass });
+
+  SPtr<Pass> shadowPass = make_shared<Pass>();
+  // create all pointers
+  shadowPass->create();
+  shadowPass->setVSData(L"shaders/pkShadowMapping.hlsl", "VS", "vs_5_0");
+  shadowPass->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
+  shadowPass->compileShaders();
+  shadowPass->createShaders();
+  shadowPass->createInputLayout();
+  shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
+                                 SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  m_passes.insert({ 1, shadowPass });
+
+  //SPtr<Pass> AOPass = make_shared<Pass>();
+  //// create all pointers
+  //AOPass->create();
+  //// set and compile shaders
+  //AOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  //AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
+  //AOPass->compileShaders();
+  //AOPass->createShaders();
+  //AOPass->createInputLayout();
+  //AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+  //                           SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  //m_passes.insert({ 1, AOPass });
 }
 
 void
@@ -92,18 +136,22 @@ RendererManager::updateCameraBuffers(Camera* _pCamera)
   // Update view
   CBView viewBuffer = CBView();
   viewBuffer.view = _pCamera->view.getTransposed();
-  api.updateConstantBuffer(m_cBView, &viewBuffer, 0);
+  m_CView = _pCamera->view.getTransposed();
+  updateBuffer(viewBuffer, m_cBView);
 
   // Update projection
   CBProjection projectionBuffer = CBProjection();
   projectionBuffer.projection = _pCamera->projection.getTransposed();
-  api.updateConstantBuffer(m_cBProjection, &projectionBuffer, 0);
+  m_CProj = _pCamera->projection.getTransposed();
+  updateBuffer(projectionBuffer, m_cBProjection);
 
   // update camera
   CBCamera cameraBuffer = CBCamera();
   cameraBuffer.eye = _pCamera->eye;
   cameraBuffer.forward = _pCamera->getForward();
-  api.updateConstantBuffer(m_cbCamera, &cameraBuffer, 0);
+  cameraBuffer.view = _pCamera->view;
+  cameraBuffer.projection = _pCamera->projection;
+  updateBuffer(cameraBuffer, m_cbCamera);
 }
 
 template<typename T>
@@ -116,6 +164,12 @@ RendererManager::actorToClass(SPtr<Actor>& _subject)
   if (aTC) { return aTC; }
   // casting failed
   return nullptr;
+}
+
+template<class T> void
+RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
+{
+  g_GraphicAPI().updateConstantBuffer(_pCBuffer, &_data, 0);
 }
   
 void
@@ -167,34 +221,67 @@ RendererManager::render()
   // screen clear color
   float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
   GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& renderer = g_RenderManager().instance();
 
+  // set light
+  light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  light.SpotCutoff = 1.0f;
+  light.SpotExponent = 32.0f;
+  light.LightDir = Vector3::FORWARD;
+  light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
+  light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
+
+  /*
+   * Shadow Map render
+  api.clearRenderTargetView(clearColor, m_pRTargetView);
+  api.clearDepthBuffer(1.0f, m_pShadowDepthSV);
+  
+  // set the base pass for the shadow rendering stage
+  api.setPSShader(m_passes.find(1)->second->getPShader());
+  api.setVSShader(m_passes.find(1)->second->getVShader());
+  api.setSampler(m_passes.find(1)->second->getSamplerState());
+  
+  Camera lightCam;
+  lightCam.init(30,
+                17,
+                3.1416f / 4.0f,
+                0.01f,
+                1000.0f,
+                light.LightPos, // position
+                light.LightDir, // target
+                Vector3::UP,
+                pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
+  
+  Matrix4 lightProj = lightCam.projection.getTransposed();
+  Matrix4 lightView = lightCam.view.getTransposed();
+  
+  api.updateConstantBuffer(m_cBView, &lightView, static_cast<uint32>(sizeof(CBView)));
+  api.updateConstantBuffer(m_cBProjection, &lightProj, static_cast<uint32>(sizeof(CBProjection)));
+  
+  // set constant buffers for the pixel and vertex shaders
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
+  // render the objects
+  renderActors(g_sceneManager().getAllActors());*/
+
+  api.updateConstantBuffer(m_cbLight,
+    &light,
+    static_cast<uint32>(sizeof(Light)));
   api.clearRenderTargetView(clearColor, m_pRTargetView);
   api.clearDepthBuffer(1.0f, m_pDepthSView);
 
+  // set the base pass for the first rendering stage
+  api.setPSShader(m_passes.find(0)->second->getPShader());
+  api.setVSShader(m_passes.find(0)->second->getVShader());
+  api.setSampler(m_passes.find(0)->second->getSamplerState());
 
-  Map<uint32, SPtr<Pass>>::iterator it;
-  for (it = m_passes.begin(); it != m_passes.end(); ++it) {
-    // Set shaders
-    api.setPSShader(it->second->getPShader());
-    api.setVSShader(it->second->getVShader());
-  }
-  // set light
-  renderer.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  renderer.light.SpotCutoff = 1.0f;
-  renderer.light.SpotExponent = 32.0f;
-  renderer.light.LightDir = Vector3::FORWARD;
-  renderer.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  renderer.light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
-  // update the light buffer
-  api.updateConstantBuffer(m_cbLight,
-                           &light,
-                           static_cast<uint32>(sizeof(Light)));
+  api.updateConstantBuffer(m_cBView, &m_CView, static_cast<uint32>(sizeof(CBView)));
+  api.updateConstantBuffer(m_cBProjection, &m_CProj, static_cast<uint32>(sizeof(CBProjection)));
+
   // set constant buffers for the pixel and vertex shaders
-  renderer.VSSetConstantBuffers();
-  renderer.PSSetConstantBuffers();
+  VSSetConstantBuffers();
+  PSSetConstantBuffers();
   // render the objects
-  renderer.renderActors(g_sceneManager().getAllActors());
+  renderActors(g_sceneManager().getAllActors());
 }
 
 void
@@ -222,24 +309,7 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
      * Recast to a gameobject. If it fails, do none of this
      */
     SPtr<GameObject> gameObject = actorToClass<GameObject>(_gameActors[i]);
-    if (gameObject) {
-      // set the diffuse texture to the resource view if the model has a material
-      if (gameObject->getComponent<Material>()) {
-        // get the material
-        SPtr<Material> material = gameObject->getComponent<Material>();
-        // set the material textures to the shader
-        g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
-        g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
-        g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
-        g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
-        g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
-
-        // get the basic bass sampler and set it to the pixel shader
-      }
-      g_GraphicAPI().setSampler(m_passes.find(0)->second->getSamplerState());
-      // render the model component
-      renderModel(*gameObject->getComponent<Model>());
-    }
+    renderModel(*gameObject->getComponent<Model>());
     // if the actor has children, do the same for them
     if (!_gameActors[i]->m_children.empty()) {
       renderActors(_gameActors[i]->m_children);

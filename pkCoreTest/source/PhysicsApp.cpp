@@ -21,6 +21,7 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
 using pkEngineSDK::uint32;
+using pkEngineSDK::RendererManager;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
@@ -32,8 +33,6 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
-  TextureManager& tm = g_TextureManager().instance();
-  
   SPtr<Actor> anchor = g_sceneManager().instantiate();
   anchor->addComponent(newModel("sprite.fbx"));
   
@@ -55,6 +54,16 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
+  RendererManager& rm = g_RenderManager().instance();
+  TextureManager& tm = g_TextureManager().instance();
+  // set light
+  rm.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  rm.light.SpotCutoff = 1.0f;
+  rm.light.SpotExponent = 32.0f;
+  rm.light.LightDir = Vector3::FORWARD * -1.0f;
+  rm.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
+  rm.light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
+
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -75,7 +84,6 @@ PhysicsApp::onInit()
   /**
    * Cannon creation
    */
-  
   m_cannon = std::make_shared<Cannon>();
   m_cannon->m_actor = g_sceneManager().instantiate();
   m_cannon->m_actor->addComponent(newModel("sphere.obj"));
@@ -104,10 +112,10 @@ PhysicsApp::onInit()
   /**
    * Instantiate obstacle
    */
-  SPtr<Actor> obst = g_sceneManager().instantiate();
-  obst->m_transform = Matrix4::IDENTITY;
-  obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
-  obstacle.m_actor->addComponent(newModel("sphere.obj"));
+  // SPtr<Actor> obst = g_sceneManager().instantiate();
+  // obst->m_transform = Matrix4::IDENTITY;
+  // obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
+  // obstacle.m_actor->addComponent(newModel("sphere.obj"));
 
   /**
    * Instantiate spring
@@ -118,13 +126,20 @@ PhysicsApp::onInit()
    * @brief Create IK
    */
   m_ik = make_shared<InverseKinematics>();
-  for (uint32 i = 0; i < 4; ++i) {
+  for (uint32 i = 0; i < 20; ++i) {
     SPtr<Actor> ikRoot = g_sceneManager().instantiate();
     ikRoot->addComponent(newModel("sphere.obj"));
+    ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 
-    m_ik->insertNodeLocal(Vector3(i * 2, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+    m_ik->insertNodeLocal(Vector3(i * -0.5, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+
+    SPtr<Obstacle> obs = make_shared<Obstacle>();
+    obs->m_actor = ikRoot;
+    obs->m_bounciness = 0.9f;
+    obs->m_sphere.m_origin = ikRoot->getPosition3();
+    obs->m_sphere.m_radius = 0.5f;
+    obstacles.push_back(obs);
   }
-
 
   m_fireDirection = Vector2(0.0f);
 }
@@ -194,6 +209,21 @@ PhysicsApp::onUpdate()
     m_ik->fabrik(posIK + 
                  Vector3::LEFT *
                  strength);
+  }
+
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
+    Vector3 mousePos = Vector3(m_eventQueue.mousePosition.x,
+                               m_eventQueue.mousePosition.y,
+                               0.0f);
+    float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
+    float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
+    float ndcZ = 0.0f;
+
+    Vector3 ndcPos = Vector3(ndcX, ndcY, ndcZ);
+    g_Logger().print(mousePos);
+    m_ik->fabrik(mousePos * 0.01f);
+    if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
+    }
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
@@ -299,8 +329,10 @@ void
 PhysicsApp::checkObstacles()
 {
   for (uint32 i = 0; i < m_projectiles.size(); ++i) {
-    m_projectiles[i]->obstacleBounce(obstacle.m_actor->m_transform.getTranslation3(), 
-                                     obstacle.m_sphere.m_radius);
+    for (uint32 j = 0; j < obstacles.size(); ++j) {
+      m_projectiles[i]->obstacleBounce(obstacles[j]->m_actor->getPosition3(),
+                                       obstacles[j]->m_sphere.m_radius);
+    }
   }
 }
 

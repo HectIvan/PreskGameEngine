@@ -40,39 +40,30 @@ class PK_CORE_EXPORT Model : public Component
   }
 
   /**
-  * Load the model from a path.
-  * 
-  * @param _path
-  * File path.
+  * @brief Load the model from a path.
+  * @param _path File path.
   **/
   void
   load(String& _path);
 
   /**
-  * Get the map of bones assigned to the model.
-  * 
-  * @return
-  * The bone map.
-  **/
+   * @brief Get the map of bones assigned to the model.
+   * @return The bone map.
+   */
   auto&
   getBoneInfoMap() { return boneMap; }
 
   /**
-  * Get the ammount of bones in the model.
-  * 
-  * @return
-  * The bone count.
-  **/
+   * @brief Get the ammount of bones in the model.
+   * @return The bone count.
+   */
   uint32
   getBoneCount() { return boneCounter; }
 
   /**
-  * Set the data of the vertex to a default
-  * value
-  * 
-  * @param _vertex
-  * Vertex to set to default.
-  **/
+   * @brief Set the data of the vertex to a default value
+   * @param _vertex Vertex to set to default.
+   */
   void
   setVertexBoneDataToDefault(SimpleVertex& _vertex)
   {
@@ -84,43 +75,40 @@ class PK_CORE_EXPORT Model : public Component
   }
 
   /**
-  * Assign bone data to a vertex.
-  * 
-  * @param _vertex
-  * Vertex to modify.
-  * 
-  * @param _boneID
-  * What bone id it will have.
-  * 
-  * @param _weight
-  * How much influence will the bone have.
-  **/
+   * @brief Assign bone data to a vertex.
+   * @param _vertex Vertex to modify.
+   * @param _boneID What bone id it will have.
+   * @param _weight How much influence will the bone have.
+   */
   void
   setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
 
   /**
-  * Get the component type of this component.
-  * 
-  * @return
-  * The component type.
-  **/
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
   COMPONENT_TYPE::E
   getType() override { return COMPONENT_TYPE::kModel; }
 
   /**
-  * Get the component type of this component.
-  * 
-  * @return
-  * The component type.
-  **/
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
   static COMPONENT_TYPE::E
   getObjType() { return COMPONENT_TYPE::kModel; }
 
   /**
-  * Clean all data from the model.
-  **/
+   * @brief Clean all data from the model.
+   */
   void
   clean();
+
+  /**
+   * @brief Gets all the meshes of the model.
+   * @return A vector with all the meshes.
+   */
+  Vector<SPtr<Mesh>>
+  getMeshes() { return meshes; }
 
  public:
   // vertex and index data

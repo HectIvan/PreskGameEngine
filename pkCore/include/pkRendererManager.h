@@ -51,6 +51,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   createPasses();
 
   /**
+   * @brief Compile the shaders of all passes.
+   */
+  void
+  compileShaders();
+
+  /**
    * @brief Update the camera.
    * @param _pCamera Camera to update.
    */
@@ -82,13 +88,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Set the buffers of each game object.
    */
   void
-  setActorsBuffers(Scene& _scene);
+  setActorsBuffers();
 
   /**
    * @brief Render a scene
    */
   void
-  render(Scene& _scene);
+  render();
 
   /**
    * @brief Render a list of actors.
@@ -104,16 +110,24 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   void
   renderModel(Model& _model);
 
+  /**
+   * @brief Update a constant buffer.
+   * @param _data Data to update the cBuffer with.
+   * @param _pCBuffer Constant buffer to update.
+   */
+  template<class T> void
+  updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer);
+
  public:
   // light source
   Light light;
 
   // constant buffers
-  SPtr<ConstantBuffer> m_buffer;
   SPtr<ConstantBuffer> m_cBView;
   SPtr<ConstantBuffer> m_cBProjection;
   SPtr<ConstantBuffer> m_cBWorld;
   SPtr<ConstantBuffer> m_cbLight;
+  SPtr<ConstantBuffer> m_cbCamera;
 
   // render targets
   SPtr<Texture> m_pRTargetView;
@@ -122,10 +136,17 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
 
   // depth stencil
   SPtr<DepthStencilView> m_pDepthSView;
-  // SPtr<Texture> m_pDepthSView;
 
   // passes
   Map<uint32, SPtr<Pass>> m_passes;
+
+  // shadows
+  SPtr<Texture> m_pShadowDepth;
+  SPtr<DepthStencilView> m_pShadowDepthSV;
+
+  // main camera storage
+  Matrix4 m_CView;
+  Matrix4 m_CProj;
 };
 
 PK_CORE_EXPORT RendererManager&

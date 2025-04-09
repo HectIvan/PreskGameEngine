@@ -30,9 +30,8 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Actor
 {
  public:
-  Actor();
-  virtual ~Actor()
-  {
+   Actor();
+  virtual ~Actor() {
     clear();
   }
 
@@ -89,6 +88,13 @@ class PK_CORE_EXPORT Actor
    */
   void
   move(float _addX, float _addY, float _addZ);
+  
+  /**
+   * @brief Get the actor position.
+   * @return The vector position.
+   */
+  Vector3
+  getPosition3() { return m_transform.getTranslation3(); }
 
   /**
    * @brief Set the rotation of the GameObject.
@@ -162,8 +168,12 @@ class PK_CORE_EXPORT Actor
     return nullptr;
   }
 
-  virtual void
-  update(float _deltaTime) {}
+  /**
+   * @brief Update the actor.
+   * @brief _deltaTime Time between frames.
+   */
+  void
+  update(float _deltaTime);
 
   /**
    * @brief Get a specific child of the actor.
@@ -202,6 +212,7 @@ class PK_CORE_EXPORT Actor
 
  public:
   bool m_active = true;
+  Vector3 m_forward;
   Vector<SPtr<Component>> m_components;
   Vector<SPtr<Actor>> m_children;
   SPtr<Actor> m_parent;

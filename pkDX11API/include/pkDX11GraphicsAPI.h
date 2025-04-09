@@ -138,7 +138,8 @@ class DX11GraphicsAPI : public GraphicsAPI
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
-                bool _mipLevels) override;
+                bool _mipLevels,
+                uint32 _shaderResourceFormat) override;
 
   /**
    * @brief Create the sampler state.
@@ -152,7 +153,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _height Client height.
    */
   SPtr<DepthStencilView>
-  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) override;
+  createDepthStencilView(SPtr<Texture> _depthRT) override;
 
   /**
    * @brief Set input layout
@@ -240,6 +241,28 @@ class DX11GraphicsAPI : public GraphicsAPI
                         uint32 _numViews = 1) override;
 
   /**
+   * @brief Set a texture to the resource view of a pixel shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  void
+  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) override;
+
+  /**
+   * @brief Set a texture to the resource view of a vertex shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  void
+  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) override;
+
+  /**
    * @brief Create the device and swap chain.
    * @param _width Client width.
    * @param _height Client height.
@@ -292,8 +315,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Get the device pointer.
    * @return Return te pointer to the device.
    */
-  SPtr<DX11Device>
-  getDevice() { return m_pDevice; }
+  SPtr<Device>
+  getDevice() override { return m_pDevice; }
 
   /**
    * @brief Draw the indexed data.
@@ -365,6 +388,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
  private:
   // api device
-  SPtr<DX11Device> m_pDevice;
+  SPtr<Device> m_pDevice;
 };
 }

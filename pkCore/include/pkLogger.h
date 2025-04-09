@@ -2,8 +2,8 @@
 /**
  * @file    pkLogger.h
  * @author  Héctor Iván Muñoz Ceballos
- * @date    07/03/2025
- * @brief   Engine Logger used for logging in text to the console.
+ * @date    03/03/2025
+ * @brief   Logger used for printing messages in the console.
  *
  * @bug    No known bugs.
  */
@@ -29,7 +29,12 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   Logger() = default;
   virtual ~Logger() = default;
 
-  static String
+  /**
+   * @brief Get the error message from a HRESULT.
+   * @param _hr HRESULT to pass.
+   * @return The error message.
+   */
+  String
   getMessageError(int32 _hr);
 
   /**

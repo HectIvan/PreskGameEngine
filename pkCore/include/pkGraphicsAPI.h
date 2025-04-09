@@ -143,7 +143,8 @@ public:
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
-                bool _mipLevels) = 0;
+                bool _mipLevels,
+                uint32 _shaderResourceFormat) = 0;
 
   /**
   * Create the sampler state.
@@ -157,7 +158,7 @@ public:
    * @param _height Client height.
    */
   virtual SPtr<DepthStencilView>
-  createDepthStencilView(uint32 _width, uint32 _height, SPtr<Texture> _depthRT) = 0;
+  createDepthStencilView(SPtr<Texture> _depthRT) = 0;
 
   /**
   * Set input layout
@@ -257,6 +258,28 @@ public:
                         uint32 _numViews = 1) = 0;
 
   /**
+   * @brief Set a texture to the resource view of a pixel shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  virtual void
+  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) = 0;
+
+  /**
+   * @brief Set a texture to the resource view of a vertex shader.
+   * @param _pTexture Pointer to the texture.
+   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _numViews The number of resources that will be passed
+   */
+  virtual void
+  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) = 0;
+
+  /**
    * @brief Set the render targets to the device.
    */
   // virtual void
@@ -340,6 +363,13 @@ public:
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) = 0;
+
+  /**
+   * @brief Get the api device.
+   * @return The Pointer to the device
+   */
+  virtual SPtr<Device>
+  getDevice() = 0;
 
   /**
   * Draw the indexed data.

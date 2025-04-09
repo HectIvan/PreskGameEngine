@@ -1,6 +1,22 @@
+/*****************************************************************************/
+/**
+ * @file    pkLogger.cpp
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    03/03/2025
+ * @brief   Logger used for printing messages in the console.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
+
+ /*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include <iostream>
 
-#include "pkDebug.h"
+#include "pkLogger.h"
 
 using std::cout;
 using std::endl;
@@ -36,14 +52,13 @@ Logger::getMessageError(int32 _hr)
   return message;
 }
 }
-
 #endif
 
 namespace pkEngineSDK
 {
 
 void
-Debug::print(String _text)
+Logger::print(String _text)
 {
   cout << _text << endl << endl;
 }
@@ -96,7 +111,6 @@ Logger::print(Matrix4 _matrix)
        << _matrix.matrix[3][2] << " "
        << _matrix.matrix[3][3] << " " << endl << endl;
 }
-
 PK_CORE_EXPORT Logger&
 g_Logger()
 {

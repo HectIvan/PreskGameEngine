@@ -12,15 +12,17 @@
 
 using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_sceneManager;
 using pkEngineSDK::g_TextureManager;
+using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
-using pkEngineSDK::TextureManager;
 using pkEngineSDK::uint32;
+using pkEngineSDK::RendererManager;
+using pkEngineSDK::TextureManager;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
@@ -31,18 +33,11 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
-  // get the texture manager
-  TextureManager& tm = g_TextureManager().instance();
-  g_sceneManager().instantiate();
-  SPtr<Actor> anchor = g_sceneManager().getLastActor();
+  SPtr<Actor> anchor = g_sceneManager().instantiate();
   anchor->addComponent(newModel("sprite.fbx"));
-  anchor->addComponent(createMaterial());
-  anchor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
-  g_sceneManager().instantiate();
-  SPtr<Actor> weight = g_sceneManager().getLastActor();
+  
+  SPtr<Actor> weight = g_sceneManager().instantiate();
   weight->addComponent(newModel("sprite.fbx"));
-  weight->addComponent(createMaterial());
-  weight->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
 
   m_spring = make_shared<Spring>();
   m_spring->m_anchor = anchor;
@@ -59,8 +54,16 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
-  // get the texture manager
+  RendererManager& rm = g_RenderManager().instance();
   TextureManager& tm = g_TextureManager().instance();
+  // set light
+  rm.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+  rm.light.SpotCutoff = 1.0f;
+  rm.light.SpotExponent = 32.0f;
+  rm.light.LightDir = Vector3::FORWARD * -1.0f;
+  rm.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
+  rm.light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
+
   m_camera.init(30,
                 17,
                 3.1416f / 4.0f,
@@ -81,23 +84,18 @@ PhysicsApp::onInit()
   /**
    * Cannon creation
    */
-  g_sceneManager().instantiate();
   m_cannon = std::make_shared<Cannon>();
-  m_cannon->m_actor = g_sceneManager().getActor(0);
-  m_cannon->m_actor->addComponent(newModel("sprite.fbx"));
-  m_cannon->m_actor->addComponent(createMaterial());
-  m_cannon->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("Canon.png"));
+  m_cannon->m_actor = g_sceneManager().instantiate();
+  m_cannon->m_actor->addComponent(newModel("sphere.obj"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
 
   for (uint32_t i = 0; i < m_projectileCount; ++i) {
-    // instantiate an actor
-    g_sceneManager().instantiate();
     // make new instance of a projectile
     SPtr<Projectile> proj = make_shared<Projectile>();
     // get the last instance
-    proj->m_actor = g_sceneManager().getLastActor();
+    proj->m_actor = g_sceneManager().instantiate();
     // start the projectile
     proj->start();
     // set projectile speed
@@ -106,9 +104,7 @@ PhysicsApp::onInit()
     // set the projectile lifetime
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the game object.
-    proj->m_actor->addComponent(newModel("sprite.fbx"));
-    proj->m_actor->addComponent(createMaterial());
-    proj->m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
+    proj->m_actor->addComponent(newModel("sphere.obj"));
     // add the game object to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -116,12 +112,10 @@ PhysicsApp::onInit()
   /**
    * Instantiate obstacle
    */
-  SPtr<Actor> obst = g_sceneManager().instantiate();;
-  obst->m_transform = Matrix4::IDENTITY;
-  obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
-  obstacle.m_actor->addComponent(newModel("sprite.fbx"));
-  obstacle.m_actor->addComponent(createMaterial());
-  obstacle.m_actor->getComponent<Material>()->setDiffuse(tm.createTexture("obstacle.png"));
+  // SPtr<Actor> obst = g_sceneManager().instantiate();
+  // obst->m_transform = Matrix4::IDENTITY;
+  // obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
+  // obstacle.m_actor->addComponent(newModel("sphere.obj"));
 
   /**
    * Instantiate spring
@@ -132,14 +126,19 @@ PhysicsApp::onInit()
    * @brief Create IK
    */
   m_ik = make_shared<InverseKinematics>();
-  for (uint32 i = 0; i < 4; ++i)
-  {
+  for (uint32 i = 0; i < 20; ++i) {
     SPtr<Actor> ikRoot = g_sceneManager().instantiate();
-    ikRoot->addComponent(newModel("sprite.fbx"));
-    ikRoot->addComponent(createMaterial());
-    ikRoot->getComponent<Material>()->setDiffuse(tm.createTexture("circle.png"));
+    ikRoot->addComponent(newModel("sphere.obj"));
+    ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 
-    m_ik->insertNodeLocal(Vector3(i * 2, i * g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+    m_ik->insertNodeLocal(Vector3(i * -0.5, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+
+    SPtr<Obstacle> obs = make_shared<Obstacle>();
+    obs->m_actor = ikRoot;
+    obs->m_bounciness = 0.9f;
+    obs->m_sphere.m_origin = ikRoot->getPosition3();
+    obs->m_sphere.m_radius = 0.5f;
+    obstacles.push_back(obs);
   }
 
   m_fireDirection = Vector2(0.0f);
@@ -184,27 +183,47 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
     g_RenderManager().compileShaders();
   }
-  float strength = 10.0f;
-  float spd = 3;
-  Vector3 ikLastPos = m_ik->getLastBone()->actorIni->m_transform.getTranslation3();
-  /**
-   * Inverse kinematics input
-   */
+//  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+  float strength = 5.0f * deltaTime;
+  Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    Vector3 speed = Vector3(0.0f, -spd, 0.0f) * g_TimeManager().m_deltaTime;
-    m_ik->fabrik(ikLastPos + speed);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
+    m_ik->fabrik(posIK +
+                 Vector3::DOWN *
+                 strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    Vector3 speed = Vector3(0.0f, spd, 0.0f) * g_TimeManager().m_deltaTime;
-    m_ik->fabrik(ikLastPos + speed);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
+    m_ik->fabrik(posIK + 
+                 Vector3::UP *
+                 strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    Vector3 speed = Vector3(spd, 0.0f, 0.0f) * g_TimeManager().m_deltaTime;
-    m_ik->fabrik(ikLastPos + speed);
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
+    m_ik->fabrik(posIK +
+                 Vector3::RIGHT *
+                 strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    Vector3 speed = Vector3(-spd, 0.0f, 0.0f) * g_TimeManager().m_deltaTime;
-    m_ik->fabrik(ikLastPos + speed);;
+    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
+    m_ik->fabrik(posIK + 
+                 Vector3::LEFT *
+                 strength);
+  }
+
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
+    Vector3 mousePos = Vector3(m_eventQueue.mousePosition.x,
+                               m_eventQueue.mousePosition.y,
+                               0.0f);
+    float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
+    float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
+    float ndcZ = 0.0f;
+
+    Vector3 ndcPos = Vector3(ndcX, ndcY, ndcZ);
+    g_Logger().print(mousePos);
+    m_ik->fabrik(mousePos * 0.01f);
+    if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
+    }
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     m_changingType = false;
@@ -310,8 +329,10 @@ void
 PhysicsApp::checkObstacles()
 {
   for (uint32 i = 0; i < m_projectiles.size(); ++i) {
-    m_projectiles[i]->obstacleBounce(obstacle.m_actor->m_transform.getTranslation3(), 
-                                     obstacle.m_sphere.m_radius);
+    for (uint32 j = 0; j < obstacles.size(); ++j) {
+      m_projectiles[i]->obstacleBounce(obstacles[j]->m_actor->getPosition3(),
+                                       obstacles[j]->m_sphere.m_radius);
+    }
   }
 }
 

@@ -1,3 +1,8 @@
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkActor.h"
 
 namespace pkEngineSDK
@@ -6,6 +11,7 @@ namespace pkEngineSDK
 Actor::Actor()
 {
   setActive(true);
+  m_forward = Vector3::FORWARD;
 }
 
 void
@@ -23,7 +29,7 @@ Actor::setPosition(Matrix4 _translation)
 void
 Actor::setPosition(Vector3 _position)
 {
-  m_transform = Matrix4::translation(_position);
+  m_transform.setTranslation(_position);
 }
 
 void
@@ -92,6 +98,12 @@ void
 Actor::setScale(float _x, float _y, float _z)
 {
   setScale(Vector3(_x, _y, _z));
+}
+
+void
+Actor::update(float _deltaTime)
+{
+  
 }
 
 SPtr<Actor>

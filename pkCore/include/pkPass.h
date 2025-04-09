@@ -45,10 +45,11 @@ public:
   createInputLayout();
 
   /**
-   * @brief Set the input layout to the device.
+   * @brief Gets the input layout to the pass.
+   * @return Pointer of the Input Layout.
    */
-  void
-  setInputLayout();
+  SPtr<InputLayout>
+  getInputLayout() { return m_pInputLayout; }
 
   /**
    * @brief Create the sampler state.

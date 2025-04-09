@@ -1,4 +1,8 @@
 #include "pkImGui.h"
+#include "pkGraphicsAPI.h"
+#include "imgui_impl_win32.h"
+
+using pkEngineSDK::g_GraphicAPI;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
@@ -31,7 +35,9 @@ ImguiEngine::init(WindowHandle& _hWnd)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
   ImGui::StyleColorsDark();
-
+    
+  ImGui_ImplWin32_Init(_hWnd);
+  // ImGui_ImplDX11_Init(g_GraphicAPI().getDevice());
 }
 }
 #endif

@@ -1,21 +1,5 @@
-/*****************************************************************************/
-/**
- * @file    pkTextureManager.cpp
- * @author  Héctor Iván Muñoz Ceballos
- * @date    01/04/2025
- * @brief   Texture manager used for handling texture management and creation.
- *
- * @bug    No known bugs.
- */
- /*****************************************************************************/
-
-/*********************************************/
-/**
-* Includes
-**/
-/*********************************************/
 #include "pkTextureManager.h"
-#include "pkGraphicsAPI.h"
+#include "pkResourceManager.h"
 
 namespace pkEngineSDK
 {
@@ -31,7 +15,7 @@ TextureManager::createTexture(String _name, String _directory)
   }
 
   // create the texture
-  SPtr<Texture> texture = createTextureFromFile(_name, _directory);
+  SPtr<Texture> texture = g_ResourceManager().newTexture(_name, _directory);
 
   // store the new texture in the memory
   SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();
@@ -42,15 +26,6 @@ TextureManager::createTexture(String _name, String _directory)
   // return the final texture
   return texture;
 }
-
-SPtr<Texture>
-TextureManager::createTextureFromFile(String _name, String _directory)
-{
-  // create the texture adress.
-  String textureName = _directory + _name;
-  return g_GraphicAPI().createTextureFromFile(textureName, 8, false, 28);
-}
-
 PK_CORE_EXPORT TextureManager&
 g_TextureManager()
 {

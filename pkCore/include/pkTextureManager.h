@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkTextureManager.h
- * @author  Héctor Iván Muñoz Ceballos
- * @date    01/04/2025
- * @brief   Texture manager used for handling texture management and creation.
+ * @file    pkTextureManager.cpp
+ * @author  Héctor  Iván Muñoz Ceballos
+ * @date    19/11/2024
+ * @brief   Manager used for creating and storing textures.
  *
  * @bug    No known bugs.
  */
@@ -16,8 +16,8 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkModule.h"
 #include "pkTexture.h"
+#include "pkModule.h"
 
 namespace pkEngineSDK
 {
@@ -30,28 +30,18 @@ struct TextureMemory
 
 class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
 {
-public:
+ public:
   TextureManager() = default;
   virtual ~TextureManager() = default;
 
   /**
-   * @brief Create a texture from a file name.
-   * @param _name Name of the texture (extension type required).
-   * @param _directory Where is the texture located (textures/ set as default).
-   * @return Pointer to the texture.
+   * @brief Creates a texture from a texture name.
+   * @param _name Name of the texture to load (extenison type is required).
+   * @param _directory Where to look for (textures/ set as default).
+   * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
   createTexture(String _name, String _directory = "textures/");
-
- private:
-  /**
-   * @brief Create a texture from file.
-   * @param _name Name of the texture (extension type required).
-   * @param _directory Where is the texture located (textures/ set as default).
-   * @return Pointer to the texture.
-   */
-  SPtr<Texture>
-  createTextureFromFile(String _name, String _directory = "textures/");
 
  public:
   Vector<SPtr<TextureMemory>> m_textures;

@@ -4727,7 +4727,7 @@ void* ImGui::MemAlloc(size_t size)
     return ptr;
 }
 
-// IM_FREE() == ImGui::MemFree()
+// IM_FREE() == ImGui:: ()
 void ImGui::MemFree(void* ptr)
 {
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS

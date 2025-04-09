@@ -4,6 +4,7 @@
 #include "pkGraphicTypes.h"
 #include "pkRendererManager.h"
 #include "pkScene.h"
+#include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
@@ -12,12 +13,15 @@ using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_sceneManager;
+using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::RendererManager;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::TEXTURE_FORMATS::kPK_FORMAT_R32G32B32_FLOAT;
+using pkEngineSDK::TextureManager;
 using pkEngineSDK::uint32;
 
 void
@@ -27,18 +31,16 @@ ShaderTest::onInit()
                 m_window.getHeight(),
                 3.1416f / 4.0f,
                 0.01f,
-                1000.0f,
+                2000.0f,
                 Vector3(0.0f, 0.0f, -30.0f), // position
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
-  g_sceneManager().instantiate();
-  SPtr<Actor> pistol = g_sceneManager().getLastActor();
+  SPtr<Actor> pistol = g_sceneManager().instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
-  //g_sceneManager().instantiate();
-  //SPtr<Actor> room = g_sceneManager().getLastActor();
-  //room->addComponent(newModel("sponza.obj"));
+  SPtr<Actor> sponza = g_sceneManager().instantiate(Matrix4::IDENTITY, pistol);
+  sponza->addComponent(newModel("sponza.obj"));
 }
 
 void
@@ -87,18 +89,18 @@ ShaderTest::onUpdate()
 
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationY(rot);
+    m_camera.view *= Matrix4::rotationY(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    actor->m_transform *= Matrix4::rotationY(rot);
+    rot *= -1.0f;
+    m_camera.view *= Matrix4::rotationY(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationX(rot);
+    m_camera.view *= Matrix4::rotationX(rot);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    actor->m_transform *= Matrix4::rotationX(rot);
+    m_camera.view *= Matrix4::rotationX(rot);
   }
 }
 

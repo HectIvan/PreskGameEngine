@@ -17,7 +17,6 @@
 #include "pkTextureManager.h"
 #include "stb_image.h"
 
-
 namespace pkEngineSDK
 {
 
@@ -41,7 +40,6 @@ Model::load(String& _path)
   String modelPath = _path;
   path = _path;
   Assimp::Importer importer;
-  bool canLoadMTL = importer.SetPropertyString("OBJImport.MaterialsPath", "models/");
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality |
                                                               aiProcess_RemoveRedundantMaterials |
                                                               aiProcess_FlipUVs);
@@ -74,9 +72,7 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
-  // get the texture manager
   TextureManager& tm = g_TextureManager().instance();
-  // process the mesh
   SPtr<Mesh> meshProcess = make_shared<Mesh>();
   meshProcess->vertexCount = _mesh->mNumVertices;
   // process vertex
@@ -125,29 +121,45 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     // mesh->mBones[i].
   }
   if (_mesh->mMaterialIndex >= 0) {
-    aiMaterial* material = _scene->mMaterials[_mesh->mMaterialIndex];
-    uint32 textureCount = material->GetTextureCount(aiTextureType_DIFFUSE);
-    // if the material has no textures or cant be found
-    if (textureCount == 0) {
-      // create a default material
-      String name = _mesh->mName.data;
-      g_Logger().print("Warning: No textures found in the mesh material. Mesh: " + name);
-      meshProcess->material = make_shared<Material>();
-      meshProcess->material->init();
-      meshProcess->material->m_name = name;
-      meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png","textures/default/"));
-      meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
-      meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
-                                                          "textures/default/"));
-      meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
-      meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png","textures/default/"));
+    aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
+    meshProcess->material = make_shared<Material>();
+    String meshName = _mesh->mName.C_Str();
+    meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
+    meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
+    meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
+    meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
+    meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
+                                                       "textures/default/"));
+
+    uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
+    // if no diffuse texture is found.
+    if (diffCount < 1) {
+      String matName = materialA->GetName().C_Str();
+      g_Logger().print("WARNING: Cound not find diffuse texture of material " + matName);
     }
-    for (uint32 i = 0; i < textureCount; ++i) {
+    // if there are diffuse textures.
+    for (uint32 i = 0; i < diffCount; ++i) {
       aiString path;
-      material->GetTexture(aiTextureType_DIFFUSE, i, &path);
-      meshProcess->materialPath = path.C_Str();
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
+      }
     }
+
+    // get all normal maps of the mesh
+    uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
+    for (uint32 i = 0; i < normCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
+        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
+      }
+    } 
+    // materialA->GetTexture(aiTextureType_DIFFUSE);
+    // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
+    // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
   }
+  
   return meshProcess;
 }
 

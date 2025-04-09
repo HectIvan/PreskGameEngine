@@ -3,6 +3,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkLogger.h"
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
 
@@ -37,6 +38,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   wcex.lpszMenuName = nullptr;
   wcex.lpszClassName = "WindowClass";
   if (!RegisterClassEx(&wcex)) {
+    g_Logger().print("Failed to register a window class");
     return;
   }
   /************************************************************************************/
@@ -67,7 +69,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   * Check if creation failed. 
   **/
   if (!m_windowH) {
-    // DWORD error = GetLastError();
+    g_Logger().print("Failed to create the window.");
     return;
   }
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(this));

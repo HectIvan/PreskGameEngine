@@ -41,18 +41,18 @@ struct CBProjection
 struct CBWorld
 {
   Matrix4 world;
+  // Vector4 meshColor;
 };
 
-<<<<<<< Updated upstream
-=======
 struct CBCamera
 {
   Vector4 eye;
   Vector3 forward;
-  float _unused;
+  Matrix4 view;
+  Matrix4 projection;
+  float unused;
 };
 
->>>>>>> Stashed changes
 struct KeyPosition
 {
   Vector3 position;

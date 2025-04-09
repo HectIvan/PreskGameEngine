@@ -76,10 +76,11 @@ class Mesh
   // stores the index and vertex info
   Vector<SimpleVertex> vertexVector;
   Vector<uint32> indexVector;
-  // Vector<Texture*> textures;
-  SPtr<Material> material;
+
   uint32 vertexCount;
   uint32 numIndex;
+
+  SPtr<Material> material;
 
   String materialPath;
 };

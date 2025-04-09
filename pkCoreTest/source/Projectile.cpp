@@ -1,9 +1,9 @@
 #include "Projectile.h"
-#include "pkDebug.h"
+#include "pkLogger.h"
 #include "pkPlatformMath.h"
 #include "pkSphere.h"
 
-using pkEngineSDK::Debug;
+using pkEngineSDK::Logger;
 using pkEngineSDK::Sphere;
 using pkEngineSDK::Math;
 
@@ -108,7 +108,6 @@ Projectile::obstacleBounce(Vector3 _obstaclePos, float _obstacleRadius)
     // get the reflected vector
     Vector3 normal = (projectilePos - _obstaclePos).normalized();
     Vector3 dir = Vector3(m_direction.x, m_direction.y, 0.0f);
-    dir.normalize();
     Vector3 reflect = Vector3::reflect(dir, normal);
     m_direction = Vector2(reflect.x, reflect.y);
 

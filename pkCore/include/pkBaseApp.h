@@ -85,7 +85,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Update function for any child class of this base app
    */
   virtual void
-  onUpdate(float _deltaTime) {}
+  onUpdate() {}
 
   /**
    * @brief Fixed update of the engine
@@ -95,16 +95,15 @@ class PK_CORE_EXPORT BaseApp
 
   /**
    * @brief Base app render function.
-   * @param _scene Scene to render.
    */
   void
-  render(Scene& _scene);
+  render();
 
   /**
    * @brief Render function for any child class of this base class
    */
   virtual void
-  onRender(Scene& _scene) {}
+  onRender() {}
 
   /**
    * @brief Create a material from a texture.
@@ -112,14 +111,6 @@ class PK_CORE_EXPORT BaseApp
    */
   SPtr<Material>
   createMaterial();
-
-  /**
-   * @brief Create a new Texture.
-   * @param _name Texture Name.
-   * @return The texture pointer.
-   */
-  // SPtr<Texture>
-  // createTexture(String _name);
 
   /**
    * @brief Create a new model component.
@@ -168,7 +159,7 @@ class PK_CORE_EXPORT BaseApp
   EventQueue m_eventQueue;
 
   // vector of game objects in the scene
-  Scene m_scene;
+  // Scene m_scene;
 
   // camera movement speed
   float m_cameraSpeed;
@@ -185,6 +176,5 @@ class PK_CORE_EXPORT BaseApp
   * its found, the loaded object will be returned, instead of loading it again.
   */
   Vector<SPtr<ModelMemory>> m_models;
-  // Vector<SPtr<TextureMemory>> m_textures;
 };
 }

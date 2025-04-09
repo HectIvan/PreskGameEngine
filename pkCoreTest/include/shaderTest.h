@@ -49,14 +49,14 @@ class ShaderTest : public BaseApp
    * @param _deltatime Time between frames.
    */
   void
-  onUpdate(float _deltaTime) override;
+  onUpdate() override;
 
   /**
    * @brief On render specific app render function.
    * @param _scene Scene to render
    */
   void
-  onRender(Scene& _scene) override;
+  onRender() override;
 
  public:
   Actor* m_actor;

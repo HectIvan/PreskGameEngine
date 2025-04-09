@@ -189,7 +189,6 @@
     <ClInclude Include="include\pkVector2.h" />
     <ClInclude Include="include\pkVector3.h" />
     <ClInclude Include="include\pkVector4.h" />
-    <ClInclude Include="include\pkScriptManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkCapsule.cpp" />
@@ -199,7 +198,6 @@
     <ClCompile Include="source\pkPlane.cpp" />
     <ClCompile Include="source\pkPlatformMath.cpp" />
     <ClCompile Include="source\pkQuaternion.cpp" />
-    <ClCompile Include="source\pkScriptManager.cpp" />
     <ClCompile Include="source\pkSphere.cpp" />
     <ClCompile Include="source\pkTransform.cpp" />
     <ClCompile Include="source\pkVector2.cpp" />

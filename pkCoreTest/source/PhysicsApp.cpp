@@ -126,12 +126,16 @@ PhysicsApp::onInit()
    * @brief Create IK
    */
   m_ik = make_shared<InverseKinematics>();
-  for (uint32 i = 0; i < 20; ++i) {
-    SPtr<Actor> ikRoot = g_sceneManager().instantiate();
+  SPtr<Actor> childActor = nullptr;
+  for (uint32 i = 0; i < 4; ++i) {
+    SPtr<Actor> ikRoot = g_sceneManager().instantiate(childActor);
     ikRoot->addComponent(newModel("sphere.obj"));
     ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 
     m_ik->insertNodeLocal(Vector3(i * -0.5, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+    // X = i * -0.5
+    // Y = i + g_TimeManager().m_fixedDeltaTime
+    childActor = ikRoot;
 
     SPtr<Obstacle> obs = make_shared<Obstacle>();
     obs->m_actor = ikRoot;
@@ -140,6 +144,7 @@ PhysicsApp::onInit()
     obs->m_sphere.m_radius = 0.5f;
     obstacles.push_back(obs);
   }
+  // m_ik->getLastBone()->actorIni = m_spring->m_weight;
 
   m_fireDirection = Vector2(0.0f);
 }
@@ -161,13 +166,28 @@ PhysicsApp::onUpdate()
     m_firing = false;
   }
   // move left or right
+  Vector3 ikPos = m_ik->getLastBone()->actorIni->getPosition3();
+  float speed = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
   {
-    m_fireDirection.x -= 1.0f * deltaTime;
+    // m_fireDirection.x -= 1.0f * deltaTime;
+    m_ik->fabrik(ikPos + (Vector3::LEFT * speed));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
   {
-    m_fireDirection.x += 1.0f * deltaTime;
+    // m_fireDirection.x += 1.0f * deltaTime;
+    m_ik->fabrik(ikPos + (Vector3::RIGHT * speed));
+  }
+  // move up or down
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW))
+  {
+    // m_fireDirection.x -= 1.0f * deltaTime;
+    m_ik->fabrik(ikPos + (Vector3::DOWN * speed));
+  }
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS))
+  {
+    // m_fireDirection.x -= 1.0f * deltaTime;
+    m_ik->fabrik(ikPos + (Vector3::UP * speed));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
     !m_changingType) {
@@ -184,31 +204,22 @@ PhysicsApp::onUpdate()
     g_RenderManager().compileShaders();
   }
 //  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
-  float strength = 5.0f * deltaTime;
+  float strength = 1.0f * deltaTime;
   Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
+  //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
-    m_ik->fabrik(posIK +
-                 Vector3::DOWN *
-                 strength);
+    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationX(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
-    m_ik->fabrik(posIK + 
-                 Vector3::UP *
-                 strength);
+    strength *= -1.0f;
+    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationX(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
-    m_ik->fabrik(posIK +
-                 Vector3::RIGHT *
-                 strength);
+    strength *= -1.0f;
+    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationZ(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
-    m_ik->fabrik(posIK + 
-                 Vector3::LEFT *
-                 strength);
+    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationZ(strength);
   }
 
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
@@ -217,11 +228,16 @@ PhysicsApp::onUpdate()
                                0.0f);
     float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
     float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
-    float ndcZ = 0.0f;
 
-    Vector3 ndcPos = Vector3(ndcX, ndcY, ndcZ);
-    g_Logger().print(mousePos);
-    m_ik->fabrik(mousePos * 0.01f);
+    Vector3 clipSpacePos = Vector3(ndcX, ndcY, 0.0f);
+
+    Matrix4 viewProj = m_camera.view * m_camera.projection;
+    Matrix4 invVP = viewProj.getInverse();
+
+    // Vector4 worldPos = 
+    mousePos *= 0.5f;
+    mousePos + mousePos * 2.0f;
+    m_ik->fabrik(mousePos);
     if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
     }
   }

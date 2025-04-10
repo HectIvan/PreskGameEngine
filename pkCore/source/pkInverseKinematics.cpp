@@ -161,4 +161,22 @@ InverseKinematics::fabrik(Vector3 _target)
     }
   }
 }
+void
+InverseKinematics::CCD(Vector3 _target, uint32 _numIt)
+{
+  SPtr<Actor> endOfVector = getLastBone()->actorIni;
+  for (uint32 i = m_bones.size()-1; i > 0; --i) {
+    Vector3 vecU1 = endOfVector->getPosition3() - m_bones[i]->actorIni->getPosition3();
+    float vecMagnU1 = vecU1.magnitude();
+
+    Vector3 u1 = vecU1 / vecMagnU1;
+
+    Vector3 vecU2 = _target - m_bones[i]->actorIni->getPosition3();
+    float vecMagnU2 = vecU2.magnitude();
+
+    Vector3 u2 = vecU2 / vecMagnU2;
+
+    float alpha = u1.dotProd(u2);
+  }
+}
 }

@@ -23,19 +23,19 @@ Actor::setTransform(Matrix4 _transform)
 void
 Actor::setPosition(Matrix4 _translation)
 {
-  m_transform = _translation;
+  m_transform.setTranslation(_translation.getTranslation3());
 }
 
 void
 Actor::setPosition(Vector3 _position)
 {
-  m_transform.setTranslation(_position);
+  setPosition(_position.x, _position.y, _position.z);
 }
 
 void
 Actor::setPosition(float _x, float _y, float _z)
 {
-  m_transform = Matrix4::translation(_x, _y, _z);
+  m_transform.setTranslation(_x, _y, _z);
 }
 
 void
@@ -62,6 +62,12 @@ Actor::move(float _addX, float _addY, float _addZ)
   currentTranslation.matrix[2][3] += _addZ;
   // set the current translation to the new translation
   m_transform = currentTranslation;
+}
+
+Vector3
+Actor::getPosition3()
+{
+  return m_transform.getTranslation3();
 }
 
 void

@@ -94,7 +94,7 @@ class PK_CORE_EXPORT Actor
    * @return The vector position.
    */
   Vector3
-  getPosition3() { return m_transform.getTranslation3(); }
+  getPosition3();
 
   /**
    * @brief Set the rotation of the GameObject.

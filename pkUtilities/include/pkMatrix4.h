@@ -179,21 +179,11 @@ class PK_UTILITY_EXPORT Matrix4
   Vector3
   operator*(const Vector3& other)
   {
-    matrix[0][0] *= other.x;
-    matrix[1][0] *= other.x;
-    matrix[2][0] *= other.x;
-
-    matrix[0][1] *= other.y;
-    matrix[1][1] *= other.y;
-    matrix[2][1] *= other.y;
-
-    matrix[0][2] *= other.z;
-    matrix[1][2] *= other.z;
-    matrix[2][2] *= other.z;
-
-    return Vector3(matrix[0][0] + matrix[1][0] + matrix[2][0],
-                   matrix[0][1] + matrix[1][1] + matrix[1][1],
-                   matrix[0][2] + matrix[1][2] + matrix[2][2]);
+    Vector3 result;
+    result.x = matrix[0][0] * other.x + matrix[0][1] * other.y + matrix[0][2] * other.z;
+    result.y = matrix[1][0] * other.x + matrix[1][1] * other.y + matrix[1][2] * other.z;
+    result.z = matrix[2][0] * other.x + matrix[2][1] * other.y + matrix[2][2] * other.z;
+    return result;
   }
 
   /**
@@ -358,6 +348,13 @@ class PK_UTILITY_EXPORT Matrix4
   
     return *this;
   }
+
+  /**
+   * @brief Gets the Inverse of this matrix.
+   * @return The inverse matrix.
+   */
+  Matrix4
+  getInverse();
 
   /**
    * @brief The transposed of this matrix.

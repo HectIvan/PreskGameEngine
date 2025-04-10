@@ -302,8 +302,15 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
       // the next parent will be the parent of this parent
       parent = parent->m_parent;
     }
+    // set new position according to rotation of parents
+    Matrix4 newTransform = transform;
+    Vector3 pos = _gameActors[i]->getPosition3();
+    Vector3 newPos = transform * pos;
+    newTransform.setTranslation(newPos);
     // set the current actor transform as the world in which the shader will work in
-    g_GraphicAPI().updateConstantBuffer(m_cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
+    g_GraphicAPI().updateConstantBuffer(m_cBWorld,
+                                        &newTransform,
+                                        static_cast<uint32>(sizeof(CBWorld)));
 
     /**
      * Recast to a gameobject. If it fails, do none of this

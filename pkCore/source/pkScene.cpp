@@ -39,6 +39,12 @@ insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
 }
 
 SPtr<Actor>
+Scene::instantiateSingle()
+{
+  return instantiate(nullptr);
+}
+
+SPtr<Actor>
 Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
 {
   // insert the game object into the vector of game objects
@@ -57,6 +63,13 @@ Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
   // return the object created.
   return gObject;
 }
+
+SPtr<Actor>
+Scene::instantiate(SPtr<Actor> _pParent)
+{
+  return instantiate(Matrix4::IDENTITY, _pParent);
+}
+
 PK_CORE_EXPORT Scene&
 g_sceneManager()
 {

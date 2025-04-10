@@ -31,13 +31,30 @@ class PK_CORE_EXPORT Scene : public Module<Scene>
   /**
    * @brief Insert a new actor into the scene or as
    * a child of another actor.
+   * @return The actor created.
+   */
+  SPtr<Actor>
+  instantiateSingle();
+
+  /**
+   * @brief Insert a new actor into the scene or as
+   * a child of another actor.
    * @param _tranform Transform of the actor.
    * @param _pParent If the actor will be the child of another actor.
    * @return The actor created.
    */
   SPtr<Actor>
-  instantiate(Matrix4 _transform = Matrix4::IDENTITY,
+  instantiate(Matrix4 _transform,
               SPtr<Actor> _pParent = nullptr);
+
+  /**
+   * @brief Insert a new actor into the scene or as
+   * a child of another actor.
+   * @param _pParent If the actor will be the child of another actor.
+   * @return The actor created.
+   */
+  SPtr<Actor>
+  instantiate(SPtr<Actor> _pParent = nullptr);
 
   /**
    * @brief Get the last inserted actor of the scene.

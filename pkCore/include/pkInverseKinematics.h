@@ -109,10 +109,19 @@ class PK_CORE_EXPORT InverseKinematics
   getLastBone() { return m_bones[m_bones.size() - 1]; }
 
   /**
-   * @brief
+   * @brief FABRIK Algorithm for inverse kinematics.
+   * @param _target Where the armature will try to reach.
    */
   void
   fabrik(Vector3 _target);
+
+  /**
+   * @brief CCD Algorithm for inverse kinematics.
+   * @param _target Where the armature will try to reach.
+   * @param _numIt How many times the algorithm will be executed.
+   */
+  void
+  CCD(Vector3 _target, uint32 _numIt);
 
  public:
   Vector<SPtr<Actor>> m_nodes;

@@ -7,6 +7,7 @@
 #include "pkModel.h"
 #include "pkRendererManager.h"
 #include "pkTextureManager.h"
+#include "pkVector4.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
 
@@ -23,6 +24,7 @@ using pkEngineSDK::Model;
 using pkEngineSDK::uint32;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::TextureManager;
+using pkEngineSDK::Vector4;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Matrix4;
@@ -40,12 +42,20 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
   weight->addComponent(newModel("sprite.fbx"));
 
   m_spring = make_shared<Spring>();
+  m_spring->m_maxDistance = 10.0f;
   m_spring->m_anchor = anchor;
   m_spring->m_weight = weight;
   m_spring->m_elasticity = _stiffness;
   m_spring->m_length = _length;
   m_spring->m_mass = 1.0f;
-  m_spring->m_gravity = 3.0f;
+  m_spring->m_gravity = 9.8f;
+
+  SPtr<Obstacle> obs = make_shared<Obstacle>();
+  obs->m_actor = anchor;
+  obs->m_bounciness = 0.9f;
+  obs->m_sphere.m_origin = anchor->getPosition3();
+  obs->m_sphere.m_radius = 0.5f;
+  obstacles.push_back(obs);
 
   anchor->setPosition(_pos);
   weight->setPosition(_pos.x, _pos.y + _length, _pos.y);
@@ -109,18 +119,6 @@ PhysicsApp::onInit()
     m_projectiles.push_back(proj);
   }
 
-  /**
-   * Instantiate obstacle
-   */
-  // SPtr<Actor> obst = g_sceneManager().instantiate();
-  // obst->m_transform = Matrix4::IDENTITY;
-  // obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
-  // obstacle.m_actor->addComponent(newModel("sphere.obj"));
-
-  /**
-   * Instantiate spring
-   */
-  // initSpring(Vector3(4.0f, 0.0f, 0.0f), 3, 1);
 
   /**
    * @brief Create IK
@@ -132,9 +130,7 @@ PhysicsApp::onInit()
     ikRoot->addComponent(newModel("sphere.obj"));
     ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 
-    m_ik->insertNodeLocal(Vector3(i * -0.5, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
-    // X = i * -0.5
-    // Y = i + g_TimeManager().m_fixedDeltaTime
+    m_ik->insertNodeLocal(Vector3(static_cast<float>(i), 0.0f, 0.0f), ikRoot);
     childActor = ikRoot;
 
     SPtr<Obstacle> obs = make_shared<Obstacle>();
@@ -145,11 +141,13 @@ PhysicsApp::onInit()
     obstacles.push_back(obs);
   }
 
-  m_targetShape = g_sceneManager().instantiate();
-  m_targetShape->addComponent(newModel("Grass_Block.obj"));
+  /**
+   * Instantiate spring
+   */
+  initSpring(m_ik->getLastBone()->actorIni->getPosition3(), 1, 15);
 
   m_fireDirection = Vector2(0.0f);
-  m_target = Vector3(0.0f);
+  m_target = Vector3(4.0f, 0.0f, 0.0f);
 }
 
 
@@ -157,6 +155,11 @@ void
 PhysicsApp::onUpdate()
 {
   float deltaTime = g_TimeManager().m_deltaTime;
+  // track the last ik bone for the spring
+  Vector3 lastIkPos = m_ik->getLastBone()->actorIni->getPosition3Global();
+  m_spring->m_anchor->setPosition(lastIkPos);
+  // move the spring
+  m_spring->move(deltaTime);
   // fire the projectile
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
     !m_firing)
@@ -232,7 +235,6 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
     g_RenderManager().compileShaders();
   }
-  m_targetShape->setPosition(m_target);
   // Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
   float strength = 1.0f * deltaTime;
   Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
@@ -255,7 +257,9 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kAdd) && !m_add) {
     ++currentBone;
     m_add = true;
-    currentBone = static_cast<uint32>(Math::clamp(currentBone, 0, m_ik->m_bones.size() - 1));
+    currentBone = static_cast<uint32>(Math::clamp(static_cast<float>(currentBone),
+                                                  0.0f,
+                                                  static_cast<float>(m_ik->m_bones.size()-1)));
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kAdd)) {
     m_add = false;
@@ -264,7 +268,9 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSubtract) && !m_subtract) {
     --currentBone;
     m_subtract = true;
-    currentBone = static_cast<uint32>(Math::clamp(currentBone, 0, m_ik->m_bones.size() - 1));
+    currentBone = static_cast<uint32>(Math::clamp(static_cast<float>(currentBone),
+                                                  0.0f,
+                                                  static_cast<float>(m_ik->m_bones.size()-1)));
   }
   else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSubtract)) {
     m_subtract = false;
@@ -274,18 +280,22 @@ PhysicsApp::onUpdate()
     Vector3 mousePos = Vector3(m_eventQueue.mousePosition.x,
                                m_eventQueue.mousePosition.y,
                                0.0f);
-    float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
-    float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
+    float ndcX = (mousePos.x / m_window.getWidth()) * 2.0f - 1.0f;
+    float ndcY = 1.0f - (mousePos.y / m_window.getHeight()) * 2.0f;
 
-    Vector3 clipSpacePos = Vector3(ndcX, ndcY, 0.0f);
-
-    Matrix4 viewProj = m_camera.view * m_camera.projection;
+    Matrix4 viewProj = m_camera.projection * m_camera.view;
     Matrix4 invVP = viewProj.getInverse();
 
-    // Vector4 worldPos = 
-    mousePos *= 0.5f;
-    mousePos + mousePos * 2.0f;
-    m_ik->fabrik(mousePos);
+    Vector4 worldPos = Vector4(ndcX, ndcY, 0.0f, 1.0f) * invVP;
+    mousePos.x = worldPos.x;
+    mousePos.y = worldPos.y;
+    mousePos.z = 0.0f;
+    if (m_ikType == IK_TYPE::kFabrik) {
+      m_ik->fabrik(mousePos);
+    }
+    else {
+      m_ik->CCD(mousePos, 4);
+    }
     if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
     }
   }

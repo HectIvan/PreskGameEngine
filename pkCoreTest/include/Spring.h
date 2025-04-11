@@ -48,7 +48,9 @@ class Spring
   applyForce(Vector3 _dir, float _force, float _deltaTime);
 
  public:
-  Vector2 m_direction;
+  Vector3 m_direction;
+  Vector3 m_velocity;
+  float m_drag = 0.99f;
   float m_maxDistance;
   float m_minDistance;
   float m_length;

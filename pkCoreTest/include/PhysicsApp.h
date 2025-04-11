@@ -137,7 +137,6 @@ class PhysicsApp : public BaseApp
   Vector2 m_fireDirection;
 
   Vector3 m_target;
-  SPtr<Actor> m_targetShape;
   bool m_add = false;
   bool m_subtract = false;
   uint32 currentBone = 0;

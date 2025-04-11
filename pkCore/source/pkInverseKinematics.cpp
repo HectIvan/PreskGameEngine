@@ -165,23 +165,37 @@ InverseKinematics::fabrik(Vector3 _target)
 void
 InverseKinematics::CCD(Vector3 _target, uint32 _numIt)
 {
-  for (int32 j = 0; j < _numIt; ++j) {
-    SPtr<Actor> endOfVector = getLastBone()->actorIni;
+  SPtr<Actor> endOfVector = getLastBone()->actorIni;
+  for (uint32 j = 0; j < _numIt; ++j) {
     // go through all joints
-    for (int32 i = m_bones.size() - 2; i >= 0; --i) {
+    for (int32 i = static_cast<int32>(m_bones.size()) - 2; i >= 0; --i) {
 
-      Vector3 currPos = m_bones[i]->actorIni->getPosition3();
+      Vector3 currPos = m_bones[i]->actorIni->getPosition3Global();
 
-      Vector3 toTarget = _target - currPos;
-      Vector3 toEnd = endOfVector->getPosition3() - currPos;
+      Vector3 toTarget = (_target - currPos).normalized();
+      Vector3 toEnd = (endOfVector->getPosition3Global() - currPos).normalized();
 
-      float dotProd = toTarget.dotProd(toEnd);
-      dotProd = Math::clamp(dotProd, -1.0f, 1.0f);
+      // if near target
+      if (toEnd.magnitude() * toEnd.magnitude() < Math::SMALL_NUMBER) {
+        continue;
+      }
 
-      float angle = Math::acos(dotProd / (toTarget.magnitude() * toEnd.magnitude()));
+      float dotProd = toTarget.x * toEnd.x + toTarget.y * toEnd.y; // toTarget.dotProd(toEnd);
+      if (dotProd > 0.9f) {
+        continue;
+      }
+      // float det = toTarget.x * toEnd.x - toTarget.y * toEnd.y;
+
+      float magnitudes = toTarget.magnitude() * toEnd.magnitude();
+      // float distEndSqr = toEnd.magnitude() * toEnd.magnitude();
+
+      float angle = Math::acos(Math::clamp((dotProd / magnitudes), -1.0f, 1.0f));// std::atan2(det, dotProd); 
+      // std::acos(dotProd / Math::sqrt(distTargetSqr * distEndSqr));
+
+      // if (angle < 0) { dotProd *= -1.0f; }
 
       angle *= Math::DEG2RAD;
-      g_Logger().print(angle);
+      // g_Logger().print(endOfVector->getPosition3().z);
 
       m_bones[i]->actorIni->m_transform *= Matrix4::rotationZ(angle);
     }

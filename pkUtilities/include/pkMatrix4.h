@@ -523,7 +523,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param angle angle to rotate.
    * @return The rotation matrix at z with the rotation given to it.
    */
-  FORCEINLINE static Matrix4
+  static Matrix4
   rotationZ(float& _angle);
   
   /**

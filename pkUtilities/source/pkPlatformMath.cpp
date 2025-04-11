@@ -144,7 +144,7 @@ PlatformMath::hookeLaw(float _elasticity, float _displacement)
 {
   // @source: https://www.britannica.com/science/Hookes-law
   // F = KX
-  return _elasticity * _displacement;
+  return -_elasticity * _displacement;
 }
 
 /**

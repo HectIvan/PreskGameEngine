@@ -97,6 +97,12 @@ class PK_CORE_EXPORT Actor
   getPosition3();
 
   /**
+   * @brief get the position taking into account the parent global.
+   */
+  Vector3
+  getPosition3Global();
+
+  /**
    * @brief Set the rotation of the GameObject.
    * @param _rotation Rotation Matrix.
    */

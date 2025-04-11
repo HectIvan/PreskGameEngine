@@ -130,9 +130,6 @@ RendererManager::compileShaders()
 void
 RendererManager::updateCameraBuffers(Camera* _pCamera)
 {
-  // get the api instance to work with
-  GraphicsAPI& api = GraphicsAPI::instance();
-
   // Update view
   CBView viewBuffer = CBView();
   viewBuffer.view = _pCamera->view.getTransposed();

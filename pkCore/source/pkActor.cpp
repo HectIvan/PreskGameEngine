@@ -70,6 +70,12 @@ Actor::getPosition3()
   return m_transform.getTranslation3();
 }
 
+Vector3
+Actor::getPosition3Global()
+{
+  return m_globalTransform.getTranslation3();
+}
+
 void
 Actor::setRotation(Matrix4 _rotation)
 {

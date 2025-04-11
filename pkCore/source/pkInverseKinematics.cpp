@@ -9,6 +9,7 @@
  */
 /*****************************************************************************/
 #include "pkInverseKinematics.h"
+#include "pkPlatformMath.h"
 #include "pkLogger.h"
 
 // Algorithms to make:
@@ -164,19 +165,26 @@ InverseKinematics::fabrik(Vector3 _target)
 void
 InverseKinematics::CCD(Vector3 _target, uint32 _numIt)
 {
-  SPtr<Actor> endOfVector = getLastBone()->actorIni;
-  for (uint32 i = m_bones.size()-1; i > 0; --i) {
-    Vector3 vecU1 = endOfVector->getPosition3() - m_bones[i]->actorIni->getPosition3();
-    float vecMagnU1 = vecU1.magnitude();
+  for (int32 j = 0; j < _numIt; ++j) {
+    SPtr<Actor> endOfVector = getLastBone()->actorIni;
+    // go through all joints
+    for (int32 i = m_bones.size() - 2; i >= 0; --i) {
 
-    Vector3 u1 = vecU1 / vecMagnU1;
+      Vector3 currPos = m_bones[i]->actorIni->getPosition3();
 
-    Vector3 vecU2 = _target - m_bones[i]->actorIni->getPosition3();
-    float vecMagnU2 = vecU2.magnitude();
+      Vector3 toTarget = _target - currPos;
+      Vector3 toEnd = endOfVector->getPosition3() - currPos;
 
-    Vector3 u2 = vecU2 / vecMagnU2;
+      float dotProd = toTarget.dotProd(toEnd);
+      dotProd = Math::clamp(dotProd, -1.0f, 1.0f);
 
-    float alpha = u1.dotProd(u2);
+      float angle = Math::acos(dotProd / (toTarget.magnitude() * toEnd.magnitude()));
+
+      angle *= Math::DEG2RAD;
+      g_Logger().print(angle);
+
+      m_bones[i]->actorIni->m_transform *= Matrix4::rotationZ(angle);
+    }
   }
 }
 }

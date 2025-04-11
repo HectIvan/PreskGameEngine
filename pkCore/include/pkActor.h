@@ -218,6 +218,7 @@ class PK_CORE_EXPORT Actor
   SPtr<Actor> m_parent;
   Matrix4 m_transform;
   Matrix4 m_prevTransform;
+  Matrix4 m_globalTransform;
   String m_name;
 };
 }

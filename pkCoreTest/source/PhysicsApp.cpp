@@ -69,7 +69,7 @@ PhysicsApp::onInit()
                 3.1416f / 4.0f,
                 0.01f,
                 1000.0f,
-                Vector3(0.0f, 0.0f, -30.0f), // position
+                Vector3(0.0f, 0.0f, -10.0f), // position
                 Vector3(0.0f, 0.0f, 0.0f), // target
                 Vector3(0.0f, 1.0f, 0.0f), // up vector
                 pkEngineSDK::CAMERA_PROJ::kOrthographic);
@@ -144,9 +144,12 @@ PhysicsApp::onInit()
     obs->m_sphere.m_radius = 0.5f;
     obstacles.push_back(obs);
   }
-  // m_ik->getLastBone()->actorIni = m_spring->m_weight;
+
+  m_targetShape = g_sceneManager().instantiate();
+  m_targetShape->addComponent(newModel("Grass_Block.obj"));
 
   m_fireDirection = Vector2(0.0f);
+  m_target = Vector3(0.0f);
 }
 
 
@@ -171,55 +174,100 @@ PhysicsApp::onUpdate()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
   {
     // m_fireDirection.x -= 1.0f * deltaTime;
-    m_ik->fabrik(ikPos + (Vector3::LEFT * speed));
+    m_target += Vector3::LEFT * speed;
+    if (m_ikType == IK_TYPE::kFabrik) {
+      m_ik->fabrik(m_target);
+    }
+    else {
+      m_ik->CCD(m_target, 4);
+    }
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
   {
     // m_fireDirection.x += 1.0f * deltaTime;
-    m_ik->fabrik(ikPos + (Vector3::RIGHT * speed));
+    m_target += Vector3::RIGHT * speed;
+    if (m_ikType == IK_TYPE::kFabrik) {
+      m_ik->fabrik(m_target);
+    }
+    else {
+      m_ik->CCD(m_target, 4);
+    }
   }
   // move up or down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW))
   {
     // m_fireDirection.x -= 1.0f * deltaTime;
-    m_ik->fabrik(ikPos + (Vector3::DOWN * speed));
+    m_target += Vector3::DOWN * speed;
+    if (m_ikType == IK_TYPE::kFabrik) {
+      m_ik->fabrik(m_target);
+    }
+    else {
+      m_ik->CCD(m_target, 4);
+    }
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS))
   {
     // m_fireDirection.x -= 1.0f * deltaTime;
-    m_ik->fabrik(ikPos + (Vector3::UP * speed));
+    m_target += Vector3::UP * speed;
+    if (m_ikType == IK_TYPE::kFabrik) {
+      m_ik->fabrik(m_target);
+    }
+    else {
+      m_ik->CCD(m_target, 4);
+    }
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
     !m_changingType) {
     m_changingType = true;
     // change simulation type
-    if (m_type == PHYSICS_TYPE::kEuler) {
-      m_type = PHYSICS_TYPE::kVerlet;
+    if (m_ikType == IK_TYPE::kCCD) {
+      m_ikType = IK_TYPE::kFabrik;
+      g_Logger().print("FABRIK Algorithm active.");
     }
     else {
-      m_type = PHYSICS_TYPE::kEuler;
+      m_ikType = IK_TYPE::kCCD;
+      g_Logger().print("CCD Algorithm active.");
     }
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
     g_RenderManager().compileShaders();
   }
-//  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+  m_targetShape->setPosition(m_target);
+  // Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
   float strength = 1.0f * deltaTime;
   Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
   //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationX(strength);
+    m_ik->m_bones[currentBone]->actorIni->m_transform *= Matrix4::rotationX(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
     strength *= -1.0f;
-    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationX(strength);
+    m_ik->m_bones[currentBone]->actorIni->m_transform *= Matrix4::rotationX(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     strength *= -1.0f;
-    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationZ(strength);
+    m_ik->m_bones[currentBone]->actorIni->m_transform *= Matrix4::rotationZ(strength);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    m_ik->m_bones[0]->actorIni->m_transform *= Matrix4::rotationZ(strength);
+    m_ik->m_bones[currentBone]->actorIni->m_transform *= Matrix4::rotationZ(strength);
+  }
+
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kAdd) && !m_add) {
+    ++currentBone;
+    m_add = true;
+    currentBone = static_cast<uint32>(Math::clamp(currentBone, 0, m_ik->m_bones.size() - 1));
+  }
+  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kAdd)) {
+    m_add = false;
+  }
+
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSubtract) && !m_subtract) {
+    --currentBone;
+    m_subtract = true;
+    currentBone = static_cast<uint32>(Math::clamp(currentBone, 0, m_ik->m_bones.size() - 1));
+  }
+  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSubtract)) {
+    m_subtract = false;
   }
 
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {

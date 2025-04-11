@@ -68,10 +68,13 @@ namespace KEY
     kQ = 0x51,
     kS = 0x53,
     kW = 0x57,
-    
+
     kEsc = 0x1B,
     kLControl = 0xA2,
     kRControl = 0xA3,
+
+    kAdd = 0x6B,
+    kSubtract = 0x6D,
   };
 }
 

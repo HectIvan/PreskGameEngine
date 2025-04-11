@@ -30,6 +30,7 @@ using pkEngineSDK::InverseKinematics;
 using pkEngineSDK::Material;
 using pkEngineSDK::Model;
 using pkEngineSDK::Scene;
+using pkEngineSDK::uint32;
 using pkEngineSDK::Vector;
 
 namespace PHYSICS_TYPE
@@ -38,6 +39,15 @@ namespace PHYSICS_TYPE
   {
     kVerlet = 0,
     kEuler,
+  };
+}
+
+namespace IK_TYPE
+{
+  enum E
+  {
+    kFabrik = 0,
+    kCCD,
   };
 }
 
@@ -109,6 +119,7 @@ class PhysicsApp : public BaseApp
   
  public:
   PHYSICS_TYPE::E m_type;
+  IK_TYPE::E m_ikType = IK_TYPE::kFabrik;
 
   Vector<SPtr<Obstacle>> obstacles;
 
@@ -124,4 +135,10 @@ class PhysicsApp : public BaseApp
   SPtr<InverseKinematics> m_ik;
 
   Vector2 m_fireDirection;
+
+  Vector3 m_target;
+  SPtr<Actor> m_targetShape;
+  bool m_add = false;
+  bool m_subtract = false;
+  uint32 currentBone = 0;
 };

@@ -295,21 +295,12 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
     // Get the final matrix by taking into account the parent actors
     SPtr<Actor> parent = _gameActors[i]->m_parent;
     Matrix4 transform = _gameActors[i]->m_transform;
-    // while there's a parent
-    while (parent) {
-      // add the parent transform to the current transform matrix
-      transform *= parent->m_transform;
-      // the next parent will be the parent of this parent
-      parent = parent->m_parent;
-    }
-    // set new position according to rotation of parents
-    Matrix4 newTransform = transform;
-    Vector3 pos = _gameActors[i]->getPosition3();
-    Vector3 newPos = transform * pos;
-    newTransform.setTranslation(newPos);
-    // set the current actor transform as the world in which the shader will work in
+    // if there's a parent
+    if (parent) { transform = parent->m_globalTransform * transform; }
+
+    _gameActors[i]->m_globalTransform = transform;
     g_GraphicAPI().updateConstantBuffer(m_cBWorld,
-                                        &newTransform,
+                                        &transform,
                                         static_cast<uint32>(sizeof(CBWorld)));
 
     /**

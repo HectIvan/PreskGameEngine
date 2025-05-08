@@ -50,10 +50,11 @@ void RendererManager::init(Window& _window)
                                      _window.getHeight(),
                                      TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
                                      kPK_USAGE_DEFAULT,
-                                     kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL,
+                                     kPK_BIND_SHADER_RESOURCE |
+                                     kPK_BIND_DEPTH_STENCIL,
                                      false,
                                      TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
-
+  
   m_pShadowDepthSV = api.createDepthStencilView(m_pShadowDepth);
 
   Vector<SPtr<Texture>> rTVector;
@@ -92,8 +93,8 @@ RendererManager::createPasses()
   SPtr<Pass> shadowPass = make_shared<Pass>();
   // create all pointers
   shadowPass->create();
-  shadowPass->setVSData(L"shaders/pkShadowMapping.hlsl", "VS", "vs_5_0");
-  shadowPass->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
+  shadowPass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
+  shadowPass->setPSData(L"shaders/pkVShader.hlsl", "PS", "ps_5_0");
   shadowPass->compileShaders();
   shadowPass->createShaders();
   shadowPass->createInputLayout();
@@ -127,33 +128,6 @@ RendererManager::compileShaders()
   }
 }
 
-void
-RendererManager::updateCameraBuffers(Camera* _pCamera)
-{
-  // get the api instance to work with
-  GraphicsAPI& api = GraphicsAPI::instance();
-
-  // Update view
-  CBView viewBuffer = CBView();
-  viewBuffer.view = _pCamera->view.getTransposed();
-  m_CView = _pCamera->view.getTransposed();
-  updateBuffer(viewBuffer, m_cBView);
-
-  // Update projection
-  CBProjection projectionBuffer = CBProjection();
-  projectionBuffer.projection = _pCamera->projection.getTransposed();
-  m_CProj = _pCamera->projection.getTransposed();
-  updateBuffer(projectionBuffer, m_cBProjection);
-
-  // update camera
-  CBCamera cameraBuffer = CBCamera();
-  cameraBuffer.eye = _pCamera->eye;
-  cameraBuffer.forward = _pCamera->getForward();
-  cameraBuffer.view = _pCamera->view;
-  cameraBuffer.projection = _pCamera->projection;
-  updateBuffer(cameraBuffer, m_cbCamera);
-}
-
 template<typename T>
 SPtr<T>
 RendererManager::actorToClass(SPtr<Actor>& _subject)
@@ -179,7 +153,7 @@ RendererManager::VSSetConstantBuffers()
   // set the constant buffers
   api.VSSetConstantBuffer(m_cBView, 0, 1);
   api.VSSetConstantBuffer(m_cBProjection, 1, 1);
-  api.VSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.VSSetConstantBuffer(m_cBTransform, 2, 1);
   api.VSSetConstantBuffer(m_cbLight, 3, 1);
   api.VSSetConstantBuffer(m_cbCamera, 4, 1);
 }
@@ -191,7 +165,7 @@ RendererManager::PSSetConstantBuffers()
   // set the constant buffers
   api.PSSetConstantBuffer(m_cBView, 0, 1);
   api.PSSetConstantBuffer(m_cBProjection, 1, 1);
-  api.PSSetConstantBuffer(m_cBWorld, 2, 1);
+  api.PSSetConstantBuffer(m_cBTransform, 2, 1);
   api.PSSetConstantBuffer(m_cbLight, 3, 1);
   api.PSSetConstantBuffer(m_cbCamera, 4, 1);
 }
@@ -219,69 +193,40 @@ void
 RendererManager::render()
 {
   // screen clear color
-  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  GraphicsAPI& api = g_GraphicAPI().instance();
-
-  // set light
-  light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  light.SpotCutoff = 1.0f;
-  light.SpotExponent = 32.0f;
-  light.LightDir = Vector3::FORWARD;
-  light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
-
-  /*
-   * Shadow Map render
-  api.clearRenderTargetView(clearColor, m_pRTargetView);
-  api.clearDepthBuffer(1.0f, m_pShadowDepthSV);
-  
-  // set the base pass for the shadow rendering stage
-  api.setPSShader(m_passes.find(1)->second->getPShader());
-  api.setVSShader(m_passes.find(1)->second->getVShader());
-  api.setSampler(m_passes.find(1)->second->getSamplerState());
-  
-  Camera lightCam;
-  lightCam.init(30,
-                17,
-                3.1416f / 4.0f,
-                0.01f,
-                1000.0f,
-                light.LightPos, // position
-                light.LightDir, // target
-                Vector3::UP,
-                pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
-  
-  Matrix4 lightProj = lightCam.projection.getTransposed();
-  Matrix4 lightView = lightCam.view.getTransposed();
-  
-  api.updateConstantBuffer(m_cBView, &lightView, static_cast<uint32>(sizeof(CBView)));
-  api.updateConstantBuffer(m_cBProjection, &lightProj, static_cast<uint32>(sizeof(CBProjection)));
-  
-  // set constant buffers for the pixel and vertex shaders
-  VSSetConstantBuffers();
-  PSSetConstantBuffers();
-  // render the objects
-  renderActors(g_sceneManager().getAllActors());*/
-
-  api.updateConstantBuffer(m_cbLight,
-    &light,
-    static_cast<uint32>(sizeof(Light)));
-  api.clearRenderTargetView(clearColor, m_pRTargetView);
-  api.clearDepthBuffer(1.0f, m_pDepthSView);
-
-  // set the base pass for the first rendering stage
-  api.setPSShader(m_passes.find(0)->second->getPShader());
-  api.setVSShader(m_passes.find(0)->second->getVShader());
-  api.setSampler(m_passes.find(0)->second->getSamplerState());
-
-  api.updateConstantBuffer(m_cBView, &m_CView, static_cast<uint32>(sizeof(CBView)));
-  api.updateConstantBuffer(m_cBProjection, &m_CProj, static_cast<uint32>(sizeof(CBProjection)));
-
-  // set constant buffers for the pixel and vertex shaders
-  VSSetConstantBuffers();
-  PSSetConstantBuffers();
-  // render the objects
-  renderActors(g_sceneManager().getAllActors());
+  // float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
+  // GraphicsAPI& api = g_GraphicAPI().instance();
+  // 
+  // /**
+  //  * Shadow Render
+  //  */
+  // api.clearRenderTargetView(clearColor, m_pShadowDepth);
+  // api.clearDepthBuffer(1.0f, m_pShadowDepthSV);
+  // 
+  // api.setPSShader(m_passes.find(1)->second->getPShader());
+  // api.setVSShader(m_passes.find(1)->second->getVShader());
+  // api.setSampler(m_passes.find(1)->second->getSamplerState());
+  // 
+  // VSSetConstantBuffers();
+  // PSSetConstantBuffers();
+  // 
+  // renderActors(g_sceneManager().getAllActors());
+  // 
+  // /**
+  //  * Normal Render
+  //  */
+  // api.clearRenderTargetView(clearColor, m_pRTargetView);
+  // api.clearDepthBuffer(1.0f, m_pDepthSView);
+  // 
+  // // set the base pass for the first rendering stage
+  // api.setPSShader(m_passes.find(0)->second->getPShader());
+  // api.setVSShader(m_passes.find(0)->second->getVShader());
+  // api.setSampler(m_passes.find(0)->second->getSamplerState());
+  // 
+  // // set constant buffers for the pixel and vertex shaders
+  // VSSetConstantBuffers();
+  // PSSetConstantBuffers();
+  // // render the objects
+  // renderActors(g_sceneManager().getAllActors());
 }
 
 void
@@ -303,7 +248,9 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work in
-    g_GraphicAPI().updateConstantBuffer(m_cBWorld, &transform, static_cast<uint32>(sizeof(CBWorld)));
+    g_GraphicAPI().updateConstantBuffer(m_cBTransform,
+                                        &transform,
+                                        static_cast<uint32>(sizeof(CBTransform)));
 
     /**
      * Recast to a gameobject. If it fails, do none of this

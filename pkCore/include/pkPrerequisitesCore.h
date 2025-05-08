@@ -6,6 +6,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
 #include "pkMatrix4.h"
@@ -38,10 +39,9 @@ struct CBProjection
   Matrix4 projection;
 };
 
-struct CBWorld
+struct CBTransform
 {
-  Matrix4 world;
-  // Vector4 meshColor;
+  Matrix4 transform;
 };
 
 struct CBCamera
@@ -51,6 +51,18 @@ struct CBCamera
   Matrix4 view;
   Matrix4 projection;
   float unused;
+};
+
+struct CBLight
+{
+  float Type;
+  float SpotCutoff;
+  float SpotExponent;
+  Vector3 LightDir;
+  Vector3 LightPos;
+  Vector3 LightColor;
+  Vector2 unused1;
+  Vector2 unused2;
 };
 
 struct KeyPosition

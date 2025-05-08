@@ -155,7 +155,6 @@ class PK_CORE_EXPORT BaseApp
  public:
   // system
   Window m_window;
-  Camera m_camera;
   EventQueue m_eventQueue;
 
   // vector of game objects in the scene

@@ -22,6 +22,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkComponent.h"
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
@@ -40,7 +41,7 @@ namespace CAMERA_PROJ
   };
 }
 
-class PK_CORE_EXPORT Camera
+class PK_CORE_EXPORT Camera : public Component
 {
  public:
   Camera() = default;
@@ -160,6 +161,21 @@ class PK_CORE_EXPORT Camera
   void
   updateRotation();
 
+  /**
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kCamera; }
+
+  /**
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kCamera; }
+
+ public:
   // Camera view
   Matrix4 view;
   Matrix4 projection;

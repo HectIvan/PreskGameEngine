@@ -57,13 +57,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   compileShaders();
 
   /**
-   * @brief Update the camera.
-   * @param _pCamera Camera to update.
-   */
-  void
-  updateCameraBuffers(Camera* _pCamera);
-
-  /**
    * @brief Converts the actor to a game object pointer.
    * @param _subject Actor to convert.
    * @return Pointer to the game object
@@ -119,13 +112,11 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer);
 
  public:
-  // light source
-  Light light;
 
   // constant buffers
   SPtr<ConstantBuffer> m_cBView;
   SPtr<ConstantBuffer> m_cBProjection;
-  SPtr<ConstantBuffer> m_cBWorld;
+  SPtr<ConstantBuffer> m_cBTransform;
   SPtr<ConstantBuffer> m_cbLight;
   SPtr<ConstantBuffer> m_cbCamera;
 

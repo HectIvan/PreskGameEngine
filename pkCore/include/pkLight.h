@@ -20,6 +20,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkComponent.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector3.h"
 
@@ -36,8 +37,27 @@ namespace LIGHT_TYPE
   };
 }
 
-struct Light
+class PK_CORE_EXPORT Light : public Component
 {
+ public:
+  Light() = default;
+  ~Light() = default;
+
+  /**
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kLight; }
+
+  /**
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kLight; }
+
+ public:
   uint32 Type;
   float SpotCutoff;
   float SpotExponent;

@@ -54,25 +54,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
-  RendererManager& rm = g_RenderManager().instance();
   TextureManager& tm = g_TextureManager().instance();
-  // set light
-  rm.light.Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  rm.light.SpotCutoff = 1.0f;
-  rm.light.SpotExponent = 32.0f;
-  rm.light.LightDir = Vector3::FORWARD * -1.0f;
-  rm.light.LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  rm.light.LightColor = Vector3(1.0f, 1.0f, 1.0f);
-
-  m_camera.init(30,
-                17,
-                3.1416f / 4.0f,
-                0.01f,
-                1000.0f,
-                Vector3(0.0f, 0.0f, -30.0f), // position
-                Vector3(0.0f, 0.0f, 0.0f), // target
-                Vector3(0.0f, 1.0f, 0.0f), // up vector
-                pkEngineSDK::CAMERA_PROJ::kOrthographic);
 
   m_type = PHYSICS_TYPE::kEuler;
 

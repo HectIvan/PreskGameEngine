@@ -126,7 +126,6 @@ public:
   SPtr<Shader> m_pPShader;
 
   SPtr<InputLayout> m_pInputLayout;
-
   SPtr<SamplerState> m_pSamplerState;
 
   /**

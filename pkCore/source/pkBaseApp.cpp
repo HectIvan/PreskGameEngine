@@ -64,9 +64,8 @@ BaseApp::init(const char** _argv)
   initWindow();
   initAPI(_argv);
 
-  createBuffers();
   g_RenderManager().init(m_window);
-  m_cameraSpeed = 50.0f;
+  m_cameraSpeed = 20.0f;
   onInit();
 }
 
@@ -110,14 +109,7 @@ run(String _name, Window& _window)
 void
 BaseApp::createBuffers()
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& render = g_RenderManager().instance();
-
-  render.m_cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  render.m_cBProjection = api.createConstantBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  render.m_cBWorld = api.createConstantBuffer(static_cast<uint32>(sizeof(CBWorld)), nullptr, 0);
-  render.m_cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(Light)), nullptr, 0);
-  render.m_cbCamera = api.createConstantBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
+  
 }
 
 void
@@ -166,7 +158,7 @@ BaseApp::messageLoop()
     // event queue
     m_eventQueue.poll();
     // update camera
-    g_RenderManager().updateCameraBuffers(&m_camera);
+    // g_RenderManager().updateCameraBuffers(&m_camera);
     // render the scene
     render();
   }

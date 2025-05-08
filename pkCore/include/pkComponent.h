@@ -31,6 +31,8 @@ namespace COMPONENT_TYPE
   {
     kModel = 0,
     kMaterial,
+    kLight,
+    kCamera,
     kUnknown,
   };
 }

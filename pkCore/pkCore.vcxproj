@@ -224,6 +224,7 @@
     <ClInclude Include="include\pkWindow.h" />
     <ClInclude Include="include\pkWindowDesc.h" />
     <ClInclude Include="include\pkSamplerState.h" />
+    <ClInclude Include="include\pkSceneManager.h" />
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +255,7 @@
     <ClCompile Include="source\pkRendererManager.cpp" />
     <ClCompile Include="source\pkResourceManager.cpp" />
     <ClCompile Include="source\pkScene.cpp" />
+    <ClCompile Include="source\pkSceneManager.cpp" />
     <ClCompile Include="source\pkScriptManager.cpp" />
     <ClCompile Include="source\pkShader.cpp" />
     <ClCompile Include="source\pkSprite.cpp" />

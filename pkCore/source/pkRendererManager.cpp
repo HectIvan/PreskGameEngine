@@ -4,7 +4,7 @@
 #include "pkLogger.h"
 #include "pkRendererManager.h"
 #include "pkSamplerState.h"
-#include "pkScene.h"
+#include "pkSceneManager.h"
 #include "pkTextureManager.h"
 
 using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
@@ -174,9 +174,9 @@ void
 RendererManager::setActorsBuffers()
 {
   // for each actor in the world
-  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
     // Cast to a gameObject, if it fails, do none of the following process
-    SPtr<Actor> actor = g_sceneManager().getActor(i);
+    SPtr<Actor> actor = g_SceneManager().getActiveScene()->getActor(i);
     SPtr<GameObject> gameObject = actorToClass<GameObject>(actor);
     if (gameObject) {
       // for each model in the game object
@@ -209,7 +209,7 @@ RendererManager::render()
   // VSSetConstantBuffers();
   // PSSetConstantBuffers();
   // 
-  // renderActors(g_sceneManager().getAllActors());
+  // renderActors(g_SceneManager().getAllActors());
   // 
   // /**
   //  * Normal Render
@@ -226,7 +226,7 @@ RendererManager::render()
   // VSSetConstantBuffers();
   // PSSetConstantBuffers();
   // // render the objects
-  // renderActors(g_sceneManager().getAllActors());
+  // renderActors(g_SceneManager().getAllActors());
 }
 
 void

@@ -1,15 +1,16 @@
 /*****************************************************************************/
 /**
- * @file    pkScriptManager.cpp
- * @author  Héctor  Iván Muñoz Ceballos
+ * @file    pkScene.cpp
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    2025/01/29
- * @brief
+ * @brief   Scene used for the engine.
  *
  * @bug    No known bugs.
  */
  /*****************************************************************************/
 
 #include "pkScene.h"
+#include "pkTimeManager.h"
 
 namespace pkEngineSDK
 {
@@ -57,9 +58,23 @@ Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
   // return the object created.
   return gObject;
 }
-PK_CORE_EXPORT Scene&
-g_sceneManager()
+
+void
+Scene::update(float _deltaTime)
 {
-  return Scene::instance();
+  for (uint32 i = 0; i < getAllActors().size(); ++i) {
+    if (getActor(i)->m_active) {
+      SPtr<Actor> actor = getActor(i);
+      updateActor(actor, _deltaTime);
+    }
+  }
+}
+void
+Scene::updateActor(SPtr<Actor> _pActor, float _deltaTime)
+{
+  _pActor->update(_deltaTime);
+  for (uint32 i = 0; i < _pActor->m_children.size(); ++i) {
+    updateActor(_pActor->m_children[i], _deltaTime);
+  }
 }
 }

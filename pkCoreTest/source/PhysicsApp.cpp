@@ -6,6 +6,7 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkRendererManager.h"
+#include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
@@ -14,7 +15,7 @@ using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_sceneManager;
+using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::Light;
@@ -33,10 +34,10 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
-  SPtr<Actor> anchor = g_sceneManager().instantiate();
+  SPtr<Actor> anchor = g_SceneManager().getActiveScene()->instantiate();
   anchor->addComponent(newModel("sprite.fbx"));
   
-  SPtr<Actor> weight = g_sceneManager().instantiate();
+  SPtr<Actor> weight = g_SceneManager().getActiveScene()->instantiate();
   weight->addComponent(newModel("sprite.fbx"));
 
   m_spring = make_shared<Spring>();
@@ -67,7 +68,7 @@ PhysicsApp::onInit()
    * Cannon creation
    */
   m_cannon = std::make_shared<Cannon>();
-  m_cannon->m_actor = g_sceneManager().instantiate();
+  m_cannon->m_actor = g_SceneManager().getActiveScene()->instantiate();
   m_cannon->m_actor->addComponent(newModel("sphere.obj"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
@@ -77,7 +78,7 @@ PhysicsApp::onInit()
     // make new instance of a projectile
     SPtr<Projectile> proj = make_shared<Projectile>();
     // get the last instance
-    proj->m_actor = g_sceneManager().instantiate();
+    proj->m_actor = g_SceneManager().getActiveScene()->instantiate();
     // start the projectile
     proj->start();
     // set projectile speed
@@ -94,7 +95,7 @@ PhysicsApp::onInit()
   /**
    * Instantiate obstacle
    */
-  // SPtr<Actor> obst = g_sceneManager().instantiate();
+  // SPtr<Actor> obst = g_SceneManager().instantiate();
   // obst->m_transform = Matrix4::IDENTITY;
   // obstacle.start(Vector3(-5, -3, 0), 1, 0.9f, obst);
   // obstacle.m_actor->addComponent(newModel("sphere.obj"));
@@ -109,7 +110,7 @@ PhysicsApp::onInit()
    */
   m_ik = make_shared<InverseKinematics>();
   for (uint32 i = 0; i < 20; ++i) {
-    SPtr<Actor> ikRoot = g_sceneManager().instantiate();
+    SPtr<Actor> ikRoot = g_SceneManager().getActiveScene()->instantiate();
     ikRoot->addComponent(newModel("sphere.obj"));
     ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 

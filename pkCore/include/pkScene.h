@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
  * @file    pkScene.h
- * @author  Héctor  Iván Muñoz Ceballos
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    2025/01/29
- * @brief   Engine Scene.
+ * @brief   Scene used for the engine.
  *
  * @bug    No known bugs.
  */
@@ -16,13 +16,12 @@
 **/
 /*********************************************/
 #include "pkActor.h"
-#include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Scene : public Module<Scene>
+class PK_CORE_EXPORT Scene
 {
  public:
   Scene() = default;
@@ -38,6 +37,13 @@ class PK_CORE_EXPORT Scene : public Module<Scene>
   SPtr<Actor>
   instantiate(Matrix4 _transform = Matrix4::IDENTITY,
               SPtr<Actor> _pParent = nullptr);
+
+  /**
+   * @brief Set the active state of the current scene.
+   * @param _active State of the scene.
+   */
+  void
+  setActive(bool _active) { m_isActive = _active; }
 
   /**
    * @brief Get the last inserted actor of the scene.
@@ -61,10 +67,24 @@ class PK_CORE_EXPORT Scene : public Module<Scene>
   SPtr<Actor>
   getActor(uint32 _index) { return m_actors[_index]; }
 
+  /**
+   * @brief Update all actors.
+   * @param _deltaTime Time between frames.
+   */
+  void
+  update(float _deltaTime);
+
+ private:
+  /**
+   * @brief Update an actor.
+   * @param _pActor Actor to update.
+   * @param _deltaTime Time between frames.
+   */
+  void
+  updateActor(SPtr<Actor> _pActor, float _deltaTime);
+
  public:
   Vector<SPtr<Actor>> m_actors;
+  bool m_isActive;
 };
-
-PK_CORE_EXPORT Scene&
-g_sceneManager();
 }

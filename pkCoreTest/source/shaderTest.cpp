@@ -2,8 +2,9 @@
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
+#include "pkLogger.h"
 #include "pkRendererManager.h"
-#include "pkScene.h"
+#include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
@@ -13,8 +14,9 @@ using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_TimeManager;
-using pkEngineSDK::g_sceneManager;
+using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
+using pkEngineSDK::g_Logger;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
@@ -52,7 +54,7 @@ ShaderTest::onInit()
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
   lightCom->LightDir = Vector3::UP;
-  lightCom->LightPos = Vector3(0.0f, -50.0f, 0.0f);
+  lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f, 1.0f, 1.0f);
 
   // add camera component
@@ -73,10 +75,10 @@ ShaderTest::onInit()
   m_cBView = rm.m_cBView;
   m_cbLight = rm.m_cbLight;
 
-  SPtr<Actor> pistol = g_sceneManager().instantiate();
+  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
-  // SPtr<Actor> sponza = g_sceneManager().instantiate();
+  // SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate();
   // sponza->addComponent(newModel("sponza.obj"));
 }
 
@@ -85,35 +87,30 @@ ShaderTest::input()
 {
   float deltaTime = g_TimeManager().m_deltaTime;
   // update the camera m_speed
-  float camm_speed = m_cameraSpeed * deltaTime;
+  float cam_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-    m_camera->move(Vector3(0.0f, 0.0f, camm_speed));
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, 0.0f, camm_speed));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, 0, cam_speed));
+    g_Logger().print(m_camera->getComponent<Camera>()->view.getTranslation3());
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-    m_camera->move(Vector3(0.0f, 0.0f, -camm_speed));
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, 0.0f, -camm_speed));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, 0, -cam_speed));
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera->move(Vector3(camm_speed, 0.0f, 0.0f));
-    m_camera->getComponent<Camera>()->move(Vector3(camm_speed, 0.0f, 0.0f));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera->move(Vector3(-camm_speed, 0.0f, 0.0f));
-    m_camera->getComponent<Camera>()->move(Vector3(-camm_speed, 0.0f, 0.0f));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
   }
   // move up/down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
     m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
-    m_camera->move(Vector3(0.0f, camm_speed, 0.0f));
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, camm_speed, 0.0f));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, cam_speed, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
     m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
-    m_camera->move(Vector3(0.0f, -camm_speed, 0.0f));
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, -camm_speed, 0.0f));
+    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, -cam_speed, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
     Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
@@ -128,22 +125,22 @@ ShaderTest::input()
     g_RenderManager().compileShaders();
   }
 
-  SPtr<Actor> actor = g_sceneManager().getActor(0);
+  SPtr<Actor> actor = g_SceneManager().getActiveScene()->getActor(0);
 
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    actor->m_transform *= Matrix4::rotationY(rot);
+    m_camera->getComponent<Camera>()->view *= Matrix4::rotationY(rot);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationY(rot);
+    m_camera->getComponent<Camera>()->view *= Matrix4::rotationY(rot);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     rot *= -1.0f;
-    actor->m_transform *= Matrix4::rotationX(rot);
+    m_camera->getComponent<Camera>()->view *= Matrix4::rotationX(rot);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    actor->m_transform *= Matrix4::rotationX(rot);
+  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+    m_camera->getComponent<Camera>()->view *= Matrix4::rotationX(rot);
   }
 }
 
@@ -192,20 +189,20 @@ ShaderTest::onRender()
    */
   SPtr<Camera> lightCam = light->getComponent<Camera>();
   Matrix4 projMatrix = lightCam->projection.getTransposed();
-  // api.updateConstantBuffer(m_cbCamera, &lightCam, static_cast<uint32>(sizeof(Camera)));
-  // api.updateConstantBuffer(m_cBProjection, &projMatrix, static_cast<uint32>(sizeof(Matrix4)));
-  // 
-  // api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
-  // api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
-  // 
-  // api.setPSShader(rm.m_passes.find(1)->second->getPShader());
-  // api.setVSShader(rm.m_passes.find(1)->second->getVShader());
-  // api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
-  // 
-  // rm.VSSetConstantBuffers();
-  // rm.PSSetConstantBuffers();
-  // 
-  // rm.renderActors(g_sceneManager().getAllActors());
+  api.updateConstantBuffer(m_cbCamera, &lightCam, static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(m_cBProjection, &projMatrix, static_cast<uint32>(sizeof(Matrix4)));
+  
+  api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
+  api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
+  
+  api.setPSShader(rm.m_passes.find(1)->second->getPShader());
+  api.setVSShader(rm.m_passes.find(1)->second->getVShader());
+  api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
+  
+  rm.VSSetConstantBuffers();
+  rm.PSSetConstantBuffers();
+  
+  rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
   /**
    * Normal Render
@@ -213,8 +210,8 @@ ShaderTest::onRender()
 
   SPtr<Camera> cam = m_camera->getComponent<Camera>();
   Matrix4 camProj = cam->projection.getTransposed();
-  api.updateConstantBuffer(m_cbCamera, &lightCam, static_cast<uint32>(sizeof(Camera)));
-  api.updateConstantBuffer(m_cBProjection, &projMatrix, static_cast<uint32>(sizeof(Matrix4)));
+  api.updateConstantBuffer(m_cbCamera, &cam, static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(m_cBProjection, &camProj, static_cast<uint32>(sizeof(Matrix4)));
   
   api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
   api.clearDepthBuffer(1.0f, rm.m_pDepthSView);
@@ -228,7 +225,7 @@ ShaderTest::onRender()
   rm.VSSetConstantBuffers();
   rm.PSSetConstantBuffers();
   // render the objects
-  rm.renderActors(g_sceneManager().getAllActors());
+  rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
   // g_RenderManager().render();
 }

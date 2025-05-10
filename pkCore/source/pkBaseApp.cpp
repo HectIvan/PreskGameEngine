@@ -7,6 +7,7 @@
 #include "pkModel.h"
 #include "pkMath.h"
 #include "pkPrerequisitesCore.h"
+#include "pkSceneManager.h"
 #include "pkSprite.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
@@ -57,12 +58,15 @@ BaseApp::init(const char** _argv)
   Logger::startUp();
   RendererManager::startUp();
   ResourceManager::startUp();
-  Scene::startUp();
+  SceneManager::startUp();
   TextureManager::startUp();
   TimeManager::startUp();
 
   initWindow();
   initAPI(_argv);
+
+  g_SceneManager().createScene();
+  g_SceneManager().setActive(0);
 
   g_RenderManager().init(m_window);
   m_cameraSpeed = 20.0f;
@@ -107,32 +111,6 @@ run(String _name, Window& _window)
 }
 
 void
-BaseApp::createBuffers()
-{
-  
-}
-
-void
-updateActor(SPtr<Actor>& _pActor, float _deltaTime)
-{
-  _pActor->update(_deltaTime);
-  for (uint32 i = 0; i < _pActor->m_children.size(); ++i) {
-    updateActor(_pActor->m_children[i], _deltaTime);
-  }
-}
-
-void
-update(float _deltaTime)
-{
-  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
-    if (g_sceneManager().getActor(i)->m_active) {
-      SPtr<Actor> actor = g_sceneManager().getActor(i);
-      updateActor(actor, _deltaTime);
-    }
-  }
-}
-
-void
 BaseApp::messageLoop()
 {
   // get the starting deltaTime
@@ -149,11 +127,14 @@ BaseApp::messageLoop()
     // child class app update
     onUpdate();
     // update game objects
-    update(g_TimeManager().m_deltaTime);
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();
+      g_SceneManager().getActiveScene()->update(g_TimeManager().m_deltaTime);
       m_fixedTimer = 0;
+    }
+    else {
+      g_SceneManager().getActiveScene()->update(g_TimeManager().m_fixedDeltaTime);
     }
     // event queue
     m_eventQueue.poll();
@@ -178,10 +159,10 @@ SPtr<Actor>
 BaseApp::actorFind(String _objectName)
 {
   // for each game object in the list
-  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
     // check if the name is the one we're looking for
-    if (g_sceneManager().getActor(i)->m_name == _objectName) {
-      return g_sceneManager().getActor(i);
+    if (g_SceneManager().getActiveScene()->getActor(i)->m_name == _objectName) {
+      return g_SceneManager().getActiveScene()->getActor(i);
     }
   }
   // if no game object fits the name
@@ -193,12 +174,12 @@ SPtr<Actor>
 BaseApp::getActorWithComponent()
 {
   // check each game object
-  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = g_sceneManager().getActor(i)->getComponent<T>();
+    SPtr<T> check = g_SceneManager().getActiveScene()->getActor(i)->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      return g_sceneManager().getActor(i);
+      return g_SceneManager().getActor(i);
     }
   }
 }
@@ -210,12 +191,12 @@ BaseApp::getAllActorsWithComponent()
   // game object list
   Vector<SPtr<GameObject>> list;
   // check each game object
-  for (uint32 i = 0; i < g_sceneManager().getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
     // check if the data type return is not null
-    SPtr<T> check = g_sceneManager().getActor(i)->getComponent<T>();
+    SPtr<T> check = g_SceneManager().getActiveScene()->getActor(i)->getComponent<T>();
     if (check) {
       // if its not null, return the final value
-      list.push_back(g_sceneManager().getActor(i));
+      list.push_back(g_SceneManager().getActiveScene()->getActor(i));
     }
   }
   return list;

@@ -252,6 +252,9 @@
     <ClInclude Include="include\pkTextureManager.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkSceneManager.h">
+      <Filter>include\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -364,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="source\pkTextureManager.cpp">
       <Filter>source\base app</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkSceneManager.cpp">
+      <Filter>source\game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

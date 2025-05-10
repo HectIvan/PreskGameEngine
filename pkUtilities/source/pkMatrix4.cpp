@@ -125,6 +125,16 @@ Matrix4::translation(Vector3& _position)
   return M;
 }
 
+Matrix4
+Matrix4::translationA(Vector3 _position)
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][3] = _position.x;
+  M.matrix[1][3] = _position.y;
+  M.matrix[2][3] = _position.z;
+  return M;
+}
+
 void
 Matrix4::setTranslation(Vector3 _pos)
 {

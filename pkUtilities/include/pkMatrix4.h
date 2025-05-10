@@ -397,6 +397,15 @@ class PK_UTILITY_EXPORT Matrix4
   translation(Vector3& _position);
 
   /**
+   * @brief The translation matrix that is created from
+   * the Vector3 given to it.
+   * @param _position vector position.
+   * @return The translation matrix at the position given to it.
+   */
+  static Matrix4
+  translationA(Vector3 _position);
+
+  /**
    * @brief Set the translation
    * @param _pos vector position.
    */

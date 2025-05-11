@@ -5,11 +5,7 @@
 /*********************************************/
 #include "pkDX11SamplerState.h"
 
-namespace pkEngineSDK {
-
-void
-DX11SamplerState::clean()
+namespace pkEngineSDK
 {
-  safeRelease(m_pSampler);
-}
+
 }

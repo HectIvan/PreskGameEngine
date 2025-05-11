@@ -5,10 +5,12 @@
 /*********************************************/
 #include "cmath"
 #include "pkPlatformMath.h"
+#include "pkVector4.h"
 
 using std::abs;
 using std::pow;
 using std::sqrt;
+using std::lerp;
 using std::min;
 using std::max;
 using std::sin;
@@ -112,6 +114,39 @@ PlatformMath::clamp(const float _t, const float _x, const float _y)
   return t;
 }
 
+float
+PlatformMath::lerp(const float _x, const float _y, const float _t)
+{
+  return std::lerp(_x, _y, _t);
+}
+
+Vector3
+PlatformMath::lerp3(const Vector3 _x, const Vector3 _y, const float _t)
+{
+  float x = std::lerp(_x.x, _y.x, _t);
+  float y = std::lerp(_x.y, _y.y, _t);
+  float z = std::lerp(_x.z, _y.z, _t);
+  return Vector3(x, y, z);
+}
+
+Vector4
+PlatformMath::lerp4(const Vector4 _x, const Vector4 _y, const float _t)
+{
+  float x = std::lerp(_x.x, _y.x, _t);
+  float y = std::lerp(_x.y, _y.y, _t);
+  float z = std::lerp(_x.z, _y.z, _t);
+  float w = std::lerp(_x.w, _y.w, _t);
+  return Vector4(x, y, z, w);
+}
+
+float
+PlatformMath::hookeLaw(float _elasticity, float _displacement)
+{
+  // @source: https://www.britannica.com/science/Hookes-law
+  // F = KX
+  return -_elasticity * _displacement;
+}
+
 /**
  * Sphere
 **/
@@ -137,6 +172,8 @@ PlatformMath::intersectSpherePoint(Sphere& _sphere, const Vector3& _other)
 bool
 PlatformMath::intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other)
 {
+  _capsule = _capsule;
+  _capsule = _other;
   return false;
 }
 
@@ -211,5 +248,11 @@ PlatformMath::intersectCubePoint(Cube& _cube, const Vector3& _other)
     }
   }
   return false;
+}
+
+bool
+PlatformMath::isNan(float _x)
+{
+  return std::isnan(_x);
 }
 }

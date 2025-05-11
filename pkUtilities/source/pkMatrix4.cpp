@@ -3,6 +3,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkMath.h"
 #include "pkMatrix4.h"
 
 namespace pkEngineSDK {
@@ -82,6 +83,102 @@ Matrix4::Matrix4(float m00, float m01, float m02, float m03,
 }
 
 Matrix4
+Matrix4::getInverse()
+{
+  // Matrix4.cpp. (s. f.). https://graphics.stanford.edu/~mdfisher/Code/Engine/Matrix4.cpp.html
+
+// Inversion by Cramer's rule.  Code taken from an Intel publication
+//
+  double Result[4][4];
+  double tmp[12]; /* temp array for pairs */
+  double src[16]; /* array of transpose source matrix */
+  double det; /* determinant */
+  /* transpose matrix */
+  for (uint32 i = 0; i < 4; i++)
+  {
+    src[i + 0] = matrix[i][0];
+    src[i + 4] = matrix[i][1];
+    src[i + 8] = matrix[i][2];
+    src[i + 12] = matrix[i][3];
+  }
+  /* calculate pairs for first 8 elements (cofactors) */
+  tmp[0] = src[10] * src[15];
+  tmp[1] = src[11] * src[14];
+  tmp[2] = src[9] * src[15];
+  tmp[3] = src[11] * src[13];
+  tmp[4] = src[9] * src[14];
+  tmp[5] = src[10] * src[13];
+  tmp[6] = src[8] * src[15];
+  tmp[7] = src[11] * src[12];
+  tmp[8] = src[8] * src[14];
+  tmp[9] = src[10] * src[12];
+  tmp[10] = src[8] * src[13];
+  tmp[11] = src[9] * src[12];
+  /* calculate first 8 elements (cofactors) */
+  Result[0][0] = tmp[0] * src[5] + tmp[3] * src[6] + tmp[4] * src[7];
+  Result[0][0] -= tmp[1] * src[5] + tmp[2] * src[6] + tmp[5] * src[7];
+  Result[0][1] = tmp[1] * src[4] + tmp[6] * src[6] + tmp[9] * src[7];
+  Result[0][1] -= tmp[0] * src[4] + tmp[7] * src[6] + tmp[8] * src[7];
+  Result[0][2] = tmp[2] * src[4] + tmp[7] * src[5] + tmp[10] * src[7];
+  Result[0][2] -= tmp[3] * src[4] + tmp[6] * src[5] + tmp[11] * src[7];
+  Result[0][3] = tmp[5] * src[4] + tmp[8] * src[5] + tmp[11] * src[6];
+  Result[0][3] -= tmp[4] * src[4] + tmp[9] * src[5] + tmp[10] * src[6];
+  Result[1][0] = tmp[1] * src[1] + tmp[2] * src[2] + tmp[5] * src[3];
+  Result[1][0] -= tmp[0] * src[1] + tmp[3] * src[2] + tmp[4] * src[3];
+  Result[1][1] = tmp[0] * src[0] + tmp[7] * src[2] + tmp[8] * src[3];
+  Result[1][1] -= tmp[1] * src[0] + tmp[6] * src[2] + tmp[9] * src[3];
+  Result[1][2] = tmp[3] * src[0] + tmp[6] * src[1] + tmp[11] * src[3];
+  Result[1][2] -= tmp[2] * src[0] + tmp[7] * src[1] + tmp[10] * src[3];
+  Result[1][3] = tmp[4] * src[0] + tmp[9] * src[1] + tmp[10] * src[2];
+  Result[1][3] -= tmp[5] * src[0] + tmp[8] * src[1] + tmp[11] * src[2];
+  /* calculate pairs for second 8 elements (cofactors) */
+  tmp[0] = src[2] * src[7];
+  tmp[1] = src[3] * src[6];
+  tmp[2] = src[1] * src[7];
+  tmp[3] = src[3] * src[5];
+  tmp[4] = src[1] * src[6];
+  tmp[5] = src[2] * src[5];
+
+  tmp[6] = src[0] * src[7];
+  tmp[7] = src[3] * src[4];
+  tmp[8] = src[0] * src[6];
+  tmp[9] = src[2] * src[4];
+  tmp[10] = src[0] * src[5];
+  tmp[11] = src[1] * src[4];
+  /* calculate second 8 elements (cofactors) */
+  Result[2][0] = tmp[0] * src[13] + tmp[3] * src[14] + tmp[4] * src[15];
+  Result[2][0] -= tmp[1] * src[13] + tmp[2] * src[14] + tmp[5] * src[15];
+  Result[2][1] = tmp[1] * src[12] + tmp[6] * src[14] + tmp[9] * src[15];
+  Result[2][1] -= tmp[0] * src[12] + tmp[7] * src[14] + tmp[8] * src[15];
+  Result[2][2] = tmp[2] * src[12] + tmp[7] * src[13] + tmp[10] * src[15];
+  Result[2][2] -= tmp[3] * src[12] + tmp[6] * src[13] + tmp[11] * src[15];
+  Result[2][3] = tmp[5] * src[12] + tmp[8] * src[13] + tmp[11] * src[14];
+  Result[2][3] -= tmp[4] * src[12] + tmp[9] * src[13] + tmp[10] * src[14];
+  Result[3][0] = tmp[2] * src[10] + tmp[5] * src[11] + tmp[1] * src[9];
+  Result[3][0] -= tmp[4] * src[11] + tmp[0] * src[9] + tmp[3] * src[10];
+  Result[3][1] = tmp[8] * src[11] + tmp[0] * src[8] + tmp[7] * src[10];
+  Result[3][1] -= tmp[6] * src[10] + tmp[9] * src[11] + tmp[1] * src[8];
+  Result[3][2] = tmp[6] * src[9] + tmp[11] * src[11] + tmp[3] * src[8];
+  Result[3][2] -= tmp[10] * src[11] + tmp[2] * src[8] + tmp[7] * src[9];
+  Result[3][3] = tmp[10] * src[10] + tmp[4] * src[8] + tmp[9] * src[9];
+  Result[3][3] -= tmp[8] * src[9] + tmp[11] * src[10] + tmp[5] * src[8];
+  /* calculate determinant */
+  det = src[0] * Result[0][0] + src[1] * Result[0][1] + src[2] * Result[0][2] + src[3] * Result[0][3];
+  /* calculate matrix inverse */
+  det = 1.0f / det;
+
+  Matrix4 FloatResult;
+  for (uint32 i = 0; i < 4; i++)
+  {
+    for (uint32 j = 0; j < 4; j++)
+    {
+      FloatResult.matrix[i][j] = float(Result[i][j] * det);
+    }
+  }
+  return FloatResult;
+}
+
+Matrix4
 Matrix4::getTransposed()
 {
   Matrix4 result;
@@ -124,6 +221,44 @@ Matrix4::translation(Vector3& _position)
   return M;
 }
 
+void
+Matrix4::setTranslation(Vector3 _pos)
+{
+  matrix[0][3] = _pos.x;
+  matrix[1][3] = _pos.y;
+  matrix[2][3] = _pos.z;
+}
+
+void
+Matrix4::setTranslation(float _x, float _y, float _z)
+{
+  matrix[0][3] = _x;
+  matrix[1][3] = _y;
+  matrix[2][3] = _z;
+}
+
+Matrix4
+Matrix4::getTranslation()
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][3] = matrix[0][3];
+  M.matrix[1][3] = matrix[1][3];
+  M.matrix[2][3] = matrix[2][3];
+  return M;
+}
+
+Vector3
+Matrix4::getTranslation3()
+{
+  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
+}
+
+Vector3
+Matrix4::getTranslationVector()
+{
+  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
+}
+
 Matrix4
 Matrix4::scale(Vector3& _scale)
 {
@@ -132,6 +267,107 @@ Matrix4::scale(Vector3& _scale)
   M.matrix[3][1] = _scale.y;
   M.matrix[3][2] = _scale.z;
   return M;
+}
+
+Matrix4
+Matrix4::getScale()
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[3][0] = matrix[3][0];
+  M.matrix[3][1] = matrix[3][1];
+  M.matrix[3][2] = matrix[3][2];
+  return M;
+}
+
+Vector3
+Matrix4::getScale3()
+{
+  return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
+}
+
+void
+Matrix4::setScale(Vector3 _scale)
+{
+  matrix[3][0] = _scale.x;
+  matrix[3][1] = _scale.y;
+  matrix[3][2] = _scale.z;
+}
+
+void
+Matrix4::setScale(Matrix4 _scale)
+{
+  matrix[3][0] = _scale.matrix[3][0];
+  matrix[3][1] = _scale.matrix[3][1];
+  matrix[3][2] = _scale.matrix[3][2];
+}
+
+void
+Matrix4::setScale(float _x, float _y, float _z)
+{
+  matrix[3][0] = _x;
+  matrix[3][1] = _y;
+  matrix[3][2] = _z;
+}
+
+void
+Matrix4::setScale(float _val)
+{
+  matrix[3][0] = _val;
+  matrix[3][1] = _val;
+  matrix[3][2] = _val;
+}
+
+Matrix4
+Matrix4::MatrixRotationAxis(Vector3 _axis, float _angle)
+{
+  PK_ASSERT(!_axis.isZero());
+  PK_ASSERT(!_axis.hasNan());
+
+  _axis.normalize();
+  
+  //Compute rotation matrix from axis and angle
+  float s = Math::sin(_angle);
+  float c = Math::cos(_angle);
+  float t = 1.0f - c;
+
+  float x = _axis.x;  float y = _axis.y;  float z = _axis.z;
+
+  float tx = t * x;  float ty = t * y;  float tz = t * z;
+  float txy = tx * y;  float txz = tx * z;  float tyz = ty * z;
+  float sx = s * x;  float sy = s * y;  float sz = s * z;
+
+  Matrix4 Result = Matrix4::IDENTITY;
+  Result.matrix[0][0] = tx * x + c;
+  Result.matrix[0][1] = txy + sz;
+  Result.matrix[0][2] = txz - sy;
+
+  Result.matrix[1][0] = txy - sz;
+  Result.matrix[1][1] = ty * y + c;
+  Result.matrix[1][2] = tyz + sx;
+
+  Result.matrix[2][0] = txz + sy;
+  Result.matrix[2][1] = tyz - sx;
+  Result.matrix[2][2] = tz * z + c;
+
+  return Result;
+}
+
+Matrix4
+Matrix4::getRotation()
+{
+  Matrix4 rot = Matrix4::IDENTITY;
+  rot.matrix[0][0] = matrix[0][0];
+  rot.matrix[0][1] = matrix[0][1];
+  rot.matrix[0][2] = matrix[0][2];
+
+  rot.matrix[1][0] = matrix[1][0];
+  rot.matrix[1][1] = matrix[1][1];
+  rot.matrix[1][2] = matrix[1][2];
+
+  rot.matrix[2][0] = matrix[2][0];
+  rot.matrix[2][1] = matrix[2][1];
+  rot.matrix[2][2] = matrix[2][2];
+  return rot;
 }
 
 Matrix4
@@ -145,9 +381,7 @@ Matrix4::rotation(float& _angleX, float& _angleY, float& _angleZ)
 Matrix4
 Matrix4::rotation(Vector3& _rot)
 {
-  Matrix4 M = Matrix4::IDENTITY;
-  M = rotationX(_rot.x) * rotationY(_rot.y) * rotationZ(_rot.z);
-  return M;
+  return rotation(_rot.x, _rot.y, _rot.z);
 }
 
 Matrix4
@@ -199,14 +433,32 @@ Matrix4::rotationX(float& _angle)
 
   return M;
 }
+
+void
+Matrix4::setRotation(Matrix4 _rotation)
+{
+  matrix[0][0] = _rotation.matrix[0][0];
+  matrix[0][1] = _rotation.matrix[0][1];
+  matrix[0][2] = _rotation.matrix[0][2];
+
+  matrix[1][0] = _rotation.matrix[1][0];
+  matrix[1][1] = _rotation.matrix[1][1];
+  matrix[1][2] = _rotation.matrix[1][2];
+
+  matrix[2][0] = _rotation.matrix[2][0];
+  matrix[2][1] = _rotation.matrix[2][1];
+  matrix[2][2] = _rotation.matrix[2][2];
+}
+
 Matrix4
-Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector4 _upDir)
+Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector3 _upDir)
 {
   Vector4 EyeDirection;
   Matrix4 M;
 
   EyeDirection = _atPos - _eyePos;
-  M = lookToLH(_eyePos, EyeDirection, _upDir);
+  Vector4 upDir = Vector4(_upDir, 0.0f);
+  M = lookToLH(_eyePos, EyeDirection, upDir);
 
   return M;
 }
@@ -215,16 +467,8 @@ Matrix4
 Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
 {
   Vector4 negEyePosition;
-  Vector4 D0, D1, D2;
   Vector4 R0, R1, R2;
-  Matrix4 M;
-
-  // assert(EyeDirection != Vector4D::ZERO);
-  // assert(EyeDirection.IsDifferent(Vector4D::ZERO));
-  // assert(!EyeDirection.IsInfinite());
-  // assert(UpDirection.IsDifferent(Vector4D::ZERO));
-  // assert(!UpDirection.IsInfinite());
-
+  Matrix4 M = Matrix4::IDENTITY;
   // forward vector
   Vector4 eyeDirectionNormalized = _eyeDir;
   eyeDirectionNormalized.normalize();
@@ -241,7 +485,7 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
   R1CrossProduct = R2 ^ R0;
   R1 = R1CrossProduct;
 
-  negEyePosition = -_eyePos;
+  negEyePosition = _eyePos * -1.0f;
 
   // get the rows dot product
   float R0Dot = Vector4::dotProd(negEyePosition, R0);
@@ -252,22 +496,18 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
   M.matrix[0][0] = R0.x;
   M.matrix[0][1] = R1.x;
   M.matrix[0][2] = R2.x;
-  M.matrix[0][3] = 0.0f;
 
   M.matrix[1][0] = R0.y;
   M.matrix[1][1] = R1.y;
   M.matrix[1][2] = R2.y;
-  M.matrix[1][3] = 0.0f;
 
   M.matrix[2][0] = R0.z;
   M.matrix[2][1] = R1.z;
   M.matrix[2][2] = R2.z;
-  M.matrix[2][3] = 0.0f;
 
   M.matrix[3][0] = R0Dot;
   M.matrix[3][1] = R1Dot;
   M.matrix[3][2] = R2Dot;
-  M.matrix[3][3] = 1.0f;
 
   return M;
 }
@@ -283,6 +523,26 @@ Matrix4::perspectiveFOVLH(float _halfFOV, float _width, float _height, float _ne
   M.matrix[2][3] = 1.0f;
   M.matrix[3][2] = -_nearZ * (_farZ / (_farZ - _nearZ));
 
+  return M;
+}
+
+Matrix4
+Matrix4::orthographicFOVLH(float _left,
+                           float _right,
+                           float _top,
+                           float _bottom,
+                           float _nearZ,
+                           float _farZ)
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][0] = 2.0f / (_right - _left);
+  M.matrix[0][3] = -(_right + _left) / (_right - _left);
+
+  M.matrix[1][1] = 2.0f / (_top - _bottom);
+  M.matrix[1][3] = -(_top + _bottom) / (_top - _bottom);
+
+  M.matrix[2][2] = 1.0f / (_farZ - _nearZ);
+  M.matrix[2][3] = -_nearZ / (_farZ - _nearZ);
   return M;
 }
 }

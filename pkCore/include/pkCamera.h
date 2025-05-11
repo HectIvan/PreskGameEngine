@@ -7,13 +7,21 @@
 *
 * This file will contain the Camera used for the engine
 *
-* @bug No bug known.
+* @bug.
+* Camera movement not as intended when moving to a certain Z coordinat range.
+* Erratic camera rotation when its performed constantly.
 *
-* @HectIvan 30/09/2024
+* @HectIvan 02/01/2025
+* Movement and camera rotation at the same time.
 */
 /************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
@@ -23,7 +31,16 @@
 namespace pkEngineSDK
 {
 
-class Camera
+namespace CAMERA_PROJ
+{
+  enum E : uint32
+  {
+    kPerspective = 0,
+    kOrthographic,
+  };
+}
+
+class PK_CORE_EXPORT Camera
 {
  public:
   Camera() = default;
@@ -33,15 +50,22 @@ class Camera
   * Initialize the camera.
   **/
   void
-  Init(uint32 _width,
+  init(uint32 _width,
        uint32 _height,
        float _halfFOV,
        float _nearZ,
        float _farZ,
-       Vector4 _eye,
-       Vector4 _at,
-       Vector4 _up
+       Vector3 _eye,
+       Vector3 _at,
+       Vector3 _up,
+       CAMERA_PROJ::E _camMode = CAMERA_PROJ::kPerspective
   );
+
+  /**
+   * @brief Set the view matrix data
+   */
+  void
+  setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up);
   
   /**
   * Move the camera to a new position.
@@ -82,8 +106,8 @@ class Camera
   * @return
   * The forward vector as a vector4.
   **/
-  Vector4
-  getForwardVector();
+  Vector3
+  getForward();
 
   /**
   * Gets the right vector of the camera.
@@ -91,8 +115,8 @@ class Camera
   * @return
   * The right vector as a vector4.
   **/
-  Vector4
-  getRightVector();
+  Vector3
+  getRight();
 
   /**
   * Gets the up vector of the camera.
@@ -100,8 +124,8 @@ class Camera
   * @return
   * The up vector as a vector4.
   **/
-  Vector4
-  getUpVector();
+  Vector3
+  getUp();
 
   /**
   * Sets the forward vector of the camera.
@@ -110,7 +134,7 @@ class Camera
   * New forward vector.
   **/
   void
-  setForwardVector(Vector4 _vec) { m_forward = _vec; }
+  setForward(Vector3 _vec) { forward = _vec; }
 
   /**
   * Sets the right vector of the camera.
@@ -119,7 +143,7 @@ class Camera
   * New right vector.
   **/
   void
-  setRightVector(Vector4 _vec) { m_right = _vec; }
+  setRight(Vector3 _vec) { right = _vec; }
 
   /**
   * Sets the up vector of the camera.
@@ -128,7 +152,7 @@ class Camera
   * New up vector.
   **/
   void
-  setUpVector(Vector4 _vec) { m_up = _vec; }
+  setUp(Vector3 _vec) { up = _vec; }
 
   /**
   * Set all the direction vectors.
@@ -137,22 +161,22 @@ class Camera
   updateRotation();
 
   // Camera view
-  Matrix4 m_view;
-  Matrix4 m_projection;
-  uint32 m_width;
-  uint32 m_height;
+  Matrix4 view;
+  Matrix4 projection;
+  uint32 width;
+  uint32 height;
 
   // Camera position
-  Vector4 m_eye;
-  Vector4 m_at;
-  Vector4 m_up;
+  Vector4 eye;
+  Vector4 at;
+  Vector3 up;
 
   // camera vectors
-  Vector4 m_forward;
-  Vector4 m_right;
+  Vector3 forward;
+  Vector3 right;
 
   // camera rotation and start position
-  Vector3 m_rotation = Vector3(0.0f);
-  Vector2 m_startPos = Vector2(0.0f);
+  Vector3 rotation;
+  Vector2 startPos = Vector2(0.0f);
 };
 }

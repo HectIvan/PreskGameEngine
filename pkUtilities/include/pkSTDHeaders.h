@@ -5,26 +5,36 @@
 * Includes
 **/
 /*********************************************/
+#include <cassert>
 #include <map>
+#include <memory>
 #include <optional>
 #include <queue>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace pkEngineSDK
 {
 
+using std::make_unique;
+
 template <class T>
 using Queue = std::queue<T>;
 
-template<typename T>
+template<class T>
 using SPtr = std::shared_ptr<T>;
+
+template<class T>
+using UPtr = std::unique_ptr<T>;
 
 template <class T>
 using Stack = std::stack<T>;
 
 using String = std::string;
+
+using WString = std::wstring;
 
 template<class _Kty, class _Ty>
 using UMap = std::unordered_map<_Kty, _Ty>;

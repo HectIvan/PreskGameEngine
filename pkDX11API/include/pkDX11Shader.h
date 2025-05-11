@@ -17,58 +17,23 @@
 * Includes
 **/
 /*********************************************/
-#include <d3dcompiler.h>
 #include "pkDX11Prerequisites.h"
+#include "pkShader.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 using std::wstring;
 
-class DX11Device;
-
-class DX11Shaders
+class DX11Shaders : public Shader
 {
  public:
   DX11Shaders() = default;
-  virtual ~DX11Shaders()
-  {
-    safeRelease(m_pSBlob);
+  virtual ~DX11Shaders() {
+    safeRelease(pSBlob);
   }
 
-  /**
-  * Compile.
-  * 
-  * Compile the shader from a file.
-  * 
-  * @param _szFileName
-  * Name of the shader.
-  * 
-  * @param _szEntryPoint
-  * What section will we compile.
-  * 
-  * @param _szShaderModel
-  * What model of the shader is compiled.
-  * 
-  * @param _ppBlobOut
-  * Blob info.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  * 
-  **/
-  HRESULT
-  compileShaderFromFile(wstring _szFileName,
-                        LPCSTR _szEntryPoint,
-                        LPCSTR _szShaderModel,
-                        ID3DBlob** _ppBlobOut);
-  
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
-
  public:
-  ID3DBlob* m_pSBlob = nullptr;
+  ID3DBlob* pSBlob = nullptr;
 };
 }

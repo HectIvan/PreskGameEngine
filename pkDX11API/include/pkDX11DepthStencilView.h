@@ -18,25 +18,21 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkDepthStencilView.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
-class DX11DepthStencilView
+class DX11DepthStencilView : public DepthStencilView
 {
  public:
   DX11DepthStencilView() = default;
   virtual ~DX11DepthStencilView()
   {
-    safeRelease(m_pDepthSV);
+    safeRelease(pDepthSV);
   }
 
-  /**
-  * Clean the depth stencil view.
-  **/
-  void
-  clean();
-
  public:
-  ID3D11DepthStencilView* m_pDepthSV = nullptr;
+  ID3D11DepthStencilView* pDepthSV = nullptr;
 };
 }

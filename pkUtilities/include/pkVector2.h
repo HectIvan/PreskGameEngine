@@ -332,7 +332,7 @@ class PK_UTILITY_EXPORT Vector2
   * A boolean determining if they are the same.
   **/
   FORCEINLINE const bool
-    operator==(const Vector2& other) const
+  operator==(const Vector2& other) const
   {
     return (x != other.x ||
             y != other.y);
@@ -384,6 +384,12 @@ class PK_UTILITY_EXPORT Vector2
   **/
   FORCEINLINE void 
   normalize();
+
+  /**
+   * @brief Return the normalized vector.
+   */
+  const Vector2
+  normalized() const;
 
   /**
   * clamps the vector.

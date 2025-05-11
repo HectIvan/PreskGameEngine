@@ -33,14 +33,5 @@ class IndexBuffer
  public:
   IndexBuffer() = default;
   virtual ~IndexBuffer() = default;
-
-  template <class Device>
-  SPtr<Device>
-  create(Device* _pDevice,
-         const Vector<uint32>& _index,
-         uint32 _usage);
-
-  virtual void
-  set() = 0;
 };
 }

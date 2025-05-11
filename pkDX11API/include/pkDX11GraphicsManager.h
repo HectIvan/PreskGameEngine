@@ -12,7 +12,8 @@
 /************************************************************************/
 #pragma once
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class DX11GraphicsManager
 {

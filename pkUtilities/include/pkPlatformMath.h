@@ -28,6 +28,7 @@
 
 namespace pkEngineSDK 
 {
+
 class PK_UTILITY_EXPORT PlatformMath
 {
  public:
@@ -232,6 +233,75 @@ class PK_UTILITY_EXPORT PlatformMath
   static float
   clamp(const float _t, const float _x, const float _y);
 
+  /**
+  * Lerp between 2 numbers.
+  * 
+  * Gets the lerped number between 2 numbers in a specific timestamp.
+  * 
+  * @param _x
+  * The first number.
+  * 
+  * @param _y
+  * The second number.
+  * 
+  * @param _t
+  * Timestamp.
+  * 
+  * @return
+  * The lerped number.
+  **/
+  static float
+  lerp(const float _x, const float _y, const float _t);
+
+  /**
+  * Lerp between 2 Vector3.
+  *
+  * Gets the lerped number between 2 Vector3 in a specific timestamp.
+  *
+  * @param _x
+  * The first Vector.
+  *
+  * @param _y
+  * The second Vector.
+  *
+  * @param _t
+  * Timestamp.
+  *
+  * @return
+  * The lerped Vector.
+  **/
+  static Vector3
+  lerp3(const Vector3 _x, const Vector3 _y, const float _t);
+
+  /**
+  * Lerp between 2 Vector4.
+  *
+  * Gets the lerped number between 2 Vector4 in a specific timestamp.
+  *
+  * @param _x
+  * The first Vector.
+  *
+  * @param _y
+  * The second Vector.
+  *
+  * @param _t
+  * Timestamp.
+  *
+  * @return
+  * The lerped Vector.
+  **/
+  static Vector4
+  lerp4(const Vector4 _x, const Vector4 _y, const float _t);
+
+  /**
+   * @brief Hooke's law of elasticity.
+   * @param _elasticity Elasticity to use.
+   * @param _displacement Difference in distance.
+   * @return The force applied.
+   */
+  static float
+  hookeLaw(float _elasticity, float _displacement);
+
   /***************************************************************************
   * 
   * Shapes
@@ -351,6 +421,13 @@ class PK_UTILITY_EXPORT PlatformMath
   intersectCubePoint(Cube& _cube, const Vector3& _other);
 
   /**
+   * @brief Check if the value is nan.
+   * @param _x Value to check.
+   */
+  static bool
+  isNan(float _x);
+
+  /**
    * Static variables
   **/
   static const float PI;
@@ -363,4 +440,6 @@ class PK_UTILITY_EXPORT PlatformMath
 
   static const float DEG2RAD;
 };
+
+using Math = PlatformMath;
 }

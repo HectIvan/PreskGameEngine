@@ -18,38 +18,24 @@
 **/
 /*********************************************/
 #include "pkDX11Prerequisites.h"
+#include "pkInputLayout.h"
 
 namespace pkEngineSDK
 {
 
-class DX11Device;
-class DX11VertexShader;
+class Device;
+class Shader;
 
-class DX11InputLayout
+using std::dynamic_pointer_cast;
+
+class DX11InputLayout : public InputLayout
 {
  public:
   DX11InputLayout() = default;
   virtual ~DX11InputLayout()
   {
-    safeRelease(m_pVertexLayout);
+    safeRelease(pVertexLayout);
   }
-
-  /**
-  * Create.
-  * 
-  * Create the Input layout.
-  * 
-  * @param _pDevice
-  * What device the input layout will be created in.
-  * 
-  * @param _vs
-  * Vertex shader to use.
-  * 
-  * @return
-  * If the creation was successful or not.
-  **/
-  HRESULT
-  create(DX11Device* _pDevice, DX11VertexShader _vs);
 
   /**
   * Set the input layout.
@@ -58,16 +44,10 @@ class DX11InputLayout
   * Device where the input layout is located
   **/
   void
-  set(DX11Device* _pDevice);
-
-  /**
-  * Clean the input layout.
-  **/
-  void
-  clean();
+  set(SPtr<Device> _pDevice);
 
  public:
-  uint32 m_numElements = 0;
-  ID3D11InputLayout* m_pVertexLayout = nullptr;
+  uint32 numElements = 0;
+  ID3D11InputLayout* pVertexLayout = nullptr;
 };
 }

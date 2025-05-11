@@ -21,14 +21,18 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
+
+class Matrix4;
 
 class PK_UTILITY_EXPORT Vector4
 {
  public:
   Vector4() = default;
   FORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
+  FORCEINLINE Vector4(Vector3 _vec, float _w);
   FORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
   ~Vector4() = default;
 
@@ -109,6 +113,20 @@ class PK_UTILITY_EXPORT Vector4
   }
 
   /**
+   * @brief Adds a Vector3 to a Vector4.
+   * @param other Vector with which the addition will be made.
+   * @return A vector with the addition done.
+   */
+  FORCEINLINE Vector4&
+  operator+=(const Vector3& other)
+  {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+  }
+
+  /**
   * add a Vector to this Vector.
   *
   * This operator adds another vector to this vector.
@@ -144,6 +162,17 @@ class PK_UTILITY_EXPORT Vector4
   operator+(const Vector4& other) const
   {
     return Vector4(x + other.x, y + other.y, z + other.z, w + other.w);
+  }
+
+  /**
+  * @brief Adds a Vector3 to a Vector4.
+  * @param other Vector with which the addition will be made.
+  * @return A vector with the addition done.
+  **/
+  FORCEINLINE const Vector4
+  operator+(const Vector3& other) const
+  {
+    return Vector4(x + other.x, y + other.y, z + other.z, w);
   }
 
   /**
@@ -258,6 +287,9 @@ class PK_UTILITY_EXPORT Vector4
   {
     return !operator==(other);
   }
+
+  const Vector4
+  operator*(const Matrix4& other) const;
   
   /**
   * Calculate the cross product of this vector.
@@ -369,6 +401,12 @@ class PK_UTILITY_EXPORT Vector4
   normalize();
 
   /**
+   * @brief returns a copy of this normalized vector.
+   */
+  Vector4
+  normalized();
+
+  /**
   * Gets the distance between this vector and another.
   *
   * This function gets the distance between this vector and
@@ -411,7 +449,7 @@ class PK_UTILITY_EXPORT Vector4
   * A boolean determining if any value changes.
   **/
   bool
-  isDifferent(Vector4& _other) const;
+  isDifferent(const Vector4& _other) const;
 
   /**
   * Sets all parts of a vector to a single value.
@@ -437,8 +475,8 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The final dot product.
   **/
-  FORCEINLINE static float
-  dotProd(const Vector4 _this, const Vector4 _other);
+  static float
+  dotProd(const Vector4& _this, const Vector4& _other);
 
   float x, y, z, w;
 

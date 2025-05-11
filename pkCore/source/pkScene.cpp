@@ -59,6 +59,53 @@ Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
   return gObject;
 }
 
+SPtr<Actor>
+Scene::actorFind(String _objectName)
+{
+  // for each game object in the list
+  for (uint32 i = 0; i < getAllActors().size(); ++i) {
+    // check if the name is the one we're looking for
+    if (getActor(i)->m_name == _objectName) {
+      return getActor(i);
+    }
+  }
+  // if no game object fits the name
+  return nullptr;
+}
+
+template<typename T>
+SPtr<Actor>
+Scene::getActorWithComponent()
+{
+  // check each game object
+  for (uint32 i = 0; i < getAllActors().size(); ++i) {
+    // check if the data type return is not null
+    SPtr<T> check = getActor(i)->getComponent<T>();
+    if (check) {
+      // if its not null, return the final value
+      return getActor(i);
+    }
+  }
+}
+
+template<typename T>
+Vector<SPtr<Actor>>
+Scene::getAllActorsWithComponent()
+{
+  // game object list
+  Vector<SPtr<Actor>> list;
+  // check each game object
+  for (uint32 i = 0; i < getAllActors().size(); ++i) {
+    // check if the data type return is not null
+    SPtr<T> check = getActor(i)->getComponent<T>();
+    if (check) {
+      // if its not null, return the final value
+      list.push_back(getActor(i));
+    }
+  }
+  return list;
+}
+
 void
 Scene::update(float _deltaTime)
 {

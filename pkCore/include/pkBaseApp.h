@@ -120,29 +120,7 @@ class PK_CORE_EXPORT BaseApp
   SPtr<Model>
   newModel(String _modelName = "");
 
-  /**
-   * @brief Find an actor by name.
-   * @param _actorName Name of the actor.
-   * @return Pointer to the actor.
-   */
-  SPtr<Actor>
-  actorFind(String _actorName);
-
-  /**
-   * @brief Get a game object with a specific component.
-   * @return A pointer to the game object.
-   */
-  template<typename T>
-  SPtr<Actor>
-  getActorWithComponent();
-
-  /**
-   * @brief Get a vector with all game objects with a specific component.
-   * @return A vector of game objects.
-   */
-  template<typename T>
-  Vector<SPtr<Actor>>
-  getAllActorsWithComponent();
+  
 
  private:
 

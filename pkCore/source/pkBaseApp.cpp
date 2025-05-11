@@ -138,8 +138,6 @@ BaseApp::messageLoop()
     }
     // event queue
     m_eventQueue.poll();
-    // update camera
-    // g_RenderManager().updateCameraBuffers(&m_camera);
     // render the scene
     render();
   }
@@ -153,52 +151,5 @@ BaseApp::render()
   onRender();
   // present the final result to the screen
   g_GraphicAPI().present(1, 0);
-}
-
-SPtr<Actor>
-BaseApp::actorFind(String _objectName)
-{
-  // for each game object in the list
-  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
-    // check if the name is the one we're looking for
-    if (g_SceneManager().getActiveScene()->getActor(i)->m_name == _objectName) {
-      return g_SceneManager().getActiveScene()->getActor(i);
-    }
-  }
-  // if no game object fits the name
-  return nullptr;
-}
-
-template<typename T>
-SPtr<Actor>
-BaseApp::getActorWithComponent()
-{
-  // check each game object
-  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
-    // check if the data type return is not null
-    SPtr<T> check = g_SceneManager().getActiveScene()->getActor(i)->getComponent<T>();
-    if (check) {
-      // if its not null, return the final value
-      return g_SceneManager().getActor(i);
-    }
-  }
-}
-
-template<typename T>
-Vector<SPtr<Actor>>
-BaseApp::getAllActorsWithComponent()
-{
-  // game object list
-  Vector<SPtr<GameObject>> list;
-  // check each game object
-  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
-    // check if the data type return is not null
-    SPtr<T> check = g_SceneManager().getActiveScene()->getActor(i)->getComponent<T>();
-    if (check) {
-      // if its not null, return the final value
-      list.push_back(g_SceneManager().getActiveScene()->getActor(i));
-    }
-  }
-  return list;
 }
 }

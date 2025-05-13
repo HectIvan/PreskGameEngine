@@ -42,7 +42,7 @@ ShaderTest::onInit()
                                          0.01f,
                                          2000.0f,
                                          Vector3(0.0f, 0.0f, -30.0f), // position
-                                         Vector3(0.0f, 0.0f, 0.0f), // target
+                                         Vector3(0.0f, 0.0f, 1.0f), // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
   // create light
@@ -90,27 +90,26 @@ ShaderTest::input()
   float cam_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, 0, cam_speed));
-    g_Logger().print(m_camera->getComponent<Camera>()->view.getTranslation3());
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(0, 0, cam_speed));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, 0, -cam_speed));
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(0, 0, -cam_speed));
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(cam_speed, 0, 0));
   }
   // move up/down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) ||
     m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kSpace)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, cam_speed, 0));
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(0, cam_speed, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) ||
     m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLControl)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::translationA(Vector3(0, -cam_speed, 0));
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::translationA(Vector3(0, -cam_speed, 0));
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
     Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
@@ -129,18 +128,20 @@ ShaderTest::input()
 
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::rotationY(rot);
+    // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
+    m_camera->getComponent<Camera>()->rotate(Vector3(0.0f, rot, 0.0f));
   }
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
     rot *= -1.0f;
-    m_camera->getComponent<Camera>()->view *= Matrix4::rotationY(rot);
+    // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
+    m_camera->getComponent<Camera>()->rotate(Vector3(0.0f, rot, 0.0f));
   }
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     rot *= -1.0f;
-    m_camera->getComponent<Camera>()->view *= Matrix4::rotationX(rot);
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationX(rot);
   }
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    m_camera->getComponent<Camera>()->view *= Matrix4::rotationX(rot);
+    m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationX(rot);
   }
 }
 
@@ -167,8 +168,8 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   input();
   SPtr<Camera> camData = m_camera->getComponent<Camera>();
-  Matrix4 view = camData->view.getTransposed();
-  Matrix4 proj = camData->projection.getTransposed();
+  Matrix4 view = camData->m_view.getTransposed();
+  Matrix4 proj = camData->m_projection.getTransposed();
   SPtr<Light> lightData = light->getComponent<Light>();
   api.updateConstantBuffer(m_cBView, &view, static_cast<uint32>(sizeof(Matrix4)));
   api.updateConstantBuffer(m_cBProjection, &proj, static_cast<uint32>(sizeof(Matrix4)));
@@ -185,10 +186,10 @@ ShaderTest::onRender()
   RendererManager& rm = g_RenderManager().instance();
 
   /**
-   * Shadow Render
+   * Shadow Mapping.
    */
   SPtr<Camera> lightCam = light->getComponent<Camera>();
-  Matrix4 projMatrix = lightCam->projection.getTransposed();
+  Matrix4 projMatrix = lightCam->m_projection.getTransposed();
   api.updateConstantBuffer(m_cbCamera, &lightCam, static_cast<uint32>(sizeof(Camera)));
   api.updateConstantBuffer(m_cBProjection, &projMatrix, static_cast<uint32>(sizeof(Matrix4)));
   
@@ -205,11 +206,11 @@ ShaderTest::onRender()
   rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
   /**
-   * Normal Render
+   * Normal Render.
    */
 
   SPtr<Camera> cam = m_camera->getComponent<Camera>();
-  Matrix4 camProj = cam->projection.getTransposed();
+  Matrix4 camProj = cam->m_projection.getTransposed();
   api.updateConstantBuffer(m_cbCamera, &cam, static_cast<uint32>(sizeof(Camera)));
   api.updateConstantBuffer(m_cBProjection, &camProj, static_cast<uint32>(sizeof(Matrix4)));
   
@@ -227,5 +228,16 @@ ShaderTest::onRender()
   // render the objects
   rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
-  // g_RenderManager().render();
+  /**
+   * Ambient Occlussion. (Deferred)
+   */
+
+  api.setPSShader(rm.m_passes.find(2)->second->getPShader());
+  api.setVSShader(rm.m_passes.find(2)->second->getVShader());
+  api.setSampler(rm.m_passes.find(2)->second->getSamplerState());
+
+  rm.PSSetConstantBuffers();
+  rm.VSSetConstantBuffers();
+
+  api.draw(3, 0);
 }

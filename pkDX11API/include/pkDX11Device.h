@@ -42,8 +42,6 @@ class DX11Device : public Device
   /**
   * Initialize device.
   * 
-  * Initializes the DX11 device.
-  * 
   * @param _pDriverType
   * Type of driver we will be using for the device.
   * 

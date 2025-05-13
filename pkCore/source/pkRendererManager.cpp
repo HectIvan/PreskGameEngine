@@ -102,18 +102,18 @@ RendererManager::createPasses()
                                  SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ 1, shadowPass });
 
-  //SPtr<Pass> AOPass = make_shared<Pass>();
-  //// create all pointers
-  //AOPass->create();
-  //// set and compile shaders
-  //AOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  //AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
-  //AOPass->compileShaders();
-  //AOPass->createShaders();
-  //AOPass->createInputLayout();
-  //AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-  //                           SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  //m_passes.insert({ 1, AOPass });
+  SPtr<Pass> AOPass = make_shared<Pass>();
+  // create all pointers
+  AOPass->create();
+  // set and compile shaders
+  AOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
+  AOPass->compileShaders();
+  AOPass->createShaders();
+  AOPass->createInputLayout();
+  AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+                             SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  m_passes.insert({ 2, AOPass });
 }
 
 void

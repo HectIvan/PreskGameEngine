@@ -48,6 +48,7 @@ SceneManager::getActiveScene()
       return m_scenes[i];
     }
   }
+  return nullptr;
 }
 PK_CORE_EXPORT SceneManager&
 g_SceneManager()

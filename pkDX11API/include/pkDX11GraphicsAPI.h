@@ -263,6 +263,17 @@ class DX11GraphicsAPI : public GraphicsAPI
                           uint32 _numViews = 1) override;
 
   /**
+   * @brief Set the Compute Shader Constant Buffer
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
+  void
+  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                      uint32 _startSlot,
+                      uint32 _numBuffers = 0) override;
+
+  /**
    * @brief Create the device and swap chain.
    * @param _width Client width.
    * @param _height Client height.
@@ -328,6 +339,24 @@ class DX11GraphicsAPI : public GraphicsAPI
   drawIndexed(uint32 _indexCount,
               uint32 _startIndexLocation,
               uint32 _baseVertexLocation) override;
+
+  /**
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   */
+  void
+  draw(uint32 _indexCount,
+      uint32 _startIndexLocation) override;
+
+  /**
+   * @brief Compute shader draw call.
+   * @param _countX Thread group size in the X axis.
+   * @param _countY Thread group size in the Y axis.
+   * @param _countZ Thread group size in the Z axis.
+   */
+  void
+  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.

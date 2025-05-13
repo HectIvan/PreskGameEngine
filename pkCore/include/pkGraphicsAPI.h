@@ -44,22 +44,23 @@ public:
   virtual ~GraphicsAPI() = default;
 
   /**
-  * Initialize the graphic api.
-  *
-  * @param _wHnd
-  * Handler to the window to be used.
+  * @brief Initialize the graphic api.
+  * @param _wHnd Handler to the window to be used.
   **/
   virtual void
   initApi(const Window& _window) = 0;
 
   /**
    * @brief Create the render target view.
+   * @return Pointer to the render target view.
    */
   virtual SPtr<Texture>
   createRenderTargetView() = 0;
 
   /**
    * @brief Set the render targets to the device.
+   * @param _rTargets List of targets to set.
+   * @param _DepthSV Depth stencil view to use.
    */
   virtual void
   setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<DepthStencilView> _DepthSV) = 0;
@@ -94,12 +95,14 @@ public:
 
   /**
    * @brief Set the vertex shader to the device context.
+   * @param _pShader Shader to set.
    */
   virtual void
   setVSShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
+   * @param _pShader Shader to set.
    */
   virtual void
   setPSShader(SPtr<Shader> _pShader) = 0;
@@ -147,8 +150,11 @@ public:
                 uint32 _shaderResourceFormat) = 0;
 
   /**
-  * Create the sampler state.
-  **/
+   * @brief Create the sampler state.
+   * @param _mode Mode of the sampler.
+   * @param _filter What filter will be used.
+   * @return Pointer to the new sampler state.
+   */
   virtual SPtr<SamplerState>
   createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
 
@@ -156,26 +162,35 @@ public:
    * @brief Create the depth stencil texture and view.
    * @param _width Client width.
    * @param _height Client height.
+   * @return Pointer to the new Depth stencil view
    */
   virtual SPtr<DepthStencilView>
   createDepthStencilView(SPtr<Texture> _depthRT) = 0;
 
   /**
-  * Set input layout
-  **/
+   * @brief Set input layout.
+   * @param _pInputLayout What input layout to use.
+   */
   virtual void
   setInputLayout(SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
-  * Create a VertexBuffer
-  **/
+   * @brief Create a VertexBuffer.
+   * @param _vertex Vertex for the buffer.
+   * @param _usage What use will be given to the buffer.
+   * @return Pointer to the Vertex Buffer.
+   */
   virtual SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
                      uint32 _usage = 0) = 0;
 
   /**
-  * Set data to the vertex buffer
-  **/
+   * @brief Set data to the vertex buffer.
+   * @param _pVertexB Vertex buffer to set.
+   * @param _start Where the buffer starts.
+   * @param _bufferCount How many buffers are there.
+   * @param _offset Difference in size between buffers.
+   */
   virtual void
   setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
@@ -183,75 +198,54 @@ public:
                   uint32 _offset = 0) = 0;
 
   /**
-  * Create an IndexBuffer
-  **/
+   * @brief Create an IndexBuffer.
+   * @param _index Index for the buffer.
+   * @param _usage What use will be given to the buffer.
+   * @return Pointer to the Vertex Buffer.
+   */
   virtual SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
                     uint32 _usage = 0) = 0;
 
   /**
-  * Set the index buffer.
-  *
-  * @param _format
-  * What kind of format will the buffer use.
-  *
-  * @param _offset
-  * Distance between blobs of data.
-  **/
+   * @brief Set the index buffer.
+   * @param _format What kind of format will the buffer use.
+   * @param _offset Distance between blobs of data.
+   */
   virtual void
   setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
                  uint32 _format = 42,
                  uint32 _offset = 0) = 0;
 
   /**
-  * Create the constant buffer.
-  *
-  * @param _pDevice
-  * What device will create the buffer.
-  *
-  * @param _size
-  * Size of the constant buffer.
-  *
-  * @param _pData
-  * What data will the constant buffer store.
-  *
-  * @param _usage
-  * What usage will be given to the buffer.
-  **/
+   * @brief Create the constant buffer.
+   * @param _size Size of the constant buffer.
+   * @param _pData What data will the constant buffer store.
+   * @param _usage What usage will be given to the buffer.
+   * @return Pointer to the constant buffer
+   */
   virtual SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
                        const void* _pData,
                        uint32 _usage) = 0;
 
   /**
-  * Update the constant buffer.
-  * 
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  * 
-  * @param _pNewData
-  * New data that the buffer will store.
-  * 
-  * @param _size
-  * Size of the data to store.
-  **/
+   * @brief Update the constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _pNewData New data that the buffer will store.
+   * @param _size Size of the data to store.
+   */
   virtual void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
                        uint32 _size) = 0;
 
   /**
-  * Set a texture to the resource view.
-  * 
-  * param _pTexture
-  * Pointer to the texture.
-  * 
-  * @param _start
-  * Where the setting will start.
-  * 
-  * @param _numViews
-  * How many views are there.
-  **/
+   * @brief Set a texture to the resource view.
+   * @param _pTexture Pointer to the texture.
+   * @param _start Where the setting will start.
+   * @param _numViews How many views are there.
+   */
   virtual void
   setShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
@@ -280,66 +274,61 @@ public:
                           uint32 _numViews = 1) = 0;
 
   /**
-   * @brief Set the render targets to the device.
+   * @brief Clear the render target fiew and fill the screen with a new color.
+   * @param _color New screen color.
    */
-  // virtual void
-  // setRenderTargets(Vector<SPtr<Texture>> _rTargets) = 0;
-
-  /**
-  * Clear the render target fiew and fill the
-  * screen with a new color.
-  * 
-  * @param _color
-  * New screen color.
-  **/
   virtual void
   clearRenderTargetView(float _color[], SPtr<Texture> _rtv) = 0;
 
   /**
-  * clear the depth buffer.
-  **/
+   * @brief clear the depth buffer.
+   * @param _depth Default depth of the stencil.
+   * @param _depthSV Depth stencil view to clear.
+   */
   virtual void
   clearDepthBuffer(float _depth, SPtr<DepthStencilView> _depthSV) = 0;
 
   /**
-  * Create the Input Layout.
-  **/
+   * @brief Create the Input Layout.
+   * @param _vDesc Description of the input layout.
+   * @param _pVShader Shader to use.
+   * @return Pointer to the new input layout
+   */
   virtual SPtr<InputLayout>
   createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
 
   /**
-  * Set the Vertex Shader constant buffer.
-  *
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  *
-  * @param _startSlot
-  * Index into the device's zero-based array.
-  *
-  * @param _numBuffers
-  * Number of buffers to set.
-  **/
+   * @brief Set the Vertex Shader constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
   virtual void
   VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers) = 0;
+                      uint32 _startSlot,
+                      uint32 _numBuffers) = 0;
 
   /**
-  * Set the Pixel Shader constant buffer.
-  *
-  * @param _pCBuffer
-  * Pointer to the constant buffer.
-  *
-  * @param _startSlot
-  * Index into the device's zero-based array.
-  *
-  * @param _numBuffers
-  * Number of buffers to set.
-  **/
+   * @brief Set the Pixel Shader constant buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
   virtual void
   PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers) = 0;
+                      uint32 _startSlot,
+                      uint32 _numBuffers) = 0;
+
+  /**
+   * @brief Set the Compute Shader Constant Buffer.
+   * @param _pCBuffer Pointer to the constant buffer.
+   * @param _startSlot Index into the device's zero-based array.
+   * @param _numBuffers Number of buffers to set.
+   */
+  virtual void
+  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                      uint32 _startSlot,
+                      uint32 _numBuffers = 0) = 0;
 
   /**
   * Set the sampler state.
@@ -350,14 +339,13 @@ public:
              uint32 _numSamplers = 1) = 0;
 
   /**
-  * create a texture from file.
-  * 
-  * @param _fileName
-  * Name of the texture.
-  * 
-  * @param _bindFlags
-  * What kind of binding will it have
-  **/
+   * @brief Create a texture from file.
+   * @param _fileName Name of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _bindFlags Bind flags of the texture.
+   * @param _format Format of the texture.
+   * @return Pointer to the texture.
+   */
   virtual SPtr<Texture>
   createTextureFromFile(String& _fileName,
                         uint32 _bindFlags,
@@ -372,37 +360,42 @@ public:
   getDevice() = 0;
 
   /**
-  * Draw the indexed data.
-  * 
-  * @param _indexCount
-  * The ammount of index to draw.
-  * 
-  * @param _startIndexLocation
-  * Which index will be the starting point.
-  * 
-  * @param _baseVertexLocation
-  * Which vertex will be the starting point.
-  **/
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   * @param _baseVertexLocation Which vertex will be the starting point.
+   */
   virtual void
   drawIndexed(uint32 _indexCount,
               uint32 _startIndexLocation,
               uint32 _baseVertexLocation) = 0;
 
   /**
-  * Present the result to the screen.
-  * 
-  * @param _syncInterval
-  * If vertical sync is enabled.
-  * 
-  * @param _flags
-  * Swap chain presentation options.
-  **/
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   */
+  virtual void
+  draw(uint32 _indexCount,
+      uint32 _startIndexLocation) = 0;
+
+  /**
+   * @brief Compute shader draw call.
+   * @param _countX Thread group size in the X axis.
+   * @param _countY Thread group size in the Y axis.
+   * @param _countZ Thread group size in the Z axis.
+   */
+  virtual void
+  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) = 0;
+
+  /**
+   * @brief Present the result to the screen.
+   * @param _syncInterval If vertical sync is enabled.
+   * @param _flags Swap chain presentation options.
+   */
   virtual void
   present(uint32 _syncInterval, uint32 _flags) = 0;
 
- public:
-  // world matrix
-  // Matrix4 world;
 };
 
 PK_CORE_EXPORT GraphicsAPI&

@@ -120,16 +120,6 @@ class PK_CORE_EXPORT BaseApp
   SPtr<Model>
   newModel(String _modelName = "");
 
-  
-
- private:
-
-  /**
-   * @brief Create the constant buffers needed.
-   */
-  void
-  createBuffers();
-
  public:
   // system
   Window m_window;

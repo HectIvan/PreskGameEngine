@@ -161,11 +161,34 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
   // draw the data
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the draw call");
+    g_Logger().print("Failed to utilize the DX device in the Draw Indexed call");
   }
   device->pImmediateContext->DrawIndexed(_indexCount,
                                          _startIndexLocation,
                                          _baseVertexLocation);
+}
+
+void
+DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
+{
+  // draw the data
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the Draw call");
+  }
+  device->pImmediateContext->Draw(_indexCount,
+                                  _startIndexLocation);
+}
+
+void
+DX11GraphicsAPI::dispatch(uint32 _countX, uint32 _countY, uint32 _countZ)
+{
+  // draw the data
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the Dispatch call");
+  }
+  device->pImmediateContext->Dispatch(_countX, _countY, _countZ);
 }
 
 void
@@ -792,6 +815,23 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
     g_Logger().print("Failed to utilize the DX device in the setting of a pixel CBuffer.");
   }
   device->pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
+}
+
+void
+DX11GraphicsAPI::CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer, uint32 _startSlot, uint32 _numBuffers)
+{
+  // Recast to a DirectX Constant buffer.
+  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
+  // if the casting failed
+  if (!dxCB) {
+    g_Logger().print("Failed to set a constant buffer.");
+    return;
+  } // casting failed
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a compute CBuffer.");
+  }
+  device->pImmediateContext->CSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void

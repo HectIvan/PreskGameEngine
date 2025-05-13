@@ -114,7 +114,7 @@ PhysicsApp::onInit()
     ikRoot->addComponent(newModel("sphere.obj"));
     ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
 
-    m_ik->insertNodeLocal(Vector3(i * -0.5, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
+    m_ik->insertNodeLocal(Vector3(i * -0.5f, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
 
     SPtr<Obstacle> obs = make_shared<Obstacle>();
     obs->m_actor = ikRoot;

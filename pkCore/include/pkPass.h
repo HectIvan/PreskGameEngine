@@ -134,6 +134,9 @@ public:
   WString m_PShaderDirectory;
   WString m_VShaderDirectory;
 
+  // constant buffers for the shaders.
+  Vector<SPtr<ConstantBuffer>> m_cBuffers;
+
   const char* m_PSEntryPoint;
   const char* m_VSEntryPoint;
 

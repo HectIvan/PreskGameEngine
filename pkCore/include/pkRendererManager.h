@@ -69,13 +69,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Set the Vertex Shader constant buffers
    */
   void
-  VSSetConstantBuffers();
+  VSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the Pixel Shader constant buffers
    */
   void
-  PSSetConstantBuffers();
+  PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the buffers of each game object.
@@ -113,13 +113,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
 
  public:
 
-  // constant buffers
-  SPtr<ConstantBuffer> m_cBView;
-  SPtr<ConstantBuffer> m_cBProjection;
-  SPtr<ConstantBuffer> m_cBTransform;
-  SPtr<ConstantBuffer> m_cbLight;
-  SPtr<ConstantBuffer> m_cbCamera;
-
   // render targets
   SPtr<Texture> m_pRTargetView;
   SPtr<Texture> m_pNormalRT;
@@ -134,10 +127,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // shadows
   SPtr<Texture> m_pShadowDepth;
   SPtr<DepthStencilView> m_pShadowDepthSV;
-
-  // main camera storage
-  Matrix4 m_CView;
-  Matrix4 m_CProj;
 };
 
 PK_CORE_EXPORT RendererManager&

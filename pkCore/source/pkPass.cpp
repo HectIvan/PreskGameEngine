@@ -92,4 +92,10 @@ Pass::compilePShader()
                                        m_PSModel,
                                        m_pPShader);
 }
+
+void
+Pass::addToCBuffers(SPtr<ConstantBuffer> _pCBuffer)
+{
+  m_cBuffers.push_back(_pCBuffer);
+}
 }

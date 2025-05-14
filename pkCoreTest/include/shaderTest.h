@@ -42,6 +42,7 @@ using pkEngineSDK::Pass;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Texture;
+using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 
@@ -62,12 +63,6 @@ class ShaderTest : public BaseApp
    */
   void
   input();
-
-  /**
-   * @brief Create the constant buffers
-   */
-  void
-  createConstantBuffers();
 
   /**
    * @brief Update the shader test.
@@ -97,11 +92,11 @@ class ShaderTest : public BaseApp
   SPtr<Texture> m_pRTNormal;
   SPtr<Texture> m_pRTColor;
 
-  SPtr<ConstantBuffer> m_cBView;
-  SPtr<ConstantBuffer> m_cBProjection;
-  SPtr<ConstantBuffer> m_cBTransform;
-  SPtr<ConstantBuffer> m_cbLight;
-  SPtr<ConstantBuffer> m_cbCamera;
+  // SPtr<ConstantBuffer> m_cBView;
+  // SPtr<ConstantBuffer> m_cBProjection;
+  // SPtr<ConstantBuffer> m_cBTransform;
+  // SPtr<ConstantBuffer> m_cbLight;
+  // SPtr<ConstantBuffer> m_cbCamera;
 
   SPtr<Pass> m_basicPass;
 };

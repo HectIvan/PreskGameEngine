@@ -118,6 +118,28 @@ public:
   SPtr<Shader>
   getPShader() { return m_pPShader; }
 
+  /**
+   * @brief Get the constant buffer vector.
+   * @return The vector of cBuffers.
+   */
+  Vector<SPtr<ConstantBuffer>>
+  getCBuffers() { return m_cBuffers; }
+
+  /**
+   * @brief Get the constant buffer in the index position.
+   * @param _index Where to look for the cbuffer.
+   * @return Pointer to the cbuffer.
+   */
+  SPtr<ConstantBuffer>
+  getCBuffer(uint32 _index) { return m_cBuffers[_index]; }
+
+  /**
+   * @brief Adds a new buffer to the CBuffer vector.
+   * @param _pCBuffer Buffer to add.
+   */
+  void
+  addToCBuffers(SPtr<ConstantBuffer> _pCBuffer);
+
  private:
   /**
    * Shader pointers

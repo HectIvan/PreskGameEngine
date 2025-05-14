@@ -12,6 +12,7 @@ using PK_USAGE::kPK_USAGE_DEFAULT;
 using PK_BIND_FLAG::kPK_BIND_DEPTH_STENCIL;
 using PK_BIND_FLAG::kPK_BIND_RENDER_TARGET;
 using PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
+using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
 
 namespace pkEngineSDK
 {
@@ -27,7 +28,8 @@ void RendererManager::init(Window& _window)
                                  _window.getHeight(),
                                  TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
                                  kPK_USAGE_DEFAULT,
-                                 kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL,
+                                 kPK_BIND_SHADER_RESOURCE |
+                                 kPK_BIND_DEPTH_STENCIL,
                                  false,
                                  TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
 
@@ -57,13 +59,6 @@ void RendererManager::init(Window& _window)
   
   m_pShadowDepthSV = api.createDepthStencilView(m_pShadowDepth);
 
-  Vector<SPtr<Texture>> rTVector;
-  rTVector.push_back(m_pRTargetView);
-  rTVector.push_back(m_pNormalRT);
-  rTVector.push_back(m_pDepthRT);
-
-  // set the render targets
-  api.setRenderTargets(rTVector, m_pDepthSView);// m_pDepthSView);
   // create the passes needed
   createPasses();
 }
@@ -71,9 +66,13 @@ void RendererManager::init(Window& _window)
 void
 RendererManager::createPasses()
 {
-  /**
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& rm = g_RenderManager().instance();
+
+  /****************************************************************************
    * Create the base pass.
-   */
+   ***************************************************************************/
   SPtr<Pass> basePass = make_shared<Pass>();
   // create all pointers
   basePass->create();
@@ -86,10 +85,38 @@ RendererManager::createPasses()
   basePass->createInputLayout();
   basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+
+  // constant buffers
+  SPtr<ConstantBuffer> cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)),
+                                                         nullptr,
+                                                         0);
+  SPtr<ConstantBuffer> cBProj = api.createConstantBuffer(
+                                               static_cast<uint32>(sizeof(CBProjection)),
+                                               nullptr,
+                                               0);
+  SPtr<ConstantBuffer> cBTransform = api.createConstantBuffer(
+                                              static_cast<uint32>(sizeof(CBTransform)),
+                                              nullptr,
+                                              0);
+  SPtr<ConstantBuffer> cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(CBLight)),
+                                                          nullptr,
+                                                          0);
+  SPtr<ConstantBuffer> cbCam = api.createConstantBuffer(static_cast<uint32>(sizeof(CBCamera)),
+                                                           nullptr,
+                                                           0);
+  basePass->addToCBuffers(cBView);
+  basePass->addToCBuffers(cBProj);
+  basePass->addToCBuffers(cBTransform);
+  basePass->addToCBuffers(cbLight);
+  basePass->addToCBuffers(cbCam);
+
   g_GraphicAPI().setInputLayout(basePass->getInputLayout());
   // insert to the pass map.
   m_passes.insert({ 0, basePass });
 
+  /****************************************************************************
+   * Shadow Pass
+   ***************************************************************************/
   SPtr<Pass> shadowPass = make_shared<Pass>();
   // create all pointers
   shadowPass->create();
@@ -97,6 +124,31 @@ RendererManager::createPasses()
   shadowPass->setPSData(L"shaders/pkVShader.hlsl", "PS", "ps_5_0");
   shadowPass->compileShaders();
   shadowPass->createShaders();
+
+  // constant buffers
+  SPtr<ConstantBuffer> sView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)),
+                                                        nullptr,
+                                                        0);
+  SPtr<ConstantBuffer> sProj = api.createConstantBuffer(
+                                               static_cast<uint32>(sizeof(CBProjection)),
+                                               nullptr,
+                                               0);
+  SPtr<ConstantBuffer> sTransform = api.createConstantBuffer(
+                                              static_cast<uint32>(sizeof(CBTransform)),
+                                              nullptr,
+                                              0);
+  SPtr<ConstantBuffer> sLight = api.createConstantBuffer(static_cast<uint32>(sizeof(CBLight)),
+                                                         nullptr,
+                                                         0);
+  SPtr<ConstantBuffer> sCam = api.createConstantBuffer(static_cast<uint32>(sizeof(CBCamera)),
+                                                       nullptr,
+                                                       0);
+  shadowPass->addToCBuffers(sView);
+  shadowPass->addToCBuffers(sProj);
+  shadowPass->addToCBuffers(sTransform);
+  shadowPass->addToCBuffers(sLight);
+  shadowPass->addToCBuffers(sCam);
+
   shadowPass->createInputLayout();
   shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                  SAM_STATE_FILTERS::kFilterMigMagMipLinear);
@@ -110,6 +162,12 @@ RendererManager::createPasses()
   AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
   AOPass->compileShaders();
   AOPass->createShaders();
+
+  SPtr<ConstantBuffer> cbAO = api.createConstantBuffer(static_cast<uint32>(sizeof(CBAOData)),
+                                                       nullptr,
+                                                       0);
+  AOPass->addToCBuffers(cbAO);
+
   AOPass->createInputLayout();
   AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
@@ -147,27 +205,23 @@ RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 }
   
 void
-RendererManager::VSSetConstantBuffers()
+RendererManager::VSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
-  api.VSSetConstantBuffer(m_cBView, 0, 1);
-  api.VSSetConstantBuffer(m_cBProjection, 1, 1);
-  api.VSSetConstantBuffer(m_cBTransform, 2, 1);
-  api.VSSetConstantBuffer(m_cbLight, 3, 1);
-  api.VSSetConstantBuffer(m_cbCamera, 4, 1);
+  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
+    api.VSSetConstantBuffer(_cBuffers[i], i, 1);
+  }
 }
 
 void
-RendererManager::PSSetConstantBuffers()
+RendererManager::PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
-  api.PSSetConstantBuffer(m_cBView, 0, 1);
-  api.PSSetConstantBuffer(m_cBProjection, 1, 1);
-  api.PSSetConstantBuffer(m_cBTransform, 2, 1);
-  api.PSSetConstantBuffer(m_cbLight, 3, 1);
-  api.PSSetConstantBuffer(m_cbCamera, 4, 1);
+  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
+    api.VSSetConstantBuffer(_cBuffers[i], i, 1);
+  }
 }
 
 void
@@ -248,7 +302,10 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work in
-    g_GraphicAPI().updateConstantBuffer(m_cBTransform,
+    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[0]->getCBuffer(2),
+                                        &transform,
+                                        static_cast<uint32>(sizeof(CBTransform)));
+    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[1]->getCBuffer(2),
                                         &transform,
                                         static_cast<uint32>(sizeof(CBTransform)));
 

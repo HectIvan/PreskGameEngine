@@ -65,6 +65,18 @@ struct CBLight
   Vector2 unused2;
 };
 
+struct CBAOData
+{
+  Vector2 screen_size;
+  float random_size;
+
+  float sample_rad;
+  float scale;
+  float bias;
+  float intensity;
+  float unused;
+};
+
 struct KeyPosition
 {
   Vector3 position;

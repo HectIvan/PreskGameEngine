@@ -242,8 +242,8 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
     g_Logger().print("Failed to utilize the DX device in the creation of a pixel shader.");
   }
   hr = device->pd3dDevice->CreatePixelShader(dxPShader->pSBlob->GetBufferPointer(),
-                                                dxPShader->pSBlob->GetBufferSize(),
-                                                nullptr, &dxPShader->pShader);
+                                             dxPShader->pSBlob->GetBufferSize(),
+                                             nullptr, &dxPShader->pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -1104,6 +1104,15 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);
+    }
+    /**
+     * Set unordered access
+     */
+    if ((_bindFlags & D3D11_BIND_UNORDERED_ACCESS) == D3D11_BIND_UNORDERED_ACCESS) {
+      D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+      memset(&uavDesc, 0, sizeof(uavDesc));
+      uavDesc.Format = desc.Format;
+      // uavDesc.
     }
   }
   return tex;

@@ -1,5 +1,4 @@
 #include "pkCamera.h"
-#include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
 #include "pkLogger.h"
 #include "pkRendererManager.h"
@@ -68,7 +67,6 @@ RendererManager::createPasses()
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
 
   /****************************************************************************
    * Create the base pass.
@@ -186,18 +184,6 @@ RendererManager::compileShaders()
   }
 }
 
-template<typename T>
-SPtr<T>
-RendererManager::actorToClass(SPtr<Actor>& _subject)
-{
-  // cast to a game actor
-  SPtr<T> aTC = reinterpret_pointer_cast<T>(_subject);
-  // casting was successful
-  if (aTC) { return aTC; }
-  // casting failed
-  return nullptr;
-}
-
 template<class T> void
 RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 {
@@ -227,60 +213,19 @@ RendererManager::PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
 void
 RendererManager::setActorsBuffers()
 {
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  SceneManager& sm = g_SceneManager().instance();
   // for each actor in the world
-  for (uint32 i = 0; i < g_SceneManager().getActiveScene()->getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < sm.getActiveScene()->getAllActors().size(); ++i) {
     // Cast to a gameObject, if it fails, do none of the following process
-    SPtr<Actor> actor = g_SceneManager().getActiveScene()->getActor(i);
-    SPtr<GameObject> gameObject = actorToClass<GameObject>(actor);
-    if (gameObject) {
-      // for each model in the game object
-      for (uint32 j = 0; j < gameObject->models.size(); ++j) {
-        // set its vertex and index buffers
-        g_GraphicAPI().setVertexBuffer(gameObject->models[j]->vertexB);
-        g_GraphicAPI().setIndexBuffer(gameObject->models[j]->indexB); ;
-      }
+    SPtr<Actor> actor = sm.getActiveScene()->getActor(i);
+    // if the actor has a model component
+    if (actor->getComponent<Model>()) {
+      api.setVertexBuffer(actor->getComponent<Model>()->vertexB);
+      api.setIndexBuffer(actor->getComponent<Model>()->indexB);
     }
   }
-}
-
-void
-RendererManager::render()
-{
-  // screen clear color
-  // float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  // GraphicsAPI& api = g_GraphicAPI().instance();
-  // 
-  // /**
-  //  * Shadow Render
-  //  */
-  // api.clearRenderTargetView(clearColor, m_pShadowDepth);
-  // api.clearDepthBuffer(1.0f, m_pShadowDepthSV);
-  // 
-  // api.setPSShader(m_passes.find(1)->second->getPShader());
-  // api.setVSShader(m_passes.find(1)->second->getVShader());
-  // api.setSampler(m_passes.find(1)->second->getSamplerState());
-  // 
-  // VSSetConstantBuffers();
-  // PSSetConstantBuffers();
-  // 
-  // renderActors(g_SceneManager().getAllActors());
-  // 
-  // /**
-  //  * Normal Render
-  //  */
-  // api.clearRenderTargetView(clearColor, m_pRTargetView);
-  // api.clearDepthBuffer(1.0f, m_pDepthSView);
-  // 
-  // // set the base pass for the first rendering stage
-  // api.setPSShader(m_passes.find(0)->second->getPShader());
-  // api.setVSShader(m_passes.find(0)->second->getVShader());
-  // api.setSampler(m_passes.find(0)->second->getSamplerState());
-  // 
-  // // set constant buffers for the pixel and vertex shaders
-  // VSSetConstantBuffers();
-  // PSSetConstantBuffers();
-  // // render the objects
-  // renderActors(g_SceneManager().getAllActors());
 }
 
 void
@@ -309,12 +254,11 @@ RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
                                         &transform,
                                         static_cast<uint32>(sizeof(CBTransform)));
 
-    /**
-     * Recast to a gameobject. If it fails, do none of this
-     */
-    SPtr<GameObject> gameObject = actorToClass<GameObject>(_gameActors[i]);
-    renderModel(*gameObject->getComponent<Model>());
-    // if the actor has children, do the same for them
+    // render the model of the actor
+    if (_gameActors[i]->getComponent<Model>()) {
+      renderModel(*_gameActors[i]->getComponent<Model>());
+    }
+    // if the actor has children, do the same for them (recursive)
     if (!_gameActors[i]->m_children.empty()) {
       renderActors(_gameActors[i]->m_children);
     }
@@ -326,8 +270,6 @@ void
 RendererManager::renderModel(Model& _model)
 {
   // get a reference from the api
-  // GraphicsAPI& api = GraphicsAPI::instance();
-  // g_GraphicAPI().createInputLayoutFromVShader();
   g_GraphicAPI().setVertexBuffer(_model.vertexB);
   g_GraphicAPI().setIndexBuffer(_model.indexB);
   // offsets

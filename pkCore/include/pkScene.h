@@ -76,16 +76,16 @@ class PK_CORE_EXPORT Scene
   actorFind(String _actorName);
 
   /**
-   * @brief Get a game object with a specific component.
-   * @return A pointer to the game object.
+   * @brief Get an actor with a specific component.
+   * @return A pointer to the actor.
    */
   template<typename T>
   SPtr<Actor>
   getActorWithComponent();
 
   /**
-   * @brief Get a vector with all game objects with a specific component.
-   * @return A vector of game objects.
+   * @brief Get a vector with all actors with a specific component.
+   * @return A vector of actors.
    */
   template<typename T>
   Vector<SPtr<Actor>>

@@ -23,7 +23,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
 {
   /************************************************************************************/
   WNDCLASSEXA wcex;
-  InstanceHandle hInstance = InstanceHandle();
+  m_hInstance = InstanceHandle();
   memset(&wcex, 0, sizeof(wcex));
   wcex.cbSize = sizeof(WNDCLASSEX);
   // CS_HREDRAW Redraws the entire window if a movement or size adjustment changes the width of the client area.
@@ -32,7 +32,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
   wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
-  wcex.hInstance = hInstance;
+  wcex.hInstance = m_hInstance;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
   wcex.lpszMenuName = nullptr;
@@ -62,9 +62,8 @@ Window::create(const PKWindowDesc& _desc, String& _name)
                               rc.bottom - rc.top,
                               nullptr,
                               nullptr,
-                              hInstance,
+                              m_hInstance,
                               nullptr);
-  m_hInstance = hInstance;
   /**
   * Check if creation failed. 
   **/

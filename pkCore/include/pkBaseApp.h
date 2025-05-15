@@ -22,7 +22,6 @@
 /*********************************************/
 #include "pkCamera.h"
 #include "pkEventQueue.h"
-#include "pkGameObject.h"
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"
 #include "pkRendererManager.h"
@@ -125,9 +124,6 @@ class PK_CORE_EXPORT BaseApp
   Window m_window;
   EventQueue m_eventQueue;
 
-  // vector of game objects in the scene
-  // Scene m_scene;
-
   // camera movement speed
   float m_cameraSpeed;
 
@@ -138,10 +134,10 @@ class PK_CORE_EXPORT BaseApp
 
  protected:
   /**
-  * Used to store an object that is loaded from memory. once loaded, it will be stored
-  * in here, if the same object is asked to be loaded, it will first be searched here,if
-  * its found, the loaded object will be returned, instead of loading it again.
-  */
+   * Used to store an object that is loaded from memory. once loaded, it will be stored
+   * in here, if the same object is asked to be loaded, it will first be searched here,if
+   * its found, the loaded object will be returned, instead of loading it again.
+   */
   Vector<SPtr<ModelMemory>> m_models;
 };
 }

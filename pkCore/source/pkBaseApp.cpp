@@ -1,7 +1,6 @@
 #include "pkBaseApp.h"
 #include "pkLogger.h"
 #include "pkDllLoader.h"
-#include "pkGameObject.h"
 #include "pkGraphicsAPI.h"
 #include "pkLight.h"
 #include "pkModel.h"
@@ -125,7 +124,7 @@ BaseApp::messageLoop()
     m_fixedTimer += g_TimeManager().m_deltaTime;
     // child class app update
     onUpdate();
-    // update game objects
+    // update scene
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();
@@ -145,10 +144,9 @@ BaseApp::messageLoop()
 void
 BaseApp::render()
 {
-  g_RenderManager().render();
-  // on scene specific app render
+  // Scene specific app render
   onRender();
-  // present the final result to the screen
+  // Present the final result to the screen
   g_GraphicAPI().present(1, 0);
 }
 }

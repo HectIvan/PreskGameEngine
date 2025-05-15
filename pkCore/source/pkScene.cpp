@@ -42,34 +42,34 @@ insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
 SPtr<Actor>
 Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
 {
-  // insert the game object into the vector of game objects
-  SPtr<Actor> gObject = createActor();
-  // set the gameObject transform
-  gObject->setTransform(_transform);
-  // if the parent is not a nullptr (there is a parent that will have this game object)
+  // insert the actor into the vector of actors
+  SPtr<Actor> actor = createActor();
+  // set the actor transform
+  actor->setTransform(_transform);
+  // if the parent is not a nullptr (there is a parent that will have this actor)
   if (_pParent) {
-    // insert the current gameObject to the children vector of the parent
-    insertActor(gObject, _pParent->m_children);
-    // set the parent as the parent of the current game Object
-    gObject->m_parent = _pParent;
+    // insert the current actor to the children vector of the parent
+    insertActor(actor, _pParent->m_children);
+    // set the parent as the parent of the current actor.
+    actor->m_parent = _pParent;
   }
-  // otherwise, the object is part of the scene
-  else { insertActor(gObject, m_actors); }
-  // return the object created.
-  return gObject;
+  // otherwise, the actor is part of the scene
+  else { insertActor(actor, m_actors); }
+  // return the actor created.
+  return actor;
 }
 
 SPtr<Actor>
-Scene::actorFind(String _objectName)
+Scene::actorFind(String _actorName)
 {
-  // for each game object in the list
+  // for each actor in the list
   for (uint32 i = 0; i < getAllActors().size(); ++i) {
     // check if the name is the one we're looking for
-    if (getActor(i)->m_name == _objectName) {
+    if (getActor(i)->m_name == _actorName) {
       return getActor(i);
     }
   }
-  // if no game object fits the name
+  // if no actor fits the name.
   return nullptr;
 }
 
@@ -77,7 +77,7 @@ template<typename T>
 SPtr<Actor>
 Scene::getActorWithComponent()
 {
-  // check each game object
+  // check each actor
   for (uint32 i = 0; i < getAllActors().size(); ++i) {
     // check if the data type return is not null
     SPtr<T> check = getActor(i)->getComponent<T>();
@@ -92,9 +92,9 @@ template<typename T>
 Vector<SPtr<Actor>>
 Scene::getAllActorsWithComponent()
 {
-  // game object list
+  // actor list
   Vector<SPtr<Actor>> list;
-  // check each game object
+  // check each actor
   for (uint32 i = 0; i < getAllActors().size(); ++i) {
     // check if the data type return is not null
     SPtr<T> check = getActor(i)->getComponent<T>();

@@ -97,7 +97,7 @@ class PK_CORE_EXPORT Actor
   getPosition3() { return m_transform.getTranslation3(); }
 
   /**
-   * @brief Set the rotation of the GameObject.
+   * @brief Set the rotation of the Actor.
    * @param _rotation Rotation Matrix.
    */
   void

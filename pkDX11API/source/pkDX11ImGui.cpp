@@ -12,7 +12,7 @@ DX11_Init(ID3D11Device* device, ID3D11DeviceContext* device_context)
   return false;
 }
 
-// void
+void
 // ImguiEngine::APIInit()
 // {
 //   // get the api

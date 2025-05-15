@@ -43,7 +43,7 @@ ShaderTest::onInit()
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
   // create light
-  light = make_shared<Actor>();
+  light = g_SceneManager().getActiveScene()->instantiate();
   // add light component
   light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = light->getComponent<Light>();
@@ -56,8 +56,8 @@ ShaderTest::onInit()
 
   // add camera component
   light->addComponent(make_shared<Camera>());
-  light->getComponent<Camera>()->init(30,
-                                      17,
+  light->getComponent<Camera>()->init(m_window.getWidth(),
+                                      m_window.getHeight(),
                                       3.1416f / 4.0f,
                                       0.01f,
                                       10.0f,
@@ -239,15 +239,15 @@ ShaderTest::onRender()
   /**
    * Ambient Occlussion. (Deferred)
    */
-  api.setPSShader(rm.m_passes.find(2)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(2)->second->getVShader());
-  api.setSampler(rm.m_passes.find(2)->second->getSamplerState());
-
-  api.PSSetShaderResourceView(rm.m_pRTargetView);
-
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
+  // api.setPSShader(rm.m_passes.find(2)->second->getPShader());
+  // api.setVSShader(rm.m_passes.find(2)->second->getVShader());
+  // api.setSampler(rm.m_passes.find(2)->second->getSamplerState());
+  // 
+  // api.PSSetShaderResourceView(rm.m_pRTargetView);
+  // 
+  // // set constant buffers for the pixel and vertex shaders
+  // rm.PSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
+  // rm.VSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
     
-  api.draw(3, 0);
+  // api.draw(3, 0);
 }

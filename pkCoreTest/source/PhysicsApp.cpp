@@ -86,9 +86,9 @@ PhysicsApp::onInit()
     proj->m_maxSpeed = projSpeed;
     // set the projectile lifetime
     proj->m_lifeTimer = m_projDuration;
-    // assign a new model component to the game object.
+    // assign a new model component to the actor.
     proj->m_actor->addComponent(newModel("sphere.obj"));
-    // add the game object to the vector of projectiles
+    // add the actor to the vector of projectiles
     m_projectiles.push_back(proj);
   }
 
@@ -322,7 +322,6 @@ PhysicsApp::checkObstacles()
 void
 PhysicsApp::onRender()
 {
-  g_RenderManager().render();
   // // Set shaders
   // g_GraphicAPI().setVSShader(g_GraphicAPI().getVSShader());
   // g_GraphicAPI().setPSShader(g_GraphicAPI().getPSShader());

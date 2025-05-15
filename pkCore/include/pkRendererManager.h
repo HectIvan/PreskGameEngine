@@ -57,15 +57,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   compileShaders();
 
   /**
-   * @brief Converts the actor to a game object pointer.
-   * @param _subject Actor to convert.
-   * @return Pointer to the game object
-   */
-  template<typename T>
-  SPtr<T>
-  actorToClass(SPtr<Actor>& _subject);
-
-  /**
    * @brief Set the Vertex Shader constant buffers
    */
   void
@@ -78,16 +69,10 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
-   * @brief Set the buffers of each game object.
+   * @brief Set the buffers of each actor.
    */
   void
   setActorsBuffers();
-
-  /**
-   * @brief Render a scene
-   */
-  void
-  render();
 
   /**
    * @brief Render a list of actors.

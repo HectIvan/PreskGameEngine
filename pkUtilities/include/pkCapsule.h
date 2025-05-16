@@ -29,12 +29,15 @@ class PK_UTILITY_EXPORT Capsule
 {
  public:
   Capsule() = default;
-  Capsule(Vector3 _topCircle, Vector3 _bottomCircle, float _radius, float _height)
-  : m_topCircle(_topCircle), m_bottomCircle(_bottomCircle), m_radius(_radius), m_height(_height) {};
+  Capsule(Vector3 _topOrigin, Vector3 _bottomOrigin, float _radius, float _height)
+  : m_topOrigin(_topOrigin),
+    m_bottomOrigin(_bottomOrigin),
+    m_radius(_radius),
+    m_height(_height) {};
   ~Capsule() = default;
 
-  Vector3 m_topCircle;
-  Vector3 m_bottomCircle;
+  Vector3 m_topOrigin;
+  Vector3 m_bottomOrigin;
   float m_radius;
   float m_height;
 };

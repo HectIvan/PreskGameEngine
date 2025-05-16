@@ -6,6 +6,7 @@
 #include "cmath"
 #include "pkPlatformMath.h"
 #include "pkVector4.h"
+#include "pkMatrix4.h"
 
 using std::abs;
 using std::pow;
@@ -114,6 +115,16 @@ PlatformMath::clamp(const float _t, const float _x, const float _y)
   return t;
 }
 
+Vector3
+PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)
+{
+  Vector3 vec = _t;
+  vec.x = clamp(vec.x, _x, _y);
+  vec.y = clamp(vec.y, _x, _y);
+  vec.z = clamp(vec.z, _x, _y);
+  return vec;
+}
+
 float
 PlatformMath::lerp(const float _x, const float _y, const float _t)
 {
@@ -183,8 +194,8 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other)
   /**
    * check if its near the 2 half spheres
   **/
-  if (_capsule.m_topCircle.distanceTo(_other) < _capsule.m_radius ||
-      _capsule.m_bottomCircle.distanceTo(_other) < _capsule.m_radius)
+  if (_capsule.m_topOrigin.distanceTo(_other) < _capsule.m_radius ||
+      _capsule.m_bottomOrigin.distanceTo(_other) < _capsule.m_radius)
   {
     return true;
   }
@@ -193,8 +204,8 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other)
   **/
   else
   {
-    Vector3 cylinderAxis = _capsule.m_topCircle - _capsule.m_bottomCircle;
-    Vector3 pointToBase = _other - _capsule.m_bottomCircle;
+    Vector3 cylinderAxis = _capsule.m_topOrigin - _capsule.m_bottomOrigin;
+    Vector3 pointToBase = _other - _capsule.m_bottomOrigin;
 
     // projection of pointToBase onto the axis of the cylinder
     float projection = pointToBase.dotProd(cylinderAxis) /
@@ -203,13 +214,33 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other)
     projection = PlatformMath::clamp(projection, 0.0f, 1.0f);
 
     // gets entire axis and multiplies by the brojection gotten
-    Vector3 closestAxisToPoint = _capsule.m_bottomCircle + cylinderAxis * projection;
+    Vector3 closestAxisToPoint = _capsule.m_bottomOrigin + cylinderAxis * projection;
 
     // gets distance between point in axis and the _other point
     float distAtoOther = closestAxisToPoint.distanceTo(_other);
 
     return distAtoOther <= _capsule.m_radius;
   }
+}
+
+bool
+PlatformMath::intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere)
+{
+  // collision point
+  Vector3 top = _capsule.m_topOrigin; // top sphere origin of capsule.
+  Vector3 bottom = _capsule.m_bottomOrigin; // bottom sphere origin of capsule.
+  Vector3 cS = _sphere.m_origin; // sphere center.
+  /** d is the intersection point between the origin of the sphere and the line going through
+   *  the capusle.
+   */
+  Vector3 d = top + ((cS - top) * (bottom - top)) * (bottom - top);
+
+  // a new sphere will be generated in the intersection point.
+  Sphere newSphere = Sphere();
+  newSphere.m_origin = d;
+  newSphere.m_radius = _capsule.m_radius;
+  // use the enw sphere to do a sphere on sphere collission check.
+  return (intersectSphereSphere(_sphere, newSphere));
 }
 
 /**
@@ -246,6 +277,32 @@ PlatformMath::intersectCubePoint(Cube& _cube, const Vector3& _other)
         return true;
       }
     }
+  }
+  return false;
+}
+
+bool
+PlatformMath::intersectCubeSphere(Cube& _cube, Sphere& _sphere)
+{
+  // get vector between the origin of both objects.
+  Vector3 vBetween = _sphere.m_origin - _cube.m_origin;
+
+  // identity is placeholder for cube rotation.
+  Matrix4 TRot = Matrix4::IDENTITY;
+  Vector3 localVBetween = vBetween * TRot;
+
+  // 10 is arbitrary until i find how to calculate the vector between the center and a corner.
+  Vector3 qLocal = Math::clamp(localVBetween, -10, 10);
+  
+  // identity is placeholder for cube rotation.
+  // q is the closest point.
+  Vector3 q = _cube.m_origin + (qLocal * Matrix4::IDENTITY);
+
+  float distance = q.distanceTo(_sphere.m_origin);
+
+  // if the closest point is inside of the sphere.
+  if (distance < _sphere.m_radius) {
+    return true;
   }
   return false;
 }

@@ -32,264 +32,155 @@ namespace pkEngineSDK
 class PK_UTILITY_EXPORT PlatformMath
 {
  public:
-
   PlatformMath() = default;
   ~PlatformMath() = default;
 
   /**
-  * absolute of a value.
-  *
-  * This function returns the absolute value of _x.
-  *
-  * @param _x
-  * number to calculate the absolute value.
-  *
-  * @return
-  * absolute value of the parameter.
-  **/
+   * @brief Get the absolute value of _x.
+   * @param _x Number to calculate the absolute value.
+   * @return Absolute value of the parameter.
+   */
   static float
   abs(const float _x);
 
   /**
-  * power of a value.
-  *
-  * This function returns the power of _x.
-  *
-  * @param _x
-  * number to calculate the power.
-  *
-  * @param _y
-  * number of times _x will be multiplied by itself.
-  *
-  * @return
-  * result of _x elevated by the power of _y.
-  **/
+   * @brief Get the power of _x.
+   * @param _x Number to calculate the power.
+   * @param _y Number of times _x will be multiplied by itself.
+   * @return Result of _x elevated by the power of _y.
+   */
   static float
   pow(const float _x, const float _y);
 
   /**
-  * Euler elevated by _x.
-  *
-  * This function returns Euler elevated by _x.
-  *
-  * @param _x
-  * number to elevate Euler.
-  * 
-  * @return
-  * result of Euler elevated by _x.
-  **/
+   * @brief Get Euler elevated by _x.
+   * @param _x Number to elevate Euler.
+   * @return Result of Euler elevated by _x.
+   */
   static float
   exp(const float _x);
 
   /**
-  * square root.
-  *
-  * This function returns the square root of _x.
-  *
-  * @param _x
-  * number to calculate the square root.
-  *
-  * @return
-  * square root of _x.
-  **/
+   * @brief Get the square root of _x.
+   * @param _x Number to calculate the square root.
+   * @return Square root of _x.
+   */
   static float
   sqrt(const float _x);
 
   /**
-  * minimum between the 2.
-  *
-  * This function returns the lowest of 2 parameters.
-  *
-  * @param _x
-  * first number to compare.
-  * 
-  * @param _y
-  * second number to compare
-  *
-  * @return
-  * whichever value is the smallest.
-  **/
+   * @brief Get the lowest of 2 parameters.
+   * @param _x First number to compare.
+   * @param _y Second number to compare.
+   * @return Whichever value is the smallest.
+   */
   static float
   min(const float _x, const float _y);
 
   /**
-  * maximum between the 2.
-  *
-  * This function returns the highest of 2 parameters.
-  *
-  * @param _x
-  * first number to compare.
-  *
-  * @param _y
-  * second number to compare
-  *
-  * @return
-  * whichever value is the largest.
-  **/
+   * @brief Get the highest of 2 parameters.
+   * @param _x First number to compare.
+   * @param _y Second number to compare.
+   * @return Whichever value is the largest.
+   */
   static float
   max(const float _x, const float _y);
 
   /**
-  * sin of _x.
-  *
-  * This function returns the sin of _x.
-  *
-  * @param _x
-  * value to calculate sin.
-  *
-  * @return
-  * sin of _x.
-  **/
+   * @brief Get the sin of _x.
+   * @param _x Value to calculate sin.
+   * @return sin of _x.
+   */
   static float
   sin(const float _x);
 
   /**
-  * asin of _x.
-  *
-  * This function returns the asin of _x.
-  *
-  * @param _x
-  * value to calculate asin.
-  *
-  * @return
-  * asin of _x.
-  **/
+   * @brief Get the asin of _x.
+   * @param _x Value to calculate asin.
+   * @return asin of _x.
+   */
   static float
   asin(const float _x);
 
   /**
-  * cos of _x.
-  *
-  * This function returns the cos of _x.
-  *
-  * @param _x
-  * value to calculate cos.
-  *
-  * @return
-  * cos of _x.
-  **/
+   * @brief Get the cos of _x.
+   * @param _x Value to calculate cos.
+   * @return cos of _x.
+   */
   static float
   cos(const float _x);
 
   /**
-  * acos of _x.
-  *
-  * This function returns the acos of _x.
-  *
-  * @param _x
-  * value to calculate acos.
-  *
-  * @return
-  * acos of _x.
-  **/
+   * @brief Get the acos of _x.
+   * @param _x Value to calculate acos.
+   * @return acos of _x.
+   */
   static float
   acos(const float _x);
 
   /**
-  * tan of _x.
-  *
-  * This function returns the tan of _x.
-  *
-  * @param _x
-  * value to calculate tan.
-  *
-  * @return
-  * tan of _x.
-  **/
+   * @brief Get the tan of _x.
+   * @param _x Value to calculate tan.
+   * @return tan of _x.
+   */
   static float
   tan(const float _x);
 
   /**
-  * atan of _x.
-  *
-  * This function returns the atan of _x.
-  *
-  * @param _x
-  * value to calculate atan.
-  *
-  * @return
-  * atan of _x.
-  **/
+   * @brief Get the atan of _x.
+   * @param _x Value to calculate atan.
+   * @return atan of _x.
+   */
   static float
   atan(const float _x);
 
   /**
-  * atan of float.
-  *
-  * This function clamps a float between 2 functions.
-  *
-  * @param _t
-  * Float to clamp.
-  *
-  * @param _x
-  * Minimum clamping value.
-  * 
-  * @param _y
-  * Maximum clamping value.
-  *
-  * @return
-  * Clamped float.
-  **/
+   * @brief clamps a float between 2 functions.
+   * @param _t Float to clamp.
+   * @param _x Minimum clamping value.
+   * @param _y Maximum clamping value.
+   * @return Clamped float.
+   */
   static float
   clamp(const float _t, const float _x, const float _y);
 
   /**
-  * Lerp between 2 numbers.
-  * 
-  * Gets the lerped number between 2 numbers in a specific timestamp.
-  * 
-  * @param _x
-  * The first number.
-  * 
-  * @param _y
-  * The second number.
-  * 
-  * @param _t
-  * Timestamp.
-  * 
-  * @return
-  * The lerped number.
-  **/
+   * @brief clamps a Vector3 between 2 functions.
+   * @param _t Vector3 to clamp.
+   * @param _x Minimum clamping value.
+   * @param _y Maximum clamping value.
+   * @return Clamped float.
+   */
+  static Vector3
+  clamp(const Vector3 _t, const float _x, const float _y);
+
+  /**
+   * @brief Gets the lerped number between 2 numbers in a specific timestamp.
+   * @param _x The first number.
+   * @param _y The second number.
+   * @param _t Timestamp.
+   * @return The lerped number.
+   */
   static float
   lerp(const float _x, const float _y, const float _t);
 
   /**
-  * Lerp between 2 Vector3.
-  *
-  * Gets the lerped number between 2 Vector3 in a specific timestamp.
-  *
-  * @param _x
-  * The first Vector.
-  *
-  * @param _y
-  * The second Vector.
-  *
-  * @param _t
-  * Timestamp.
-  *
-  * @return
-  * The lerped Vector.
-  **/
+   * @brief Gets the lerped number between 2 Vector3 in a specific timestamp.
+   * @param _x The first Vector.
+   * @param _y The second Vector.
+   * @param _t Timestamp.
+   * @return The lerped Vector.
+   */
   static Vector3
   lerp3(const Vector3 _x, const Vector3 _y, const float _t);
 
   /**
-  * Lerp between 2 Vector4.
-  *
-  * Gets the lerped number between 2 Vector4 in a specific timestamp.
-  *
-  * @param _x
-  * The first Vector.
-  *
-  * @param _y
-  * The second Vector.
-  *
-  * @param _t
-  * Timestamp.
-  *
-  * @return
-  * The lerped Vector.
-  **/
+   * @brief Gets the lerped number between 2 Vector4 in a specific timestamp.
+   * @param _x The first Vector.
+   * @param _y The second Vector.
+   * @param _t Timestamp.
+   * @return The lerped Vector.
+   */
   static Vector4
   lerp4(const Vector4 _x, const Vector4 _y, const float _t);
 
@@ -313,36 +204,20 @@ class PK_UTILITY_EXPORT PlatformMath
   ***************************************************************************/
 
   /**
-  * Sphere intersection.
-  *
-  * This function checks if there is a collision between 2 spheres
-  * 
-  * @param _sphere
-  * The reference to the sphere
-  *
-  * @param _other
-  * The reference to the other sphere
-  *
-  * @return
-  * a bool confirming or denying if there is a collision
+  * @brief Check if there is a collision between 2 spheres.
+  * @param _sphere The reference to the sphere.
+  * @param _other The reference to the other sphere.
+  * @return A bool confirming or denying if there is a collision.
   **/
   static bool
   intersectSphereSphere(Sphere& _sphere, const Sphere& _other);
 
   /**
-  * Sphere intersection.
-  *
-  * This function checks if there is a collision between 2 spheres
-  * 
-  * @param _sphere
-  * The reference to the sphere
-  *
-  * @param _other
-  * The point that will be ckecked
-  *
-  * @return
-  * a bool confirming or denying if there is a collision
-  **/
+   * @brief Check if there is a collision between 2 spheres.
+   * @param _sphere The reference to the sphere.
+   * @param _other The point that will be ckecked.
+   * @return A bool confirming or denying if there is a collision.
+   */
   static bool
   intersectSpherePoint(Sphere& _sphere, const Vector3& _other);
 
@@ -351,74 +226,62 @@ class PK_UTILITY_EXPORT PlatformMath
   ***************************************************************************/
 
   /**
-  * Capsule intersection.
-  *
-  * This function checks if there is a collision between 2 Capsule
-  *
-  * @param _other
-  * The reference to the other Capsule
-  *
-  * @return
-  * a bool confirming or denying if there is a collision
-  **/
+   * @brief Check if there is a collision between 2 Capsule.
+   * @param _capsule Capsule to check.
+   * @param _other The reference to the other Capsule.
+   * @return A bool confirming or denying if there is a collision.
+   */
   static bool
   intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other);
 
   /**
-  * Capsule intersection.
-  *
-  * This function checks if there is a collision between 2 Capsule
-  * 
-  * @param _capsule
-  * The reference to the Capsule
-  *
-  * @param _other
-  * The reference to the other Capsule
-  *
-  * @return
-  * a bool confirming or denying if there is a collision
-  **/
+   * @brief Check if there is a collision between a capsule and a point.
+   * @param _capsule The reference to the Capsule.
+   * @param _other The reference to the Point.
+   * @return A bool confirming or denying if there is a collision.
+   */
   static bool
   intersectCapsulePoint(Capsule& _capsule, Vector3& _other);
+
+  /**
+   * @brief Check if there is a collision between a capsule and a sphere.
+   * @param _capsule The reference to the Capsule.
+   * @param _spehre The reference to the other Sphere.
+   * @return A bool confirming or denying if there is a collision.
+   */
+  static bool
+  intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere);
 
   /***************************************************************************
   * Cube
   ***************************************************************************/
 
   /**
-  * Cube intersection Cube.
-  *
-  * This function checks if there is a collision between 2 Cube.
-  *
-  * @param _other
-  * The reference to the cube.
-  *
-  * @param _other
-  * The reference to the other Cube.
-  *
-  * @return
-  * A bool confirming or denying if there is a collision.
-  **/
+   * @brief Check if there is a collision between 2 Cube.
+   * @param _other The reference to the cube.
+   * @param _other The reference to the other Cube.
+   * @return A bool confirming or denying if there is a collision.
+   */
   static bool
   intersectCubeCube(Cube& _cube, const Cube& _other);
 
   /**
-  * Cube intersection Point.
-  *
-  * This function checks if there is a collision between a cube
-  * and a point.
-  * 
-  * @param _cube
-  * The reference to the cube.
-  *
-  * @param _other
-  * The reference to the point.
-  *
-  * @return
-  * A bool confirming or denying if there is a collision.
-  **/
+   * @brief Check for a collision between a Cube and a Point.
+   * @param _cube The reference to the cube.
+   * @param _other The reference to the point.
+   * @return A bool confirming or denying if there is a collision.
+   */
   static bool
   intersectCubePoint(Cube& _cube, const Vector3& _other);
+
+  /**
+   * @brief Check for a collision between a Cube and a Sphere.
+   * @param _cube Cube to check.
+   * @param _sphere Sphere to check.
+   * @return Wether there was an intersection or not.
+   */
+  static bool
+  intersectCubeSphere(Cube& _cube, Sphere& _sphere);
 
   /**
    * @brief Check if the value is nan.
@@ -429,7 +292,7 @@ class PK_UTILITY_EXPORT PlatformMath
 
   /**
    * Static variables
-  **/
+   */
   static const float PI;
 
   static const float EULER;

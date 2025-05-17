@@ -50,8 +50,8 @@ ShaderTest::onInit()
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3::DOWN;
-  lightCom->LightPos = Vector3(0.0f, 10.0f, 0.0f);
+  lightCom->LightDir = Vector3(0.0f, 0.0f, 1.0f);
+  lightCom->LightPos = Vector3(0.0f, 0.0f, -30.0f);
   lightCom->LightColor = Vector3(1.0f, 1.0f, 1.0f);
 
   // add camera component
@@ -63,8 +63,7 @@ ShaderTest::onInit()
                                       10.0f,
                                       lightCom->LightPos, // position
                                       lightCom->LightDir, // target
-                                      Vector3::UP,
-                                      pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
+                                      Vector3::UP); // up vector);
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));

@@ -51,19 +51,20 @@ ShaderTest::onInit()
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
   lightCom->LightDir = Vector3(0.0f, 0.0f, 1.0f);
-  lightCom->LightPos = Vector3(0.0f, 0.0f, -30.0f);
+  lightCom->LightPos = Vector3(0.0f, -50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f, 1.0f, 1.0f);
 
   // add camera component
   light->addComponent(make_shared<Camera>());
-  light->getComponent<Camera>()->init(m_window.getWidth(),
-                                      m_window.getHeight(),
+  light->getComponent<Camera>()->init(30,
+                                      17,
                                       3.1416f / 4.0f,
                                       0.01f,
-                                      10.0f,
+                                      2000.0f,
                                       lightCom->LightPos, // position
                                       lightCom->LightDir, // target
-                                      Vector3::UP); // up vector);
+                                      Vector3::UP,
+                                      pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
@@ -162,8 +163,8 @@ ShaderTest::onUpdate()
 
   // update shadow map buffers
   SPtr<Camera> lightCam = light->getComponent<Camera>();
-  Matrix4 lightView = lightCam->m_view;// .getTransposed();
-  Matrix4 lightProj = lightCam->m_projection;// .getTransposed();
+  Matrix4 lightView = lightCam->m_view.getTransposed();// .getTransposed();
+  Matrix4 lightProj = lightCam->m_projection.getTransposed();// .getTransposed();
   api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(0),
                            &lightView,
                            static_cast<uint32>(sizeof(Matrix4)));

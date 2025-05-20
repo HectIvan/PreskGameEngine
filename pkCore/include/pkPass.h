@@ -119,6 +119,16 @@ public:
   getPShader() { return m_pPShader; }
 
   /**
+   * @brief Create a constant buffer for this pass and stores it in the buffer vector.
+   * @param _size Size of the CBuffer.
+   * @param _pData Data that the buffer will store.
+   * @param _usage What usage will be given to the CBuffer.
+   * @return Pointer to the buffer
+   */
+  SPtr<ConstantBuffer>
+  createCBuffer(uint32 _size, const void* _data, uint32 _usage);
+
+  /**
    * @brief Get the constant buffer vector.
    * @return The vector of cBuffers.
    */

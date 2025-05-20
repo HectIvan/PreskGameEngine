@@ -93,6 +93,19 @@ Pass::compilePShader()
                                        m_pPShader);
 }
 
+SPtr<ConstantBuffer>
+Pass::createCBuffer(uint32 _size, const void* _data, uint32 _usage)
+{
+  // get the api
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  // create the constant buffer with the parameters given
+  SPtr<ConstantBuffer> cb = api.createConstantBuffer(_size, _data, _usage);
+  // store into the constant buffer vector
+  addToCBuffers(cb);
+  // return the pointer
+  return cb;
+}
+
 void
 Pass::addToCBuffers(SPtr<ConstantBuffer> _pCBuffer)
 {

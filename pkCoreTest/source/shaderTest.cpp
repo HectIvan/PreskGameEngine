@@ -163,8 +163,8 @@ ShaderTest::onUpdate()
 
   // update shadow map buffers
   SPtr<Camera> lightCam = light->getComponent<Camera>();
-  Matrix4 lightView = lightCam->m_view.getTransposed();// .getTransposed();
-  Matrix4 lightProj = lightCam->m_projection.getTransposed();// .getTransposed();
+  Matrix4 lightView = lightCam->m_view.getTransposed();
+  Matrix4 lightProj = lightCam->m_projection.getTransposed();
   api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(0),
                            &lightView,
                            static_cast<uint32>(sizeof(Matrix4)));
@@ -176,6 +176,22 @@ ShaderTest::onUpdate()
                            static_cast<uint32>(sizeof(Light)));
   api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(4),
                            &lightCam,
+                           static_cast<uint32>(sizeof(Camera)));
+
+  // update shadow deferred buffers
+  SPtr<Camera> tempLightCam = light->getComponent<Camera>();
+  SPtr<Camera> mainCam = m_camera->getComponent<Camera>();
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(0),
+                           &tempLightCam,
+                           static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(1),
+                           &mainCam,
+                           static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(2),
+                           &light->m_transform,
+                           static_cast<uint32>(sizeof(Matrix4)));
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(3),
+                           &m_camera->m_transform,
                            static_cast<uint32>(sizeof(Camera)));
 }
 
@@ -206,8 +222,8 @@ ShaderTest::onRender()
   api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
   
   // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes[1]->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes[1]->getCBuffers());
+  rm.PSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
+  rm.VSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
   
   rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
@@ -231,8 +247,8 @@ ShaderTest::onRender()
   api.setSampler(rm.m_passes.find(0)->second->getSamplerState());
   
   // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes[0]->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes[0]->getCBuffers());
+  rm.PSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
+  rm.VSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
   // render the objects
   rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
@@ -246,8 +262,31 @@ ShaderTest::onRender()
   // api.PSSetShaderResourceView(rm.m_pRTargetView);
   // 
   // // set constant buffers for the pixel and vertex shaders
-  // rm.PSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
-  // rm.VSSetConstantBuffers(rm.m_passes[2]->getCBuffers());
+  // rm.PSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
+  // rm.VSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
     
   // api.draw(3, 0);
+
+  /**
+   * Shadow pass. (Deferred)
+   */
+  rTVector.clear();
+  rTVector.push_back(rm.m_pRTargetView);
+  rTVector.push_back(rm.m_pNormalRT);
+  rTVector.push_back(rm.m_pDepthRT);
+
+  // set the render targets
+  api.setRenderTargets(rTVector, rm.m_pDepthSView);
+
+  api.setPSShader(rm.m_passes.find(3)->second->getPShader());
+  api.setVSShader(rm.m_passes.find(3)->second->getVShader());
+  api.setSampler(rm.m_passes.find(3)->second->getSamplerState());
+  
+  // set constant buffers for the pixel and vertex shaders
+  rm.PSSetConstantBuffers(rm.m_passes.find(3)->second->getCBuffers());
+
+  api.setShaderResourceView(rm.m_pShadowDepth, 0);
+  api.setShaderResourceView(rm.m_pDepthRT, 1);
+
+  api.draw(3, 0);
 }

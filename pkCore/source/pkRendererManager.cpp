@@ -85,28 +85,11 @@ RendererManager::createPasses()
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
 
   // constant buffers
-  SPtr<ConstantBuffer> cBView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)),
-                                                         nullptr,
-                                                         0);
-  SPtr<ConstantBuffer> cBProj = api.createConstantBuffer(
-                                               static_cast<uint32>(sizeof(CBProjection)),
-                                               nullptr,
-                                               0);
-  SPtr<ConstantBuffer> cBTransform = api.createConstantBuffer(
-                                              static_cast<uint32>(sizeof(CBTransform)),
-                                              nullptr,
-                                              0);
-  SPtr<ConstantBuffer> cbLight = api.createConstantBuffer(static_cast<uint32>(sizeof(CBLight)),
-                                                          nullptr,
-                                                          0);
-  SPtr<ConstantBuffer> cbCam = api.createConstantBuffer(static_cast<uint32>(sizeof(CBCamera)),
-                                                           nullptr,
-                                                           0);
-  basePass->addToCBuffers(cBView);
-  basePass->addToCBuffers(cBProj);
-  basePass->addToCBuffers(cBTransform);
-  basePass->addToCBuffers(cbLight);
-  basePass->addToCBuffers(cbCam);
+  basePass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
+  basePass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
+  basePass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
+  basePass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
+  basePass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
 
   g_GraphicAPI().setInputLayout(basePass->getInputLayout());
   // insert to the pass map.
@@ -123,35 +106,21 @@ RendererManager::createPasses()
   shadowPass->compileShaders();
   shadowPass->createShaders();
 
-  // constant buffers
-  SPtr<ConstantBuffer> sView = api.createConstantBuffer(static_cast<uint32>(sizeof(CBView)),
-                                                        nullptr,
-                                                        0);
-  SPtr<ConstantBuffer> sProj = api.createConstantBuffer(
-                                               static_cast<uint32>(sizeof(CBProjection)),
-                                               nullptr,
-                                               0);
-  SPtr<ConstantBuffer> sTransform = api.createConstantBuffer(
-                                              static_cast<uint32>(sizeof(CBTransform)),
-                                              nullptr,
-                                              0);
-  SPtr<ConstantBuffer> sLight = api.createConstantBuffer(static_cast<uint32>(sizeof(CBLight)),
-                                                         nullptr,
-                                                         0);
-  SPtr<ConstantBuffer> sCam = api.createConstantBuffer(static_cast<uint32>(sizeof(CBCamera)),
-                                                       nullptr,
-                                                       0);
-  shadowPass->addToCBuffers(sView);
-  shadowPass->addToCBuffers(sProj);
-  shadowPass->addToCBuffers(sTransform);
-  shadowPass->addToCBuffers(sLight);
-  shadowPass->addToCBuffers(sCam);
+  // create constant buffers
+  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
+  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
+  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
+  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
+  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
 
   shadowPass->createInputLayout();
   shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                  SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ 1, shadowPass });
 
+  /****************************************************************************
+   * Ambient Occlussion Pass
+   ***************************************************************************/
   SPtr<Pass> AOPass = make_shared<Pass>();
   // create all pointers
   AOPass->create();
@@ -161,15 +130,35 @@ RendererManager::createPasses()
   AOPass->compileShaders();
   AOPass->createShaders();
 
-  SPtr<ConstantBuffer> cbAO = api.createConstantBuffer(static_cast<uint32>(sizeof(CBAOData)),
-                                                       nullptr,
-                                                       0);
-  AOPass->addToCBuffers(cbAO);
+  // create the buffers needed (reminder to remember the order in which they are created)
+  AOPass->createCBuffer(static_cast<uint32>(sizeof(CBAOData)), nullptr, 0);
 
   AOPass->createInputLayout();
   AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ 2, AOPass });
+
+  /****************************************************************************
+   * Shadow Deferred pass
+   ***************************************************************************/
+  SPtr<Pass> ShadowDef = make_shared<Pass>();
+  // create all pointers
+  ShadowDef->create();
+  // set and compile shaders
+  ShadowDef->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  ShadowDef->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
+  ShadowDef->compileShaders();
+  ShadowDef->createShaders();
+
+  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // light camera
+  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // main camera
+  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // light transform
+  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // camera transform
+
+  ShadowDef->createInputLayout();
+  ShadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
+                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  m_passes.insert({ 3, ShadowDef });
 }
 
 void

@@ -21,23 +21,29 @@ struct ImGui_ImplWin32_Data
 };
 
 void
-initWin32(WindowHandle& _hWnd)
+ImguiEngine::WindowNewFrame()
 {
-  _hWnd = _hWnd; // temporary (prevent warning)
+  ImGui_ImplWin32_NewFrame();
 }
 
 void
-ImguiEngine::init(WindowHandle& _hWnd)
+ImguiEngine::initWin(WindowHandle& _hWnd)
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); static_cast<void>(io);
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-  ImGui::StyleColorsDark();
+  // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to
+  ImGuiStyle& style = ImGui::GetStyle();
+  if (io.ConfigFlags)
+  {
+    style.WindowRounding = 0.0f;
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+  }
     
   ImGui_ImplWin32_Init(_hWnd);
-  // ImGui_ImplDX11_Init(g_GraphicAPI().getDevice());
+  // initialize with the current api
 }
 }
 #endif

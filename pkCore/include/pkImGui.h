@@ -9,7 +9,7 @@ namespace pkEngineSDK
 
 class PK_CORE_EXPORT ImguiEngine
 {
-public:
+ public:
   ImguiEngine() = default;
   virtual ~ImguiEngine() = default;
 
@@ -18,5 +18,35 @@ public:
    */
   void
   init(WindowHandle& _hWnd);
+
+  /**
+   * @brief Initialize ImGui for the window
+   */
+  void
+  initWin(WindowHandle& _hWnd);
+
+  /**
+   * @brief Initialize Imgui through the current api.
+   */
+  void
+  APIInit();
+
+  /**
+   * @brief 
+   */
+  void
+  WindowNewFrame();
+
+  /**
+   * @brief 
+   */
+  void
+  APInewFrame();
+
+  /**
+   * @brief 
+   */
+  void
+  render();
 };
 }

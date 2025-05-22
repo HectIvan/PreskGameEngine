@@ -8,10 +8,16 @@
 namespace pkEngineSDK
 {
 
-UPtr<Device>
+void*
 DX11Device::getDevice()
 {
-  return make_unique<DX11Device>();
+  return pd3dDevice;
+}
+
+void*
+DX11Device::getDeviceContext()
+{
+  return pImmediateContext;
 }
 
 HRESULT

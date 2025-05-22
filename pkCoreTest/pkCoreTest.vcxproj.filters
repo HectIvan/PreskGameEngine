@@ -16,19 +16,19 @@
       <Filter>source\main</Filter>
     </ClCompile>
     <ClCompile Include="source\PhysicsApp.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Projectile.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\ShaderTest.cpp">
-      <Filter>source</Filter>
+      <Filter>source\main</Filter>
     </ClCompile>
     <ClCompile Include="source\pkObstacle.cpp">
-      <Filter>source</Filter>
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Projectile.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ShaderTest.cpp">
+      <Filter>source\main</Filter>
     </ClCompile>
     <ClCompile Include="source\Spring.cpp">
-      <Filter>source</Filter>
+      <Filter>source\main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,12 @@
-#include "pkImGui.h"
-#include "pkDX11GraphicsAPI.h"
-#include "imgui_impl_dx11.h"
+#include "pkInterface.h"
+#include "pkGraphicsAPI.h"
+#include "externals/imgui_impl_dx11.h"
 
 namespace pkEngineSDK
 {
 
 void
-ImguiEngine::APIInit()
+Interface::initAPI()
 {
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
@@ -15,14 +15,14 @@ ImguiEngine::APIInit()
 }
 
 void
-ImguiEngine::APInewFrame()
+Interface::newFrameAPI()
 {
   ImGui_ImplDX11_NewFrame();
   ImGui::NewFrame();
 }
 
 void
-ImguiEngine::render()
+Interface::render()
 {
   ImGuiIO& io = ImGui::GetIO();
   // Rendering

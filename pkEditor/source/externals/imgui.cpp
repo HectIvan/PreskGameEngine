@@ -1066,9 +1066,9 @@ CODE
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 
-#include "imgui.h"
+#include "externals/imgui.h"
 #ifndef IMGUI_DISABLE
-#include "imgui_internal.h"
+#include "externals/imgui_internal.h"
 
 // System includes
 #include <stdio.h>      // vsnprintf, sscanf, printf
@@ -4727,7 +4727,7 @@ void* ImGui::MemAlloc(size_t size)
     return ptr;
 }
 
-// IM_FREE() == ImGui:: ()
+// IM_FREE() == ImGui::MemFree()
 void ImGui::MemFree(void* ptr)
 {
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS

@@ -1,6 +1,6 @@
-#include "pkImGui.h"
+#include "pkInterface.h"
 #include "pkGraphicsAPI.h"
-#include "imgui_impl_win32.h"
+#include "externals/imgui_impl_win32.h"
 
 using pkEngineSDK::g_GraphicAPI;
 
@@ -21,13 +21,13 @@ struct ImGui_ImplWin32_Data
 };
 
 void
-ImguiEngine::WindowNewFrame()
+Interface::windowNewFrame()
 {
   ImGui_ImplWin32_NewFrame();
 }
 
 void
-ImguiEngine::initWin(WindowHandle& _hWnd)
+Interface::init(const WindowHandle& _hWnd)
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();

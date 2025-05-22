@@ -37,11 +37,9 @@
 //  2018-02-06: Misc: Removed call to ImGui::Shutdown() which is not available from 1.60 WIP, user needs to call CreateContext/DestroyContext themselves.
 //  2016-05-07: DirectX11: Disabling depth-write.
 
-#include "pkImGui.h"
+#include "pkInterface.h"
 #ifndef IMGUI_DISABLE
-#include "imgui_impl_dx11.h"
-#include "pkDX11Device.h"
-#include "pkDX11Prerequisites.h"
+#include "externals/imgui_impl_dx11.h"
 #include "pkPrerequisitesCore.h"
 
 // DirectX
@@ -570,7 +568,10 @@ void    ImGui_ImplDX11_InvalidateDeviceObjects()
 
 bool    ImGui_ImplDX11_Init(pkEngineSDK::SPtr<pkEngineSDK::Device> _device)
 {
-    auto device = reinterpret_pointer_cast<pkEngineSDK::DX11Device>(_device);
+  // reinterpret sections of the device
+    auto device = static_cast<ID3D11Device*>(_device->getDevice());
+    auto context = static_cast<ID3D11DeviceContext*>(_device->getDeviceContext());
+
     ImGuiIO& io = ImGui::GetIO();
     IMGUI_CHECKVERSION();
     IM_ASSERT(io.BackendRendererUserData == nullptr && "Already initialized a renderer backend!");
@@ -586,12 +587,12 @@ bool    ImGui_ImplDX11_Init(pkEngineSDK::SPtr<pkEngineSDK::Device> _device)
     IDXGIAdapter* pDXGIAdapter = nullptr;
     IDXGIFactory* pFactory = nullptr;
 
-    if (device->pd3dDevice->QueryInterface(IID_PPV_ARGS(&pDXGIDevice)) == S_OK)
+    if (device->QueryInterface(IID_PPV_ARGS(&pDXGIDevice)) == S_OK)
         if (pDXGIDevice->GetParent(IID_PPV_ARGS(&pDXGIAdapter)) == S_OK)
             if (pDXGIAdapter->GetParent(IID_PPV_ARGS(&pFactory)) == S_OK)
             {
-                bd->pd3dDevice = device->pd3dDevice;
-                bd->pd3dDeviceContext = device->pImmediateContext;
+                bd->pd3dDevice = device;
+                bd->pd3dDeviceContext = context;
                 bd->pFactory = pFactory;
             }
     if (pDXGIDevice) pDXGIDevice->Release();

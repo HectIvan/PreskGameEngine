@@ -34,32 +34,32 @@ class DX11Device : public Device
   }
 
   /**
-  * Get the new device as the child class of the parent
-  **/
-  UPtr<Device>
+   * @brief Get the raw version of the device.
+   * @return The pointer to the device.
+   */
+  void*
   getDevice() override;
+
+  /**
+   * @brief Get the raw version of the device context.
+   * @return The pointer to the device context.
+   */
+  void*
+  getDeviceContext() override;
   
   /**
-  * Initialize device.
-  * 
-  * @param _pDriverType
-  * Type of driver we will be using for the device.
-  * 
-  * @param _pFeatureLevel
-  * Feature levels of the device.
-  * 
-  * @return
-  * What was the end result of the creation
-  **/
+   * @brief Initialize device.
+   * @param _pDriverType Type of driver we will be using for the device.
+   * @param _pFeatureLevel Feature levels of the device.
+   * @return What was the end result of the creation.
+   */
   HRESULT
   init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
 
   /**
-  * Set primitive topology
-  * 
-  * @param _topology
-  * The kind of topology we will be using.
-  **/
+   * @brief Set primitive topology.
+   * @param _topology The kind of topology we will be using.
+   */
   void
   setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

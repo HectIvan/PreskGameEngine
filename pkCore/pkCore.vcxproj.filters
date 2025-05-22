@@ -61,17 +61,11 @@
     <Filter Include="source\graphics">
       <UniqueIdentifier>{97698cb5-919b-4d24-b37b-c212942a8975}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\imgui">
-      <UniqueIdentifier>{cc33b101-0a66-4e8c-b246-3fc51bf3136e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\debug">
       <UniqueIdentifier>{2f4fc196-7749-4980-8965-a42c527517eb}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\debug">
       <UniqueIdentifier>{f27c31e5-d2cc-4ff7-b281-9d8ed159169b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\imgui">
-      <UniqueIdentifier>{a18d7496-f355-4cef-be71-660a483699d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="include\script">
       <UniqueIdentifier>{4bccd719-0cdb-4e48-9088-54fe53d235e9}</UniqueIdentifier>
@@ -189,27 +183,6 @@
     <ClInclude Include="include\pkLogger.h">
       <Filter>include\debug</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkImGui.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imconfig.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui_internal.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_rectpack.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_textedit.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_truetype.h">
-      <Filter>include\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkRendererManager.h">
       <Filter>include\base app</Filter>
     </ClInclude>
@@ -245,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="include\pkInverseKinematics.h">
       <Filter>include\game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\imgui_impl_win32.h">
-      <Filter>include\imgui</Filter>
     </ClInclude>
     <ClInclude Include="include\pkTextureManager.h">
       <Filter>include\base app</Filter>
@@ -314,24 +284,6 @@
     <ClCompile Include="source\pkLogger.cpp">
       <Filter>source\debug</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkImGui.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_demo.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_draw.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_tables.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_widgets.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkRendererManager.cpp">
       <Filter>source\base app</Filter>
     </ClCompile>
@@ -340,9 +292,6 @@
     </ClCompile>
     <ClCompile Include="source\pkTimeManager.cpp">
       <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkImGui_win32.cpp">
-      <Filter>source\imgui</Filter>
     </ClCompile>
     <ClCompile Include="source\pkScriptManager.cpp">
       <Filter>source\script</Filter>
@@ -361,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="source\pkInverseKinematics.cpp">
       <Filter>source\game</Filter>
-    </ClCompile>
-    <ClCompile Include="source\imgui_impl_win32.cpp">
-      <Filter>source\imgui</Filter>
     </ClCompile>
     <ClCompile Include="source\pkTextureManager.cpp">
       <Filter>source\base app</Filter>

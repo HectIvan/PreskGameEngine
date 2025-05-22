@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\baseApp">
+      <UniqueIdentifier>{5a30d403-aebc-4eaf-939f-d97a3e029491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{fe17dee2-aed7-4ef6-a8ab-f7c9e7e18a54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{493c38ec-bff2-4524-99d4-55dc331fee09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Interface">
+      <UniqueIdentifier>{54a6d8a2-e618-4e1b-b26c-f66d08bffca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Interface\ImGui">
+      <UniqueIdentifier>{f7055187-d7a2-498f-9af3-25e14c65ddda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\interface">
+      <UniqueIdentifier>{d0f4fb97-30d9-4ddd-879d-bfa68c258a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\interface\ImGui">
+      <UniqueIdentifier>{28315225-3dc1-49ca-af04-f91699a9b30e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\shaderTest.cpp">
+      <Filter>Source Files\baseApp</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkEditorApp.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkInterface.cpp">
+      <Filter>Source Files\interface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui_win32.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_demo.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_draw.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_impl_win32.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_tables.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_widgets.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_impl_dx11.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11ImGui.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\pkInterface.h">
+      <Filter>include\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imconfig.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_impl_win32.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_internal.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_rectpack.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_textedit.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_truetype.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_impl_dx11.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

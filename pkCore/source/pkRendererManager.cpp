@@ -65,9 +65,6 @@ void RendererManager::init(Window& _window)
 void
 RendererManager::createPasses()
 {
-  // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/

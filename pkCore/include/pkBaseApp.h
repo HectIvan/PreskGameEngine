@@ -1,18 +1,13 @@
-/************************************************************************/
+/*************************************************************************/
 /**
-* @pkBaseApp pkBaseApp.h
-* @Hector Ivan Muñoz Ceballos
-* @date 07/12/2024
-* @Base app for the Presk Game Engine.
-*
-* This file contains the Base App of the engine
-*
-* @bug. Children will not follow their parent transform correctly.
-* 
-* @HectIvan 06/02/2025
-* @brief Changed the Create Material function and added a new create Texture function.
-*/
-/************************************************************************/
+ * @file    pkBaseApp.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    07/12/2024
+ * @brief   Base app for the Presk Game Engine
+ *
+ * @bug    no knon bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

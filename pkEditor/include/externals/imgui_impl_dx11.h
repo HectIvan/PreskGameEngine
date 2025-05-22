@@ -15,7 +15,7 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #pragma once
-#include "pkImGui.h"
+#include "pkInterface.h"
 #include "pkDevice.h"
 #ifndef IMGUI_DISABLE
 

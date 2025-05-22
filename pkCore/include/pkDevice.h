@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkDevice pkDevice.h
-* @Hector Ivan Muñoz Ceballos
-* @date 22/11/2024
-* @Device file for the Presk Game Engine.
-*
-* Device base class for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 25/11/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkDevice.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    22/11/2024
+ * @brief   Device base class for the engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -31,7 +26,18 @@ class PK_CORE_EXPORT Device
   Device() = default;
   virtual ~Device() = default;
 
-  virtual UPtr<Device>
+  /**
+   * @brief Get the raw version of the device.
+   * @return The pointer to the device.
+   */
+  virtual void*
   getDevice() = 0;
+
+  /**
+   * @brief Get the raw version of the device context.
+   * @return The pointer to the device context.
+   */
+  virtual void*
+  getDeviceContext() = 0;
 };
 }

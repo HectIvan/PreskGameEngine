@@ -18,68 +18,35 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="source\pkDX11ConstantBuffer.cpp" />
-    <ClCompile Include="source\pkDX11DepthStencilView.cpp" />
-    <ClCompile Include="source\pkDX11Device.cpp" />
-    <ClCompile Include="source\pkDX11GraphicsAPI.cpp" />
-    <ClCompile Include="source\pkDX11IndexBuffer.cpp" />
-    <ClCompile Include="source\pkDX11InputLayout.cpp" />
-    <ClCompile Include="source\pkDX11PixelShader.cpp" />
-    <ClCompile Include="source\pkDX11SamplerState.cpp" />
-    <ClCompile Include="source\pkDX11Shader.cpp" />
-    <ClCompile Include="source\pkDX11Texture.cpp" />
-    <ClCompile Include="source\pkDX11VertexBuffer.cpp" />
-    <ClCompile Include="source\pkDX11VertexShader.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\pkDX11BlendState.h" />
-    <ClInclude Include="include\pkDX11ConstantBuffer.h" />
-    <ClInclude Include="include\pkDX11DepthStencilView.h" />
-    <ClInclude Include="include\pkDX11Device.h" />
-    <ClInclude Include="include\pkDX11GraphicsAPI.h" />
-    <ClInclude Include="include\pkDX11GraphicsManager.h" />
-    <ClInclude Include="include\pkDX11IndexBuffer.h" />
-    <ClInclude Include="include\pkDX11InputLayout.h" />
-    <ClInclude Include="include\pkDX11PixelShader.h" />
-    <ClInclude Include="include\pkDX11Prerequisites.h" />
-    <ClInclude Include="include\pkDX11RenderTargetView.h" />
-    <ClInclude Include="include\pkDX11SamplerState.h" />
-    <ClInclude Include="include\pkDX11Shader.h" />
-    <ClInclude Include="include\pkDX11SwapChain.h" />
-    <ClInclude Include="include\pkDX11Texture.h" />
-    <ClInclude Include="include\pkDX11VertexBuffer.h" />
-    <ClInclude Include="include\pkDX11VertexShader.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{9ae71f54-e4f9-4641-9dd4-28c6e344775b}</ProjectGuid>
-    <RootNamespace>pkDX11API</RootNamespace>
+    <ProjectGuid>{67325aa0-7011-459d-b4ec-ff9405f2b376}</ProjectGuid>
+    <RootNamespace>pkEditor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -104,18 +71,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)d</TargetName>
     <OutDir>$(SolutionDir)bin/$(PlatformTarget)/</OutDir>
     <IntDir>$(SolutionDir)intermediate/$(ProjectName)/$(PlatformTarget)/$(Configuration)/</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)d</TargetName>
-    <OutDir>$(SolutionDir)bin/$(PlatformTarget)/</OutDir>
-    <IntDir>$(SolutionDir)intermediate/$(ProjectName)/$(PlatformTarget)/$(Configuration)/</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin/$(PlatformTarget)/</OutDir>
     <IntDir>$(SolutionDir)intermediate/$(ProjectName)/$(PlatformTarget)/$(Configuration)/</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin/$(PlatformTarget)/</OutDir>
+    <IntDir>$(SolutionDir)intermediate/$(ProjectName)/$(PlatformTarget)/$(Configuration)/</IntDir>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin/$(PlatformTarget)/</OutDir>
@@ -128,15 +95,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;./externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)imgui-master/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,17 +113,16 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;./externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)imgui-master/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -168,15 +132,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;./externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\</AdditionalLibraryDirectories>
-      <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)imgui-master/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,19 +150,43 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;./externals/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)imgui-master/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;D3DCompiler.lib;D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\externals\imgui.cpp" />
+    <ClCompile Include="source\externals\imgui_demo.cpp" />
+    <ClCompile Include="source\externals\imgui_draw.cpp" />
+    <ClCompile Include="source\externals\imgui_impl_dx11.cpp" />
+    <ClCompile Include="source\externals\imgui_impl_win32.cpp" />
+    <ClCompile Include="source\externals\imgui_tables.cpp" />
+    <ClCompile Include="source\externals\imgui_widgets.cpp" />
+    <ClCompile Include="source\pkDX11ImGui.cpp" />
+    <ClCompile Include="source\pkEditorApp.cpp" />
+    <ClCompile Include="source\pkImGui_win32.cpp" />
+    <ClCompile Include="source\pkInterface.cpp" />
+    <ClCompile Include="source\shaderTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\externals\imconfig.h" />
+    <ClInclude Include="include\externals\imgui.h" />
+    <ClInclude Include="include\externals\imgui_impl_dx11.h" />
+    <ClInclude Include="include\externals\imgui_impl_win32.h" />
+    <ClInclude Include="include\externals\imgui_internal.h" />
+    <ClInclude Include="include\externals\imstb_rectpack.h" />
+    <ClInclude Include="include\externals\imstb_textedit.h" />
+    <ClInclude Include="include\externals\imstb_truetype.h" />
+    <ClInclude Include="include\pkInterface.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

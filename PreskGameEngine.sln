@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkOGLAPI", "pkOGLAPI\pkOGLA
 		{7AC8224F-1F51-4711-BE1B-B59FDDCAC0ED} = {7AC8224F-1F51-4711-BE1B-B59FDDCAC0ED}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkEditor", "pkEditor\pkEditor.vcxproj", "{67325AA0-7011-459D-B4EC-FF9405F2B376}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -89,6 +91,14 @@ Global
 		{F382B7A6-8080-48C8-BFD8-AB76F5AF5C39}.Release|x64.Build.0 = Release|x64
 		{F382B7A6-8080-48C8-BFD8-AB76F5AF5C39}.Release|x86.ActiveCfg = Release|Win32
 		{F382B7A6-8080-48C8-BFD8-AB76F5AF5C39}.Release|x86.Build.0 = Release|Win32
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Debug|x64.ActiveCfg = Debug|x64
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Debug|x64.Build.0 = Debug|x64
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Debug|x86.ActiveCfg = Debug|Win32
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Debug|x86.Build.0 = Debug|Win32
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Release|x64.ActiveCfg = Release|x64
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Release|x64.Build.0 = Release|x64
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Release|x86.ActiveCfg = Release|Win32
+		{67325AA0-7011-459D-B4EC-FF9405F2B376}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

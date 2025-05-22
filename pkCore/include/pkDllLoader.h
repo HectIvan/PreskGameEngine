@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkDllLoader pkDllLoader.h
-* @Hector Ivan Muñoz Ceballos
-* @date 06/12/2024
-* @Dll Loader file for the Presk Game Engine.
-*
-* Dll loader class for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 06/12/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkDllLoader.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/12/2024
+ * @brief   Dll loader class for the engine.
+ *
+ * @bug    no known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

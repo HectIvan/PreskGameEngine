@@ -15,11 +15,13 @@ using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
 
 namespace pkEngineSDK
 {
-void RendererManager::init(Window& _window)
+void RendererManager::init(const Window& _window)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // create the render targets and depth stencil view
   m_pRTargetView = api.createRenderTargetView();
+
+  uint32 winHeight = _window.getHeight();
 
   m_pDepthRT = api.createTexture(nullptr,
                                  4,
@@ -177,7 +179,7 @@ RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 }
   
 void
-RendererManager::VSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
+RendererManager::VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
@@ -187,7 +189,7 @@ RendererManager::VSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
 }
 
 void
-RendererManager::PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers)
+RendererManager::PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
@@ -215,7 +217,7 @@ RendererManager::setActorsBuffers()
 }
 
 void
-RendererManager::renderActors(Vector<SPtr<Actor>> _gameActors)
+RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {

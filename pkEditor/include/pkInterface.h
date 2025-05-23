@@ -3,7 +3,7 @@
  * @file    pkInterface.h
  * @author  Héctor Iván Muñoz Ceballos
  * @date    01/04/2025
- * @brief
+ * @brief   Interface for the Editor app.
  *
  * @bug    Interface class is fundamentally wrong.
  */
@@ -17,15 +17,16 @@
 /*********************************************/
 #include "externals/imgui.h"
 #include "pkPrerequisitesCore.h"
+#include "pkModule.h"
 #include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Interface
+class PK_CORE_EXPORT Interface : public Module<Interface>
 {
  public:
-   Interface() = default;
+  Interface() = default;
   virtual ~Interface() = default;
 
   /**
@@ -41,7 +42,7 @@ class PK_CORE_EXPORT Interface
   initAPI();
 
   /**
-   * @brief 
+   * @brief initialize the interface with the desired API.
    */
   void
   windowNewFrame();
@@ -58,4 +59,7 @@ class PK_CORE_EXPORT Interface
   void
   render();
 };
+
+PK_CORE_EXPORT Interface&
+g_interface();
 }

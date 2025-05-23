@@ -125,6 +125,15 @@ PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)
   return vec;
 }
 
+bool
+PlatformMath::isInRange(const float _t, float _x, float _y)
+{
+  if (_t >= _x && _t <= _y) {
+    return true;
+  }
+  return false;
+}
+
 float
 PlatformMath::lerp(const float _x, const float _y, const float _t)
 {

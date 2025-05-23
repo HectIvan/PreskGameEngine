@@ -155,6 +155,16 @@ class PK_UTILITY_EXPORT PlatformMath
   clamp(const Vector3 _t, const float _x, const float _y);
 
   /**
+   * @brief Check if a float number is in range of 2 values.
+   * @param _t value to check for.
+   * @param _x minimum value.
+   * @param _y maximum value.
+   * @return If it's in range or not.
+   */
+  static bool
+  isInRange(const float _t, float _x, float _y);
+
+  /**
    * @brief Gets the lerped number between 2 numbers in a specific timestamp.
    * @param _x The first number.
    * @param _y The second number.

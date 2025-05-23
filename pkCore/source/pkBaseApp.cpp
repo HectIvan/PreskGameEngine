@@ -64,8 +64,7 @@ BaseApp::init(const char** _argv)
   initWindow();
   initAPI(_argv);
 
-  g_SceneManager().createScene();
-  g_SceneManager().setActive(0);
+  g_SceneManager().init();
 
   g_RenderManager().init(m_window);
   onInit();

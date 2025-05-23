@@ -42,7 +42,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Initialize the render manager
    */
   void
-  init(Window& _window);
+  init(const Window& _window);
 
   /**
    * @brief Create the passes needed for the renderer.
@@ -60,13 +60,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Set the Vertex Shader constant buffers
    */
   void
-  VSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers);
+  VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the Pixel Shader constant buffers
    */
   void
-  PSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _cBuffers);
+  PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the buffers of each actor.
@@ -79,7 +79,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _gameActors The actors to render.
    */
   void
-  renderActors(Vector<SPtr<Actor>> _gameActors);
+  renderActors(const Vector<SPtr<Actor>> _gameActors);
 
   /**
    * @brief Render a given model

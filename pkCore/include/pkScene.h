@@ -98,6 +98,12 @@ class PK_CORE_EXPORT Scene
   void
   update(float _deltaTime);
 
+  /**
+   * @brief Clear all the data from the scene.
+   */
+  void
+  clear();
+
  private:
   /**
    * @brief Update an actor.

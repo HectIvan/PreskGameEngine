@@ -232,7 +232,6 @@
     <ClCompile Include="source\pkGraphicsAPI.cpp" />
     <ClCompile Include="source\pkIndexBuffer.cpp" />
     <ClCompile Include="source\pkLinuxWindow.cpp" />
-    <ClCompile Include="source\pkMain.cpp" />
     <ClCompile Include="source\pkMaterial.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkModel.cpp" />

@@ -68,6 +68,17 @@ TEST_CASE("Platform Math") {
   REQUIRE(Math::clamp(2.0f, 0.0f, 1.0f) == 1.0f);
 
   /**
+  * In range
+  **/
+  float inRangeTest = 2.0f;
+  float inRangeMax = 3.0f;
+  float inRangeMin = 1.0f;
+  REQUIRE(Math::isInRange(inRangeTest, inRangeMin, inRangeMax) == Approx(true));
+  inRangeMax = 4.0f;
+  inRangeMin = 3.0f;
+  REQUIRE(Math::isInRange(inRangeTest, inRangeMin, inRangeMax) == Approx(false));
+
+  /**
   * lerp
   **/
   float timeDif = 0.16f;

@@ -116,6 +116,17 @@ Scene::update(float _deltaTime)
     }
   }
 }
+
+void
+Scene::clear()
+{
+  for (uint32 i = 0; i < m_actors.size(); ++i) {
+    m_actors[i]->clear();
+  }
+  m_actors.clear();
+  m_isActive = false;
+}
+
 void
 Scene::updateActor(SPtr<Actor> _pActor, float _deltaTime)
 {

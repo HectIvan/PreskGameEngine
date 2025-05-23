@@ -43,6 +43,7 @@ Interface::init(const WindowHandle& _hWnd)
   }
     
   ImGui_ImplWin32_Init(_hWnd);
+  ImGui::StyleColorsDark();
   // initialize with the current api
 }
 }

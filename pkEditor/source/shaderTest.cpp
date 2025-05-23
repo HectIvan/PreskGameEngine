@@ -2,6 +2,7 @@
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
+#include "pkInterface.h"
 #include "pkLogger.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
@@ -9,15 +10,17 @@
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
-using pkEngineSDK::Logger;
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::g_interface;
+using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
-using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::Interface;
 using pkEngineSDK::Light;
+using pkEngineSDK::Logger;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::RendererManager;
@@ -30,6 +33,10 @@ using pkEngineSDK::uint32;
 void
 ShaderTest::onInit()
 {
+  //start the interface
+  Logger::startUp();
+  g_interface().initAPI(); // should it have access to the argv?
+
   m_cameraSpeed = 20.0f;
   m_camera = make_shared<Actor>();
   m_camera->addComponent(make_shared<Camera>());

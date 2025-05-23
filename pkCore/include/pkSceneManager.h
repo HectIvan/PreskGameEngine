@@ -28,6 +28,12 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
   virtual ~SceneManager() = default;
 
   /**
+   * @brief Clear all and initialize a single scene.
+   */
+  void
+  init();
+
+  /**
    * @brief Create a new scene.
    */
   void
@@ -38,7 +44,7 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
    * @param _index Index of the scene to delete.
    */
   void
-  deleteScene(uint32 _index) { m_scenes.erase(m_scenes.begin() + _index); }
+  deleteScene(uint32 _index);
 
   /**
    * @brief Set the scene as active.
@@ -53,6 +59,12 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
    */
   SPtr<Scene>
   getActiveScene();
+
+  /**
+   * @brief Clear the scene manager.
+   */
+  void
+  clear();
 
  public:
   Vector<SPtr<Scene>> m_scenes;

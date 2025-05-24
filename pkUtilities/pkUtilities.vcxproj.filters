@@ -37,9 +37,6 @@
     <Filter Include="source\graphics">
       <UniqueIdentifier>{ff7b745e-e9b8-47fb-a47f-a3183648351e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\util">
-      <UniqueIdentifier>{f5d576c1-a7dc-4b06-8b4e-d2b4bea54190}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkModule.h">
@@ -101,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="include\pkColor.h">
       <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkCollisionInfo.h">
+      <Filter>include\figures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

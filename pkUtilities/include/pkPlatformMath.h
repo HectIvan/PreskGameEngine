@@ -20,7 +20,7 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesUtilities.h"
+#include "pkCollisionInfo.h"
 #include "pkSphere.h"
 #include "pkCube.h"
 #include "pkCapsule.h"
@@ -217,19 +217,21 @@ class PK_UTILITY_EXPORT PlatformMath
   * @brief Check if there is a collision between 2 spheres.
   * @param _sphere The reference to the sphere.
   * @param _other The reference to the other sphere.
+  * @param _cInfo Collision info.
   * @return A bool confirming or denying if there is a collision.
   **/
   static bool
-  intersectSphereSphere(Sphere& _sphere, const Sphere& _other);
+  intersectSphereSphere(Sphere& _sphere, const Sphere& _other, CollisionInfo& _cInfo);
 
   /**
    * @brief Check if there is a collision between 2 spheres.
    * @param _sphere The reference to the sphere.
    * @param _other The point that will be ckecked.
+   * @param _cInfo Collision info.
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectSpherePoint(Sphere& _sphere, const Vector3& _other);
+  intersectSpherePoint(Sphere& _sphere, const Vector3& _other, CollisionInfo& _cInfo);
 
   /***************************************************************************
   * Capsule
@@ -248,19 +250,21 @@ class PK_UTILITY_EXPORT PlatformMath
    * @brief Check if there is a collision between a capsule and a point.
    * @param _capsule The reference to the Capsule.
    * @param _other The reference to the Point.
+   * @param _cInfo Collision info.
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCapsulePoint(Capsule& _capsule, Vector3& _other);
+  intersectCapsulePoint(Capsule& _capsule, Vector3& _other, CollisionInfo& _cInfo);
 
   /**
    * @brief Check if there is a collision between a capsule and a sphere.
    * @param _capsule The reference to the Capsule.
    * @param _spehre The reference to the other Sphere.
+   * @param _cInfo Collision info.
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere);
+  intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere, CollisionInfo& _cInfo);
 
   /***************************************************************************
   * Cube

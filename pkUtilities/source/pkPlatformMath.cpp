@@ -171,19 +171,40 @@ PlatformMath::hookeLaw(float _elasticity, float _displacement)
  * Sphere
 **/
 bool
-PlatformMath::intersectSphereSphere(Sphere& _sphere, const Sphere& _other)
+PlatformMath::intersectSphereSphere(Sphere& _sphere,
+                                    const Sphere& _other,
+                                    CollisionInfo& _cInfo)
 {
-  float distance = _sphere.m_origin.distanceTo(_other.m_origin);
+  // get the origin of each sphere
+  Vector3 O1 = _sphere.m_origin;
+  Vector3 O2 = _other.m_origin;
 
-  return (distance < (_sphere.m_radius + _other.m_radius));
+  float distance = _sphere.m_origin.distanceTo(_other.m_origin);
+  float sumRaius = _sphere.m_radius + _other.m_radius;
+
+  // if the distance between both spheres is less than the sum of both their radius.
+  if (distance < sumRaius) {
+    _cInfo.m_normalHit = (O1 - O2).normalized();
+    _cInfo.m_penDistance = sumRaius - distance;
+    return true;
+  }
+  return false;
 }
 
 bool
-PlatformMath::intersectSpherePoint(Sphere& _sphere, const Vector3& _other)
+PlatformMath::intersectSpherePoint(Sphere& _sphere,
+                                   const Vector3& _other,
+                                   CollisionInfo& _cInfo)
 {
   float distance = _sphere.m_origin.distanceTo(_other);
+  Vector3 vec = _sphere.m_origin - _other;
 
-  return (distance < _sphere.m_radius);
+  if (distance < _sphere.m_radius) {
+    _cInfo.m_normalHit = (_other - _sphere.m_origin).normalized();
+    _cInfo.m_penDistance = _sphere.m_radius - vec.magnitude();
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -198,21 +219,28 @@ PlatformMath::intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other)
 }
 
 bool
-PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other)
+PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other, CollisionInfo& _cInfo)
 {
   /**
    * check if its near the 2 half spheres
   **/
-  if (_capsule.m_topOrigin.distanceTo(_other) < _capsule.m_radius ||
-      _capsule.m_bottomOrigin.distanceTo(_other) < _capsule.m_radius)
-  {
-    return true;
+  if (_capsule.m_topOrigin.distanceTo(_other) < _capsule.m_radius) {
+    Sphere topSphere = Sphere();
+    topSphere.m_origin = _capsule.m_topOrigin;
+    topSphere.m_radius = _capsule.m_radius;
+    return intersectSpherePoint(topSphere, _other, _cInfo);
+  }
+
+  if (_capsule.m_bottomOrigin.distanceTo(_other) < _capsule.m_radius) {
+    Sphere bottomSphere = Sphere();
+    bottomSphere.m_origin = _capsule.m_bottomOrigin;
+    bottomSphere.m_radius = _capsule.m_radius;
+    return intersectSpherePoint(bottomSphere, _other, _cInfo);
   }
   /**
    * if not near the 2 half spheres, check if it may be inside of the cylinder
   **/
-  else
-  {
+  else {
     Vector3 cylinderAxis = _capsule.m_topOrigin - _capsule.m_bottomOrigin;
     Vector3 pointToBase = _other - _capsule.m_bottomOrigin;
 
@@ -227,13 +255,17 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other)
 
     // gets distance between point in axis and the _other point
     float distAtoOther = closestAxisToPoint.distanceTo(_other);
-
-    return distAtoOther <= _capsule.m_radius;
+    if (distAtoOther <= _capsule.m_radius) {
+      _cInfo.m_penDistance = closestAxisToPoint.distanceTo(_other) - _capsule.m_radius;
+      _cInfo.m_normalHit = (closestAxisToPoint - _other).normalized();
+      return true;
+    }
+    return false;
   }
 }
 
 bool
-PlatformMath::intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere)
+PlatformMath::intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere, CollisionInfo& _cInfo)
 {
   // collision point
   Vector3 top = _capsule.m_topOrigin; // top sphere origin of capsule.
@@ -249,7 +281,7 @@ PlatformMath::intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere)
   newSphere.m_origin = d;
   newSphere.m_radius = _capsule.m_radius;
   // use the enw sphere to do a sphere on sphere collission check.
-  return (intersectSphereSphere(_sphere, newSphere));
+  return (intersectSphereSphere(_sphere, newSphere, _cInfo));
 }
 
 /**

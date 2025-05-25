@@ -18,7 +18,7 @@
 
 namespace pkEngineSDK
 {
-  /*
+
 void
 Interface::init(const WindowHandle& _hWnd)
 {
@@ -26,7 +26,7 @@ Interface::init(const WindowHandle& _hWnd)
 
   ImGui::StyleColorsDark();
   //ImGui::StyleColorsClassic();
-}*/
+}
 
 PK_CORE_EXPORT Interface&
 g_interface()

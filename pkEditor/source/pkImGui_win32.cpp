@@ -27,6 +27,12 @@ Interface::windowNewFrame()
 }
 
 void
+Interface::windowShutDown()
+{
+  ImGui_ImplWin32_Shutdown();
+}
+
+void
 Interface::init(const WindowHandle& _hWnd)
 {
   IMGUI_CHECKVERSION();

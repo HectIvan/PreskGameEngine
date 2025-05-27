@@ -274,6 +274,12 @@ public:
                           uint32 _numViews = 1) = 0;
 
   /**
+   * @brief Set a 
+   */
+  virtual void
+  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) = 0;
+
+  /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
    */

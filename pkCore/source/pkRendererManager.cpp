@@ -15,18 +15,19 @@ using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
 
 namespace pkEngineSDK
 {
-void RendererManager::init(const Window& _window)
+void RendererManager::init(Window& _window)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // create the render targets and depth stencil view
   m_pRTargetView = api.createRenderTargetView();
 
   uint32 winHeight = _window.getHeight();
+  uint32 winWidth = _window.getWidth();
 
   m_pDepthRT = api.createTexture(nullptr,
                                  4,
-                                 _window.getWidth(),
-                                 _window.getHeight(),
+                                 winWidth,
+                                 winHeight,
                                  TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
                                  kPK_USAGE_DEFAULT,
                                  kPK_BIND_SHADER_RESOURCE |
@@ -36,8 +37,8 @@ void RendererManager::init(const Window& _window)
 
   m_pNormalRT = api.createTexture(nullptr,
                                   4,
-                                  _window.getWidth(),
-                                  _window.getHeight(),
+                                  winWidth,
+                                  winHeight,
                                   kPK_FORMAT_R32G32B32A32_FLOAT,
                                   kPK_USAGE_DEFAULT,
                                   kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
@@ -49,8 +50,8 @@ void RendererManager::init(const Window& _window)
   // create shadow mapping
   m_pShadowDepth = api.createTexture(nullptr,
                                      4,
-                                     _window.getWidth(),
-                                     _window.getHeight(),
+                                     winWidth,
+                                     winHeight,
                                      TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
                                      kPK_USAGE_DEFAULT,
                                      kPK_BIND_SHADER_RESOURCE |

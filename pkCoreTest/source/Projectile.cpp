@@ -97,28 +97,28 @@ Projectile::obstacleBounce(Vector3 _obstaclePos, float _obstacleRadius)
   // R2 Obstacle radius
   // Pi Intersection point.
   // Get the projectile position
-  Vector3 projectilePos = Vector3(m_actor->m_transform.getTranslation3());
-
-  // Create spheres of obstacle and projectile
-  Sphere projSphere(projectilePos, m_radius);
-  Sphere obsSphere(_obstaclePos, _obstacleRadius);
-
-  // check for a collission
-  if (Math::intersectSphereSphere(projSphere, obsSphere)) {
-    // get the reflected vector
-    Vector3 normal = (projectilePos - _obstaclePos).normalized();
-    Vector3 dir = Vector3(m_direction.x, m_direction.y, 0.0f);
-    Vector3 reflect = Vector3::reflect(dir, normal);
-    m_direction = Vector2(reflect.x, reflect.y);
-
-    /**
-    * Position reset
-    */
-    float difference = Math::abs((_obstacleRadius + m_radius) -
-                                 (projectilePos - _obstaclePos).magnitude());
-    projectilePos += normal * difference;
-    m_actor->m_transform.setTranslation(projectilePos);
-  }
+  // Vector3 projectilePos = Vector3(m_actor->m_transform.getTranslation3());
+  // 
+  // // Create spheres of obstacle and projectile
+  // Sphere projSphere(projectilePos, m_radius);
+  // Sphere obsSphere(_obstaclePos, _obstacleRadius);
+  // 
+  // // check for a collission
+  // if (Math::intersectSphereSphere(projSphere, obsSphere)) {
+  //   // get the reflected vector
+  //   Vector3 normal = (projectilePos - _obstaclePos).normalized();
+  //   Vector3 dir = Vector3(m_direction.x, m_direction.y, 0.0f);
+  //   Vector3 reflect = Vector3::reflect(dir, normal);
+  //   m_direction = Vector2(reflect.x, reflect.y);
+  // 
+  //   /**
+  //   * Position reset
+  //   */
+  //   float difference = Math::abs((_obstacleRadius + m_radius) -
+  //                                (projectilePos - _obstaclePos).magnitude());
+  //   projectilePos += normal * difference;
+  //   m_actor->m_transform.setTranslation(projectilePos);
+  // }
 }
 
 void

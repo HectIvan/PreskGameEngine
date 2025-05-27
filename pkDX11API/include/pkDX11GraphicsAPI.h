@@ -263,6 +263,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                           uint32 _numViews = 1) override;
 
   /**
+   * @brief Set a 
+   */
+  void
+  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
+
+  /**
    * @brief Set the Compute Shader Constant Buffer
    * @param _pCBuffer Pointer to the constant buffer.
    * @param _startSlot Index into the device's zero-based array.

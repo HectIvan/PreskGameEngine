@@ -12,7 +12,7 @@
 
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_GraphicAPI;
-using pkEngineSDK::g_interface;
+//using pkEngineSDK::g_interface;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
@@ -35,7 +35,7 @@ ShaderTest::onInit()
 {
   //start the interface
   Logger::startUp();
-  g_interface().initAPI(); // should it have access to the argv?
+  // g_interface().initAPI(); // should it have access to the argv?
 
   m_cameraSpeed = 20.0f;
   m_camera = make_shared<Actor>();

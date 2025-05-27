@@ -131,7 +131,7 @@ class PK_CORE_EXPORT Window
   * the current width of the window as an uint32
   **/
   uint32
-  getWidth() const { return m_width; }
+  getWidth() { return m_width; }
 
   /**
   * Get height.
@@ -142,7 +142,7 @@ class PK_CORE_EXPORT Window
   * The current height of the window as an uint32
   **/
   uint32
-  getHeight() const { return m_height; }
+  getHeight() { return m_height; }
 
   /**
   * Set window handle.

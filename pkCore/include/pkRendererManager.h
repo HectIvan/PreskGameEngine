@@ -42,7 +42,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Initialize the render manager
    */
   void
-  init(const Window& _window);
+  init(Window& _window);
 
   /**
    * @brief Create the passes needed for the renderer.

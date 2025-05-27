@@ -818,7 +818,9 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 }
 
 void
-DX11GraphicsAPI::CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer, uint32 _startSlot, uint32 _numBuffers)
+DX11GraphicsAPI::CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+                                     uint32 _startSlot,
+                                     uint32 _numBuffers)
 {
   // Recast to a DirectX Constant buffer.
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
@@ -888,37 +890,63 @@ DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
 }
 
 void
-DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews)
+DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture,
+                                         uint32 _start,
+                                         uint32 _numViews)
 {
   // cast to a directX texture
   auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   // if failed to cast to the texture
   if (!dxTX) {
+    g_Logger().print("Failed to get a DX Texture in setting of a pixel shader resource");
     return;
   }
   // set the shader resource view 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a pixel shader resource view.");
   }
   device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
 }
 
 void
-DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews)
+DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture,
+                                         uint32 _start,
+                                         uint32 _numViews)
 {
   // cast to a directX texture
   auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   // if failed to cast to the texture
   if (!dxTX) {
+    g_Logger().print("Failed to get a DX Texture in setting of a vertex shader resource");
     return;
   }
   // set the shader resource view 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader resource view.");
   }
   device->pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->srv);
+}
+
+void
+DX11GraphicsAPI::CSSetShaderResourceView(SPtr<Texture> _pTexture,
+                                         uint32 _start,
+                                         uint32 _numViews)
+{
+  // cast to a directX texture
+  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  // if failed to cast to the texture
+  if (!dxTX) {
+    g_Logger().print("Failed to get a DX Texture in setting of a compute shader resource");
+    return;
+  }
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a compute shader resource view.");
+  }
+  device->pImmediateContext->CSSetShaderResources(_start, _numViews, &dxTX->srv);
 }
 
 SPtr<Texture>

@@ -4,7 +4,7 @@
 
 namespace pkEngineSDK
 {
-
+  /*
 void
 Interface::initAPI()
 {
@@ -95,5 +95,5 @@ Interface::render()
   // Rendering
   ImGui::Render();
   ImGui_ImplDX11_RenderDrawData(static_cast<ImDrawData*>(getDrawData()));
-}
+}*/
 }

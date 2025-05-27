@@ -8,7 +8,7 @@ using pkEngineSDK::g_GraphicAPI;
 
 namespace pkEngineSDK
 {
-
+  /*
 struct ImGui_ImplWin32_Data
 {
   HWND                        hWnd;
@@ -51,6 +51,6 @@ Interface::init(const WindowHandle& _hWnd)
   ImGui_ImplWin32_Init(_hWnd);
   ImGui::StyleColorsDark();
   // initialize with the current api
-}
-}
+}*/
 #endif
+}

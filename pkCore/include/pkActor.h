@@ -30,7 +30,7 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Actor
 {
  public:
-   Actor();
+  Actor();
   virtual ~Actor() {
     clear();
   }

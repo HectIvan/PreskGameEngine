@@ -76,8 +76,8 @@ ShaderTest::onInit()
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate();
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
-  // SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate();
-  // sponza->addComponent(newModel("sponza.obj"));
+  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate();
+  sponza->addComponent(newModel("sponza.obj"));
 }
 
 void

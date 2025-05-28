@@ -77,6 +77,12 @@ struct CBAOData
   float unused;
 };
 
+struct CBLuminosity
+{
+  float tolerance;
+  Vector3 unused;
+};
+
 struct KeyPosition
 {
   Vector3 position;

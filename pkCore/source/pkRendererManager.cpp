@@ -141,24 +141,43 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Deferred pass
    ***************************************************************************/
-  SPtr<Pass> ShadowDef = make_shared<Pass>();
+  SPtr<Pass> shadowDef = make_shared<Pass>();
   // create all pointers
-  ShadowDef->create();
+  shadowDef->create();
   // set and compile shaders
-  ShadowDef->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  ShadowDef->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
-  ShadowDef->compileShaders();
-  ShadowDef->createShaders();
+  shadowDef->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  shadowDef->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
+  shadowDef->compileShaders();
+  shadowDef->createShaders();
 
-  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // light camera
-  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // main camera
-  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // light transform
-  ShadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // camera transform
+  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // light camera
+  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // main camera
+  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // light transform
+  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // camera transform
 
-  ShadowDef->createInputLayout();
-  ShadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
+  shadowDef->createInputLayout();
+  shadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
                                 SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 3, ShadowDef });
+  m_passes.insert({ 3, shadowDef });
+
+  /****************************************************************************
+   * Luminosity pass
+   ***************************************************************************/
+  SPtr<Pass> lumPass = make_shared<Pass>();
+  // create all pointers
+  lumPass->create();
+  // set and compile shaders
+  lumPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  lumPass->setPSData(L"shaders/pkPSLuminosity.hlsl", "PS", "ps_5_0");
+  lumPass->compileShaders();
+  lumPass->createShaders();
+
+  lumPass->createCBuffer(static_cast<uint32>(sizeof(CBLuminosity)), nullptr, 0);
+
+  lumPass->createInputLayout();
+  lumPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+    SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  m_passes.insert({ 4, lumPass });
 }
 
 void

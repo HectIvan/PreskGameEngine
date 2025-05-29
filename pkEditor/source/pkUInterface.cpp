@@ -1,0 +1,58 @@
+/*****************************************************************************/
+/**
+ * @file    pkUInterface.cpp
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    01/04/2025
+ * @brief   User Interface for the Editor app.
+ /*****************************************************************************/
+
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
+#include "pkUInterface.h"
+
+namespace pkEngineSDK
+{
+  
+void
+UInterface::init()
+{
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); static_cast<void>(io);
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+  // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to
+  ImGuiStyle& style = ImGui::GetStyle();
+  if (io.ConfigFlags)
+  {
+    style.WindowRounding = 0.0f;
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+  }
+
+  initAPI();
+
+  ImGui::StyleColorsDark();
+  // ImGui::StyleColorsClassic();
+}
+
+void
+UInterface::setNewWindowSize(Vector2 _size)
+{
+  ImGui::SetNextWindowSize(ImVec2(_size.x, _size.y), ImGuiCond_Always);
+}
+
+void
+UInterface::setNextWindowPos(Vector2 _pos)
+{
+  ImGui::SetNextWindowPos(ImVec2(_pos.x, _pos.y), ImGuiCond_Appearing);
+}
+
+UInterface&
+g_uInterface()
+{
+  return UInterface::instance();
+}
+}

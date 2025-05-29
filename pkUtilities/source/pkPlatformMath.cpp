@@ -167,6 +167,12 @@ PlatformMath::hookeLaw(float _elasticity, float _displacement)
   return _elasticity * _displacement;
 }
 
+bool
+PlatformMath::isNan(float _x)
+{
+  return std::isnan(_x);
+}
+
 /**
  * Sphere
 **/
@@ -346,11 +352,23 @@ PlatformMath::intersectCubeSphere(Cube& _cube, Sphere& _sphere)
     return true;
   }
   return false;
-}
+} 
 
-bool
-PlatformMath::isNan(float _x)
+Vector3
+PlatformMath::supportPointConvex(Vector3& _direction, Vector<Vector3>& _points)
 {
-  return std::isnan(_x);
+  // if the points list has nothing
+  if (_points.empty()) { return Vector3(0); }
+  // otherwise, if there's only one element
+  if (_points.size() < 2) { return _points[0]; }
+  // for each point
+  uint32 iMax = 0;
+  for (uint32 i = 1; i < _points.size(); ++i) {
+    if (_points[i].dotProd(_direction) >
+        _points[iMax].dotProd(_direction)) {
+      iMax = i;
+    }
+  }
+  return _points[iMax];
 }
 }

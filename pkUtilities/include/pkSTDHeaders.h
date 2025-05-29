@@ -11,14 +11,16 @@
 #include <optional>
 #include <queue>
 #include <stack>
+#include <stdlib.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace pkEngineSDK
 {
-
 using std::make_unique;
+
+using std::rand;
 
 template <class T>
 using Queue = std::queue<T>;

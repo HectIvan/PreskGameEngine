@@ -1,12 +1,12 @@
-#include "pkInterface.h"
+#include "pkUInterface.h"
 #include "pkGraphicsAPI.h"
 #include "externals/imgui_impl_dx11.h"
 
 namespace pkEngineSDK
 {
-  /*
+  
 void
-Interface::initAPI()
+UInterface::initAPI()
 {
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();
@@ -15,38 +15,44 @@ Interface::initAPI()
 }
 
 void
-Interface::newFrameAPI()
+UInterface::setCurrentContext()
+{
+  ImGui::SetCurrentContext(ImGui::GetCurrentContext());
+}
+
+void
+UInterface::newFrameAPI()
 {
   ImGui_ImplDX11_NewFrame();
   ImGui::NewFrame();
 }
 
 void
-Interface::endFrame()
+UInterface::endFrame()
 {
   ImGui::EndFrame();
 }
 
 void
-Interface::startWindowCreate(const char* _name)
+UInterface::startWindowCreate(const char* _name)
 {
   ImGui::Begin(_name);
 }
 
 void
-Interface::createText(const char* _text)
+UInterface::createText(const char* _text)
 {
   ImGui::Text(_text);
 }
 
 void
-Interface::createSliderF(const char* _name, float& _param, const float _min, const float _max)
+UInterface::createSliderF(const char* _name, float& _param, const float _min, const float _max)
 {
   ImGui::SliderFloat(_name, &_param, _min, _max);
 }
 
 void
-Interface::createSliderVector2(const char* _name,
+UInterface::createSliderVector2(const char* _name,
                                Vector2& _param,
                                const float _min,
                                const float _max)
@@ -58,7 +64,7 @@ Interface::createSliderVector2(const char* _name,
 }
 
 void
-Interface::createSliderVector3(const char* _name,
+UInterface::createSliderVector3(const char* _name,
                                Vector3& _param,
                                const float _min,
                                const float _max)
@@ -71,29 +77,29 @@ Interface::createSliderVector3(const char* _name,
 }
 
 void
-Interface::createCheckBox(const char* _name, bool& _param)
+UInterface::createCheckBox(const char* _name, bool& _param)
 {
   ImGui::Checkbox(_name, &_param);
 }
 
 void
-Interface::endWindowCreate()
+UInterface::endWindowCreate()
 {
   ImGui::End();
 }
 
 void*
-Interface::getDrawData()
+UInterface::getDrawData()
 {
   return ImGui::GetDrawData();
 }
 
 void
-Interface::render()
+UInterface::render()
 {
-  ImGuiIO& io = ImGui::GetIO();
+  // ImGuiIO& io = ImGui::GetIO();
   // Rendering
   ImGui::Render();
   ImGui_ImplDX11_RenderDrawData(static_cast<ImDrawData*>(getDrawData()));
-}*/
+}
 }

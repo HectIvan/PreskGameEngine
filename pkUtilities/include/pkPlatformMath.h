@@ -203,6 +203,13 @@ class PK_UTILITY_EXPORT PlatformMath
   static float
   hookeLaw(float _elasticity, float _displacement);
 
+  /**
+   * @brief Check if the value is nan.
+   * @param _x Value to check.
+   */
+  static bool
+  isNan(float _x);
+
   /***************************************************************************
   * 
   * Shapes
@@ -298,11 +305,12 @@ class PK_UTILITY_EXPORT PlatformMath
   intersectCubeSphere(Cube& _cube, Sphere& _sphere);
 
   /**
-   * @brief Check if the value is nan.
-   * @param _x Value to check.
+   * @brief Get the support point of a collection of points from a convex shape in a direction.
+   * @param _direction Direction where the support point should be.
+   * @param _points Group of points of  the shape.
    */
-  static bool
-  isNan(float _x);
+  Vector3
+  supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
 
   /**
    * Static variables

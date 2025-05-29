@@ -154,4 +154,24 @@ Vector3::hasNan()
   if (Math::isNan(z)) { return true; }
   return false;
 }
+Vector3
+Vector3::random()
+{
+  return Vector3(rand(), rand(), rand());
+}
+Vector3 Vector3::randomRange(int32 _x, int32 _y)
+{
+  return Vector3(_x + (rand() % _y),
+                 _x + (rand() % _y),
+                 _x + (rand() % _y));
+}
+
+Vector3
+Vector3::randomRange(float _x, float _y)
+{
+  float x = _x + static_cast <float> (rand()) / _y;
+  float y = _x + static_cast <float> (rand()) / _y;
+  float z = _x + static_cast <float> (rand()) / _y;
+  return Vector3(x, y, z);
+}
 }

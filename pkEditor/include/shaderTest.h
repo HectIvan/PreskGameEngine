@@ -65,6 +65,12 @@ class ShaderTest : public BaseApp
   input();
 
   /**
+   * @brief Update the UI.
+   */
+  void
+  UInterfaceUpdate();
+
+  /**
    * @brief Update the shader test.
    * @param _deltatime Time between frames.
    */

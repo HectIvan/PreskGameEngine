@@ -248,6 +248,11 @@ class PK_UTILITY_EXPORT Vector3
   const Vector3
   operator*(const Matrix4& other) const;
 
+  /**
+   * @brief Cross product between 2 Vector3.
+   * @param other Other Vector3.
+   * @return The cross poduct.
+   */
   FORCEINLINE const Vector3
   operator^(const Vector3& other) const;
 
@@ -358,6 +363,31 @@ class PK_UTILITY_EXPORT Vector3
    */
   FORCEINLINE bool
   hasNan();
+
+  /**
+   * @brief Get a Vector3 with random values.
+   * @return A random Vector3.
+   */
+  Vector3
+  random();
+
+  /**
+   * @brief Get a random Vector3 in between ranges.
+   * @param _x Minimum value.
+   * @param _y Maximum value.
+   * @return Rando Vector3 in range.
+   */
+  Vector3
+  randomRange(int32 _x, int32 _y);
+
+  /**
+   * @brief Get a random Vector3 in between ranges.
+   * @param _x Minimum value.
+   * @param _y Maximum value.
+   * @return Rando Vector3 in range.
+   */
+  Vector3
+  randomRange(float _x, float _y);
 
  public:
   float x;

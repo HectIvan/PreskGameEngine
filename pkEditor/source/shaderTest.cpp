@@ -2,7 +2,7 @@
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
-#include "pkInterface.h"
+#include "pkUInterface.h"
 #include "pkLogger.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
@@ -12,13 +12,13 @@
 
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_GraphicAPI;
-//using pkEngineSDK::g_interface;
+using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
-using pkEngineSDK::Interface;
+using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::Material;
@@ -34,8 +34,7 @@ void
 ShaderTest::onInit()
 {
   //start the interface
-  Logger::startUp();
-  // g_interface().initAPI(); // should it have access to the argv?
+  UInterface::startUp();
 
   m_cameraSpeed = 20.0f;
   m_camera = make_shared<Actor>();
@@ -139,6 +138,18 @@ ShaderTest::input()
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
     m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationX(rot);
   }
+}
+
+void
+ShaderTest::UInterfaceUpdate()
+{
+  UInterface& im = g_uInterface().instance();
+  im.setCurrentContext();
+  im.setNewWindowSize(Vector2(100, 100));
+  im.setNextWindowPos(Vector2(0));
+  im.startWindowCreate("Test window");
+  im.createText("a test window to check if the user interface works");
+  im.endWindowCreate();
 }
 
 void

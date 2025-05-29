@@ -5,14 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\baseApp">
       <UniqueIdentifier>{5a30d403-aebc-4eaf-939f-d97a3e029491}</UniqueIdentifier>
     </Filter>
@@ -42,7 +34,7 @@
     <ClCompile Include="source\pkEditorApp.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkInterface.cpp">
+    <ClCompile Include="source\pkUInterface.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
     <ClCompile Include="source\pkImGui_win32.cpp">
@@ -74,7 +66,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pkInterface.h">
+    <ClInclude Include="include\pkUInterface.h">
       <Filter>include\Interface</Filter>
     </ClInclude>
     <ClInclude Include="include\externals\imconfig.h">

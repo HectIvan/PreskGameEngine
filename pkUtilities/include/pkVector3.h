@@ -70,7 +70,7 @@ class PK_UTILITY_EXPORT Vector3
   }
 
   /**
-   * @brief Multiply a float to a vector.
+   * @brief Multiply a vector to a float.
    * @param other float with which the multiplication will be made.
    * @return A vector with the multiplication done.
    */

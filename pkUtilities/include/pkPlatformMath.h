@@ -25,6 +25,8 @@
 #include "pkCube.h"
 #include "pkCapsule.h"
 #include "pkPlane.h"
+#include "pkOBB.h"
+#include "pkAABB.h"
 
 namespace pkEngineSDK 
 {
@@ -305,12 +307,55 @@ class PK_UTILITY_EXPORT PlatformMath
   intersectCubeSphere(Cube& _cube, Sphere& _sphere);
 
   /**
+   * @brief Get a signed value.
+   * @param _val Value to sign.
+   * @return The signed value.
+   */
+  float
+  sign(float _val);
+
+  /**
+   * @brief Get a signed direction.
+   * @param _direction Direction to use.
+   * @return The new signed direction.
+   */
+  Vector3
+  sign3(Vector3& _direction);
+
+  /**
+   * @brief Get the support point of an Object Bounding Box.
+   * @param _box Box to study.
+   * @param _dir Direction to use.
+   * @return The support point of the box.
+   */
+  Vector3
+  supportPointOBB(OBB& _box, Vector3& _dir);
+
+  /**
    * @brief Get the support point of a collection of points from a convex shape in a direction.
    * @param _direction Direction where the support point should be.
    * @param _points Group of points of  the shape.
    */
   Vector3
   supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
+
+  /**
+   * @brief Get the support point from a sphere.
+   * @param _direction Direction to use.
+   * @param _sphere Sphere of use.
+   * @return The support point.
+   */
+  Vector3
+  supportPointSphere(Vector3& _direction, Sphere& _sphere);
+
+  /**
+   * @brief Get the support point from a capsule.
+   * @param _direction Direction to use.
+   * @param _capsule Capsule of use.
+   * @return The support point.
+   */
+  Vector3
+  supportPointCapsule(Vector3& _direction, Capsule& _capsule);
 
   /**
    * Static variables

@@ -21,6 +21,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkMatrix4.h"
 
 namespace pkEngineSDK {
 
@@ -29,5 +30,7 @@ class PK_UTILITY_EXPORT AABB
 public:
   AABB() = default;
   ~AABB() = default;
+
+  Matrix4 m_transform;
 };
 }

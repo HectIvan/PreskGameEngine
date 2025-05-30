@@ -21,6 +21,8 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkMatrix4.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
 
@@ -29,5 +31,8 @@ class PK_UTILITY_EXPORT OBB
  public:
   OBB() = default;
   ~OBB() = default;
+
+  Matrix4 m_transform;
+  Vector3 m_halfSize;
 };
 }

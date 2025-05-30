@@ -230,16 +230,16 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other, Collisio
   /**
    * check if its near the 2 half spheres
   **/
-  if (_capsule.m_topOrigin.distanceTo(_other) < _capsule.m_radius) {
+  if (_capsule.getA().distanceTo(_other) < _capsule.m_radius) {
     Sphere topSphere = Sphere();
-    topSphere.m_origin = _capsule.m_topOrigin;
+    topSphere.m_origin = _capsule.getA();
     topSphere.m_radius = _capsule.m_radius;
     return intersectSpherePoint(topSphere, _other, _cInfo);
   }
 
-  if (_capsule.m_bottomOrigin.distanceTo(_other) < _capsule.m_radius) {
+  if (_capsule.getB().distanceTo(_other) < _capsule.m_radius) {
     Sphere bottomSphere = Sphere();
-    bottomSphere.m_origin = _capsule.m_bottomOrigin;
+    bottomSphere.m_origin = _capsule.getB();
     bottomSphere.m_radius = _capsule.m_radius;
     return intersectSpherePoint(bottomSphere, _other, _cInfo);
   }
@@ -247,8 +247,8 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other, Collisio
    * if not near the 2 half spheres, check if it may be inside of the cylinder
   **/
   else {
-    Vector3 cylinderAxis = _capsule.m_topOrigin - _capsule.m_bottomOrigin;
-    Vector3 pointToBase = _other - _capsule.m_bottomOrigin;
+    Vector3 cylinderAxis = _capsule.getA() - _capsule.getB();
+    Vector3 pointToBase = _other - _capsule.getB();
 
     // projection of pointToBase onto the axis of the cylinder
     float projection = pointToBase.dotProd(cylinderAxis) /
@@ -257,7 +257,7 @@ PlatformMath::intersectCapsulePoint(Capsule& _capsule, Vector3& _other, Collisio
     projection = PlatformMath::clamp(projection, 0.0f, 1.0f);
 
     // gets entire axis and multiplies by the brojection gotten
-    Vector3 closestAxisToPoint = _capsule.m_bottomOrigin + cylinderAxis * projection;
+    Vector3 closestAxisToPoint = _capsule.getB() + cylinderAxis * projection;
 
     // gets distance between point in axis and the _other point
     float distAtoOther = closestAxisToPoint.distanceTo(_other);
@@ -274,8 +274,8 @@ bool
 PlatformMath::intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere, CollisionInfo& _cInfo)
 {
   // collision point
-  Vector3 top = _capsule.m_topOrigin; // top sphere origin of capsule.
-  Vector3 bottom = _capsule.m_bottomOrigin; // bottom sphere origin of capsule.
+  Vector3 top = _capsule.getA(); // top sphere origin of capsule.
+  Vector3 bottom = _capsule.getB(); // bottom sphere origin of capsule.
   Vector3 cS = _sphere.m_origin; // sphere center.
   /** d is the intersection point between the origin of the sphere and the line going through
    *  the capusle.
@@ -352,11 +352,34 @@ PlatformMath::intersectCubeSphere(Cube& _cube, Sphere& _sphere)
     return true;
   }
   return false;
-} 
+}
+
+float
+PlatformMath::sign(float _val)
+{
+  if (_val > 0.0f) { return 1.0f; }
+  if (_val == 0.0f) { return 0.0f; }
+  return -1.0f;
+}
+
+Vector3
+PlatformMath::sign3(Vector3& _direction)
+{
+  return Vector3(sign(_direction.x), sign(_direction.y), sign(_direction.z));
+}
+
+Vector3 PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
+{
+  Vector3 dir = _dir.normalized();
+  Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
+  Vector3 dirSigns = sign3(dir);
+  return _box.m_transform * (_box.m_halfSize * dirSigns);
+}
 
 Vector3
 PlatformMath::supportPointConvex(Vector3& _direction, Vector<Vector3>& _points)
 {
+  Vector3 direction = _direction.normalized();
   // if the points list has nothing
   if (_points.empty()) { return Vector3(0); }
   // otherwise, if there's only one element
@@ -364,11 +387,29 @@ PlatformMath::supportPointConvex(Vector3& _direction, Vector<Vector3>& _points)
   // for each point
   uint32 iMax = 0;
   for (uint32 i = 1; i < _points.size(); ++i) {
-    if (_points[i].dotProd(_direction) >
-        _points[iMax].dotProd(_direction)) {
+    if (_points[i].dotProd(direction) >
+        _points[iMax].dotProd(direction)) {
       iMax = i;
     }
   }
   return _points[iMax];
+}
+
+Vector3
+PlatformMath::supportPointSphere(Vector3& _direction, Sphere& _sphere)
+{
+  Vector3 direction = _direction.normalized();
+  return direction * _sphere.m_radius + _sphere.m_origin;
+}
+
+Vector3
+PlatformMath::supportPointCapsule(Vector3& _direction, Capsule& _capsule)
+{
+  Vector3 direction = _direction.normalized();
+  // d = a + [(c\index{s}-a)·(b-a)](b-a)
+  Vector3 tOr = _capsule.getA();
+  Vector3 bOr = _capsule.getB();
+  Vector3 closestPointOnLine = tOr + ((bOr - tOr) * (_direction - tOr).dotProd(bOr - tOr));
+  return direction * _capsule.m_radius + closestPointOnLine;
 }
 }

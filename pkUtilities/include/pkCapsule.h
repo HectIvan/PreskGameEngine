@@ -29,16 +29,26 @@ class PK_UTILITY_EXPORT Capsule
 {
  public:
   Capsule() = default;
-  Capsule(Vector3 _topOrigin, Vector3 _bottomOrigin, float _radius, float _height)
-  : m_topOrigin(_topOrigin),
-    m_bottomOrigin(_bottomOrigin),
+  Capsule(Vector3 _center, Vector3 _direction, float _height, float _radius)
+  : m_center(_center),
+    m_direction(_direction),
     m_radius(_radius),
     m_height(_height) {};
   ~Capsule() = default;
 
-  Vector3 m_topOrigin;
-  Vector3 m_bottomOrigin;
-  float m_radius;
+  float
+  getHeight() { return (getA() - getB()).magnitude(); }
+  
+  Vector3
+  getA() { return m_direction.normalized() * (0.5f * m_height) + m_center; }
+
+  Vector3
+  getB() { return m_direction.normalized() * -1.0f * (0.5f * m_height) + m_center; }
+
+ public:
+  Vector3 m_center;
+  Vector3 m_direction;
   float m_height;
+  float m_radius;
 };
 }

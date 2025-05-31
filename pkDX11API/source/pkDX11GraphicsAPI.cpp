@@ -90,6 +90,10 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            createDeviceFlags,
                            featureLevels,
                            numFeatureLevels);
+
+  // create the render targets
+  auto dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
+  dxSCh->createRenderTargetView(m_pDevice);
   
   setViewport(width, height);
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -326,7 +330,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                              _numFeatureLevels,
                                              D3D11_SDK_VERSION,
                                              &sd,
-                                             &pSwapChain->pSch,
+                                             &pSwapChain->m_pSch,
                                              &device->pd3dDevice,
                                              &device->featureLevel,
                                              &device->pImmediateContext);
@@ -338,42 +342,6 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
       break;
     }
   }
-}
-
-SPtr<Texture>
-DX11GraphicsAPI::createRenderTargetView()
-{
-  // reinterpret as a directX texture
-  SPtr<DX11Texture> rTargetView = make_shared<DX11Texture>();
-
-  // get buffer data
-  ID3D11Texture2D* pBackBuffer = nullptr;
-  // reinterpret the swap chain to a DirectX swap chain
-  SPtr<DX11SwapChain> dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
-  int32 hr = dxSCh->pSch->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-  // if the buffer is not correct
-  if (hr != 0x00000000) {
-    String errMsg = g_Logger().getMessageError(hr);
-    g_Logger().print("Failed to get the buffer to create a render target view. Error: " + 
-                      errMsg);
-    return nullptr;
-  }
-
-  // create the render target view
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the render target view creation.");
-  }
-  hr = device->pd3dDevice->CreateRenderTargetView(pBackBuffer,
-                                                  nullptr,
-                                                  &rTargetView->m_rTV);
-  // if the creation was not successful
-  if (hr != 0x00000000) {
-    String errMsg = g_Logger().getMessageError(hr);
-    g_Logger().print("Failed to create a render target view. Error: " + errMsg);
-    return nullptr;
-  }
-  return rTargetView;
 }
 
 void
@@ -453,7 +421,7 @@ DX11GraphicsAPI::createDepthStencilView(SPtr<Texture> _depthRT)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the depth stencil view creation.");
   }
-  hr = device->pd3dDevice->CreateDepthStencilView(dxDepthTx->t2d,
+  hr = device->pd3dDevice->CreateDepthStencilView(dxDepthTx->m_t2d,
                                                   &descDSV,
                                                   &pDepthSView->pDepthSV);
   // if the creation was not succesful
@@ -846,7 +814,7 @@ DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
     return;
   }
   // use the swap chain to present the result
-  dxSwapChain->pSch->Present(_syncInterval, _flags);
+  dxSwapChain->m_pSch->Present(_syncInterval, _flags);
 }
 
 void
@@ -886,7 +854,7 @@ DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
   }
-  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
+  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -906,7 +874,7 @@ DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a pixel shader resource view.");
   }
-  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->srv);
+  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -926,7 +894,7 @@ DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader resource view.");
   }
-  device->pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->srv);
+  device->pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -946,7 +914,7 @@ DX11GraphicsAPI::CSSetShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a compute shader resource view.");
   }
-  device->pImmediateContext->CSSetShaderResources(_start, _numViews, &dxTX->srv);
+  device->pImmediateContext->CSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 SPtr<Texture>
@@ -968,6 +936,7 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   }
 
   // how wide each line of the texture will be
+  if (bpp == 3) { ++bpp; }
   pitch = width * bpp;
 
   // create a default texture using the received parameters
@@ -1001,7 +970,7 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a texture.");
   }
-  device->pImmediateContext->UpdateSubresource(dxTX->t2d, 0, nullptr, data, pitch, 0);
+  device->pImmediateContext->UpdateSubresource(dxTX->m_t2d, 0, nullptr, data, pitch, 0);
 
   // free the texture data if there's data to release
   if (data) { stbi_image_free(data); }
@@ -1070,14 +1039,14 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
     // create the texture
-    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
+    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
     // if texture creation failed
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a texture. Error: " + errMsg);
     }
     // create the shader resource view
-    hr = device->pd3dDevice->CreateShaderResourceView(tex->t2d, &sDesc, &tex->srv);
+    hr = device->pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_srv);
     // if failed to create shader resource view
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
@@ -1104,8 +1073,8 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     descDepth.MiscFlags = 0;
 
     // create the texture
-    hr = device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->t2d);
-    if (!tex->t2d) {
+    hr = device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->m_t2d);
+    if (!tex->m_t2d) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create the depth stencil. Error: " + errMsg);
     }
@@ -1122,13 +1091,13 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     rtvDesc.Texture2D.MipSlice = 0;
 
     // create the render target texture
-    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->t2d);
+    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create RT texture. Error: " + errMsg);
     }
     // create the render target itself
-    hr = device->pd3dDevice->CreateRenderTargetView(tex->t2d, &rtvDesc, &tex->m_rTV);
+    hr = device->pd3dDevice->CreateRenderTargetView(tex->m_t2d, &rtvDesc, &tex->m_rTV);
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);

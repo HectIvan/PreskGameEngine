@@ -34,10 +34,16 @@ class DX11Texture : public Texture
 {
  public:
   DX11Texture() = default;
+  DX11Texture(ID3D11Texture2D* _t2d) :
+    m_t2d(_t2d),
+    m_owner(false)
+  {}
   virtual ~DX11Texture()
   {
-    safeRelease(t2d);
-    safeRelease(srv);
+    if (m_owner) { safeRelease(m_t2d); }
+    safeRelease(m_srv);
+    safeRelease(m_dSV);
+    safeRelease(m_rTV);
   }
 
   /**
@@ -47,7 +53,7 @@ class DX11Texture : public Texture
   * Pointer to the resource.
   **/
   ID3D11Texture2D*
-  getTexture2D() { return t2d; }
+  getTexture2D() { return m_t2d; }
 
   /**
   * Set the DirectX texture.
@@ -56,7 +62,7 @@ class DX11Texture : public Texture
   * Pointer to the new texture.
   **/
   void
-  setTexture2D(ID3D11Texture2D* _t2d) { t2d = _t2d; }
+  setTexture2D(ID3D11Texture2D* _t2d) { m_t2d = _t2d; }
 
   /**
   * Gets a pointer to the shader resource view.
@@ -65,7 +71,7 @@ class DX11Texture : public Texture
   * Pointer to the resource.
   **/
   ID3D11ShaderResourceView*
-  getSRV() const { return srv; }
+  getSRV() const { return m_srv; }
 
   /**
   * Sets the shader resource view of the texture.
@@ -74,7 +80,7 @@ class DX11Texture : public Texture
   * New shader resource view.
   **/
   void
-  setSRV(ID3D11ShaderResourceView* _srv) { srv = _srv; }
+  setSRV(ID3D11ShaderResourceView* _srv) { m_srv = _srv; }
 
   /**
   * Gets the type of the current texture.
@@ -95,13 +101,15 @@ class DX11Texture : public Texture
   setType(uint32 _type) { m_type = _type; }
 
  public:
-  ID3D11Texture2D* t2d = nullptr;
+  ID3D11Texture2D* m_t2d = nullptr;
 
   ID3D11RenderTargetView* m_rTV;
 
   ID3D11DepthStencilView* m_dSV;
 
-  ID3D11ShaderResourceView* srv;
+  ID3D11ShaderResourceView* m_srv;
+
+  bool m_owner = true;
 
  private:
   uint32 m_type;

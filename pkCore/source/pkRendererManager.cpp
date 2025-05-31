@@ -19,7 +19,7 @@ void RendererManager::init(Window& _window)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // create the render targets and depth stencil view
-  m_pRTargetView = api.createRenderTargetView();
+  m_pRTargetView = api.getSwapChain()->getBuffer(0);
 
   uint32 winHeight = _window.getHeight();
   uint32 winWidth = _window.getWidth();

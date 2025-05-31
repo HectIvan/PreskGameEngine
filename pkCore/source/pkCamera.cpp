@@ -64,6 +64,9 @@ Camera::move(Vector3 _dist)
 void
 Camera::rotate(float _x, float _y, float _z)
 {
+  // for stopping warning messages
+  _x = _x;
+  _z = _z;
   // _z = _z;
   // Matrix4 rotRight = Matrix4::MatrixRotationAxis(getRight(), _y);
   // Matrix4 rotUp = Matrix4::MatrixRotationAxis(Vector3::UP, _x);

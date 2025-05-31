@@ -51,13 +51,6 @@ public:
   initApi(const Window& _window) = 0;
 
   /**
-   * @brief Create the render target view.
-   * @return Pointer to the render target view.
-   */
-  virtual SPtr<Texture>
-  createRenderTargetView() = 0;
-
-  /**
    * @brief Set the render targets to the device.
    * @param _rTargets List of targets to set.
    * @param _DepthSV Depth stencil view to use.
@@ -106,6 +99,13 @@ public:
    */
   virtual void
   setPSShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Get the API Swap chain
+   * @return Swap chain.
+   */
+  virtual SPtr<SwapChain>
+  getSwapChain() = 0;
 
   /**
    * @brief Compile a shader from a specific file.

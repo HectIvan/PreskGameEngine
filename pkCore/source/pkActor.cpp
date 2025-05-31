@@ -103,7 +103,8 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float _deltaTime)
 {
-  
+  // to stop warnings.
+  _deltaTime = _deltaTime;
 }
 
 SPtr<Actor>

@@ -49,12 +49,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   initApi(const Window& _window) override;
 
   /**
-   * @brief Create the render target view.
-   */
-  SPtr<Texture>
-  createRenderTargetView() override;
-
-  /**
    * @brief Set the render targets to the device.
    */
   void
@@ -404,6 +398,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
                        uint32 _numBuffers) override;
+
+  /**
+   * @brief Get the API Swap chain
+   * @return Swap chain.
+   */
+  SPtr<SwapChain>
+  getSwapChain() override { return m_pSwapChain; }
 
   /**
    * @brief Present the result to the screen.

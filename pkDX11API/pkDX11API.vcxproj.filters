@@ -66,6 +66,9 @@
     <ClCompile Include="source\pkDX11Texture.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="source\pkDX11SwapChain.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkDX11DepthStencilView.h">

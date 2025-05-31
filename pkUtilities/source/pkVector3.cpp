@@ -157,21 +157,23 @@ Vector3::hasNan()
 Vector3
 Vector3::random()
 {
-  return Vector3(rand(), rand(), rand());
+  return Vector3(static_cast<float>(rand()), 
+                 static_cast<float>(rand()), 
+                 static_cast<float>(rand()));
 }
 Vector3 Vector3::randomRange(int32 _x, int32 _y)
 {
-  return Vector3(_x + (rand() % _y),
-                 _x + (rand() % _y),
-                 _x + (rand() % _y));
+  return Vector3(static_cast<float>(_x + (rand() % _y)),
+                 static_cast<float>(_x + (rand() % _y)),
+                 static_cast<float>(_x + (rand() % _y)));
 }
 
 Vector3
 Vector3::randomRange(float _x, float _y)
 {
-  float x = _x + static_cast <float> (rand()) / _y;
-  float y = _x + static_cast <float> (rand()) / _y;
-  float z = _x + static_cast <float> (rand()) / _y;
-  return Vector3(x, y, z);
+  float tx = _x + static_cast <float> (rand()) / _y;
+  float ty = _x + static_cast <float> (rand()) / _y;
+  float tz = _x + static_cast <float> (rand()) / _y;
+  return Vector3(tx, ty, tz);
 }
 }

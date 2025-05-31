@@ -23,16 +23,32 @@
 namespace pkEngineSDK
 {
 
-class DX11SwapChain : public SwapChain
-{
- public:
-  DX11SwapChain() = default;
-  virtual ~DX11SwapChain()
+  class DX11SwapChain : public SwapChain
   {
-    safeRelease(pSch);
-  }
+  public:
+    DX11SwapChain() = default;
+    virtual ~DX11SwapChain()
+    {
+      safeRelease(m_pSch);
+      m_buffers.clear();
+    }
+
+  /**
+   * @brief Create the back buffers for the swaap chain.
+   * @param _pDevice API specific device.
+   */
+  void
+  createRenderTargetView(SPtr<Device> _pDevice);
+
+  /**
+   * @get the back buffer texture.
+   * @param _index Position of the buffer.
+   * @return Texture of the back buffer.
+   */
+  SPtr<Texture>
+  getBuffer(uint32 _index) override;
 
  public:
-  IDXGISwapChain* pSch;
+  IDXGISwapChain* m_pSch;
 };
 }

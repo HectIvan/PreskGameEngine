@@ -28,6 +28,7 @@
     <ClCompile Include="source\pkDX11PixelShader.cpp" />
     <ClCompile Include="source\pkDX11SamplerState.cpp" />
     <ClCompile Include="source\pkDX11Shader.cpp" />
+    <ClCompile Include="source\pkDX11SwapChain.cpp" />
     <ClCompile Include="source\pkDX11Texture.cpp" />
     <ClCompile Include="source\pkDX11VertexBuffer.cpp" />
     <ClCompile Include="source\pkDX11VertexShader.cpp" />

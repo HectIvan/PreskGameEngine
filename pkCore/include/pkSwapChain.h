@@ -18,6 +18,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkTexture.h"
 
 namespace pkEngineSDK
 {
@@ -27,5 +28,17 @@ class SwapChain
  public:
   SwapChain() = default;
   virtual ~SwapChain() = default;
+
+  /**
+   * @get the back buffer texture.
+   * @param _index Position of the buffer.
+   * @return Texture of the back buffer.
+   */
+  virtual SPtr<Texture>
+  getBuffer(uint32 _index) = 0;
+
+ public:
+  Vector<SPtr<Texture>> m_buffers;
+  const uint32 m_bufferCount = 2;
 };
 }

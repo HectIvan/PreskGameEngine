@@ -6,6 +6,8 @@
  * @brief   User Interface for the Editor app.
  *
  * @bug     No known bugs.
+ * 
+ * to do: fix the window proportion issue
  */
  /*****************************************************************************/
 #pragma once
@@ -42,16 +44,30 @@ class UInterface : public Module<UInterface>
   void
   initAPI();
 
-
+  /**
+   * @brief Initialize imgui with the window.
+   * @param _hWnd Handle to the window to use.
+   */
   void
   initWin(const WindowHandle& _hWnd);
 
+  /**
+   * @brief set the position of the window being created.
+   * @param _pos Window position.
+   */
   void
   setNextWindowPos(Vector2 _pos);
 
+  /**
+   * @brief Set the size of the window being created.
+   * @param _size Window size.
+   */
   void
   setNewWindowSize(Vector2 _size);
   
+  void
+  uINewFrame();
+
   /**
    * @brief initialize the User interface with the desired API.
    */
@@ -139,6 +155,13 @@ class UInterface : public Module<UInterface>
    */
   void
   endWindowCreate();
+
+  /**
+   * @brief Get the io display size.
+   * @return Size of the display.
+   */
+  Vector2
+  getDisplaySize();
   
   /**
    * @brief 

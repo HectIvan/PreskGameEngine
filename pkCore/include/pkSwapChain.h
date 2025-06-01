@@ -20,6 +20,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
 
+// to do: swap chain creation failes to create more than 1 render target.
 namespace pkEngineSDK
 {
 
@@ -39,6 +40,6 @@ class SwapChain
 
  public:
   Vector<SPtr<Texture>> m_buffers;
-  const uint32 m_bufferCount = 2;
+  const uint32 m_bufferCount = 1;
 };
 }

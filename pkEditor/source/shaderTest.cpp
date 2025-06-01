@@ -35,6 +35,8 @@ ShaderTest::onInit()
 {
   //start the interface
   UInterface::startUp();
+  g_uInterface().init();
+  g_uInterface().initWin(m_window.getWindowHandle());
 
   m_cameraSpeed = 20.0f;
   m_camera = make_shared<Actor>();
@@ -145,11 +147,30 @@ ShaderTest::UInterfaceUpdate()
 {
   UInterface& im = g_uInterface().instance();
   im.setCurrentContext();
-  im.setNewWindowSize(Vector2(100, 100));
-  im.setNextWindowPos(Vector2(0));
-  im.startWindowCreate("Test window");
-  im.createText("a test window to check if the user interface works");
+  im.newFrameAPI();
+  im.windowNewFrame();
+  im.uINewFrame();
+
+  // --- Scene graph window --- //
+  im.setNewWindowSize(Vector2(im.getDisplaySize().x * 0.2f, im.getDisplaySize().y));
+  im.setNextWindowPos(Vector2(0.0f));
+  im.startWindowCreate("Scene");
   im.endWindowCreate();
+  // -------------------------- //
+
+  // --- Transform window --- //
+  Vector3 testPos = Vector3(0.0f);
+  im.setNewWindowSize(Vector2(500.0f, 300.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 0.0f));
+  im.startWindowCreate("Transform");
+  im.createSliderVector3("Position",
+                         testPos,
+                         -2147483648,
+                          2147483647);
+  im.endWindowCreate();
+  // -------------------------- //
+
+  im.render();
 }
 
 void
@@ -307,4 +328,6 @@ ShaderTest::onRender()
   api.setShaderResourceView(rm.m_pDepthRT, 1);
 
   api.draw(3, 0);
+
+  UInterfaceUpdate();
 }

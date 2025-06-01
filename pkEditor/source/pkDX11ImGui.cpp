@@ -24,7 +24,6 @@ void
 UInterface::newFrameAPI()
 {
   ImGui_ImplDX11_NewFrame();
-  ImGui::NewFrame();
 }
 
 void

@@ -45,9 +45,23 @@ UInterface::setNewWindowSize(Vector2 _size)
 }
 
 void
+UInterface::uINewFrame()
+{
+  ImGui::NewFrame();
+}
+
+void
 UInterface::setNextWindowPos(Vector2 _pos)
 {
-  ImGui::SetNextWindowPos(ImVec2(_pos.x, _pos.y), ImGuiCond_Appearing);
+  ImGui::SetNextWindowPos(ImVec2(_pos.x, _pos.y), ImGuiCond_Always);
+}
+
+
+Vector2
+UInterface::getDisplaySize()
+{
+  ImGuiIO& io = ImGui::GetIO();
+  return Vector2(io.DisplaySize.x, io.DisplaySize.y);
 }
 
 UInterface&

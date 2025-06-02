@@ -13,7 +13,7 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
   {
     // get buffer data
     ID3D11Texture2D* pBackBuffer = nullptr;
-    // reinterpret the swap chain to a DirectX swap chain
+    // Get the buffers in the swap chain
     int32 hr = m_pSch->GetBuffer(i, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
     // if the buffer is not correct
     if (hr != 0x00000000) {
@@ -32,8 +32,8 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
       g_Logger().print("Failed to utilize the DX device in the render target view creation.");
     }
     hr = device->pd3dDevice->CreateRenderTargetView(pBackBuffer,
-      nullptr,
-      &rTargetView->m_rTV);
+                                                    nullptr,
+                                                    &rTargetView->m_rTV);
     // if the creation was not successful
     if (hr != 0x00000000) {
       String errMsg = g_Logger().getMessageError(hr);

@@ -34,8 +34,8 @@ UInterface::init()
 
   initAPI();
 
-  ImGui::StyleColorsDark();
-  // ImGui::StyleColorsClassic();
+  // ImGui::StyleColorsDark();
+  ImGui::StyleColorsClassic();
 }
 
 void

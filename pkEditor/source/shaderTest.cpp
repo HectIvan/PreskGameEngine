@@ -151,8 +151,10 @@ ShaderTest::UInterfaceUpdate()
   im.windowNewFrame();
   im.uINewFrame();
 
+  Vector2 winRect = m_window.getClientWidthHeight();
+
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(im.getDisplaySize().x * 0.2f, im.getDisplaySize().y));
+  im.setNewWindowSize(Vector2(winRect.x * 0.2f, winRect.y));
   im.setNextWindowPos(Vector2(0.0f));
   im.startWindowCreate("Scene");
   im.endWindowCreate();

@@ -82,6 +82,7 @@ DX11GraphicsAPI::initApi(const Window& _window)
   WindowHandle winHandle = _window.getWindowHandle();
   uint32 width = static_cast<uint32>(_window.getSize().x);
   uint32 height = static_cast<uint32>(_window.getSize().y);
+
   createDeviceAndSwapChain(width,
                            height,
                            winHandle,
@@ -91,11 +92,14 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            featureLevels,
                            numFeatureLevels);
 
+  setViewport(width, height);
+  // uint32 vpX = static_cast<uint32>(getViewportSize(1).x);
+  // uint32 vpY = static_cast<uint32>(getViewportSize(1).y);
+
   // create the render targets
   auto dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
   dxSCh->createRenderTargetView(m_pDevice);
   
-  setViewport(width, height);
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the API Initialization");
@@ -815,6 +819,16 @@ DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
   }
   // use the swap chain to present the result
   dxSwapChain->m_pSch->Present(_syncInterval, _flags);
+}
+
+Vector2
+DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
+{
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  D3D11_VIEWPORT viewport;
+  device->pImmediateContext->RSGetViewports(&_vpPos, &viewport);
+  
+  return Vector2(viewport.Width, viewport.Height);
 }
 
 void

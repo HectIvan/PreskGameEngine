@@ -302,6 +302,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   setViewport(uint32 _width, uint32 _height);
 
   /**
+   * @brief Get the client viewport size.
+   * @pa
+   */
+  Vector2
+  getViewportSize(uint32 _vpPos);
+
+  /**
    * Set the sampler state.
    */
   void

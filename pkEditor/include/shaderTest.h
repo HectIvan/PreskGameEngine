@@ -105,4 +105,7 @@ class ShaderTest : public BaseApp
   // SPtr<ConstantBuffer> m_cbCamera;
 
   SPtr<Pass> m_basicPass;
+
+  bool m_shadows;
+  bool m_AO;
 };

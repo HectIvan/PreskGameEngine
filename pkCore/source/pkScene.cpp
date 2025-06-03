@@ -40,10 +40,14 @@ insertActor(SPtr<Actor> _pActor, Vector<SPtr<Actor>>& _vector)
 }
 
 SPtr<Actor>
-Scene::instantiate(Matrix4 _transform, SPtr<Actor> _pParent)
+Scene::instantiate(String _name,
+                   SPtr<Actor> _pParent,
+                   Matrix4 _transform)
 {
   // insert the actor into the vector of actors
   SPtr<Actor> actor = createActor();
+  // set the actor name.
+  actor->m_name = _name;
   // set the actor transform
   actor->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this actor)

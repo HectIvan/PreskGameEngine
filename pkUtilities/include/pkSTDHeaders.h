@@ -22,6 +22,8 @@ using std::make_unique;
 
 using std::rand;
 
+using std::to_string;
+
 template <class T>
 using Queue = std::queue<T>;
 
@@ -49,4 +51,5 @@ using Vector = std::vector<T>;
 
 template<typename T>
 using WPtr = std::weak_ptr<T>;
+
 }

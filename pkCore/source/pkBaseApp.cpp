@@ -146,6 +146,6 @@ BaseApp::render()
   // Scene specific app render
   onRender();
   // Present the final result to the screen
-  g_GraphicAPI().present(1, 0);
+  g_GraphicAPI().present(m_vSync, 0);
 }
 }

@@ -35,9 +35,10 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
 
   /**
    * @brief Create a new scene.
+   * @param _name Name of the scene.
    */
   void
-  createScene();
+  createScene(String _name = "");
 
   /**
    * @brief Deletes a desired scene.

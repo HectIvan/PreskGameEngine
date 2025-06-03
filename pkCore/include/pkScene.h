@@ -30,13 +30,15 @@ class PK_CORE_EXPORT Scene
   /**
    * @brief Insert a new actor into the scene or as
    * a child of another actor.
-   * @param _tranform Transform of the actor.
+   * @param _name Name of the scene.
    * @param _pParent If the actor will be the child of another actor.
+   * @param _tranform Transform of the actor.
    * @return The actor created.
    */
   SPtr<Actor>
-  instantiate(Matrix4 _transform = Matrix4::IDENTITY,
-              SPtr<Actor> _pParent = nullptr);
+  instantiate(String _name = "",
+              SPtr<Actor> _pParent = nullptr,
+              Matrix4 _transform = Matrix4::IDENTITY);
 
   /**
    * @brief Set the active state of the current scene.
@@ -66,6 +68,13 @@ class PK_CORE_EXPORT Scene
    */
   SPtr<Actor>
   getActor(uint32 _index) { return m_actors[_index]; }
+
+  /**
+   * @brief Get the actor count.
+   * @return The ammount of actors in this scene.
+   */
+  uint32
+  getActorCount() { return static_cast<uint32>(m_actors.size()); }
 
   /**
    * @brief Find an actor by name.
@@ -115,6 +124,7 @@ class PK_CORE_EXPORT Scene
 
  public:
   Vector<SPtr<Actor>> m_actors;
+  String m_name;
   bool m_isActive;
 };
 }

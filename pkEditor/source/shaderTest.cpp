@@ -23,9 +23,12 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::to_string;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::Scene;
+using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::String;
 using pkEngineSDK::TEXTURE_FORMATS::kPK_FORMAT_R32G32B32_FLOAT;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::uint32;
@@ -39,7 +42,7 @@ ShaderTest::onInit()
   g_uInterface().initWin(m_window.getWindowHandle());
 
   m_cameraSpeed = 20.0f;
-  m_camera = make_shared<Actor>();
+  m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
                                          m_window.getHeight(),
@@ -51,7 +54,7 @@ ShaderTest::onInit()
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
   // create light
-  light = g_SceneManager().getActiveScene()->instantiate();
+  light = g_SceneManager().getActiveScene()->instantiate("Test Light");
   // add light component
   light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = light->getComponent<Light>();
@@ -74,11 +77,13 @@ ShaderTest::onInit()
                                       Vector3::UP,
                                       pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
-  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate();
+  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
-  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate();
+  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
   sponza->addComponent(newModel("sponza.obj"));
+
+  m_shadows = true;
 }
 
 void
@@ -145,18 +150,24 @@ ShaderTest::input()
 void
 ShaderTest::UInterfaceUpdate()
 {
+  SceneManager& sm = g_SceneManager().instance();
   UInterface& im = g_uInterface().instance();
+
   im.setCurrentContext();
   im.newFrameAPI();
   im.windowNewFrame();
   im.uINewFrame();
 
   Vector2 winRect = m_window.getClientWidthHeight();
-
+  
   // --- Scene graph window --- //
   im.setNewWindowSize(Vector2(winRect.x * 0.2f, winRect.y));
   im.setNextWindowPos(Vector2(0.0f));
   im.startWindowCreate("Scene");
+  uint32 actorCount = sm.getActiveScene()->getActorCount();
+  for (uint32 i = 0; i < actorCount; ++i) {
+    im.createText(sm.getActiveScene()->getActor(i)->getNameCSTR());
+  }
   im.endWindowCreate();
   // -------------------------- //
 
@@ -167,8 +178,32 @@ ShaderTest::UInterfaceUpdate()
   im.startWindowCreate("Transform");
   im.createSliderVector3("Position",
                          testPos,
-                         -2147483648,
-                          2147483647);
+                         -2147483648.0f,
+                          2147483647.0f);
+  im.endWindowCreate();
+  // -------------------------- //
+
+  // get framerate
+  uint32 fps = static_cast<uint32>(1.0f / g_TimeManager().m_deltaTime);
+  String str = "FPS: " + to_string(fps);
+
+  // --- Display window --- //
+  testPos = Vector3(0.0f);
+  im.setNewWindowSize(Vector2(500.0f, 100.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 300.0f));
+  im.startWindowCreate("Display");
+  im.createText(str.c_str());
+  im.createCheckBox("vSync", m_vSync);
+  im.endWindowCreate();
+  // -------------------------- //
+
+  // --- Post-Process window --- //
+  testPos = Vector3(0.0f);
+  im.setNewWindowSize(Vector2(500.0f, 300.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 400.0f));
+  im.startWindowCreate("Render");
+  im.createCheckBox("Shadows", m_shadows);
+  im.createCheckBox("Ambient Oclussion", m_AO);
   im.endWindowCreate();
   // -------------------------- //
 
@@ -178,62 +213,46 @@ ShaderTest::UInterfaceUpdate()
 void
 ShaderTest::onUpdate()
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
+  // user input
   input();
 
-  // buffer update
+  // managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& rm = g_RenderManager().instance();
+
+  // buffer data
   SPtr<Camera> camData = m_camera->getComponent<Camera>();
   Matrix4 view = camData->m_view.getTransposed();
   Matrix4 proj = camData->m_projection.getTransposed();
   SPtr<Light> lightData = light->getComponent<Light>();
 
+  // data type sizes
+  uint32 m4x4Size = static_cast<uint32>(sizeof(Matrix4));
+  uint32 camSize = static_cast<uint32>(sizeof(Camera));
+  uint32 lightSize = static_cast<uint32>(sizeof(Light));
+
   // update normal pass buffers
-  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(0),
-                           &view,
-                           static_cast<uint32>(sizeof(Matrix4)));
-  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(1),
-                           &proj,
-                           static_cast<uint32>(sizeof(Matrix4)));
-  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(3),
-                           &lightData,
-                           static_cast<uint32>(sizeof(Light)));
-  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(4),
-                           &camData,
-                           static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(0), &view, m4x4Size);
+  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(1), &proj, m4x4Size);
+  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(3), &lightData, lightSize);
+  api.updateConstantBuffer(rm.m_passes[0]->getCBuffer(4), &camData, camSize);
 
   // update shadow map buffers
   SPtr<Camera> lightCam = light->getComponent<Camera>();
   Matrix4 lightView = lightCam->m_view.getTransposed();
   Matrix4 lightProj = lightCam->m_projection.getTransposed();
-  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(0),
-                           &lightView,
-                           static_cast<uint32>(sizeof(Matrix4)));
-  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(1),
-                           &lightProj,
-                           static_cast<uint32>(sizeof(Matrix4)));
-  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(3),
-                           &lightData,
-                           static_cast<uint32>(sizeof(Light)));
-  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(4),
-                           &lightCam,
-                           static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(0), &lightView, m4x4Size);
+  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(1), &lightProj, m4x4Size);
+  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(3), &lightData, lightSize);
+  api.updateConstantBuffer(rm.m_passes[1]->getCBuffer(4), &lightCam,  camSize);
 
   // update shadow deferred buffers
   SPtr<Camera> tempLightCam = light->getComponent<Camera>();
   SPtr<Camera> mainCam = m_camera->getComponent<Camera>();
-  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(0),
-                           &tempLightCam,
-                           static_cast<uint32>(sizeof(Camera)));
-  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(1),
-                           &mainCam,
-                           static_cast<uint32>(sizeof(Camera)));
-  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(2),
-                           &light->m_transform,
-                           static_cast<uint32>(sizeof(Matrix4)));
-  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(3),
-                           &m_camera->m_transform,
-                           static_cast<uint32>(sizeof(Camera)));
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(0), &tempLightCam, camSize);
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(1), &mainCam, camSize);
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(2), &light->m_transform, m4x4Size);
+  api.updateConstantBuffer(rm.m_passes[3]->getCBuffer(3), &m_camera->m_transform, camSize);
 }
 
 void
@@ -244,29 +263,31 @@ ShaderTest::onRender()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
+  Vector<SPtr<Texture>> rTVector;
   /**
    * Shadow Mapping.
    */
-  Vector<SPtr<Texture>> rTVector;
-  rTVector.push_back(rm.m_pRTargetView);
-  rTVector.push_back(rm.m_pNormalRT);
-  rTVector.push_back(rm.m_pShadowDepth);
+  if (m_shadows) {
+    rTVector.push_back(rm.m_pRTargetView);
+    rTVector.push_back(rm.m_pNormalRT);
+    rTVector.push_back(rm.m_pShadowDepth);
 
-  // set the render targets
-  api.setRenderTargets(rTVector, rm.m_pShadowDepthSV);
+    // set the render targets
+    api.setRenderTargets(rTVector, rm.m_pShadowDepthSV);
 
-  api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
-  api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
-  
-  api.setPSShader(rm.m_passes.find(1)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(1)->second->getVShader());
-  api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
-  
-  rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+    api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
+    api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
+    
+    api.setPSShader(rm.m_passes.find(1)->second->getPShader());
+    api.setVSShader(rm.m_passes.find(1)->second->getVShader());
+    api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
+    
+    // set constant buffers for the pixel and vertex shaders
+    rm.PSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
+    rm.VSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
+    
+    rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  }
 
   /**
    * Normal Render.
@@ -296,40 +317,44 @@ ShaderTest::onRender()
   /**
    * Ambient Occlussion. (Deferred)
    */
-  // api.setPSShader(rm.m_passes.find(2)->second->getPShader());
-  // api.setVSShader(rm.m_passes.find(2)->second->getVShader());
-  // api.setSampler(rm.m_passes.find(2)->second->getSamplerState());
-  // 
-  // api.PSSetShaderResourceView(rm.m_pRTargetView);
-  // 
-  // // set constant buffers for the pixel and vertex shaders
-  // rm.PSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
-  // rm.VSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
+  if (m_AO) {
+    api.setPSShader(rm.m_passes.find(2)->second->getPShader());
+    api.setVSShader(rm.m_passes.find(2)->second->getVShader());
+    api.setSampler(rm.m_passes.find(2)->second->getSamplerState());
     
-  // api.draw(3, 0);
+    api.PSSetShaderResourceView(rm.m_pRTargetView);
+    
+    // set constant buffers for the pixel and vertex shaders
+    rm.PSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
+    rm.VSSetConstantBuffers(rm.m_passes.find(2)->second->getCBuffers());
+    
+    api.draw(3, 0);
+  }
 
   /**
    * Shadow pass. (Deferred)
    */
-  rTVector.clear();
-  rTVector.push_back(rm.m_pRTargetView);
-  rTVector.push_back(rm.m_pNormalRT);
-  rTVector.push_back(rm.m_pDepthRT);
+  if (m_shadows) {
+    rTVector.clear();
+    rTVector.push_back(rm.m_pRTargetView);
+    rTVector.push_back(rm.m_pNormalRT);
+    rTVector.push_back(rm.m_pDepthRT);
 
-  // set the render targets
-  api.setRenderTargets(rTVector, rm.m_pDepthSView);
+    // set the render targets
+    api.setRenderTargets(rTVector, rm.m_pDepthSView);
 
-  api.setPSShader(rm.m_passes.find(3)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(3)->second->getVShader());
-  api.setSampler(rm.m_passes.find(3)->second->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes.find(3)->second->getCBuffers());
+    api.setPSShader(rm.m_passes.find(3)->second->getPShader());
+    api.setVSShader(rm.m_passes.find(3)->second->getVShader());
+    api.setSampler(rm.m_passes.find(3)->second->getSamplerState());
+    
+    // set constant buffers for the pixel and vertex shaders
+    rm.PSSetConstantBuffers(rm.m_passes.find(3)->second->getCBuffers());
 
-  api.setShaderResourceView(rm.m_pShadowDepth, 0);
-  api.setShaderResourceView(rm.m_pDepthRT, 1);
+    api.setShaderResourceView(rm.m_pShadowDepth, 0);
+    api.setShaderResourceView(rm.m_pDepthRT, 1);
 
-  api.draw(3, 0);
+    api.draw(3, 0);
+  }
 
   UInterfaceUpdate();
 }

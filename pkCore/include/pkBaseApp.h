@@ -134,5 +134,6 @@ class PK_CORE_EXPORT BaseApp
    * its found, the loaded object will be returned, instead of loading it again.
    */
   Vector<SPtr<ModelMemory>> m_models;
+  bool m_vSync;
 };
 }

@@ -169,6 +169,20 @@ class PK_CORE_EXPORT Actor
   }
 
   /**
+   * @brief Get the actor name.
+   * @return Name of the actor
+   */
+  String
+  getName() { return m_name; }
+
+  /**
+   * @brief Get the actor name as a const char*.
+   * @return Name as a const char*
+   */
+  const char*
+  getNameCSTR() { return m_name.c_str(); }
+
+  /**
    * @brief Update the actor.
    * @brief _deltaTime Time between frames.
    */

@@ -42,6 +42,7 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
     }
 
     m_buffers.push_back(rTargetView);
+    pBackBuffer->Release();
   }
 
 }

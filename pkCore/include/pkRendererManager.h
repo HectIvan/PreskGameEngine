@@ -6,6 +6,8 @@
  * @brief   This file will contain the Render Manager used for the engine
  *
  * @bug    No known bugs.
+ * 
+ * @changes Changed the management of render targets to use maps.
  */
  /*****************************************************************************/
 #pragma once
@@ -49,6 +51,30 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    */
   void
   createPasses();
+
+  /**
+   * @brief Get a pass from the map.
+   * @param _index Pass to search for.
+   * @return Pointer to the pass.
+   */
+  SPtr<Pass>
+  getPass(uint32 _index);
+
+  /**
+   * @brief Get a specific G-buffer.
+   * @param _name Name of the buffer.
+   * @return Pointer to the buffer.
+   */
+  SPtr<Texture>
+  getGBuffer(String _name);
+
+  /**
+   * @brief Get a specific Depth buffer.
+   * @param _name Name of the buffer.
+   * @return Pointer to the buffer.
+   */
+  SPtr<Texture>
+  getDepthBuffer(String _name);
 
   /**
    * @brief Compile the shaders of all passes.
@@ -99,12 +125,14 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
  public:
 
   // render targets
-  SPtr<Texture> m_pRTargetView;
-  SPtr<Texture> m_pNormalRT;
-  SPtr<Texture> m_pDepthRT;
+  Map<String, SPtr<Texture>> m_gBuffers;
+  Map<String, SPtr<Texture>> m_depthBuffers;
+  // SPtr<Texture> m_pRTargetView;
+  // SPtr<Texture> m_pNormalRT;
+  // SPtr<Texture> m_pDepthRT;
 
   // depth stencil
-  SPtr<DepthStencilView> m_pDepthSView;
+  // SPtr<DepthStencilView> m_pDepthSView;
 
   // passes
   Map<uint32, SPtr<Pass>> m_passes;

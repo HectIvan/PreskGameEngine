@@ -218,10 +218,10 @@ DX11GraphicsAPI::clearRenderTargetView(float _color[], SPtr<Texture> _rtv)
 }
 
 void
-DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<DepthStencilView> _depthSV)
+DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _depthSV)
 {
   // Cast to a DirectX depth stencil.
-  auto dxDSV = reinterpret_pointer_cast<DX11DepthStencilView>(_depthSV);
+  auto dxDSV = reinterpret_pointer_cast<DX11Texture>(_depthSV);
   // If the casting failed.
   if (!dxDSV) {
     g_Logger().print("Failed to clear depth stencil view.");
@@ -232,10 +232,10 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<DepthStencilView> _depthSV)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the clearing of the depth buffer.");
   }
-  device->pImmediateContext->ClearDepthStencilView(dxDSV->pDepthSV,
-                                                      D3D11_CLEAR_DEPTH,
-                                                      _depth,
-                                                      0);
+  device->pImmediateContext->ClearDepthStencilView(dxDSV->m_dSV,
+                                                   D3D11_CLEAR_DEPTH,
+                                                   _depth,
+                                                   0);
 }
 
 void
@@ -251,7 +251,8 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
   }
   hr = device->pd3dDevice->CreatePixelShader(dxPShader->pSBlob->GetBufferPointer(),
                                              dxPShader->pSBlob->GetBufferSize(),
-                                             nullptr, &dxPShader->pShader);
+                                             nullptr,
+                                             &dxPShader->pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -350,10 +351,10 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
 
 void
 DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
-                                  SPtr<DepthStencilView> _DepthSV)
+                                  SPtr<Texture> _DepthSV)
 {
   // reinterpret the depth stencil view to a DirectX texture
-  auto pDSV = reinterpret_pointer_cast<DX11DepthStencilView>(_DepthSV);
+  auto pDSV = reinterpret_pointer_cast<DX11Texture>(_DepthSV);
   // get a texture vector for DX11 textures
   Vector<SPtr<DX11Texture>> txVector;
   // render target vector
@@ -374,7 +375,22 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   }
   device->pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
                                                 rTVector.data(),
-                                                pDSV->pDepthSV);
+                                                pDSV->m_dSV);
+}
+
+void
+DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
+{
+  // reinterpet render target
+  auto rTarget = reinterpret_pointer_cast<DX11Texture>(_pRTarget);
+  // reinterpret the depth stencil view
+  auto dsv = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
+  // reinterpet device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of the render target.");
+  }
+  device->pImmediateContext->OMSetRenderTargets(1, &rTarget->m_rTV, dsv->m_dSV);
 }
 
 SPtr<SamplerState>
@@ -1092,6 +1108,14 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create the depth stencil. Error: " + errMsg);
     }
+
+    // create the depth stencil side of the texture
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Texture2D.MipSlice = 0;
+
+    device->pd3dDevice->CreateDepthStencilView(tex->m_t2d, &dsvDesc, &tex->m_dSV);
   }
   /**
    * Set render target

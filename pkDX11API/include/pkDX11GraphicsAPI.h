@@ -50,9 +50,19 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set the render targets to the device.
+   * @param _rTargets List of targets to set.
+   * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<DepthStencilView> _DepthSV) override;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) override;
+
+  /**
+   * @brief Set the render target to the device.
+   * @param _rTargets Target to set.
+   * @param _DepthSV Depth stencil view to use.
+   */
+  void
+  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV) override;
 
   /**
    * @brief Create the blend state.
@@ -376,7 +386,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Clear the depth buffer.
    */
   void
-  clearDepthBuffer(float _depth, SPtr<DepthStencilView> _depthSV) override;
+  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) override;
 
   /**
    * @brief Create the Input Layout.

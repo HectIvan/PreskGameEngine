@@ -198,59 +198,59 @@ ShaderTest::onUpdate()
 void
 ShaderTest::onRender()
 {
-  // screen clear color
-  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
-
-  /**
-   * Shadow Mapping.
-   */
-  Vector<SPtr<Texture>> rTVector;
-  rTVector.push_back(rm.m_pRTargetView);
-  rTVector.push_back(rm.m_pNormalRT);
-  rTVector.push_back(rm.m_pShadowDepth);
-
-  // set the render targets
-  api.setRenderTargets(rTVector, rm.m_pShadowDepthSV);
-
-  api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
-  api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
-  
-  api.setPSShader(rm.m_passes.find(1)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(1)->second->getVShader());
-  api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
-  
-  rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-
-  /**
-   * Normal Render.
-   */
-  rTVector.clear();
-  rTVector.push_back(rm.m_pRTargetView);
-  rTVector.push_back(rm.m_pNormalRT);
-  rTVector.push_back(rm.m_pDepthRT);
-
-  // set the render targets
-  api.setRenderTargets(rTVector, rm.m_pDepthSView);
-
-  api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
-  api.clearDepthBuffer(1.0f, rm.m_pDepthSView);
-  
-  // set the base pass for the first rendering stage
-  api.setPSShader(rm.m_passes.find(0)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(0)->second->getVShader());
-  api.setSampler(rm.m_passes.find(0)->second->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
-  rm.VSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
-  // render the objects
-  rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  // // screen clear color
+  // float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
+  // GraphicsAPI& api = g_GraphicAPI().instance();
+  // RendererManager& rm = g_RenderManager().instance();
+  // 
+  // /**
+  //  * Shadow Mapping.
+  //  */
+  // Vector<SPtr<Texture>> rTVector;
+  // rTVector.push_back(rm.m_pRTargetView);
+  // rTVector.push_back(rm.m_pNormalRT);
+  // rTVector.push_back(rm.m_pShadowDepth);
+  // 
+  // // set the render targets
+  // api.setRenderTargets(rTVector, rm.m_pShadowDepthSV);
+  // 
+  // api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
+  // api.clearDepthBuffer(1.0f, rm.m_pShadowDepthSV);
+  // 
+  // api.setPSShader(rm.m_passes.find(1)->second->getPShader());
+  // api.setVSShader(rm.m_passes.find(1)->second->getVShader());
+  // api.setSampler(rm.m_passes.find(1)->second->getSamplerState());
+  // 
+  // // set constant buffers for the pixel and vertex shaders
+  // rm.PSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
+  // rm.VSSetConstantBuffers(rm.m_passes.find(1)->second->getCBuffers());
+  // 
+  // rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  // 
+  // /**
+  //  * Normal Render.
+  //  */
+  // rTVector.clear();
+  // rTVector.push_back(rm.m_pRTargetView);
+  // rTVector.push_back(rm.m_pNormalRT);
+  // rTVector.push_back(rm.m_pDepthRT);
+  // 
+  // // set the render targets
+  // api.setRenderTargets(rTVector, rm.m_pDepthSView);
+  // 
+  // api.clearRenderTargetView(clearColor, rm.m_pRTargetView);
+  // api.clearDepthBuffer(1.0f, rm.m_pDepthSView);
+  // 
+  // // set the base pass for the first rendering stage
+  // api.setPSShader(rm.m_passes.find(0)->second->getPShader());
+  // api.setVSShader(rm.m_passes.find(0)->second->getVShader());
+  // api.setSampler(rm.m_passes.find(0)->second->getSamplerState());
+  // 
+  // // set constant buffers for the pixel and vertex shaders
+  // rm.PSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
+  // rm.VSSetConstantBuffers(rm.m_passes.find(0)->second->getCBuffers());
+  // // render the objects
+  // rm.renderActors(g_SceneManager().getActiveScene()->getAllActors());
 
   /**
    * Ambient Occlussion. (Deferred)
@@ -270,23 +270,23 @@ ShaderTest::onRender()
   /**
    * Shadow pass. (Deferred)
    */
-  rTVector.clear();
-  rTVector.push_back(rm.m_pRTargetView);
-  rTVector.push_back(rm.m_pNormalRT);
-  rTVector.push_back(rm.m_pDepthRT);
-
-  // set the render targets
-  api.setRenderTargets(rTVector, rm.m_pDepthSView);
-
-  api.setPSShader(rm.m_passes.find(3)->second->getPShader());
-  api.setVSShader(rm.m_passes.find(3)->second->getVShader());
-  api.setSampler(rm.m_passes.find(3)->second->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  rm.PSSetConstantBuffers(rm.m_passes.find(3)->second->getCBuffers());
-
-  api.setShaderResourceView(rm.m_pShadowDepth, 0);
-  api.setShaderResourceView(rm.m_pDepthRT, 1);
-
-  api.draw(3, 0);
+  // rTVector.clear();
+  // rTVector.push_back(rm.m_pRTargetView);
+  // rTVector.push_back(rm.m_pNormalRT);
+  // rTVector.push_back(rm.m_pDepthRT);
+  // 
+  // // set the render targets
+  // api.setRenderTargets(rTVector, rm.m_pDepthSView);
+  // 
+  // api.setPSShader(rm.m_passes.find(3)->second->getPShader());
+  // api.setVSShader(rm.m_passes.find(3)->second->getVShader());
+  // api.setSampler(rm.m_passes.find(3)->second->getSamplerState());
+  // 
+  // // set constant buffers for the pixel and vertex shaders
+  // rm.PSSetConstantBuffers(rm.m_passes.find(3)->second->getCBuffers());
+  // 
+  // api.setShaderResourceView(rm.m_pShadowDepth, 0);
+  // api.setShaderResourceView(rm.m_pDepthRT, 1);
+  // 
+  // api.draw(3, 0);
 }

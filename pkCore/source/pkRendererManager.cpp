@@ -18,48 +18,63 @@ namespace pkEngineSDK
 void RendererManager::init(Window& _window)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
-  // create the render targets and depth stencil view
-  m_pRTargetView = api.getSwapChain()->getBuffer(0);
 
   uint32 winHeight = _window.getHeight();
   uint32 winWidth = _window.getWidth();
 
-  m_pDepthRT = api.createTexture(nullptr,
-                                 4,
-                                 winWidth,
-                                 winHeight,
-                                 TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                 kPK_USAGE_DEFAULT,
-                                 kPK_BIND_SHADER_RESOURCE |
-                                 kPK_BIND_DEPTH_STENCIL,
-                                 false,
-                                 TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  // get the main render target from the swap chain
+  m_gBuffers.insert({ "[AlbedoRTV]", api.getSwapChain()->getBuffer(0) });
 
-  m_pNormalRT = api.createTexture(nullptr,
-                                  4,
-                                  winWidth,
-                                  winHeight,
-                                  kPK_FORMAT_R32G32B32A32_FLOAT,
-                                  kPK_USAGE_DEFAULT,
-                                  kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                  false,
-                                  kPK_FORMAT_R32G32B32A32_FLOAT);
+  // create the normal render target that will store the normals of the world
+  SPtr<Texture> normalRT = api.createTexture(nullptr,
+                                             4,
+                                             winWidth,
+                                             winHeight,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT,
+                                             kPK_USAGE_DEFAULT,
+                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                             false,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ "[NormalRTV]", normalRT });
 
-  m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
+  SPtr<Texture> luminosityRT = api.createTexture(nullptr,
+                                             4,
+                                             winWidth,
+                                             winHeight,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT,
+                                             kPK_USAGE_DEFAULT,
+                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                             false,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ "[LuminosityRTV]", luminosityRT });
 
-  // create shadow mapping
-  m_pShadowDepth = api.createTexture(nullptr,
-                                     4,
-                                     winWidth,
-                                     winHeight,
-                                     TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                     kPK_USAGE_DEFAULT,
-                                     kPK_BIND_SHADER_RESOURCE |
-                                     kPK_BIND_DEPTH_STENCIL,
-                                     false,
-                                     TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  // m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
+  // create the main camera depth buffer to store pixel distance from world to main camera.
+  SPtr<Texture> depthBuffer = api.createTexture(nullptr,
+                                                4,
+                                                winWidth,
+                                                winHeight,
+                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
+                                                kPK_USAGE_DEFAULT,
+                                                kPK_BIND_SHADER_RESOURCE |
+                                                kPK_BIND_DEPTH_STENCIL,
+                                                false,
+                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  m_depthBuffers.insert({ "[MainDepthBuffer]", depthBuffer });
+
+  // create the depth buffer for the light camera rendering in shadow mapping
+  SPtr<Texture> shadowDepth = api.createTexture(nullptr,
+                                                4,
+                                                winWidth,
+                                                winHeight,
+                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
+                                                kPK_USAGE_DEFAULT,
+                                                kPK_BIND_SHADER_RESOURCE |
+                                                kPK_BIND_DEPTH_STENCIL,
+                                                false,
+                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  m_depthBuffers.insert({ "[ShadowMapBuffer]", shadowDepth });
   
-  m_pShadowDepthSV = api.createDepthStencilView(m_pShadowDepth);
 
   // create the passes needed
   createPasses();
@@ -76,7 +91,7 @@ RendererManager::createPasses()
   basePass->create();
   // set the data for the shaders to be compiled, and compile.
   basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  basePass->setPSData(L"shaders/pkVShader.hlsl", "PS", "ps_5_0");
+  basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
   basePass->compileShaders();
   basePass->createShaders();
   // create the vertex shader input layout && sampler state.
@@ -102,7 +117,7 @@ RendererManager::createPasses()
   // create all pointers
   shadowPass->create();
   shadowPass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  shadowPass->setPSData(L"shaders/pkVShader.hlsl", "PS", "ps_5_0");
+  shadowPass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
   shadowPass->compileShaders();
   shadowPass->createShaders();
 
@@ -176,8 +191,49 @@ RendererManager::createPasses()
 
   lumPass->createInputLayout();
   lumPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-    SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ 4, lumPass });
+
+  /****************************************************************************
+   * Test pass
+   ***************************************************************************/
+  SPtr<Pass> testPass = make_shared<Pass>();
+  // create all pointers
+  testPass->create();
+  // set and compile shaders
+  testPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  testPass->setPSData(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
+  testPass->compileShaders();
+  testPass->createShaders();
+
+  testPass->createInputLayout();
+  testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  m_passes.insert({ 5, testPass });
+}
+
+SPtr<Pass>
+RendererManager::getPass(uint32 _index)
+{
+  // if index is out of bounds
+  if (_index > m_passes.size() - 1 || _index < 0) {
+    String errMsg = "WARNING: Get pass search [" + _index;
+    g_Logger().print(errMsg + "] out of bounds");
+    return nullptr;
+  }
+  return m_passes.find(_index)->second;
+}
+
+SPtr<Texture>
+RendererManager::getGBuffer(String _name)
+{
+  return m_gBuffers.find(_name)->second;
+}
+
+SPtr<Texture>
+RendererManager::getDepthBuffer(String _name)
+{
+  return m_depthBuffers.find(_name)->second;
 }
 
 void
@@ -214,7 +270,7 @@ RendererManager::PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffe
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    api.VSSetConstantBuffer(_cBuffers[i], i, 1);
+    api.PSSetConstantBuffer(_cBuffers[i], i, 1);
   }
 }
 

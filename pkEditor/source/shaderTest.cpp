@@ -80,8 +80,8 @@ ShaderTest::onInit()
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
   pistol->addComponent(newModel("drakefire_pistol_low.obj"));
 
-  // SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
-  // sponza->addComponent(newModel("sponza.obj"));
+  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
+  sponza->addComponent(newModel("sponza.obj"));
 
   m_shadows = false;
 }
@@ -214,7 +214,9 @@ void
 ShaderTest::onUpdate()
 {
   // user input
-  input();
+  if (m_window.m_isFocused) {
+    input();
+  }
 
   // managers
   GraphicsAPI& api = g_GraphicAPI().instance();

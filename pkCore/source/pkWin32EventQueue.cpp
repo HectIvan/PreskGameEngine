@@ -1,4 +1,5 @@
 #include "pkEventQueue.h"
+#include "pkWindow.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -37,13 +38,14 @@ EventQueue::iskeyPressed(KEY::E _key)
 }
 
 void
-EventQueue::windowInput()
+EventQueue::windowInput(Window& _window)
 {
   MSG msg = { 0 };
   if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
   }
+  _window.m_isFocused = GetFocus() == _window.getWindowHandle();
 }
 }
 #endif

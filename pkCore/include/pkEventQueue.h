@@ -26,6 +26,8 @@
 namespace pkEngineSDK
 {
 
+class Window;
+
 class PK_CORE_EXPORT EventQueue
 {
  public:
@@ -55,7 +57,7 @@ class PK_CORE_EXPORT EventQueue
   * Window specific input.
   **/
   void
-  windowInput();
+  windowInput(Window& _window);
 
  public:
   UMap<uint32, Key> keys;

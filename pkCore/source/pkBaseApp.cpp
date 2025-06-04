@@ -115,7 +115,7 @@ BaseApp::messageLoop()
   // event loop, while the escape key has not been pressed
   while (!m_eventQueue.iskeyPressed(KEY::kEsc)) {
     // event window specific input
-    m_eventQueue.windowInput();
+    m_eventQueue.windowInput(m_window);
     // update the delta time
     // m_deltaTime = g_TimeManager().getDeltaTime(delta);
     g_TimeManager().m_deltaTime = g_TimeManager().getDeltaTime(delta);

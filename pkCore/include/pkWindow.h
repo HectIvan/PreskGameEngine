@@ -194,6 +194,7 @@ class PK_CORE_EXPORT Window
   Vector2
   getClientWidthHeight();
 
+  bool m_isFocused;
  private:
   uint32 m_width;
   uint32 m_height;

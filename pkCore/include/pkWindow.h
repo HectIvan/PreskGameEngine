@@ -1,17 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkWindow pkWindow.h
-* @Hector Ivan Muñoz Ceballos
-* @date 30/09/2024
-* @Window file for the Presk Game Engine.
-*
-* This file will contain the window used for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 30/09/2024
-*/
-/************************************************************************/
+ * @file    pkWindow.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    30/09/2024
+ * @brief   This file will contain the window used for the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

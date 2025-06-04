@@ -311,7 +311,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _val Value to sign.
    * @return The signed value.
    */
-  float
+  static float
   sign(float _val);
 
   /**
@@ -319,7 +319,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _direction Direction to use.
    * @return The new signed direction.
    */
-  Vector3
+  static Vector3
   sign3(Vector3& _direction);
 
   /**
@@ -328,7 +328,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _dir Direction to use.
    * @return The support point of the box.
    */
-  Vector3
+  static Vector3
   supportPointOBB(OBB& _box, Vector3& _dir);
 
   /**
@@ -336,7 +336,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _direction Direction where the support point should be.
    * @param _points Group of points of  the shape.
    */
-  Vector3
+  static Vector3
   supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
 
   /**
@@ -345,16 +345,16 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _sphere Sphere of use.
    * @return The support point.
    */
-  Vector3
+  static Vector3
   supportPointSphere(Vector3& _direction, Sphere& _sphere);
 
   /**
    * @brief Get the support point from a capsule.
    * @param _direction Direction to use.
    * @param _capsule Capsule of use.
-   * @return The support point.
+   * @return The support point.|
    */
-  Vector3
+  static Vector3
   supportPointCapsule(Vector3& _direction, Capsule& _capsule);
 
   /**

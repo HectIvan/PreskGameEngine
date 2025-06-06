@@ -80,8 +80,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
   WindowHandle winHandle = _window.getWindowHandle();
-  uint32 width = static_cast<uint32>(_window.getSize().x);
-  uint32 height = static_cast<uint32>(_window.getSize().y);
+  uint32 width = static_cast<uint32>(_window.getClientWidthHeight().x);
+  uint32 height = static_cast<uint32>(_window.getClientWidthHeight().y);
 
   createDeviceAndSwapChain(width,
                            height,
@@ -351,10 +351,10 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
 
 void
 DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
-                                  SPtr<Texture> _DepthSV)
+                                  SPtr<Texture> _pDepthSV)
 {
   // reinterpret the depth stencil view to a DirectX texture
-  auto pDSV = reinterpret_pointer_cast<DX11Texture>(_DepthSV);
+  auto pDSV = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
   // get a texture vector for DX11 textures
   Vector<SPtr<DX11Texture>> txVector;
   // render target vector
@@ -375,7 +375,7 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   }
   device->pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
                                                 rTVector.data(),
-                                                pDSV->m_dSV);
+                                                (pDSV) ? pDSV->m_dSV : nullptr);
 }
 
 void
@@ -384,13 +384,15 @@ DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthS
   // reinterpet render target
   auto rTarget = reinterpret_pointer_cast<DX11Texture>(_pRTarget);
   // reinterpret the depth stencil view
-  auto dsv = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
+  auto pDSV = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
   // reinterpet device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of the render target.");
   }
-  device->pImmediateContext->OMSetRenderTargets(1, &rTarget->m_rTV, dsv->m_dSV);
+  device->pImmediateContext->OMSetRenderTargets(1,
+                                                &rTarget->m_rTV,
+                                                (pDSV) ? pDSV->m_dSV : nullptr);
 }
 
 SPtr<SamplerState>

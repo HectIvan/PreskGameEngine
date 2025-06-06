@@ -151,10 +151,6 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     
     float3 viewDir = normalize(camPosition.xyz - input.Depth.xyz);
     
-    // final color
-    // output.diffuse = diffuseSam * float4(lamb + blinnPhong, 1.0f);
-    
-    // output.diffuse = float4(normalize(mul(normalSam, TBN)), 1.0f);
     // normal in world space
     float3 normalWS = TangentToWorld(normalSam, TBN);
     
@@ -167,12 +163,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     
     float3 lightning = lamb * LightColor + blinnPhong * LightColor;
     
+    output.diffuse = diffuseSam;
     output.normal = float4(normalWS, 1.0f);
-    output.diffuse = diffuseSam; // float4(diffuseSam.rgb * lightning, diffuseSam.a);
-    // output.luminosity = float4(0, 0, 0, 0);
-    // if (diffuseSam > float4(0.7f, 0.7f, 0.7f, 0.0f))
-    // {
-    //     output.luminosity = float4(1.0f, 1.0f, 1.0f, diffuseSam.a);
-    // }
     return output;
 }

@@ -32,6 +32,33 @@
 namespace pkEngineSDK
 {
 
+namespace G_BUFFERS
+{
+  enum E {
+    kGB_Albedo = 0,
+    kGB_Normal,
+  };
+};
+
+namespace D_BUFFERS
+{
+  enum E {
+    kDB_Base = 0,
+    kDB_Shadow,
+  };
+}
+
+namespace PASS_TYPE
+{
+  enum E {
+    kP_Base = 0,
+    kP_Shadow,
+    kP_AO,
+    kP_ShadowDef,
+    kP_Test,
+  };
+}
+
 class Model;
 
 class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
@@ -54,27 +81,34 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
 
   /**
    * @brief Get a pass from the map.
-   * @param _index Pass to search for.
+   * @param _type Pass type to search for.
    * @return Pointer to the pass.
    */
   SPtr<Pass>
-  getPass(uint32 _index);
+  getPass(PASS_TYPE::E _type);
 
   /**
    * @brief Get a specific G-buffer.
-   * @param _name Name of the buffer.
+   * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
   SPtr<Texture>
-  getGBuffer(String _name);
+  getGBuffer(G_BUFFERS::E _type);
+
+  /**
+   * @brief Get all the buffers in the manager.
+   * @return Vector of Textures.
+   */
+  Vector<SPtr<Texture>>
+  getGBuffers();
 
   /**
    * @brief Get a specific Depth buffer.
-   * @param _name Name of the buffer.
+   * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
   SPtr<Texture>
-  getDepthBuffer(String _name);
+  getDepthBuffer(D_BUFFERS::E _type);
 
   /**
    * @brief Compile the shaders of all passes.
@@ -125,8 +159,8 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
  public:
 
   // render targets
-  Map<String, SPtr<Texture>> m_gBuffers;
-  Map<String, SPtr<Texture>> m_depthBuffers;
+  Map<G_BUFFERS::E, SPtr<Texture>> m_gBuffers;
+  Map<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
   // SPtr<Texture> m_pRTargetView;
   // SPtr<Texture> m_pNormalRT;
   // SPtr<Texture> m_pDepthRT;
@@ -135,7 +169,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // SPtr<DepthStencilView> m_pDepthSView;
 
   // passes
-  Map<uint32, SPtr<Pass>> m_passes;
+  Map<PASS_TYPE::E, SPtr<Pass>> m_passes;
 
   // shadows
   SPtr<Texture> m_pShadowDepth;

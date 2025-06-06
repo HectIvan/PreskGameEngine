@@ -33,8 +33,10 @@ ShaderTest::onInit()
   m_cameraSpeed = 20.0f;
   m_camera = make_shared<Actor>();
   m_camera->addComponent(make_shared<Camera>());
-  m_camera->getComponent<Camera>()->init(m_window.getWidth(),
-                                         m_window.getHeight(),
+  uint32 width = static_cast<uint32>(m_window.getClientWidthHeight().x);
+  uint32 height = static_cast<uint32>(m_window.getClientWidthHeight().y);
+  m_camera->getComponent<Camera>()->init(width,
+                                         height,
                                          3.1416f / 4.0f,
                                          0.01f,
                                          2000.0f,

@@ -1,3 +1,14 @@
+/*****************************************************************************/
+/**
+ * @file    pkPlatformMath.cpp
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/09/2024
+ * @brief   Basic math used for the game engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
+
 /*********************************************/
 /**
 * Includes
@@ -8,6 +19,7 @@
 #include "pkVector4.h"
 #include "pkMatrix4.h"
 
+/*
 using std::abs;
 using std::pow;
 using std::sqrt;
@@ -19,20 +31,20 @@ using std::asin;
 using std::cos;
 using std::acos;
 using std::atan;
-using std::tan;
+using std::tan;*/
 
 namespace pkEngineSDK
 {
 
-const float PlatformMath::PI = PlatformMath::acos(-1.0f);
+const float Math::PI = Math::acos(-1.0f);
 
-const float PlatformMath::EULER = PlatformMath::exp(1.0f);
+const float Math::EULER = Math::exp(1.0f);
 
-const float PlatformMath::SMALL_NUMBER = 1e-6f;
+const float Math::SMALL_NUMBER = 1e-6f;
 
-const float PlatformMath::DEG2RAD = PI / 180.0f;
+const float Math::DEG2RAD = PI / 180.0f;
 
-const float PlatformMath::RAD2DEG = 180.0f / PI;
+const float Math::RAD2DEG = 180.0f / PI;
 
 float
 PlatformMath::abs(const float _x)
@@ -119,9 +131,9 @@ Vector3
 PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)
 {
   Vector3 vec = _t;
-  vec.x = clamp(vec.x, _x, _y);
-  vec.y = clamp(vec.y, _x, _y);
-  vec.z = clamp(vec.z, _x, _y);
+  vec.x = std::clamp(vec.x, _x, _y);
+  vec.y = std::clamp(vec.y, _x, _y);
+  vec.z = std::clamp(vec.z, _x, _y);
   return vec;
 }
 
@@ -170,7 +182,7 @@ PlatformMath::hookeLaw(float _elasticity, float _displacement)
 bool
 PlatformMath::isNan(float _x)
 {
-  return std::isnan(_x);
+  return isnan(_x);
 }
 
 /**
@@ -299,11 +311,11 @@ PlatformMath::intersectCubeCube(Cube& _cube, const Cube& _other)
 {
   float sizeComb = _cube.m_size + _other.m_size;
 
-  if (PlatformMath::abs(_cube.m_origin.x - _other.m_origin.x) < sizeComb)
+  if (Math::abs(_cube.m_origin.x - _other.m_origin.x) < sizeComb)
   {
-    if (PlatformMath::abs(_cube.m_origin.y - _other.m_origin.y) < sizeComb)
+    if (Math::abs(_cube.m_origin.y - _other.m_origin.y) < sizeComb)
     {
-      if (PlatformMath::abs(_cube.m_origin.z - _other.m_origin.z) < sizeComb)
+      if (Math::abs(_cube.m_origin.z - _other.m_origin.z) < sizeComb)
       {
         return true;
       }
@@ -315,11 +327,11 @@ PlatformMath::intersectCubeCube(Cube& _cube, const Cube& _other)
 bool
 PlatformMath::intersectCubePoint(Cube& _cube, const Vector3& _other)
 {
-  if (PlatformMath::abs(_cube.m_origin.x - _other.x) < _cube.m_size)
+  if (Math::abs(_cube.m_origin.x - _other.x) < _cube.m_size)
   {
-    if (PlatformMath::abs(_cube.m_origin.y - _other.y) < _cube.m_size)
+    if (Math::abs(_cube.m_origin.y - _other.y) < _cube.m_size)
     {
-      if (PlatformMath::abs(_cube.m_origin.z - _other.z) < _cube.m_size)
+      if (Math::abs(_cube.m_origin.z - _other.z) < _cube.m_size)
       {
         return true;
       }

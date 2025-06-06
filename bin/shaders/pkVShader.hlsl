@@ -76,37 +76,3 @@ PS_INPUT VS(VS_INPUT input)
     
     return output;
 }
-
-
-/*
-PS_OUTPUT PS(PS_INPUT input) : SV_Target
-{
-    PS_OUTPUT output = (PS_OUTPUT) 0;
-    
-    float4 diffusePix = diffuseTex.Sample(samLinear, input.Tex);
-    float4 normalPix = normalTex.Sample(samLinear, input.Tex);
-    float4 neightPix = heightTex.Sample(samLinear, input.Tex);
-    float4 metallicPix = metallicTex.Sample(samLinear, input.Tex);
-    float4 occlusionPix = occlusionTex.Sample(samLinear, input.Tex);
-    
-    if (diffusePix.a < 0.1f)
-    {
-        discard;
-    }
-    
-    float3 lightDir = normalize(float3(0.5f, -1.0f, -0.3f)); // Example light direction
-    float3 lightColor = float3(1.0f, 1.0f, 1.0f); // White light
-    
-    output.diffuse = diffusePix;
-    float3 normal = normalTex.Sample(samLinear, input.Tex).xyz * 2.0f - 1.0f;
-    float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
-    normal = normalize(mul(normal.xyz, TBN));
-    float diff = max(dot(normal, lightDir), 0.0f);
-    float3 diffuse = diff * lightColor * diffusePix.rgb;
-    output.diffuse = float4(diffuse, diffusePix.a);
-    // output.diffuse = diffusePix;
-    // output.normal = float4(normal * 0.5f + 0.5f, 1.0f);
-    // output.depth = float4(input.Depth.xyz, 1.0f);
-  
-    return output;
-}*/

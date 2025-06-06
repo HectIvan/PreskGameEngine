@@ -11,11 +11,6 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD0;
 };
 
-struct PS_OUTPUT
-{
-    float4 diffuse : SV_Target0;
-};
-
 // deferred pass
 PS_INPUT VS(uint vertexID : SV_VertexID)
 {

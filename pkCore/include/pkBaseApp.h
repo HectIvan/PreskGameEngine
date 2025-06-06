@@ -48,7 +48,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Initialize the app.
    */
   void
-  init(const char** _argv);
+  init(const char** _argv, int32 _count);
 
   /**
    * @brief On initializing the app.
@@ -64,9 +64,11 @@ class PK_CORE_EXPORT BaseApp
 
   /**
    * @brief Initialize the api.
+   * @param _argv
+   * @param _count Ammount of parameters.
    */
   void
-  initAPI(const char** _argv);
+  initAPI(const char** _argv, int32 _count);
 
   /**
    * @brief Event message loop.
@@ -133,6 +135,8 @@ class PK_CORE_EXPORT BaseApp
    * in here, if the same object is asked to be loaded, it will first be searched here,if
    * its found, the loaded object will be returned, instead of loading it again.
    */
+
+   // to do: transfer this to a resource manager
   Vector<SPtr<ModelMemory>> m_models;
   bool m_vSync;
 };

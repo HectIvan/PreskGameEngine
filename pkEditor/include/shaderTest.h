@@ -68,7 +68,7 @@ class ShaderTest : public BaseApp
    * @brief Update the UI.
    */
   void
-  UInterfaceUpdate();
+  uInterfaceUpdate();
 
   /**
    * @brief Update the shader test.

@@ -192,7 +192,7 @@ class PK_CORE_EXPORT Window
   * Get width and height of the client rect for later use
   **/
   Vector2
-  getClientWidthHeight();
+  getClientWidthHeight() const;
 
   bool m_isFocused;
  private:

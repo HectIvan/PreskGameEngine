@@ -76,7 +76,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
 }
 
 Vector2
-Window::getClientWidthHeight()
+Window::getClientWidthHeight() const
 {
   RECT rc;
   GetClientRect(m_windowH, &rc);

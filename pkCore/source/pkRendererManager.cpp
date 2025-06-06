@@ -15,15 +15,28 @@ using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
 
 namespace pkEngineSDK
 {
+
+  // to do: change albedoRTV to a correct semantic
 void RendererManager::init(Window& _window)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
 
-  uint32 winHeight = _window.getHeight();
-  uint32 winWidth = _window.getWidth();
+  uint32 winHeight = static_cast<uint32>(_window.getClientWidthHeight().y);
+  uint32 winWidth = static_cast<uint32>(_window.getClientWidthHeight().x);
 
-  // get the main render target from the swap chain
-  m_gBuffers.insert({ "[AlbedoRTV]", api.getSwapChain()->getBuffer(0) });
+  // uint32 winHeight = _window.getHeight();
+  // uint32 winWidth = _window.getWidth();
+
+  SPtr<Texture> albedoRTV = api.createTexture(nullptr,
+                                              4,
+                                              winWidth,
+                                              winHeight,
+                                              kPK_FORMAT_R32G32B32A32_FLOAT,
+                                              kPK_USAGE_DEFAULT,
+                                              kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                              false,
+                                              kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRTV });
 
   // create the normal render target that will store the normals of the world
   SPtr<Texture> normalRT = api.createTexture(nullptr,
@@ -35,18 +48,7 @@ void RendererManager::init(Window& _window)
                                              kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
                                              false,
                                              kPK_FORMAT_R32G32B32A32_FLOAT);
-  m_gBuffers.insert({ "[NormalRTV]", normalRT });
-
-  SPtr<Texture> luminosityRT = api.createTexture(nullptr,
-                                             4,
-                                             winWidth,
-                                             winHeight,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT);
-  m_gBuffers.insert({ "[LuminosityRTV]", luminosityRT });
+  m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
   // m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
   // create the main camera depth buffer to store pixel distance from world to main camera.
@@ -60,7 +62,7 @@ void RendererManager::init(Window& _window)
                                                 kPK_BIND_DEPTH_STENCIL,
                                                 false,
                                                 TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
-  m_depthBuffers.insert({ "[MainDepthBuffer]", depthBuffer });
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
 
   // create the depth buffer for the light camera rendering in shadow mapping
   SPtr<Texture> shadowDepth = api.createTexture(nullptr,
@@ -73,7 +75,7 @@ void RendererManager::init(Window& _window)
                                                 kPK_BIND_DEPTH_STENCIL,
                                                 false,
                                                 TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
-  m_depthBuffers.insert({ "[ShadowMapBuffer]", shadowDepth });
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Shadow, shadowDepth });
   
 
   // create the passes needed
@@ -108,7 +110,7 @@ RendererManager::createPasses()
 
   g_GraphicAPI().setInputLayout(basePass->getInputLayout());
   // insert to the pass map.
-  m_passes.insert({ 0, basePass });
+  m_passes.insert({ PASS_TYPE::kP_Base, basePass });
 
   /****************************************************************************
    * Shadow Pass
@@ -131,7 +133,7 @@ RendererManager::createPasses()
   shadowPass->createInputLayout();
   shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                  SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 1, shadowPass });
+  m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
   /****************************************************************************
    * Ambient Occlussion Pass
@@ -151,7 +153,7 @@ RendererManager::createPasses()
   AOPass->createInputLayout();
   AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 2, AOPass });
+  m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
   /****************************************************************************
    * Shadow Deferred pass
@@ -173,26 +175,7 @@ RendererManager::createPasses()
   shadowDef->createInputLayout();
   shadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
                                 SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 3, shadowDef });
-
-  /****************************************************************************
-   * Luminosity pass
-   ***************************************************************************/
-  SPtr<Pass> lumPass = make_shared<Pass>();
-  // create all pointers
-  lumPass->create();
-  // set and compile shaders
-  lumPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  lumPass->setPSData(L"shaders/pkPSLuminosity.hlsl", "PS", "ps_5_0");
-  lumPass->compileShaders();
-  lumPass->createShaders();
-
-  lumPass->createCBuffer(static_cast<uint32>(sizeof(CBLuminosity)), nullptr, 0);
-
-  lumPass->createInputLayout();
-  lumPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 4, lumPass });
+  m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
   /****************************************************************************
    * Test pass
@@ -209,37 +192,43 @@ RendererManager::createPasses()
   testPass->createInputLayout();
   testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 5, testPass });
+  m_passes.insert({ PASS_TYPE::kP_Test, testPass });
 }
 
 SPtr<Pass>
-RendererManager::getPass(uint32 _index)
+RendererManager::getPass(PASS_TYPE::E _type)
 {
-  // if index is out of bounds
-  if (_index > m_passes.size() - 1 || _index < 0) {
-    String errMsg = "WARNING: Get pass search [" + _index;
-    g_Logger().print(errMsg + "] out of bounds");
-    return nullptr;
+  return m_passes.find(_type)->second;
+}
+
+SPtr<Texture>
+RendererManager::getGBuffer(G_BUFFERS::E _type)
+{
+  return m_gBuffers.find(_type)->second;
+}
+
+Vector<SPtr<Texture>>
+RendererManager::getGBuffers()
+{
+  Vector<SPtr<Texture>> textures(m_gBuffers.size());
+
+  int32 i = 0;
+  for (auto [textureName, sptrTexture] : m_gBuffers) {
+    textures[i++] = sptrTexture;
   }
-  return m_passes.find(_index)->second;
+  return textures;
 }
 
 SPtr<Texture>
-RendererManager::getGBuffer(String _name)
+RendererManager::getDepthBuffer(D_BUFFERS::E _type)
 {
-  return m_gBuffers.find(_name)->second;
-}
-
-SPtr<Texture>
-RendererManager::getDepthBuffer(String _name)
-{
-  return m_depthBuffers.find(_name)->second;
+  return m_depthBuffers.find(_type)->second;
 }
 
 void
 RendererManager::compileShaders()
 {
-  Map<uint32, SPtr<Pass>>::iterator it;
+  Map<PASS_TYPE::E, SPtr<Pass>>::iterator it;
   for (it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Compile shaders
     it->second->compileShaders();
@@ -257,20 +246,18 @@ RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 void
 RendererManager::VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    api.VSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().VSSetConstantBuffer(_cBuffers[i], i, 1);
   }
 }
 
 void
 RendererManager::PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    api.PSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().PSSetConstantBuffer(_cBuffers[i], i, 1);
   }
 }
 
@@ -295,6 +282,8 @@ RendererManager::setActorsBuffers()
 void
 RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
+  RendererManager& rManager = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
     if (!_gameActors[i]->m_active) {
@@ -311,12 +300,12 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work in
-    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[0]->getCBuffer(2),
-                                        &transform,
-                                        static_cast<uint32>(sizeof(CBTransform)));
-    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[1]->getCBuffer(2),
-                                        &transform,
-                                        static_cast<uint32>(sizeof(CBTransform)));
+    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Base)->getCBuffer(2),
+                             &transform,
+                             static_cast<uint32>(sizeof(CBTransform)));
+    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Shadow)->getCBuffer(2),
+                             &transform,
+                             static_cast<uint32>(sizeof(CBTransform)));
 
     // render the model of the actor
     if (_gameActors[i]->getComponent<Model>()) {
@@ -333,9 +322,10 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 void
 RendererManager::renderModel(Model& _model)
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // get a reference from the api
-  g_GraphicAPI().setVertexBuffer(_model.vertexB);
-  g_GraphicAPI().setIndexBuffer(_model.indexB);
+  api.setVertexBuffer(_model.vertexB);
+  api.setIndexBuffer(_model.indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
@@ -344,13 +334,13 @@ RendererManager::renderModel(Model& _model)
     // get the material
     SPtr<Material> material = _model.meshes[i]->material;
     // set the material textures to the shader
-    g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
-    g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
-    g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
-    g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
-    g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
+    api.PSSetShaderResourceView(material->diffuse, 0);
+    api.PSSetShaderResourceView(material->normal, 1);
+    api.PSSetShaderResourceView(material->height, 2);
+    api.PSSetShaderResourceView(material->metallic, 3);
+    api.PSSetShaderResourceView(material->occlusion, 4);
     // draw the mesh
-    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
+    api.drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,
                                currentVertexOrigin);
     // update the offsets

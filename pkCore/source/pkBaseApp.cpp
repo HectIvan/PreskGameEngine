@@ -24,6 +24,7 @@ BaseApp::createMaterial()
   return g_ResourceManager().newMaterial();
 }
 
+// to do: transfer this to a resource manager
 SPtr<Model>
 BaseApp::newModel(String _modelName)
 {
@@ -52,7 +53,7 @@ BaseApp::newModel(String _modelName)
 /*********************************************/
 
 void
-BaseApp::init(const char** _argv)
+BaseApp::init(const char** _argv, int32 _count)
 {
   Logger::startUp();
   RendererManager::startUp();
@@ -62,7 +63,7 @@ BaseApp::init(const char** _argv)
   TimeManager::startUp();
 
   initWindow();
-  initAPI(_argv);
+  initAPI(_argv, _count);
 
   g_SceneManager().init();
 
@@ -81,12 +82,15 @@ BaseApp::initWindow()
 }
 
 void
-BaseApp::initAPI(const char** _argv)
+BaseApp::initAPI(const char** _argv, int32 _count)
 {
-  String abstraction = "DX11API";//  _argv[1];
+  String abstraction = "DX11APId";
+  if (_count > 1) {
+    abstraction = _argv[1]; // _argv[0] is always the executable path
+  }
 
 #if PK_DEBUG_MODE
-  if (abstraction == "DX11API") {
+  if (abstraction == "DX11APId") {
     run("pkDX11APId", m_window);
   }
 #else

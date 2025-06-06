@@ -16,9 +16,18 @@
     <ClInclude Include="include\pkShape.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkRigidBody.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPhysicsManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkShape.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPhysicsManager.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,0 +1,59 @@
+/*************************************************************************/
+/**
+ * @file    pkPhysicsManager.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    05/06/2025
+ * @brief   Physics manager for the physics library.
+ *
+ * @bug    no knon bugs.
+ */
+ /*****************************************************************************/
+#pragma once
+
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
+#include "pkModule.h"
+#include "pkShape.h"
+
+namespace pkEngineSDK
+{
+
+class PhysicsManager : public Module<PhysicsManager>
+{
+ public:
+  PhysicsManager() = default;
+  virtual ~PhysicsManager() = default;
+
+  bool
+  GJK(Shape& _shape1, Shape& _shape2, uint32 _attempts);
+
+  /**
+   * @brief Configuration space obstacle.
+   * @param _shape1 First shape to use.
+   * @param _shape2 Second shape to use.
+   * @param _direction Direction to use.
+   * @return The support point using the algorithm.
+   */
+  Vector3
+  supportCSO(Shape& _shape1, Shape& _shape2, Vector3& _direction);
+
+  bool
+  updateSimplexNDirection(Shape& _simplex, Vector3& _direction);
+
+  /**
+   * @brief Get if the origin is in front of the plane.
+   * @param _vertex Points of the plane (from last inserted [0] to first inserted[2].
+   * @param _direction
+   */
+  bool
+  originInFrontOfPlane(Vector3 _vertex[], Vector3& _direction);
+};
+PhysicsManager&
+g_physicsManager()
+{
+  return PhysicsManager::instance();
+}
+}

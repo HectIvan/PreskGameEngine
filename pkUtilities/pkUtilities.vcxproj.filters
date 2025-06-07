@@ -102,6 +102,9 @@
     <ClInclude Include="include\pkCollisionInfo.h">
       <Filter>include\figures</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkFigure.h">
+      <Filter>include\figures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPlatformMath.cpp">
@@ -140,5 +143,7 @@
     <ClCompile Include="source\pkColor.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="include\pkAABB.cpp" />
+    <ClCompile Include="include\pkOBB.cpp" />
   </ItemGroup>
 </Project>

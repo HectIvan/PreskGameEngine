@@ -27,7 +27,6 @@ class RigidBody
   RigidBody() = default;
   virtual ~RigidBody() = default;
 
-
  public:
   float m_drag;
   float m_gravity;

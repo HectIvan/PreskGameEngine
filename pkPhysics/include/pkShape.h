@@ -37,5 +37,6 @@ class Shape
 
  public:
   Vector<Vector3> m_vertex;
+  Vector3 m_position;
 };
 }

@@ -212,6 +212,22 @@ class PK_UTILITY_EXPORT PlatformMath
   static bool
   isNan(float _x);
 
+  /**
+   * @brief Get a signed value.
+   * @param _val Value to sign.
+   * @return The signed value.
+   */
+  static float
+  sign(float _val);
+
+  /**
+   * @brief Get a signed direction.
+   * @param _direction Direction to use.
+   * @return The new signed direction.
+   */
+  static Vector3
+  sign3(Vector3& _direction);
+
   /***************************************************************************
   * 
   * Shapes
@@ -306,21 +322,11 @@ class PK_UTILITY_EXPORT PlatformMath
   static bool
   intersectCubeSphere(Cube& _cube, Sphere& _sphere);
 
-  /**
-   * @brief Get a signed value.
-   * @param _val Value to sign.
-   * @return The signed value.
-   */
-  static float
-  sign(float _val);
-
-  /**
-   * @brief Get a signed direction.
-   * @param _direction Direction to use.
-   * @return The new signed direction.
-   */
-  static Vector3
-  sign3(Vector3& _direction);
+  /***************************************************************************
+  * 
+  * Support points from shapes.
+  * 
+  ***************************************************************************/
 
   /**
    * @brief Get the support point of an Object Bounding Box.

@@ -27,7 +27,7 @@ PhysicsManager::GJK(Shape& _shape1, Shape& _shape2, uint32 _attempts)
   // create the simplex
   Shape simplex;
   // get a random direction
-  Vector3 direction = Vector3::random();
+  Vector3 direction = Vector3::RIGHT;
   // get the first support point between the 2 shapes and the direction
   Vector3 supportPoint = supportCSO(_shape1, _shape2, direction);
 

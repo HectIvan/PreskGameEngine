@@ -27,6 +27,19 @@ class PhysicsManager : public Module<PhysicsManager>
   PhysicsManager() = default;
   virtual ~PhysicsManager() = default;
 
+  /**
+   * @brief Update the manager on a fixed time.
+   */
+  void
+  fixedUpdate();
+
+  /**
+   * @brief Calculates a collision using Gilbert-Johnson-Keerthi (GJK).
+   * @param _shape1 First shape of the collision.
+   * @param _shape2 Second shape of the collision.
+   * @param _attempts How many attempts will be made for the detection.
+   * @return bool for when there was a collision or not.
+   */
   bool
   GJK(Shape& _shape1, Shape& _shape2, uint32 _attempts);
 
@@ -40,6 +53,11 @@ class PhysicsManager : public Module<PhysicsManager>
   Vector3
   supportCSO(Shape& _shape1, Shape& _shape2, Vector3& _direction);
 
+  /**
+   * @brief Update the dierction by using the simplex provided.
+   * @param _simplex Simplex to use.
+   * @param _direction Direction to use and change.
+   */
   bool
   updateSimplexNDirection(Shape& _simplex, Vector3& _direction);
 

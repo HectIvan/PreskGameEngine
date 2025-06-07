@@ -234,9 +234,9 @@ class DX11GraphicsAPI : public GraphicsAPI
                        uint32 _size) override;
 
   /**
-   * @brief Set a texture to the resource view.
+   * @brief Set a resource to the vertex shader.
    * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
+   * @param _start In what slot of the vertex shader will the resource be allocated.
    * @param _numViews The number of resources that will be passed
    */
   void

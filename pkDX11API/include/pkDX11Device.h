@@ -29,8 +29,8 @@ class DX11Device : public Device
   DX11Device() = default;
   virtual ~DX11Device()
   {
-    safeRelease(pd3dDevice);
-    safeRelease(pImmediateContext);
+    safeRelease(m_pd3dDevice);
+    safeRelease(m_pImmediateContext);
   }
 
   /**
@@ -64,9 +64,9 @@ class DX11Device : public Device
   setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
  public:
-  ID3D11Device* pd3dDevice = nullptr;
-  ID3D11DeviceContext* pImmediateContext = nullptr;
-  D3D_DRIVER_TYPE* pDriverType;
-  D3D_FEATURE_LEVEL featureLevel;
+  ID3D11Device* m_pd3dDevice = nullptr;
+  ID3D11DeviceContext* m_pImmediateContext = nullptr;
+  D3D_DRIVER_TYPE* m_pDriverType;
+  D3D_FEATURE_LEVEL m_featureLevel;
 };
 }

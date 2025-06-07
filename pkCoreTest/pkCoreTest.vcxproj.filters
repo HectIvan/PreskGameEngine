@@ -24,9 +24,6 @@
     <ClCompile Include="source\Projectile.cpp">
       <Filter>source\main</Filter>
     </ClCompile>
-    <ClCompile Include="source\ShaderTest.cpp">
-      <Filter>source\main</Filter>
-    </ClCompile>
     <ClCompile Include="source\Spring.cpp">
       <Filter>source\main</Filter>
     </ClCompile>
@@ -36,9 +33,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Projectile.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ShaderTest.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Cannon.h">

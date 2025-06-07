@@ -34,20 +34,11 @@ class DX11InputLayout : public InputLayout
   DX11InputLayout() = default;
   virtual ~DX11InputLayout()
   {
-    safeRelease(pVertexLayout);
+    safeRelease(m_pVertexLayout);
   }
 
-  /**
-  * Set the input layout.
-  * 
-  * @param _pDevice
-  * Device where the input layout is located
-  **/
-  void
-  set(SPtr<Device> _pDevice);
-
  public:
-  uint32 numElements = 0;
-  ID3D11InputLayout* pVertexLayout = nullptr;
+  uint32 m_numElements = 0;
+  ID3D11InputLayout* m_pVertexLayout = nullptr;
 };
 }

@@ -190,7 +190,7 @@ RendererManager::createPasses()
   testPass->createShaders();
 
   testPass->createInputLayout();
-  testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
+  testPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ PASS_TYPE::kP_Test, testPass });
 }
@@ -219,6 +219,22 @@ RendererManager::getGBuffers()
   return textures;
 }
 
+Vector<SPtr<Texture>>
+RendererManager::getGBuffers(G_BUFFERS::E _types)
+{
+  Vector<SPtr<Texture>> textures;
+
+  for (uint32 i = 0; i < m_gBuffers.size(); ++i) {
+    if ((_types & G_BUFFERS::kGB_Albedo) == G_BUFFERS::kGB_Albedo) {
+      textures.push_back(getGBuffer(G_BUFFERS::kGB_Albedo));
+    }
+    if ((_types & G_BUFFERS::kGB_Normal) == G_BUFFERS::kGB_Normal) {
+      textures.push_back(getGBuffer(G_BUFFERS::kGB_Normal));
+    }
+  }
+  return textures;
+}
+
 SPtr<Texture>
 RendererManager::getDepthBuffer(D_BUFFERS::E _type)
 {
@@ -228,8 +244,7 @@ RendererManager::getDepthBuffer(D_BUFFERS::E _type)
 void
 RendererManager::compileShaders()
 {
-  Map<PASS_TYPE::E, SPtr<Pass>>::iterator it;
-  for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+  for (auto it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Compile shaders
     it->second->compileShaders();
     it->second->createShaders();

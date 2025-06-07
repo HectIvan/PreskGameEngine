@@ -272,54 +272,6 @@ ShaderTest::onUpdate()
 void
 ShaderTest::onRender()
 {
-  // screen clear color
-  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
-  // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& renderManager = g_RenderManager().instance();
-  /**
-   * Normal Render.
-   */
-  // clear the render targets
-  // to do: change this to the render targets created in the renderer
-  SPtr<Pass> currentPass = renderManager.getPass(kP_Base);
-  api.clearRenderTargetView(clearColor, api.getSwapChain()->getBuffer(0));//  renderManager.getGBuffer(kGB_Albedo));
-  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Normal));
-  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Base));
-  
-  // set the render targets
-  api.setRenderTarget(api.getSwapChain()->getBuffer(0),
-                      renderManager.getDepthBuffer(kDB_Base));
-
-  // set the base pass for the first rendering stage
-  api.setPSShader(currentPass->getPShader());
-  api.setVSShader(currentPass->getVShader());
-  api.setSampler(currentPass->getSamplerState());
-  
-  // set constant buffers for the pixel and vertex shaders
-  renderManager.PSSetConstantBuffers(currentPass->getCBuffers());
-  renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
-  // render the objects
-  renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-
-  // /**
-  //  * Deferred render test
-  //  */
-  // // get the current pass
-  // currentPass = renderManager.getPass(kP_Test);
-  // // clear the back buffer
-  // api.clearRenderTargetView(clearColor, api.getSwapChain()->getBuffer(0));
-  // // set the back buffer as render target
-  // api.setRenderTarget(api.getSwapChain()->getBuffer(0));
-  // // set the shaders needed
-  // api.setVSShader(currentPass->getVShader());
-  // api.setPSShader(currentPass->getPShader());
-  // api.setSampler(currentPass->getSamplerState());
-  // // set the resources for the render
-  // api.setShaderResourceView(renderManager.getGBuffer(kGB_Albedo));
-  // // draw in deferred
-  // api.draw(3, 0);
-
   // update the user interface
   uInterfaceUpdate();
 }

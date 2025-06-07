@@ -14,18 +14,18 @@ float g_intensity;
 
 struct PS_INPUT
 {
-    float4 Position : SV_Position;
-    float2 TextCoord : TEXCOORD0;
+  float4 Position : SV_Position;
+  float2 TextCoord : TEXCOORD0;
 };
 
 struct PS_OUTPUT
 {
-    float4 color : SV_Target0;  
+  float4 color : SV_Target0;
 };
 
 float4 getPosition(in float2 uv)
 {
-    return posMap.Sample(samState, uv);
+  return posMap.Sample(samState, uv);
 }
 
 float3 getNormal(in float2 uv)
@@ -95,6 +95,5 @@ float4 PS(PS_INPUT input) : SV_Target0
 
   ao /= (iterations * 4);
   
-
   return 1.0f - ao;
 }

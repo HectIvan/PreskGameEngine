@@ -131,7 +131,9 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a CBuffer.");
   }
-  hr = device->pd3dDevice->CreateBuffer(&bDesc, _pData ? &subData : nullptr, &dxCB->pCBuffer);
+  hr = device->m_pd3dDevice->CreateBuffer(&bDesc,
+                                          _pData ? &subData : nullptr,
+                                          &dxCB->pCBuffer);
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create the constant buffer. Error: " + errMsg);
@@ -158,7 +160,7 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the update of a CBuffer");
   }
-  device->pImmediateContext->UpdateSubresource(dxCB->pCBuffer, 0, nullptr, _pNewData, _size, 0);
+  device->m_pImmediateContext->UpdateSubresource(dxCB->pCBuffer, 0, nullptr, _pNewData, _size, 0);
 }
 
 void
@@ -171,7 +173,7 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the Draw Indexed call");
   }
-  device->pImmediateContext->DrawIndexed(_indexCount,
+  device->m_pImmediateContext->DrawIndexed(_indexCount,
                                          _startIndexLocation,
                                          _baseVertexLocation);
 }
@@ -184,7 +186,7 @@ DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the Draw call");
   }
-  device->pImmediateContext->Draw(_indexCount,
+  device->m_pImmediateContext->Draw(_indexCount,
                                   _startIndexLocation);
 }
 
@@ -196,7 +198,7 @@ DX11GraphicsAPI::dispatch(uint32 _countX, uint32 _countY, uint32 _countZ)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the Dispatch call");
   }
-  device->pImmediateContext->Dispatch(_countX, _countY, _countZ);
+  device->m_pImmediateContext->Dispatch(_countX, _countY, _countZ);
 }
 
 void
@@ -214,7 +216,7 @@ DX11GraphicsAPI::clearRenderTargetView(float _color[], SPtr<Texture> _rtv)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the clearing of the Render TV.");
   }
-  device->pImmediateContext->ClearRenderTargetView(dxRTV->m_rTV, _color);
+  device->m_pImmediateContext->ClearRenderTargetView(dxRTV->m_rTV, _color);
 }
 
 void
@@ -232,7 +234,7 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _depthSV)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the clearing of the depth buffer.");
   }
-  device->pImmediateContext->ClearDepthStencilView(dxDSV->m_dSV,
+  device->m_pImmediateContext->ClearDepthStencilView(dxDSV->m_dSV,
                                                    D3D11_CLEAR_DEPTH,
                                                    _depth,
                                                    0);
@@ -249,10 +251,10 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a pixel shader.");
   }
-  hr = device->pd3dDevice->CreatePixelShader(dxPShader->pSBlob->GetBufferPointer(),
-                                             dxPShader->pSBlob->GetBufferSize(),
-                                             nullptr,
-                                             &dxPShader->pShader);
+  hr = device->m_pd3dDevice->CreatePixelShader(dxPShader->pSBlob->GetBufferPointer(),
+                                               dxPShader->pSBlob->GetBufferSize(),
+                                               nullptr,
+                                               &dxPShader->pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -275,10 +277,10 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the");
   }
-  hr = device->pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
-                                              dxVShader->pSBlob->GetBufferSize(),
-                                              nullptr,
-                                              &dxVShader->pShader);
+  hr = device->m_pd3dDevice->CreateVertexShader(dxVShader->pSBlob->GetBufferPointer(),
+                                                dxVShader->pSBlob->GetBufferSize(),
+                                                nullptr,
+                                                &dxVShader->pShader);
   // check if the creation was successful
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -326,9 +328,9 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   }
   for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++) {
     // try and create the device and swap chain with the current driver type
-    device->pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
+    device->m_pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
     int32 hr = D3D11CreateDeviceAndSwapChain(nullptr,
-                                             *device->pDriverType,
+                                             *device->m_pDriverType,
                                              nullptr,
                                              _createDeviceFlags,
                                              _featureLevels,
@@ -336,9 +338,9 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                              D3D11_SDK_VERSION,
                                              &sd,
                                              &pSwapChain->m_pSch,
-                                             &device->pd3dDevice,
-                                             &device->featureLevel,
-                                             &device->pImmediateContext);
+                                             &device->m_pd3dDevice,
+                                             &device->m_featureLevel,
+                                             &device->m_pImmediateContext);
 
     // if creation was successful
     if (hr == 0x00000000) {
@@ -373,9 +375,9 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of the render targets.");
   }
-  device->pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
-                                                rTVector.data(),
-                                                (pDSV) ? pDSV->m_dSV : nullptr);
+  device->m_pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
+                                                  rTVector.data(),
+                                                  (pDSV) ? pDSV->m_dSV : nullptr);
 }
 
 void
@@ -390,9 +392,9 @@ DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthS
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of the render target.");
   }
-  device->pImmediateContext->OMSetRenderTargets(1,
-                                                &rTarget->m_rTV,
-                                                (pDSV) ? pDSV->m_dSV : nullptr);
+  device->m_pImmediateContext->OMSetRenderTargets((rTarget) ? 1 : 0,
+                                                  (rTarget) ?  &rTarget->m_rTV : nullptr,
+                                                  (pDSV) ? pDSV->m_dSV : nullptr);
 }
 
 SPtr<SamplerState>
@@ -415,7 +417,7 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the sampler state creation.");
   }
-  int32 hr = device->pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->m_pSampler);
+  int32 hr = device->m_pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->m_pSampler);
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a sampler state. Error: " + errMsg);
@@ -443,9 +445,9 @@ DX11GraphicsAPI::createDepthStencilView(SPtr<Texture> _depthRT)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the depth stencil view creation.");
   }
-  hr = device->pd3dDevice->CreateDepthStencilView(dxDepthTx->m_t2d,
-                                                  &descDSV,
-                                                  &pDepthSView->pDepthSV);
+  hr = device->m_pd3dDevice->CreateDepthStencilView(dxDepthTx->m_t2d,
+                                                    &descDSV,
+                                                    &pDepthSView->pDepthSV);
   // if the creation was not succesful
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -471,7 +473,7 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of the viewport.");
   }
-  device->pImmediateContext->RSSetViewports(1, &vp);
+  device->m_pImmediateContext->RSSetViewports(1, &vp);
   // world = Matrix4::IDENTITY;
 }
 
@@ -489,7 +491,7 @@ DX11GraphicsAPI::setPSShader(SPtr<Shader> _pShader)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a pixel shader.");
   }
-  device->pImmediateContext->PSSetShader(dxPShader->pShader, nullptr, 0);
+  device->m_pImmediateContext->PSSetShader(dxPShader->pShader, nullptr, 0);
 }
 
 void
@@ -506,7 +508,7 @@ DX11GraphicsAPI::setVSShader(SPtr<Shader> _pShader)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader.");
   }
-  device->pImmediateContext->VSSetShader(dxVShader->pShader, nullptr, 0);
+  device->m_pImmediateContext->VSSetShader(dxVShader->pShader, nullptr, 0);
 }
 
 SPtr<BlendState>
@@ -535,7 +537,7 @@ DX11GraphicsAPI::createBlendState()
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a blend state.");
   }
-  int32 hr = device->pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
+  int32 hr = device->m_pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
 
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -559,7 +561,7 @@ DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a blend state.");
   }
-  device->pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
+  device->m_pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
 }
 
 void
@@ -691,11 +693,11 @@ DX11GraphicsAPI::createInputLayoutFromVShader(SPtr<Shader> _pShader)
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of an input layout.");
   }
-  device->pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
-                                        static_cast<uint32>(inputLayoutDesc.size()),
-                                        dxVShader->pSBlob->GetBufferPointer(),
-                                        dxVShader->pSBlob->GetBufferSize(),
-                                        &pLayout->pVertexLayout);
+  device->m_pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
+                                          static_cast<uint32>(inputLayoutDesc.size()),
+                                          dxVShader->pSBlob->GetBufferPointer(),
+                                          dxVShader->pSBlob->GetBufferSize(),
+                                          &pLayout->m_pVertexLayout);
   if (!pLayout) {
     g_Logger().print("Failed to create the input layout.");
     return nullptr;
@@ -755,11 +757,11 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of an input layout.");
   }
-  hr = device->pd3dDevice->CreateInputLayout(dxLayout.data(),
-                                             static_cast<uint32>(dxLayout.size()),
-                                             dxVShader->pSBlob->GetBufferPointer(),
-                                             dxVShader->pSBlob->GetBufferSize(),
-                                             &pInputL->pVertexLayout);
+  hr = device->m_pd3dDevice->CreateInputLayout(dxLayout.data(),
+                                               static_cast<uint32>(dxLayout.size()),
+                                               dxVShader->pSBlob->GetBufferPointer(),
+                                               dxVShader->pSBlob->GetBufferSize(),
+                                               &pInputL->m_pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
@@ -785,7 +787,7 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex CBuffer.");
   }
-  device->pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
+  device->m_pImmediateContext->VSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void
@@ -804,7 +806,7 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a pixel CBuffer.");
   }
-  device->pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
+  device->m_pImmediateContext->PSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void
@@ -823,7 +825,7 @@ DX11GraphicsAPI::CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a compute CBuffer.");
   }
-  device->pImmediateContext->CSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
+  device->m_pImmediateContext->CSSetConstantBuffers(_startSlot, _numBuffers, &dxCB->pCBuffer);
 }
 
 void
@@ -844,7 +846,7 @@ DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
 {
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   D3D11_VIEWPORT viewport;
-  device->pImmediateContext->RSGetViewports(&_vpPos, &viewport);
+  device->m_pImmediateContext->RSGetViewports(&_vpPos, &viewport);
   
   return Vector2(viewport.Width, viewport.Height);
 }
@@ -865,7 +867,7 @@ DX11GraphicsAPI::setSampler(SPtr<SamplerState> _pSamLinear,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a sampler.");
   }
-  device->pImmediateContext->PSSetSamplers(_startSlot,
+  device->m_pImmediateContext->PSSetSamplers(_startSlot,
                                            _numSamplers,
                                            &dxSS->m_pSampler);
 }
@@ -886,7 +888,7 @@ DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a shader resource view.");
   }
-  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->m_srv);
+  device->m_pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -904,9 +906,10 @@ DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture,
   // set the shader resource view 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a pixel shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a pixel " \
+                     "shader resource view.");
   }
-  device->pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->m_srv);
+  device->m_pImmediateContext->PSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -924,9 +927,10 @@ DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture,
   // set the shader resource view 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader" \
+                     "resource view.");
   }
-  device->pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->m_srv);
+  device->m_pImmediateContext->VSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 void
@@ -946,7 +950,7 @@ DX11GraphicsAPI::CSSetShaderResourceView(SPtr<Texture> _pTexture,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a compute shader resource view.");
   }
-  device->pImmediateContext->CSSetShaderResources(_start, _numViews, &dxTX->m_srv);
+  device->m_pImmediateContext->CSSetShaderResources(_start, _numViews, &dxTX->m_srv);
 }
 
 SPtr<Texture>
@@ -1002,7 +1006,7 @@ DX11GraphicsAPI::createTextureFromFile(String& _fileName,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a texture.");
   }
-  device->pImmediateContext->UpdateSubresource(dxTX->m_t2d, 0, nullptr, data, pitch, 0);
+  device->m_pImmediateContext->UpdateSubresource(dxTX->m_t2d, 0, nullptr, data, pitch, 0);
 
   // free the texture data if there's data to release
   if (data) { stbi_image_free(data); }
@@ -1051,6 +1055,9 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
 
   // create the texture
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
+  tex->width = _width;
+  tex->height = _height;
+
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -1058,6 +1065,8 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
   }
   // hresult
   int32 hr = 0;
+  // create the texture
+  hr = device->m_pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
   /**
    * Set shader resource.
    */
@@ -1070,15 +1079,13 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-    // create the texture
-    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
     // if texture creation failed
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a texture. Error: " + errMsg);
     }
     // create the shader resource view
-    hr = device->pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_srv);
+    hr = device->m_pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_srv);
     // if failed to create shader resource view
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
@@ -1105,7 +1112,7 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     descDepth.MiscFlags = 0;
 
     // create the texture
-    hr = device->pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->m_t2d);
+    hr = device->m_pd3dDevice->CreateTexture2D(&descDepth, nullptr, &tex->m_t2d);
     if (!tex->m_t2d) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create the depth stencil. Error: " + errMsg);
@@ -1117,7 +1124,7 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
 
-    device->pd3dDevice->CreateDepthStencilView(tex->m_t2d, &dsvDesc, &tex->m_dSV);
+    device->m_pd3dDevice->CreateDepthStencilView(tex->m_t2d, &dsvDesc, &tex->m_dSV);
   }
   /**
    * Set render target
@@ -1130,14 +1137,12 @@ DX11GraphicsAPI::createTexture(unsigned char* _data,
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
 
-    // create the render target texture
-    hr = device->pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create RT texture. Error: " + errMsg);
     }
     // create the render target itself
-    hr = device->pd3dDevice->CreateRenderTargetView(tex->m_t2d, &rtvDesc, &tex->m_rTV);
+    hr = device->m_pd3dDevice->CreateRenderTargetView(tex->m_t2d, &rtvDesc, &tex->m_rTV);
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);
@@ -1160,9 +1165,21 @@ DX11GraphicsAPI::setInputLayout(SPtr<InputLayout> _pInputLayout)
 {
   // reinterpret to a DirectX input layout
   SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
-  if (!dxIL) { g_Logger().print("Failed to set the input layout."); }
-  // set the device
-  dxIL->set(m_pDevice);
+  // if the input layout itself is null, send no warning message
+  if (!_pInputLayout) {}
+  // if the layout is not null but failed to reinterpret
+  else if (!dxIL) { g_Logger().print("Failed to set the input layout."); }
+  // get the dx11 device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to get the DirectX device when setting an input layout.");
+    return;
+  }
+  // get the dx11 input layout
+  auto inputLayout = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
+  // set the input layout
+  device->m_pImmediateContext->IASetInputLayout((inputLayout) ? inputLayout->m_pVertexLayout : 
+                                                                nullptr);
 }
 
 SPtr<VertexBuffer>
@@ -1194,7 +1211,7 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of a vertex buffer.");
   }
-  int32 hr = device->pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
+  int32 hr = device->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("Failed to create a vertex buffer. Error: " + errMsg);
@@ -1223,7 +1240,7 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex buffer.");
   }
-  device->pImmediateContext->IASetVertexBuffers(_start,
+  device->m_pImmediateContext->IASetVertexBuffers(_start,
                                                 _bufferCount,
                                                 &dxVB->pBuffer,
                                                 &stride,
@@ -1258,7 +1275,7 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the creation of an index buffer.");
   }
-  int32 hr = device->pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
+  int32 hr = device->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
   if (FAILED(hr)) {
     String errMsg = g_Logger().getMessageError(hr);
     g_Logger().print("failed to create an index buffer. Error: " + errMsg);
@@ -1282,7 +1299,7 @@ DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of an index buffer.");
   }
-  device->pImmediateContext->IASetIndexBuffer(dxIB->pBuffer,
+  device->m_pImmediateContext->IASetIndexBuffer(dxIB->pBuffer,
                                               static_cast<DXGI_FORMAT>(_format),
                                               _offset);
 }

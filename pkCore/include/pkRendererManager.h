@@ -103,6 +103,14 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   getGBuffers();
 
   /**
+   * @brief Get all buffers of the types inserted.
+   * @param _types Types to search for.
+   * @return Vector of G-Buffers.
+   */
+  Vector<SPtr<Texture>>
+  getGBuffers(G_BUFFERS::E _types);
+
+  /**
    * @brief Get a specific Depth buffer.
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
@@ -159,8 +167,8 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
  public:
 
   // render targets
-  Map<G_BUFFERS::E, SPtr<Texture>> m_gBuffers;
-  Map<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
+  UMap<G_BUFFERS::E, SPtr<Texture>> m_gBuffers;
+  UMap<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
   // SPtr<Texture> m_pRTargetView;
   // SPtr<Texture> m_pNormalRT;
   // SPtr<Texture> m_pDepthRT;
@@ -169,7 +177,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // SPtr<DepthStencilView> m_pDepthSView;
 
   // passes
-  Map<PASS_TYPE::E, SPtr<Pass>> m_passes;
+  UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;
 
   // shadows
   SPtr<Texture> m_pShadowDepth;

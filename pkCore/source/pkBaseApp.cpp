@@ -12,6 +12,16 @@
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
 
+using pkEngineSDK::PASS_TYPE::kP_AO;
+using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_Shadow;
+using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_Test;
+using pkEngineSDK::D_BUFFERS::kDB_Base;
+using pkEngineSDK::D_BUFFERS::kDB_Shadow;
+using pkEngineSDK::G_BUFFERS::kGB_Albedo;
+using pkEngineSDK::G_BUFFERS::kGB_Normal;
+
 namespace pkEngineSDK
 {
 
@@ -147,6 +157,55 @@ BaseApp::messageLoop()
 void
 BaseApp::render()
 {
+  // screen clear color
+  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& renderManager = g_RenderManager().instance();
+  /**
+   * Normal Render.
+   */
+   // clear the render targets
+   // to do: change this to the render targets created in the renderer
+  SPtr<Pass> currentPass = renderManager.getPass(kP_Base);
+  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Albedo));
+  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Normal));
+  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Base));
+
+  // set the render targets
+  api.setRenderTargets(renderManager.getGBuffers(),
+    renderManager.getDepthBuffer(kDB_Base));
+  api.setInputLayout(currentPass->getInputLayout());
+  // set the base pass for the first rendering stage
+  api.setPSShader(currentPass->getPShader());
+  api.setVSShader(currentPass->getVShader());
+  api.setSampler(currentPass->getSamplerState());
+
+  // set constant buffers for the pixel and vertex shaders
+  renderManager.PSSetConstantBuffers(currentPass->getCBuffers());
+  renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
+  // render the objects
+  renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  api.setRenderTarget(nullptr);
+
+  /**
+   * Deferred render test
+   */
+   // get the current pass
+  currentPass = renderManager.getPass(kP_Test);
+  // clear the back buffer
+  api.clearRenderTargetView(clearColor, api.getSwapChain()->getBuffer(0));
+  // set the back buffer as render target
+  api.setRenderTarget(api.getSwapChain()->getBuffer(0));
+  api.setInputLayout(nullptr);
+  // set the shaders needed
+  api.setVSShader(currentPass->getVShader());
+  api.setPSShader(currentPass->getPShader());
+  api.setSampler(currentPass->getSamplerState());
+  // set the resources for the render
+  api.PSSetShaderResourceView(renderManager.getGBuffer(kGB_Albedo));
+  // draw in deferred
+  api.draw(3, 0);
   // Scene specific app render
   onRender();
   // Present the final result to the screen

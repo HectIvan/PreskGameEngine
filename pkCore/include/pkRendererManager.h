@@ -68,10 +68,11 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   virtual ~RendererManager() = default;
 
   /**
-   * @brief Initialize the render manager
+   * @brief Initialize the render manager.
+   * @param _clientRect The size of the client rect.
    */
   void
-  init(Window& _window);
+  init(const Vector2& _clientRect);
 
   /**
    * @brief Create the passes needed for the renderer.
@@ -108,7 +109,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @return Vector of G-Buffers.
    */
   Vector<SPtr<Texture>>
-  getGBuffers(G_BUFFERS::E _types);
+  getGBuffers(const G_BUFFERS::E _types);
 
   /**
    * @brief Get a specific Depth buffer.
@@ -116,7 +117,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @return Pointer to the buffer.
    */
   SPtr<Texture>
-  getDepthBuffer(D_BUFFERS::E _type);
+  getDepthBuffer(const D_BUFFERS::E _type);
 
   /**
    * @brief Compile the shaders of all passes.
@@ -169,12 +170,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // render targets
   UMap<G_BUFFERS::E, SPtr<Texture>> m_gBuffers;
   UMap<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
-  // SPtr<Texture> m_pRTargetView;
-  // SPtr<Texture> m_pNormalRT;
-  // SPtr<Texture> m_pDepthRT;
-
-  // depth stencil
-  // SPtr<DepthStencilView> m_pDepthSView;
 
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;

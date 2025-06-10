@@ -19,6 +19,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkColor.h"
 
@@ -203,7 +204,7 @@ class PK_CORE_EXPORT Texture
  public:
   uint32 id;
   TEXTURE_TYPE::E type;
-  String path;
+  Path path;
   uint32 width;
   uint32 height;
 };

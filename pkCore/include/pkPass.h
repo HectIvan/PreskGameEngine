@@ -29,14 +29,8 @@ namespace pkEngineSDK
 class Pass
 {
 public:
-  Pass() = default;
+  Pass();
   virtual ~Pass() = default;
-
-  /**
-   * @brief Create the pass, creating all shaders, layouts and samplers.
-   */
-  void
-  create();
 
   /**
    * @brief Create the vertex shader input layout.
@@ -65,44 +59,22 @@ public:
   getSamplerState() { return m_pSamplerState; }
 
   /**
-   * @brief Set the data for the compilation of the vertex shader.
-   *        used for when we need to recompile, so that the parameters dont
-   *        need to be sent every time.
+   * @brief Create the vertex shader.
    */
   void
-  setVSData(WString _fileName, const char* _entryPoint, const char* _model);
+  createVShader(const WString _directory, const char* _entry, const char* _sModel);
 
   /**
-   * @brief Set the data for the compilation of the pixel shader.
-   *        used for when we need to recompile, so that the parameters dont
-   *        need to be sent every time.
+   * @brief Create the pixel shader.
    */
   void
-  setPSData(WString _fileName, const char* _entryPoint, const char* _model);
-
-  /**
-   * @brief Create the shaders from their blobs
-   */
-  void
-  createShaders();
+  createPShader(const WString _directory, const char* _entry, const char* _sModel);
 
   /**
    * @brief Compile both pixel and vertex shaders;
    */
   void
   compileShaders();
-
-  /**
-   * @brief Compile the Vertex Shader.
-   */
-  void
-  compileVShader();
-
-  /**
-   * @brief Compile the Pixel Shader.
-   */
-  void
-  compilePShader();
 
   /**
    * @brief Get the vertex shader.
@@ -126,7 +98,7 @@ public:
    * @return Pointer to the buffer
    */
   SPtr<ConstantBuffer>
-  createCBuffer(uint32 _size, const void* _data, uint32 _usage);
+  createCBuffer(SIZE_T _size, const void* _data = nullptr, uint32 _usage = 0);
 
   /**
    * @brief Get the constant buffer vector.
@@ -154,25 +126,14 @@ public:
   /**
    * Shader pointers
    */
-  SPtr<Shader> m_pVShader = nullptr;
+  SPtr<Shader> m_pVShader;
   SPtr<Shader> m_pPShader;
 
   SPtr<InputLayout> m_pInputLayout;
   SPtr<SamplerState> m_pSamplerState;
 
-  /**
-   * Data used to compile shaders
-   */
-  WString m_PShaderDirectory;
-  WString m_VShaderDirectory;
-
   // constant buffers for the shaders.
   Vector<SPtr<ConstantBuffer>> m_cBuffers;
 
-  const char* m_PSEntryPoint;
-  const char* m_VSEntryPoint;
-
-  const char* m_PSModel;
-  const char* m_VSModel;
 };
 }

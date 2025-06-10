@@ -91,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -131,7 +131,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -174,10 +174,12 @@
     <ClInclude Include="include\pkCollisionInfo.h" />
     <ClInclude Include="include\pkColor.h" />
     <ClInclude Include="include\pkCube.h" />
+    <ClInclude Include="include\pkFileSystem.h" />
     <ClInclude Include="include\pkMath.h" />
     <ClInclude Include="include\pkMatrix4.h" />
     <ClInclude Include="include\pkModule.h" />
     <ClInclude Include="include\pkOBB.h" />
+    <ClInclude Include="include\pkPath.h" />
     <ClInclude Include="include\pkPlane.h" />
     <ClInclude Include="include\pkPlatformDefines.h" />
     <ClInclude Include="include\pkPlatformMath.h" />

@@ -59,8 +59,7 @@ class Mesh
   Mesh(Vector<SimpleVertex> _vertex,
          Vector<uint32> _index,
          uint32 _vertexCount,
-         uint32 _numIndex,
-         Vector<Texture*> _textures);
+         uint32 _numIndex);
 
   /**
   * Clean the mesh of any data

@@ -32,12 +32,12 @@ SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene);
 
 void
-Model::load(String& _path)
+Model::load(Path& _path)
 {
-  indexB = nullptr;
-  vertexB = nullptr;
+  m_indexB = nullptr;
+  m_vertexB = nullptr;
 
-  String modelPath = _path;
+  String modelPath = _path.toString();
   path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality |
@@ -124,12 +124,16 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
     meshProcess->material = make_shared<Material>();
     String meshName = _mesh->mName.C_Str();
-    meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
-    meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
-    meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
-    meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
-    meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
-                                                       "textures/default/"));
+    Path texPath("textures/default/FlatDiff.png");
+    meshProcess->material->setDiffuse(tm.loadTexture(texPath));
+    texPath = Path("textures/default/FlatNormal.png");
+    meshProcess->material->setNormal(tm.loadTexture(texPath));
+    texPath = Path("textures/default/FlatAO.png");
+    meshProcess->material->setOcclusion(tm.loadTexture(texPath));
+    texPath = Path("textures/default/FlatHeight.png");
+    meshProcess->material->setHeight(tm.loadTexture(texPath));
+    texPath = Path("textures/default/FlatMetallic.png");
+    meshProcess->material->setMetallic(tm.loadTexture(texPath));
 
     uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     // if no diffuse texture is found.
@@ -141,8 +145,9 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     for (uint32 i = 0; i < diffCount; ++i) {
       aiString path;
       // diffuse texture loading.
+      Path newPath(path.C_Str());
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
+        meshProcess->material->setDiffuse(tm.loadTexture(newPath));
       }
     }
 
@@ -152,7 +157,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       aiString path;
       // diffuse texture loading.
       if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
+        Path newPath(path.C_Str());
+        meshProcess->material->setNormal(tm.loadTexture(newPath));
       }
     } 
     // materialA->GetTexture(aiTextureType_DIFFUSE);
@@ -247,11 +253,9 @@ Model::clean()
   meshes.clear();
   boneCounter = 0;
 
-  vertexB = make_shared<VertexBuffer>();
-  indexB = make_shared<IndexBuffer>();
+  m_vertexB = make_shared<VertexBuffer>();
+  m_indexB = make_shared<IndexBuffer>();
 
   material = Material();
-
-  path = "";
 }
 }

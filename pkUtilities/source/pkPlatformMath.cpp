@@ -14,11 +14,12 @@
 * Includes
 **/
 /*********************************************/
-#include "cmath"
 #include "pkPlatformMath.h"
 #include "pkVector4.h"
 #include "pkMatrix4.h"
 
+#include <cmath>
+#include <algorithm>
 /*
 using std::abs;
 using std::pow;
@@ -125,15 +126,15 @@ PlatformMath::clamp(const float _t, const float _x, const float _y)
   if (t < _x) { t = _x; }
   if (t > _y) { t = _y; }
   return t;
-}
+} 
 
 Vector3
 PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)
 {
   Vector3 vec = _t;
-  vec.x = std::clamp(vec.x, _x, _y);
-  vec.y = std::clamp(vec.y, _x, _y);
-  vec.z = std::clamp(vec.z, _x, _y);
+  vec.x = std::ranges::clamp(vec.x, _x, _y);
+  vec.y = std::ranges::clamp(vec.y, _x, _y);
+  vec.z = std::ranges::clamp(vec.z, _x, _y);
   return vec;
 }
 

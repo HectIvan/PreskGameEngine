@@ -17,15 +17,12 @@ namespace pkEngineSDK
 {
 
   // to do: change albedoRTV to a correct semantic
-void RendererManager::init(Window& _window)
+void RendererManager::init(const Vector2& _clientRect)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
 
-  uint32 winHeight = static_cast<uint32>(_window.getClientWidthHeight().y);
-  uint32 winWidth = static_cast<uint32>(_window.getClientWidthHeight().x);
-
-  // uint32 winHeight = _window.getHeight();
-  // uint32 winWidth = _window.getWidth();
+  uint32 winHeight = static_cast<uint32>(_clientRect.y);
+  uint32 winWidth = static_cast<uint32>(_clientRect.x);
 
   SPtr<Texture> albedoRTV = api.createTexture(nullptr,
                                               4,
@@ -89,24 +86,20 @@ RendererManager::createPasses()
    * Create the base pass.
    ***************************************************************************/
   SPtr<Pass> basePass = make_shared<Pass>();
-  // create all pointers
-  basePass->create();
   // set the data for the shaders to be compiled, and compile.
-  basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
-  basePass->compileShaders();
-  basePass->createShaders();
+  basePass->createVShader(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
+  basePass->createPShader(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
   // create the vertex shader input layout && sampler state.
   basePass->createInputLayout();
   basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
 
   // constant buffers
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
+  basePass->createCBuffer(sizeof(CBView));
+  basePass->createCBuffer(sizeof(CBProjection));
+  basePass->createCBuffer(sizeof(CBTransform));
+  basePass->createCBuffer(sizeof(CBLight));
+  basePass->createCBuffer(sizeof(CBCamera));
 
   g_GraphicAPI().setInputLayout(basePass->getInputLayout());
   // insert to the pass map.
@@ -116,19 +109,15 @@ RendererManager::createPasses()
    * Shadow Pass
    ***************************************************************************/
   SPtr<Pass> shadowPass = make_shared<Pass>();
-  // create all pointers
-  shadowPass->create();
-  shadowPass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  shadowPass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
-  shadowPass->compileShaders();
-  shadowPass->createShaders();
+  shadowPass->createVShader(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
+  shadowPass->createPShader(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
 
   // create constant buffers
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
+  shadowPass->createCBuffer(sizeof(CBView));
+  shadowPass->createCBuffer(sizeof(CBProjection));
+  shadowPass->createCBuffer(sizeof(CBTransform));
+  shadowPass->createCBuffer(sizeof(CBLight));
+  shadowPass->createCBuffer(sizeof(CBCamera));
 
   shadowPass->createInputLayout();
   shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
@@ -139,16 +128,12 @@ RendererManager::createPasses()
    * Ambient Occlussion Pass
    ***************************************************************************/
   SPtr<Pass> AOPass = make_shared<Pass>();
-  // create all pointers
-  AOPass->create();
   // set and compile shaders
-  AOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
-  AOPass->compileShaders();
-  AOPass->createShaders();
+  AOPass->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  AOPass->createPShader(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
 
   // create the buffers needed (reminder to remember the order in which they are created)
-  AOPass->createCBuffer(static_cast<uint32>(sizeof(CBAOData)), nullptr, 0);
+  AOPass->createCBuffer(static_cast<uint32>(sizeof(CBAOData)));
 
   AOPass->createInputLayout();
   AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
@@ -159,18 +144,14 @@ RendererManager::createPasses()
    * Shadow Deferred pass
    ***************************************************************************/
   SPtr<Pass> shadowDef = make_shared<Pass>();
-  // create all pointers
-  shadowDef->create();
   // set and compile shaders
-  shadowDef->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  shadowDef->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
-  shadowDef->compileShaders();
-  shadowDef->createShaders();
+  shadowDef->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  shadowDef->createPShader(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
 
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // light camera
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // main camera
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // light transform
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // camera transform
+  shadowDef->createCBuffer(sizeof(CBCamera)); // light camera
+  shadowDef->createCBuffer(sizeof(CBCamera)); // main camera
+  shadowDef->createCBuffer(sizeof(Matrix4)); // light transform
+  shadowDef->createCBuffer(sizeof(Matrix4)); // camera transform
 
   shadowDef->createInputLayout();
   shadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
@@ -181,13 +162,9 @@ RendererManager::createPasses()
    * Test pass
    ***************************************************************************/
   SPtr<Pass> testPass = make_shared<Pass>();
-  // create all pointers
-  testPass->create();
   // set and compile shaders
-  testPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  testPass->setPSData(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
-  testPass->compileShaders();
-  testPass->createShaders();
+  testPass->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
+  testPass->createPShader(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
 
   testPass->createInputLayout();
   testPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
@@ -220,7 +197,7 @@ RendererManager::getGBuffers()
 }
 
 Vector<SPtr<Texture>>
-RendererManager::getGBuffers(G_BUFFERS::E _types)
+RendererManager::getGBuffers(const G_BUFFERS::E _types)
 {
   Vector<SPtr<Texture>> textures;
 
@@ -236,7 +213,7 @@ RendererManager::getGBuffers(G_BUFFERS::E _types)
 }
 
 SPtr<Texture>
-RendererManager::getDepthBuffer(D_BUFFERS::E _type)
+RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
   return m_depthBuffers.find(_type)->second;
 }
@@ -247,7 +224,6 @@ RendererManager::compileShaders()
   for (auto it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Compile shaders
     it->second->compileShaders();
-    it->second->createShaders();
     g_Logger().print("recompiled shaders.");
   }
 }
@@ -288,8 +264,8 @@ RendererManager::setActorsBuffers()
     SPtr<Actor> actor = sm.getActiveScene()->getActor(i);
     // if the actor has a model component
     if (actor->getComponent<Model>()) {
-      api.setVertexBuffer(actor->getComponent<Model>()->vertexB);
-      api.setIndexBuffer(actor->getComponent<Model>()->indexB);
+      api.setVertexBuffer(actor->getComponent<Model>()->m_vertexB);
+      api.setIndexBuffer(actor->getComponent<Model>()->m_indexB);
     }
   }
 }
@@ -339,8 +315,8 @@ RendererManager::renderModel(Model& _model)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // get a reference from the api
-  api.setVertexBuffer(_model.vertexB);
-  api.setIndexBuffer(_model.indexB);
+  api.setVertexBuffer(_model.m_vertexB);
+  api.setIndexBuffer(_model.m_indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;

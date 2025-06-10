@@ -27,15 +27,6 @@
 namespace pkEngineSDK
 {
 
-/**
- * Memory structures used to store already loaded data and call it when needed.
- */
-struct ModelMemory
-{
-  String name;
-  SPtr<Model> model;
-};
-
 class Camera;
 
 class PK_CORE_EXPORT BaseApp
@@ -101,21 +92,6 @@ class PK_CORE_EXPORT BaseApp
   virtual void
   onRender() {}
 
-  /**
-   * @brief Create a material from a texture.
-   * @return The material pointer.
-   */
-  SPtr<Material>
-  createMaterial();
-
-  /**
-   * @brief Create a new model component.
-   * @param _modelName Name of the model file to load.
-   * @return Pointer to the new model object.
-   */
-  SPtr<Model>
-  newModel(String _modelName = "");
-
  public:
   // system
   Window m_window;
@@ -136,8 +112,6 @@ class PK_CORE_EXPORT BaseApp
    * its found, the loaded object will be returned, instead of loading it again.
    */
 
-   // to do: transfer this to a resource manager
-  Vector<SPtr<ModelMemory>> m_models;
   bool m_vSync;
 };
 }

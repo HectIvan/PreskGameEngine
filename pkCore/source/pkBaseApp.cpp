@@ -28,34 +28,6 @@ namespace pkEngineSDK
 void
 run(String _name, Window& _window);
 
-SPtr<Material>
-BaseApp::createMaterial()
-{
-  return g_ResourceManager().newMaterial();
-}
-
-// to do: transfer this to a resource manager
-SPtr<Model>
-BaseApp::newModel(String _modelName)
-{
-  // search if the model has been stored before
-  for (uint32 i = 0; i < m_models.size(); ++i) {
-    if (m_models[i]->name == _modelName) {
-      return m_models[i]->model;
-    }
-  }
-  // load the model.
-  SPtr<Model> model = g_ResourceManager().loadModel(_modelName);
-  // insetr the new model to the model memory.
-  SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
-  newModelMem->name = _modelName;
-  newModelMem->model = model;
-  m_models.push_back(newModelMem);
-
-  // return the model
-  return model;
-}
-
 /*********************************************/
 /**
 * Definitions.
@@ -77,7 +49,7 @@ BaseApp::init(const char** _argv, int32 _count)
 
   g_SceneManager().init();
 
-  g_RenderManager().init(m_window);
+  g_RenderManager().init(m_window.getClientWidthHeight());
   onInit();
 }
 
@@ -165,6 +137,7 @@ BaseApp::render()
   /**
    * Normal Render.
    */
+  api.setRenderTarget(nullptr);
    // clear the render targets
    // to do: change this to the render targets created in the renderer
   SPtr<Pass> currentPass = renderManager.getPass(kP_Base);
@@ -187,7 +160,6 @@ BaseApp::render()
   // render the objects
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   api.setRenderTarget(nullptr);
-
   /**
    * Deferred render test
    */

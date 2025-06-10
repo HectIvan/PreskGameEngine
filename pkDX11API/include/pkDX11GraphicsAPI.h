@@ -25,6 +25,7 @@
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector4.h"
+#include "pkDX11Shader.h"
 
 
 namespace pkEngineSDK
@@ -79,17 +80,24 @@ class DX11GraphicsAPI : public GraphicsAPI
   setBlendState(SPtr<BlendState> _pBlendState) override;
 
   /**
-   * @brief Create a vertex shader.
-   * @param _pShader Shader to create
+   * @brief Creates a shader of the specific graphic API.
+   * @return API Specific shader.
    */
-  void
+  SPtr<Shader>
+  internalCreateShader() override { return make_shared<DX11Shader>(); }
+
+  /**
+   * @brief Create a vertex shader.
+   * @return Vertex Shader.
+   */
+  SPtr<Shader>
   createVShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Create a pixel shader.
-   * @param _pShader Shader to create
+   * @return Pixel Shader.
    */
-  void
+  SPtr<Shader>
   createPShader(SPtr<Shader> _pShader) override;
 
   /**
@@ -109,13 +117,12 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _szFileName What file we will get.
    * @param _szEntryPoint Main function of the shader.
    * @param _szShaderModel What kind of model is the shader.
-   * @param _pTargetShader Shader to store the data in.
+   * @return Data blob.
    */
-  void
+  void **
   compileShaderFromFile(WString _szFileName,
                         const char* _szEntryPoint,
-                        const char* _szShaderModel,
-                        SPtr<Shader> _pTargetShader) override;
+                        const char* _szShaderModel) override;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -328,13 +335,13 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture from file.
-   * @param _fileName Name of the texture.
+   * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
    * @param _mipLevels If the texture has mip levels.
    * @param _format What format will the texture be.
    */
   SPtr<Texture>
-  createTextureFromFile(String& _fileName,
+  createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) override;
@@ -384,9 +391,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Clear the depth buffer.
+   * @param _pDepthSV Depth stencil to clear.s
    */
   void
-  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) override;
+  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) override;
 
   /**
    * @brief Create the Input Layout.

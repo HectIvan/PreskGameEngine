@@ -21,6 +21,7 @@
 #include "pkInputLayoutDesc.h"
 #include "pkModel.h"
 #include "pkModule.h"
+#include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkRenderTargetView.h"
 #include "pkTexture.h"
@@ -81,17 +82,24 @@ public:
   setBlendState(SPtr<BlendState> _pBlendState) = 0;
 
   /**
-   * @brief Create a vertex shader.
-   * @param _pShader Shader to create
+   * @brief Creates a shader of the specific graphic API.
+   * @return API Specific shader.
    */
-  virtual void
+  virtual SPtr<Shader>
+  internalCreateShader() = 0;
+
+  /**
+   * @brief Create a vertex shader.
+   * @returtn Vertex Shader.
+   */
+  virtual SPtr<Shader>
   createVShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Create a pixel shader.
-   * @param _pShader Shader to create
+   * @return Pixel Shader.
    */
-  virtual void
+  virtual SPtr<Shader>
   createPShader(SPtr<Shader> _pShader) = 0;
 
   /**
@@ -120,13 +128,12 @@ public:
    * @param _szFileName What file we will get.
    * @param _szEntryPoint Main function of the shader.
    * @param _szShaderModel What kind of model is the shader.
-   * @param _pTargetShader Shader to store the data in.
+   * @return Data blob.
    */
-  virtual void
+  virtual void**
   compileShaderFromFile(WString _szFileName,
                         const char* _szEntryPoint,
-                        const char* _szShaderModel,
-                        SPtr<Shader> _pTargetShader) = 0;
+                        const char* _szShaderModel) = 0;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -297,10 +304,10 @@ public:
   /**
    * @brief clear the depth buffer.
    * @param _depth Default depth of the stencil.
-   * @param _depthSV Depth stencil view to clear.
+   * @param _pDepthSV Depth stencil view to clear.
    */
   virtual void
-  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) = 0;
+  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) = 0;
 
   /**
    * @brief Create the Input Layout.
@@ -354,14 +361,14 @@ public:
 
   /**
    * @brief Create a texture from file.
-   * @param _fileName Name of the texture.
+   * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
    * @param _bindFlags Bind flags of the texture.
    * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
-  createTextureFromFile(String& _fileName,
+  createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) = 0;

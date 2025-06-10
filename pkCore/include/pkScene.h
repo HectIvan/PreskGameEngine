@@ -59,7 +59,7 @@ class PK_CORE_EXPORT Scene
    * @return A vector with all the actors.
    */
   Vector<SPtr<Actor>>
-  getAllActors() { return m_actors; }
+  getAllActors() const { return m_actors; }
 
   /**
    * @brief Get the actor in the index of the scene.

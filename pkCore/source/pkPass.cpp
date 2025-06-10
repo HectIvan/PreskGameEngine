@@ -23,11 +23,9 @@
 namespace pkEngineSDK
 {
 
-void
-Pass::create()
-{
-  m_pVShader = make_shared<Shader>();
-  m_pPShader = make_shared<Shader>();
+Pass::Pass() {
+  m_pVShader = g_GraphicAPI().internalCreateShader();
+  m_pPShader = g_GraphicAPI().internalCreateShader();
   m_pInputLayout = make_shared<InputLayout>();
   m_pSamplerState = make_shared<SamplerState>();
 }
@@ -45,61 +43,37 @@ Pass::createSamplerState(uint32 _mode, uint32 _filter)
 }
 
 void
-Pass::setVSData(WString _fileName, const char* _entryPoint, const char* _model)
+Pass::createVShader(const WString _directory, const char* _entry, const char* _sModel)
 {
-  m_VShaderDirectory = _fileName;
-  m_VSEntryPoint = _entryPoint;
-  m_VSModel = _model;
-}
-
-void
-Pass::setPSData(WString _fileName, const char* _entryPoint, const char* _model)
-{
-  m_PShaderDirectory = _fileName;
-  m_PSEntryPoint = _entryPoint;
-  m_PSModel = _model;
-}
-
-void
-Pass::createShaders()
-{
-  // create the shaders
+  m_pVShader->setData(_directory, _entry, _sModel);
+  m_pVShader->compile();
   g_GraphicAPI().createVShader(m_pVShader);
+}
+
+void
+Pass::createPShader(const WString _directory, const char* _entry, const char* _sModel)
+{
+  m_pPShader->setData(_directory, _entry, _sModel);
+  m_pPShader->compile();
   g_GraphicAPI().createPShader(m_pPShader);
 }
 
 void
 Pass::compileShaders()
 {
-  compileVShader();
-  compilePShader();
-}
-
-void
-Pass::compileVShader()
-{
-  g_GraphicAPI().compileShaderFromFile(m_VShaderDirectory,
-                                       m_VSEntryPoint,
-                                       m_VSModel,
-                                       m_pVShader);
-}
-
-void
-Pass::compilePShader()
-{
-  g_GraphicAPI().compileShaderFromFile(m_PShaderDirectory,
-                                       m_PSEntryPoint,
-                                       m_PSModel,
-                                       m_pPShader);
+  m_pVShader->compile();
+  m_pPShader->compile();
 }
 
 SPtr<ConstantBuffer>
-Pass::createCBuffer(uint32 _size, const void* _data, uint32 _usage)
+Pass::createCBuffer(SIZE_T _size, const void* _data, uint32 _usage)
 {
   // get the api
   GraphicsAPI& api = g_GraphicAPI().instance();
   // create the constant buffer with the parameters given
-  SPtr<ConstantBuffer> cb = api.createConstantBuffer(_size, _data, _usage);
+  SPtr<ConstantBuffer> cb = api.createConstantBuffer(static_cast<uint32>(_size),
+                                                     _data,
+                                                     _usage);
   // store into the constant buffer vector
   addToCBuffers(cb);
   // return the pointer

@@ -4,7 +4,9 @@
 #include "pkGraphicTypes.h"
 #include "pkUInterface.h"
 #include "pkLogger.h"
+#include "pkPath.h"
 #include "pkRendererManager.h"
+#include "pkResourceManager.h"
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
@@ -19,6 +21,7 @@ using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
+using pkEngineSDK::g_ResourceManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
@@ -27,12 +30,14 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::Material;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
 using pkEngineSDK::PASS_TYPE::kP_Test;
 using pkEngineSDK::RendererManager;
+using pkEngineSDK::ResourceManager;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
@@ -41,6 +46,9 @@ using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 
+// to do: create fileSystem.h in utilities
+// create class Path
+
 void
 ShaderTest::onInit()
 {
@@ -48,6 +56,7 @@ ShaderTest::onInit()
   UInterface::startUp();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
+  ResourceManager& resourceMan = g_ResourceManager().instance();
 
   m_cameraSpeed = 20.0f;
   m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
@@ -86,10 +95,10 @@ ShaderTest::onInit()
                                       pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
-  pistol->addComponent(newModel("drakefire_pistol_low.obj"));
+  pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
 
   SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
-  sponza->addComponent(newModel("sponza.obj"));
+  sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
   m_shadows = false;
 }
@@ -133,8 +142,6 @@ ShaderTest::input()
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
     g_RenderManager().compileShaders();
   }
-
-  SPtr<Actor> actor = g_SceneManager().getActiveScene()->getActor(0);
 
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {

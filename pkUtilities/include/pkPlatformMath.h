@@ -15,6 +15,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkPrerequisitesUtilities.h"
 #include "pkCollisionInfo.h"
 #include "pkSphere.h"
 #include "pkCube.h"

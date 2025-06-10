@@ -13,30 +13,31 @@ ResourceManager::newMaterial()
   return pMatComp;
 }
 
-SPtr<Texture>
-ResourceManager::newTexture(String _name, String _directory)
-{
-  // create the texture adress.
-  String textureName = _directory + _name;
-  return g_GraphicAPI().createTextureFromFile(textureName, 8, false, 28);
-}
-
 SPtr<Model>
-ResourceManager::loadModel(String& _fileName)
+ResourceManager::loadModel(Path _directory)
 {
-  // create the model path
-  String modelPath = "models/" + _fileName;
+  // search if the model has been stored before
+  for (uint32 i = 0; i < m_models.size(); ++i) {
+    if (m_models[i]->directory.toString() == _directory.toString()) {
+      return m_models[i]->model;
+    }
+  }
+
   // create the model pointer
   SPtr<Model> model = make_shared<Model>();
   // load the model from the path
-  model->load(modelPath);
+  model->load(_directory);
   if (!model->index.empty()) {
     // create the index and vertex buffers
-    model->vertexB = g_GraphicAPI().createVertexBuffer(model->vertex);
-    model->indexB = g_GraphicAPI().createIndexBuffer(model->index);
-    g_GraphicAPI().setIndexBuffer(model->indexB);
-    g_GraphicAPI().setVertexBuffer(model->vertexB);
+    model->m_vertexB = g_GraphicAPI().createVertexBuffer(model->vertex);
+    model->m_indexB = g_GraphicAPI().createIndexBuffer(model->index);
+    g_GraphicAPI().setIndexBuffer(model->m_indexB);
+    g_GraphicAPI().setVertexBuffer(model->m_vertexB);
   }
+  SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
+  newModelMem->directory = _directory;
+  newModelMem->model = model;
+  m_models.push_back(newModelMem);
   // return the final model
   return model;
 }

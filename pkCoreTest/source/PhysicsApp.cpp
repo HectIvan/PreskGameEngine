@@ -1,19 +1,22 @@
-#include <iostream>
-
 #include "PhysicsApp.h"
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkMath.h"
 #include "pkModel.h"
+#include "pkPath.h"
+#include "pkResourceManager.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkVector3.h"
 #include "pkVector2.h"
 
+#include <iostream>
+
 using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_ResourceManager;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
@@ -22,6 +25,8 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
 using pkEngineSDK::uint32;
+using pkEngineSDK::Path;
+using pkEngineSDK::ResourceManager;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::Vector3;
@@ -34,11 +39,12 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
+  ResourceManager& resourceMan = g_ResourceManager().instance();
   SPtr<Actor> anchor = g_SceneManager().getActiveScene()->instantiate();
-  anchor->addComponent(newModel("sprite.fbx"));
+  anchor->addComponent(resourceMan.loadModel(Path("sprite.fbx")));
   
   SPtr<Actor> weight = g_SceneManager().getActiveScene()->instantiate();
-  weight->addComponent(newModel("sprite.fbx"));
+  weight->addComponent(resourceMan.loadModel(Path("sprite.fbx")));
 
   m_spring = make_shared<Spring>();
   m_spring->m_anchor = anchor;
@@ -55,6 +61,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
+  ResourceManager& resourceMan = g_ResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
 
   m_type = PHYSICS_TYPE::kEuler;
@@ -69,7 +76,7 @@ PhysicsApp::onInit()
    */
   m_cannon = std::make_shared<Cannon>();
   m_cannon->m_actor = g_SceneManager().getActiveScene()->instantiate();
-  m_cannon->m_actor->addComponent(newModel("sphere.obj"));
+  // // m_cannon->m_actor->addComponent(newModel("sphere.obj"));
   m_cannon->m_actor->move(Vector3(-0.0f, 0.0f, 0.0f));
   m_cannon->m_actor->setPosition(Vector3(0.0f, 7.0f, 0.0f));
   m_cannon->m_actor->setRotation(0.0f, 0.0f, -1.5708f);
@@ -87,7 +94,7 @@ PhysicsApp::onInit()
     // set the projectile lifetime
     proj->m_lifeTimer = m_projDuration;
     // assign a new model component to the actor.
-    proj->m_actor->addComponent(newModel("sphere.obj"));
+    // proj->m_actor->addComponent(newModel("sphere.obj"));
     // add the actor to the vector of projectiles
     m_projectiles.push_back(proj);
   }
@@ -111,8 +118,9 @@ PhysicsApp::onInit()
   m_ik = make_shared<InverseKinematics>();
   for (uint32 i = 0; i < 20; ++i) {
     SPtr<Actor> ikRoot = g_SceneManager().getActiveScene()->instantiate();
-    ikRoot->addComponent(newModel("sphere.obj"));
-    ikRoot->getComponent<Model>()->getMeshes()[0]->material->setDiffuse(tm.createTexture("blue.png"));
+    ikRoot->addComponent(resourceMan.loadModel(Path("sphere.obj")));
+    ikRoot->getComponent<Model>()->getMeshes()[0]->material->
+                        setDiffuse(tm.loadTexture(Path("blue.png")));
 
     m_ik->insertNodeLocal(Vector3(i * -0.5f, i + g_TimeManager().m_fixedDeltaTime, 0), ikRoot);
 

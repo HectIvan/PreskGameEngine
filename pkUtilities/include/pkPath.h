@@ -10,6 +10,11 @@
  /*****************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkPrerequisitesUtilities.h"
 
 namespace pkEngineSDK
@@ -18,21 +23,33 @@ namespace pkEngineSDK
 class PK_UTILITY_EXPORT Path
 {
  public:
-   Path() = default;
-   Path(const Path&) = default;
-   Path(Path&) = default;
+  Path();
+  Path(const Path&);
+  Path(Path&);
 
-   Path& operator=(const Path&) = default;
+  Path& operator=(const Path&) = default;
 
-   Path(const String& _path) : m_path(_path) {}
+  Path(const String& _path) : m_path(_path) {}
 
-   /**
-    * @brief Gets the path.
-    */
+  virtual ~Path() = default;
+
+  /**
+   * @brief Gets the path.
+   */
   const String&
   getPath() const
   {
     return m_path;
+  }
+
+  /**
+   * @brief Set the path.
+   * @param _path Path to set.
+   */
+  void
+  setPath(String _path)
+  {
+    m_path = _path;
   }
 
   /**

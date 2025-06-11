@@ -383,11 +383,18 @@ class DX11GraphicsAPI : public GraphicsAPI
   dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
 
   /**
+   * @brief Clear all render target views of a vector.
+   * @param _color New render target color.
+   */
+  void
+  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) override;
+
+  /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
    */
   void
-  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) override;
+  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
 
   /**
    * @brief Clear the depth buffer.

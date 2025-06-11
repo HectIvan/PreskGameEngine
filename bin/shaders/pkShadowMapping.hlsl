@@ -42,7 +42,7 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-    float4 diffuse : COLOR0;
+    float4 diffuse : SV_Target0;
 };
 
 float SampleShadow(float3 worldPos)
@@ -53,6 +53,11 @@ float SampleShadow(float3 worldPos)
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
     PS_OUTPUT output = (PS_OUTPUT) 0;
+    float4 shadowTex = shadowMap.Sample(samLinear, input.Tex);
+    float4 depthTex = depthMap.Sample(samLinear, input.Tex);
+    
+    output.diffuse = float4(1, 1, 1, 1) * shadowTex.r;
+    output.diffuse.a = 1;
 
     return output;
 }

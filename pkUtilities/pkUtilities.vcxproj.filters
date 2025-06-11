@@ -40,6 +40,9 @@
     <Filter Include="include\system">
       <UniqueIdentifier>{4c824a7e-aca4-4b01-b376-3ee72279bb40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\system">
+      <UniqueIdentifier>{af2194b7-3563-42d3-aa31-bba8b7a31064}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkModule.h">
@@ -148,6 +151,12 @@
     </ClCompile>
     <ClCompile Include="source\pkColor.cpp">
       <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPath.cpp">
+      <Filter>source\system</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkFileSystem.cpp">
+      <Filter>source\system</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -78,20 +78,20 @@ ShaderTest::onInit()
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3(0.0f, 0.0f, 1.0f);
-  lightCom->LightPos = Vector3(0.0f, -50.0f, 0.0f);
+  lightCom->LightDir = Vector3(0.0f, -1.0f, 0.0f);
+  lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f, 1.0f, 1.0f);
 
   // add camera component
   light->addComponent(make_shared<Camera>());
-  light->getComponent<Camera>()->init(30,
-                                      17,
+  light->getComponent<Camera>()->init(1280,
+                                      720,
                                       3.1416f / 4.0f,
                                       0.01f,
                                       2000.0f,
                                       lightCom->LightPos, // position
-                                      lightCom->LightDir + lightCom->LightPos, // target
-                                      Vector3::UP,
+                                      lightCom->LightDir, // target
+                                      Vector3::FORWARD,
                                       pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
@@ -139,7 +139,7 @@ ShaderTest::input()
     m_lastCursorPos = m_eventQueue.mousePosition;
   }
 
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
+  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) && m_window.m_isFocused) {
     g_RenderManager().compileShaders();
   }
 

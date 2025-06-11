@@ -122,6 +122,20 @@ class Material : public Component
   FORCEINLINE void
   setOcclusion(SPtr<Texture> _pTexture) { occlusion = _pTexture; }
 
+  /**
+   * @brief Set the material name.
+   * @param _name The material name.
+   */
+  void
+  setName(String _name) { m_name = _name; }
+
+  /**
+   * @brief Get the material name.
+   * @return The material name.
+   */
+  String
+  getName() const { return m_name; }
+
  public:
   String m_name;
   bool m_castShadow;

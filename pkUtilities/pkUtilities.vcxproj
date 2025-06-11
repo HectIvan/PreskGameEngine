@@ -197,7 +197,9 @@
     <ClCompile Include="source\pkCapsule.cpp" />
     <ClCompile Include="source\pkColor.cpp" />
     <ClCompile Include="source\pkCube.cpp" />
+    <ClCompile Include="source\pkFileSystem.cpp" />
     <ClCompile Include="source\pkMatrix4.cpp" />
+    <ClCompile Include="source\pkPath.cpp" />
     <ClCompile Include="source\pkPlane.cpp" />
     <ClCompile Include="source\pkPlatformMath.cpp" />
     <ClCompile Include="source\pkQuaternion.cpp" />

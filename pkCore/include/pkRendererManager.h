@@ -37,6 +37,7 @@ namespace G_BUFFERS
   enum E {
     kGB_Albedo = 0,
     kGB_Normal,
+    kGB_Shadow,
   };
 };
 
@@ -69,10 +70,9 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
 
   /**
    * @brief Initialize the render manager.
-   * @param _clientRect The size of the client rect.
    */
   void
-  init(const Vector2& _clientRect);
+  init();
 
   /**
    * @brief Create the passes needed for the renderer.
@@ -93,7 +93,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>
+  SPtr<Texture>&
   getGBuffer(G_BUFFERS::E _type);
 
   /**
@@ -116,7 +116,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>
+  SPtr<Texture>&
   getDepthBuffer(const D_BUFFERS::E _type);
 
   /**

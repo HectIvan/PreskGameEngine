@@ -295,11 +295,18 @@ public:
   CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) = 0;
 
   /**
+   * @brief Clear all render target views of a vector.
+   * @param _color New render target color.
+   */
+  virtual void
+  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) = 0;
+
+  /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
    */
   virtual void
-  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) = 0;
+  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
 
   /**
    * @brief clear the depth buffer.

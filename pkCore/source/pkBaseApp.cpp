@@ -21,6 +21,7 @@ using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
+using pkEngineSDK::G_BUFFERS::kGB_Shadow;
 
 namespace pkEngineSDK
 {
@@ -48,8 +49,7 @@ BaseApp::init(const char** _argv, int32 _count)
   initAPI(_argv, _count);
 
   g_SceneManager().init();
-
-  g_RenderManager().init(m_window.getClientWidthHeight());
+  g_RenderManager().init();
   onInit();
 }
 
@@ -130,24 +130,21 @@ void
 BaseApp::render()
 {
   // screen clear color
-  float clearColor[4] = { 0.0f, 0.123f, 0.3f, 1.0f };
+  Color clearColor = Color(0, 30, 76, 255);
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& renderManager = g_RenderManager().instance();
   /**
-   * Normal Render.
+   * Shadow Render.
    */
-  api.setRenderTarget(nullptr);
    // clear the render targets
-   // to do: change this to the render targets created in the renderer
-  SPtr<Pass> currentPass = renderManager.getPass(kP_Base);
-  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Albedo));
-  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Normal));
-  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Base));
+  SPtr<Pass> currentPass = renderManager.getPass(kP_Shadow);
+  api.clearRenderTargetViews(clearColor, renderManager.getGBuffers());
+  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Shadow));
 
   // set the render targets
   api.setRenderTargets(renderManager.getGBuffers(),
-    renderManager.getDepthBuffer(kDB_Base));
+                       renderManager.getDepthBuffer(kDB_Shadow));
   api.setInputLayout(currentPass->getInputLayout());
   // set the base pass for the first rendering stage
   api.setPSShader(currentPass->getPShader());
@@ -159,6 +156,45 @@ BaseApp::render()
   renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
   // render the objects
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  api.setRenderTarget(nullptr);
+
+  /**
+   * Normal Render.
+   */
+  // clear the render targets
+  currentPass = renderManager.getPass(kP_Base);
+  api.clearRenderTargetViews(clearColor, renderManager.getGBuffers());
+  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Base));
+
+  // set the render targets
+  api.setRenderTargets(renderManager.getGBuffers(),
+                       renderManager.getDepthBuffer(kDB_Base));
+  api.setInputLayout(currentPass->getInputLayout());
+  // set the base pass for the first rendering stage
+  api.setPSShader(currentPass->getPShader());
+  api.setVSShader(currentPass->getVShader());
+  api.setSampler(currentPass->getSamplerState());
+
+  // set constant buffers for the pixel and vertex shaders
+  renderManager.PSSetConstantBuffers(currentPass->getCBuffers());
+  renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
+  // render the objects
+  renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  api.setRenderTarget(nullptr);
+
+  /**
+   * Deferred shadow pass
+   */
+  currentPass = renderManager.getPass(kP_ShadowDef);
+  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Shadow));
+  api.setRenderTarget(renderManager.getGBuffer(kGB_Shadow));
+  api.setInputLayout(nullptr);
+  api.setVSShader(currentPass->getVShader());
+  api.setPSShader(currentPass->getPShader());
+  api.setSampler(currentPass->getSamplerState());
+  api.PSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Shadow));
+  api.PSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Base), 1);
+  api.draw(3, 0);
   api.setRenderTarget(nullptr);
   /**
    * Deferred render test

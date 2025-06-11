@@ -17,13 +17,14 @@ namespace pkEngineSDK
 {
 
   // to do: change albedoRTV to a correct semantic
-void RendererManager::init(const Vector2& _clientRect)
+void RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
 
-  uint32 winHeight = static_cast<uint32>(_clientRect.y);
-  uint32 winWidth = static_cast<uint32>(_clientRect.x);
+  uint32 winHeight = api.getSwapChain()->getHeight();
+  uint32 winWidth = api.getSwapChain()->getWidth();
 
+  
   SPtr<Texture> albedoRTV = api.createTexture(nullptr,
                                               4,
                                               winWidth,
@@ -47,8 +48,20 @@ void RendererManager::init(const Vector2& _clientRect)
                                              kPK_FORMAT_R32G32B32A32_FLOAT);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  // m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
-  // create the main camera depth buffer to store pixel distance from world to main camera.
+  SPtr<Texture> shadowRT = api.createTexture(nullptr,
+                                             4,
+                                             winWidth,
+                                             winHeight,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT,
+                                             kPK_USAGE_DEFAULT,
+                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                             false,
+                                             kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
+
+  // ---------------------------------------------------------- //
+  // DEPTH TARGETS
+  // ---------------------------------------------------------- //
   SPtr<Texture> depthBuffer = api.createTexture(nullptr,
                                                 4,
                                                 winWidth,
@@ -110,7 +123,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   SPtr<Pass> shadowPass = make_shared<Pass>();
   shadowPass->createVShader(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  shadowPass->createPShader(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
+  shadowPass->createPShader(L"shaders/pkPShaderDepth.hlsl", "PS", "ps_5_0");
 
   // create constant buffers
   shadowPass->createCBuffer(sizeof(CBView));
@@ -167,7 +180,7 @@ RendererManager::createPasses()
   testPass->createPShader(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
 
   testPass->createInputLayout();
-  testPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
+  testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
   m_passes.insert({ PASS_TYPE::kP_Test, testPass });
 }
@@ -178,7 +191,7 @@ RendererManager::getPass(PASS_TYPE::E _type)
   return m_passes.find(_type)->second;
 }
 
-SPtr<Texture>
+SPtr<Texture>&
 RendererManager::getGBuffer(G_BUFFERS::E _type)
 {
   return m_gBuffers.find(_type)->second;
@@ -212,7 +225,7 @@ RendererManager::getGBuffers(const G_BUFFERS::E _types)
   return textures;
 }
 
-SPtr<Texture>
+SPtr<Texture>&
 RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
   return m_depthBuffers.find(_type)->second;

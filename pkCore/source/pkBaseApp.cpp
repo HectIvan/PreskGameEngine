@@ -152,8 +152,8 @@ BaseApp::render()
   api.setSampler(currentPass->getSamplerState());
 
   // set constant buffers for the pixel and vertex shaders
-  renderManager.PSSetConstantBuffers(currentPass->getCBuffers());
-  renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
+  renderManager.pSSetConstantBuffers(currentPass->getCBuffers());
+  renderManager.vSSetConstantBuffers(currentPass->getCBuffers());
   // render the objects
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   api.setRenderTarget(nullptr);
@@ -176,9 +176,9 @@ BaseApp::render()
   api.setSampler(currentPass->getSamplerState());
 
   // set constant buffers for the pixel and vertex shaders
-  renderManager.PSSetConstantBuffers(currentPass->getCBuffers());
-  renderManager.VSSetConstantBuffers(currentPass->getCBuffers());
-  // render the objects
+  renderManager.pSSetConstantBuffers(currentPass->getCBuffers());
+  renderManager.vSSetConstantBuffers(currentPass->getCBuffers());
+  // render the actors
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   api.setRenderTarget(nullptr);
 
@@ -192,8 +192,8 @@ BaseApp::render()
   api.setVSShader(currentPass->getVShader());
   api.setPSShader(currentPass->getPShader());
   api.setSampler(currentPass->getSamplerState());
-  api.PSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Shadow));
-  api.PSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Base), 1);
+  api.pSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Shadow));
+  api.pSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Base), 1);
   api.draw(3, 0);
   api.setRenderTarget(nullptr);
   /**
@@ -211,7 +211,7 @@ BaseApp::render()
   api.setPSShader(currentPass->getPShader());
   api.setSampler(currentPass->getSamplerState());
   // set the resources for the render
-  api.PSSetShaderResourceView(renderManager.getGBuffer(kGB_Albedo));
+  api.pSSetShaderResourceView(renderManager.getGBuffer(kGB_Albedo));
   // draw in deferred
   api.draw(3, 0);
   // Scene specific app render

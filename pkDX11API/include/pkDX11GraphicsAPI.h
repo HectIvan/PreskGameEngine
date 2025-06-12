@@ -159,14 +159,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   createSamplerState(const uint32 _mode, const uint32 _filter) override;
 
   /**
-   * @brief Create the depth stencil texture and view.
-   * @param _width Client width.
-   * @param _height Client height.
-   */
-  SPtr<DepthStencilView>
-  createDepthStencilView(SPtr<Texture> _depthRT) override;
-
-  /**
    * @brief Set input layout
    */
   void
@@ -226,8 +218,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
-                       const void* _pData,
-                       uint32 _usage) override;
+                       const void* _pData = nullptr,
+                       uint32 _usage = 0) override;
 
   /**
    * @brief Update the constant buffer.
@@ -258,7 +250,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numViews The number of resources that will be passed
    */
   void
-  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+  pSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) override;
 
@@ -269,7 +261,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numViews The number of resources that will be passed
    */
   void
-  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+  vSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) override;
 
@@ -277,7 +269,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Set a 
    */
   void
-  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
+  cSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
 
   /**
    * @brief Set the Compute Shader Constant Buffer
@@ -286,7 +278,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numBuffers Number of buffers to set.
    */
   void
-  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
                       uint32 _numBuffers = 0) override;
 
@@ -416,7 +408,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numBuffers Number of buffers to set.
    */
   void
-  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
                        uint32 _numBuffers) override;
 
@@ -427,7 +419,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numBuffers Number of buffers to set.
    */
   void
-  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
                        uint32 _numBuffers) override;
 

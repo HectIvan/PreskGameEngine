@@ -174,15 +174,6 @@ public:
   createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
 
   /**
-   * @brief Create the depth stencil texture and view.
-   * @param _width Client width.
-   * @param _height Client height.
-   * @return Pointer to the new Depth stencil view
-   */
-  virtual SPtr<DepthStencilView>
-  createDepthStencilView(SPtr<Texture> _depthRT) = 0;
-
-  /**
    * @brief Set input layout.
    * @param _pInputLayout What input layout to use.
    */
@@ -241,8 +232,8 @@ public:
    */
   virtual SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
-                       const void* _pData,
-                       uint32 _usage) = 0;
+                       const void* _pData = nullptr,
+                       uint32 _usage = 0) = 0;
 
   /**
    * @brief Update the constant buffer.
@@ -273,7 +264,7 @@ public:
    * @param _numViews The number of resources that will be passed
    */
   virtual void
-  PSSetShaderResourceView(SPtr<Texture> _pTexture,
+  pSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) = 0;
 
@@ -284,7 +275,7 @@ public:
    * @param _numViews The number of resources that will be passed
    */
   virtual void
-  VSSetShaderResourceView(SPtr<Texture> _pTexture,
+  vSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) = 0;
 
@@ -292,7 +283,7 @@ public:
    * @brief Set a 
    */
   virtual void
-  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) = 0;
+  cSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) = 0;
 
   /**
    * @brief Clear all render target views of a vector.
@@ -332,7 +323,7 @@ public:
    * @param _numBuffers Number of buffers to set.
    */
   virtual void
-  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
                       uint32 _numBuffers) = 0;
 
@@ -343,7 +334,7 @@ public:
    * @param _numBuffers Number of buffers to set.
    */
   virtual void
-  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
                       uint32 _numBuffers) = 0;
 
@@ -354,7 +345,7 @@ public:
    * @param _numBuffers Number of buffers to set.
    */
   virtual void
-  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
                       uint32 _numBuffers = 0) = 0;
 
@@ -405,7 +396,7 @@ public:
    */
   virtual void
   draw(uint32 _indexCount,
-      uint32 _startIndexLocation) = 0;
+       uint32 _startIndexLocation) = 0;
 
   /**
    * @brief Compute shader draw call.

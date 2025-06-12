@@ -16,7 +16,7 @@
 /*********************************************/
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
-// #include "pkShader.h"
+#include "pkRendererManager.h"
 
 #include <iostream>
 
@@ -30,16 +30,26 @@ Pass::Pass() {
   m_pSamplerState = make_shared<SamplerState>();
 }
 
-void
-Pass::createInputLayout()
+Pass::Pass(PassDesc& _desc)
 {
-  m_pInputLayout = g_GraphicAPI().createInputLayoutFromVShader(m_pVShader);
-}
+  // call the api manager
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  // create all pointers
+  m_pVShader = api.internalCreateShader();
+  m_pPShader = api.internalCreateShader();
+  m_pInputLayout = make_shared<InputLayout>();
+  m_pSamplerState = make_shared<SamplerState>();
+  // create the shaders
+  createVShader(_desc.vSDirectory, _desc.vSEntry, _desc.vSModel);
+  createPShader(_desc.pSDirectory, _desc.pSEntry, _desc.pSModel);
+  // create input and sampler state
+  m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
+  m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
 
-void
-Pass::createSamplerState(uint32 _mode, uint32 _filter)
-{
-  m_pSamplerState = g_GraphicAPI().createSamplerState(_mode, _filter);
+  // create a buffer for each size in the vector
+  for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
+    m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
+  }
 }
 
 void
@@ -65,24 +75,30 @@ Pass::compileShaders()
   m_pPShader->compile();
 }
 
-SPtr<ConstantBuffer>
-Pass::createCBuffer(SIZE_T _size, const void* _data, uint32 _usage)
-{
-  // get the api
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  // create the constant buffer with the parameters given
-  SPtr<ConstantBuffer> cb = api.createConstantBuffer(static_cast<uint32>(_size),
-                                                     _data,
-                                                     _usage);
-  // store into the constant buffer vector
-  addToCBuffers(cb);
-  // return the pointer
-  return cb;
-}
-
+// to do: properly link passes with the textures
 void
-Pass::addToCBuffers(SPtr<ConstantBuffer> _pCBuffer)
+Pass::render(Color _color)
 {
-  m_cBuffers.push_back(_pCBuffer);
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& renderManager = g_RenderManager().instance();
+  // set the render target to null
+  api.setRenderTarget(nullptr);
+  // clear RTVs and Depth stencil
+  api.clearRenderTargetViews(_color, m_outputTex);
+  api.clearDepthBuffer(1.0f, m_depthTex);
+  // set render targets and depth texture
+  api.setRenderTargets(m_outputTex, m_depthTex);
+  // set input layout of shader
+  api.setInputLayout(getInputLayout());
+  // set the shaders
+  api.setVSShader(getVShader());
+  api.setPSShader(getPShader());
+  // set the sampler state
+  api.setSampler(getSamplerState());
+  // set constant buffers
+  renderManager.pSSetConstantBuffers(getCBuffers());
+  renderManager.vSSetConstantBuffers(getCBuffers());
+  // to do: call render or draw in the base app
 }
 }

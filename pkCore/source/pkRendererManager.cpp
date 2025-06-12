@@ -6,13 +6,6 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 
-using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
-using PK_USAGE::kPK_USAGE_DEFAULT;
-using PK_BIND_FLAG::kPK_BIND_DEPTH_STENCIL;
-using PK_BIND_FLAG::kPK_BIND_RENDER_TARGET;
-using PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
-using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
-
 namespace pkEngineSDK
 {
 
@@ -98,90 +91,55 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-  SPtr<Pass> basePass = make_shared<Pass>();
-  // set the data for the shaders to be compiled, and compile.
-  basePass->createVShader(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  basePass->createPShader(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
-  // create the vertex shader input layout && sampler state.
-  basePass->createInputLayout();
-  basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
-                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-
-  // constant buffers
-  basePass->createCBuffer(sizeof(CBView));
-  basePass->createCBuffer(sizeof(CBProjection));
-  basePass->createCBuffer(sizeof(CBTransform));
-  basePass->createCBuffer(sizeof(CBLight));
-  basePass->createCBuffer(sizeof(CBCamera));
-
-  g_GraphicAPI().setInputLayout(basePass->getInputLayout());
+  PassDesc pDesc = PassDesc();
+  pDesc.vSDirectory = L"shaders/pkVShader.hlsl";
+  pDesc.pSDirectory = L"shaders/pkPShader.hlsl";
+  pDesc.vSEntry = "VS";
+  pDesc.pSEntry = "PS";
+  pDesc.vSModel = "vs_5_0";
+  pDesc.pSModel = "ps_5_0";
+  pDesc.samAdress = SAM_STATE_ADRESS::kWrap;
+  pDesc.samFilters = SAM_STATE_FILTERS::kFilterMigMagMipLinear;
+  pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
+                    sizeof(CBCamera)};
+  SPtr<Pass> basePass = make_shared<Pass>(pDesc);
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Base, basePass });
 
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  SPtr<Pass> shadowPass = make_shared<Pass>();
-  shadowPass->createVShader(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  shadowPass->createPShader(L"shaders/pkPShaderDepth.hlsl", "PS", "ps_5_0");
-
-  // create constant buffers
-  shadowPass->createCBuffer(sizeof(CBView));
-  shadowPass->createCBuffer(sizeof(CBProjection));
-  shadowPass->createCBuffer(sizeof(CBTransform));
-  shadowPass->createCBuffer(sizeof(CBLight));
-  shadowPass->createCBuffer(sizeof(CBCamera));
-
-  shadowPass->createInputLayout();
-  shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
-                                 SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
+  SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
-  SPtr<Pass> AOPass = make_shared<Pass>();
-  // set and compile shaders
-  AOPass->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  AOPass->createPShader(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
-
-  // create the buffers needed (reminder to remember the order in which they are created)
-  AOPass->createCBuffer(static_cast<uint32>(sizeof(CBAOData)));
-
-  AOPass->createInputLayout();
-  AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                             SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  pDesc.vSDirectory = L"shaders/pkDeferredShader.hlsl";
+  pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
+  pDesc.cBSizes = { sizeof(CBAOData) };
+  pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+  SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
+  // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
   /****************************************************************************
    * Shadow Deferred pass
    ***************************************************************************/
-  SPtr<Pass> shadowDef = make_shared<Pass>();
-  // set and compile shaders
-  shadowDef->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  shadowDef->createPShader(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
-
-  shadowDef->createCBuffer(sizeof(CBCamera)); // light camera
-  shadowDef->createCBuffer(sizeof(CBCamera)); // main camera
-  shadowDef->createCBuffer(sizeof(Matrix4)); // light transform
-  shadowDef->createCBuffer(sizeof(Matrix4)); // camera transform
-
-  shadowDef->createInputLayout();
-  shadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
+  pDesc.cBSizes = { sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
+  SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
+  // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
   /****************************************************************************
    * Test pass
    ***************************************************************************/
-  SPtr<Pass> testPass = make_shared<Pass>();
-  // set and compile shaders
-  testPass->createVShader(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  testPass->createPShader(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
-
-  testPass->createInputLayout();
-  testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+  pDesc.pSDirectory = L"shaders/pkTestDefShader.hlsl";
+  pDesc.cBSizes = {};
+  SPtr<Pass> testPass = make_shared<Pass>(pDesc);
+  // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Test, testPass });
 }
 
@@ -248,20 +206,20 @@ RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 }
   
 void
-RendererManager::VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
+RendererManager::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().VSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().vSSetConstantBuffer(_cBuffers[i], i, 1);
   }
 }
 
 void
-RendererManager::PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
+RendererManager::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
 {
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().PSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().pSSetConstantBuffer(_cBuffers[i], i, 1);
   }
 }
 
@@ -338,11 +296,11 @@ RendererManager::renderModel(Model& _model)
     // get the material
     SPtr<Material> material = _model.meshes[i]->material;
     // set the material textures to the shader
-    api.PSSetShaderResourceView(material->diffuse, 0);
-    api.PSSetShaderResourceView(material->normal, 1);
-    api.PSSetShaderResourceView(material->height, 2);
-    api.PSSetShaderResourceView(material->metallic, 3);
-    api.PSSetShaderResourceView(material->occlusion, 4);
+    api.pSSetShaderResourceView(material->diffuse, 0);
+    api.pSSetShaderResourceView(material->normal, 1);
+    api.pSSetShaderResourceView(material->height, 2);
+    api.pSSetShaderResourceView(material->metallic, 3);
+    api.pSSetShaderResourceView(material->occlusion, 4);
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,

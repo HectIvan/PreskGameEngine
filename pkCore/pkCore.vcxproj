@@ -199,6 +199,7 @@
     <ClInclude Include="include\pkModel.h" />
     <ClInclude Include="include\pkMouseWheelData.h" />
     <ClInclude Include="include\pkPass.h" />
+    <ClInclude Include="include\pkPassDesc.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
     <ClInclude Include="include\pkRendererManager.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />

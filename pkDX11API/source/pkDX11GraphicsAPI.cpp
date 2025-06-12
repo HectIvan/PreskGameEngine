@@ -178,8 +178,8 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
     return;
   }
   device->m_pImmediateContext->DrawIndexed(_indexCount,
-                                         _startIndexLocation,
-                                         _baseVertexLocation);
+                                           _startIndexLocation,
+                                           _baseVertexLocation);
 }
 
 void
@@ -192,7 +192,7 @@ DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
     return;
   }
   device->m_pImmediateContext->Draw(_indexCount,
-                                  _startIndexLocation);
+                                    _startIndexLocation);
 }
 
 void
@@ -257,9 +257,9 @@ DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV)
     return;
   }
   device->m_pImmediateContext->ClearDepthStencilView(dxDSV->m_dSV,
-                                                   D3D11_CLEAR_DEPTH,
-                                                   _depth,
-                                                   0);
+                                                     D3D11_CLEAR_DEPTH,
+                                                     _depth,
+                                                     0);
 }
 
 SPtr<Shader>
@@ -453,40 +453,6 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
     return nullptr;
   }
   return pSamState;
-}
-
-SPtr<DepthStencilView>
-DX11GraphicsAPI::createDepthStencilView(SPtr<Texture> _depthRT)
-{
-  PK_ASSERT(_depthRT);
-  //// reinterpret as a directX texture
-  SPtr<DX11Texture> dxDepthTx = reinterpret_pointer_cast<DX11Texture>(_depthRT);
-
-  int32 hr;
-  // create depth stencil with the generated 2D texture
-  SPtr<DX11DepthStencilView> pDepthSView = make_shared<DX11DepthStencilView>();
-  D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-  ZeroMemory(&descDSV, sizeof(descDSV));
-  descDSV.Format = DXGI_FORMAT_D32_FLOAT; // DXGI_FORMAT_D24_UNORM_S8_UINT;
-  descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-  descDSV.Texture2D.MipSlice = 0;
-
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the depth stencil view creation.");
-    return nullptr;
-  }
-  hr = device->m_pd3dDevice->CreateDepthStencilView(dxDepthTx->m_t2d,
-                                                    &descDSV,
-                                                    &pDepthSView->pDepthSV);
-  // if the creation was not succesful
-  if (hr != 0x00000000) {
-    String errMsg = g_Logger().getMessageError(hr);
-    g_Logger().print("Failed to create a depth stencil. Error: " + errMsg);
-    return nullptr;
-  }
-  // return the final value
-  return pDepthSView;
 }
 
 void
@@ -821,7 +787,7 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
 }
 
 void
-DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+DX11GraphicsAPI::vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                      uint32 _startSlot,
                                      uint32 _numBuffers)
 {
@@ -841,7 +807,7 @@ DX11GraphicsAPI::VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 }
 
 void
-DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+DX11GraphicsAPI::pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                      uint32 _startSlot,
                                      uint32 _numBuffers)
 {
@@ -862,7 +828,7 @@ DX11GraphicsAPI::PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 }
 
 void
-DX11GraphicsAPI::CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+DX11GraphicsAPI::cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                      uint32 _startSlot,
                                      uint32 _numBuffers)
 {
@@ -954,7 +920,7 @@ DX11GraphicsAPI::setShaderResourceView(SPtr<Texture> _pTexture,
 }
 
 void
-DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture,
+DX11GraphicsAPI::pSSetShaderResourceView(SPtr<Texture> _pTexture,
                                          uint32 _start,
                                          uint32 _numViews)
 {
@@ -977,7 +943,7 @@ DX11GraphicsAPI::PSSetShaderResourceView(SPtr<Texture> _pTexture,
 }
 
 void
-DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture,
+DX11GraphicsAPI::vSSetShaderResourceView(SPtr<Texture> _pTexture,
                                          uint32 _start,
                                          uint32 _numViews)
 {
@@ -1000,7 +966,7 @@ DX11GraphicsAPI::VSSetShaderResourceView(SPtr<Texture> _pTexture,
 }
 
 void
-DX11GraphicsAPI::CSSetShaderResourceView(SPtr<Texture> _pTexture,
+DX11GraphicsAPI::cSSetShaderResourceView(SPtr<Texture> _pTexture,
                                          uint32 _start,
                                          uint32 _numViews)
 {
@@ -1060,31 +1026,14 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     return nullptr;
   }
 
-  // cast to DX11Texture
-  SPtr<DX11Texture> dxTX = reinterpret_pointer_cast<DX11Texture>(temptTexture);
-
-  // if casting the texture failed
-  if (!dxTX) {
-    g_Logger().print("Failed to create a texture.");
-    return nullptr;
-  }
-
-  // update the texture
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the creation of a texture.");
-    return nullptr;
-  }
-  device->m_pImmediateContext->UpdateSubresource(dxTX->m_t2d, 0, nullptr, data, pitch, 0);
-
   // free the texture data if there's data to release
   if (data) { stbi_image_free(data); }
 
   // set the path
-  dxTX->path = _fileName;
+  temptTexture->path = _fileName;
 
   // return the texture
-  return dxTX;
+  return temptTexture;
 }
 
 SPtr<Texture>

@@ -26,7 +26,6 @@
 #include "pkPass.h"
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
-#include "pkTexture.h"
 #include "pkWindow.h"
 
 namespace pkEngineSDK
@@ -129,13 +128,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @brief Set the Vertex Shader constant buffers
    */
   void
-  VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
+  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the Pixel Shader constant buffers
    */
   void
-  PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
+  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
 
   /**
    * @brief Set the buffers of each actor.

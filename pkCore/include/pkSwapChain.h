@@ -35,7 +35,7 @@ class SwapChain
    * @param _index Position of the buffer.
    * @return Texture of the back buffer.
    */
-  virtual SPtr<Texture>
+  virtual SPtr<Texture>&
   getBuffer(uint32 _index) = 0;
 
   /**

@@ -59,7 +59,7 @@ struct PS_INPUT
 struct PS_OUTPUT
 {
     float4 diffuse : VS_Target0;
-    float4 normal : SV_Target1;
+  // float4 normal : SV_Target1;
   // float4 depth : COLOR0;
 };
 
@@ -67,8 +67,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
     PS_OUTPUT output = (PS_OUTPUT) 0;
     // get the base color
-    float4 diffuseSam = diffuseTex.Sample(samLinear, input.Tex);
+    // float4 diffuseSam = diffuseTex.Sample(samLinear, input.Tex);
     
-    output.diffuse = diffuseSam;
+    // output.diffuse = diffuseSam;
     return output;
 }

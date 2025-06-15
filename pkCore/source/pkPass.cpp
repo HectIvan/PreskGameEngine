@@ -17,6 +17,7 @@
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
 #include "pkRendererManager.h"
+#include "pkSceneManager.h"
 
 #include <iostream>
 
@@ -45,11 +46,14 @@ Pass::Pass(PassDesc& _desc)
   // create input and sampler state
   m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
   m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
-
   // create a buffer for each size in the vector
   for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
     m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
   }
+  // set input, output and depth
+  m_inputTex = _desc.inputs;
+  m_outputTex = _desc.outputs;
+  m_depthTex = _desc.pDepth;
 }
 
 void
@@ -77,13 +81,11 @@ Pass::compileShaders()
 
 // to do: properly link passes with the textures
 void
-Pass::render(Color _color)
+Pass::beginPass(Color _color)
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& renderManager = g_RenderManager().instance();
-  // set the render target to null
-  api.setRenderTarget(nullptr);
   // clear RTVs and Depth stencil
   api.clearRenderTargetViews(_color, m_outputTex);
   api.clearDepthBuffer(1.0f, m_depthTex);
@@ -94,11 +96,34 @@ Pass::render(Color _color)
   // set the shaders
   api.setVSShader(getVShader());
   api.setPSShader(getPShader());
+  // set resources
+  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
+    api.pSSetShaderResourceView(m_inputTex[i], i);
+  }
   // set the sampler state
   api.setSampler(getSamplerState());
   // set constant buffers
   renderManager.pSSetConstantBuffers(getCBuffers());
   renderManager.vSSetConstantBuffers(getCBuffers());
-  // to do: call render or draw in the base app
+}
+
+void
+Pass::endPass()
+{
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  // set all to nullptr
+  api.setRenderTarget(nullptr);
+  api.setInputLayout(nullptr);
+  api.setVSShader(nullptr);
+  api.setPSShader(nullptr);
+  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
+    api.pSSetShaderResourceView(nullptr, i);
+  }
+  api.setSampler(nullptr);
+  for (uint32 i = 0; i < m_cBuffers.size(); ++i) {
+    api.pSSetConstantBuffer(nullptr, i);
+    api.vSSetConstantBuffer(nullptr, i);
+  }
 }
 }

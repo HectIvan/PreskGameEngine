@@ -57,5 +57,8 @@ struct PassDesc
   SAM_STATE_FILTERS::E samFilters;
 
   Vector<SIZE_T> cBSizes;
+  Vector<SPtr<Texture>> inputs;
+  Vector<SPtr<Texture>> outputs;
+  SPtr<Texture> pDepth;
 };
 }

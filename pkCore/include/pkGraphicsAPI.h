@@ -65,7 +65,8 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTarget(SPtr<Texture> _pRTarget,
+                  SPtr<Texture> _pDepthSV = nullptr) = 0;
 
   /**
    * @brief Create the blend state.
@@ -253,7 +254,7 @@ public:
    * @param _numViews How many views are there.
    */
   virtual void
-  setShaderResourceView(SPtr<Texture> _pTexture,
+  vSSetShaderResourceView(SPtr<Texture> _pTexture,
                         uint32 _start = 0,
                         uint32 _numViews = 1) = 0;
 
@@ -265,17 +266,6 @@ public:
    */
   virtual void
   pSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) = 0;
-
-  /**
-   * @brief Set a texture to the resource view of a vertex shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
-   */
-  virtual void
-  vSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) = 0;
 
@@ -325,7 +315,7 @@ public:
   virtual void
   vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
-                      uint32 _numBuffers) = 0;
+                      uint32 _numBuffers = 1) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -336,7 +326,7 @@ public:
   virtual void
   pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                       uint32 _startSlot,
-                      uint32 _numBuffers) = 0;
+                      uint32 _numBuffers = 1) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.

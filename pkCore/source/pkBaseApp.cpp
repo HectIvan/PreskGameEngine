@@ -129,90 +129,23 @@ BaseApp::messageLoop()
 void
 BaseApp::render()
 {
-  // screen clear color
-  Color clearColor = Color(0, 30, 76, 255);
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& renderManager = g_RenderManager().instance();
-  /**
-   * Shadow Render.
-   */
-   // clear the render targets
-  SPtr<Pass> currentPass = renderManager.getPass(kP_Shadow);
-  api.clearRenderTargetViews(clearColor, renderManager.getGBuffers());
-  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Shadow));
-
-  // set the render targets
-  api.setRenderTargets(renderManager.getGBuffers(),
-                       renderManager.getDepthBuffer(kDB_Shadow));
-  api.setInputLayout(currentPass->getInputLayout());
-  // set the base pass for the first rendering stage
-  api.setPSShader(currentPass->getPShader());
-  api.setVSShader(currentPass->getVShader());
-  api.setSampler(currentPass->getSamplerState());
-
-  // set constant buffers for the pixel and vertex shaders
-  renderManager.pSSetConstantBuffers(currentPass->getCBuffers());
-  renderManager.vSSetConstantBuffers(currentPass->getCBuffers());
-  // render the objects
+  // first shadow pass
+  renderManager.getPass(PASS_TYPE::kP_Shadow)->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-  api.setRenderTarget(nullptr);
-
-  /**
-   * Normal Render.
-   */
-  // clear the render targets
-  currentPass = renderManager.getPass(kP_Base);
-  api.clearRenderTargetViews(clearColor, renderManager.getGBuffers());
-  api.clearDepthBuffer(1.0f, renderManager.getDepthBuffer(kDB_Base));
-
-  // set the render targets
-  api.setRenderTargets(renderManager.getGBuffers(),
-                       renderManager.getDepthBuffer(kDB_Base));
-  api.setInputLayout(currentPass->getInputLayout());
-  // set the base pass for the first rendering stage
-  api.setPSShader(currentPass->getPShader());
-  api.setVSShader(currentPass->getVShader());
-  api.setSampler(currentPass->getSamplerState());
-
-  // set constant buffers for the pixel and vertex shaders
-  renderManager.pSSetConstantBuffers(currentPass->getCBuffers());
-  renderManager.vSSetConstantBuffers(currentPass->getCBuffers());
-  // render the actors
+  renderManager.getPass(PASS_TYPE::kP_Shadow)->endPass();
+  // base pass
+  renderManager.getPass(PASS_TYPE::kP_Base)->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-  api.setRenderTarget(nullptr);
-
-  /**
-   * Deferred shadow pass
-   */
-  currentPass = renderManager.getPass(kP_ShadowDef);
-  api.clearRenderTargetView(clearColor, renderManager.getGBuffer(kGB_Shadow));
-  api.setRenderTarget(renderManager.getGBuffer(kGB_Shadow));
-  api.setInputLayout(nullptr);
-  api.setVSShader(currentPass->getVShader());
-  api.setPSShader(currentPass->getPShader());
-  api.setSampler(currentPass->getSamplerState());
-  api.pSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Shadow));
-  api.pSSetShaderResourceView(renderManager.getDepthBuffer(kDB_Base), 1);
+  renderManager.getPass(PASS_TYPE::kP_Base)->endPass();
+  // quad shadow pass
+  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
   api.draw(3, 0);
-  api.setRenderTarget(nullptr);
-  /**
-   * Deferred render test
-   */
-   // get the current pass
-  currentPass = renderManager.getPass(kP_Test);
-  // clear the back buffer
-  api.clearRenderTargetView(clearColor, api.getSwapChain()->getBuffer(0));
-  // set the back buffer as render target
-  api.setRenderTarget(api.getSwapChain()->getBuffer(0));
-  api.setInputLayout(nullptr);
-  // set the shaders needed
-  api.setVSShader(currentPass->getVShader());
-  api.setPSShader(currentPass->getPShader());
-  api.setSampler(currentPass->getSamplerState());
-  // set the resources for the render
-  api.pSSetShaderResourceView(renderManager.getGBuffer(kGB_Albedo));
-  // draw in deferred
+  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
+  // tone map pass
+  renderManager.getPass(PASS_TYPE::kP_Test)->beginPass();
   api.draw(3, 0);
   // Scene specific app render
   onRender();

@@ -95,10 +95,17 @@ public:
   getCBuffer(uint32 _index) { return m_cBuffers[_index]; }
 
   /**
-   * @brief Render the scene.
+   * @brief Start pass based parameter setting.
+   * @param _color Clear color.
    */
   void
-  render(Color _color = Color(0, 30, 76, 255));
+  beginPass(Color _color = Color(0, 30, 76, 255));
+
+  /**
+   * @brief Set all parameters to null;
+   */
+  void
+  endPass();
 
  private:
   /**

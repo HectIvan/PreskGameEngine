@@ -63,7 +63,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTarget(SPtr<Texture> _pRTarget,
+                  SPtr<Texture> _pDepthSV = nullptr) override;
 
   /**
    * @brief Create the blend state.
@@ -239,9 +240,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _numViews The number of resources that will be passed
    */
   void
-  setShaderResourceView(SPtr<Texture> _pTexture,
-                        uint32 _start = 0,
-                        uint32 _numViews = 1) override;
+  vSSetShaderResourceView(SPtr<Texture> _pTexture,
+                          uint32 _start = 0,
+                          uint32 _numViews = 1) override;
 
   /**
    * @brief Set a texture to the resource view of a pixel shader.
@@ -251,17 +252,6 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   pSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) override;
-
-  /**
-   * @brief Set a texture to the resource view of a vertex shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
-   */
-  void
-  vSSetShaderResourceView(SPtr<Texture> _pTexture,
                           uint32 _start = 0,
                           uint32 _numViews = 1) override;
 
@@ -410,7 +400,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
-                       uint32 _numBuffers) override;
+                       uint32 _numBuffers = 1) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -421,7 +411,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        uint32 _startSlot,
-                       uint32 _numBuffers) override;
+                       uint32 _numBuffers = 1) override;
 
   /**
    * @brief Get the API Swap chain

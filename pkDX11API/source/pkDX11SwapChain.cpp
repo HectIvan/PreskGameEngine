@@ -47,7 +47,7 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
 
 }
 
-SPtr<Texture>
+SPtr<Texture>&
 DX11SwapChain::getBuffer(uint32 _index)
 {
   return m_buffers[_index];

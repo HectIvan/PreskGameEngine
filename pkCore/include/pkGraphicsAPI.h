@@ -65,8 +65,7 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(SPtr<Texture> _pRTarget,
-                  SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
 
   /**
    * @brief Create the blend state.

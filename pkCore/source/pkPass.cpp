@@ -113,7 +113,11 @@ Pass::endPass()
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set all to nullptr
-  api.setRenderTarget(nullptr);
+  Vector<SPtr<Texture>> nullTargets;
+  for (uint32 i = 0; i < m_outputTex.size(); ++i) {
+    nullTargets.push_back(nullptr);
+  }
+  api.setRenderTargets(nullTargets);
   api.setInputLayout(nullptr);
   api.setVSShader(nullptr);
   api.setPSShader(nullptr);

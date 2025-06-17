@@ -387,8 +387,6 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
 {
   // reinterpret the depth stencil view to a DirectX texture
   auto pDSV = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
-  // get a texture vector for DX11 textures
-  Vector<SPtr<DX11Texture>> txVector;
   // render target vector
   Vector<ID3D11RenderTargetView*> rTVector;
   // get the vector size
@@ -396,9 +394,10 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   // reinterpret each of the targets as a DX11 texture and store in the texture vector
   for (uint32 i = 0; i < RTCount; ++i) {
     SPtr<DX11Texture> dxTx = reinterpret_pointer_cast<DX11Texture>(_rTargets[i]);
-    // store the render target and the texture
-    if (dxTx->m_rTV) { rTVector.push_back(dxTx->m_rTV); }
-    txVector.push_back(dxTx);
+    // if target is valid, store it
+    if (_rTargets[i] && dxTx->m_rTV) { rTVector.push_back(dxTx->m_rTV); }
+    // if its not, save a null pointer
+    else { rTVector.push_back(nullptr); }
   }
   // set the render targets
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -412,8 +411,7 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
 }
 
 void
-DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget,
-                                 SPtr<Texture> _pDepthSV)
+DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
 {
   // reinterpet render target
   auto rTarget = reinterpret_pointer_cast<DX11Texture>(_pRTarget);
@@ -1172,10 +1170,8 @@ DX11GraphicsAPI::setInputLayout(SPtr<InputLayout> _pInputLayout)
 {
   // reinterpret to a DirectX input layout
   SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
-  // if the input layout itself is null, send no warning message
-  if (!_pInputLayout) {}
   // if the layout is not null but failed to reinterpret
-  else if (!dxIL) {
+  if (_pInputLayout && !dxIL) {
     g_Logger().print("Failed to set the input layout.");
     return;
   }
@@ -1188,8 +1184,8 @@ DX11GraphicsAPI::setInputLayout(SPtr<InputLayout> _pInputLayout)
   // get the dx11 input layout
   auto inputLayout = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
   // set the input layout
-  device->m_pImmediateContext->IASetInputLayout((inputLayout) ? inputLayout->m_pVertexLayout : 
-                                                                nullptr);
+  device->m_pImmediateContext->IASetInputLayout(inputLayout ? inputLayout->m_pVertexLayout : 
+                                                              nullptr);
 }
 
 SPtr<VertexBuffer>

@@ -63,8 +63,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(SPtr<Texture> _pRTarget,
-                  SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
 
   /**
    * @brief Create the blend state.

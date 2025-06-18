@@ -133,24 +133,24 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture.
-   * @param _data Data of the image loaded.
    * @param _width How wide is the texture.
    * @param _height How tall is the texture.
    * @param _format Format of the texture.
    * @param _usage What usage will the api give the texture.
    * @param _bindFlags flag for binding to the pipeline stages.
    * @param _mipLevels The maximum number of mipmap levels in the texture.
+   * @param _data Data of the image loaded.
    */
   SPtr<Texture>
-  createTexture(unsigned char* _data,
-                uint32 _bpp,
+  createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat) override;
+                uint32 _shaderResourceFormat,
+                unsigned char* _data = nullptr) override;
 
   /**
    * @brief Create the sampler state.
@@ -230,7 +230,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
-                       uint32 _size) override;
+                       SIZE_T _size) override;
 
   /**
    * @brief Set a resource to the vertex shader.

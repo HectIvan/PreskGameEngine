@@ -77,7 +77,7 @@ struct CBAOData
   float unused;
 };
 
-struct CBLuminosity
+struct CBLuminance
 {
   float tolerance;
   Vector3 unused;

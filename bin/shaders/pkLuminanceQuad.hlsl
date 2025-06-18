@@ -24,12 +24,11 @@ PS_Output PS(PS_INPUT input) : SV_Target0
     
     float4 texPix = inputTexture.Sample(samState, input.Tex);
     output.diffuse = float4(0.0f, 0.0f, 0.0f, 1.0f);
-    float range = 255.0f - tolerance;
-    if (texPix.r > range && 
-        texPix.g > range &&
-        texPix.b > range)
+    if (texPix.r > tolerance || 
+        texPix.g > tolerance ||
+        texPix.b > tolerance)
     {
-        output.diffuse = texPix;
+        output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f); // texPix;
     }
     return output;
 }

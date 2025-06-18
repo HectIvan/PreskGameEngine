@@ -37,6 +37,7 @@ namespace G_BUFFERS
     kGB_Albedo = 0,
     kGB_Normal,
     kGB_Shadow,
+    kGB_Luminance,
   };
 };
 
@@ -55,7 +56,8 @@ namespace PASS_TYPE
     kP_Shadow,
     kP_AO,
     kP_ShadowDef,
-    kP_Test,
+    kP_Luminance,
+    kP_Tone,
   };
 }
 

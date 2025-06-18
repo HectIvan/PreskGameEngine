@@ -148,7 +148,7 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
 void
 DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                                       const void* _pNewData,
-                                      uint32 _size)
+                                      SIZE_T _size)
 {
   // cast to DX11ConstantBuffer
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
@@ -163,7 +163,13 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
     g_Logger().print("Failed to utilize the DX device in the update of a CBuffer");
     return;
   }
-  device->m_pImmediateContext->UpdateSubresource(dxCB->pCBuffer, 0, nullptr, _pNewData, _size, 0);
+  uint32 size = static_cast<uint32>(_size);
+  device->m_pImmediateContext->UpdateSubresource(dxCB->pCBuffer,
+                                                 0,
+                                                 nullptr,
+                                                 _pNewData,
+                                                 size,
+                                                 0);
 }
 
 void
@@ -998,15 +1004,15 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   pitch = width * bpp;
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(data,
-                                             bpp,
+  SPtr<Texture> temptTexture = createTexture(bpp,
                                              width,
                                              height,
                                              _format,
                                              0,
                                              _bindFlags,
                                              _mipLevels,
-                                             _format);
+                                             _format,
+                                             data);
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -1025,15 +1031,15 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTexture(unsigned char* _data,
-                               uint32 _bpp,
+DX11GraphicsAPI::createTexture(uint32 _bpp,
                                uint32 _width,
                                uint32 _height,
                                uint32 _format,
                                uint32 _usage,
                                uint32 _bindFlags,
                                bool _mipLevels,
-                               uint32 _shaderResourceFormat)
+                               uint32 _shaderResourceFormat,
+                               unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
 

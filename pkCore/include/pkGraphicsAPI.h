@@ -154,15 +154,15 @@ public:
   * @param _mipLevels The maximum number of mipmap levels in the texture.
   **/
   virtual SPtr<Texture>
-  createTexture(unsigned char* _data,
-                uint32 _bpp,
+  createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
                 uint32 _format,
                 uint32 _usage,
                 uint32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat) = 0;
+                uint32 _shaderResourceFormat,
+                unsigned char* _data = nullptr) = 0;
 
   /**
    * @brief Create the sampler state.
@@ -244,7 +244,7 @@ public:
   virtual void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
-                       uint32 _size) = 0;
+                       SIZE_T _size) = 0;
 
   /**
    * @brief Set a texture to the resource view.

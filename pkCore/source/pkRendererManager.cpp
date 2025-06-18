@@ -18,8 +18,7 @@ void RendererManager::init()
   uint32 winWidth = api.getSwapChain()->getWidth();
 
   
-  SPtr<Texture> albedoRTV = api.createTexture(nullptr,
-                                              4,
+  SPtr<Texture> albedoRTV = api.createTexture(4,
                                               winWidth,
                                               winHeight,
                                               kPK_FORMAT_R32G32B32A32_FLOAT,
@@ -30,8 +29,7 @@ void RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRTV });
 
   // create the normal render target that will store the normals of the world
-  SPtr<Texture> normalRT = api.createTexture(nullptr,
-                                             4,
+  SPtr<Texture> normalRT = api.createTexture(4,
                                              winWidth,
                                              winHeight,
                                              kPK_FORMAT_R32G32B32A32_FLOAT,
@@ -41,8 +39,7 @@ void RendererManager::init()
                                              kPK_FORMAT_R32G32B32A32_FLOAT);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  SPtr<Texture> shadowRT = api.createTexture(nullptr,
-                                             4,
+  SPtr<Texture> shadowRT = api.createTexture(4,
                                              winWidth,
                                              winHeight,
                                              kPK_FORMAT_R32G32B32A32_FLOAT,
@@ -52,11 +49,20 @@ void RendererManager::init()
                                              kPK_FORMAT_R32G32B32A32_FLOAT);
   m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
 
+  SPtr<Texture> luminanceRT = api.createTexture(4,
+                                                winWidth,
+                                                winHeight,
+                                                kPK_FORMAT_R32G32B32A32_FLOAT,
+                                                kPK_USAGE_DEFAULT,
+                                                kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                                false,
+                                                kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, luminanceRT });
+
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
-  SPtr<Texture> depthBuffer = api.createTexture(nullptr,
-                                                4,
+  SPtr<Texture> depthBuffer = api.createTexture(4,
                                                 winWidth,
                                                 winHeight,
                                                 TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
@@ -68,8 +74,7 @@ void RendererManager::init()
   m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
 
   // create the depth buffer for the light camera rendering in shadow mapping
-  SPtr<Texture> shadowDepth = api.createTexture(nullptr,
-                                                4,
+  SPtr<Texture> shadowDepth = api.createTexture(4,
                                                 winWidth,
                                                 winHeight,
                                                 TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
@@ -100,7 +105,7 @@ RendererManager::createPasses()
   pDesc.samAdress = SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = SAM_STATE_FILTERS::kFilterMigMagMipLinear;
   pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
-                    sizeof(CBCamera)};
+                    sizeof(CBCamera) };
   pDesc.inputs = {};
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -120,43 +125,51 @@ RendererManager::createPasses()
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
-  // pDesc.vSDirectory = L"shaders/pkDeferredShader.hlsl";
-  // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
-  // pDesc.cBSizes = { sizeof(CBAOData) };
-  // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
-  // pDesc.type = PK_PASS_TYPE::kDeferred;
-  // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
-  // AOPass->setSamplerState(nullptr);
-  // // insert to the passes
-  // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
+   // pDesc.vSDirectory = L"shaders/pkDeferredShader.hlsl";
+   // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
+   // pDesc.cBSizes = { sizeof(CBAOData) };
+   // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+   // pDesc.type = PK_PASS_TYPE::kDeferred;
+   // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
+   // // insert to the passes
+   // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
-  /****************************************************************************
-   * Shadow Deferred pass
-   ***************************************************************************/
+   /****************************************************************************
+    * Shadow Quad pass
+    ***************************************************************************/
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
   pDesc.vSDirectory = L"shaders/pkQuadShader.hlsl";
   pDesc.cBSizes = { sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow)};
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
   pDesc.pDepth = nullptr;
   pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
-  shadowDef->setSamplerState(nullptr);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
   /****************************************************************************
-   * Test pass
+   * Luminance Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkTestDefShader.hlsl";
-  pDesc.cBSizes = {};
+  pDesc.pSDirectory = L"shaders/pkLuminanceQuad.hlsl";
+  pDesc.cBSizes = { sizeof(CBLuminance) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  SPtr<Pass> luminancePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Luminance, luminancePass });
+
+  /****************************************************************************
+   * Tone mapping Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = L"shaders/pkToneMapQuadShader.hlsl";
+  pDesc.cBSizes = {};
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> testPass = make_shared<Pass>(pDesc);
-  testPass->setSamplerState(nullptr);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_Test, testPass });
+  m_passes.insert({ PASS_TYPE::kP_Tone, testPass });
 }
 
 SPtr<Pass>

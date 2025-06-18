@@ -12,6 +12,7 @@
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
+using pkEngineSDK::CBLuminance;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
 using pkEngineSDK::GraphicsAPI;
@@ -35,7 +36,8 @@ using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
-using pkEngineSDK::PASS_TYPE::kP_Test;
+using pkEngineSDK::PASS_TYPE::kP_Tone;
+using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
 using pkEngineSDK::Scene;
@@ -242,11 +244,13 @@ ShaderTest::onUpdate()
   Matrix4 view = camData->m_view.getTransposed();
   Matrix4 proj = camData->m_projection.getTransposed();
   SPtr<Light> lightData = light->getComponent<Light>();
+  CBLuminance lum;
+  lum.tolerance = 0.7f;
 
   // data type sizes
-  uint32 m4x4Size = static_cast<uint32>(sizeof(Matrix4));
-  uint32 camSize = static_cast<uint32>(sizeof(Camera));
-  uint32 lightSize = static_cast<uint32>(sizeof(Light));
+  uint32 m4x4Size = sizeof(Matrix4);
+  uint32 camSize = sizeof(Camera);
+  uint32 lightSize = sizeof(Light);
   // update normal pass buffers
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(1), &proj, m4x4Size);
@@ -273,6 +277,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(3),
                            &m_camera->m_transform,
                            camSize);
+
+  api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));
 }
 
 // to do: fix the deferred renderer to be able to show the final result

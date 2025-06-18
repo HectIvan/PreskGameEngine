@@ -16,7 +16,7 @@ using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
-using pkEngineSDK::PASS_TYPE::kP_Test;
+using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
@@ -140,12 +140,16 @@ BaseApp::render()
   renderManager.getPass(PASS_TYPE::kP_Base)->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   renderManager.getPass(PASS_TYPE::kP_Base)->endPass();
-  // quad shadow pass
+  // Quad luminance pass
+  renderManager.getPass(PASS_TYPE::kP_Luminance)->beginPass();
+  api.draw(3, 0);
+  renderManager.getPass(PASS_TYPE::kP_Luminance)->endPass();
+  // Quad shadow pass
   renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
   api.draw(3, 0);
   renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
-  // tone map pass
-  renderManager.getPass(PASS_TYPE::kP_Test)->beginPass();
+  // Quad tone map pass
+  renderManager.getPass(PASS_TYPE::kP_Tone)->beginPass();
   api.draw(3, 0);
   // Scene specific app render
   onRender();

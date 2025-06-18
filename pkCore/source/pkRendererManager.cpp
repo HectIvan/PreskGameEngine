@@ -126,6 +126,7 @@ RendererManager::createPasses()
   // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
   // pDesc.type = PK_PASS_TYPE::kDeferred;
   // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
+  // AOPass->setSamplerState(nullptr);
   // // insert to the passes
   // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
@@ -133,6 +134,7 @@ RendererManager::createPasses()
    * Shadow Deferred pass
    ***************************************************************************/
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
+  pDesc.vSDirectory = L"shaders/pkQuadShader.hlsl";
   pDesc.cBSizes = { sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base) };
@@ -140,6 +142,7 @@ RendererManager::createPasses()
   pDesc.pDepth = nullptr;
   pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
+  shadowDef->setSamplerState(nullptr);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
@@ -151,6 +154,7 @@ RendererManager::createPasses()
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> testPass = make_shared<Pass>(pDesc);
+  testPass->setSamplerState(nullptr);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Test, testPass });
 }

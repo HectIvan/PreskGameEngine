@@ -41,6 +41,13 @@ public:
   getInputLayout() { return m_pInputLayout; }
 
   /**
+   * @brief Set the sampler state of the pass.
+   * @param _samState Reference to the sampler state.
+   */
+  void
+  setSamplerState(SPtr<SamplerState> _samState) { m_pSamplerState = _samState; }
+
+  /**
    * @brief Get the sampler state of this pass.
    * @return Pointer to the sampler state.
    */

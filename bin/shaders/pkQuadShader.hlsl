@@ -11,7 +11,7 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD0;
 };
 
-// deferred pass
+// quad pass
 PS_INPUT VS(uint vertexID : SV_VertexID)
 {
   PS_INPUT output;

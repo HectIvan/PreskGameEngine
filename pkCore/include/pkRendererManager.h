@@ -57,6 +57,7 @@ namespace PASS_TYPE
     kP_AO,
     kP_ShadowDef,
     kP_Luminance,
+    kP_Blur,
     kP_Tone,
   };
 }

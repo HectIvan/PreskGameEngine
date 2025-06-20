@@ -148,6 +148,10 @@ BaseApp::render()
   renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
   api.draw(3, 0);
   renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
+  // blur quad pass
+  renderManager.getPass(PASS_TYPE::kP_Blur)->beginPass();
+  api.draw(3, 0);
+  renderManager.getPass(PASS_TYPE::kP_Blur)->endPass();
   // Quad tone map pass
   renderManager.getPass(PASS_TYPE::kP_Tone)->beginPass();
   api.draw(3, 0);

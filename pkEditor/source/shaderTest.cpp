@@ -245,7 +245,7 @@ ShaderTest::onUpdate()
   Matrix4 proj = camData->m_projection.getTransposed();
   SPtr<Light> lightData = light->getComponent<Light>();
   CBLuminance lum;
-  lum.tolerance = 0.7f;
+  lum.tolerance = 0.9f;
 
   // data type sizes
   uint32 m4x4Size = sizeof(Matrix4);

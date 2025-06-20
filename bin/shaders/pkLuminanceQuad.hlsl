@@ -28,7 +28,7 @@ PS_Output PS(PS_INPUT input) : SV_Target0
         texPix.g > tolerance ||
         texPix.b > tolerance)
     {
-        output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f); // texPix;
+        output.diffuse = texPix;// float4(1.0f, 1.0f, 1.0f, 1.0f);
     }
     return output;
 }

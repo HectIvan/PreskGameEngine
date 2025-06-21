@@ -343,7 +343,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _points Group of points of  the shape.
    */
   static Vector3
-  supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
+  supportPointConvex(Vector3 _direction, Vector<Vector3>& _points);
 
   /**
    * @brief Get the support point from a sphere.

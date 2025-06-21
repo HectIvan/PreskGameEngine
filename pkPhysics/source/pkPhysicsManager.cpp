@@ -20,6 +20,44 @@
 
 namespace pkEngineSDK
 {
+
+Vector<Shape>
+PhysicsManager::sortByLeft(Vector<Shape>& _shapes)
+{
+  Vector<Shape> returnShapes = _shapes;
+  // sort in ascending order using the x axis
+  std::sort(returnShapes.begin(),
+            returnShapes.end(),
+            [](const Vector3& a, const Vector3& b) {
+              return a.x < b.x;
+            });
+  return returnShapes;
+}
+
+void
+PhysicsManager::BPCDSweepAndPrune(Vector<Shape>& _colliders)
+{
+  // temporary shape vector
+  Vector<Shape> shapes = sortByLeft(_colliders);
+  // check for objects
+  for (int32 i = 0; i < _colliders.size(); ++i) {
+    const Shape coll1 = _colliders[i];
+    // for each collider in front of the brevious one
+    for (int32 j = i + 1; j < _colliders.size(); ++j) {
+      const Shape coll2 = _colliders[j];
+      // get the vertex of both objects
+      Vector<Vector3> points1 = coll1.m_vertex;
+      Vector<Vector3> points2 = coll2.m_vertex;
+      // get the most right of the first collision and the most left of the second collision.
+      Vector3 coll1right = Math::supportPointConvex(Vector3::RIGHT, points1);
+      Vector3 coll2Left = Math::supportPointConvex(Vector3::LEFT, points2);
+      // if the left and right of both objects do not intersect, there is no collision.
+      if (coll2Left.x > coll1right.x) { break; }
+      // else, a collision is possible.
+    }
+  }
+}
+
 // to do: make a simplex structure, currently using a simple shape
 bool
 PhysicsManager::GJK(Shape& _shape1, Shape& _shape2, uint32 _attempts)

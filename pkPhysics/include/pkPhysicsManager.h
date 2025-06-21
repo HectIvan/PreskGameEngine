@@ -34,6 +34,21 @@ class PhysicsManager : public Module<PhysicsManager>
   fixedUpdate();
 
   /**
+   * @brief Sort a vector of shapes by order from left to right in the X axis.
+   * @param _shapes Vector of shapes.
+   * @return New vector of organized shapes.
+   */
+  Vector<Shape>
+  sortByLeft(Vector<Shape>& _shapes);
+
+  /**
+   * @brief Sweep and prune algorithm for Broad Phase Collision Detection.
+   * @param _colliders Vectors of shapes to use
+   */
+  void
+  BPCDSweepAndPrune(Vector<Shape>& _colliders);
+
+  /**
    * @brief Calculates a collision using Gilbert-Johnson-Keerthi (GJK).
    * @param _shape1 First shape of the collision.
    * @param _shape2 Second shape of the collision.

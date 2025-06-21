@@ -404,7 +404,7 @@ class PK_UTILITY_EXPORT Vector4
    * @brief returns a copy of this normalized vector.
    */
   Vector4
-  normalized();
+  normalized() const;
 
   /**
   * Gets the distance between this vector and another.

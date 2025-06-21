@@ -163,14 +163,14 @@ RendererManager::createPasses()
   /****************************************************************************
    * Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
-  pDesc.pSEntry = "HBlur";
-  pDesc.cBSizes = { sizeof(Vector4) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  SPtr<Pass> blurPass = make_shared<Pass>(pDesc);
-  // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_Blur, blurPass });
+  // pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
+  // pDesc.pSEntry = "HBlur";
+  // pDesc.cBSizes = { sizeof(Vector4) };
+  // pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  // SPtr<Pass> blurPass = make_shared<Pass>(pDesc);
+  // // insert to the passes
+  // m_passes.insert({ PASS_TYPE::kP_Blur, blurPass });
 
   /****************************************************************************
    * Tone mapping Quad pass

@@ -77,6 +77,9 @@ class PK_CORE_EXPORT Camera : public Component
   void
   move(Vector3 _dist);
 
+  void
+  moveForward(float _offset);
+
   /**
   * Rotate the camera by rotating the At vector
   * 

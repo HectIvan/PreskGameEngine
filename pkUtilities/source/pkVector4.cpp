@@ -87,7 +87,7 @@ Vector4::normalize()
 }
 
 Vector4
-Vector4::normalized()
+Vector4::normalized() const
 {
   float mag = magnitude();
   if (mag == 0.0f) { return Vector4(0.0f); }

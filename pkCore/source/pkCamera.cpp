@@ -55,32 +55,28 @@ Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 void
 Camera::move(Vector3 _dist)
 {
-  Vector3 offset = getRight() * _dist.x + Vector3::UP * _dist.y + getForward() * _dist.z;
-  m_eye += offset;
-  m_at += offset;
+  Vector3 offset = getRight() * _dist.x + getUp() * _dist.y + getForward() * _dist.z;
+  m_eye += _dist;
+  m_at += _dist;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveForward(float _offset)
+{
+  // scale is the third column in the matrix, which in a view matrix is the view direction.
+  Vector3 forward = (m_view.inverse().getScale3()).normalized();
+  // m_eye += forward * _offset;
+  // m_at += forward * _offset;
+  Vector3 pos = forward * _offset;
+  m_view *= Matrix4::translation(pos);
+  // m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  // for stopping warning messages
-  _x = _x;
-  _z = _z;
-  // _z = _z;
-  // Matrix4 rotRight = Matrix4::MatrixRotationAxis(getRight(), _y);
-  // Matrix4 rotUp = Matrix4::MatrixRotationAxis(Vector3::UP, _x);
-  // Matrix4 rot = rotRight * rotUp;
-  // 
-  // Vector3 newForward = (rot * m_forward).normalized();
-  // 
-  // // setView(m_eye, m_eye + newForward, Vector3::UP);
-  // m_view = Matrix4::lookAtLH(m_eye, m_eye + newForward, Vector3::UP);
-
-  Vector4 newAt = m_at - m_eye;
-  newAt = newAt * Matrix4::rotationY(_y);
-  newAt += m_eye;
-  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  m_view *= Matrix4::rotation(_x, _y, _z);
 }
 
 void

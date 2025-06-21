@@ -258,6 +258,19 @@ class PK_UTILITY_EXPORT Matrix4
                    other.w);
   }
 
+  float
+  determinant();
+
+  float
+  determinant3x3(int r1, int r2, int r3, int c1, int c2, int c3);
+
+  /**
+   * @brief Get the inverse matrix.
+   * @return The inverse matrix.
+   */
+  Matrix4
+  inverse();
+
   /**
    * @brief Multiply a matrix with another.
    * @param Other The other matrix.

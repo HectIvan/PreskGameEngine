@@ -60,21 +60,22 @@ ShaderTest::onInit()
   g_uInterface().initWin(m_window.getWindowHandle());
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
+  // create camera
   m_cameraSpeed = 20.0f;
   m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
+  Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
                                          m_window.getHeight(),
                                          3.1416f / 4.0f,
                                          0.01f,
                                          2000.0f,
-                                         Vector3(0.0f, 0.0f, -30.0f), // position
-                                         Vector3(0.0f, 0.0f, 1.0f), // target
+                                         camPos, // position
+                                         Vector3::FORWARD + camPos * -1.0f, // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
 
   // create light
   light = g_SceneManager().getActiveScene()->instantiate("Test Light");
-  // add light component
   light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = light->getComponent<Light>();
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
@@ -113,10 +114,10 @@ ShaderTest::input()
   float cam_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, 0.0f, cam_speed));
+    m_camera->getComponent<Camera>()->moveForward(cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, 0.0f, -cam_speed));
+    m_camera->getComponent<Camera>()->moveForward(-cam_speed);
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
@@ -148,12 +149,11 @@ ShaderTest::input()
   float rot = 1.0f * deltaTime;
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
     // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
-    m_camera->getComponent<Camera>()->rotate(Vector3(0.0f, rot, 0.0f));
+    m_camera->getComponent<Camera>()->rotate(0.0f, rot, 0.0f);
   }
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    rot *= -1.0f;
     // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
-    m_camera->getComponent<Camera>()->rotate(Vector3(0.0f, rot, 0.0f));
+    m_camera->getComponent<Camera>()->rotate(0.0f, -rot, 0.0f);
   }
   else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
     rot *= -1.0f;

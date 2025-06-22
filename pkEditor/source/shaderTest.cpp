@@ -121,17 +121,17 @@ ShaderTest::input()
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera->getComponent<Camera>()->move(Vector3(cam_speed, 0.0f, 0.0f));
+    m_camera->getComponent<Camera>()->moveRight(cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera->getComponent<Camera>()->move(Vector3(-cam_speed, 0.0f, 0.0f));
+    m_camera->getComponent<Camera>()->moveRight(-cam_speed);
   }
   // move up/down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, cam_speed, 0.0f));
+    m_camera->getComponent<Camera>()->moveUp(cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
-    m_camera->getComponent<Camera>()->move(Vector3(0.0f, -cam_speed, 0.0f));
+    m_camera->getComponent<Camera>()->moveUp(-cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
     Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;

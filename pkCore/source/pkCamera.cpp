@@ -65,12 +65,48 @@ void
 Camera::moveForward(float _offset)
 {
   // scale is the third column in the matrix, which in a view matrix is the view direction.
-  Vector3 forward = (m_view.inverse().getScale3()).normalized();
+  Vector4 forward = Vector4(getForward(), 1.0f);
+  m_at = forward + m_eye;
   // m_eye += forward * _offset;
   // m_at += forward * _offset;
-  Vector3 pos = forward * _offset;
-  m_view *= Matrix4::translation(pos);
-  // m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  Vector3 newOffset = forward.xyz() * _offset;
+  m_eye += newOffset;
+  m_at += newOffset;
+  m_up += newOffset;
+  // m_view *= Matrix4::translation(pos);
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveRight(float _offset)
+{
+  Vector3 right = getRight();
+  Vector3 pos = right * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_up += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveUpLocal(float _offset)
+{
+  Vector3 up = getUp();
+  Vector3 pos = up * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_up += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveUp(float _offset)
+{
+  Vector3 pos = Vector3::UP * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_up += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
 void
@@ -88,8 +124,9 @@ Camera::rotate(Vector3 _rotate)
 Vector3
 Camera::getForward()
 {
-  Vector4 forwardVec = (m_at - m_eye);
-  forwardVec.normalize();
+  // Vector4 forwardVec = (m_at - m_eye);
+  Vector4 forwardVec = Vector4(m_view.inverse().getScale3().normalized(), 1.0f) - m_eye;
+  forwardVec.w = 1.0f;
   Vector3 forward3 = Vector3(forwardVec.x, forwardVec.y, forwardVec.z);
   setForward(forward3);
   return forward3;

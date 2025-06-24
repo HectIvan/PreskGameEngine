@@ -12,6 +12,7 @@
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
 
+using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBLuminance;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
@@ -34,10 +35,12 @@ using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_VBlur;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
 using pkEngineSDK::Scene;
@@ -114,17 +117,17 @@ ShaderTest::input()
   float cam_speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-    m_camera->getComponent<Camera>()->moveForward(cam_speed);
+    m_camera->getComponent<Camera>()->moveForwardLocal(cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-    m_camera->getComponent<Camera>()->moveForward(-cam_speed);
+    m_camera->getComponent<Camera>()->moveForwardLocal(-cam_speed);
   }
   // move left/right
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera->getComponent<Camera>()->moveRight(cam_speed);
+    m_camera->getComponent<Camera>()->moveRight(-cam_speed);
   }
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera->getComponent<Camera>()->moveRight(-cam_speed);
+    m_camera->getComponent<Camera>()->moveRight(cam_speed);
   }
   // move up/down
   if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
@@ -247,6 +250,9 @@ ShaderTest::onUpdate()
   CBLuminance lum;
   lum.tolerance = 0.9f;
 
+  CBBlur blur;
+  blur.targetSize = Vector2(10.0f, 10.0f);
+
   // data type sizes
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 camSize = sizeof(Camera);
@@ -279,6 +285,9 @@ ShaderTest::onUpdate()
                            camSize);
 
   api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));
+
+  api.updateConstantBuffer(rm.getPass(kP_HBlur)->getCBuffer(0), &blur, sizeof(blur));
+  api.updateConstantBuffer(rm.getPass(kP_VBlur)->getCBuffer(0), &blur, sizeof(blur));
 }
 
 // to do: fix the deferred renderer to be able to show the final result

@@ -78,25 +78,32 @@ class PK_CORE_EXPORT Camera : public Component
   move(Vector3 _dist);
 
   /**
-   * @brief Move the camera forward in its local axis.
+   * @brief Move the camera forward in the global axis.
    * @param _offset Distance to move.
    */
   void
   moveForward(float _offset);
 
   /**
-   * @brief Move the camera right in its local axis.
+   * @brief Move the camera forward in its local axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveForwardLocal(float _offset);
+
+  /**
+   * @brief Move the camera right in the global axis.
    * @param _offset Distance to move.
    */
   void
   moveRight(float _offset);
 
   /**
-   * @brief Move the camera up in its local axis.
+   * @brief Move the camera right in its local axis.
    * @param _offset Distance to move.
    */
   void
-  moveUpLocal(float _offset);
+  moveRightLocal(float _offset);
 
   /**
    * @brief Move the camera up in the global axis.
@@ -104,6 +111,13 @@ class PK_CORE_EXPORT Camera : public Component
    */
   void
   moveUp(float _offset);
+
+  /**
+   * @brief Move the camera up in its local axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveUpLocal(float _offset);
 
   /**
   * Rotate the camera by rotating the At vector

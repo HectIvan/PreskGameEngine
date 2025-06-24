@@ -59,6 +59,28 @@ void RendererManager::init()
                                                 kPK_FORMAT_R32G32B32A32_FLOAT);
   m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, luminanceRT });
 
+  SPtr<Texture> hBlurredluminanceRT = api.createTexture(4,
+                                                        winWidth,
+                                                        winHeight,
+                                                        kPK_FORMAT_R32G32B32A32_FLOAT,
+                                                        kPK_USAGE_DEFAULT,
+                                                        kPK_BIND_SHADER_RESOURCE |
+                                                        kPK_BIND_RENDER_TARGET,
+                                                        false,
+                                                        kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_HBlurredLuminance, hBlurredluminanceRT });
+
+  SPtr<Texture> vBlurredluminanceRT = api.createTexture(4,
+                                                        winWidth,
+                                                        winHeight,
+                                                        kPK_FORMAT_R32G32B32A32_FLOAT,
+                                                        kPK_USAGE_DEFAULT,
+                                                        kPK_BIND_SHADER_RESOURCE |
+                                                        kPK_BIND_RENDER_TARGET,
+                                                        false,
+                                                        kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_VBlurredLuminance, vBlurredluminanceRT });
+
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
@@ -161,23 +183,34 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_Luminance, luminancePass });
 
   /****************************************************************************
-   * Blur Quad pass
+   * Horizontal Blur Quad pass
    ***************************************************************************/
-  // pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
-  // pDesc.pSEntry = "HBlur";
-  // pDesc.cBSizes = { sizeof(Vector4) };
-  // pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  // SPtr<Pass> blurPass = make_shared<Pass>(pDesc);
-  // // insert to the passes
-  // m_passes.insert({ PASS_TYPE::kP_Blur, blurPass });
+  pDesc.pSDirectory = L"shaders/pkHBlur.hlsl";
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
+  SPtr<Pass> hBlurPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_HBlur, hBlurPass });
+
+  /****************************************************************************
+   * Vrtical Blur Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_VBlurredLuminance) };
+  SPtr<Pass> vBlurPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_VBlur, vBlurPass });
 
   /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = L"shaders/pkToneMapQuadShader.hlsl";
   pDesc.cBSizes = {};
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Luminance) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
+                   getGBuffer(G_BUFFERS::kGB_VBlurredLuminance) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> testPass = make_shared<Pass>(pDesc);
   // insert to the passes

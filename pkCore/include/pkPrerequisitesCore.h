@@ -83,6 +83,12 @@ struct CBLuminance
   Vector3 unused;
 };
 
+struct CBBlur
+{
+  Vector2 targetSize;
+  Vector2 unused;
+};
+
 struct KeyPosition
 {
   Vector3 position;

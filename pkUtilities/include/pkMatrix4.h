@@ -265,6 +265,34 @@ class PK_UTILITY_EXPORT Matrix4
   determinant3x3(int r1, int r2, int r3, int c1, int c2, int c3);
 
   /**
+   * @brief get the forward vector from a view matrix.
+   * @return the forward vector.
+   */
+  Vector3
+  getForwardVector();
+
+  /**
+   * @brief get the up vector from a view matrix.
+   * @return the up vector.
+   */
+  Vector3
+  getUpVector();
+
+  /**
+   * @brief get the right vector from a view matrix.
+   * @return the right vector.
+   */
+  Vector3
+  getRightVector();
+
+  /**
+   * @brief Get the position of the view matrix.
+   * @return The position of the view.
+   */
+  Vector3
+  getViewPosition();
+
+  /**
    * @brief Get the inverse matrix.
    * @return The inverse matrix.
    */

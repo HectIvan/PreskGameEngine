@@ -16,5 +16,4 @@ float4 PS(PS_INPUT input) : SV_Target0
     // float2 uv = input.Position.xy / float2(1920, 1080);
 
     return albedoSample + luminanceSample;
-
 }

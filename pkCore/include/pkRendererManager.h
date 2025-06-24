@@ -38,6 +38,8 @@ namespace G_BUFFERS
     kGB_Normal,
     kGB_Shadow,
     kGB_Luminance,
+    kGB_HBlurredLuminance,
+    kGB_VBlurredLuminance,
   };
 };
 
@@ -57,7 +59,8 @@ namespace PASS_TYPE
     kP_AO,
     kP_ShadowDef,
     kP_Luminance,
-    kP_Blur,
+    kP_HBlur,
+    kP_VBlur,
     kP_Tone,
   };
 }

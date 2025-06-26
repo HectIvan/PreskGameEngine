@@ -6,6 +6,8 @@
 #include "pkLogger.h"
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
+#include "pkEventQueue.h"
+#include "pkPlatformMath.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -101,6 +103,12 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   case WM_DESTROY:
   {
     PostQuitMessage(0);
+    break;
+  }
+  case WM_MOUSEWHEEL:
+  {
+    g_eventManager().scrollWheel = static_cast<int8>(GET_WHEEL_DELTA_WPARAM(wParam));
+    g_eventManager().scrollWheel = Math::clamp(g_eventManager().scrollWheel, -1.0f, 1.0f);
     break;
   }
   default:

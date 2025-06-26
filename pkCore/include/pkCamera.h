@@ -198,12 +198,6 @@ class PK_CORE_EXPORT Camera : public Component
   setUp(Vector3 _vec) { m_up = _vec; }
 
   /**
-  * Set all the direction vectors.
-  **/
-  void
-  updateRotation();
-
-  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */

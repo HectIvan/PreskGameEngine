@@ -557,9 +557,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at the rotations given to it.
    */
   static Matrix4
-  rotation(float& _angleX,
-           float& _angleY,
-           float& _angleZ);
+  rotation(float _angleX, float _angleY, float _angleZ);
 
   /**
    * @brief The rotation matrix that is created from

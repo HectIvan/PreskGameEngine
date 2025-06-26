@@ -361,7 +361,7 @@ Matrix4::getRotation()
 }
 
 Matrix4
-Matrix4::rotation(float& _angleX, float& _angleY, float& _angleZ)
+Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M = rotationX(_angleX) * rotationY(_angleY) * rotationZ(_angleZ);

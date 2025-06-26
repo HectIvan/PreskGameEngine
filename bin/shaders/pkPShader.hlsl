@@ -140,6 +140,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     // get the base color
     float4 diffuseSam = diffuseTex.Sample(samLinear, input.Tex);
     float3 normalSam = normalTex.Sample(samLinear, input.Tex).rgb * 2.0f - 1.0f;
+    float4 aoSam = occlusionTex.Sample(samLinear, input.Tex);
     
     float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
     float3 normWorld = normalize(mul(normalSam, TBN));
@@ -163,7 +164,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     
     float3 lightning = lamb * LightColor + blinnPhong * LightColor;
     
-    output.diffuse = diffuseSam;
+    output.diffuse = diffuseSam * aoSam;
     output.normal = float4(normalWS, 1.0f);
     return output;
 }

@@ -44,6 +44,7 @@ BaseApp::init(const char** _argv, int32 _count)
   SceneManager::startUp();
   TextureManager::startUp();
   TimeManager::startUp();
+  EventQueue::startUp();
 
   initWindow();
   initAPI(_argv, _count);
@@ -96,12 +97,15 @@ run(String _name, Window& _window)
 void
 BaseApp::messageLoop()
 {
+  EventQueue& eventQueue = g_eventManager();
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
   // event loop, while the escape key has not been pressed
-  while (!m_eventQueue.iskeyPressed(KEY::kEsc)) {
+  while (!eventQueue.iskeyPressed(KEY::kEsc)) {
+    // reset scroll wheel input
+    eventQueue.scrollWheel = 0;
     // event window specific input
-    m_eventQueue.windowInput(m_window);
+    eventQueue.windowInput(m_window);
     // update the delta time
     // m_deltaTime = g_TimeManager().getDeltaTime(delta);
     g_TimeManager().m_deltaTime = g_TimeManager().getDeltaTime(delta);
@@ -120,7 +124,7 @@ BaseApp::messageLoop()
       g_SceneManager().getActiveScene()->update(g_TimeManager().m_fixedDeltaTime);
     }
     // event queue
-    m_eventQueue.poll();
+    eventQueue.poll();
     // render the scene
     render();
   }
@@ -153,9 +157,9 @@ BaseApp::render()
   api.draw(3, 0);
   renderManager.getPass(PASS_TYPE::kP_HBlur)->endPass();
   // vertical blur quad pass
-  renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
-  api.draw(3, 0);
-  renderManager.getPass(PASS_TYPE::kP_VBlur)->endPass();
+  // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
+  // api.draw(3, 0);
+  // renderManager.getPass(PASS_TYPE::kP_VBlur)->endPass();
   // Quad tone map pass
   renderManager.getPass(PASS_TYPE::kP_Tone)->beginPass();
   api.draw(3, 0);

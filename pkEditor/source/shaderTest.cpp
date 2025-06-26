@@ -4,6 +4,7 @@
 #include "pkGraphicTypes.h"
 #include "pkUInterface.h"
 #include "pkLogger.h"
+#include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
 #include "pkResourceManager.h"
@@ -16,9 +17,11 @@ using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBLuminance;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
+using pkEngineSDK::EventQueue;
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
+using pkEngineSDK::g_eventManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
@@ -31,6 +34,7 @@ using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::Material;
+using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_AO;
@@ -64,7 +68,10 @@ ShaderTest::onInit()
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
   // create camera
-  m_cameraSpeed = 20.0f;
+  m_baseCamSpeed = 20.0f;
+  m_cameraSpeed = m_baseCamSpeed;
+  m_maxCamSpeed = 200.0f;
+  m_camAccelerate = 30.0f;
   m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
@@ -72,7 +79,7 @@ ShaderTest::onInit()
                                          m_window.getHeight(),
                                          3.1416f / 4.0f,
                                          0.01f,
-                                         2000.0f,
+                                         3000.0f,
                                          camPos, // position
                                          Vector3::FORWARD + camPos * -1.0f, // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
@@ -112,58 +119,44 @@ ShaderTest::onInit()
 void
 ShaderTest::input()
 {
+  EventQueue& eventQueue = g_eventManager().instance();
   float deltaTime = g_TimeManager().m_deltaTime;
   // update the camera m_speed
-  float cam_speed = m_cameraSpeed * deltaTime;
+  m_cameraSpeed += m_camAccelerate * deltaTime * eventQueue.scrollWheel;
+  m_cameraSpeed = Math::clamp(m_cameraSpeed, 0.0f, m_maxCamSpeed);
+  float speed = m_cameraSpeed * deltaTime;
   // move forward/backward
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused) {
+    m_camera->getComponent<Camera>()->moveForwardLocal(speed);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(-cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused) {
+    m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
   }
   // move left/right
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-    m_camera->getComponent<Camera>()->moveRight(-cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused) {
+    m_camera->getComponent<Camera>()->moveRightLocal(-speed);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-    m_camera->getComponent<Camera>()->moveRight(cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused) {
+    m_camera->getComponent<Camera>()->moveRightLocal(speed);
   }
   // move up/down
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
-    m_camera->getComponent<Camera>()->moveUp(cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
+    m_camera->getComponent<Camera>()->moveUpLocal(speed);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
-    m_camera->getComponent<Camera>()->moveUp(-cam_speed);
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
+    m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
-    Vector2 posDif = (m_lastCursorPos - m_eventQueue.mousePosition) * deltaTime;
-    // m_camera->rotate(-posDif.y, posDif.x, 0.0f);
-    m_lastCursorPos = m_eventQueue.mousePosition;
+  // rotate camera
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused) {
+    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * deltaTime;
+    m_lastCursorPos = eventQueue.mousePosition;
+    m_camera->getComponent<Camera>()->rotate(-posDif.y, 0.0f, 0.0f);
+    m_camera->getComponent<Camera>()->rotate(0.0f, posDif.x, 0.0f);
   }
-  else {
-    m_lastCursorPos = m_eventQueue.mousePosition;
-  }
-
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) && m_window.m_isFocused) {
+  m_lastCursorPos = eventQueue.mousePosition;
+  // compile shaders
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) && m_window.m_isFocused) {
     g_RenderManager().compileShaders();
-  }
-
-  float rot = 1.0f * deltaTime;
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
-    m_camera->getComponent<Camera>()->rotate(0.0f, rot, 0.0f);
-  }
-  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    // m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationY(rot);
-    m_camera->getComponent<Camera>()->rotate(0.0f, -rot, 0.0f);
-  }
-  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    rot *= -1.0f;
-    m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationX(rot);
-  }
-  else if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    m_camera->getComponent<Camera>()->m_view *= Matrix4::rotationX(rot);
   }
 }
 
@@ -178,10 +171,12 @@ ShaderTest::uInterfaceUpdate()
   im.windowNewFrame();
   im.uINewFrame();
 
+  float yOffset = 0.0f;
+  float winWidth = 420.0f;
   Vector2 winRect = m_window.getClientWidthHeight();
   
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(winRect.x * 0.2f, winRect.y));
+  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
   im.setNextWindowPos(Vector2(0.0f));
   im.startWindowCreate("Scene");
   uint32 actorCount = sm.getActiveScene()->getActorCount();
@@ -193,38 +188,50 @@ ShaderTest::uInterfaceUpdate()
 
   // --- Transform window --- //
   Vector3 testPos = Vector3(0.0f);
-  im.setNewWindowSize(Vector2(500.0f, 300.0f));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 0.0f));
+  im.setNewWindowSize(Vector2(winWidth, 300.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Transform");
   im.createSliderVector3("Position",
                          testPos,
                          -2147483648.0f,
                          2147483647.0f);
   im.endWindowCreate();
+  yOffset += 300;
   // -------------------------- //
 
   // get framerate
   uint32 fps = static_cast<uint32>(1.0f / g_TimeManager().m_deltaTime);
-  String str = "FPS: " + to_string(fps);
+  String fpsStr = "FPS: " + to_string(fps);
+  String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
 
   // --- Display window --- //
-  testPos = Vector3(0.0f);
-  im.setNewWindowSize(Vector2(500.0f, 100.0f));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 300.0f));
+  im.setNewWindowSize(Vector2(winWidth, 75.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Display");
-  im.createText(str.c_str());
+  im.createText(fpsStr.c_str());
   im.createCheckBox("vSync", m_vSync);
   im.endWindowCreate();
+  yOffset += 75.0f;
+  // -------------------------- //
+
+  // --- Camera window --- //
+  im.setNewWindowSize(Vector2(winWidth, 75.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+  im.startWindowCreate("Camera");
+  im.createSliderF("Camera Acceleration", m_camAccelerate, 0.0f, m_maxCamSpeed);
+  im.createText(camSpeed.c_str());
+  im.endWindowCreate();
+  yOffset += 75.0f;
   // -------------------------- //
 
   // --- Post-Process window --- //
-  testPos = Vector3(0.0f);
-  im.setNewWindowSize(Vector2(500.0f, 300.0f));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - 500.0f, 400.0f));
+  im.setNewWindowSize(Vector2(winWidth, 300.0f));
+  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Render");
   im.createCheckBox("Shadows", m_shadows);
   im.createCheckBox("Ambient Oclussion", m_AO);
   im.endWindowCreate();
+  yOffset += 300.0f;
   // -------------------------- //
 
   im.render();

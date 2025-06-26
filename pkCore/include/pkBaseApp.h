@@ -95,10 +95,13 @@ class PK_CORE_EXPORT BaseApp
  public:
   // system
   Window m_window;
-  EventQueue m_eventQueue;
+  // EventQueue m_eventQueue;
 
   // camera movement speed
   float m_cameraSpeed;
+  float m_baseCamSpeed;
+  float m_camAccelerate;
+  float m_maxCamSpeed;
 
   // fixed update
   float m_deltaTime = 0.0f;

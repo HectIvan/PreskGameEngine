@@ -71,17 +71,14 @@ Camera::moveForward(float _offset)
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
+// to do: change return of xyz from copy to reference (maybe)
 void
 Camera::moveForwardLocal(float _offset)
 {
-  Vector4 forward = Vector4(getForward(), 1.0f);
-  // m_eye = Vector4(m_view.inverse().getViewPosition(), 1.0f);
-  m_at = forward + m_eye;
-  Vector3 newOffset = forward.xyz() * _offset;
-  m_eye += newOffset;
-  m_at += newOffset;
-  // m_up += newOffset;
-  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  m_at += forward * _offset;
+  m_eye += forward * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
@@ -90,21 +87,17 @@ Camera::moveRight(float _offset)
   Vector3 pos = Vector3::RIGHT * _offset;
   m_eye += pos;
   m_at += pos;
-  // m_up += pos;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
 void
 Camera::moveRightLocal(float _offset)
 {
-  Vector4 right = Vector4(getRight(), 1.0f);
-  // m_eye = Vector4(m_view.inverse().getViewPosition(), 1.0f);
-  m_at = right + m_eye;
-  Vector3 newOffset = right.xyz() * _offset;
-  m_eye += newOffset;
-  m_at += newOffset;
-  // m_up += newOffset;
-  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  Vector3 right = m_view.getUpVector().cross(forward);
+  m_at += right * _offset;
+  m_eye += right * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
@@ -120,20 +113,18 @@ Camera::moveUp(float _offset)
 void
 Camera::moveUpLocal(float _offset)
 {
-  Vector4 up = Vector4(getUp(), 1.0f);
-  // m_eye = Vector4(m_view.inverse().getViewPosition(), 1.0f);
-  m_at = up + m_eye;
-  Vector3 newOffset = up.xyz() * _offset;
-  m_eye += newOffset;
-  m_at += newOffset;
-  m_up += newOffset;
-  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  m_at += Vector3::UP * _offset;
+  m_eye += Vector3::UP * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  m_view *= Matrix4::rotation(_x, _y, _z);
+  m_view *= Matrix4::rotation(_x, _y, 0.0f);
+  m_at = m_eye + m_view.getForwardVector();
+  m_up = m_eye.xyz() + m_view.getUpVector();
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
@@ -145,38 +136,24 @@ Camera::rotate(Vector3 _rotate)
 Vector3
 Camera::getForward()
 {
-  // Vector4 forwardVec = (m_at - m_eye);
   Vector3 forwardVec = m_view.inverse().getForwardVector();
   forwardVec.normalize();
-  setForward(forwardVec);
   return forwardVec;
 }
 
 Vector3
 Camera::getRight()
 {
-  // Vector3 rightVec = (getForward() ^ m_up);
   Vector3 rightVec = m_view.inverse().getRightVector();
   rightVec.normalize();
-  setRight(rightVec);
   return rightVec;
 }
 
 Vector3
 Camera::getUp()
 {
-  // Vector3 upVec = getForward() ^ getRight();
   Vector3 upVec = m_view.inverse().getUpVector();
   upVec.normalize();
-  setUp(upVec);
   return upVec;
-}
-
-void
-Camera::updateRotation()
-{
-  setForward(getForward());
-  setRight(getRight());
-  setUp(getUp());
 }
 }

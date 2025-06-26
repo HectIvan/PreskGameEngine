@@ -47,5 +47,11 @@ EventQueue::windowInput(Window& _window)
   }
   _window.m_isFocused = GetFocus() == _window.getWindowHandle();
 }
+
+PK_CORE_EXPORT EventQueue&
+g_eventManager()
+{
+  { return EventQueue::instance(); }
+}
 }
 #endif

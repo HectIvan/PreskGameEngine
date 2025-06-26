@@ -24,12 +24,12 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     float2 texelSize = 1.0 / targetSize;
 
     // Horizontal offsets (X direction)
-    float kernel[5] = { 0.1f, 0.2f, 0.4f, 0.2f, 0.1f };
-    float offsetX[5] = { -2.0f, -1.0f, 0.0f, 1.0f, 2.0f };
+    float kernel[2] = { 0.1f, 0.1f };
+    float offsetX[2] = { -2.0f, 2.0f };
 
     float3 sum = float3(0.0f, 0.0f, 0.0f);
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         float2 offsetCoord = input.TexCoord + float2(offsetX[i], 0.0f) * texelSize;
         sum += textureResource.Sample(samState, offsetCoord).rgb * kernel[i];

@@ -26,6 +26,7 @@
 #include "pkTexture.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
+#include "pkWindowDesc.h"
 
 using pkEngineSDK::Actor;
 using pkEngineSDK::BaseApp;
@@ -57,6 +58,12 @@ class ShaderTest : public BaseApp
    */
   void
   onInit() override;
+
+  /**
+   * @brief Initialize Editor window.
+   */
+  void
+  initWin() override;
 
   /**
    * @brief Application input. 

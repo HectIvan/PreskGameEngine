@@ -6,7 +6,7 @@ namespace pkEngineSDK
 {
   
 void
-UInterface::initAPI()
+UInterface::initWithAPI()
 {
   // get the api
   GraphicsAPI& api = GraphicsAPI::instance();

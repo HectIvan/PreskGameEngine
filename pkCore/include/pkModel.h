@@ -40,9 +40,9 @@ class PK_CORE_EXPORT Model : public Component
   }
 
   /**
-  * @brief Load the model from a path.
-  * @param _path File path.
-  **/
+   * @brief Load the model from a path.
+   * @param _path File path.
+   */
   void
   load(Path& _path);
 

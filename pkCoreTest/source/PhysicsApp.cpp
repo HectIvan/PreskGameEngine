@@ -139,89 +139,90 @@ PhysicsApp::onInit()
 void
 PhysicsApp::onUpdate()
 {
-  float deltaTime = g_TimeManager().m_deltaTime;
-  // fire the projectile
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
-    !m_firing)
-  {
-    fireProjectile();
-    m_firing = true;
-  }
-  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF))
-  {
-    m_firing = false;
-  }
-  // move left or right
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
-  {
-    m_fireDirection.x -= 1.0f * deltaTime;
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
-  {
-    m_fireDirection.x += 1.0f * deltaTime;
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
-    !m_changingType) {
-    m_changingType = true;
-    // change simulation type
-    if (m_type == PHYSICS_TYPE::kEuler) {
-      m_type = PHYSICS_TYPE::kVerlet;
-    }
-    else {
-      m_type = PHYSICS_TYPE::kEuler;
-    }
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
-    g_RenderManager().compileShaders();
-  }
-//  Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
-  float strength = 5.0f * deltaTime;
-  Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
-    m_ik->fabrik(posIK +
-                 Vector3::DOWN *
-                 strength);
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
-    m_ik->fabrik(posIK + 
-                 Vector3::UP *
-                 strength);
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
-    m_ik->fabrik(posIK +
-                 Vector3::RIGHT *
-                 strength);
-  }
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
-    //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
-    m_ik->fabrik(posIK + 
-                 Vector3::LEFT *
-                 strength);
-  }
-
-  if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
-    Vector3 mousePos = Vector3(m_eventQueue.mousePosition.x,
-                               m_eventQueue.mousePosition.y,
-                               0.0f);
-    float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
-    float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
-    float ndcZ = 0.0f;
-
-    Vector3 ndcPos = Vector3(ndcX, ndcY, ndcZ);
-    g_Logger().print(mousePos);
-    m_ik->fabrik(mousePos * 0.01f);
-    if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
-    }
-  }
-  else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
-    m_changingType = false;
-  }
-  if (m_type == PHYSICS_TYPE::kEuler) {
-    physics(deltaTime);
-  }
+  // float deltaTime = g_TimeManager().m_deltaTime;
+  // 
+  // // fire the projectile
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF) &&
+  //   !m_firing)
+  // {
+  //   fireProjectile();
+  //   m_firing = true;
+  // }
+  // else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kF))
+  // {
+  //   m_firing = false;
+  // }
+  // // move left or right
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kA))
+  // {
+  //   m_fireDirection.x -= 1.0f * deltaTime;
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kD))
+  // {
+  //   m_fireDirection.x += 1.0f * deltaTime;
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) &&
+  //   !m_changingType) {
+  //   m_changingType = true;
+  //   // change simulation type
+  //   if (m_type == PHYSICS_TYPE::kEuler) {
+  //     m_type = PHYSICS_TYPE::kVerlet;
+  //   }
+  //   else {
+  //     m_type = PHYSICS_TYPE::kEuler;
+  //   }
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kB)) {
+  //   g_RenderManager().compileShaders();
+  // }
+////   Vector3 weightPos = m_spring->m_weight->m_transform.getTranslation3();
+  // float strength = 5.0f * deltaTime;
+  // Vector3 posIK = m_ik->getLastBone()->actorIni->getPosition3();
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kUp)) {
+  //   //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::DOWN * deltaTime * strength);
+  //   m_ik->fabrik(posIK +
+  //                Vector3::DOWN *
+  //                strength);
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kDown)) {
+  //   //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::UP * deltaTime * strength);
+  //   m_ik->fabrik(posIK + 
+  //                Vector3::UP *
+  //                strength);
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kRight)) {
+  //   //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::RIGHT * deltaTime * strength);
+  //   m_ik->fabrik(posIK +
+  //                Vector3::RIGHT *
+  //                strength);
+  // }
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLeft)) {
+  //   //m_spring->m_weight->m_transform.setTranslation(weightPos + Vector3::LEFT * deltaTime * strength);
+  //   m_ik->fabrik(posIK + 
+  //                Vector3::LEFT *
+  //                strength);
+  // }
+  // 
+  // if (m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
+  //   Vector3 mousePos = Vector3(m_eventQueue.mousePosition.x,
+  //                              m_eventQueue.mousePosition.y,
+  //                              0.0f);
+  //   float ndcX = (2.0f * mousePos.x) / m_window.getWidth() - 1.0f;
+  //   float ndcY  = 1.0f - (2.0f * mousePos.y) / m_window.getHeight();
+  //   float ndcZ = 0.0f;
+  // 
+  //   Vector3 ndcPos = Vector3(ndcX, ndcY, ndcZ);
+  //   g_Logger().print(mousePos);
+  //   m_ik->fabrik(mousePos * 0.01f);
+  //   if (mousePos.distanceTo(m_ik->getLastBone()->actorIni->getPosition3()) < 1.0f) {
+  //   }
+  // }
+  // else if (!m_eventQueue.iskeyPressed(pkEngineSDK::KEY::kC)) {
+  //   m_changingType = false;
+  // }
+  // if (m_type == PHYSICS_TYPE::kEuler) {
+  //   physics(deltaTime);
+  // }
 }
 
 void

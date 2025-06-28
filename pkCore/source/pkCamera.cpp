@@ -121,7 +121,7 @@ Camera::moveUpLocal(float _offset)
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  m_view *= Matrix4::rotation(_x, _y, 0.0f);
+  m_view *= Matrix4::rotation(_x, _y, _z);
   m_at = m_eye + m_view.getForwardVector();
   m_up = m_eye.xyz() + m_view.getUpVector();
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);

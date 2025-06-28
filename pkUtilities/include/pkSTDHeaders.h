@@ -6,6 +6,7 @@
 **/
 /*********************************************/
 #include <cassert>
+#include <functional>
 #include <map>
 #include <memory>
 #include <optional>
@@ -18,6 +19,10 @@
 
 namespace pkEngineSDK
 {
+
+template<class T>
+using Function = std::function<T>;
+
 using std::make_unique;
 
 using std::rand;

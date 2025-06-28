@@ -30,6 +30,7 @@ using pkEngineSDK::g_ResourceManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::int32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
@@ -45,6 +46,8 @@ using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_VBlur;
+using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
 using pkEngineSDK::Scene;
@@ -54,9 +57,24 @@ using pkEngineSDK::String;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
-
 // to do: create fileSystem.h in utilities
 // create class Path
+
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+#include "externals/imgui_impl_win32.h"
+// to do: delete this and replace with own
+#include "Windows.h"
+
+// Win32 message handler your application need to call.
+// - Intentionally commented out in a '#if 0' block to avoid dragging dependencies on <windows.h> from this helper.
+// - You should COPY the line below into your .cpp code to forward declare the function and then you can call it.
+// - Call from your application's message handler. Keep calling your message handler unless this function returns TRUE.
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
+                                                             UINT msg,
+                                                             WPARAM wParam,
+                                                             LPARAM lParam);
+#endif
 
 void
 ShaderTest::onInit()
@@ -64,7 +82,7 @@ ShaderTest::onInit()
   //start the interface
   UInterface::startUp();
   g_uInterface().init();
-  g_uInterface().initWin(m_window.getWindowHandle());
+  // g_uInterface().initWin(m_window.getWindowHandle());
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
   // create camera
@@ -114,6 +132,29 @@ ShaderTest::onInit()
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
   m_shadows = false;
+}
+
+void
+ShaderTest::initWin()
+{
+  PKWindowDesc desc;
+  desc.width = 1920;
+  desc.height = 1080;
+  std::string name = "Game Engine Window";
+  // imgui input
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+  desc.funct = [](PlatformPointer _hwnd,
+                  int32 _msg,
+                  PlatformPointer _wParam,
+                  PlatformPointer _lParam) {
+    LRESULT result = ImGui_ImplWin32_WndProcHandler(reinterpret_cast<HWND>(_hwnd),
+                                                    _msg,
+                                                    reinterpret_cast<WPARAM>(_wParam),
+                                                    reinterpret_cast<LPARAM>(_lParam));
+    return reinterpret_cast<PlatformPointer>(result);
+  };
+#endif
+  m_window.create(desc);
 }
 
 void

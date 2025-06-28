@@ -42,7 +42,7 @@ class UInterface : public Module<UInterface>
    * @brief Initialize the User Interface through the current api.
    */
   void
-  initAPI();
+  initWithAPI();
 
   /**
    * @brief Initialize imgui with the window.

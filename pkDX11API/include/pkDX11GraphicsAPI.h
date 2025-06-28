@@ -44,7 +44,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Initialize the api.
-   * @param _wHnd Window handle.
    */
   void
   initApi(const Window& _window) override;

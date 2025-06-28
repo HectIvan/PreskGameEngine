@@ -32,7 +32,8 @@ UInterface::init()
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
 
-  initAPI();
+  // initalize the UI with the desired Graphic API
+  initWithAPI();
 
   // ImGui::StyleColorsDark();
   ImGui::StyleColorsClassic();

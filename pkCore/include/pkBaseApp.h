@@ -47,11 +47,8 @@ class PK_CORE_EXPORT BaseApp
   virtual void
   onInit() {}
 
-  /**
-   * @brief Initialize the app window.
-   */
-  void
-  initWindow();
+  virtual void
+  initWin() {};
 
   /**
    * @brief Initialize the api.

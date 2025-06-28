@@ -46,22 +46,12 @@ BaseApp::init(const char** _argv, int32 _count)
   TimeManager::startUp();
   EventQueue::startUp();
 
-  initWindow();
+  initWin();
   initAPI(_argv, _count);
 
   g_SceneManager().init();
   g_RenderManager().init();
   onInit();
-}
-
-void
-BaseApp::initWindow()
-{
-  PKWindowDesc desc;
-  desc.width = 1920;
-  desc.height = 1080;
-  std::string name = "Game Engine Window";
-  m_window.create(desc, name);
 }
 
 void

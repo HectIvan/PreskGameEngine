@@ -62,9 +62,9 @@ UInterface::createSliderVector2(const char* _name,
   _param.y = vector[1];
 }
 
-void
+Vector3
 UInterface::createSliderVector3(const char* _name,
-                               Vector3& _param,
+                               Vector3 _param,
                                const float _min,
                                const float _max)
 {
@@ -73,6 +73,7 @@ UInterface::createSliderVector3(const char* _name,
   _param.x = vector[0];
   _param.y = vector[1];
   _param.z = vector[2];
+  return _param;
 }
 
 void

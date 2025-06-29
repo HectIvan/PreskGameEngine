@@ -139,8 +139,8 @@ class UInterface : public Module<UInterface>
    * @param _min Minimum value the parameter can have.
    * @param _max Maximum value the parameter can have.
    */
-  void
-  createSliderVector3(const char* _name, Vector3& _param, const float _min, const float _max);
+  Vector3
+  createSliderVector3(const char* _name, Vector3 _param, const float _min, const float _max);
   
   /**
    * @brief Create a checkbox.

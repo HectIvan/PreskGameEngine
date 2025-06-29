@@ -427,15 +427,6 @@ class PK_UTILITY_EXPORT Matrix4
    */
   static Matrix4
   translation(float& _offsetX, float& _offsetY, float& _offsetZ);
-  
-  /**
-   * @brief The translation matrix that is created from
-   * the Vector3 given to it.
-   * @param _position vector position.
-   * @return The translation matrix at the position given to it.
-   */
-  static Matrix4
-  translation(Vector3& _position);
 
   /**
    * @brief The translation matrix that is created from
@@ -444,7 +435,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The translation matrix at the position given to it.
    */
   static Matrix4
-  translationA(Vector3 _position);
+  translation(Vector3 _position);
 
   /**
    * @brief Set the translation
@@ -473,13 +464,6 @@ class PK_UTILITY_EXPORT Matrix4
    */
   Vector3
   getTranslation3();
-
-  /**
-   * @brief Get the current translation in a Vector3.
-   * @return The translation Vector.
-   */
-  Vector3
-  getTranslationVector();
   
   /**
    * @brief The translation matrix that is created from

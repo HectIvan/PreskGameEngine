@@ -192,17 +192,7 @@ Matrix4::translation(float& _offsetX, float& _offsetY, float& _offsetZ)
 } 
 
 Matrix4
-Matrix4::translation(Vector3& _position)
-{
-  Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][3] = _position.x;
-  M.matrix[1][3] = _position.y;
-  M.matrix[2][3] = _position.z;
-  return M;
-}
-
-Matrix4
-Matrix4::translationA(Vector3 _position)
+Matrix4::translation(Vector3 _position)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][3] = _position.x;
@@ -243,19 +233,11 @@ Matrix4::getTranslation3()
   return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
 
-Vector3
-Matrix4::getTranslationVector()
-{
-  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
-}
-
 Matrix4
 Matrix4::scale(Vector3& _scale)
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][3] = _scale.x;
-  M.matrix[1][3] = _scale.y;
-  M.matrix[2][3] = _scale.z;
+  M.setScale(_scale);
   return M;
 }
 
@@ -263,48 +245,45 @@ Matrix4
 Matrix4::getScale()
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][3] = matrix[0][3];
-  M.matrix[1][3] = matrix[1][3];
-  M.matrix[2][3] = matrix[2][3];
+  Vector3 scale = getScale3();
+  M.matrix[0][3] = scale.x;
+  M.matrix[1][3] = scale.y;
+  M.matrix[2][3] = scale.z;
   return M;
 }
 
 Vector3
 Matrix4::getScale3()
 {
-  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
+  return Vector3(matrix[0][3],
+                 matrix[1][3],
+                 matrix[2][3]);
 }
 
 void
 Matrix4::setScale(Vector3 _scale)
 {
-  matrix[3][0] = _scale.x;
-  matrix[3][1] = _scale.y;
-  matrix[3][2] = _scale.z;
+  setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
 Matrix4::setScale(Matrix4 _scale)
 {
-  matrix[3][0] = _scale.matrix[3][0];
-  matrix[3][1] = _scale.matrix[3][1];
-  matrix[3][2] = _scale.matrix[3][2];
-}
-
-void
-Matrix4::setScale(float _x, float _y, float _z)
-{
-  matrix[3][0] = _x;
-  matrix[3][1] = _y;
-  matrix[3][2] = _z;
+  setScale(_scale.getScale3());
 }
 
 void
 Matrix4::setScale(float _val)
 {
-  matrix[3][0] = _val;
-  matrix[3][1] = _val;
-  matrix[3][2] = _val;
+  setScale(_val, _val, _val);
+}
+
+void
+Matrix4::setScale(float _x, float _y, float _z)
+{
+  matrix[0][0] *= _x;
+  matrix[1][1] *= _y;
+  matrix[2][2] *= _z;
 }
 
 Matrix4

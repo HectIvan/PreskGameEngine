@@ -35,7 +35,7 @@ Actor::setPosition(Vector3 _position)
 void
 Actor::setPosition(float _x, float _y, float _z)
 {
-  m_transform = Matrix4::translation(_x, _y, _z);
+  m_transform.setTranslation(_x, _y, _z);
 }
 
 void

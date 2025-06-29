@@ -82,6 +82,7 @@ ShaderTest::onInit()
   //start the interface
   UInterface::startUp();
   g_uInterface().init();
+  g_uInterface().initWin(m_window.getWindowHandle());
   // g_uInterface().initWin(m_window.getWindowHandle());
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
@@ -127,6 +128,8 @@ ShaderTest::onInit()
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
+  pistol->m_transform.setScale(10.0f);
+  pistol->setPosition(0.0f, 5.0f, 0.0f);
 
   SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
@@ -228,12 +231,22 @@ ShaderTest::uInterfaceUpdate()
   // -------------------------- //
 
   // --- Transform window --- //
-  Vector3 testPos = Vector3(0.0f);
   im.setNewWindowSize(Vector2(winWidth, 300.0f));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Transform");
-  im.createSliderVector3("Position",
-                         testPos,
+  SPtr<Actor> pistol = sm.getActiveScene()->actorFind("Pistol");
+  Vector3 newTranslation = im.createSliderVector3("Position",
+                                                  pistol->getPosition3(),
+                                                  -2147483648.0f,
+                                                  2147483647.0f);
+  pistol->m_transform.setTranslation(newTranslation);
+  Vector3 newRotation = im.createSliderVector3("Rotation",
+                                               Vector3(0),
+                                               -2147483648.0f,
+                                               2147483647.0f);
+  // pistol->m_transform.setRotation(newRotation);
+  im.createSliderVector3("Scale",
+                         Vector3(10),
                          -2147483648.0f,
                          2147483647.0f);
   im.endWindowCreate();

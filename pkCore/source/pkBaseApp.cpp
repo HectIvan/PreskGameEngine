@@ -127,25 +127,31 @@ BaseApp::render()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& renderManager = g_RenderManager().instance();
   // first shadow pass
-  renderManager.getPass(PASS_TYPE::kP_Shadow)->beginPass();
-  renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-  renderManager.getPass(PASS_TYPE::kP_Shadow)->endPass();
+  if (m_shadows) {
+    renderManager.getPass(PASS_TYPE::kP_Shadow)->beginPass();
+    renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+    renderManager.getPass(PASS_TYPE::kP_Shadow)->endPass();
+  }
   // base pass
   renderManager.getPass(PASS_TYPE::kP_Base)->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   renderManager.getPass(PASS_TYPE::kP_Base)->endPass();
   // Quad luminance pass
-  renderManager.getPass(PASS_TYPE::kP_Luminance)->beginPass();
-  api.draw(3, 0);
-  renderManager.getPass(PASS_TYPE::kP_Luminance)->endPass();
-  // Quad shadow pass
-  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
-  api.draw(3, 0);
-  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
-  // horizontal blur quad pass
-  renderManager.getPass(PASS_TYPE::kP_HBlur)->beginPass();
-  api.draw(3, 0);
-  renderManager.getPass(PASS_TYPE::kP_HBlur)->endPass();
+  if (m_luminance) {
+    renderManager.getPass(PASS_TYPE::kP_Luminance)->beginPass();
+    api.draw(3, 0);
+    renderManager.getPass(PASS_TYPE::kP_Luminance)->endPass();
+    // horizontal blur quad pass
+    renderManager.getPass(PASS_TYPE::kP_HBlur)->beginPass();
+    api.draw(3, 0);
+    renderManager.getPass(PASS_TYPE::kP_HBlur)->endPass();
+  }
+  if (m_shadows) {
+    // Quad shadow pass
+    renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
+    api.draw(3, 0);
+    renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
+  }
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
   // api.draw(3, 0);

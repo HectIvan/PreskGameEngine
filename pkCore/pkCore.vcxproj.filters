@@ -96,9 +96,6 @@
     <ClInclude Include="include\pkSimpleVertex.h">
       <Filter>include\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkGameObject.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkIndexBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
@@ -241,9 +238,6 @@
     </ClCompile>
     <ClCompile Include="source\pkCamera.cpp">
       <Filter>source\camera</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkGameObject.cpp">
-      <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkModel.cpp">
       <Filter>source\game</Filter>

@@ -128,7 +128,7 @@ ShaderTest::onInit()
 
   SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
-  pistol->m_transform.setScale(10.0f);
+  pistol->setScale(10.0f);
   pistol->setPosition(0.0f, 5.0f, 0.0f);
 
   SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
@@ -225,33 +225,53 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate("Scene");
   uint32 actorCount = sm.getActiveScene()->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
-    im.createText(sm.getActiveScene()->getActor(i)->getNameCSTR());
+    if (im.createButton(sm.getActiveScene()->getActor(i)->getNameCSTR())) {
+      m_selectedActor = sm.getActiveScene()->getActor(i);
+    }
   }
+  m_selectedActor = sm.getActiveScene()->getActor(2);
   im.endWindowCreate();
   // -------------------------- //
 
+  float winHeight = 0.0f;
   // --- Transform window --- //
-  im.setNewWindowSize(Vector2(winWidth, 300.0f));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.startWindowCreate("Transform");
-  SPtr<Actor> pistol = sm.getActiveScene()->actorFind("Pistol");
-  Vector3 newTranslation = im.createSliderVector3("Position",
-                                                  pistol->getPosition3(),
-                                                  -2147483648.0f,
-                                                  2147483647.0f);
-  pistol->m_transform.setTranslation(newTranslation);
-  Vector3 newRotation = im.createSliderVector3("Rotation",
-                                               Vector3(0),
-                                               -2147483648.0f,
-                                               2147483647.0f);
-  // pistol->m_transform.setRotation(newRotation);
-  im.createSliderVector3("Scale",
-                         Vector3(10),
-                         -2147483648.0f,
-                         2147483647.0f);
-  im.endWindowCreate();
-  yOffset += 300;
+  if (m_selectedActor) {
+    winHeight = 100.0f;
+    im.setNewWindowSize(Vector2(winWidth, winHeight));
+    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+    im.startWindowCreate("Transform");
+    Vector3 newTranslation = im.createSliderVector3("Position",
+                                                    m_selectedActor->getPosition3(),
+                                                    -2147483648.0f,
+                                                    2147483647.0f);
+    m_selectedActor->setPosition(newTranslation);
+    Vector3 newRotation = im.createSliderVector3("Rotation",
+                                                 Vector3(0),
+                                                 -2147483648.0f,
+                                                 2147483647.0f);
+    // pistol->m_transform.setRotation(newRotation);
+    Vector3 newScale = im.createSliderVector3("Scale",
+                                              m_selectedActor->getScale(),
+                                              -2147483648.0f,
+                                              2147483647.0f);
+    m_selectedActor->setScale(newScale);
+    im.endWindowCreate();
+    yOffset += winHeight;
+
+    // ---- Components window ---- //
+    winHeight = m_selectedActor->getComponents().size() * 20.0f + 20.0f;
+    im.setNewWindowSize(Vector2(winWidth, winHeight));
+    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+    im.startWindowCreate("Components");
+    for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
+      im.createText(m_selectedActor->getComponents()[i]->getName());
+    }
+    im.endWindowCreate();
+    yOffset += winHeight;
+    // --------------------------- //
+  }
   // -------------------------- //
+
 
   // get framerate
   uint32 fps = static_cast<uint32>(1.0f / g_TimeManager().m_deltaTime);
@@ -259,33 +279,37 @@ ShaderTest::uInterfaceUpdate()
   String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
 
   // --- Display window --- //
-  im.setNewWindowSize(Vector2(winWidth, 75.0f));
+  winHeight = 75.0f;
+  im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Display");
   im.createText(fpsStr.c_str());
   im.createCheckBox("vSync", m_vSync);
   im.endWindowCreate();
-  yOffset += 75.0f;
+  yOffset += winHeight;
   // -------------------------- //
 
   // --- Camera window --- //
-  im.setNewWindowSize(Vector2(winWidth, 75.0f));
+  winHeight = 75.0f;
+  im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Camera");
   im.createSliderF("Camera Acceleration", m_camAccelerate, 0.0f, m_maxCamSpeed);
   im.createText(camSpeed.c_str());
   im.endWindowCreate();
-  yOffset += 75.0f;
+  yOffset += winHeight;
   // -------------------------- //
 
   // --- Post-Process window --- //
-  im.setNewWindowSize(Vector2(winWidth, 300.0f));
+  winHeight = 100.0f;
+  im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Render");
   im.createCheckBox("Shadows", m_shadows);
   im.createCheckBox("Ambient Oclussion", m_AO);
+  im.createCheckBox("Luminance", m_luminance);
   im.endWindowCreate();
-  yOffset += 300.0f;
+  yOffset += winHeight;
   // -------------------------- //
 
   im.render();

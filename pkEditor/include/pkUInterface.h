@@ -29,7 +29,7 @@ namespace pkEngineSDK
 class UInterface : public Module<UInterface>
 {
  public:
-   UInterface() = default;
+  UInterface() = default;
   virtual ~UInterface() = default;
 
   /**
@@ -37,7 +37,7 @@ class UInterface : public Module<UInterface>
    */
   void
   init();
-  
+
   /**
    * @brief Initialize the User Interface through the current api.
    */
@@ -64,7 +64,7 @@ class UInterface : public Module<UInterface>
    */
   void
   setNewWindowSize(Vector2 _size);
-  
+
   void
   uINewFrame();
 
@@ -73,7 +73,7 @@ class UInterface : public Module<UInterface>
    */
   void
   windowNewFrame();
-  
+
   /**
    * @brief
    */
@@ -85,33 +85,33 @@ class UInterface : public Module<UInterface>
    */
   void
   setCurrentContext();
-  
+
   /**
-   * @brief 
+   * @brief
    */
   void
   newFrameAPI();
-  
+
   /**
-   * brief 
+   * brief
    */
   void
   endFrame();
-  
+
   /**
    * @brief Creates a new User interface window.
    * @param _name Name of the window.
    */
   void
   startWindowCreate(const char* _name);
-  
+
   /**
    * @brief Create a text in the User interface window.
    * @param _text What text to display.
    */
   void
   createText(const char* _text);
-  
+
   /**
    * @brief Create a float slider.
    * @param _name Name of the slider.
@@ -121,7 +121,7 @@ class UInterface : public Module<UInterface>
    */
   void
   createSliderF(const char* _name, float& _param, const float _min, const float _max);
-  
+
   /**
    * @brief Create a Vector2 slider.
    * @param _name Name of the slider.
@@ -131,7 +131,7 @@ class UInterface : public Module<UInterface>
    */
   void
   createSliderVector2(const char* _name, Vector2& _param, const float _min, const float _max);
-  
+
   /**
    * @brief Create a Vector3 slider.
    * @param _name Name of the slider.
@@ -141,7 +141,7 @@ class UInterface : public Module<UInterface>
    */
   Vector3
   createSliderVector3(const char* _name, Vector3 _param, const float _min, const float _max);
-  
+
   /**
    * @brief Create a checkbox.
    * @param _name Name of the checkbox.
@@ -149,6 +149,13 @@ class UInterface : public Module<UInterface>
    */
   void
   createCheckBox(const char* _name, bool& _param);
+
+  /**
+   * @brief Create a Button.
+   * @param _name Name of the button.
+   */
+  bool
+  createButton(const char* _name);
   
   /**
    * @brief End the window creation process.

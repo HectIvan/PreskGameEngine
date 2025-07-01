@@ -205,6 +205,12 @@ class PK_CORE_EXPORT Camera : public Component
   getType() override { return COMPONENT_TYPE::kCamera; }
 
   /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Camera"; }
+
+  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */

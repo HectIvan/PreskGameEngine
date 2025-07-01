@@ -92,7 +92,7 @@ class ShaderTest : public BaseApp
   onRender() override;
 
  public:
-  Actor* m_actor;
+  SPtr<Actor> m_selectedActor;
   Vector2 m_lastCursorPos;
 
   // light source
@@ -112,7 +112,4 @@ class ShaderTest : public BaseApp
   // SPtr<ConstantBuffer> m_cbCamera;
 
   SPtr<Pass> m_basicPass;
-
-  bool m_shadows;
-  bool m_AO;
 };

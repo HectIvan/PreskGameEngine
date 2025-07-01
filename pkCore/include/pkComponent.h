@@ -45,5 +45,11 @@ class PK_CORE_EXPORT Component
 
   virtual COMPONENT_TYPE::E
   getType() = 0;
+
+  /**
+   * @brief Get the name of the component.
+   */
+  virtual const char*
+  getName() = 0;
 };
 }

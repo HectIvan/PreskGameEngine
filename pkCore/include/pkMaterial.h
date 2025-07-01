@@ -73,6 +73,12 @@ class Material : public Component
   getType() override { return COMPONENT_TYPE::kMaterial; }
 
   /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Material"; }
+
+  /**
    * @brief Get the component type of this class.
    * @return The class type.
    */

@@ -82,6 +82,12 @@ UInterface::createCheckBox(const char* _name, bool& _param)
   ImGui::Checkbox(_name, &_param);
 }
 
+bool
+UInterface::createButton(const char* _name)
+{
+  return ImGui::Button(_name);
+}
+
 void
 UInterface::endWindowCreate()
 {

@@ -23,19 +23,13 @@ Actor::setTransform(Matrix4 _transform)
 void
 Actor::setPosition(Matrix4 _translation)
 {
-  m_transform = _translation;
+  m_transform.setTranslation(_translation.getTranslation3());
 }
 
 void
 Actor::setPosition(Vector3 _position)
 {
   m_transform.setTranslation(_position);
-}
-
-void
-Actor::setPosition(float _x, float _y, float _z)
-{
-  m_transform.setTranslation(_x, _y, _z);
 }
 
 void
@@ -83,15 +77,31 @@ Actor::setRotation(float _x, float _y, float _z)
 }
 
 void
+Actor::setPosition(float _x, float _y, float _z)
+{
+  m_transform.setTranslation(_x, _y, _z);
+}
+
+void
 Actor::setScale(Matrix4 _scale)
 {
   m_transform.setScale(_scale);
 }
 
 void
+Actor::setScale(float _val) {
+  m_transform.setScale(_val);
+  m_scale = Vector3(_val, _val, _val);
+}
+
+void
 Actor::setScale(Vector3 _scale)
 {
+  m_transform.matrix[0][0] /= _scale.x;
+  m_transform.matrix[1][1] /= _scale.y;
+  m_transform.matrix[2][2] /= _scale.z;
   m_transform.setScale(_scale);
+  m_scale = _scale;
 }
 
 void

@@ -47,6 +47,9 @@ class PK_CORE_EXPORT BaseApp
   virtual void
   onInit() {}
 
+  /**
+   * @brief Initialize the window app.
+   */
   virtual void
   initWin() {};
 
@@ -106,12 +109,10 @@ class PK_CORE_EXPORT BaseApp
   float m_fixedDeltaTime = 0.016f;
 
  protected:
-  /**
-   * Used to store an object that is loaded from memory. once loaded, it will be stored
-   * in here, if the same object is asked to be loaded, it will first be searched here,if
-   * its found, the loaded object will be returned, instead of loading it again.
-   */
-
   bool m_vSync;
+
+  bool m_shadows;
+  bool m_AO;
+  bool m_luminance;
 };
 }

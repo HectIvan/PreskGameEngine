@@ -322,7 +322,7 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
   GraphicsAPI& api = g_GraphicAPI().instance();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
-    if (!_gameActors[i]->m_active) {
+    if (!_gameActors[i]->isActive()) {
       continue;
     }
     // Get the final matrix by taking into account the parent actors

@@ -91,6 +91,12 @@ class PK_CORE_EXPORT Model : public Component
   getType() override { return COMPONENT_TYPE::kModel; }
 
   /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Model"; }
+
+  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */

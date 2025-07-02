@@ -46,6 +46,12 @@ UInterface::setNewWindowSize(Vector2 _size)
 }
 
 void
+UInterface::setNewWindowSize(float _x, float _y)
+{
+  ImGui::SetNextWindowSize(ImVec2(_x, _y), ImGuiCond_Always);
+}
+
+void
 UInterface::uINewFrame()
 {
   ImGui::NewFrame();

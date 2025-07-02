@@ -1,4 +1,4 @@
-#include "ShaderTest.h"
+#include "ActorInspector.h"
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
@@ -12,6 +12,7 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkGraphicsAPI.h"
+#include "ShaderTest.h"
 
 using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBLuminance;
@@ -229,7 +230,7 @@ ShaderTest::uInterfaceUpdate()
       m_selectedActor = sm.getActiveScene()->getActor(i);
     }
   }
-  m_selectedActor = sm.getActiveScene()->getActor(2);
+  m_selectedActor = sm.getActiveScene()->getActor(1);
   im.endWindowCreate();
   // -------------------------- //
 
@@ -240,31 +241,22 @@ ShaderTest::uInterfaceUpdate()
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.startWindowCreate("Transform");
-    Vector3 newTranslation = im.createSliderVector3("Position",
-                                                    m_selectedActor->getPosition3(),
-                                                    -2147483648.0f,
-                                                    2147483647.0f);
-    m_selectedActor->setPosition(newTranslation);
-    Vector3 newRotation = im.createSliderVector3("Rotation",
-                                                 Vector3(0),
-                                                 -2147483648.0f,
-                                                 2147483647.0f);
-    // pistol->m_transform.setRotation(newRotation);
-    Vector3 newScale = im.createSliderVector3("Scale",
-                                              m_selectedActor->getScale(),
-                                              -2147483648.0f,
-                                              2147483647.0f);
-    m_selectedActor->setScale(newScale);
+
+    ActorInspector inspector(m_selectedActor);
+    
     im.endWindowCreate();
     yOffset += winHeight;
 
     // ---- Components window ---- //
-    winHeight = m_selectedActor->getComponents().size() * 20.0f + 20.0f;
+    winHeight = 160.0f;// m_selectedActor->getComponents().size() * 20.0f + 20.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.startWindowCreate("Components");
+    // for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
+    //   im.createText(m_selectedActor->getComponents()[i]->getName());
+    // }
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      im.createText(m_selectedActor->getComponents()[i]->getName());
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
     }
     im.endWindowCreate();
     yOffset += winHeight;
@@ -290,7 +282,7 @@ ShaderTest::uInterfaceUpdate()
   // -------------------------- //
 
   // --- Camera window --- //
-  winHeight = 75.0f;
+  winHeight = 100.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Camera");

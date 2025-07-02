@@ -65,6 +65,14 @@ class UInterface : public Module<UInterface>
   void
   setNewWindowSize(Vector2 _size);
 
+  /**
+   * @brief Set the size of the window being created.
+   * @param _x Window width.
+   * @param _y Window height.
+   */
+  void
+  setNewWindowSize(float _x, float _y);
+
   void
   uINewFrame();
 

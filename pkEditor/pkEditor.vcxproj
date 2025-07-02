@@ -163,6 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\ActorInspector.cpp" />
     <ClCompile Include="source\externals\imgui.cpp" />
     <ClCompile Include="source\externals\imgui_demo.cpp" />
     <ClCompile Include="source\externals\imgui_draw.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="source\shaderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ActorInspector.h" />
     <ClInclude Include="include\externals\imconfig.h" />
     <ClInclude Include="include\externals\imgui.h" />
     <ClInclude Include="include\externals\imgui_impl_dx11.h" />

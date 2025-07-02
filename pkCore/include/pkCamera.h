@@ -48,8 +48,17 @@ class PK_CORE_EXPORT Camera : public Component
   virtual ~Camera() = default;
 
   /**
-  * Initialize the camera.
-  **/
+   * @brief Initialize the camera.
+   * @param _width Width to the view.
+   * @param _height Height of the view.
+   * @param _halfFov Half of the field of view.
+   * @param _nearZ Nearest point to the camera.
+   * @param _farZ Furthest point to the camera.
+   * @param _eye Position of the camera view.
+   * @param _at Where the camera will be looking at.
+   * @param _up Up vector of the camera.
+   * @param _camMode Wether Camera perspective.
+   */
   void
   init(uint32 _width,
        uint32 _height,
@@ -120,80 +129,60 @@ class PK_CORE_EXPORT Camera : public Component
   moveUpLocal(float _offset);
 
   /**
-  * Rotate the camera by rotating the At vector
-  * 
-  * @param _x
-  * New x rotation.
-  * 
-  * @param _y
-  * New y rotation.
-  * 
-  * @param _z
-  * New z rotation.
-  **/
+   * @brief Rotate the camera by rotating the At vector.
+   * @param _x New x rotation.
+   * @param _y New y rotation.
+   * @param _z New z rotation.
+   */
   void
   rotate(float _x, float _y, float _z);
 
   /**
-  * Rotate the camera by rotating the At vector
-  *
-  * @param _rotate
-  * New rotation vector.
-  **/
+   * @brief Rotate the camera by rotating the At vector.
+   * @param _rotate New rotation vector.
+   */
   void
   rotate(Vector3 _rotate);
 
   /**
-  * Gets the forward vector of the camera.
-  * 
-  * @return
-  * The forward vector as a vector4.
-  **/
+   * @brief Get the forward vector of the camera.
+   * @return The forward vector as a vector4.
+   */
   Vector3
   getForward();
 
   /**
-  * Gets the right vector of the camera.
-  *
-  * @return
-  * The right vector as a vector4.
-  **/
+   * @brief Get the right vector of the camera.
+   * @return The right vector as a vector4.
+   */
   Vector3
   getRight();
 
   /**
-  * Gets the up vector of the camera.
-  *
-  * @return
-  * The up vector as a vector4.
-  **/
+   * @brief Get the up vector of the camera.
+   * @return The up vector as a vector4.
+   */
   Vector3
   getUp();
 
   /**
-  * Sets the forward vector of the camera.
-  * 
-  * @param _vec
-  * New forward vector.
-  **/
+   * @brief Set the forward vector of the camera.
+   * @param _vec New forward vector.
+   */
   void
   setForward(Vector3 _vec) { m_forward = _vec; }
 
   /**
-  * Sets the right vector of the camera.
-  * 
-  * @param _vec
-  * New right vector.
-  **/
+   * @brief Set the right vector of the camera.
+   * @param _vec New right vector.
+   */
   void
   setRight(Vector3 _vec) { m_right = _vec; }
 
   /**
-  * Sets the up vector of the camera.
-  * 
-  * @param _vec
-  * New up vector.
-  **/
+   * @brief Set the up vector of the camera.
+   * @param _vec New up vector.
+   */
   void
   setUp(Vector3 _vec) { m_up = _vec; }
 

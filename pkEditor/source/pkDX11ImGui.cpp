@@ -35,7 +35,7 @@ UInterface::endFrame()
 void
 UInterface::startWindowCreate(const char* _name)
 {
-  ImGui::Begin(_name);
+  ImGui::Begin(_name, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 }
 
 void

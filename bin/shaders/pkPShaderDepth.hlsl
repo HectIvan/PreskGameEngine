@@ -1,9 +1,4 @@
 Texture2D diffuseTex : register(t0);
-Texture2D normalTex : register(t1);
-Texture2D heightTex : register(t2);
-Texture2D metallicTex : register(t3);
-Texture2D occlusionTex : register(t4);
-Texture2D testDepthLight : register(t5);
 
 SamplerState samLinear : register(s0);
 
@@ -46,9 +41,15 @@ cbuffer cbCamera : register(b4)
     float _unused;
 }
 
-struct PS_INPUT
+cbuffer AlphaThreshold : register(b5)
 {
-    float4 Position : SV_POSITION;
+    float fAlphaThreshold;
+    float3 _unusedAlpha;
+}
+
+struct VS_INPUT
+{
+    float3 Position : SV_POSITION;
     float2 Tex : TEXCOORD0;
     float3 Normal : TEXCOORD1;
     float3 Tangent : TEXCOORD2;
@@ -56,19 +57,28 @@ struct PS_INPUT
     float3 Depth : TEXCOORD4;
 };
 
-struct PS_OUTPUT
+struct PS_INPUT
 {
-    float4 diffuse : VS_Target0;
-  // float4 normal : SV_Target1;
-  // float4 depth : COLOR0;
+    float4 position : SV_Position;
+    float2 tex : TEXCOORD0;
 };
 
-PS_OUTPUT PS(PS_INPUT input) : SV_Target0
+PS_INPUT VS(VS_INPUT input)
 {
-    PS_OUTPUT output = (PS_OUTPUT) 0;
-    // get the base color
-    // float4 diffuseSam = diffuseTex.Sample(samLinear, input.Tex);
-    
-    // output.diffuse = diffuseSam;
+    PS_INPUT output = (PS_INPUT) 0;
+    float4x4 viewProj = mul(projection, view);
+    output.position = mul(mul(float4(input.Position, 1.0f), World), viewProj);
+    output.tex = input.Tex;
     return output;
+}
+
+float4 PS(PS_INPUT input) : SV_Target0
+{
+    float4 color = diffuseTex.Sample(samLinear, input.tex);
+    if (color.a <= fAlphaThreshold)
+    {
+        clip(-1);
+    }
+    float depth = input.position.z / input.position.w;
+    return float4(depth.xxx, 1.0f);
 }

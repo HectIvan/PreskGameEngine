@@ -111,9 +111,9 @@ ShaderTest::onInit()
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3(0.0f, -1.0f, 0.0f);
+  lightCom->LightDir = Vector3(-1.0f, 0.0f, -1.0f);
   lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  lightCom->LightColor = Vector3(1.0f, 1.0f, 1.0f);
+  lightCom->LightColor = Vector3(0.5f, 0.5f, 0.5f);
 
   // add camera component
   light->addComponent(make_shared<Camera>());
@@ -135,7 +135,7 @@ ShaderTest::onInit()
   SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
-  m_shadows = false;
+  m_shadows = true;
 }
 
 void
@@ -199,10 +199,6 @@ ShaderTest::input()
     m_camera->getComponent<Camera>()->rotate(0.0f, posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
-  // compile shaders
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kC) && m_window.m_isFocused) {
-    g_RenderManager().compileShaders();
-  }
 }
 
 void
@@ -293,13 +289,16 @@ ShaderTest::uInterfaceUpdate()
   // -------------------------- //
 
   // --- Post-Process window --- //
-  winHeight = 100.0f;
+  winHeight = 125.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Render");
   im.createCheckBox("Shadows", m_shadows);
   im.createCheckBox("Ambient Oclussion", m_AO);
   im.createCheckBox("Luminance", m_luminance);
+  if (im.createButton("Compile Shaders")) {
+    g_RenderManager().compileShaders();
+  }
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //
@@ -349,17 +348,13 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(3), &lightData, lightSize);
   api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(4), &lightCam,  camSize);
 
-  // update shadow deferred buffers
+  // update shadow quad buffers
   SPtr<Camera> tempLightCam = light->getComponent<Camera>();
-  SPtr<Camera> mainCam = m_camera->getComponent<Camera>();
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0), &tempLightCam, camSize);
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(1), &mainCam, camSize);
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(2), 
-                           &light->m_transform,
-                           m4x4Size);
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(3),
-                           &m_camera->m_transform,
-                           camSize);
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0), &lightData, lightSize);
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(1), &camData, sizeof(camData));
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(2),
+                           &tempLightCam,
+                           sizeof(tempLightCam));
 
   api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));
 

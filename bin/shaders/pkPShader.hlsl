@@ -60,7 +60,7 @@ struct PS_OUTPUT
 {
     float4 diffuse : VS_Target0;
     float4 normal : SV_Target1;
-  // float4 depth : COLOR0;
+    float4 depth : COLOR0;
 };
 
 // surface shape (bumps)
@@ -95,7 +95,6 @@ float ndf_GGX(float NdH, float roughness, float squaredRoughness)
     float multiScatterFactor = 1.0f + roughness;
     return min(alphaSq / denom * multiScatterFactor, 1.0f);
 }
-
 
 // L dot N
 // L = light direction
@@ -137,34 +136,20 @@ float3 TangentToWorld(float3 normalTS, float3x3 TBN)
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
     PS_OUTPUT output = (PS_OUTPUT) 0;
-    // get the base color
-    float4 diffuseSam = diffuseTex.Sample(samLinear, input.Tex);
-    float3 normalSam = normalTex.Sample(samLinear, input.Tex).rgb * 2.0f - 1.0f;
-    float4 aoSam = occlusionTex.Sample(samLinear, input.Tex);
-    
-    float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
-    float3 normWorld = normalize(mul(normalSam, TBN));
-  
-    if (diffuseSam.a < 0.1f)
+    float4 AO = occlusionTex.Sample(samLinear, input.Tex);
+
+    float4 colorSam = diffuseTex.Sample(samLinear, input.Tex);
+    if (colorSam.a <= 0.1f)
     {
-        discard;
+        clip(-1);
     }
+    output.diffuse = colorSam * AO;
+    float metallicSam = metallicTex.Sample(samLinear, input.Tex).r;
+    float3 normalSam = normalTex.Sample(samLinear, input.Tex) * 2.0f - 1.0f;
+    float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
+    normalSam = normalize(mul(normalSam.xyz, TBN));
+    output.normal = float4(normalSam, 1.0f);
+    output.depth = float4(input.Depth.xyz, 1.0f);
     
-    float3 viewDir = normalize(camPosition.xyz - input.Depth.xyz);
-    
-    // normal in world space
-    float3 normalWS = TangentToWorld(normalSam, TBN);
-    
-    /* lambertian reflection */
-    float lamb = Lambert(normalWS, normalize(LightDir));
-    /* Phong specular light */
-    // float3 phong = PhongSpecular(input.Normal, LightDir, viewDir, 32.0f);
-    /* Blinn-Phong */
-    float3 blinnPhong = BlinnPhong(normalWS, normalize(LightDir), viewDir, SpotExponent);
-    
-    float3 lightning = lamb * LightColor + blinnPhong * LightColor;
-    
-    output.diffuse = diffuseSam * aoSam;
-    output.normal = float4(normalWS, 1.0f);
     return output;
 }

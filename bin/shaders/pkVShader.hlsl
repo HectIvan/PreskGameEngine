@@ -64,15 +64,16 @@ PS_INPUT VS(VS_INPUT input)
     float4x4 wvp = mul(World, mul(View, Projection));
 
     output.Position = mul(float4(input.Position.xyz, 1.0f), wvp);
+    
+    float4 localPos = float4(input.Position.xyz, 1.0f);
+    // position of pixel in local position
+    float4 viewPos = mul(localPos, World);
+    output.Depth = viewPos.xyz;
     output.Tex = input.Tex;
-    output.Depth = mul(float4(input.Position.xyz, 1.0f), World);
     
-    // light rotates with object
-    // output.Normal = input.Normal;
-    
-    output.Normal = normalize(mul(input.Normal, (float3x3)World));
-    output.Tangent = normalize(mul(input.Tangent, (float3x3)World));
-    output.Bitangent = normalize(mul(input.Bitangent, (float3x3)World));
+    output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
+    output.Tangent = normalize(mul(float4(input.Tangent, 0.0f), World).xyz);
+    output.Bitangent = normalize(cross(output.Normal, output.Tangent));
     
     return output;
 }

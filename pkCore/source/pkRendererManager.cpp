@@ -139,7 +139,7 @@ RendererManager::createPasses()
    * Shadow Pass
    ***************************************************************************/
   pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.outputs = {  };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Shadow);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
@@ -147,7 +147,6 @@ RendererManager::createPasses()
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
-   // pDesc.vSDirectory = L"shaders/pkDeferredShader.hlsl";
    // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
    // pDesc.cBSizes = { sizeof(CBAOData) };
    // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
@@ -159,11 +158,12 @@ RendererManager::createPasses()
    /****************************************************************************
     * Shadow Quad pass
     ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
   pDesc.vSDirectory = L"shaders/pkQuadShader.hlsl";
-  pDesc.cBSizes = { sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
+  pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
-                   getDepthBuffer(D_BUFFERS::kDB_Base) };
+                   getDepthBuffer(D_BUFFERS::kDB_Base),
+                   getGBuffer(G_BUFFERS::kGB_Normal)};
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
   pDesc.pDepth = nullptr;
   pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
@@ -194,7 +194,7 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_HBlur, hBlurPass });
 
   /****************************************************************************
-   * Vrtical Blur Quad pass
+   * Vertical Blur Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
   pDesc.cBSizes = { sizeof(CBBlur) };
@@ -210,7 +210,8 @@ RendererManager::createPasses()
   pDesc.pSDirectory = L"shaders/pkToneMapQuadShader.hlsl";
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getGBuffer(G_BUFFERS::kGB_VBlurredLuminance) };
+                   getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
+                   getGBuffer(G_BUFFERS::kGB_Shadow) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> testPass = make_shared<Pass>(pDesc);
   // insert to the passes

@@ -28,8 +28,8 @@ cbuffer cbLight : register(b3)
     float3 LightDir; // 24
     float3 LightPos; // 36
     float3 LightColor; // 48
-    float2 unused1; // 56
-    float2 unused2; // 64
+    float3 shadowColor; // 56
+    float unused1; // 64
 }
 
 cbuffer cbCamera : register(b4)

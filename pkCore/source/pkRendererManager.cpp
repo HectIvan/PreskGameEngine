@@ -49,6 +49,16 @@ void RendererManager::init()
                                              kPK_FORMAT_R32G32B32A32_FLOAT);
   m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
 
+  SPtr<Texture> metallicRT = api.createTexture(4,
+                                               winWidth,
+                                               winHeight,
+                                               kPK_FORMAT_R32G32B32A32_FLOAT,
+                                               kPK_USAGE_DEFAULT,
+                                               kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
+                                               false,
+                                               kPK_FORMAT_R32G32B32A32_FLOAT);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
+
   SPtr<Texture> luminanceRT = api.createTexture(4,
                                                 winWidth,
                                                 winHeight,
@@ -129,7 +139,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
                     sizeof(CBCamera) };
   pDesc.inputs = {};
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal),
+                    getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   SPtr<Pass> basePass = make_shared<Pass>(pDesc);
   // insert to the pass map.
@@ -155,15 +166,17 @@ RendererManager::createPasses()
    // // insert to the passes
    // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
-   /****************************************************************************
-    * Shadow Quad pass
-    ***************************************************************************/
+  /****************************************************************************
+   * Shadow Quad pass
+   ***************************************************************************/
   pDesc.vSDirectory = L"shaders/pkQuadShader.hlsl";
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera) };
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
+                    sizeof(Matrix4), sizeof(Vector4) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Normal)};
+                   getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
   pDesc.pDepth = nullptr;
   pDesc.samAdress = SAM_STATE_ADRESS::kClamp;

@@ -61,8 +61,8 @@ struct CBLight
   Vector3 LightDir;
   Vector3 LightPos;
   Vector3 LightColor;
-  Vector2 unused1;
-  Vector2 unused2;
+  Vector3 shadowColor;
+  float unused;
 };
 
 struct CBAOData
@@ -86,6 +86,12 @@ struct CBLuminance
 struct CBBlur
 {
   Vector2 targetSize;
+  Vector2 unused;
+};
+
+struct CBWinSize
+{
+  Vector2 size;
   Vector2 unused;
 };
 

@@ -258,12 +258,6 @@ class PK_UTILITY_EXPORT Matrix4
                    other.w);
   }
 
-  float
-  determinant();
-
-  float
-  determinant3x3(int r1, int r2, int r3, int c1, int c2, int c3);
-
   /**
    * @brief get the forward vector from a view matrix.
    * @return the forward vector.

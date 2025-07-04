@@ -60,6 +60,7 @@ struct PS_OUTPUT
 {
     float4 diffuse : VS_Target0;
     float4 normal : SV_Target1;
+    float4 metallic : SV_Target2;
     float4 depth : COLOR0;
 };
 
@@ -144,12 +145,13 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
         clip(-1);
     }
     output.diffuse = colorSam * AO;
-    float metallicSam = metallicTex.Sample(samLinear, input.Tex).r;
+    float3 metallicSam = metallicTex.Sample(samLinear, input.Tex);
     float3 normalSam = normalTex.Sample(samLinear, input.Tex) * 2.0f - 1.0f;
     float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
     normalSam = normalize(mul(normalSam.xyz, TBN));
     output.normal = float4(normalSam, 1.0f);
     output.depth = float4(input.Depth.xyz, 1.0f);
+    output.metallic = float4(metallicSam, 1.0f);
     
     return output;
 }

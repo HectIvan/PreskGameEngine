@@ -4,6 +4,7 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -73,6 +74,9 @@ Actor::setRotation(Vector3 _rotation)
 void
 Actor::setRotation(float _x, float _y, float _z)
 {
+  _x *= Math::DEG2RAD;
+  _y *= Math::DEG2RAD;
+  _z *= Math::DEG2RAD;
   m_transform.setRotation(Matrix4::rotation(_x, _y, _z));
 }
 

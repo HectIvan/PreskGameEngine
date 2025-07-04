@@ -16,8 +16,6 @@ float4 PS(PS_INPUT input) : SV_Target0
     float4 luminanceSample = luminanceTex.Sample(samState, input.TexCoord);
     float4 shadowSample = shadowTex.Sample(samState, input.TexCoord);
     // float2 uv = input.Position.xy / float2(1920, 1080);
-    
-    // float4 shadow = saturate(shadowSample);
 
     return albedoSample * shadowSample;
 }

@@ -38,6 +38,7 @@ namespace G_BUFFERS
     kGB_Normal,
     kGB_Shadow,
     kGB_Luminance,
+    kGB_Metallic,
     kGB_HBlurredLuminance,
     kGB_VBlurredLuminance,
   };

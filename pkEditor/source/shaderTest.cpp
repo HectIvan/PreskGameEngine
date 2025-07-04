@@ -58,6 +58,7 @@ using pkEngineSDK::String;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
+using pkEngineSDK::CBWinSize;
 // to do: create fileSystem.h in utilities
 // create class Path
 
@@ -111,9 +112,10 @@ ShaderTest::onInit()
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3(-1.0f, 0.0f, -1.0f);
-  lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  lightCom->LightColor = Vector3(0.5f, 0.5f, 0.5f);
+  lightCom->LightDir = Vector3(0, -1.0f, 0).normalized();
+  lightCom->LightPos = Vector3(0.0f, 10.0f, 0.0f);
+  lightCom->LightColor = Vector3(1.0f);
+  lightCom->shadowColor = Vector3(1.0f); // this one is actually the light color??? what???
 
   // add camera component
   light->addComponent(make_shared<Camera>());
@@ -132,8 +134,17 @@ ShaderTest::onInit()
   pistol->setScale(10.0f);
   pistol->setPosition(0.0f, 5.0f, 0.0f);
 
+  // SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
+  // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
+
   SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
+
+  // SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
+  // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
+  // rpd->setRotation(0, 90, 0);
+  // rpd->setScale(100.0f);
+  // rpd->setPosition(0, 0, -100);
 
   m_shadows = true;
 }
@@ -322,7 +333,16 @@ ShaderTest::onUpdate()
   SPtr<Camera> camData = m_camera->getComponent<Camera>();
   Matrix4 view = camData->m_view.getTransposed();
   Matrix4 proj = camData->m_projection.getTransposed();
+  Matrix4 invView = view.inverse();
+  Matrix4 invProj = proj.inverse();
   SPtr<Light> lightData = light->getComponent<Light>();
+  CBLight lData;
+  lData.LightColor = lightData->LightColor;
+  lData.shadowColor = lightData->shadowColor;
+  lData.LightDir = lightData->LightDir;
+  lData.LightPos = lightData->LightPos;
+  lData.SpotCutoff = lightData->SpotCutoff;
+  lData.SpotExponent = lightData->SpotExponent;
   CBLuminance lum;
   lum.tolerance = 0.9f;
 
@@ -350,11 +370,20 @@ ShaderTest::onUpdate()
 
   // update shadow quad buffers
   SPtr<Camera> tempLightCam = light->getComponent<Camera>();
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0), &lightData, lightSize);
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0), &lData, sizeof(lData));
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(1), &camData, sizeof(camData));
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(2),
                            &tempLightCam,
                            sizeof(tempLightCam));
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(3),
+                           &invProj,
+                           sizeof(Matrix4));
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(4),
+                           &invView,
+                           sizeof(Matrix4));
+  CBWinSize winSize;
+  winSize.size = Vector2(api.getSwapChain()->getBuffer(0)->width, api.getSwapChain()->getBuffer(0)->height);
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(5), &winSize, sizeof(CBWinSize));
 
   api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));
 

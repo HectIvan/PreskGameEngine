@@ -82,23 +82,6 @@ Matrix4::Matrix4(float m00, float m01, float m02, float m03,
   matrix[3][0] = m30; matrix[3][1] = m31; matrix[3][2] = m32; matrix[3][3] = m33;
 }
 
-float
-Matrix4::determinant()
-{
-  return matrix[0][0] * determinant3x3(1, 2, 3, 1, 2, 3)
-       - matrix[0][1] * determinant3x3(1, 2, 3, 0, 2, 3)
-       + matrix[0][2] * determinant3x3(1, 2, 3, 0, 1, 3)
-       - matrix[0][3] * determinant3x3(1, 2, 3, 0, 1, 2);
-}
-
-float
-Matrix4::determinant3x3(int r1, int r2, int r3, int c1, int c2, int c3)
-{
-  return  matrix[r1][c1] * (matrix[r2][c2] * matrix[r3][c3] - matrix[r2][c3] * matrix[r3][c2])
-        - matrix[r1][c2] * (matrix[r2][c1] * matrix[r3][c3] - matrix[r2][c3] * matrix[r3][c1])
-        + matrix[r1][c3] * (matrix[r2][c1] * matrix[r3][c2] - matrix[r2][c2] * matrix[r3][c1]);
-}
-
 Vector3
 Matrix4::getForwardVector()
 {
@@ -126,36 +109,134 @@ Matrix4::getViewPosition()
 Matrix4
 Matrix4::inverse()
 {
-  Matrix4 result;
-  float det = determinant();
+  // Cofactors
+  Vector<float> inv;
+  inv.resize(16);
+  float det;
 
-  if (abs(det) < 1e-6f) {
-    return Matrix4::IDENTITY;
-  }
+  inv[0] = matrix[1][1] * matrix[2][2] * matrix[3][3] -
+           matrix[1][1] * matrix[2][3] * matrix[3][2] -
+           matrix[2][1] * matrix[1][2] * matrix[3][3] +
+           matrix[2][1] * matrix[1][3] * matrix[3][2] +
+           matrix[3][1] * matrix[1][2] * matrix[2][3] -
+           matrix[3][1] * matrix[1][3] * matrix[2][2];
 
-  float invDet = 1.0f / det;
+  inv[1] = -matrix[0][1] * matrix[2][2] * matrix[3][3] +
+            matrix[0][1] * matrix[2][3] * matrix[3][2] +
+            matrix[2][1] * matrix[0][2] * matrix[3][3] -
+            matrix[2][1] * matrix[0][3] * matrix[3][2] -
+            matrix[3][1] * matrix[0][2] * matrix[2][3] +
+            matrix[3][1] * matrix[0][3] * matrix[2][2];
 
-  result.matrix[0][0] = determinant3x3(1, 2, 3, 1, 2, 3) * invDet;
-  result.matrix[0][1] = -determinant3x3(0, 2, 3, 1, 2, 3) * invDet;
-  result.matrix[0][2] = determinant3x3(0, 1, 3, 1, 2, 3) * invDet;
-  result.matrix[0][3] = -determinant3x3(0, 1, 2, 1, 2, 3) * invDet;
+  inv[2] = matrix[0][1] * matrix[1][2] * matrix[3][3] -
+           matrix[0][1] * matrix[1][3] * matrix[3][2] -
+           matrix[1][1] * matrix[0][2] * matrix[3][3] +
+           matrix[1][1] * matrix[0][3] * matrix[3][2] +
+           matrix[3][1] * matrix[0][2] * matrix[1][3] -
+           matrix[3][1] * matrix[0][3] * matrix[1][2];
 
-  result.matrix[1][0] = -determinant3x3(1, 2, 3, 0, 2, 3) * invDet;
-  result.matrix[1][1] = determinant3x3(0, 2, 3, 0, 2, 3) * invDet;
-  result.matrix[1][2] = -determinant3x3(0, 1, 3, 0, 2, 3) * invDet;
-  result.matrix[1][3] = determinant3x3(0, 1, 2, 0, 2, 3) * invDet;
+  inv[3] = -matrix[0][1] * matrix[1][2] * matrix[2][3] +
+            matrix[0][1] * matrix[1][3] * matrix[2][2] +
+            matrix[1][1] * matrix[0][2] * matrix[2][3] -
+            matrix[1][1] * matrix[0][3] * matrix[2][2] -
+            matrix[2][1] * matrix[0][2] * matrix[1][3] +
+            matrix[2][1] * matrix[0][3] * matrix[1][2];
 
-  result.matrix[2][0] = determinant3x3(1, 2, 3, 0, 1, 3) * invDet;
-  result.matrix[2][1] = -determinant3x3(0, 2, 3, 0, 1, 3) * invDet;
-  result.matrix[2][2] = determinant3x3(0, 1, 3, 0, 1, 3) * invDet;
-  result.matrix[2][3] = -determinant3x3(0, 1, 2, 0, 1, 3) * invDet;
+  inv[4] = -matrix[1][0] * matrix[2][2] * matrix[3][3] +
+            matrix[1][0] * matrix[2][3] * matrix[3][2] +
+            matrix[2][0] * matrix[1][2] * matrix[3][3] -
+            matrix[2][0] * matrix[1][3] * matrix[3][2] -
+            matrix[3][0] * matrix[1][2] * matrix[2][3] +
+            matrix[3][0] * matrix[1][3] * matrix[2][2];
 
-  result.matrix[3][0] = -determinant3x3(1, 2, 3, 0, 1, 2) * invDet;
-  result.matrix[3][1] = determinant3x3(0, 2, 3, 0, 1, 2) * invDet;
-  result.matrix[3][2] = -determinant3x3(0, 1, 3, 0, 1, 2) * invDet;
-  result.matrix[3][3] = determinant3x3(0, 1, 2, 0, 1, 2) * invDet;
+  inv[5] = matrix[0][0] * matrix[2][2] * matrix[3][3] -
+           matrix[0][0] * matrix[2][3] * matrix[3][2] -
+           matrix[2][1] * matrix[0][2] * matrix[3][3] +
+           matrix[2][1] * matrix[0][3] * matrix[3][2] +
+           matrix[3][1] * matrix[0][2] * matrix[2][3] -
+           matrix[3][1] * matrix[0][3] * matrix[2][2];
 
-  return result;
+  inv[6] = -matrix[0][0] * matrix[2][2] * matrix[3][3] +
+            matrix[0][0] * matrix[2][3] * matrix[3][2] +
+            matrix[1][0] * matrix[0][2] * matrix[3][3] -
+            matrix[1][0] * matrix[0][3] * matrix[3][2] -
+            matrix[3][0] * matrix[0][2] * matrix[1][3] +
+            matrix[3][0] * matrix[0][3] * matrix[1][2];
+
+  inv[7] = matrix[0][0] * matrix[1][2] * matrix[2][3] -
+           matrix[0][0] * matrix[1][3] * matrix[2][2] -
+           matrix[1][0] * matrix[0][2] * matrix[2][3] +
+           matrix[1][0] * matrix[0][3] * matrix[2][2] +
+           matrix[2][0] * matrix[0][2] * matrix[1][3] -
+           matrix[2][0] * matrix[0][3] * matrix[1][2];
+
+  inv[8] = matrix[1][0] * matrix[2][1] * matrix[3][3] -
+           matrix[1][0] * matrix[2][3] * matrix[3][1] -
+           matrix[2][0] * matrix[1][1] * matrix[3][3] +
+           matrix[2][0] * matrix[1][3] * matrix[3][1] +
+           matrix[3][0] * matrix[1][1] * matrix[2][3] -
+           matrix[3][0] * matrix[1][3] * matrix[2][1];
+
+  inv[9] = -matrix[0][0] * matrix[2][1] * matrix[3][3] +
+            matrix[0][0] * matrix[2][3] * matrix[3][1] +
+            matrix[2][0] * matrix[0][1] * matrix[3][3] -
+            matrix[2][0] * matrix[0][3] * matrix[3][1] -
+            matrix[3][0] * matrix[0][1] * matrix[2][3] +
+            matrix[3][0] * matrix[0][3] * matrix[2][1];
+
+  inv[10] = matrix[0][0] * matrix[1][1] * matrix[3][3] -
+            matrix[0][0] * matrix[1][3] * matrix[3][1] -
+            matrix[1][0] * matrix[0][1] * matrix[3][3] +
+            matrix[1][0] * matrix[0][3] * matrix[3][1] +
+            matrix[3][0] * matrix[0][1] * matrix[1][3] -
+            matrix[3][0] * matrix[0][3] * matrix[1][1];
+
+  inv[11] = -matrix[0][0] * matrix[1][1] * matrix[2][3] +
+             matrix[0][0] * matrix[1][3] * matrix[2][1] +
+             matrix[1][0] * matrix[0][1] * matrix[2][3] -
+             matrix[1][0] * matrix[0][3] * matrix[2][1] -
+             matrix[2][0] * matrix[0][1] * matrix[1][3] +
+             matrix[2][0] * matrix[0][3] * matrix[1][1];
+
+  inv[12] = -matrix[1][0] * matrix[2][1] * matrix[3][2] +
+             matrix[1][0] * matrix[2][2] * matrix[3][1] +
+             matrix[2][0] * matrix[1][1] * matrix[3][2] -
+             matrix[2][0] * matrix[1][2] * matrix[3][1] -
+             matrix[3][0] * matrix[1][1] * matrix[2][2] +
+             matrix[3][0] * matrix[1][2] * matrix[2][1];
+
+  inv[13] = matrix[0][0] * matrix[2][1] * matrix[3][2] -
+            matrix[0][0] * matrix[2][2] * matrix[3][1] -
+            matrix[2][0] * matrix[0][1] * matrix[3][2] +
+            matrix[2][0] * matrix[0][2] * matrix[3][1] +
+            matrix[3][0] * matrix[0][1] * matrix[2][2] -
+            matrix[3][0] * matrix[0][2] * matrix[2][1];
+
+  inv[14] = -matrix[0][0] * matrix[1][1] * matrix[3][2] +
+             matrix[0][0] * matrix[1][2] * matrix[3][1] +
+             matrix[1][0] * matrix[0][1] * matrix[3][2] -
+             matrix[1][0] * matrix[0][2] * matrix[3][1] -
+             matrix[3][0] * matrix[0][1] * matrix[1][2] +
+             matrix[3][0] * matrix[0][2] * matrix[1][1];
+
+  inv[15] = matrix[0][0] * matrix[1][1] * matrix[2][2] -
+            matrix[0][0] * matrix[1][2] * matrix[2][1] -
+            matrix[1][0] * matrix[0][1] * matrix[2][2] +
+            matrix[1][0] * matrix[0][2] * matrix[2][1] +
+            matrix[2][0] * matrix[0][1] * matrix[1][2] -
+            matrix[2][0] * matrix[0][2] * matrix[1][1];
+
+  det = matrix[0][0] * inv[0] +
+        matrix[0][1] * inv[4] +
+        matrix[0][2] * inv[8] +
+        matrix[0][3] * inv[12];
+
+  det = 1.0f / det;
+
+  return Matrix4(inv[0] * det, inv[1] * det, inv[2] * det, inv[3] * det,
+                 inv[4] * det, inv[5] * det, inv[6] * det, inv[7] * det,
+                 inv[8] * det, inv[9] * det, inv[10] * det, inv[11] * det,
+                 inv[12] * det, inv[13] * det, inv[14] * det, inv[15] * det);
 }
 
 Matrix4

@@ -78,11 +78,9 @@ class PK_CORE_EXPORT Camera : public Component
   setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up);
   
   /**
-  * Move the camera to a new position.
-  * 
-  * @param _dist
-  * New position of the camera.
-  **/
+   * @brief Move the camera to a new position.
+   * @param _dist New position of the camera.
+   */
   void
   move(Vector3 _dist);
 

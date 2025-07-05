@@ -59,6 +59,7 @@ using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 using pkEngineSDK::CBWinSize;
+using pkEngineSDK::Vector4;
 // to do: create fileSystem.h in utilities
 // create class Path
 
@@ -115,7 +116,7 @@ ShaderTest::onInit()
   lightCom->LightDir = Vector3(0, -1.0f, 0);
   lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f);
-  lightCom->shadowColor = Vector3(1.0f); // this one is actually the light color??? what???
+  lightCom->shadowColor = Vector3(0.3f); // this one is actually the light color??? what???
 
   // add camera component
   light->addComponent(make_shared<Camera>());
@@ -337,14 +338,11 @@ ShaderTest::onUpdate()
   Matrix4 invProj = proj.inverse();
   SPtr<Light> lightData = light->getComponent<Light>();
   CBLight lData;
-  lData.Type = lightData->getType();
-  lData.LightColor = lightData->LightColor;
-  lData.shadowColor = lightData->shadowColor;
-  lData.LightDir = lightData->LightDir;
-  lData.LightPos = lightData->LightPos;
-  lData.SpotCutoff = lightData->SpotCutoff;
-  lData.SpotExponent = lightData->SpotExponent;
-  lData.unused = 1.0f;
+  lData.LightDir = Vector4(lightData->LightDir, 1.0f);
+  lData.LightPos = Vector4(lightData->LightPos, 1.0f);
+  lData.LightColor = Vector4(lightData->LightColor, 1.0f);
+  lData.shadowColor = Vector4(lightData->shadowColor, 1.0f);
+
   CBLuminance lum;
   lum.tolerance = 0.9f;
 
@@ -361,7 +359,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(3), &lightData, lightSize);
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(4), &camData, camSize);
 
-  // update shadow map buffers
+  // update shadow depth map buffers
   SPtr<Camera> lightCam = light->getComponent<Camera>();
   Matrix4 lightView = lightCam->m_view.getTransposed();
   Matrix4 lightProj = lightCam->m_projection.getTransposed();
@@ -371,15 +369,21 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(4), &lightCam,  camSize);
 
   // update shadow quad buffers
-  SPtr<Camera> tempLightCam = light->getComponent<Camera>();
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0), &lData, sizeof(lData));
+  // light buffer data
+  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0),
+                           &lData,
+                           sizeof(CBLight));
+  // main camera data
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(1), &camData, sizeof(camData));
+  // light camera data
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(2),
-                           &tempLightCam,
-                           sizeof(tempLightCam));
+                           &lightCam,
+                           sizeof(Camera));
+  // inverse projection data
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(3),
                            &invProj,
                            sizeof(Matrix4));
+  // inverse view data
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(4),
                            &invView,
                            sizeof(Matrix4));

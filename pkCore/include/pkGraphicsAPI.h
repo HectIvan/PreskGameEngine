@@ -307,36 +307,26 @@ public:
 
   /**
    * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
    */
   virtual void
-  vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 1) = 0;
+  vSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @brief _startSlot Start position of the buffers.
    */
   virtual void
-  pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 1) = 0;
+  pSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers,
+                       uint32 _startSlot = 0) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
    */
   virtual void
-  cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 0) = 0;
+  cSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) = 0;
 
   /**
   * Set the sampler state.

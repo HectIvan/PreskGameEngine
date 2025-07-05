@@ -173,7 +173,6 @@ RendererManager::createPasses()
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Matrix4), sizeof(Vector4) };
-  g_Logger().print(sizeof(CBLight));
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Normal),
@@ -292,24 +291,6 @@ template<class T> void
 RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 {
   g_GraphicAPI().updateConstantBuffer(_pCBuffer, &_data, 0);
-}
-  
-void
-RendererManager::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
-{
-  // set the constant buffers
-  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().vSSetConstantBuffer(_cBuffers[i], i);
-  }
-}
-
-void
-RendererManager::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
-{
-  // set the constant buffers
-  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().pSSetConstantBuffer(_cBuffers[i], i);
-  }
 }
 
 void

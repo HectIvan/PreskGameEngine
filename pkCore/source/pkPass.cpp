@@ -85,7 +85,6 @@ Pass::beginPass(Color _color)
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& renderManager = g_RenderManager().instance();
   // clear RTVs and Depth stencil
   api.clearRenderTargetViews(_color, m_outputTex);
   api.clearDepthBuffer(1.0f, m_depthTex);
@@ -103,8 +102,8 @@ Pass::beginPass(Color _color)
   // set the sampler state
   api.setSampler(getSamplerState());
   // set constant buffers
-  renderManager.pSSetConstantBuffers(getCBuffers());
-  renderManager.vSSetConstantBuffers(getCBuffers());
+  api.pSSetConstantBuffers(getCBuffers());
+  api.vSSetConstantBuffers(getCBuffers());
 }
 
 void
@@ -125,9 +124,8 @@ Pass::endPass()
     api.pSSetShaderResourceView(nullptr, i);
   }
   api.setSampler(nullptr);
-  for (uint32 i = 0; i < m_cBuffers.size(); ++i) {
-    api.pSSetConstantBuffer(nullptr, i);
-    api.vSSetConstantBuffer(nullptr, i);
-  }
+  Vector<SPtr<ConstantBuffer>> vector = { nullptr };
+  api.vSSetConstantBuffers(vector);
+  api.pSSetConstantBuffers(vector);
 }
 }

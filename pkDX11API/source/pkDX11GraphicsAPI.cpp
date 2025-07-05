@@ -797,68 +797,79 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
 }
 
 void
-DX11GraphicsAPI::vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                                     uint32 _startSlot,
-                                     uint32 _numBuffers)
+DX11GraphicsAPI::vSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers)
 {
-  // Recast to a DirectX Constant buffer
-  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
-  if (_pCBuffer && !dxCB) {
-    g_Logger().print("Failed to set a constant buffer.");
-    return;
-  } // casting failed
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex CBuffer.");
     return;
   }
-  device->m_pImmediateContext->VSSetConstantBuffers(_startSlot,
-                                                    _pCBuffer ? _numBuffers : 0,
-                                                    _pCBuffer ? &dxCB->pCBuffer : nullptr);
+  // set all buffers
+  for (uint32 i = 0; i < _pCBuffers.size(); ++i) {
+    // Recast to a DirectX Constant buffer
+    auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
+    if (_pCBuffers[i] && !dxCB) {
+      g_Logger().print("Failed to set the vertex constant buffer at the index." + i);
+      return;
+    } // casting failed
+    device->m_pImmediateContext->VSSetConstantBuffers(i,
+                                                      dxCB ? 1 : 0,
+                                                      dxCB ? &dxCB->pCBuffer : nullptr);
+  }
 }
 
 void
-DX11GraphicsAPI::pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                                     uint32 _startSlot,
-                                     uint32 _numBuffers)
+DX11GraphicsAPI::pSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers,
+                                      uint32 _startSlot)
 {
-  // Recast to a DirectX Constant buffer.
-  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
-  // if the casting failed
-  if (_pCBuffer && !dxCB) {
-    g_Logger().print("Failed to set a constant buffer.");
-    return;
-  } // casting failed
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a pixel CBuffer.");
     return;
   }
-  device->m_pImmediateContext->PSSetConstantBuffers(_startSlot,
-                                                    _pCBuffer ? _numBuffers : 0,
-                                                    _pCBuffer ? &dxCB->pCBuffer : nullptr);
+
+  // local array of directx buffers
+  uint32 count = _pCBuffers.size();
+  Vector<ID3D11Buffer*> buffers;
+
+  // set all the buffers in the array
+  for (uint32 i = 0; i < _pCBuffers.size(); ++i) {
+    // Recast to a DirectX Constant buffer.
+    auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
+    // if the casting failed
+    if (_pCBuffers[i] && !dxCB) {
+      g_Logger().print("Failed to set the pixel constant buffer at the index." + i);
+      return;
+    } // casting failed
+    buffers.push_back(dxCB->pCBuffer);
+  }
+  device->m_pImmediateContext->PSSetConstantBuffers(_startSlot, count, &buffers.data());
 }
 
 void
-DX11GraphicsAPI::cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                                     uint32 _startSlot,
-                                     uint32 _numBuffers)
+DX11GraphicsAPI::cSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers)
 {
-  // Recast to a DirectX Constant buffer.
-  auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
-  // if the casting failed
-  if (_pCBuffer && !dxCB) {
-    g_Logger().print("Failed to set a constant buffer.");
-    return;
-  } // casting failed
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a compute CBuffer.");
     return;
   }
-  device->m_pImmediateContext->CSSetConstantBuffers(_startSlot,
-                                                    _pCBuffer ? _numBuffers : 0,
-                                                    _pCBuffer ? &dxCB->pCBuffer : nullptr);
+  for (uint32 i = 0; i < _pCBuffers.size(); ++i)
+  {
+    // Recast to a DirectX Constant buffer.
+    auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
+    // if the casting failed
+    if (_pCBuffers[i] && !dxCB) {
+      g_Logger().print("Failed to set a constant buffer.");
+      return;
+    } // casting failed
+    if (!device) {
+      g_Logger().print("Failed to utilize the DX device in the setting of a compute CBuffer.");
+      return;
+    }
+    device->m_pImmediateContext->CSSetConstantBuffers(i,
+                                                      dxCB ? 1 : 0,
+                                                      dxCB ? &dxCB->pCBuffer : nullptr);
+  }
 }
 
 void

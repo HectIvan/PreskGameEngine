@@ -260,17 +260,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   cSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
 
   /**
-   * @brief Set the Compute Shader Constant Buffer
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
-   */
-  void
-  cSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 0) override;
-
-  /**
    * @brief Create the device and swap chain.
    * @param _width Client width.
    * @param _height Client height.
@@ -391,25 +380,26 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
    */
   void
-  vSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers = 1) override;
+  vSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   void
-  pSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers = 1) override;
+  pSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers,
+                       uint32 _startSlot = 0) override;
+
+  /**
+   * @brief Set the Compute Shader Constant Buffer
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   */
+  void
+  cSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) override;
 
   /**
    * @brief Get the API Swap chain

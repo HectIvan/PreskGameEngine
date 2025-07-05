@@ -132,18 +132,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   compileShaders();
 
   /**
-   * @brief Set the Vertex Shader constant buffers
-   */
-  void
-  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
-
-  /**
-   * @brief Set the Pixel Shader constant buffers
-   */
-  void
-  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers);
-
-  /**
    * @brief Set the buffers of each actor.
    */
   void

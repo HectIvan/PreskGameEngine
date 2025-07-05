@@ -149,8 +149,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
-  pDesc.outputs = {  };
+  // pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
+  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Shadow);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
@@ -158,13 +158,13 @@ RendererManager::createPasses()
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
-   // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
-   // pDesc.cBSizes = { sizeof(CBAOData) };
-   // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
-   // pDesc.type = PK_PASS_TYPE::kDeferred;
-   // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
-   // // insert to the passes
-   // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
+  // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
+  // pDesc.cBSizes = { sizeof(CBAOData) };
+  // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+  // pDesc.type = PK_PASS_TYPE::kDeferred;
+  // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
+  // // insert to the passes
+  // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
   /****************************************************************************
    * Shadow Quad pass
@@ -173,6 +173,7 @@ RendererManager::createPasses()
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Matrix4), sizeof(Vector4) };
+  g_Logger().print(sizeof(CBLight));
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Normal),
@@ -298,7 +299,7 @@ RendererManager::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffe
 {
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().vSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().vSSetConstantBuffer(_cBuffers[i], i);
   }
 }
 
@@ -307,7 +308,7 @@ RendererManager::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffe
 {
   // set the constant buffers
   for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    g_GraphicAPI().pSSetConstantBuffer(_cBuffers[i], i, 1);
+    g_GraphicAPI().pSSetConstantBuffer(_cBuffers[i], i);
   }
 }
 

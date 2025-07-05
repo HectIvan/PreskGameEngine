@@ -59,26 +59,43 @@ struct VS_INPUT
 
 struct PS_INPUT
 {
-    float4 position : SV_Position;
-    float2 tex : TEXCOORD0;
+    float4 Position : SV_POSITION;
+    float2 Tex : TEXCOORD0;
+    float3 Normal : TEXCOORD1;
+    float3 Tangent : TEXCOORD2;
+    float3 Bitangent : TEXCOORD3;
+    float3 Depth : TEXCOORD4;
+};
+
+struct PS_OUTPUT
+{
+    float4 diffuse : VS_Target0;
+    float4 depth : COLOR0;
 };
 
 PS_INPUT VS(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
     float4x4 viewProj = mul(projection, view);
-    output.position = mul(mul(float4(input.Position, 1.0f), World), viewProj);
-    output.tex = input.Tex;
+    
+    float4 localPos = float4(input.Position.xyz, 1.0f);
+    float4 viewPos = mul(localPos, World);
+    output.Depth = viewPos.xyz;
+    
+    output.Position = mul(mul(float4(input.Position, 1.0f), World), viewProj);
+    output.Tex = input.Tex;
     return output;
 }
 
 float4 PS(PS_INPUT input) : SV_Target0
 {
-    float4 color = diffuseTex.Sample(samLinear, input.tex);
+    float4 color = diffuseTex.Sample(samLinear, input.Tex);
     if (color.a <= fAlphaThreshold)
     {
         clip(-1);
     }
-    float depth = input.position.z / input.position.w;
-    return float4(depth.xxx, 1.0f);
+    // float depth = input.Position.z / input.Position.w;
+    return float4(input.Depth.xyz, 1.0f);
+    // return float4(depth.xxx, 1.0f);
+
 }

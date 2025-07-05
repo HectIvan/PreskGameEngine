@@ -112,8 +112,8 @@ ShaderTest::onInit()
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
   lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3(0, -1.0f, 0).normalized();
-  lightCom->LightPos = Vector3(0.0f, 10.0f, 0.0f);
+  lightCom->LightDir = Vector3(0, -1.0f, 0);
+  lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f);
   lightCom->shadowColor = Vector3(1.0f); // this one is actually the light color??? what???
 
@@ -337,12 +337,14 @@ ShaderTest::onUpdate()
   Matrix4 invProj = proj.inverse();
   SPtr<Light> lightData = light->getComponent<Light>();
   CBLight lData;
+  lData.Type = lightData->getType();
   lData.LightColor = lightData->LightColor;
   lData.shadowColor = lightData->shadowColor;
   lData.LightDir = lightData->LightDir;
   lData.LightPos = lightData->LightPos;
   lData.SpotCutoff = lightData->SpotCutoff;
   lData.SpotExponent = lightData->SpotExponent;
+  lData.unused = 1.0f;
   CBLuminance lum;
   lum.tolerance = 0.9f;
 

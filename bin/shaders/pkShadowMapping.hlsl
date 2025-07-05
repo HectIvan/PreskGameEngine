@@ -9,10 +9,6 @@ Texture2D normalMap : register(t2);
 // metallic texture of the scene
 Texture2D metallicMap : register(t3);
 
-// #ifndef PCF_KERNEL_SIZE
-// #define PCF_KERNEL_SIZE 10
-// #endif
-
 cbuffer Light : register(b0)
 {
     float LightType;
@@ -70,6 +66,28 @@ struct PS_OUTPUT
     float4 diffuse : SV_Target0;
 };
 
+float pcfFilter(float2 uv, float depth, float texelSize)
+{
+    float shadow = 0.0f;
+    uint sampleCount = 0;
+    
+    for (int y = -10; y <= 10; ++y)
+    {
+        for (int x = -10; x <= 10; ++x)
+        {
+            float2 offset = float2(x, y) * texelSize;
+            float sampleDepth = shadowMap.Sample(samLinear, uv + offset).r;
+            
+            if (depth > sampleDepth)
+            {
+                shadow = 1.0f;
+            }
+            sampleCount++;
+        }
+    }
+    return 1.0f - (shadow / sampleCount);
+}
+
 float ShadowCalculation(float4 fragPosLightSpace)
 {
     // perspective divide
@@ -94,19 +112,19 @@ float ShadowCalculation(float4 fragPosLightSpace)
     return shadow;
 }
 
-float3 getWorldPos(PS_INPUT input)
+float3 getWorldPos(float2 clipPos)
 {
-    float depth = depthMap.Sample(samLinear, input.Tex).r;
+    float depth = depthMap.Sample(samLinear, clipPos).r;
     
     // SOLUTION 1 (seems to be the best result so far)
     
     // 1. Clip space to view space (using inverse projection)
-    float4 viewSpacePositionHomogeneous = mul(camInvProj, float4(input.Tex, 1.0f, 1.0f));
+    float4 viewSpacePositionHomogeneous = mul(camInvProj, float4(clipPos, 1.0f, 1.0f));
     float3 viewSpacePosition = viewSpacePositionHomogeneous.xyz / viewSpacePositionHomogeneous.w;
     
     // 2. Reconstruct view space position from depth
     // (This part is highly dependent on your specific setup and depth buffer)
-    float viewZ = depth;  // Get Z from depth buffer
+    float viewZ = depth; // Get Z from depth buffer
     float3 viewRay = normalize(viewSpacePosition);
     float3 viewPosition = viewRay * viewZ;
     
@@ -142,35 +160,59 @@ float3 getWorldPos(PS_INPUT input)
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
     PS_OUTPUT output = (PS_OUTPUT) 0;
-    float4 shadowTex = shadowMap.Sample(samLinear, input.Tex);
-    float4 depthTex = depthMap.Sample(samLinear, input.Tex);
-    float4 normalTex = normalMap.Sample(samLinear, input.Tex);
-    float4 metallicTex = metallicMap.Sample(samLinear, input.Tex);
+    
+    float2 uv = input.Position.xy / winSize;
+    
+    float4 shadowTex = shadowMap.Sample(samLinear, uv);
+    float4 depthTex = depthMap.Sample(samLinear, uv);
+    float4 normalTex = normalMap.Sample(samLinear, uv);
+    float4 metallicTex = metallicMap.Sample(samLinear, uv);
+    
+    if (normalTex.w == 1.0f)
+    {
+        clip(-1.0f);
+    }
     
     // remap normal from 0,1 to -1,1
     float3 normal = normalize(normalTex.xyz);
     
+    float4 worldPos = depthTex;
+    
     // generate the light or shadow first pass
     // in this part, replacing getWorldPos with input.position will make the shine move with the camera
-    float3 lightDir = normalize(LightPos - getWorldPos(input)); // input.Position.xyz);
+    float3 lightDir = normalize(LightPos - worldPos.xyz); // input.Position.xyz);
     // utilize the normal map to generate the shadows in normal maps
     float surfaceNormalShadow = max(dot(lightDir, normal), 0.0f);
     float3 diffuse = LightColor * surfaceNormalShadow;
     
     // specular
-    float3 viewDir = normalize(Eye - input.Position);
+    float3 viewDir = normalize(Eye.xyz - worldPos.xyz);
     float spec = 0.0f;
     float3 halfWayDir = normalize(lightDir + viewDir);
     spec = pow(max(dot(normal, halfWayDir), 0.0f), 64.0f);
     float3 specular = spec * LightColor;
     
+    // compute shadows
+    float4x4 lightVP = mul(ViewLight, ProjectionLight);
+    float4 lightSpacePos = mul(worldPos, lightVP);
+    lightSpacePos /= lightSpacePos.w;
+    // map light space position to shadow map coords
+    float2 shadowCoord = lightSpacePos.xy * 0.5f + 0.5f; // to [0, 1] range
+    shadowCoord.y = 1.0f - shadowCoord.y; // flip the Y coordinate
+    
+    // PCF sampling
+    float texelSize = 1.0f / 2048.0f;
+    float shadow = pcfFilter(shadowCoord, lightSpacePos.z, texelSize);
+    
+    output.diffuse = float4(1, 1, 1, 1) * max(shadow, 1.0f - float4(ShadowColor, 1.0f));
+    /*
     // calculate shadows
     float4x4 lightVP = mul(ViewLight, ProjectionLight);
     float shadow = ShadowCalculation(mul(lightVP, float4(getWorldPos(input), 1.0f))); // input.Position));
     float3 ambient = 0.1f * LightColor;
     float3 lighting = ambient + shadow * (diffuse + specular);// * metallicTex.r));
     
-    output.diffuse = float4(lighting, 1.0f); // 
+    output.diffuse = float4(lighting, 1.0f); // */
 
     return output;
 }

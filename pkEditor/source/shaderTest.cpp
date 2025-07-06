@@ -86,7 +86,7 @@ ShaderTest::onInit()
   UInterface::startUp();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
-  // g_uInterface().initWin(m_window.getWindowHandle());
+  // get the resource manager
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
   // create camera
@@ -388,7 +388,8 @@ ShaderTest::onUpdate()
                            &invView,
                            sizeof(Matrix4));
   CBWinSize winSize;
-  winSize.size = Vector2(api.getSwapChain()->getBuffer(0)->width, api.getSwapChain()->getBuffer(0)->height);
+  winSize.size = Vector2(static_cast<float>(api.getSwapChain()->getBuffer(0)->width),
+                         static_cast<float>(api.getSwapChain()->getBuffer(0)->height));
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(5), &winSize, sizeof(CBWinSize));
 
   api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));

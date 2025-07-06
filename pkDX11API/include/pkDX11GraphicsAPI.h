@@ -381,9 +381,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   /**
    * @brief Set the Vertex Shader constant buffer.
    * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   void
-  vSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) override;
+  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -391,15 +393,17 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _startSlot Start position of the buffers.
    */
   void
-  pSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers,
-                       uint32 _startSlot = 0) override;
+  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
 
   /**
    * @brief Set the Compute Shader Constant Buffer
    * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   void
-  cSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) override;
+  cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
 
   /**
    * @brief Get the API Swap chain

@@ -308,9 +308,11 @@ public:
   /**
    * @brief Set the Vertex Shader constant buffer.
    * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   virtual void
-  vSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) = 0;
+  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -318,15 +320,17 @@ public:
    * @brief _startSlot Start position of the buffers.
    */
   virtual void
-  pSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers,
-                       uint32 _startSlot = 0) = 0;
+  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.
    * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   virtual void
-  cSSetConstantBuffers(Vector<SPtr<ConstantBuffer>> _pCBuffers) = 0;
+  cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
   * Set the sampler state.

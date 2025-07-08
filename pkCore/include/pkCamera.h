@@ -223,5 +223,7 @@ class PK_CORE_EXPORT Camera : public Component
   // camera rotation and start position
   Vector3 m_rotation;
   Vector2 m_startPos = Vector2(0.0f);
+
+  Vector2 m_farNear;
 };
 }

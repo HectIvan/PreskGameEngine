@@ -85,10 +85,10 @@ struct CBBlur
   Vector2 unused;
 };
 
-struct CBWinSize
+struct CBShadowParam
 {
-  Vector2 size;
-  Vector2 unused;
+  Vector2 winSize;
+  Vector2 farNear;
 };
 
 struct KeyPosition

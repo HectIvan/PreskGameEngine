@@ -94,8 +94,6 @@ float4 PS(PS_INPUT input) : SV_Target0
     {
         clip(-1);
     }
-    // float depth = input.Position.z / input.Position.w;
     return float4(input.Depth.xyz, 1.0f);
-    // return float4(depth.xxx, 1.0f);
 
 }

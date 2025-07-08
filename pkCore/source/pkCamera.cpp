@@ -24,6 +24,7 @@ Camera::init(uint32 _width,
   m_forward = Vector3::FORWARD;
   m_right = Vector3::RIGHT;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  m_farNear = Vector2(_farZ, _nearZ);
   if (_camMode == CAMERA_PROJ::kPerspective) {
     m_projection = Matrix4::perspectiveFOVLH(_halfFOV,
                                              static_cast<float>(_width),

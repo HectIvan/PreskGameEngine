@@ -1,4 +1,4 @@
-SamplerState samLinear : register(s0);
+﻿SamplerState samLinear : register(s0);
 
 // Depth texture from the shadow pass
 Texture2D shadowMap : register(t0);
@@ -8,6 +8,16 @@ Texture2D depthMap : register(t1);
 Texture2D normalMap : register(t2);
 // metallic texture of the scene
 Texture2D metallicMap : register(t3);
+
+/**
+_______________________________________________________________________________________________________________
+|Variable Type               | Coordinate space        | Range        | Common use                             |
+|____________________________|_________________________|______________|_____________________________________   |
+|input.Position.xy           | Pixel space             | [0, winSize] | Pixel-based effects, screen offsets    |
+|input.Position.xy / winSize | Normalized screen space | [0,1]        | UV reconstruction, fallback UV         |
+|input.Tex                   | Normalized UV           | [0,1]        | Texture sampling, depth reconstruction |
+|____________________________|_________________________|______________|________________________________________|
+*/
 
 cbuffer cbLight : register(b0)
 {
@@ -48,10 +58,10 @@ cbuffer CamInvView : register(b4)
     float4x4 camInvView; // 64
 }
 
-cbuffer windowSize : register(b5)
+cbuffer ShadowParam : register(b5)
 {
     float2 winSize; // 8
-    float2 _unusedWin; // 8
+    float2 farNear; // 8
 }
 
 struct PS_INPUT
@@ -87,23 +97,24 @@ float pcfFilter(float2 uv, float depth, float texelSize)
     return 1.0f - (shadow / sampleCount);
 }
 
-float ShadowCalculation(float4 fragPosLightSpace)
+float LinearDepth(float z)
 {
-    return 1.0f;
+    return (farNear.x * farNear.y) / (farNear.y - z * (farNear.y - farNear.x));
 }
 
-float3 VSPositionFromDepth(float2 vTexCoord, float4 DepthSample)
+float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
 {
-    // Get the depth value for this pixel
-    float z = DepthSample.r;
-    // Get x/w and y/w from the viewport position
-    float x = vTexCoord.x * 2 - 1;
-    float y = (1 - vTexCoord.y) * 2 - 1;
-    float4 vProjectedPos = float4(x, y, z, 1.0f);
-    // Transform by the inverse projection matrix
-    float4 vPositionVS = mul(vProjectedPos, camInvProj);
-    // Divide by w to get the view-space position
-    return vPositionVS.xyz / vPositionVS.w;
+    float z = DepthSample * 2.0f - 1.0f;
+
+    float4 clipSpacePosition = float4(TexCoord * 2.0f - 1.0f, z, 1.0f);
+    float4 viewSpacePosition = mul(camInvProj, clipSpacePosition);
+
+    // Perspective division
+    float3 VSP = viewSpacePosition.xyz /= viewSpacePosition.w;
+
+    float4 worldSpacePosition = mul(camInvView, float4(VSP, 1.0f));
+
+    return worldSpacePosition.xyz;
 }
 
 float4 PS(PS_INPUT input) : SV_Target0
@@ -113,32 +124,32 @@ float4 PS(PS_INPUT input) : SV_Target0
      * light data
      */
     float3 lightColor = LightColor.xyz;
-    float3 lightDir = LightDir.xyz;
     float3 lightPos = LightPos.xyz;
-    float3 shadowColor = ShadowColor.xyz;
     
     /**
      * texture data
      */
-    float2 uv = input.Position.xy / winSize;
     
-    float4 shadowTex = shadowMap.Sample(samLinear, uv);
-    float4 depthTex = depthMap.Sample(samLinear, uv);
-    float4 normalTex = normalMap.Sample(samLinear, uv);
-    float4 metallicTex = metallicMap.Sample(samLinear, uv);
+    float4 shadowTex = shadowMap.Sample(samLinear, input.Tex);
+    float4 depthTex = depthMap.Sample(samLinear, input.Tex);
+    float4 normalTex = normalMap.Sample(samLinear, input.Tex);
+    float4 metallicTex = metallicMap.Sample(samLinear, input.Tex);
     
-    float normal = normalize(normalTex);
+    float3 normal = normalTex.xyz;
+    
+    // get world position from depth map
+    float3 worldPos = WorldPosFromDepth(input.Tex, depthTex.r);
+    
     // diffuse
-    float3 worldPos = VSPositionFromDepth(input.Position.xy, depthTex);
-    lightDir = normalize(lightPos - worldPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    float3 diffuse = diff * lightColor;
+    float3 lightDir = normalize(lightPos - worldPos);
+    float diff = max(dot(lightDir, normal), ShadowColor.x);
+    float3 diffuse = lightColor * diff;
     // specular
     float3 viewDir = normalize(Eye.xyz - worldPos);
     float spec = 0.0;
     float3 halfwayDir = normalize(lightDir + viewDir);
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    float3 specular = spec * lightColor;
+    spec = pow(max(dot(normal, halfwayDir), 0.0f), 32.0f);
+    float3 specular = lightColor * spec;
     
-    return float4(diffuse + specular, 1.0);
+    return float4(diffuse + specular, 1.0f);
 }

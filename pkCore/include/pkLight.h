@@ -70,7 +70,7 @@ class PK_CORE_EXPORT Light : public Component
   Vector3 LightDir = Vector3::FORWARD;
   Vector3 LightPos;
   Vector3 LightColor = Vector3(1.0f);
-  Vector3 shadowColor = Vector3(0.2f);
+  Vector3 shadowColor;
   float unused;
 };
 }

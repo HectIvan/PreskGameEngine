@@ -135,17 +135,17 @@ ShaderTest::onInit()
   pistol->setScale(10.0f);
   pistol->setPosition(0.0f, 5.0f, 0.0f);
 
-  SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
-  leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
+  // SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
+  // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
 
-  // SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
-  // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
+  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
+  sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
-  SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
-  rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
-  rpd->setRotation(0, 90, 0);
-  // rpd->setScale(1.0f);
-  rpd->setPosition(0, 0, -100);
+  // SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
+  // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
+  // rpd->setRotation(0, 90, 0);
+  // // rpd->setScale(1.0f);
+  // rpd->setPosition(0, 0, -100);
 
   m_shadows = true;
 }

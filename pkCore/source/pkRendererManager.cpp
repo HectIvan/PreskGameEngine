@@ -173,7 +173,6 @@ RendererManager::createPasses()
   pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Matrix4), sizeof(CBShadowParam) };
-  pDesc.cBSizes = {};
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Normal),

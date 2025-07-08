@@ -614,9 +614,8 @@ DX11GraphicsAPI::compileShaderFromFile(WString _szFileName,
   {
     if (pErrorBlob != nullptr)
     {
-      // String errText(reinterpret_cast<char*>(pErrorBlob->GetBufferPointer()));
-      String errMsg = g_Logger().getMessageError(hr);
-      g_Logger().print("Failed to compile shader: " + errMsg);
+      g_Logger().print((static_cast<char*>(pErrorBlob->GetBufferPointer())));
+      pErrorBlob->Release();
     }
     safeRelease(pErrorBlob);
     return nullptr;

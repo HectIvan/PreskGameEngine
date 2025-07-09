@@ -191,6 +191,15 @@ class UInterface : public Module<UInterface>
   createInputVector3(const char* _name, Vector3& _param);
 
   /**
+   * @brief Create an input Vector3 that returns the new value.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return New value.
+   */
+  Vector3
+  createInputVector3Ret(const char* _name, Vector3 _param);
+
+  /**
    * @brief Create an input Vector3 with clamp.
    * @param _name Name of the input.
    * @param _param Value to change.

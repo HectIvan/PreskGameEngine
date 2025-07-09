@@ -107,6 +107,11 @@ Actor::setScale(Vector3 _scale)
 void
 Actor::setScale(float _x, float _y, float _z)
 {
+  // make sure scale is never 0
+  if (_x == 0.0f) { _x = Math::SMALL_NUMBER; }
+  if (_y == 0.0f) { _y = Math::SMALL_NUMBER; }
+  if (_z == 0.0f) { _z = Math::SMALL_NUMBER; }
+
   m_transform.matrix[0][0] /= m_scale.x;
   m_transform.matrix[1][1] /= m_scale.y;
   m_transform.matrix[2][2] /= m_scale.z;

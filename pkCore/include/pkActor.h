@@ -153,7 +153,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor scale.
    * @return The actor scale.
    */
-  FORCEINLINE Vector3&
+  FORCEINLINE Vector3
   getScale() { return m_scale; }
 
   /**

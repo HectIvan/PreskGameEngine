@@ -46,20 +46,14 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
   // generate the transform matrix in interface
-  Vector3 newTranslation = im.createSliderVector3("Position",
-                                                  _pActor->getPosition3(),
-                                                  -2147483648.0f,
-                                                  2147483647.0f);
+  Vector3 newTranslation = im.createInputVector3Ret("Position",
+                                                    _pActor->getPosition3());
   _pActor->setPosition(newTranslation);
-  Vector3 newRotation = im.createSliderVector3("Rotation",
-                                               Vector3(0),
-                                               -2147483648.0f,
-                                               2147483647.0f);
+  Vector3 newRotation = im.createInputVector3Ret("Rotation",
+                                                 Vector3(0));
   // pistol->m_transform.setRotation(newRotation);
-  Vector3 newScale = im.createSliderVector3("Scale",
-                                            _pActor->getScale(),
-                                            -2147483648.0f,
-                                            2147483647.0f);
+  Vector3 newScale = im.createInputVector3Ret("Scale",
+                                              _pActor->getScale());
   _pActor->setScale(newScale);
 }
 
@@ -97,7 +91,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   case kModel:
   {
     SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
-    im.createText(model->getName());
+    im.createText("Meshes:");
     for (uint32 i = 0; i < model->getMeshes().size(); ++i) {
       String name = "  " + model->getMeshes()[i]->getName();
       im.createText(name.c_str());

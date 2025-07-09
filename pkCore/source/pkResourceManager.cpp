@@ -26,14 +26,19 @@ ResourceManager::loadModel(Path _directory)
   // create the model pointer
   SPtr<Model> model = make_shared<Model>();
   // load the model from the path
-  model->load(_directory);
-  if (!model->index.empty()) {
+  if (model->load(_directory)) {
     // create the index and vertex buffers
     model->m_vertexB = g_GraphicAPI().createVertexBuffer(model->vertex);
     model->m_indexB = g_GraphicAPI().createIndexBuffer(model->index);
     g_GraphicAPI().setIndexBuffer(model->m_indexB);
     g_GraphicAPI().setVertexBuffer(model->m_vertexB);
   }
+  else { // if the model could not be loaded, destroy the pointer and return null.
+    model = nullptr;
+    return nullptr;
+  }
+
+  // store the model in memory for later use if needed
   SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
   newModelMem->directory = _directory;
   newModelMem->model = model;

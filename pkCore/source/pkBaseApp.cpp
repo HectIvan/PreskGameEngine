@@ -146,6 +146,7 @@ BaseApp::render()
     api.draw(3, 0);
     renderManager.getPass(PASS_TYPE::kP_HBlur)->endPass();
   }
+  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->clearRenderTargets();
   if (m_shadows) {
     // Quad shadow pass
     renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();

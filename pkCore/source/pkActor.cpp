@@ -13,6 +13,7 @@ Actor::Actor()
 {
   setActive(true);
   m_forward = Vector3::FORWARD;
+  m_scale = Vector3(1.0f);
 }
 
 void
@@ -94,24 +95,23 @@ Actor::setScale(Matrix4 _scale)
 
 void
 Actor::setScale(float _val) {
-  m_transform.setScale(_val);
-  m_scale = Vector3(_val, _val, _val);
+  setScale(_val, _val, _val);
 }
 
 void
 Actor::setScale(Vector3 _scale)
 {
-  m_transform.matrix[0][0] /= _scale.x;
-  m_transform.matrix[1][1] /= _scale.y;
-  m_transform.matrix[2][2] /= _scale.z;
-  m_transform.setScale(_scale);
-  m_scale = _scale;
+  setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
 Actor::setScale(float _x, float _y, float _z)
 {
-  setScale(Vector3(_x, _y, _z));
+  m_transform.matrix[0][0] /= m_scale.x;
+  m_transform.matrix[1][1] /= m_scale.y;
+  m_transform.matrix[2][2] /= m_scale.z;
+  m_transform.setScale(_x, _y, _z);
+  m_scale = Vector3(_x, _y, _z);
 }
 
 void
@@ -144,6 +144,8 @@ Actor::clear()
 void
 Actor::addComponent(SPtr<Component> _pComponent)
 {
-  m_components.push_back(_pComponent);
+  if (_pComponent) {
+    m_components.push_back(_pComponent);
+  }
 }
 }

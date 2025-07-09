@@ -1,6 +1,7 @@
 #include "pkUInterface.h"
 #include "pkGraphicsAPI.h"
 #include "externals/imgui_impl_dx11.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -42,6 +43,87 @@ void
 UInterface::createText(const char* _text)
 {
   ImGui::Text(_text);
+}
+
+bool
+UInterface::createInputText(const char* _name, String& _param)
+{
+  return ImGui::InputText(_name, strdup(_param.c_str()), sizeof(_param));
+}
+
+bool
+UInterface::createInputF(const char* _name, float& _param, float _step, float _largeStep)
+{
+  return ImGui::InputFloat(_name, &_param, _step, _largeStep);
+}
+
+bool
+UInterface::createInputFClamp(const char* _name,
+                              float& _param,
+                              float _min,
+                              float _max,
+                              float _step,
+                              float _largeStep)
+{
+  bool change = createInputF(_name, _param, _step, _largeStep);
+  _param = Math::clamp(_param, _min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector2(const char* _name, Vector2& _param)
+{
+  float v[2] = { _param.x, _param.y };
+  bool change = ImGui::InputFloat2(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  return change;
+}
+
+bool UInterface::createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max)
+{
+  bool change = createInputVector2(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector3(const char* _name, Vector3& _param)
+{
+  float v[3] = { _param.x, _param.y, _param.z };
+  bool change = ImGui::InputFloat3(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  _param.z = v[2];
+  return change;
+}
+
+bool
+UInterface::createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max)
+{
+  bool change = createInputVector3(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector4(const char* _name, Vector4& _param)
+{
+  float v[4] = { _param.x, _param.y, _param.z, _param.w };
+  bool change = ImGui::InputFloat4(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  _param.z = v[2];
+  _param.w = v[3];
+  return change;
+}
+
+bool
+UInterface::createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max)
+{
+  bool change = createInputVector4(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
 }
 
 void

@@ -9,7 +9,6 @@
 namespace pkEngineSDK
 {
 
-  // to do: change albedoRTV to a correct semantic
 void RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
@@ -17,104 +16,58 @@ void RendererManager::init()
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
 
+  // Texture description
+  TextureDesc txDesc;
+  txDesc.bpp = 4;
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
+  txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
+  txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
+  txDesc.usage = kPK_USAGE_DEFAULT;
+  txDesc.mipLevels = false;
+  txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
-  SPtr<Texture> albedoRTV = api.createTexture(4,
-                                              winWidth,
-                                              winHeight,
-                                              kPK_FORMAT_R32G32B32A32_FLOAT,
-                                              kPK_USAGE_DEFAULT,
-                                              kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                              false,
-                                              kPK_FORMAT_R32G32B32A32_FLOAT);
+  // render target for scene colors
+  SPtr<Texture> albedoRTV = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRTV });
 
   // create the normal render target that will store the normals of the world
-  SPtr<Texture> normalRT = api.createTexture(4,
-                                             winWidth,
-                                             winHeight,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT);
+  SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  SPtr<Texture> shadowRT = api.createTexture(4,
-                                             winWidth,
-                                             winHeight,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT);
+  // render target for the shadow result
+  SPtr<Texture> shadowRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
 
-  SPtr<Texture> metallicRT = api.createTexture(4,
-                                               winWidth,
-                                               winHeight,
-                                               kPK_FORMAT_R32G32B32A32_FLOAT,
-                                               kPK_USAGE_DEFAULT,
-                                               kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                               false,
-                                               kPK_FORMAT_R32G32B32A32_FLOAT);
+  // render target for the metallic result
+  SPtr<Texture> metallicRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
 
-  SPtr<Texture> luminanceRT = api.createTexture(4,
-                                                winWidth,
-                                                winHeight,
-                                                kPK_FORMAT_R32G32B32A32_FLOAT,
-                                                kPK_USAGE_DEFAULT,
-                                                kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                                false,
-                                                kPK_FORMAT_R32G32B32A32_FLOAT);
+  // render target for the luminance result
+  SPtr<Texture> luminanceRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, luminanceRT });
 
-  SPtr<Texture> hBlurredluminanceRT = api.createTexture(4,
-                                                        winWidth,
-                                                        winHeight,
-                                                        kPK_FORMAT_R32G32B32A32_FLOAT,
-                                                        kPK_USAGE_DEFAULT,
-                                                        kPK_BIND_SHADER_RESOURCE |
-                                                        kPK_BIND_RENDER_TARGET,
-                                                        false,
-                                                        kPK_FORMAT_R32G32B32A32_FLOAT);
+  // horizontal blur of luminance
+  SPtr<Texture> hBlurredluminanceRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_HBlurredLuminance, hBlurredluminanceRT });
 
-  SPtr<Texture> vBlurredluminanceRT = api.createTexture(4,
-                                                        winWidth,
-                                                        winHeight,
-                                                        kPK_FORMAT_R32G32B32A32_FLOAT,
-                                                        kPK_USAGE_DEFAULT,
-                                                        kPK_BIND_SHADER_RESOURCE |
-                                                        kPK_BIND_RENDER_TARGET,
-                                                        false,
-                                                        kPK_FORMAT_R32G32B32A32_FLOAT);
+  // vertical blur of luminance
+  SPtr<Texture> vBlurredluminanceRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_VBlurredLuminance, vBlurredluminanceRT });
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
-  SPtr<Texture> depthBuffer = api.createTexture(4,
-                                                winWidth,
-                                                winHeight,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                                kPK_USAGE_DEFAULT,
-                                                kPK_BIND_SHADER_RESOURCE |
-                                                kPK_BIND_DEPTH_STENCIL,
-                                                false,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  // depth buffer description
+  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS;
+  txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL;
+  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT;
+  // camera depth buffer
+  SPtr<Texture> depthBuffer = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
 
-  // create the depth buffer for the light camera rendering in shadow mapping
-  SPtr<Texture> shadowDepth = api.createTexture(4,
-                                                winWidth,
-                                                winHeight,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                                kPK_USAGE_DEFAULT,
-                                                kPK_BIND_SHADER_RESOURCE |
-                                                kPK_BIND_DEPTH_STENCIL,
-                                                false,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
+  // light depth buffer
+  SPtr<Texture> shadowDepth = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Shadow, shadowDepth });
   
   // create the passes needed

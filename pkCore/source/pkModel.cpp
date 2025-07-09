@@ -31,7 +31,7 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene);
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene);
 
-void
+bool
 Model::load(Path& _path)
 {
   m_indexB = nullptr;
@@ -43,7 +43,8 @@ Model::load(Path& _path)
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality |
                                                               aiProcess_RemoveRedundantMaterials |
                                                               aiProcess_FlipUVs);
-  if (scene == nullptr) { return; }
+  if (scene == nullptr) { return false; }
+  setName(scene->mName.C_Str());
   processNode(*this, scene->mRootNode, scene);
   for (uint32 i = 0; i < meshes.size(); ++i) {
     vertex.insert(vertex.end(),
@@ -54,6 +55,7 @@ Model::load(Path& _path)
                  meshes[i]->indexVector.begin(),
                  meshes[i]->indexVector.end());
   }
+  return true;
 }
   
 void
@@ -275,7 +277,5 @@ Model::clean()
 
   m_vertexB = make_shared<VertexBuffer>();
   m_indexB = make_shared<IndexBuffer>();
-
-  material = Material();
 }
 }

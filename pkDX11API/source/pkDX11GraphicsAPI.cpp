@@ -725,6 +725,14 @@ DX11GraphicsAPI::createInputLayoutFromVShader(SPtr<Shader> _pShader)
   return pLayout;
 }
 
+SPtr<Texture>
+DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
+{
+  return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
+                       _desc.bindFlags, _desc.mipLevels, _desc.shaderResourceFormat,
+                       _desc.data);
+}
+
 SPtr<InputLayout>
 DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                    const SPtr<Shader> _pVShader)
@@ -807,7 +815,7 @@ DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
 
   // local array of directx buffers
-  uint32 count = _pCBuffers.size();
+  uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
   // set all buffers
@@ -833,7 +841,7 @@ DX11GraphicsAPI::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
 
   // local array of directx buffers
-  uint32 count = _pCBuffers.size();
+  uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
   // set all the buffers in the array
@@ -859,7 +867,7 @@ DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
 
   // local array of directx buffers
-  uint32 count = _pCBuffers.size();
+  uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
   for (uint32 i = 0; i < _pCBuffers.size(); ++i)
@@ -993,6 +1001,7 @@ DX11GraphicsAPI::cSSetShaderResourceView(SPtr<Texture> _pTexture,
                                                     _pTexture ? &dxTX->m_srv : nullptr);
 }
 
+// to do: currently, texture loading is taking the old directory from
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
@@ -1007,7 +1016,9 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 
   // check if the texture was found
   if (!data) {
-    g_Logger().print("Data to create a texture was not found.");
+    delete data;
+    data = nullptr;
+    g_Logger().print("Can't open " + _fileName.getDirectory() + ", unable to open file");
     return nullptr;
   }
 
@@ -1036,7 +1047,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   if (data) { stbi_image_free(data); }
 
   // set the path
-  temptTexture->path = _fileName;
+  temptTexture->setName(_fileName);
 
   // return the texture
   return temptTexture;
@@ -1046,11 +1057,11 @@ SPtr<Texture>
 DX11GraphicsAPI::createTexture(uint32 _bpp,
                                uint32 _width,
                                uint32 _height,
-                               uint32 _format,
-                               uint32 _usage,
-                               uint32 _bindFlags,
+                               int32 _format,
+                               int32 _usage,
+                               int32 _bindFlags,
                                bool _mipLevels,
-                               uint32 _shaderResourceFormat,
+                               int32 _shaderResourceFormat,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
@@ -1081,8 +1092,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 
   // create the texture
   SPtr<DX11Texture> tex = make_shared<DX11Texture>();
-  tex->width = _width;
-  tex->height = _height;
+  tex->setSize(Vector2(_width, _height));
 
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);

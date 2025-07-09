@@ -114,6 +114,14 @@ public:
   void
   endPass();
 
+  // to do: this function may not need to exist.
+  /**
+   * @brief Clear the render targets with a base color.
+   * @param _color Color to clear with.
+   */
+  void
+  clearRenderTargets(Color _color = Color(1.0f, 1.0f, 1.0f, 0.0f));
+
  private:
   /**
    * Shader pointers

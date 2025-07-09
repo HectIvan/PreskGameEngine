@@ -121,6 +121,107 @@ class UInterface : public Module<UInterface>
   createText(const char* _text);
 
   /**
+   * @brief Create an input text.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputText(const char* _name, String& _param);
+
+  /**
+   * @brief Create an input float.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _step How much to increment when an arrow is clicked.
+   * @param _largeStep How much to increment when an arrow is held down.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputF(const char* _name,
+               float& _param,
+               float _step = 5.0f,
+               float _largeStep = 10.0f);
+
+  /**
+   * @brief Create an input float.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @param _step How much to increment when an arrow is clicked.
+   * @param _largeStep How much to increment when an arrow is held down.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputFClamp(const char* _name,
+                    float& _param,
+                    float _min,
+                    float _max,
+                    float _step = 5.0f,
+                    float _largeStep = 10.0f);
+
+  /**
+   * @brief Create an input Vector2.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector2(const char* _name, Vector2& _param);
+
+  /**
+   * @brief Create an input Vector2 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max);
+
+  /**
+   * @brief Create an input Vector3.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector3(const char* _name, Vector3& _param);
+
+  /**
+   * @brief Create an input Vector3 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max);
+
+  /**
+   * @brief Create an input Vector4.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector4(const char* _name, Vector4& _param);
+
+  /**
+   * @brief Create an input Vector4 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max);
+
+  /**
    * @brief Create a float slider.
    * @param _name Name of the slider.
    * @param _param What parameter is to be modified.

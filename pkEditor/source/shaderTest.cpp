@@ -105,6 +105,9 @@ ShaderTest::onInit()
                                          camPos, // position
                                          Vector3::FORWARD + camPos * -1.0f, // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
+  // camera sensitivity
+  m_sensX = 0.3f;
+  m_sensY = 0.3f;
 
   // create light
   light = g_SceneManager().getActiveScene()->instantiate("Test Light");
@@ -112,11 +115,11 @@ ShaderTest::onInit()
   SPtr<Light> lightCom = light->getComponent<Light>();
   lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
   lightCom->SpotCutoff = 0.90f;
-  lightCom->SpotExponent = 64.0f;
+  lightCom->SpotExponent = 32.0f;
   lightCom->LightDir = Vector3(0, 1.0f, 0);
   lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
   lightCom->LightColor = Vector3(1.0f);
-  lightCom->shadowColor = Vector3(0.3f);
+  lightCom->shadowIntensity = 0.85f;
 
   // add camera component
   light->addComponent(make_shared<Camera>());
@@ -205,10 +208,12 @@ ShaderTest::input()
   }
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused) {
-    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * deltaTime;
+    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
+    posDif.x *= m_sensX;
+    posDif.y *= m_sensY;
     m_lastCursorPos = eventQueue.mousePosition;
-    m_camera->getComponent<Camera>()->rotate(-posDif.y, 0.0f, 0.0f);
-    m_camera->getComponent<Camera>()->rotate(0.0f, posDif.x, 0.0f);
+    m_camera->getComponent<Camera>()->rotate(-posDif.y * Math::DEG2RAD, 0.0f, 0.0f);
+    m_camera->getComponent<Camera>()->rotate(0.0f, posDif.x * Math::DEG2RAD, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }
@@ -238,7 +243,6 @@ ShaderTest::uInterfaceUpdate()
       m_selectedActor = sm.getActiveScene()->getActor(i);
     }
   }
-  m_selectedActor = sm.getActiveScene()->getActor(1);
   im.endWindowCreate();
   // -------------------------- //
 
@@ -256,13 +260,10 @@ ShaderTest::uInterfaceUpdate()
     yOffset += winHeight;
 
     // ---- Components window ---- //
-    winHeight = 160.0f;// m_selectedActor->getComponents().size() * 20.0f + 20.0f;
+    winHeight = 180.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.startWindowCreate("Components");
-    // for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-    //   im.createText(m_selectedActor->getComponents()[i]->getName());
-    // }
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
       inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
     }
@@ -290,12 +291,14 @@ ShaderTest::uInterfaceUpdate()
   // -------------------------- //
 
   // --- Camera window --- //
-  winHeight = 100.0f;
+  winHeight = 125.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Camera");
   im.createSliderF("Camera Acceleration", m_camAccelerate, 0.0f, m_maxCamSpeed);
   im.createText(camSpeed.c_str());
+  im.createInputF("X Sensitivity", m_sensX);
+  im.createInputF("Y Sensitivity", m_sensY);
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //
@@ -330,23 +333,24 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
-  // buffer data
+  // camera data
   SPtr<Camera> camData = m_camera->getComponent<Camera>();
   Matrix4 view = camData->m_view.getTransposed();
   Matrix4 proj = camData->m_projection.getTransposed();
   Matrix4 invView = view.inverse();
   Matrix4 invProj = proj.inverse();
+  // light data
   SPtr<Light> lightData = light->getComponent<Light>();
   CBLight lData;
   lData.LightDir = Vector4(lightData->LightDir, 1.0f);
   lData.LightPos = Vector4(lightData->LightPos, 1.0f);
   lData.LightColor = Vector4(lightData->LightColor, 1.0f);
-  lData.shadowColor = Vector4(lightData->shadowColor, 1.0f);
-  // lData.spotExponent = lightData->SpotExponent;
-
+  lData.shadowIntensity = lightData->shadowIntensity;
+  lData.spotExponent = lightData->SpotExponent;
+  // luminance parameters
   CBLuminance lum;
   lum.tolerance = 0.9f;
-
+  // blur parameters
   CBBlur blur;
   blur.targetSize = Vector2(10.0f, 10.0f);
 
@@ -354,6 +358,7 @@ ShaderTest::onUpdate()
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 camSize = sizeof(Camera);
   uint32 lightSize = sizeof(Light);
+
   // update normal pass buffers
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(1), &proj, m4x4Size);
@@ -388,21 +393,20 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(4),
                            &invView,
                            sizeof(Matrix4));
+  // get the shadow data needed
   CBShadowParam shadowsParam;
   shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
-  shadowsParam.winSize = Vector2(static_cast<float>(api.getSwapChain()->getBuffer(0)->width),
-                                 static_cast<float>(api.getSwapChain()->getBuffer(0)->height));
+  shadowsParam.winSize = api.getSwapChain()->getBuffer(0)->getSize();
   api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(5),
                            &shadowsParam,
                            sizeof(CBShadowParam));
-
-  api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(lum));
-
-  api.updateConstantBuffer(rm.getPass(kP_HBlur)->getCBuffer(0), &blur, sizeof(blur));
-  api.updateConstantBuffer(rm.getPass(kP_VBlur)->getCBuffer(0), &blur, sizeof(blur));
+  // update the luminance pass buffer
+  api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(CBLuminance));
+  // update the Horizontal/Vertical blur pass buffer
+  api.updateConstantBuffer(rm.getPass(kP_HBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(rm.getPass(kP_VBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
 }
 
-// to do: fix the deferred renderer to be able to show the final result
 void
 ShaderTest::onRender()
 {

@@ -8,6 +8,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 1
-map_Kd D:/Work/visual studio/PreskGameEngine/bin/textures/drakePistol/base_albedo.png
-map_Ns D:/Work/visual studio/PreskGameEngine/bin/textures/drakePistol/base_normal.png
-map_refl D:/Work/visual studio/PreskGameEngine/bin/textures/drakePistol/base_roughness.png
+map_Kd textures/drakePistol/base_albedo.png
+map_Ns textures/drakePistol/base_normal.png
+map_refl textures/drakePistol/base_roughness.png

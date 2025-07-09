@@ -18,6 +18,12 @@ TextureManager::loadTexture(const Path& _directory)
   // create the texture
   SPtr<Texture> texture = g_GraphicAPI().createTextureFromFile(_directory, 8, false, 28);
 
+  // if the texture failed to load
+  if (!texture) {
+    texture = nullptr;
+    return nullptr;
+  }
+
   // store the new texture in the memory
   SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();
   newTexture->name = _directory;

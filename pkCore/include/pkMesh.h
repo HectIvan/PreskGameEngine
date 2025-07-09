@@ -64,6 +64,13 @@ class Mesh
   void
   setName(String _name) { m_name = _name; }
 
+  /**
+   * @brief Get the name of the mesh.
+   * @return Reference to the name of the mesh.
+   */
+  String&
+  getName() { return m_name; }
+
  public:
   // stores the index and vertex info
   Vector<SimpleVertex> vertexVector;
@@ -76,6 +83,8 @@ class Mesh
   SPtr<Material> material;
 
   String materialPath;
+
+ private:
   String m_name;
 };
 }

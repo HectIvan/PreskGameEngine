@@ -21,14 +21,15 @@ ________________________________________________________________________________
 
 cbuffer cbLight : register(b0)
 {
-    float3 LightDir;
-    float padd1; // 12
-    float3 LightPos;
-    float padd2; // 24
-    float3 LightColor;
-    float padd3; // 36
-    float3 ShadowColor;
-    float padd4; // 48
+    float3 LightDir; // 12
+    float lightPadd1; // 16
+    float3 LightPos; // 28
+    float lightPadd2; // 32
+    float3 LightColor; // 44
+    float lightPadd3; // 48
+    float ShadowIntensity; // 52
+    float spotExponent; // 56
+    float2 lightPadd4; // 64
 }
 cbuffer Camera : register(b1)
 {
@@ -118,14 +119,15 @@ float4 PS(PS_INPUT input) : SV_Target0
   float3 worldPos = WorldPosFromDepth(input.Tex, depthTex.r);
   
   // diffuse
+  float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(lightPos - worldPos);
-  float diff = max(dot(lightDir, normal), ShadowColor.x);
+  float diff = max(dot(lightDir, normal), shadowColor);
   float3 diffuse = lightColor * diff;
   // specular
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float spec = 0.0;
   float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), 0.0f), 32.0f);
+  spec = pow(max(dot(normal, halfwayDir), 0.0f), spotExponent);
   float3 specular = lightColor * spec;
     
   float3 finalColor = diffuse + specular;

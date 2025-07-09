@@ -132,6 +132,14 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture.
+   * @param _desc Texture descrition.
+   * @return Texture.
+   */
+  SPtr<Texture>
+  createTexture(const TextureDesc& _desc) override;
+
+  /**
+   * @brief Create a texture.
    * @param _width How wide is the texture.
    * @param _height How tall is the texture.
    * @param _format Format of the texture.
@@ -144,11 +152,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
-                uint32 _format,
-                uint32 _usage,
-                uint32 _bindFlags,
+                int32 _format,
+                int32 _usage,
+                int32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat,
+                int32 _shaderResourceFormat,
                 unsigned char* _data = nullptr) override;
 
   /**

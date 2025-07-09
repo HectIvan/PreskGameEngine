@@ -73,7 +73,8 @@ Window::create(const PKWindowDesc& _desc)
     g_Logger().print("Failed to create the window.");
     return;
   }
-  SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(&_desc.funct));
+  auto* eventFunct = new WinFunctEvent(_desc.funct);
+  SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(eventFunct));
   ShowWindow(m_windowH, 1);
 }
 
@@ -84,13 +85,13 @@ Window::getClientWidthHeight() const
   GetClientRect(m_windowH, &rc);
   uint32 width = rc.right - rc.left;
   uint32 height = rc.bottom - rc.top;
-  return Vector2(static_cast<float>(width), static_cast<float>(height));
+  return Vector2(width, height);
 }
 
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(hWnd, 0);
+  WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
   if (winEvent) {
     PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),
                                          static_cast<uint32>(message),
@@ -112,6 +113,10 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   }
   case WM_DESTROY:
   {
+    // get the function and delete it
+    WinFunctEvent* eventFunct = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
+    delete eventFunct;
+    eventFunct = nullptr;
     PostQuitMessage(0);
     break;
   }
@@ -175,7 +180,6 @@ Window::setHeight(uint32 _height)
 Vector2
 Window::getSize() const
 {
-  return Vector2(static_cast<float>(m_width), 
-                 static_cast<float>(m_height));
+  return Vector2(m_width, m_height);
 }
 }

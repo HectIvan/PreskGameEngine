@@ -55,10 +55,12 @@ struct CBCamera
 
 struct CBLight
 {
-  Vector4 LightDir; // 12
-  Vector4 LightPos; // 24
-  Vector4 LightColor; // 36
-  Vector4 shadowColor; // 48
+  Vector4 LightDir; // 16
+  Vector4 LightPos; // 32
+  Vector4 LightColor; // 48
+  float shadowIntensity; // 52
+  float spotExponent; // 56
+  Vector2 unused1; // 64
 };
 
 struct CBAOData

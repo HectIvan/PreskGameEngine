@@ -42,8 +42,9 @@ class PK_CORE_EXPORT Model : public Component
   /**
    * @brief Load the model from a path.
    * @param _path File path.
+   * @return If the model was able to be loaded.
    */
-  void
+  bool
   load(Path& _path);
 
   /**
@@ -91,10 +92,17 @@ class PK_CORE_EXPORT Model : public Component
   getType() override { return COMPONENT_TYPE::kModel; }
 
   /**
+   * @brief Set the name of the model.
+   * @param _name Name of the model.
+   */
+  void
+  setName(const char* _name) { m_name = String(_name); }
+
+  /**
    * @brief Get the name of the component.
    */
   const char*
-  getName() override { return "Model"; }
+  getName() override { return m_name.c_str(); }
 
   /**
    * @brief Get the component type of this component.
@@ -135,6 +143,7 @@ class PK_CORE_EXPORT Model : public Component
   Vector<SimpleVertex> vertex;
   Vector<uint32> index;
 
+
   // skeleton data
   Map<String, Bone> boneMap;
   Vector<SPtr<Mesh>> meshes;
@@ -144,10 +153,10 @@ class PK_CORE_EXPORT Model : public Component
   SPtr<VertexBuffer> m_vertexB;
   SPtr<IndexBuffer> m_indexB;
 
-  // material
-  Material material;
-
+ private:
   // location data
   Path path;
+  // name
+  String m_name;
 };
 }

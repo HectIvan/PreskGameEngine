@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkTexture pkTexture.h
-* @Hector Ivan Muñoz Ceballos
-* @date 22/11/2024
-* @Texture file for the Presk Game Engine.
-*
-* Texture class for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 25/11/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkTexture.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    22/11/2024
+ * @brief   Texture file for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 /*********************************************/
 /**
@@ -195,17 +190,100 @@ namespace TEXTURE_TYPE
   };
 }
 
+struct TextureDesc
+{
+  uint32 bpp;
+  uint32 width;
+  uint32 height;
+  int32 format;
+  int32 usage;
+  int32 bindFlags;
+  bool mipLevels;
+  int32 shaderResourceFormat;
+  unsigned char* data = nullptr;
+};
+
 class PK_CORE_EXPORT Texture
 {
  public:
   Texture() = default;
   virtual ~Texture() = default;
 
- public:
-  uint32 id;
-  TEXTURE_TYPE::E type;
-  Path path;
-  uint32 width;
-  uint32 height;
+  /**
+   * @brief Set the texture width.
+   * @param _width Window width.
+   */
+  void
+  setWidth(uint32 _width) { m_width = _width; }
+
+  /**
+   * @brief Set the texture height.
+   * @param _height Window Height.
+   */
+  void
+  setHeight(uint32 _height) { m_height = _height; }
+
+  /**
+   * @brief Set the texture size.
+   * @param _size Size of the texture.
+   */
+  void
+  setSize(const Vector2 _size);
+
+  /**
+   * @brief Get the texture width.
+   * @return the texture width.
+   */
+  uint32
+  getWidth() { return m_width; }
+
+  /**
+   * @brief Get the texture height.
+   * @return the texture height.
+   */
+  uint32
+  getHeight() { return m_height; }
+
+  /**
+   * @brief Get the texture size.
+   * @return Texture size.
+   */
+  Vector2
+  getSize() { return Vector2(m_width, m_height); }
+
+  /**
+   * @brief Get texture type.
+   * @return Type as an uint32.
+   */
+  const uint32
+  getType() { return m_type; }
+
+  /**
+   * @brief Set texture type.
+   * @param _type What type of texture it will be
+   */
+  void
+  setType(uint32 _type) { m_type = static_cast<TEXTURE_TYPE::E>(_type); }
+
+  /**
+   * @brief Set the texture name.
+   * @param _name Name of the texture
+   */
+  void
+  setName(Path _name) { m_name = _name; }
+
+  /**
+   * @brief Get the texture name.
+   * @return Name of the texture.
+   */
+  Path&
+  getName() { return m_name; }
+
+ private:
+  uint32 m_id;
+  TEXTURE_TYPE::E m_type;
+  Path m_name;
+  uint32 m_width;
+  uint32 m_height;
 };
 }

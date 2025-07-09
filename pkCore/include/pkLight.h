@@ -67,10 +67,10 @@ class PK_CORE_EXPORT Light : public Component
   float Type;
   float SpotCutoff;
   float SpotExponent;
+  float shadowIntensity;
   Vector3 LightDir = Vector3::FORWARD;
   Vector3 LightPos;
   Vector3 LightColor = Vector3(1.0f);
-  Vector3 shadowColor;
-  float unused;
+  Vector2 unused;
 };
 }

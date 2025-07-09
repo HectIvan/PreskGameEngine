@@ -11,9 +11,12 @@
 **/
 /*********************************************/
 #include "pkCamera.h"
-#include "pkLight.h";
+#include "pkLight.h"
+#include "pkModel.h"
 #include "pkUInterface.h"
 #include "pkVector3.h"
+#include "pkVector4.h"
+#include "pkPrerequisitesCore.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::COMPONENT_TYPE::kCamera;
@@ -23,10 +26,13 @@ using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
+using pkEngineSDK::Model;
 using pkEngineSDK::reinterpret_pointer_cast;
+using pkEngineSDK::String;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
+using pkEngineSDK::Vector4;
 
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
@@ -69,16 +75,18 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   {
     SPtr<Camera> cam = reinterpret_pointer_cast<Camera>(_pComponent);
     im.createText("Camera");
-    im.createSliderVector3("Eye", cam->m_eye.xyz(), -9999999.9f, 9999999.9f);
+    im.createInputVector4Clamp("Eye", cam->m_eye, -9999999.9f, 9999999.9f);
     break;
   }
   case kLight:
   {
     SPtr<Light> light = reinterpret_pointer_cast<Light>(_pComponent);
     im.createText("Light");
-    im.createSliderVector3("Color", light->LightColor, 0.0f, 255.0f);
-    im.createSliderVector3("Direction", light->LightDir, -1.0f, 1.0f);
-    im.createSliderVector3("Position", light->LightPos, -9999999.9f, 9999999.9f);
+    im.createInputVector3Clamp("Color", light->LightColor, 0.0f, 1.0f);
+    im.createInputVector3Clamp("Direction", light->LightDir, -1.0f, 1.0f);
+    im.createInputVector3Clamp("Position", light->LightPos, -9999999.9f, 9999999.9f);
+    im.createInputF("Spot Exponent", light->SpotExponent, 1.0f, 1.0f);
+    im.createInputFClamp("Shadow Intensity", light->shadowIntensity, 0.0f, 1.0f, 0.05f, 0.1f);
     break;
   }
   case kMaterial:
@@ -88,7 +96,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   }
   case kModel:
   {
-    im.createText("Model");
+    SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
+    im.createText(model->getName());
+    for (uint32 i = 0; i < model->getMeshes().size(); ++i) {
+      String name = "  " + model->getMeshes()[i]->getName();
+      im.createText(name.c_str());
+    }
     break;
   }
   case kUnknown:

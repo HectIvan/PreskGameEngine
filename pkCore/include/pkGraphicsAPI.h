@@ -144,6 +144,14 @@ public:
   createInputLayoutFromVShader(SPtr<Shader> _pShader) = 0;
 
   /**
+   * @brief Create a texture.
+   * @param _desc Texture descrition.
+   * @return Texture.
+   */
+  virtual SPtr<Texture>
+  createTexture(const TextureDesc& _desc) = 0;
+
+  /**
   * @brief Create a texture.
   * @param _data Data of the image loaded.
   * @param _width How wide is the texture.
@@ -157,11 +165,11 @@ public:
   createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
-                uint32 _format,
-                uint32 _usage,
-                uint32 _bindFlags,
+                int32 _format,
+                int32 _usage,
+                int32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat,
+                int32 _shaderResourceFormat,
                 unsigned char* _data = nullptr) = 0;
 
   /**

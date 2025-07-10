@@ -4,6 +4,12 @@
 
 namespace pkEngineSDK
 {
+void
+Camera::init(const CameraDesc& _desc)
+{
+  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.at,
+       _desc.up, _desc.camMode);
+}
 
 void
 Camera::init(uint32 _width,
@@ -16,14 +22,17 @@ Camera::init(uint32 _width,
              Vector3 _up,
              CAMERA_PROJ::E _camMode)
 {
-  m_width = _width;
-  m_height = _height;
+  // creation parameters
+  m_descriptor = CameraDesc(_width, _height, _halfFOV, _nearZ,
+                            _farZ, _eye, _at, _up, _camMode);
   m_eye = Vector4(_eye, 1.0f);
   m_at = Vector4(_at, 0.0f);
   m_up = _up;
   m_forward = Vector3::FORWARD;
   m_right = Vector3::RIGHT;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  m_farNear = Vector2(_farZ, _nearZ);
+  m_projType = _camMode;
   if (_camMode == CAMERA_PROJ::kPerspective) {
     m_projection = Matrix4::perspectiveFOVLH(_halfFOV,
                                              static_cast<float>(_width),
@@ -55,32 +64,76 @@ Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 void
 Camera::move(Vector3 _dist)
 {
-  Vector3 offset = getRight() * _dist.x + Vector3::UP * _dist.y + getForward() * _dist.z;
-  m_eye += offset;
-  m_at += offset;
+  Vector3 offset = getRight() * _dist.x + getUp() * _dist.y + getForward() * _dist.z;
+  m_eye += _dist;
+  m_at += _dist;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveForward(float _offset)
+{
+  Vector3 pos = Vector3::FORWARD * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_up += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+// to do: change return of xyz from copy to reference (maybe)
+void
+Camera::moveForwardLocal(float _offset)
+{
+  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  m_at += forward * _offset;
+  m_eye += forward * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+}
+
+void
+Camera::moveRight(float _offset)
+{
+  Vector3 pos = Vector3::RIGHT * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveRightLocal(float _offset)
+{
+  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  Vector3 right = m_view.getUpVector().cross(forward);
+  m_at += right * _offset;
+  m_eye += right * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+}
+
+void
+Camera::moveUp(float _offset)
+{
+  Vector3 pos = Vector3::UP * _offset;
+  m_eye += pos;
+  m_at += pos;
+  m_up += pos;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+}
+
+void
+Camera::moveUpLocal(float _offset)
+{
+  m_at += Vector3::UP * _offset;
+  m_eye += Vector3::UP * _offset;
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
 Camera::rotate(float _x, float _y, float _z)
 {
-  // for stopping warning messages
-  _x = _x;
-  _z = _z;
-  // _z = _z;
-  // Matrix4 rotRight = Matrix4::MatrixRotationAxis(getRight(), _y);
-  // Matrix4 rotUp = Matrix4::MatrixRotationAxis(Vector3::UP, _x);
-  // Matrix4 rot = rotRight * rotUp;
-  // 
-  // Vector3 newForward = (rot * m_forward).normalized();
-  // 
-  // // setView(m_eye, m_eye + newForward, Vector3::UP);
-  // m_view = Matrix4::lookAtLH(m_eye, m_eye + newForward, Vector3::UP);
-
-  Vector4 newAt = m_at - m_eye;
-  newAt = newAt * Matrix4::rotationY(_y);
-  newAt += m_eye;
-  m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
+  m_view *= Matrix4::rotation(_x, _y, _z);
+  m_at = m_eye + m_view.getForwardVector();
+  m_up = m_eye.xyz() + m_view.getUpVector();
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
@@ -92,36 +145,24 @@ Camera::rotate(Vector3 _rotate)
 Vector3
 Camera::getForward()
 {
-  Vector4 forwardVec = (m_at - m_eye);
+  Vector3 forwardVec = m_view.inverse().getForwardVector();
   forwardVec.normalize();
-  Vector3 forward3 = Vector3(forwardVec.x, forwardVec.y, forwardVec.z);
-  setForward(forward3);
-  return forward3;
+  return forwardVec;
 }
 
 Vector3
 Camera::getRight()
 {
-  Vector3 rightVec = (getForward() ^ m_up);
+  Vector3 rightVec = m_view.inverse().getRightVector();
   rightVec.normalize();
-  setRight(rightVec);
   return rightVec;
 }
 
 Vector3
 Camera::getUp()
 {
-  Vector3 upVec = getForward() ^ getRight();
+  Vector3 upVec = m_view.inverse().getUpVector();
   upVec.normalize();
-  setUp(upVec);
   return upVec;
-}
-
-void
-Camera::updateRotation()
-{
-  setForward(getForward());
-  setRight(getRight());
-  setUp(getUp());
 }
 }

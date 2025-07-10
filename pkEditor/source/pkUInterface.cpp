@@ -32,7 +32,8 @@ UInterface::init()
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
 
-  initAPI();
+  // initalize the UI with the desired Graphic API
+  initWithAPI();
 
   // ImGui::StyleColorsDark();
   ImGui::StyleColorsClassic();
@@ -42,6 +43,12 @@ void
 UInterface::setNewWindowSize(Vector2 _size)
 {
   ImGui::SetNextWindowSize(ImVec2(_size.x, _size.y), ImGuiCond_Always);
+}
+
+void
+UInterface::setNewWindowSize(float _x, float _y)
+{
+  ImGui::SetNextWindowSize(ImVec2(_x, _y), ImGuiCond_Always);
 }
 
 void

@@ -91,17 +91,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)sol2/include/;$(DEVLIBS)lua-5.4.7/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)/sol2/include/;$(DEVLIBS)/lua-5.4.7/include/</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>libluad.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -115,7 +115,7 @@
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)sol2/include/;$(DEVLIBS)lua-5.4.7/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)/sol2/include/;$(DEVLIBS)/lua-5.4.7/include/</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -123,7 +123,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>liblua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -131,17 +131,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)sol2/include/;$(DEVLIBS)lua-5.4.7/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)/sol2/include/;$(DEVLIBS)/lua-5.4.7/include/</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>libluad.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>PK_UTILITY_EXPORTS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)sol2/include/;$(DEVLIBS)lua-5.4.7/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;$(DEVLIBS)/sol2/include/;$(DEVLIBS)/lua-5.4.7/include/</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -163,7 +163,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/lua-5.4.7/lib/$(PlatformTarget)/</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)lib/$(PlatformTarget)/$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>liblua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -174,11 +174,12 @@
     <ClInclude Include="include\pkCollisionInfo.h" />
     <ClInclude Include="include\pkColor.h" />
     <ClInclude Include="include\pkCube.h" />
-    <ClInclude Include="include\pkFigure.h" />
+    <ClInclude Include="include\pkFileSystem.h" />
     <ClInclude Include="include\pkMath.h" />
     <ClInclude Include="include\pkMatrix4.h" />
     <ClInclude Include="include\pkModule.h" />
     <ClInclude Include="include\pkOBB.h" />
+    <ClInclude Include="include\pkPath.h" />
     <ClInclude Include="include\pkPlane.h" />
     <ClInclude Include="include\pkPlatformDefines.h" />
     <ClInclude Include="include\pkPlatformMath.h" />
@@ -193,12 +194,12 @@
     <ClInclude Include="include\pkVector4.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\pkAABB.cpp" />
-    <ClCompile Include="include\pkOBB.cpp" />
     <ClCompile Include="source\pkCapsule.cpp" />
     <ClCompile Include="source\pkColor.cpp" />
     <ClCompile Include="source\pkCube.cpp" />
+    <ClCompile Include="source\pkFileSystem.cpp" />
     <ClCompile Include="source\pkMatrix4.cpp" />
+    <ClCompile Include="source\pkPath.cpp" />
     <ClCompile Include="source\pkPlane.cpp" />
     <ClCompile Include="source\pkPlatformMath.cpp" />
     <ClCompile Include="source\pkQuaternion.cpp" />

@@ -25,6 +25,7 @@
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector4.h"
+#include "pkDX11Shader.h"
 
 
 namespace pkEngineSDK
@@ -43,7 +44,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Initialize the api.
-   * @param _wHnd Window handle.
    */
   void
   initApi(const Window& _window) override;
@@ -54,7 +54,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) override;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
 
   /**
    * @brief Set the render target to the device.
@@ -62,7 +62,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV) override;
+  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
 
   /**
    * @brief Create the blend state.
@@ -79,43 +79,63 @@ class DX11GraphicsAPI : public GraphicsAPI
   setBlendState(SPtr<BlendState> _pBlendState) override;
 
   /**
-   * @brief Create a vertex shader.
-   * @param _pShader Shader to create
+   * @brief Creates a shader of the specific graphic API.
+   * @return API Specific shader.
    */
-  void
+  SPtr<Shader>
+  internalCreateShader() override { return make_shared<DX11Shader>(); }
+
+  /**
+   * @brief Create a vertex shader.
+   * @return Vertex Shader.
+   */
+  SPtr<Shader>
   createVShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Create a pixel shader.
-   * @param _pShader Shader to create
+   * @return Pixel Shader.
    */
-  void
+  SPtr<Shader>
   createPShader(SPtr<Shader> _pShader) override;
+
+  /**
+   * @brief Create a compute shader.
+   * @return Compute shader.
+   */
+  SPtr<Shader>
+  createCShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Set the vertex shader to the device context.
    */
   void
-  setVSShader(SPtr<Shader> _pShader) override;
+  setVShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
    */
   void
-  setPSShader(SPtr<Shader> _pShader) override;
+  setPShader(SPtr<Shader> _pShader) override;
+
+  /**
+   * @brief Set a compute shader.
+   * @return Compute shader.
+   */
+  void
+  setCShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.
    * @param _szFileName What file we will get.
    * @param _szEntryPoint Main function of the shader.
    * @param _szShaderModel What kind of model is the shader.
-   * @param _pTargetShader Shader to store the data in.
+   * @return Data blob.
    */
-  void
-  compileShaderFromFile(WString _szFileName,
+  void **
+  compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
-                        const char* _szShaderModel,
-                        SPtr<Shader> _pTargetShader) override;
+                        const char* _szShaderModel) override;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -126,38 +146,38 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture.
-   * @param _data Data of the image loaded.
+   * @param _desc Texture descrition.
+   * @return Texture.
+   */
+  SPtr<Texture>
+  createTexture(const TextureDesc& _desc) override;
+
+  /**
+   * @brief Create a texture.
    * @param _width How wide is the texture.
    * @param _height How tall is the texture.
    * @param _format Format of the texture.
    * @param _usage What usage will the api give the texture.
    * @param _bindFlags flag for binding to the pipeline stages.
    * @param _mipLevels The maximum number of mipmap levels in the texture.
+   * @param _data Data of the image loaded.
    */
   SPtr<Texture>
-  createTexture(unsigned char* _data,
-                uint32 _bpp,
+  createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
-                uint32 _format,
-                uint32 _usage,
-                uint32 _bindFlags,
+                int32 _format,
+                int32 _usage,
+                int32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat) override;
+                int32 _shaderResourceFormat,
+                unsigned char* _data = nullptr) override;
 
   /**
    * @brief Create the sampler state.
    */
   SPtr<SamplerState>
   createSamplerState(const uint32 _mode, const uint32 _filter) override;
-
-  /**
-   * @brief Create the depth stencil texture and view.
-   * @param _width Client width.
-   * @param _height Client height.
-   */
-  SPtr<DepthStencilView>
-  createDepthStencilView(SPtr<Texture> _depthRT) override;
 
   /**
    * @brief Set input layout
@@ -219,8 +239,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
-                       const void* _pData,
-                       uint32 _usage) override;
+                       const void* _pData = nullptr,
+                       uint32 _usage = 0) override;
 
   /**
    * @brief Update the constant buffer.
@@ -231,57 +251,42 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
-                       uint32 _size) override;
+                       SIZE_T _size) override;
 
   /**
-   * @brief Set a texture to the resource view.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set a resource to the vertex shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  setShaderResourceView(SPtr<Texture> _pTexture,
-                        uint32 _start = 0,
-                        uint32 _numViews = 1) override;
+  vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
-   * @brief Set a texture to the resource view of a pixel shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set resources to a pixel shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  PSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) override;
+  pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
-   * @brief Set a texture to the resource view of a vertex shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set resources to a compute shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  VSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) override;
+  cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
-   * @brief Set a 
+   * @brief Set unordered views to a compute shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the compute shader will the resources be allocated.
+   * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   void
-  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
-
-  /**
-   * @brief Set the Compute Shader Constant Buffer
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
-   */
-  void
-  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 0) override;
+  cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+                            uint32 _start = 0,
+                            uint32* _initialCounts = nullptr) override;
 
   /**
    * @brief Create the device and swap chain.
@@ -328,13 +333,13 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture from file.
-   * @param _fileName Name of the texture.
+   * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
    * @param _mipLevels If the texture has mip levels.
    * @param _format What format will the texture be.
    */
   SPtr<Texture>
-  createTextureFromFile(String& _fileName,
+  createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) override;
@@ -376,17 +381,41 @@ class DX11GraphicsAPI : public GraphicsAPI
   dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
 
   /**
+   * @brief Clear all render target views of a vector.
+   * @param _color New render target color.
+   */
+  void
+  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) override;
+
+  /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
    */
   void
-  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) override;
+  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
+
+  /**
+   * @brief Clear all unordered access views of a vector.
+   * @param _color New view color.
+   */
+  void
+  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+                            const Color& _color = Color(1, 1, 1, 0)) override;
+
+  /**
+   * @brief Clear access view.
+   * @param _color New view color.
+   */
+  void
+  clearUnorderedAccessView(SPtr<Texture> _uav,
+                           const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**
    * @brief Clear the depth buffer.
+   * @param _pDepthSV Depth stencil to clear.s
    */
   void
-  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) override;
+  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) override;
 
   /**
    * @brief Create the Input Layout.
@@ -396,25 +425,30 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   void
-  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers) override;
+  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   void
-  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                       uint32 _startSlot,
-                       uint32 _numBuffers) override;
+  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
+
+  /**
+   * @brief Set the Compute Shader Constant Buffer
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @param _startSlot Start position of the buffers.
+   */
+  void
+  cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) override;
 
   /**
    * @brief Get the API Swap chain

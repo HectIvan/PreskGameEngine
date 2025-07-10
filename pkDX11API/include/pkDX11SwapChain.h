@@ -45,7 +45,7 @@ namespace pkEngineSDK
    * @param _index Position of the buffer.
    * @return Texture of the back buffer.
    */
-  SPtr<Texture>
+  SPtr<Texture>&
   getBuffer(uint32 _index) override;
 
  public:

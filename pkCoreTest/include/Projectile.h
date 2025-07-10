@@ -18,11 +18,9 @@
 #include "pkActor.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
-#include "pkGameObject.h"
 #include "pkPrerequisitesCore.h"
 
 using pkEngineSDK::Actor;
-using pkEngineSDK::GameObject;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;

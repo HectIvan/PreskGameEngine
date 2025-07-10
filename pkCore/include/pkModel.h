@@ -25,6 +25,7 @@
 #include "pkIndexBuffer.h"
 #include "pkMaterial.h"
 #include "pkMesh.h"
+#include "pkPath.h"
 #include "pkVertexBuffer.h"
 
 namespace pkEngineSDK
@@ -34,17 +35,17 @@ class PK_CORE_EXPORT Model : public Component
 {
  public:
   Model() = default;
-  virtual ~Model()
-  {
+  virtual ~Model() {
     clean();
   }
 
   /**
-  * @brief Load the model from a path.
-  * @param _path File path.
-  **/
-  void
-  load(String& _path);
+   * @brief Load the model from a path.
+   * @param _path File path.
+   * @return If the model was able to be loaded.
+   */
+  bool
+  load(Path& _path);
 
   /**
    * @brief Get the map of bones assigned to the model.
@@ -91,6 +92,19 @@ class PK_CORE_EXPORT Model : public Component
   getType() override { return COMPONENT_TYPE::kModel; }
 
   /**
+   * @brief Set the name of the model.
+   * @param _name Name of the model.
+   */
+  void
+  setName(const char* _name) { m_name = String(_name); }
+
+  /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return m_name.c_str(); }
+
+  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */
@@ -110,10 +124,25 @@ class PK_CORE_EXPORT Model : public Component
   Vector<SPtr<Mesh>>
   getMeshes() { return meshes; }
 
+  /**
+   * @brief Get the vertex buffer.
+   * @return The vertex buffer.
+   */
+  SPtr<VertexBuffer>
+  getVertexBuffer() { return m_vertexB; }
+
+  /**
+   * @brief Get the index buffer.
+   * @return The index buffer.
+   */
+  SPtr<IndexBuffer>
+  getIndexBuffer() { return m_indexB; }
+
  public:
   // vertex and index data
   Vector<SimpleVertex> vertex;
   Vector<uint32> index;
+
 
   // skeleton data
   Map<String, Bone> boneMap;
@@ -121,13 +150,13 @@ class PK_CORE_EXPORT Model : public Component
   uint32 boneCounter = 0;
 
   // buffers for both vectors and index
-  SPtr<VertexBuffer> vertexB;
-  SPtr<IndexBuffer> indexB;
+  SPtr<VertexBuffer> m_vertexB;
+  SPtr<IndexBuffer> m_indexB;
 
-  // material
-  Material material;
-
+ private:
   // location data
-  String path;
+  Path path;
+  // name
+  String m_name;
 };
 }

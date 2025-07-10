@@ -6,76 +6,79 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 
-using TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
-using PK_USAGE::kPK_USAGE_DEFAULT;
-using PK_BIND_FLAG::kPK_BIND_DEPTH_STENCIL;
-using PK_BIND_FLAG::kPK_BIND_RENDER_TARGET;
-using PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
-using PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS;
-
 namespace pkEngineSDK
 {
-void RendererManager::init(Window& _window)
+
+void RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
 
-  uint32 winHeight = _window.getHeight();
-  uint32 winWidth = _window.getWidth();
+  uint32 winHeight = api.getSwapChain()->getHeight();
+  uint32 winWidth = api.getSwapChain()->getWidth();
 
-  // get the main render target from the swap chain
-  m_gBuffers.insert({ "[AlbedoRTV]", api.getSwapChain()->getBuffer(0) });
+  // Texture description
+  TextureDesc txDesc;
+  txDesc.bpp = 4;
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
+  txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
+  txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
+  txDesc.usage = kPK_USAGE_DEFAULT;
+  txDesc.mipLevels = false;
+  txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
+  
+  // render target for scene colors
+  SPtr<Texture> albedoRTV = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRTV });
 
   // create the normal render target that will store the normals of the world
-  SPtr<Texture> normalRT = api.createTexture(nullptr,
-                                             4,
-                                             winWidth,
-                                             winHeight,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT);
-  m_gBuffers.insert({ "[NormalRTV]", normalRT });
+  SPtr<Texture> normalRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  SPtr<Texture> luminosityRT = api.createTexture(nullptr,
-                                             4,
-                                             winWidth,
-                                             winHeight,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT,
-                                             kPK_USAGE_DEFAULT,
-                                             kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET,
-                                             false,
-                                             kPK_FORMAT_R32G32B32A32_FLOAT);
-  m_gBuffers.insert({ "[LuminosityRTV]", luminosityRT });
+  // render target for the shadow result
+  SPtr<Texture> shadowRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
 
-  // m_pDepthSView = api.createDepthStencilView(m_pDepthRT);
-  // create the main camera depth buffer to store pixel distance from world to main camera.
-  SPtr<Texture> depthBuffer = api.createTexture(nullptr,
-                                                4,
-                                                winWidth,
-                                                winHeight,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                                kPK_USAGE_DEFAULT,
-                                                kPK_BIND_SHADER_RESOURCE |
-                                                kPK_BIND_DEPTH_STENCIL,
-                                                false,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
-  m_depthBuffers.insert({ "[MainDepthBuffer]", depthBuffer });
+  // render target for the metallic result
+  SPtr<Texture> metallicRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
 
-  // create the depth buffer for the light camera rendering in shadow mapping
-  SPtr<Texture> shadowDepth = api.createTexture(nullptr,
-                                                4,
-                                                winWidth,
-                                                winHeight,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS,
-                                                kPK_USAGE_DEFAULT,
-                                                kPK_BIND_SHADER_RESOURCE |
-                                                kPK_BIND_DEPTH_STENCIL,
-                                                false,
-                                                TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT);
-  m_depthBuffers.insert({ "[ShadowMapBuffer]", shadowDepth });
+  // render target for the luminance result
+  SPtr<Texture> luminanceRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, luminanceRT });
+
+  // horizontal blur of luminance
+  SPtr<Texture> hBlurredluminanceRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_HBlurredLuminance, hBlurredluminanceRT });
+
+  // vertical blur of luminance
+  SPtr<Texture> vBlurredluminanceRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_VBlurredLuminance, vBlurredluminanceRT });
+
+  // ---------------------------------------------------------- //
+  // DEPTH TARGETS
+  // ---------------------------------------------------------- //
+  // depth buffer description
+  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS;
+  txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL;
+  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT;
+  // camera depth buffer
+  SPtr<Texture> depthBuffer = api.createTexture(txDesc);
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
+
+  // light depth buffer
+  SPtr<Texture> shadowDepth = api.createTexture(txDesc);
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Shadow, shadowDepth });
+
+  // ---------------------------------------------------------- //
+  // UNORDERED ACCESS VIEWS
+  // ---------------------------------------------------------- //
+  txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
+  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  SPtr<Texture> testUAV = api.createTexture(txDesc);
+  m_uavBuffers.insert({ UAV_BUFFERS::kDB_Test, testUAV });
   
-
   // create the passes needed
   createPasses();
 }
@@ -86,164 +89,196 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-  SPtr<Pass> basePass = make_shared<Pass>();
-  // create all pointers
-  basePass->create();
-  // set the data for the shaders to be compiled, and compile.
-  basePass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  basePass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
-  basePass->compileShaders();
-  basePass->createShaders();
-  // create the vertex shader input layout && sampler state.
-  basePass->createInputLayout();
-  basePass->createSamplerState(SAM_STATE_ADRESS::kWrap,
-                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-
-  // constant buffers
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
-  basePass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
-
-  g_GraphicAPI().setInputLayout(basePass->getInputLayout());
+  PassDesc pDesc = PassDesc();
+  pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
+  pDesc.vSEntry = "VS";
+  pDesc.pSEntry = "PS";
+  pDesc.vSModel = "vs_5_0";
+  pDesc.pSModel = "ps_5_0";
+  pDesc.samAdress = SAM_STATE_ADRESS::kWrap;
+  pDesc.samFilters = SAM_STATE_FILTERS::kFilterMigMagMipLinear;
+  pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
+                    sizeof(CBCamera) };
+  pDesc.inputs = {};
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal),
+                    getGBuffer(G_BUFFERS::kGB_Metallic) };
+  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
+  SPtr<Pass> basePass = make_shared<Pass>(pDesc);
   // insert to the pass map.
-  m_passes.insert({ 0, basePass });
+  m_passes.insert({ PASS_TYPE::kP_Base, basePass });
 
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  SPtr<Pass> shadowPass = make_shared<Pass>();
-  // create all pointers
-  shadowPass->create();
-  shadowPass->setVSData(L"shaders/pkVShader.hlsl", "VS", "vs_5_0");
-  shadowPass->setPSData(L"shaders/pkPShader.hlsl", "PS", "ps_5_0");
-  shadowPass->compileShaders();
-  shadowPass->createShaders();
-
-  // create constant buffers
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBView)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBProjection)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBTransform)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBLight)), nullptr, 0);
-  shadowPass->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0);
-
-  shadowPass->createInputLayout();
-  shadowPass->createSamplerState(SAM_STATE_ADRESS::kWrap,
-                                 SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 1, shadowPass });
+  // pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
+  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Shadow);
+  SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
+  m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
-  SPtr<Pass> AOPass = make_shared<Pass>();
-  // create all pointers
-  AOPass->create();
-  // set and compile shaders
-  AOPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  AOPass->setPSData(L"shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
-  AOPass->compileShaders();
-  AOPass->createShaders();
-
-  // create the buffers needed (reminder to remember the order in which they are created)
-  AOPass->createCBuffer(static_cast<uint32>(sizeof(CBAOData)), nullptr, 0);
-
-  AOPass->createInputLayout();
-  AOPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                             SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 2, AOPass });
+  // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
+  // pDesc.cBSizes = { sizeof(CBAOData) };
+  // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+  // pDesc.type = PK_PASS_TYPE::kDeferred;
+  // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
+  // // insert to the passes
+  // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
 
   /****************************************************************************
-   * Shadow Deferred pass
+   * Shadow Quad pass
    ***************************************************************************/
-  SPtr<Pass> shadowDef = make_shared<Pass>();
-  // create all pointers
-  shadowDef->create();
-  // set and compile shaders
-  shadowDef->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  shadowDef->setPSData(L"shaders/pkShadowMapping.hlsl", "PS", "ps_5_0");
-  shadowDef->compileShaders();
-  shadowDef->createShaders();
-
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // light camera
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(CBCamera)), nullptr, 0); // main camera
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // light transform
-  shadowDef->createCBuffer(static_cast<uint32>(sizeof(Matrix4)), nullptr, 0); // camera transform
-
-  shadowDef->createInputLayout();
-  shadowDef->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                                SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 3, shadowDef });
+  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
+                    sizeof(Matrix4), sizeof(CBShadowParam) };
+  pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
+                   getDepthBuffer(D_BUFFERS::kDB_Base),
+                   getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Metallic) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
+  pDesc.pDepth = nullptr;
+  pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+  SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
   /****************************************************************************
-   * Luminosity pass
+   * Luminance Quad pass
    ***************************************************************************/
-  SPtr<Pass> lumPass = make_shared<Pass>();
-  // create all pointers
-  lumPass->create();
-  // set and compile shaders
-  lumPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  lumPass->setPSData(L"shaders/pkPSLuminosity.hlsl", "PS", "ps_5_0");
-  lumPass->compileShaders();
-  lumPass->createShaders();
-
-  lumPass->createCBuffer(static_cast<uint32>(sizeof(CBLuminosity)), nullptr, 0);
-
-  lumPass->createInputLayout();
-  lumPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                              SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 4, lumPass });
+  pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
+  pDesc.cBSizes = { sizeof(CBLuminance) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  SPtr<Pass> luminancePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Luminance, luminancePass });
 
   /****************************************************************************
-   * Test pass
+   * Horizontal Blur Quad pass
    ***************************************************************************/
-  SPtr<Pass> testPass = make_shared<Pass>();
-  // create all pointers
-  testPass->create();
-  // set and compile shaders
-  testPass->setVSData(L"shaders/pkDeferredShader.hlsl", "VS", "vs_5_0");
-  testPass->setPSData(L"shaders/pkTestDefShader.hlsl", "PS", "ps_5_0");
-  testPass->compileShaders();
-  testPass->createShaders();
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
+  SPtr<Pass> hBlurPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_HBlur, hBlurPass });
 
-  testPass->createInputLayout();
-  testPass->createSamplerState(SAM_STATE_ADRESS::kClamp,
-                               SAM_STATE_FILTERS::kFilterMigMagMipLinear);
-  m_passes.insert({ 5, testPass });
+  /****************************************************************************
+   * Vertical Blur Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkVBlur.hlsl");
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_VBlurredLuminance) };
+  SPtr<Pass> vBlurPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_VBlur, vBlurPass });
+
+  /****************************************************************************
+   * Tone mapping Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
+  //         pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
+  //         pDesc.cSEntry = "CSMain";
+  //         pDesc.cSModel = "c_5_0";
+  pDesc.cBSizes = {};
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
+                   getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
+                   getUAVBuffer(UAV_BUFFERS::kDB_Test) };
+  pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
+  SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Tone, tonePass });
+
+  /****************************************************************************
+   * Shadow Compute
+   ***************************************************************************/
+  pDesc.vSDirectory = Path("");
+  pDesc.pSDirectory = Path("");
+  pDesc.vSEntry = "";
+  pDesc.pSEntry = "";
+  pDesc.vSModel = "";
+  pDesc.pSModel = "";
+  pDesc.cSDirectory = Path("shaders/pkCShadowMapping.hlsl");
+  pDesc.cSEntry = "CSMain";
+  pDesc.cSModel = "cs_5_0";
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Metallic),
+                   getDepthBuffer(D_BUFFERS::kDB_Shadow),
+                   getDepthBuffer(D_BUFFERS::kDB_Base) };
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
+                    sizeof(Matrix4), sizeof(CBShadowParam) };
+  pDesc.outputs = {};
+  pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
+  SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_CShadows, testCompute });
+
 }
 
 SPtr<Pass>
-RendererManager::getPass(uint32 _index)
+RendererManager::getPass(PASS_TYPE::E _type)
 {
-  // if index is out of bounds
-  if (_index > m_passes.size() - 1 || _index < 0) {
-    String errMsg = "WARNING: Get pass search [" + _index;
-    g_Logger().print(errMsg + "] out of bounds");
-    return nullptr;
+  return m_passes.find(_type)->second;
+}
+
+SPtr<Texture>&
+RendererManager::getGBuffer(G_BUFFERS::E _type)
+{
+  return m_gBuffers.find(_type)->second;
+}
+
+Vector<SPtr<Texture>>
+RendererManager::getGBuffers()
+{
+  Vector<SPtr<Texture>> textures(m_gBuffers.size());
+
+  int32 i = 0;
+  for (auto [textureName, sptrTexture] : m_gBuffers) {
+    textures[i++] = sptrTexture;
   }
-  return m_passes.find(_index)->second;
+  return textures;
 }
 
-SPtr<Texture>
-RendererManager::getGBuffer(String _name)
+Vector<SPtr<Texture>>
+RendererManager::getGBuffers(const G_BUFFERS::E _types)
 {
-  return m_gBuffers.find(_name)->second;
+  Vector<SPtr<Texture>> textures;
+
+  for (uint32 i = 0; i < m_gBuffers.size(); ++i) {
+    if ((_types & G_BUFFERS::kGB_Albedo) == G_BUFFERS::kGB_Albedo) {
+      textures.push_back(getGBuffer(G_BUFFERS::kGB_Albedo));
+    }
+    if ((_types & G_BUFFERS::kGB_Normal) == G_BUFFERS::kGB_Normal) {
+      textures.push_back(getGBuffer(G_BUFFERS::kGB_Normal));
+    }
+  }
+  return textures;
 }
 
-SPtr<Texture>
-RendererManager::getDepthBuffer(String _name)
+SPtr<Texture>&
+RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
-  return m_depthBuffers.find(_name)->second;
+  return m_depthBuffers.find(_type)->second;
+}
+
+SPtr<Texture>&
+RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
+{
+  return m_uavBuffers.find(_type)->second;
 }
 
 void
 RendererManager::compileShaders()
 {
-  Map<uint32, SPtr<Pass>>::iterator it;
-  for (it = m_passes.begin(); it != m_passes.end(); ++it) {
+  for (auto it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Compile shaders
     it->second->compileShaders();
-    it->second->createShaders();
     g_Logger().print("recompiled shaders.");
   }
 }
@@ -252,26 +287,6 @@ template<class T> void
 RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
 {
   g_GraphicAPI().updateConstantBuffer(_pCBuffer, &_data, 0);
-}
-  
-void
-RendererManager::VSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
-{
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  // set the constant buffers
-  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    api.VSSetConstantBuffer(_cBuffers[i], i, 1);
-  }
-}
-
-void
-RendererManager::PSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>> _cBuffers)
-{
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  // set the constant buffers
-  for (uint32 i = 0; i < _cBuffers.size(); ++i) {
-    api.PSSetConstantBuffer(_cBuffers[i], i, 1);
-  }
 }
 
 void
@@ -286,8 +301,8 @@ RendererManager::setActorsBuffers()
     SPtr<Actor> actor = sm.getActiveScene()->getActor(i);
     // if the actor has a model component
     if (actor->getComponent<Model>()) {
-      api.setVertexBuffer(actor->getComponent<Model>()->vertexB);
-      api.setIndexBuffer(actor->getComponent<Model>()->indexB);
+      api.setVertexBuffer(actor->getComponent<Model>()->m_vertexB);
+      api.setIndexBuffer(actor->getComponent<Model>()->m_indexB);
     }
   }
 }
@@ -295,9 +310,11 @@ RendererManager::setActorsBuffers()
 void
 RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
+  RendererManager& rManager = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
-    if (!_gameActors[i]->m_active) {
+    if (!_gameActors[i]->isActive()) {
       continue;
     }
     // Get the final matrix by taking into account the parent actors
@@ -311,12 +328,12 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work in
-    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[0]->getCBuffer(2),
-                                        &transform,
-                                        static_cast<uint32>(sizeof(CBTransform)));
-    g_GraphicAPI().updateConstantBuffer(g_RenderManager().m_passes[1]->getCBuffer(2),
-                                        &transform,
-                                        static_cast<uint32>(sizeof(CBTransform)));
+    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Base)->getCBuffer(2),
+                             &transform,
+                             static_cast<uint32>(sizeof(CBTransform)));
+    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Shadow)->getCBuffer(2),
+                             &transform,
+                             static_cast<uint32>(sizeof(CBTransform)));
 
     // render the model of the actor
     if (_gameActors[i]->getComponent<Model>()) {
@@ -333,9 +350,10 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 void
 RendererManager::renderModel(Model& _model)
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // get a reference from the api
-  g_GraphicAPI().setVertexBuffer(_model.vertexB);
-  g_GraphicAPI().setIndexBuffer(_model.indexB);
+  api.setVertexBuffer(_model.m_vertexB);
+  api.setIndexBuffer(_model.m_indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
@@ -344,13 +362,11 @@ RendererManager::renderModel(Model& _model)
     // get the material
     SPtr<Material> material = _model.meshes[i]->material;
     // set the material textures to the shader
-    g_GraphicAPI().PSSetShaderResourceView(material->diffuse, 0);
-    g_GraphicAPI().PSSetShaderResourceView(material->normal, 1);
-    g_GraphicAPI().PSSetShaderResourceView(material->height, 2);
-    g_GraphicAPI().PSSetShaderResourceView(material->metallic, 3);
-    g_GraphicAPI().PSSetShaderResourceView(material->occlusion, 4);
+    Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
+                                       material->metallic, material->occlusion };
+    api.pSSetShaderResourceViews(textures);
     // draw the mesh
-    g_GraphicAPI().drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
+    api.drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,
                                currentVertexOrigin);
     // update the offsets

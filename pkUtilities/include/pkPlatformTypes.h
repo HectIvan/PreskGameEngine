@@ -87,4 +87,15 @@ using TYPE_OF_NULL = int32;
 **/
 /**************************************************************/
 using SIZE_T = size_t;
+
+/**************************************************************/
+/**
+ * Platform pointer
+**/
+/**************************************************************/
+#if PK_ARCH_TYPE == PK_ARCHITECTURE_X86_32
+using PlatformPointer = int32*;
+#else
+using PlatformPointer = int64*;
+#endif
 }

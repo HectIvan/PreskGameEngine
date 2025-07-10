@@ -21,6 +21,7 @@
 #include "pkInputLayoutDesc.h"
 #include "pkModel.h"
 #include "pkModule.h"
+#include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkRenderTargetView.h"
 #include "pkTexture.h"
@@ -56,7 +57,7 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _DepthSV) = 0;
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) = 0;
 
   /**
    * @brief Set the render target to the device.
@@ -64,7 +65,7 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV) = 0;
+  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
 
   /**
    * @brief Create the blend state.
@@ -81,32 +82,53 @@ public:
   setBlendState(SPtr<BlendState> _pBlendState) = 0;
 
   /**
-   * @brief Create a vertex shader.
-   * @param _pShader Shader to create
+   * @brief Creates a shader of the specific graphic API.
+   * @return API Specific shader.
    */
-  virtual void
+  virtual SPtr<Shader>
+  internalCreateShader() = 0;
+
+  /**
+   * @brief Create a vertex shader.
+   * @returtn Vertex Shader.
+   */
+  virtual SPtr<Shader>
   createVShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Create a pixel shader.
-   * @param _pShader Shader to create
+   * @return Pixel Shader.
    */
-  virtual void
+  virtual SPtr<Shader>
   createPShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Create a compute shader.
+   * @return Compute shader.
+   */
+  virtual SPtr<Shader>
+  createCShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setVSShader(SPtr<Shader> _pShader) = 0;
+  setVShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setPSShader(SPtr<Shader> _pShader) = 0;
+  setPShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Set a compute shader.
+   * @param _pShader Compute shader.
+   */
+  virtual void
+  setCShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Get the API Swap chain
@@ -120,13 +142,12 @@ public:
    * @param _szFileName What file we will get.
    * @param _szEntryPoint Main function of the shader.
    * @param _szShaderModel What kind of model is the shader.
-   * @param _pTargetShader Shader to store the data in.
+   * @return Data blob.
    */
-  virtual void
-  compileShaderFromFile(WString _szFileName,
+  virtual void**
+  compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
-                        const char* _szShaderModel,
-                        SPtr<Shader> _pTargetShader) = 0;
+                        const char* _szShaderModel) = 0;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -135,6 +156,14 @@ public:
    */
   virtual SPtr<InputLayout>
   createInputLayoutFromVShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Create a texture.
+   * @param _desc Texture descrition.
+   * @return Texture.
+   */
+  virtual SPtr<Texture>
+  createTexture(const TextureDesc& _desc) = 0;
 
   /**
   * @brief Create a texture.
@@ -147,15 +176,15 @@ public:
   * @param _mipLevels The maximum number of mipmap levels in the texture.
   **/
   virtual SPtr<Texture>
-  createTexture(unsigned char* _data,
-                uint32 _bpp,
+  createTexture(uint32 _bpp,
                 uint32 _width,
                 uint32 _height,
-                uint32 _format,
-                uint32 _usage,
-                uint32 _bindFlags,
+                int32 _format,
+                int32 _usage,
+                int32 _bindFlags,
                 bool _mipLevels,
-                uint32 _shaderResourceFormat) = 0;
+                int32 _shaderResourceFormat,
+                unsigned char* _data = nullptr) = 0;
 
   /**
    * @brief Create the sampler state.
@@ -165,15 +194,6 @@ public:
    */
   virtual SPtr<SamplerState>
   createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
-
-  /**
-   * @brief Create the depth stencil texture and view.
-   * @param _width Client width.
-   * @param _height Client height.
-   * @return Pointer to the new Depth stencil view
-   */
-  virtual SPtr<DepthStencilView>
-  createDepthStencilView(SPtr<Texture> _depthRT) = 0;
 
   /**
    * @brief Set input layout.
@@ -234,8 +254,8 @@ public:
    */
   virtual SPtr<ConstantBuffer>
   createConstantBuffer(uint32 _size,
-                       const void* _pData,
-                       uint32 _usage) = 0;
+                       const void* _pData = nullptr,
+                       uint32 _usage = 0) = 0;
 
   /**
    * @brief Update the constant buffer.
@@ -246,61 +266,80 @@ public:
   virtual void
   updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
                        const void* _pNewData,
-                       uint32 _size) = 0;
+                       SIZE_T _size) = 0;
 
   /**
-   * @brief Set a texture to the resource view.
-   * @param _pTexture Pointer to the texture.
-   * @param _start Where the setting will start.
-   * @param _numViews How many views are there.
+   * @brief Set resources to a vertex shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   virtual void
-  setShaderResourceView(SPtr<Texture> _pTexture,
-                        uint32 _start = 0,
-                        uint32 _numViews = 1) = 0;
+  vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
-   * @brief Set a texture to the resource view of a pixel shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set resources to a pixel shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   virtual void
-  PSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) = 0;
+  pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
-   * @brief Set a texture to the resource view of a vertex shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set resources to a pixel shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the pixel shader will the resources be allocated
    */
   virtual void
-  VSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) = 0;
+  cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
-   * @brief Set a 
+   * @brief Set unordered views to a compute shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the compute shader will the resources be allocated.
+   * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   virtual void
-  CSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) = 0;
+  cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+                            uint32 _start = 0,
+                            uint32* _initialCounts = nullptr) = 0;
+
+  /**
+   * @brief Clear all render target views of a vector.
+   * @param _color New render target color.
+   */
+  virtual void
+  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) = 0;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
    */
   virtual void
-  clearRenderTargetView(float _color[], SPtr<Texture> _rtv) = 0;
+  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
+
+  /**
+   * @brief Clear all unordered access views of a vector.
+   * @param _uavs Vector of UAVs.
+   * @param _color New view color.
+   */
+  virtual void
+  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+                            const Color& _color = Color(1,1,1,0)) = 0;
+
+  /**
+   * @brief Clear access view.
+   * @param _color New view color.
+   */
+  virtual void
+  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
 
   /**
    * @brief clear the depth buffer.
    * @param _depth Default depth of the stencil.
-   * @param _depthSV Depth stencil view to clear.
+   * @param _pDepthSV Depth stencil view to clear.
    */
   virtual void
-  clearDepthBuffer(float _depth, SPtr<Texture> _depthSV) = 0;
+  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) = 0;
 
   /**
    * @brief Create the Input Layout.
@@ -313,36 +352,30 @@ public:
 
   /**
    * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   virtual void
-  VSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers) = 0;
+  vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Vertex of Pointers to a constant buffer.
+   * @brief _startSlot Start position of the buffers.
    */
   virtual void
-  PSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers) = 0;
+  pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.
-   * @param _pCBuffer Pointer to the constant buffer.
-   * @param _startSlot Index into the device's zero-based array.
-   * @param _numBuffers Number of buffers to set.
+   * @param _pCBuffers Pointer to the constant buffer.
+   * @param _startSlot Start position of the buffers.
    */
   virtual void
-  CSSetConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
-                      uint32 _startSlot,
-                      uint32 _numBuffers = 0) = 0;
+  cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
+                       const uint32 _startSlot = 0) = 0;
 
   /**
   * Set the sampler state.
@@ -354,14 +387,14 @@ public:
 
   /**
    * @brief Create a texture from file.
-   * @param _fileName Name of the texture.
+   * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
    * @param _bindFlags Bind flags of the texture.
    * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
-  createTextureFromFile(String& _fileName,
+  createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
                         uint32 _format) = 0;
@@ -391,7 +424,7 @@ public:
    */
   virtual void
   draw(uint32 _indexCount,
-      uint32 _startIndexLocation) = 0;
+       uint32 _startIndexLocation) = 0;
 
   /**
    * @brief Compute shader draw call.

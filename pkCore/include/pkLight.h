@@ -51,6 +51,12 @@ class PK_CORE_EXPORT Light : public Component
   getType() override { return COMPONENT_TYPE::kLight; }
 
   /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Light"; }
+
+  /**
    * @brief Get the component type of this component.
    * @return The component type.
    */
@@ -58,13 +64,13 @@ class PK_CORE_EXPORT Light : public Component
   getObjType() { return COMPONENT_TYPE::kLight; }
 
  public:
-  uint32 Type;
+  float Type;
   float SpotCutoff;
   float SpotExponent;
+  float shadowIntensity;
   Vector3 LightDir = Vector3::FORWARD;
   Vector3 LightPos;
   Vector3 LightColor = Vector3(1.0f);
-  Vector2 unused1 = Vector2(0.0f);
-  Vector2 unused2 = Vector2(0.0f);
+  Vector2 unused;
 };
 }

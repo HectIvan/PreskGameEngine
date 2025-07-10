@@ -6,6 +6,8 @@
 #include "pkLogger.h"
 #include "pkWindow.h"
 #include "pkWindowDesc.h"
+#include "pkEventQueue.h"
+#include "pkPlatformMath.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -19,7 +21,7 @@ LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void
-Window::create(const PKWindowDesc& _desc, String& _name)
+Window::create(const PKWindowDesc& _desc)
 {
   /************************************************************************************/
   WNDCLASSEXA wcex;
@@ -31,7 +33,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   wcex.style = CS_HREDRAW | CS_VREDRAW;
   wcex.lpfnWndProc = WndProc; // window procedure
   wcex.cbClsExtra = 0; // The number of extra bytes to allocate following the window-class structure. 
-  wcex.cbWndExtra = 0; // The number of extra bytes to allocate following the window instance.
+  wcex.cbWndExtra = sizeof(void*); // The number of extra bytes to allocate following the window instance.
   wcex.hInstance = m_hInstance;
   wcex.hCursor = LoadCursorA(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);// register class
@@ -54,7 +56,7 @@ Window::create(const PKWindowDesc& _desc, String& _name)
   // create the window
   m_windowH = CreateWindowExA(0,
                               "WindowClass",
-                              _name.c_str(),
+                              _desc.name.c_str(),
                               WS_OVERLAPPEDWINDOW,
                               CW_USEDEFAULT,
                               CW_USEDEFAULT,
@@ -65,29 +67,40 @@ Window::create(const PKWindowDesc& _desc, String& _name)
                               m_hInstance,
                               nullptr);
   /**
-  * Check if creation failed. 
-  **/
+   * Check if creation failed. 
+   */
   if (!m_windowH) {
     g_Logger().print("Failed to create the window.");
     return;
   }
-  SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(this));
+  auto* eventFunct = new WinFunctEvent(_desc.funct);
+  SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(eventFunct));
   ShowWindow(m_windowH, 1);
 }
 
 Vector2
-Window::getClientWidthHeight()
+Window::getClientWidthHeight() const
 {
   RECT rc;
   GetClientRect(m_windowH, &rc);
   uint32 width = rc.right - rc.left;
   uint32 height = rc.bottom - rc.top;
-  return Vector2(static_cast<float>(width), static_cast<float>(height));
+  return Vector2(width, height);
 }
 
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+  WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
+  if (winEvent) {
+    PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),
+                                         static_cast<uint32>(message),
+                                         reinterpret_cast<PlatformPointer>(wParam),
+                                         reinterpret_cast<PlatformPointer>(lParam));
+    if (result) {
+      return 0;
+    }
+  }
   PAINTSTRUCT ps;
   HDC hdc;
   switch (message)
@@ -100,7 +113,19 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   }
   case WM_DESTROY:
   {
+    // get the function and delete it
+    WinFunctEvent* eventFunct = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
+    delete eventFunct;
+    eventFunct = nullptr;
     PostQuitMessage(0);
+    break;
+  }
+  case WM_MOUSEWHEEL:
+  {
+    g_eventManager().scrollWheel = static_cast<int8>(GET_WHEEL_DELTA_WPARAM(wParam));
+    g_eventManager().scrollWheel = static_cast<int8>(Math::clamp(g_eventManager().scrollWheel,
+                                                     -1.0f,
+                                                     1.0f));
     break;
   }
   default:
@@ -155,7 +180,6 @@ Window::setHeight(uint32 _height)
 Vector2
 Window::getSize() const
 {
-  return Vector2(static_cast<float>(m_width), 
-                 static_cast<float>(m_height));
+  return Vector2(m_width, m_height);
 }
 }

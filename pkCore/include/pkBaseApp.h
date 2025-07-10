@@ -27,15 +27,6 @@
 namespace pkEngineSDK
 {
 
-/**
- * Memory structures used to store already loaded data and call it when needed.
- */
-struct ModelMemory
-{
-  String name;
-  SPtr<Model> model;
-};
-
 class Camera;
 
 class PK_CORE_EXPORT BaseApp
@@ -48,7 +39,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Initialize the app.
    */
   void
-  init(const char** _argv);
+  init(const char** _argv, int32 _count);
 
   /**
    * @brief On initializing the app.
@@ -57,16 +48,18 @@ class PK_CORE_EXPORT BaseApp
   onInit() {}
 
   /**
-   * @brief Initialize the app window.
+   * @brief Initialize the window app.
    */
-  void
-  initWindow();
+  virtual void
+  initWin() {};
 
   /**
    * @brief Initialize the api.
+   * @param _argv
+   * @param _count Ammount of parameters.
    */
   void
-  initAPI(const char** _argv);
+  initAPI(const char** _argv, int32 _count);
 
   /**
    * @brief Event message loop.
@@ -99,41 +92,17 @@ class PK_CORE_EXPORT BaseApp
   virtual void
   onRender() {}
 
-  /**
-   * @brief Create a material from a texture.
-   * @return The material pointer.
-   */
-  SPtr<Material>
-  createMaterial();
-
-  /**
-   * @brief Create a new model component.
-   * @param _modelName Name of the model file to load.
-   * @return Pointer to the new model object.
-   */
-  SPtr<Model>
-  newModel(String _modelName = "");
-
  public:
   // system
   Window m_window;
-  EventQueue m_eventQueue;
 
-  // camera movement speed
-  float m_cameraSpeed;
-
-  // fixed update
-  float m_deltaTime = 0.0f;
-  float m_fixedTimer = 0.0f;
-  float m_fixedDeltaTime = 0.016f;
+  float m_fixedTimer;
 
  protected:
-  /**
-   * Used to store an object that is loaded from memory. once loaded, it will be stored
-   * in here, if the same object is asked to be loaded, it will first be searched here,if
-   * its found, the loaded object will be returned, instead of loading it again.
-   */
-  Vector<SPtr<ModelMemory>> m_models;
   bool m_vSync;
+
+  bool m_shadows;
+  bool m_AO;
+  bool m_luminance;
 };
 }

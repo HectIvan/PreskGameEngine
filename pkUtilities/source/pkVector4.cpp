@@ -5,6 +5,7 @@
 /*********************************************/
 #include "pkMath.h"
 #include "pkMatrix4.h"
+#include "pkVector2.h"
 
 namespace pkEngineSDK {
 
@@ -87,7 +88,7 @@ Vector4::normalize()
 }
 
 Vector4
-Vector4::normalized()
+Vector4::normalized() const
 {
   float mag = magnitude();
   if (mag == 0.0f) { return Vector4(0.0f); }
@@ -144,5 +145,17 @@ Vector4::dotProd(const Vector4& _this, const Vector4& _other)
          (_this.y * _other.y) +
          (_this.z * _other.z) + 
          (_this.w * _other.w);
+}
+
+Vector2
+Vector4::xy()
+{
+  return Vector2(x, y);
+}
+
+Vector2
+Vector4::yz()
+{
+  return Vector2(y, z);
 }
 }

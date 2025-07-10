@@ -26,6 +26,7 @@
 namespace pkEngineSDK {
 
 class Matrix4;
+class Vector2;
 
 class PK_UTILITY_EXPORT Vector4
 {
@@ -404,7 +405,7 @@ class PK_UTILITY_EXPORT Vector4
    * @brief returns a copy of this normalized vector.
    */
   Vector4
-  normalized();
+  normalized() const;
 
   /**
   * Gets the distance between this vector and another.
@@ -463,8 +464,8 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A Vector4 with all of its parts set to a single value.
   **/
-  static
-  Vector4 vectorSplatValue(float _val);
+  static Vector4
+  vectorSplatValue(float _val);
 
   /**
   * Calculate the dot product of one vector with this one.
@@ -478,6 +479,28 @@ class PK_UTILITY_EXPORT Vector4
   static float
   dotProd(const Vector4& _this, const Vector4& _other);
 
+  /**
+   * @brief Get vector3 from this vector.
+   * @return A vector3 with the x, y and z of this vector.
+   */
+  Vector3
+  xyz() { return Vector3(x, y, z); }
+
+  /**
+   * @brief Get a Vector2 with x and y of this vector.
+   * @return A vector2 with the x and y of this vector
+   */
+  Vector2
+  xy();
+
+  /**
+   * @brief Get a Vector2 with y and z of this vector.
+   * @return A vector2 with the y and z of this vector
+   */
+  Vector2
+  yz();
+
+ public:
   float x, y, z, w;
 
   static const Vector4 ZERO;

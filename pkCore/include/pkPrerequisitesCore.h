@@ -55,14 +55,12 @@ struct CBCamera
 
 struct CBLight
 {
-  float Type;
-  float SpotCutoff;
-  float SpotExponent;
-  Vector3 LightDir;
-  Vector3 LightPos;
-  Vector3 LightColor;
-  Vector2 unused1;
-  Vector2 unused2;
+  Vector4 LightDir; // 16
+  Vector4 LightPos; // 32
+  Vector4 LightColor; // 48
+  float shadowIntensity; // 52
+  float spotExponent; // 56
+  Vector2 unused1; // 64
 };
 
 struct CBAOData
@@ -77,10 +75,22 @@ struct CBAOData
   float unused;
 };
 
-struct CBLuminosity
+struct CBLuminance
 {
   float tolerance;
   Vector3 unused;
+};
+
+struct CBBlur
+{
+  Vector2 targetSize;
+  Vector2 unused;
+};
+
+struct CBShadowParam
+{
+  Vector2 winSize;
+  Vector2 farNear;
 };
 
 struct KeyPosition

@@ -16,99 +16,142 @@
 /*********************************************/
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
-// #include "pkShader.h"
+#include "pkRendererManager.h"
+#include "pkSceneManager.h"
 
 #include <iostream>
 
 namespace pkEngineSDK
 {
 
-void
-Pass::create()
-{
-  m_pVShader = make_shared<Shader>();
-  m_pPShader = make_shared<Shader>();
+Pass::Pass() {
   m_pInputLayout = make_shared<InputLayout>();
   m_pSamplerState = make_shared<SamplerState>();
 }
 
-void
-Pass::createInputLayout()
+Pass::Pass(PassDesc& _desc)
 {
-  m_pInputLayout = g_GraphicAPI().createInputLayoutFromVShader(m_pVShader);
+  // call the api manager
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  m_pSamplerState = make_shared<SamplerState>();
+  // Try to create the vertex shader if there's a path.
+  if (!_desc.vSDirectory.getPath().empty()) {
+    m_pVShader = api.internalCreateShader();
+    createVShader(_desc.vSDirectory, _desc.vSEntry, _desc.vSModel);
+    // create all pointers
+    m_pInputLayout = make_shared<InputLayout>();
+    // create input and sampler state
+    m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
+  };
+  // Try to create the pixel shader if there's a path.
+  if (!_desc.pSDirectory.getPath().empty()) {
+    m_pPShader = api.internalCreateShader();
+    createPShader(_desc.pSDirectory, _desc.pSEntry, _desc.pSModel);
+  }
+  // Try to create the compute shader if there's a path.
+  if (!_desc.cSDirectory.getPath().empty()) {
+    m_pCShader = api.internalCreateShader();
+    createCShader(_desc.cSDirectory, _desc.cSEntry, _desc.cSModel);
+  }
+  // create the sampler state
+  m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
+  // create a buffer for each size in the vector
+  for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
+    m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
+  }
+  // set input, output and depth
+  m_inputTex = _desc.inputs;
+  m_outputTex = _desc.outputs;
+  m_uavTex = _desc.uavs;
+  m_depthTex = _desc.pDepth;
 }
 
 void
-Pass::createSamplerState(uint32 _mode, uint32 _filter)
+Pass::createVShader(const Path _directory, const char* _entry, const char* _sModel)
 {
-  m_pSamplerState = g_GraphicAPI().createSamplerState(_mode, _filter);
-}
-
-void
-Pass::setVSData(WString _fileName, const char* _entryPoint, const char* _model)
-{
-  m_VShaderDirectory = _fileName;
-  m_VSEntryPoint = _entryPoint;
-  m_VSModel = _model;
-}
-
-void
-Pass::setPSData(WString _fileName, const char* _entryPoint, const char* _model)
-{
-  m_PShaderDirectory = _fileName;
-  m_PSEntryPoint = _entryPoint;
-  m_PSModel = _model;
-}
-
-void
-Pass::createShaders()
-{
-  // create the shaders
+  m_pVShader->setData(_directory, _entry, _sModel);
+  m_pVShader->compile();
   g_GraphicAPI().createVShader(m_pVShader);
+}
+
+void
+Pass::createPShader(const Path _directory, const char* _entry, const char* _sModel)
+{
+  m_pPShader->setData(_directory, _entry, _sModel);
+  m_pPShader->compile();
   g_GraphicAPI().createPShader(m_pPShader);
+}
+
+void
+Pass::createCShader(const Path _directory, const char* _entry, const char* _sModel)
+{
+  m_pCShader->setData(_directory, _entry, _sModel);
+  m_pCShader->compile();
+  g_GraphicAPI().createCShader(m_pCShader);
 }
 
 void
 Pass::compileShaders()
 {
-  compileVShader();
-  compilePShader();
+  if (m_pVShader) { m_pVShader->compile(); }
+  if (m_pPShader) { m_pPShader->compile(); }
+  if (m_pCShader) { m_pCShader->compile(); }
 }
 
+// to do: properly link passes with the textures
 void
-Pass::compileVShader()
+Pass::beginPass(Color _color)
 {
-  g_GraphicAPI().compileShaderFromFile(m_VShaderDirectory,
-                                       m_VSEntryPoint,
-                                       m_VSModel,
-                                       m_pVShader);
-}
-
-void
-Pass::compilePShader()
-{
-  g_GraphicAPI().compileShaderFromFile(m_PShaderDirectory,
-                                       m_PSEntryPoint,
-                                       m_PSModel,
-                                       m_pPShader);
-}
-
-SPtr<ConstantBuffer>
-Pass::createCBuffer(uint32 _size, const void* _data, uint32 _usage)
-{
-  // get the api
+  // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
-  // create the constant buffer with the parameters given
-  SPtr<ConstantBuffer> cb = api.createConstantBuffer(_size, _data, _usage);
-  // store into the constant buffer vector
-  addToCBuffers(cb);
-  // return the pointer
-  return cb;
+  // clear RTVs and Depth stencil
+  api.clearRenderTargetViews(_color, m_outputTex);
+  api.clearDepthBuffer(1.0f, m_depthTex);
+  // set render targets and depth texture
+  api.setRenderTargets(m_outputTex, m_depthTex);
+  // set input layout of shader
+  api.setInputLayout(getInputLayout());
+  // set the shaders
+  api.setVShader(getVShader());
+  api.setPShader(getPShader());
+  api.setCShader(getCShader());
+  // set resources
+  api.vSSetShaderResourceViews(m_inputTex);
+  api.pSSetShaderResourceViews(m_inputTex);
+  api.cSSetShaderResourceViews(m_inputTex);
+  api.cSSetUnorderedAccessViews(m_uavTex);
+  // set the sampler state
+  api.setSampler(getSamplerState());
+  // set constant buffers
+  api.pSSetConstantBuffers(getCBuffers());
+  api.vSSetConstantBuffers(getCBuffers());
+  api.cSSetConstantBuffers(getCBuffers());
 }
 
 void
-Pass::addToCBuffers(SPtr<ConstantBuffer> _pCBuffer)
+Pass::endPass()
 {
-  m_cBuffers.push_back(_pCBuffer);
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  // set all to nullptr
+  Vector<SPtr<Texture>> nullTargets;
+  for (uint32 i = 0; i < m_outputTex.size(); ++i) {
+    nullTargets.push_back(nullptr);
+  }
+  api.setRenderTargets(nullTargets);
+  api.setInputLayout(nullptr);
+  api.setVShader(nullptr);
+  api.setPShader(nullptr);
+  api.setCShader(nullptr);
+  Vector<SPtr<Texture>> vecTex = { nullptr };
+  api.vSSetShaderResourceViews(vecTex);
+  api.pSSetShaderResourceViews(vecTex);
+  api.cSSetShaderResourceViews(vecTex);
+  api.cSSetUnorderedAccessViews(vecTex);
+  api.setSampler(nullptr);
+  Vector<SPtr<ConstantBuffer>> vector = { nullptr };
+  api.vSSetConstantBuffers(vector);
+  api.pSSetConstantBuffers(vector);
+  api.cSSetConstantBuffers(vector);
 }
 }

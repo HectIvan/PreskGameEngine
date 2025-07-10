@@ -31,19 +31,20 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene);
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene);
 
-void
-Model::load(String& _path)
+bool
+Model::load(Path& _path)
 {
-  indexB = nullptr;
-  vertexB = nullptr;
+  m_indexB = nullptr;
+  m_vertexB = nullptr;
 
-  String modelPath = _path;
+  String modelPath = _path.toString();
   path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(), aiProcessPreset_TargetRealtime_MaxQuality |
                                                               aiProcess_RemoveRedundantMaterials |
                                                               aiProcess_FlipUVs);
-  if (scene == nullptr) { return; }
+  if (scene == nullptr) { return false; }
+  setName(scene->mName.C_Str());
   processNode(*this, scene->mRootNode, scene);
   for (uint32 i = 0; i < meshes.size(); ++i) {
     vertex.insert(vertex.end(),
@@ -54,6 +55,7 @@ Model::load(String& _path)
                  meshes[i]->indexVector.begin(),
                  meshes[i]->indexVector.end());
   }
+  return true;
 }
   
 void
@@ -74,6 +76,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
   TextureManager& tm = g_TextureManager().instance();
   SPtr<Mesh> meshProcess = make_shared<Mesh>();
+  meshProcess->setName(_mesh->mName.C_Str());
   meshProcess->vertexCount = _mesh->mNumVertices;
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i) {
@@ -124,17 +127,18 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
     meshProcess->material = make_shared<Material>();
     String meshName = _mesh->mName.C_Str();
-    meshProcess->material->setDiffuse(tm.createTexture("FlatDiff.png", "textures/default/"));
-    meshProcess->material->setNormal(tm.createTexture("FlatNormal.png","textures/default/"));
-    meshProcess->material->setOcclusion(tm.createTexture("FlatAO.png", "textures/default/"));
-    meshProcess->material->setHeight(tm.createTexture("FlatHeight.png","textures/default/"));
-    meshProcess->material->setMetallic(tm.createTexture("FlatMetallic.png",
-                                                       "textures/default/"));
+    meshProcess->material->setDiffuse(tm.loadTexture(Path("textures/default/FlatDiff.png")));
+    meshProcess->material->setNormal(tm.loadTexture(Path("textures/default/FlatNormal.png")));
+    meshProcess->material->setOcclusion(tm.loadTexture(Path("textures/default/FlatAO.png")));
+    meshProcess->material->setHeight(tm.loadTexture(Path("textures/default/FlatHeight.png")));
+    meshProcess->material->setMetallic(tm.loadTexture(Path("textures/default/FlatMetallic.png")
+                                                      ));
 
-    uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
+    String matName = materialA->GetName().C_Str();
+    meshProcess->material->setName(matName);
     // if no diffuse texture is found.
+    uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     if (diffCount < 1) {
-      String matName = materialA->GetName().C_Str();
       g_Logger().print("WARNING: Cound not find diffuse texture of material " + matName);
     }
     // if there are diffuse textures.
@@ -142,19 +146,43 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       aiString path;
       // diffuse texture loading.
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setDiffuse(tm.createTexture(path.C_Str(), ""));
+        Path newPath(path.C_Str());
+        meshProcess->material->setDiffuse(tm.loadTexture(newPath));
       }
     }
 
-    // get all normal maps of the mesh
+    // get all normal maps of the material
     uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
       // diffuse texture loading.
       if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
-        meshProcess->material->setNormal(tm.createTexture(path.C_Str(), ""));
+        Path newPath(path.C_Str());
+        meshProcess->material->setNormal(tm.loadTexture(newPath));
       }
     } 
+
+    // get all ambient occlusion maps of the material
+    uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION);
+    for (uint32 i = 0; i < aoCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
+        Path newPath(path.C_Str());
+        meshProcess->material->setOcclusion(tm.loadTexture(newPath));
+      }
+    }
+
+    // get all metallic maps of the material
+    uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
+    for (uint32 i = 0; i < metallicCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
+        Path newPath(path.C_Str());
+        meshProcess->material->setMetallic(tm.loadTexture(newPath));
+      }
+    }
     // materialA->GetTexture(aiTextureType_DIFFUSE);
     // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
@@ -247,11 +275,7 @@ Model::clean()
   meshes.clear();
   boneCounter = 0;
 
-  vertexB = make_shared<VertexBuffer>();
-  indexB = make_shared<IndexBuffer>();
-
-  material = Material();
-
-  path = "";
+  m_vertexB = make_shared<VertexBuffer>();
+  m_indexB = make_shared<IndexBuffer>();
 }
 }

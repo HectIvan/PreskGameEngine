@@ -24,6 +24,14 @@
 namespace pkEngineSDK
 {
 
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+  using WinFunctEvent = Function<int64*(PlatformPointer,
+                                        uint32,
+                                        PlatformPointer,
+                                        PlatformPointer)>;
+#endif
+
+
 struct PK_CORE_EXPORT PKWindowDesc
 {
   uint32 width;
@@ -31,5 +39,8 @@ struct PK_CORE_EXPORT PKWindowDesc
 
   uint32 posX;
   uint32 posY;
+
+  String name;
+  WinFunctEvent funct;
 };
 }

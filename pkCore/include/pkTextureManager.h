@@ -24,7 +24,7 @@ namespace pkEngineSDK
 
 struct TextureMemory
 {
-  String name;
+  Path name;
   SPtr<Texture> texture;
 };
 
@@ -35,13 +35,12 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   virtual ~TextureManager() = default;
 
   /**
-   * @brief Creates a texture from a texture name.
-   * @param _name Name of the texture to load (extenison type is required).
-   * @param _directory Where to look for (textures/ set as default).
+   * @brief Loads a texture from a texture name.
+   * @param _directory Where to look for the file.
    * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
-  createTexture(String _name, String _directory = "textures/");
+  loadTexture(const Path& _directory);
 
  public:
   Vector<SPtr<TextureMemory>> m_textures;

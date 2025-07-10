@@ -82,6 +82,163 @@ Matrix4::Matrix4(float m00, float m01, float m02, float m03,
   matrix[3][0] = m30; matrix[3][1] = m31; matrix[3][2] = m32; matrix[3][3] = m33;
 }
 
+Vector3
+Matrix4::getForwardVector()
+{
+  return Vector3(matrix[0][2], matrix[1][2], matrix[2][2]);
+}
+
+Vector3
+Matrix4::getUpVector()
+{
+  return Vector3(matrix[0][1], matrix[1][1], matrix[2][1]);
+}
+
+Vector3
+Matrix4::getRightVector()
+{
+  return Vector3(matrix[0][0], matrix[1][0], matrix[2][0]);
+}
+
+Vector3
+Matrix4::getViewPosition()
+{
+  return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
+}
+
+Matrix4
+Matrix4::inverse()
+{
+  // Cofactors
+  Vector<float> inv;
+  inv.resize(16);
+  float det;
+
+  inv[0] = matrix[1][1] * matrix[2][2] * matrix[3][3] -
+           matrix[1][1] * matrix[2][3] * matrix[3][2] -
+           matrix[2][1] * matrix[1][2] * matrix[3][3] +
+           matrix[2][1] * matrix[1][3] * matrix[3][2] +
+           matrix[3][1] * matrix[1][2] * matrix[2][3] -
+           matrix[3][1] * matrix[1][3] * matrix[2][2];
+
+  inv[1] = -matrix[0][1] * matrix[2][2] * matrix[3][3] +
+            matrix[0][1] * matrix[2][3] * matrix[3][2] +
+            matrix[2][1] * matrix[0][2] * matrix[3][3] -
+            matrix[2][1] * matrix[0][3] * matrix[3][2] -
+            matrix[3][1] * matrix[0][2] * matrix[2][3] +
+            matrix[3][1] * matrix[0][3] * matrix[2][2];
+
+  inv[2] = matrix[0][1] * matrix[1][2] * matrix[3][3] -
+           matrix[0][1] * matrix[1][3] * matrix[3][2] -
+           matrix[1][1] * matrix[0][2] * matrix[3][3] +
+           matrix[1][1] * matrix[0][3] * matrix[3][2] +
+           matrix[3][1] * matrix[0][2] * matrix[1][3] -
+           matrix[3][1] * matrix[0][3] * matrix[1][2];
+
+  inv[3] = -matrix[0][1] * matrix[1][2] * matrix[2][3] +
+            matrix[0][1] * matrix[1][3] * matrix[2][2] +
+            matrix[1][1] * matrix[0][2] * matrix[2][3] -
+            matrix[1][1] * matrix[0][3] * matrix[2][2] -
+            matrix[2][1] * matrix[0][2] * matrix[1][3] +
+            matrix[2][1] * matrix[0][3] * matrix[1][2];
+
+  inv[4] = -matrix[1][0] * matrix[2][2] * matrix[3][3] +
+            matrix[1][0] * matrix[2][3] * matrix[3][2] +
+            matrix[2][0] * matrix[1][2] * matrix[3][3] -
+            matrix[2][0] * matrix[1][3] * matrix[3][2] -
+            matrix[3][0] * matrix[1][2] * matrix[2][3] +
+            matrix[3][0] * matrix[1][3] * matrix[2][2];
+
+  inv[5] = matrix[0][0] * matrix[2][2] * matrix[3][3] -
+           matrix[0][0] * matrix[2][3] * matrix[3][2] -
+           matrix[2][1] * matrix[0][2] * matrix[3][3] +
+           matrix[2][1] * matrix[0][3] * matrix[3][2] +
+           matrix[3][1] * matrix[0][2] * matrix[2][3] -
+           matrix[3][1] * matrix[0][3] * matrix[2][2];
+
+  inv[6] = -matrix[0][0] * matrix[2][2] * matrix[3][3] +
+            matrix[0][0] * matrix[2][3] * matrix[3][2] +
+            matrix[1][0] * matrix[0][2] * matrix[3][3] -
+            matrix[1][0] * matrix[0][3] * matrix[3][2] -
+            matrix[3][0] * matrix[0][2] * matrix[1][3] +
+            matrix[3][0] * matrix[0][3] * matrix[1][2];
+
+  inv[7] = matrix[0][0] * matrix[1][2] * matrix[2][3] -
+           matrix[0][0] * matrix[1][3] * matrix[2][2] -
+           matrix[1][0] * matrix[0][2] * matrix[2][3] +
+           matrix[1][0] * matrix[0][3] * matrix[2][2] +
+           matrix[2][0] * matrix[0][2] * matrix[1][3] -
+           matrix[2][0] * matrix[0][3] * matrix[1][2];
+
+  inv[8] = matrix[1][0] * matrix[2][1] * matrix[3][3] -
+           matrix[1][0] * matrix[2][3] * matrix[3][1] -
+           matrix[2][0] * matrix[1][1] * matrix[3][3] +
+           matrix[2][0] * matrix[1][3] * matrix[3][1] +
+           matrix[3][0] * matrix[1][1] * matrix[2][3] -
+           matrix[3][0] * matrix[1][3] * matrix[2][1];
+
+  inv[9] = -matrix[0][0] * matrix[2][1] * matrix[3][3] +
+            matrix[0][0] * matrix[2][3] * matrix[3][1] +
+            matrix[2][0] * matrix[0][1] * matrix[3][3] -
+            matrix[2][0] * matrix[0][3] * matrix[3][1] -
+            matrix[3][0] * matrix[0][1] * matrix[2][3] +
+            matrix[3][0] * matrix[0][3] * matrix[2][1];
+
+  inv[10] = matrix[0][0] * matrix[1][1] * matrix[3][3] -
+            matrix[0][0] * matrix[1][3] * matrix[3][1] -
+            matrix[1][0] * matrix[0][1] * matrix[3][3] +
+            matrix[1][0] * matrix[0][3] * matrix[3][1] +
+            matrix[3][0] * matrix[0][1] * matrix[1][3] -
+            matrix[3][0] * matrix[0][3] * matrix[1][1];
+
+  inv[11] = -matrix[0][0] * matrix[1][1] * matrix[2][3] +
+             matrix[0][0] * matrix[1][3] * matrix[2][1] +
+             matrix[1][0] * matrix[0][1] * matrix[2][3] -
+             matrix[1][0] * matrix[0][3] * matrix[2][1] -
+             matrix[2][0] * matrix[0][1] * matrix[1][3] +
+             matrix[2][0] * matrix[0][3] * matrix[1][1];
+
+  inv[12] = -matrix[1][0] * matrix[2][1] * matrix[3][2] +
+             matrix[1][0] * matrix[2][2] * matrix[3][1] +
+             matrix[2][0] * matrix[1][1] * matrix[3][2] -
+             matrix[2][0] * matrix[1][2] * matrix[3][1] -
+             matrix[3][0] * matrix[1][1] * matrix[2][2] +
+             matrix[3][0] * matrix[1][2] * matrix[2][1];
+
+  inv[13] = matrix[0][0] * matrix[2][1] * matrix[3][2] -
+            matrix[0][0] * matrix[2][2] * matrix[3][1] -
+            matrix[2][0] * matrix[0][1] * matrix[3][2] +
+            matrix[2][0] * matrix[0][2] * matrix[3][1] +
+            matrix[3][0] * matrix[0][1] * matrix[2][2] -
+            matrix[3][0] * matrix[0][2] * matrix[2][1];
+
+  inv[14] = -matrix[0][0] * matrix[1][1] * matrix[3][2] +
+             matrix[0][0] * matrix[1][2] * matrix[3][1] +
+             matrix[1][0] * matrix[0][1] * matrix[3][2] -
+             matrix[1][0] * matrix[0][2] * matrix[3][1] -
+             matrix[3][0] * matrix[0][1] * matrix[1][2] +
+             matrix[3][0] * matrix[0][2] * matrix[1][1];
+
+  inv[15] = matrix[0][0] * matrix[1][1] * matrix[2][2] -
+            matrix[0][0] * matrix[1][2] * matrix[2][1] -
+            matrix[1][0] * matrix[0][1] * matrix[2][2] +
+            matrix[1][0] * matrix[0][2] * matrix[2][1] +
+            matrix[2][0] * matrix[0][1] * matrix[1][2] -
+            matrix[2][0] * matrix[0][2] * matrix[1][1];
+
+  det = matrix[0][0] * inv[0] +
+        matrix[0][1] * inv[4] +
+        matrix[0][2] * inv[8] +
+        matrix[0][3] * inv[12];
+
+  det = 1.0f / det;
+
+  return Matrix4(inv[0] * det, inv[1] * det, inv[2] * det, inv[3] * det,
+                 inv[4] * det, inv[5] * det, inv[6] * det, inv[7] * det,
+                 inv[8] * det, inv[9] * det, inv[10] * det, inv[11] * det,
+                 inv[12] * det, inv[13] * det, inv[14] * det, inv[15] * det);
+}
+
 Matrix4
 Matrix4::getTransposed()
 {
@@ -116,17 +273,7 @@ Matrix4::translation(float& _offsetX, float& _offsetY, float& _offsetZ)
 } 
 
 Matrix4
-Matrix4::translation(Vector3& _position)
-{
-  Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][3] = _position.x;
-  M.matrix[1][3] = _position.y;
-  M.matrix[2][3] = _position.z;
-  return M;
-}
-
-Matrix4
-Matrix4::translationA(Vector3 _position)
+Matrix4::translation(Vector3 _position)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][3] = _position.x;
@@ -167,19 +314,11 @@ Matrix4::getTranslation3()
   return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
 
-Vector3
-Matrix4::getTranslationVector()
-{
-  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
-}
-
 Matrix4
 Matrix4::scale(Vector3& _scale)
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[3][0] = _scale.x;
-  M.matrix[3][1] = _scale.y;
-  M.matrix[3][2] = _scale.z;
+  M.setScale(_scale);
   return M;
 }
 
@@ -187,48 +326,45 @@ Matrix4
 Matrix4::getScale()
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[3][0] = matrix[3][0];
-  M.matrix[3][1] = matrix[3][1];
-  M.matrix[3][2] = matrix[3][2];
+  Vector3 scale = getScale3();
+  M.matrix[0][3] = scale.x;
+  M.matrix[1][3] = scale.y;
+  M.matrix[2][3] = scale.z;
   return M;
 }
 
 Vector3
 Matrix4::getScale3()
 {
-  return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
+  return Vector3(matrix[0][3],
+                 matrix[1][3],
+                 matrix[2][3]);
 }
 
 void
 Matrix4::setScale(Vector3 _scale)
 {
-  matrix[3][0] = _scale.x;
-  matrix[3][1] = _scale.y;
-  matrix[3][2] = _scale.z;
+  setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
 Matrix4::setScale(Matrix4 _scale)
 {
-  matrix[3][0] = _scale.matrix[3][0];
-  matrix[3][1] = _scale.matrix[3][1];
-  matrix[3][2] = _scale.matrix[3][2];
-}
-
-void
-Matrix4::setScale(float _x, float _y, float _z)
-{
-  matrix[3][0] = _x;
-  matrix[3][1] = _y;
-  matrix[3][2] = _z;
+  setScale(_scale.getScale3());
 }
 
 void
 Matrix4::setScale(float _val)
 {
-  matrix[3][0] = _val;
-  matrix[3][1] = _val;
-  matrix[3][2] = _val;
+  setScale(_val, _val, _val);
+}
+
+void
+Matrix4::setScale(float _x, float _y, float _z)
+{
+  matrix[0][0] *= _x;
+  matrix[1][1] *= _y;
+  matrix[2][2] *= _z;
 }
 
 Matrix4
@@ -285,7 +421,7 @@ Matrix4::getRotation()
 }
 
 Matrix4
-Matrix4::rotation(float& _angleX, float& _angleY, float& _angleZ)
+Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M = rotationX(_angleX) * rotationY(_angleY) * rotationZ(_angleZ);

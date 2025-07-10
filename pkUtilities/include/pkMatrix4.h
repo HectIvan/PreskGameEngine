@@ -259,6 +259,41 @@ class PK_UTILITY_EXPORT Matrix4
   }
 
   /**
+   * @brief get the forward vector from a view matrix.
+   * @return the forward vector.
+   */
+  Vector3
+  getForwardVector();
+
+  /**
+   * @brief get the up vector from a view matrix.
+   * @return the up vector.
+   */
+  Vector3
+  getUpVector();
+
+  /**
+   * @brief get the right vector from a view matrix.
+   * @return the right vector.
+   */
+  Vector3
+  getRightVector();
+
+  /**
+   * @brief Get the position of the view matrix.
+   * @return The position of the view.
+   */
+  Vector3
+  getViewPosition();
+
+  /**
+   * @brief Get the inverse matrix.
+   * @return The inverse matrix.
+   */
+  Matrix4
+  inverse();
+
+  /**
    * @brief Multiply a matrix with another.
    * @param Other The other matrix.
    * @return The new matrix.
@@ -386,15 +421,6 @@ class PK_UTILITY_EXPORT Matrix4
    */
   static Matrix4
   translation(float& _offsetX, float& _offsetY, float& _offsetZ);
-  
-  /**
-   * @brief The translation matrix that is created from
-   * the Vector3 given to it.
-   * @param _position vector position.
-   * @return The translation matrix at the position given to it.
-   */
-  static Matrix4
-  translation(Vector3& _position);
 
   /**
    * @brief The translation matrix that is created from
@@ -403,7 +429,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The translation matrix at the position given to it.
    */
   static Matrix4
-  translationA(Vector3 _position);
+  translation(Vector3 _position);
 
   /**
    * @brief Set the translation
@@ -432,13 +458,6 @@ class PK_UTILITY_EXPORT Matrix4
    */
   Vector3
   getTranslation3();
-
-  /**
-   * @brief Get the current translation in a Vector3.
-   * @return The translation Vector.
-   */
-  Vector3
-  getTranslationVector();
   
   /**
    * @brief The translation matrix that is created from
@@ -516,9 +535,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at the rotations given to it.
    */
   static Matrix4
-  rotation(float& _angleX,
-           float& _angleY,
-           float& _angleZ);
+  rotation(float _angleX, float _angleY, float _angleZ);
 
   /**
    * @brief The rotation matrix that is created from

@@ -1,19 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkResourceManager pkResourceManager.h
-* @Hector Ivan Muñoz Ceballos
-* @date 04/02/2025
-* @Resource Manager file for the Presk Game Engine.
-*
-* This file will contain the Resource Manager used for the engine
-*
-* @bug No current function.
-*
-* @HectIvan 06/02/20245
-* @brief Added a newMaterial function that creates a material pointer.
-* @brief Added a newTexture function that creates a texture pointer.
-*/
-/************************************************************************/
+ * @file    pkResourceManager.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    04/02/2025
+ * @brief   Resource Manager used for the engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -26,8 +20,20 @@
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
+#include "pkPath.h"
+
 namespace pkEngineSDK
 {
+
+/**
+ * Memory structures used to store already loaded data and call it when needed.
+ */
+struct ModelMemory
+{
+  Path directory;
+  SPtr<Model> model;
+};
+
 
 class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
 {
@@ -44,20 +50,14 @@ class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
   newMaterial();
 
   /**
-   * @brief Create a new Texture.
-   * @param _name Texture Name.
-   * @param _directory Directory to look for.
-   * @return The texture pointer.
-   */
-  SPtr<Texture>
-  newTexture(String _name, String _directory);
-
-  /**
    * @brief Loads a model from a file.
-   * @param _path File path.
+   * @param _directory File path.
    */
   SPtr<Model>
-  loadModel(String& _fileName);
+  loadModel(Path _directory);
+
+ public:
+  Vector<SPtr<ModelMemory>> m_models;
 };
 
 PK_CORE_EXPORT ResourceManager&

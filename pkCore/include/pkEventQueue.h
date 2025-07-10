@@ -22,45 +22,45 @@
 /*********************************************/
 #include "pkKey.h"
 #include "pkVector2.h"
+#include "pkModule.h"
 
 namespace pkEngineSDK
 {
 
 class Window;
 
-class PK_CORE_EXPORT EventQueue
+class PK_CORE_EXPORT EventQueue : public Module<EventQueue>
 {
  public:
   EventQueue() = default;
   virtual ~EventQueue() = default;
 
   /**
-  * update both key inputs as well
-  * as the mouse position.
-  **/
+   * @brief update both key inputs as well as the mouse position.
+   */
   void
   poll();
 
   /**
-  * check if the key is being pressed.
-  * 
-  * @param _key
-  * Key to look for.
-  * 
-  * @return
-  * If the key was pressed or not.
-  **/
+   * @brief check if the key is being pressed.
+   * @param _key Key to look for.
+   * @return If the key was pressed or not.
+   */
   bool
   iskeyPressed(KEY::E _key);
 
   /**
-  * Window specific input.
-  **/
+   * Window specific input.
+   */
   void
   windowInput(Window& _window);
 
  public:
   UMap<uint32, Key> keys;
   Vector2 mousePosition;
+  int8 scrollWheel;
 };
+
+PK_CORE_EXPORT EventQueue&
+g_eventManager();
 }

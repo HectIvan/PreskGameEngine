@@ -22,7 +22,6 @@
     <ClCompile Include="source\pkCoreTest.cpp" />
     <ClCompile Include="source\pkObstacle.cpp" />
     <ClCompile Include="source\Projectile.cpp" />
-    <ClCompile Include="source\ShaderTest.cpp" />
     <ClCompile Include="source\PhysicsApp.cpp" />
     <ClCompile Include="source\Spring.cpp" />
   </ItemGroup>
@@ -30,7 +29,6 @@
     <ClInclude Include="include\Cannon.h" />
     <ClInclude Include="include\Obstacle.h" />
     <ClInclude Include="include\Projectile.h" />
-    <ClInclude Include="include\ShaderTest.h" />
     <ClInclude Include="include\PhysicsApp.h" />
     <ClInclude Include="include\Spring.h" />
   </ItemGroup>

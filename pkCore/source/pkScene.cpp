@@ -24,7 +24,7 @@ createActor()
 {
   SPtr<Actor> gActor = make_shared<Actor>();
   gActor->setTransform(Matrix4::IDENTITY);
-  gActor->m_name = "";
+  gActor->setName("");
   return gActor;
 }
 
@@ -47,7 +47,7 @@ Scene::instantiate(String _name,
   // insert the actor into the vector of actors
   SPtr<Actor> actor = createActor();
   // set the actor name.
-  actor->m_name = _name;
+  actor->setName(_name);
   // set the actor transform
   actor->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this actor)
@@ -69,7 +69,7 @@ Scene::actorFind(String _actorName)
   // for each actor in the list
   for (uint32 i = 0; i < getAllActors().size(); ++i) {
     // check if the name is the one we're looking for
-    if (getActor(i)->m_name == _actorName) {
+    if (getActor(i)->getName() == _actorName) {
       return getActor(i);
     }
   }
@@ -114,7 +114,7 @@ void
 Scene::update(float _deltaTime)
 {
   for (uint32 i = 0; i < getAllActors().size(); ++i) {
-    if (getActor(i)->m_active) {
+    if (getActor(i)->isActive()) {
       SPtr<Actor> actor = getActor(i);
       updateActor(actor, _deltaTime);
     }

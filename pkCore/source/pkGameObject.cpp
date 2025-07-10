@@ -18,6 +18,5 @@ GameObject::clear()
   m_children.clear();
   m_parent = nullptr;
   m_transform = Matrix4::IDENTITY;
-  m_name = "";
 }
 }

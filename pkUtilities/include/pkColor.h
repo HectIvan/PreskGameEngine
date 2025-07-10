@@ -28,22 +28,25 @@ namespace pkEngineSDK
 struct PK_UTILITY_EXPORT Color final
 {
   Color() = default;
+  // constructor with select colors
   Color(uint8 r, uint8 g, uint8 b, uint8 a = 255)
   {
     _color.R = r;
     _color.G = g;
     _color.B = b;
     _color.A = a;
-
   }
+  // construct color with another
   Color(const Color& other)
   {
     _color.fullColor = other._color.fullColor;
   }
+  // construct color from one single value
   Color(uint8 other)
   {
     _color.fullColor = other;
   }
+
   virtual ~Color();
 
   operator uint8() const
@@ -58,7 +61,7 @@ struct PK_UTILITY_EXPORT Color final
   * The red value as an uint8.
   **/
   uint8
-  getR() { return _color.R; }
+  getR() const { return _color.R; }
 
   /**
   * Sets the red value of the color.
@@ -76,7 +79,7 @@ struct PK_UTILITY_EXPORT Color final
   * The green value as an uint8.
   **/
   uint8
-  getG() { return _color.G; }
+  getG() const { return _color.G; }
 
   /**
   * Sets the green value of the color.
@@ -94,7 +97,7 @@ struct PK_UTILITY_EXPORT Color final
   * The blue value as an uint8.
   **/
   uint8
-  getB() { return _color.B; }
+  getB() const { return _color.B; }
 
   /**
   * Sets the blue value of the color.
@@ -112,7 +115,7 @@ struct PK_UTILITY_EXPORT Color final
   * The alpha value as an uint8.
   **/
   uint8
-  getA() { return _color.A; }
+  getA() const { return _color.A; }
 
   /**
   * Sets the alpha value of the color.

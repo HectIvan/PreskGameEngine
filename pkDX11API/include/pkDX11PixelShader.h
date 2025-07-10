@@ -24,15 +24,15 @@ namespace pkEngineSDK
 using std::wstring;
 class DX11Device;
 
-class DX11PixelShader : public DX11Shaders
+class DX11PixelShader : public DX11Shader
 {
  public:
   DX11PixelShader() = default;
   virtual ~DX11PixelShader() {
-    safeRelease(pShader);
+    safeRelease(m_pShader);
   }
 
  public:
-  ID3D11PixelShader* pShader = nullptr;
+  ID3D11PixelShader* m_pShader = nullptr;
 };
 }

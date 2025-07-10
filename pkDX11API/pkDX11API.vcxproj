@@ -34,6 +34,7 @@
     <ClCompile Include="source\pkDX11VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkDX11ComputeShader.h" />
     <ClInclude Include="include\pkDX11BlendState.h" />
     <ClInclude Include="include\pkDX11ConstantBuffer.h" />
     <ClInclude Include="include\pkDX11DepthStencilView.h" />

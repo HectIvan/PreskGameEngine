@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkPlatformMath pkPlatformMath.h
-* @Hector Ivan Muñoz Ceballos
-* @date 06/09/2024
-* @Platform Math file for the Presk Game Engine.
-*
-* This file will contain the math used for the engine
-* 
-* @bug No bug known.
-*
-* @HectIvan 09/09/2024
-* Added comments and missing functions
-*/
-/************************************************************************/
+ * @file    pkPlatformMath.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/09/2024
+ * @brief   Basic math used for the game engine
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -20,6 +15,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkPrerequisitesUtilities.h"
 #include "pkCollisionInfo.h"
 #include "pkSphere.h"
 #include "pkCube.h"
@@ -212,22 +208,6 @@ class PK_UTILITY_EXPORT PlatformMath
   static bool
   isNan(float _x);
 
-  /**
-   * @brief Get a signed value.
-   * @param _val Value to sign.
-   * @return The signed value.
-   */
-  static float
-  sign(float _val);
-
-  /**
-   * @brief Get a signed direction.
-   * @param _direction Direction to use.
-   * @return The new signed direction.
-   */
-  static Vector3
-  sign3(Vector3& _direction);
-
   /***************************************************************************
   * 
   * Shapes
@@ -322,11 +302,21 @@ class PK_UTILITY_EXPORT PlatformMath
   static bool
   intersectCubeSphere(Cube& _cube, Sphere& _sphere);
 
-  /***************************************************************************
-  * 
-  * Support points from shapes.
-  * 
-  ***************************************************************************/
+  /**
+   * @brief Get a signed value.
+   * @param _val Value to sign.
+   * @return The signed value.
+   */
+  static float
+  sign(float _val);
+
+  /**
+   * @brief Get a signed direction.
+   * @param _direction Direction to use.
+   * @return The new signed direction.
+   */
+  static Vector3
+  sign3(Vector3& _direction);
 
   /**
    * @brief Get the support point of an Object Bounding Box.
@@ -343,7 +333,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _points Group of points of  the shape.
    */
   static Vector3
-  supportPointConvex(Vector3 _direction, Vector<Vector3>& _points);
+  supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
 
   /**
    * @brief Get the support point from a sphere.
@@ -358,7 +348,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @brief Get the support point from a capsule.
    * @param _direction Direction to use.
    * @param _capsule Capsule of use.
-   * @return The support point.|
+   * @return The support point.
    */
   static Vector3
   supportPointCapsule(Vector3& _direction, Capsule& _capsule);

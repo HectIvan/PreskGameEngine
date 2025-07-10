@@ -1,25 +1,32 @@
 #include "pkTextureManager.h"
 #include "pkResourceManager.h"
+#include "pkGraphicsAPI.h"
 
 namespace pkEngineSDK
 {
 
 SPtr<Texture>
-TextureManager::createTexture(String _name, String _directory)
+TextureManager::loadTexture(const Path& _directory)
 {
   // search if the texture has been stored before
   for (uint32 i = 0; i < m_textures.size(); ++i) {
-    if (m_textures[i]->name == _name) {
+    if (m_textures[i]->name.toString() == _directory.toString()) {
       return m_textures[i]->texture;
     }
   }
 
   // create the texture
-  SPtr<Texture> texture = g_ResourceManager().newTexture(_name, _directory);
+  SPtr<Texture> texture = g_GraphicAPI().createTextureFromFile(_directory, 8, false, 28);
+
+  // if the texture failed to load
+  if (!texture) {
+    texture = nullptr;
+    return nullptr;
+  }
 
   // store the new texture in the memory
   SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();
-  newTexture->name = _name;
+  newTexture->name = _directory;
   newTexture->texture = texture;
   m_textures.push_back(newTexture);
 

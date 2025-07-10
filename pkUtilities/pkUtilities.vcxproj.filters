@@ -37,6 +37,12 @@
     <Filter Include="source\graphics">
       <UniqueIdentifier>{ff7b745e-e9b8-47fb-a47f-a3183648351e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\system">
+      <UniqueIdentifier>{4c824a7e-aca4-4b01-b376-3ee72279bb40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\system">
+      <UniqueIdentifier>{af2194b7-3563-42d3-aa31-bba8b7a31064}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkModule.h">
@@ -102,8 +108,11 @@
     <ClInclude Include="include\pkCollisionInfo.h">
       <Filter>include\figures</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkFigure.h">
-      <Filter>include\figures</Filter>
+    <ClInclude Include="include\pkFileSystem.h">
+      <Filter>include\system</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPath.h">
+      <Filter>include\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -143,7 +152,11 @@
     <ClCompile Include="source\pkColor.cpp">
       <Filter>source\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="include\pkAABB.cpp" />
-    <ClCompile Include="include\pkOBB.cpp" />
+    <ClCompile Include="source\pkPath.cpp">
+      <Filter>source\system</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkFileSystem.cpp">
+      <Filter>source\system</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

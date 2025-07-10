@@ -6,6 +6,8 @@
 **/
 /*********************************************/
 #include <cassert>
+#include <codecvt>
+#include <functional>
 #include <map>
 #include <memory>
 #include <optional>
@@ -18,11 +20,21 @@
 
 namespace pkEngineSDK
 {
+
+template<class T>
+using Function = std::function<T>;
+
 using std::make_unique;
 
 using std::rand;
 
 using std::to_string;
+
+template <class T>
+using WString_Conv = std::wstring_convert<T>;
+
+template <class T>
+using Codecvt_utf8 = std::codecvt_utf8<T>;  
 
 template <class T>
 using Queue = std::queue<T>;
@@ -38,6 +50,7 @@ using Stack = std::stack<T>;
 
 using String = std::string;
 
+// to do: change for linux too
 using WString = std::wstring;
 
 template<class _Kty, class _Ty>

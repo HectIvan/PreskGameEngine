@@ -35,11 +35,52 @@ class SwapChain
    * @param _index Position of the buffer.
    * @return Texture of the back buffer.
    */
-  virtual SPtr<Texture>
+  virtual SPtr<Texture>&
   getBuffer(uint32 _index) = 0;
+
+  /**
+   * @brief Get the back buffer width.
+   * @return The buffer width.
+   */
+  FORCEINLINE uint32
+  getWidth() const { return m_width; }
+
+  /**
+   * @brief Get the back buffer height.
+   * @return The buffer height.
+   */
+  FORCEINLINE uint32
+  getHeight() const { return m_height; }
+
+  /**
+   * @brief Get the swap chain size.
+   * @return The swap chain size.
+   */
+  FORCEINLINE Vector2
+  getSize() const
+  {
+    return Vector2(static_cast<float>(m_width), static_cast<float>(m_height));
+  }
+
+  /**
+   * @brief Set the back buffer width.
+   * @param _width Width of the buffer.
+   */
+  FORCEINLINE void
+  setWidth(uint32 _width) { m_width = _width; }
+
+  /**
+   * @brief Set the back buffer height.
+   * @param _width Height of the buffer.
+   */
+  FORCEINLINE void
+  setHeight(uint32 _height) { m_height = _height; }
 
  public:
   Vector<SPtr<Texture>> m_buffers;
   const uint32 m_bufferCount = 1;
+
+  uint32 m_width;
+  uint32 m_height;
 };
 }

@@ -73,6 +73,12 @@ class Material : public Component
   getType() override { return COMPONENT_TYPE::kMaterial; }
 
   /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Material"; }
+
+  /**
    * @brief Get the component type of this class.
    * @return The class type.
    */
@@ -121,6 +127,20 @@ class Material : public Component
    */
   FORCEINLINE void
   setOcclusion(SPtr<Texture> _pTexture) { occlusion = _pTexture; }
+
+  /**
+   * @brief Set the material name.
+   * @param _name The material name.
+   */
+  void
+  setName(String _name) { m_name = _name; }
+
+  /**
+   * @brief Get the material name.
+   * @return The material name.
+   */
+  String
+  getName() const { return m_name; }
 
  public:
   String m_name;

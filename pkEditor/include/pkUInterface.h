@@ -29,7 +29,7 @@ namespace pkEngineSDK
 class UInterface : public Module<UInterface>
 {
  public:
-   UInterface() = default;
+  UInterface() = default;
   virtual ~UInterface() = default;
 
   /**
@@ -37,12 +37,12 @@ class UInterface : public Module<UInterface>
    */
   void
   init();
-  
+
   /**
    * @brief Initialize the User Interface through the current api.
    */
   void
-  initAPI();
+  initWithAPI();
 
   /**
    * @brief Initialize imgui with the window.
@@ -64,7 +64,15 @@ class UInterface : public Module<UInterface>
    */
   void
   setNewWindowSize(Vector2 _size);
-  
+
+  /**
+   * @brief Set the size of the window being created.
+   * @param _x Window width.
+   * @param _y Window height.
+   */
+  void
+  setNewWindowSize(float _x, float _y);
+
   void
   uINewFrame();
 
@@ -73,7 +81,7 @@ class UInterface : public Module<UInterface>
    */
   void
   windowNewFrame();
-  
+
   /**
    * @brief
    */
@@ -85,33 +93,143 @@ class UInterface : public Module<UInterface>
    */
   void
   setCurrentContext();
-  
+
   /**
-   * @brief 
+   * @brief
    */
   void
   newFrameAPI();
-  
+
   /**
-   * brief 
+   * brief
    */
   void
   endFrame();
-  
+
   /**
    * @brief Creates a new User interface window.
    * @param _name Name of the window.
    */
   void
   startWindowCreate(const char* _name);
-  
+
   /**
    * @brief Create a text in the User interface window.
    * @param _text What text to display.
    */
   void
   createText(const char* _text);
-  
+
+  /**
+   * @brief Create an input text.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputText(const char* _name, String& _param);
+
+  /**
+   * @brief Create an input float.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _step How much to increment when an arrow is clicked.
+   * @param _largeStep How much to increment when an arrow is held down.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputF(const char* _name,
+               float& _param,
+               float _step = 5.0f,
+               float _largeStep = 10.0f);
+
+  /**
+   * @brief Create an input float.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @param _step How much to increment when an arrow is clicked.
+   * @param _largeStep How much to increment when an arrow is held down.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputFClamp(const char* _name,
+                    float& _param,
+                    float _min,
+                    float _max,
+                    float _step = 5.0f,
+                    float _largeStep = 10.0f);
+
+  /**
+   * @brief Create an input Vector2.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector2(const char* _name, Vector2& _param);
+
+  /**
+   * @brief Create an input Vector2 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max);
+
+  /**
+   * @brief Create an input Vector3.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector3(const char* _name, Vector3& _param);
+
+  /**
+   * @brief Create an input Vector3 that returns the new value.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return New value.
+   */
+  Vector3
+  createInputVector3Ret(const char* _name, Vector3 _param);
+
+  /**
+   * @brief Create an input Vector3 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max);
+
+  /**
+   * @brief Create an input Vector4.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector4(const char* _name, Vector4& _param);
+
+  /**
+   * @brief Create an input Vector4 with clamp.
+   * @param _name Name of the input.
+   * @param _param Value to change.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @return Wether there was a change or not.
+   */
+  bool
+  createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max);
+
   /**
    * @brief Create a float slider.
    * @param _name Name of the slider.
@@ -121,7 +239,7 @@ class UInterface : public Module<UInterface>
    */
   void
   createSliderF(const char* _name, float& _param, const float _min, const float _max);
-  
+
   /**
    * @brief Create a Vector2 slider.
    * @param _name Name of the slider.
@@ -131,7 +249,7 @@ class UInterface : public Module<UInterface>
    */
   void
   createSliderVector2(const char* _name, Vector2& _param, const float _min, const float _max);
-  
+
   /**
    * @brief Create a Vector3 slider.
    * @param _name Name of the slider.
@@ -139,9 +257,9 @@ class UInterface : public Module<UInterface>
    * @param _min Minimum value the parameter can have.
    * @param _max Maximum value the parameter can have.
    */
-  void
-  createSliderVector3(const char* _name, Vector3& _param, const float _min, const float _max);
-  
+  Vector3
+  createSliderVector3(const char* _name, Vector3 _param, const float _min, const float _max);
+
   /**
    * @brief Create a checkbox.
    * @param _name Name of the checkbox.
@@ -149,6 +267,13 @@ class UInterface : public Module<UInterface>
    */
   void
   createCheckBox(const char* _name, bool& _param);
+
+  /**
+   * @brief Create a Button.
+   * @param _name Name of the button.
+   */
+  bool
+  createButton(const char* _name);
   
   /**
    * @brief End the window creation process.

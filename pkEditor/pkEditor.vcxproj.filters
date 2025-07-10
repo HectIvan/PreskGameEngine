@@ -26,6 +26,9 @@
     <Filter Include="Source Files\interface\ImGui">
       <UniqueIdentifier>{28315225-3dc1-49ca-af04-f91699a9b30e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Editor">
+      <UniqueIdentifier>{8bb4215f-047b-47b5-b23c-13df7106fb10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\shaderTest.cpp">
@@ -64,6 +67,9 @@
     <ClCompile Include="source\pkDX11ImGui.cpp">
       <Filter>Source Files\interface\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="source\ActorInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -92,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="include\externals\imgui_impl_dx11.h">
       <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActorInspector.h">
+      <Filter>include\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

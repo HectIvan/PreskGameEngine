@@ -128,6 +128,13 @@ class PK_CORE_EXPORT Actor
 
   /**
    * @brief Set the scale of the Actor.
+   * @param _val Scale in all axis.
+   */
+  void
+  setScale(float _val);
+
+  /**
+   * @brief Set the scale of the Actor.
    * @param _scale Scale Vector.
    */
   void
@@ -136,11 +143,18 @@ class PK_CORE_EXPORT Actor
   /**
    * @brief Set the scale of the Actor.
    * @param _x Scale in the x.
-   * @param _x Scale in the y.
-   * @param _x Scale in the z.
+   * @param _y Scale in the y.
+   * @param _z Scale in the z.
    */
   void
   setScale(float _x, float _y, float _z);
+
+  /**
+   * @brief Get the actor scale.
+   * @return The actor scale.
+   */
+  FORCEINLINE Vector3
+  getScale() { return m_scale; }
 
   /**
    * @brief adds a component of type T.
@@ -169,11 +183,25 @@ class PK_CORE_EXPORT Actor
   }
 
   /**
+   * @brief Get all the components of the actor.
+   * @return Vector with all the components.
+   */
+  Vector<SPtr<Component>>&
+  getComponents() { return m_components; }
+
+  /**
    * @brief Get the actor name.
    * @return Name of the actor
    */
   String
   getName() { return m_name; }
+
+  /**
+   * @brief Set the actor name.
+   * @param _name Name of the actor
+   */
+  void
+  setName(String _name) { m_name = _name; }
 
   /**
    * @brief Get the actor name as a const char*.
@@ -215,7 +243,7 @@ class PK_CORE_EXPORT Actor
    * @brief If the actor is active or not.
    * @return A true or false value of the actor activity.
    */
-  bool
+  bool&
   isActive() { return m_active; }
 
   /**
@@ -225,13 +253,16 @@ class PK_CORE_EXPORT Actor
   clear();
 
  public:
-  bool m_active = true;
   Vector3 m_forward;
   Vector<SPtr<Component>> m_components;
   Vector<SPtr<Actor>> m_children;
   SPtr<Actor> m_parent;
   Matrix4 m_transform;
   Matrix4 m_prevTransform;
+
+ private:
+  Vector3 m_scale;
+  bool m_active = true;
   String m_name;
 };
 }

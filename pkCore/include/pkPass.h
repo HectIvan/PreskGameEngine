@@ -134,13 +134,26 @@ public:
   void
   endPass();
 
-  // to do: this function may not need to exist.
   /**
-   * @brief Clear the render targets with a base color.
-   * @param _color Color to clear with.
+   * @brief get the input textures of the pass.
+   * @return A list of Textures.
    */
-  void
-  clearRenderTargets(Color _color = Color(1, 1, 1, 0));
+  Vector<SPtr<Texture>>&
+  getInputTextures() { return m_inputTex; }
+
+  /**
+   * @brief get the output textures of the pass.
+   * @return A list of Textures.
+   */
+  Vector<SPtr<Texture>>&
+  getOutputTextures() { return m_outputTex; }
+
+  /**
+   * @brief get the unordered access view textures of the pass.
+   * @return A list of Textures.
+   */
+  Vector<SPtr<Texture>>&
+  getUAVTextures() { return m_uavTex; }
 
  private:
   /**

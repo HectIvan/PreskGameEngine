@@ -189,14 +189,14 @@ RendererManager::createPasses()
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
-                   getGBuffer(G_BUFFERS::kGB_Shadow) };
+                   getUAVBuffer(UAV_BUFFERS::kDB_Test) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, tonePass });
 
   /****************************************************************************
-   * Test for compute shader
+   * Shadow Compute
    ***************************************************************************/
   pDesc.vSDirectory = Path("");
   pDesc.pSDirectory = Path("");
@@ -204,15 +204,20 @@ RendererManager::createPasses()
   pDesc.pSEntry = "";
   pDesc.vSModel = "";
   pDesc.pSModel = "";
-  pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
+  pDesc.cSDirectory = Path("shaders/pkCShadowMapping.hlsl");
   pDesc.cSEntry = "CSMain";
   pDesc.cSModel = "cs_5_0";
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Metallic),
+                   getDepthBuffer(D_BUFFERS::kDB_Shadow),
+                   getDepthBuffer(D_BUFFERS::kDB_Base) };
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
+                    sizeof(Matrix4), sizeof(CBShadowParam) };
   pDesc.outputs = {};
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
   SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_TestCompute, testCompute });
+  m_passes.insert({ PASS_TYPE::kP_CShadows, testCompute });
 
 }
 

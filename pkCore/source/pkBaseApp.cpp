@@ -12,16 +12,20 @@
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
 
-using pkEngineSDK::PASS_TYPE::kP_AO;
-using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Shadow;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
+using pkEngineSDK::PASS_TYPE::kP_AO;
+using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_CShadows;
+using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_Shadow;
+using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_Tone;
+using pkEngineSDK::PASS_TYPE::kP_VBlur;
 
 namespace pkEngineSDK
 {
@@ -126,50 +130,53 @@ BaseApp::render()
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& renderManager = g_RenderManager().instance();
+  // get all passes
+  SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
+  SPtr<Pass> basePass = renderManager.getPass(kP_Base);
+  SPtr<Pass> luminancePass = renderManager.getPass(kP_Luminance);
+  SPtr<Pass> hBlurPass = renderManager.getPass(kP_HBlur);
+  SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
+  SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
+
   // first shadow pass
   if (m_shadows) {
-    renderManager.getPass(PASS_TYPE::kP_Shadow)->beginPass();
+    baseShadow->beginPass();
     renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-    renderManager.getPass(PASS_TYPE::kP_Shadow)->endPass();
+    baseShadow->endPass();
   }
   // base pass
-  renderManager.getPass(PASS_TYPE::kP_Base)->beginPass();
+  basePass->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
-  renderManager.getPass(PASS_TYPE::kP_Base)->endPass();
+  basePass->endPass();
   // Quad luminance pass
   if (m_luminance) {
-    renderManager.getPass(PASS_TYPE::kP_Luminance)->beginPass();
+    luminancePass->beginPass();
     api.draw(3, 0);
-    renderManager.getPass(PASS_TYPE::kP_Luminance)->endPass();
+    luminancePass->endPass();
     // horizontal blur quad pass
-    renderManager.getPass(PASS_TYPE::kP_HBlur)->beginPass();
+    hBlurPass->beginPass();
     api.draw(3, 0);
-    renderManager.getPass(PASS_TYPE::kP_HBlur)->endPass();
+    hBlurPass->endPass();
   }
-  renderManager.getPass(PASS_TYPE::kP_ShadowDef)->clearRenderTargets();
+  api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
+  // if shadows are set to be rendered
   if (m_shadows) {
-    // Quad shadow pass
-    renderManager.getPass(PASS_TYPE::kP_ShadowDef)->beginPass();
-    api.draw(3, 0);
-    renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
+    pCShadowPass->beginPass();
+    Vector2 texSize = api.getSwapChain()->getSize();
+    uint32 threadWidth = 16;
+    uint32 threadHeight = 16;
+    uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+    uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+    api.dispatch(x, y, 1);
+    pCShadowPass->endPass();
   }
-
-  // test compute pass
-  renderManager.getPass(PASS_TYPE::kP_TestCompute)->beginPass();
-  Vector2 texSize = api.getSwapChain()->getSize();
-  uint32 threadWidth = 16;
-  uint32 threadHeight = 16;
-  uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-  uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
-  api.dispatch(x, y, 1);
-  renderManager.getPass(PASS_TYPE::kP_TestCompute)->endPass();
 
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
   // api.draw(3, 0);
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->endPass();
   // Quad tone map pass
-  renderManager.getPass(PASS_TYPE::kP_Tone)->beginPass();
+  tonePass->beginPass();
   api.draw(3, 0);
   // Scene specific app render
   onRender();

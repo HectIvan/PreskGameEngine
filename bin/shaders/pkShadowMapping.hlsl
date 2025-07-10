@@ -98,7 +98,6 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
 
 float4 PS(PS_INPUT input) : SV_Target0
 {
-  PS_OUTPUT output = (PS_OUTPUT) 0;
   /**
    * light data
    */

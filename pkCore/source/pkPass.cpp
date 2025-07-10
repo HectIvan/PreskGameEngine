@@ -154,12 +154,4 @@ Pass::endPass()
   api.pSSetConstantBuffers(vector);
   api.cSSetConstantBuffers(vector);
 }
-
-void
-Pass::clearRenderTargets(Color _color)
-{
-  // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  api.clearRenderTargetViews(_color, m_outputTex);
-}
 }

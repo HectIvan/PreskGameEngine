@@ -318,6 +318,22 @@ public:
   clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
 
   /**
+   * @brief Clear all unordered access views of a vector.
+   * @param _uavs Vector of UAVs.
+   * @param _color New view color.
+   */
+  virtual void
+  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+                            const Color& _color = Color(1,1,1,0)) = 0;
+
+  /**
+   * @brief Clear access view.
+   * @param _color New view color.
+   */
+  virtual void
+  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
+
+  /**
    * @brief clear the depth buffer.
    * @param _depth Default depth of the stencil.
    * @param _pDepthSV Depth stencil view to clear.

@@ -395,6 +395,22 @@ class DX11GraphicsAPI : public GraphicsAPI
   clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
 
   /**
+   * @brief Clear all unordered access views of a vector.
+   * @param _color New view color.
+   */
+  void
+  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+                            const Color& _color = Color(1, 1, 1, 0)) override;
+
+  /**
+   * @brief Clear access view.
+   * @param _color New view color.
+   */
+  void
+  clearUnorderedAccessView(SPtr<Texture> _uav,
+                           const Color& _color = Color(1, 1, 1, 0)) override;
+
+  /**
    * @brief Clear the depth buffer.
    * @param _pDepthSV Depth stencil to clear.s
    */

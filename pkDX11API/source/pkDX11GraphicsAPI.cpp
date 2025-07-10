@@ -247,6 +247,38 @@ DX11GraphicsAPI::clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv)
 }
 
 void
+DX11GraphicsAPI::clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs, const Color& _color)
+{
+  for (uint32 i = 0; i < _uavs.size(); ++i) {
+    clearUnorderedAccessView(_uavs[i], _color);
+  }
+}
+
+void
+DX11GraphicsAPI::clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color)
+{
+  PK_ASSERT(_uav);
+  // Texture to a DirectX texture
+  SPtr<DX11Texture> dxUAV = reinterpret_pointer_cast<DX11Texture>(_uav);
+  // If the casting failed.
+  if (!dxUAV) {
+    g_Logger().print("Failed to clear the unordered access view");
+    return;
+  }
+  // clear the unordered access view
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the clearing of the unordered AV.");
+    return;
+  }
+  float color[4] = { static_cast<float>(_color.getR()),
+                     static_cast<float>(_color.getG()),
+                     static_cast<float>(_color.getB()),
+                     static_cast<float>(_color.getA()) };
+  device->m_pImmediateContext->ClearUnorderedAccessViewFloat(dxUAV->m_uAV, color);
+}
+
+void
 DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV)
 {
   // check if a depth stencil is being sent

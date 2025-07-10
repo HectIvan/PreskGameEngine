@@ -70,7 +70,7 @@ namespace PASS_TYPE
     kP_HBlur,
     kP_VBlur,
     kP_Tone,
-    kP_TestCompute,
+    kP_CShadows, // compute shadows
   };
 }
 

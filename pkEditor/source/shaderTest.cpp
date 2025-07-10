@@ -42,6 +42,7 @@ using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_CShadows;
 using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
@@ -368,30 +369,30 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(3), &lightData, lightSize);
   api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(4), &lightCam,  camSize);
 
-  // update shadow quad buffers
+  // update shadow compute buffers
   // light buffer data
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(0),
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(0),
                            &lData,
                            sizeof(CBLight));
   // main camera data
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(1), &camData, sizeof(camData));
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(1), &camData, sizeof(camData));
   // light camera data
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(2),
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(2),
                            &lightCam,
                            sizeof(Camera));
   // inverse projection data
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(3),
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(3),
                            &invProj,
                            sizeof(Matrix4));
   // inverse view data
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(4),
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(4),
                            &invView,
                            sizeof(Matrix4));
   // get the shadow data needed
   CBShadowParam shadowsParam;
   shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
   shadowsParam.winSize = api.getSwapChain()->getBuffer(0)->getSize();
-  api.updateConstantBuffer(rm.getPass(kP_ShadowDef)->getCBuffer(5),
+  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(5),
                            &shadowsParam,
                            sizeof(CBShadowParam));
   // update the luminance pass buffer

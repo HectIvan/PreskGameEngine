@@ -63,6 +63,16 @@ Quaternion::operator*(const Quaternion& _quat) const
   return r;
 }
 
+Quaternion
+Quaternion::axisAngle(Vector3 _axis, float _angle)
+{
+  float w = Math::cos(_angle / 2);
+  float x = _axis.x * Math::sin(_angle / 2);
+  float y = _axis.y * Math::sin(_angle / 2);
+  float z = _axis.z * Math::sin(_angle / 2);
+  return Quaternion(w, x, y, z);
+}
+
 Vector3
 Quaternion::rotate(const Vector3& x) const
 {

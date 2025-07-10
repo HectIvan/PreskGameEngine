@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPhysicsManager.cpp" />
+    <ClCompile Include="source\pkRigidBody.cpp" />
     <ClCompile Include="source\pkShape.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

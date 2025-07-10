@@ -17,6 +17,10 @@
 /*********************************************/
 #include "pkModule.h"
 #include "pkShape.h"
+#include "pkOBB.h"
+#include "pkSphere.h"
+#include "pkRigidbody.h"
+#include "pkCollisionInfo.h"
 
 namespace pkEngineSDK
 {
@@ -83,6 +87,47 @@ class PhysicsManager : public Module<PhysicsManager>
    */
   bool
   originInFrontOfPlane(Vector3 _vertex[], Vector3& _direction);
+
+  /**
+   * @brief Get inertia tensor from OBB object.
+   * @param _obb Object Bounding Box to check.
+   * @param _mass Mass of the box.
+   */
+  Matrix3
+  getInertiaTensorOBB(OBB _obb, float _mass);
+
+  /**
+   * @brief Get inertia tensor from Sphere.
+   * @param _sphere Sphere to check.
+   * @param _mass Mass of the sphere
+   */
+  Matrix3
+  getInertiaTensorSphere(Sphere& _sphere, float _mass);
+
+  /**
+   * @brief Get the effective mass between 2 rigid bodies.
+   * @param _normalHit Normal vector of the collision.
+   * @param _rb1 First rigid body.
+   * @param _rb2 Second rigid body.
+   * @param _contactPoint1 First contact point.
+   * @param _contactPoint2 Second contact point.
+   * @return Effective mass.
+   */
+  float
+  getEffectiveMass(Vector3& _normalHit,
+                   RigidBody& _rb1,
+                   RigidBody& _rb2,
+                   Vector3 _contactPoint1,
+                   Vector3 _contactPoint2);
+
+  /**
+   * @brief Detect if there was a collision.
+   * @param _rb1 First rigid body to check for.
+   * @param _rb2 Second rigid body to check for.
+   * @param _info Info of the collision.
+   */
+  void
+  resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info);
 };
 PhysicsManager&
 g_physicsManager()

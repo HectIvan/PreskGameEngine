@@ -176,6 +176,7 @@
     <ClInclude Include="include\pkCube.h" />
     <ClInclude Include="include\pkFileSystem.h" />
     <ClInclude Include="include\pkMath.h" />
+    <ClInclude Include="include\pkMatrix3.h" />
     <ClInclude Include="include\pkMatrix4.h" />
     <ClInclude Include="include\pkModule.h" />
     <ClInclude Include="include\pkOBB.h" />
@@ -194,11 +195,14 @@
     <ClInclude Include="include\pkVector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkAABB.cpp" />
     <ClCompile Include="source\pkCapsule.cpp" />
     <ClCompile Include="source\pkColor.cpp" />
     <ClCompile Include="source\pkCube.cpp" />
     <ClCompile Include="source\pkFileSystem.cpp" />
+    <ClCompile Include="source\pkMatrix3.cpp" />
     <ClCompile Include="source\pkMatrix4.cpp" />
+    <ClCompile Include="source\pkOBB.cpp" />
     <ClCompile Include="source\pkPath.cpp" />
     <ClCompile Include="source\pkPlane.cpp" />
     <ClCompile Include="source\pkPlatformMath.cpp" />

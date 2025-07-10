@@ -41,5 +41,6 @@ public:
   supportPoint(Vector3& _direction) override;
 
   Matrix4 m_transform;
+  Vector3 m_halfSize;
 };
 }

@@ -16,7 +16,8 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkVector3.h"
+#include "pkMatrix3.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK
 {
@@ -27,9 +28,45 @@ class RigidBody
   RigidBody() = default;
   virtual ~RigidBody() = default;
 
+  /**
+   * @brief Get the rigid body world position.
+   * @return The world position.
+   */
+  FORCEINLINE Vector3
+  getWorldPosition() { return m_position; }
+
+  /**
+   * @brief Get the inverse inertia world.
+   */
+  Matrix3
+  getInvInertiaWorld();
+
+  /**
+   * @brief Apply impulse to the rigid body
+   * @param _impulse Ammount of impulse to apply.
+   * @param _point Point where the impulse will be applied.
+   */
+  void
+  applyImpulse(const Vector3& _impulse, const Vector3& _point);
+
+  /**
+   * @brief Apply impulse to the rigid body
+   * @param _impulse Ammount of impulse to apply.
+   * @param _point Point where the impulse will be applied.
+   */
+  void
+  applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point);
+
  public:
   float m_drag;
   float m_gravity;
+  float m_inverseMass;
+  Vector3 m_linearVelocity;
+  Vector3 m_angularVelocity;
+  Vector3 m_invAngularInertia;
   Vector3 m_prevPos;
+  Vector3 m_position;
+  Quaternion m_orientation;
+  Matrix4 m_transform;
 };
 }

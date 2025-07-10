@@ -152,4 +152,101 @@ PhysicsManager::originInFrontOfPlane(Vector3 _vertex[], Vector3& _direction)
   }
   return dir.dotProd(_vertex[0] * -1.0f) > 0 ? true : false;
 }
+
+Matrix3
+PhysicsManager::getInertiaTensorOBB(OBB _obb, float _mass)
+{
+  Matrix3 result = Matrix3::IDENTITY;
+
+  float hx2 = _obb.m_halfSize.x * _obb.m_halfSize.x;
+  float hy2 = _obb.m_halfSize.y * _obb.m_halfSize.y;
+  float hz2 = _obb.m_halfSize.z * _obb.m_halfSize.z;
+
+  result.matrix[0][0] = (1.0f / 3.0f) * _mass * (hy2 + hz2);
+  result.matrix[1][1] = (1.0f / 3.0f) * _mass * (hz2 + hx2);
+  result.matrix[2][2] = (1.0f / 3.0f) * _mass * (hx2 + hy2);
+
+  return _obb.m_transform.getRotation().getMatrix3() *
+         result *
+         _obb.m_transform.getRotation().getTransposed().getMatrix3();
+}
+
+Matrix3
+PhysicsManager::getInertiaTensorSphere(Sphere& _sphere, float _mass)
+{
+  Matrix3 inertia = Matrix3::IDENTITY;
+
+  inertia.matrix[0][0] = (_mass * (_sphere.m_radius * _sphere.m_radius)) * 0.4f;
+  inertia.matrix[1][1] = inertia.matrix[0][0];
+  inertia.matrix[2][2] = inertia.matrix[0][0];
+
+  return inertia;
+}
+
+float
+PhysicsManager::getEffectiveMass(Vector3& _normalHit,
+                                 RigidBody& _rb1,
+                                 RigidBody& _rb2,
+                                 Vector3 _contactPoint1,
+                                 Vector3 _contactPoint2)
+{
+  Vector3 angularEffect = _rb1.getInvInertiaWorld() *
+                          (_contactPoint1.cross(_normalHit)).cross(_contactPoint1)
+                          + _rb2.getInvInertiaWorld() *
+                          (_contactPoint2.cross(_normalHit)).cross(_contactPoint2);
+
+  return _rb1.m_inverseMass + _rb2.m_inverseMass + angularEffect.dotProd(_normalHit);
+}
+
+void
+PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info)
+{
+  /* ----- Restitution ----- */
+  Vector3 r1 = _info.m_contactPoint1 - _rb1.getWorldPosition();
+  Vector3 r2 = _info.m_contactPoint2 - _rb2.getWorldPosition();
+
+  Vector3 v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
+                  - (_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
+
+  float v_alongNormal = v_rel.dotProd(_info.m_normalHit);
+  if (v_alongNormal > 0) { return; }  // do not resolve if they separate
+
+  float impulseNormal = -(1 + getElasticity(_rb1, _rb2)) * v_alongNormal;
+  impulseNormal /= getEffectiveMass(_info.m_normalHit, _rb1, _rb2, r1, r2);
+
+  Vector3 j_normal = _info.m_normalHit * impulseNormal;
+
+  _rb1.applyImpulse(j_normal, _info.m_contactPoint1);
+  Vector3 j_inNormal = j_normal * -1.0f;
+  _rb2.applyImpulse(j_inNormal, _info.m_contactPoint2);
+
+  /* ----- Recalculare velocity ----- */
+  v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
+          - (_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
+
+  v_alongNormal = v_rel.dotProd(_info.m_normalHit);
+
+  /* ----- Friction (Coulomb model) ----- */
+  Vector3 v_tan = v_rel - (_info.m_normalHit * v_alongNormal);
+  float v_tanMagnitude = v_tan.magnitudeSquare();
+  // if the magnitude of the tangent is incredibly small, there is no friction
+  if (v_tanMagnitude <= Math::SMALL_NUMBER) { return; }
+
+  // normalize
+  Vector3 d_tan = v_tan / Math::sqrt(v_tanMagnitude);
+
+  // calculate the ideal impulse
+  float impulseIdeal = v_rel.dotProd(d_tan);
+  impulseIdeal /= getEffectiveMass(d_tan, _rb1, _rb2, r1, r2);
+
+  float maxFriction = getFriction(_rb1, _rb2) * impulseNormal;
+  float impulseTan = Math::clamp(impulseIdeal, -maxFriction, maxFriction);
+
+  Vector3 j_tan = d_tan * impulseTan;
+
+  // apply said impulse to the rigid bodies
+  _rb1.applyImpulse(j_tan, _info.m_contactPoint1);
+  Vector3 j_invTan = j_tan * -1.0f;
+  _rb2.applyImpulse(j_invTan, _info.m_contactPoint2);
+}
 }

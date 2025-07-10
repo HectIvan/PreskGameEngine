@@ -103,18 +103,32 @@ public:
   createPShader(SPtr<Shader> _pShader) = 0;
 
   /**
+   * @brief Create a compute shader.
+   * @return Compute shader.
+   */
+  virtual SPtr<Shader>
+  createCShader(SPtr<Shader> _pShader) = 0;
+
+  /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setVSShader(SPtr<Shader> _pShader) = 0;
+  setVShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setPSShader(SPtr<Shader> _pShader) = 0;
+  setPShader(SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Set a compute shader.
+   * @param _pShader Compute shader.
+   */
+  virtual void
+  setCShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Get the API Swap chain
@@ -131,7 +145,7 @@ public:
    * @return Data blob.
    */
   virtual void**
-  compileShaderFromFile(WString _szFileName,
+  compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
                         const char* _szShaderModel) = 0;
 

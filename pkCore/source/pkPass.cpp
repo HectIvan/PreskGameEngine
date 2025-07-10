@@ -25,8 +25,6 @@ namespace pkEngineSDK
 {
 
 Pass::Pass() {
-  m_pVShader = g_GraphicAPI().internalCreateShader();
-  m_pPShader = g_GraphicAPI().internalCreateShader();
   m_pInputLayout = make_shared<InputLayout>();
   m_pSamplerState = make_shared<SamplerState>();
 }
@@ -35,16 +33,27 @@ Pass::Pass(PassDesc& _desc)
 {
   // call the api manager
   GraphicsAPI& api = g_GraphicAPI().instance();
-  // create all pointers
-  m_pVShader = api.internalCreateShader();
-  m_pPShader = api.internalCreateShader();
-  m_pInputLayout = make_shared<InputLayout>();
   m_pSamplerState = make_shared<SamplerState>();
-  // create the shaders
-  createVShader(_desc.vSDirectory, _desc.vSEntry, _desc.vSModel);
-  createPShader(_desc.pSDirectory, _desc.pSEntry, _desc.pSModel);
-  // create input and sampler state
-  m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
+  // Try to create the vertex shader if there's a path.
+  if (!_desc.vSDirectory.getPath().empty()) {
+    m_pVShader = api.internalCreateShader();
+    createVShader(_desc.vSDirectory, _desc.vSEntry, _desc.vSModel);
+    // create all pointers
+    m_pInputLayout = make_shared<InputLayout>();
+    // create input and sampler state
+    m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
+  };
+  // Try to create the pixel shader if there's a path.
+  if (!_desc.pSDirectory.getPath().empty()) {
+    m_pPShader = api.internalCreateShader();
+    createPShader(_desc.pSDirectory, _desc.pSEntry, _desc.pSModel);
+  }
+  // Try to create the compute shader if there's a path.
+  if (!_desc.cSDirectory.getPath().empty()) {
+    m_pCShader = api.internalCreateShader();
+    createCShader(_desc.cSDirectory, _desc.cSEntry, _desc.cSModel);
+  }
+  // create the sampler state
   m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
   // create a buffer for each size in the vector
   for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
@@ -57,7 +66,7 @@ Pass::Pass(PassDesc& _desc)
 }
 
 void
-Pass::createVShader(const WString _directory, const char* _entry, const char* _sModel)
+Pass::createVShader(const Path _directory, const char* _entry, const char* _sModel)
 {
   m_pVShader->setData(_directory, _entry, _sModel);
   m_pVShader->compile();
@@ -65,7 +74,7 @@ Pass::createVShader(const WString _directory, const char* _entry, const char* _s
 }
 
 void
-Pass::createPShader(const WString _directory, const char* _entry, const char* _sModel)
+Pass::createPShader(const Path _directory, const char* _entry, const char* _sModel)
 {
   m_pPShader->setData(_directory, _entry, _sModel);
   m_pPShader->compile();
@@ -73,10 +82,19 @@ Pass::createPShader(const WString _directory, const char* _entry, const char* _s
 }
 
 void
+Pass::createCShader(const Path _directory, const char* _entry, const char* _sModel)
+{
+  m_pCShader->setData(_directory, _entry, _sModel);
+  m_pCShader->compile();
+  g_GraphicAPI().createCShader(m_pCShader);
+}
+
+void
 Pass::compileShaders()
 {
-  m_pVShader->compile();
-  m_pPShader->compile();
+  if (m_pVShader) { m_pVShader->compile(); }
+  if (m_pPShader) { m_pPShader->compile(); }
+  if (m_pCShader) { m_pCShader->compile(); }
 }
 
 // to do: properly link passes with the textures
@@ -93,17 +111,22 @@ Pass::beginPass(Color _color)
   // set input layout of shader
   api.setInputLayout(getInputLayout());
   // set the shaders
-  api.setVSShader(getVShader());
-  api.setPSShader(getPShader());
+  api.setVShader(getVShader());
+  api.setPShader(getPShader());
+  api.setCShader(getCShader());
   // set resources
   for (uint32 i = 0; i < m_inputTex.size(); ++i) {
     api.pSSetShaderResourceView(m_inputTex[i], i);
+  }
+  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
+    api.cSSetShaderResourceView(m_uavTex[i], i, 1);
   }
   // set the sampler state
   api.setSampler(getSamplerState());
   // set constant buffers
   api.pSSetConstantBuffers(getCBuffers());
   api.vSSetConstantBuffers(getCBuffers());
+  api.cSSetConstantBuffers(getCBuffers());
 }
 
 void
@@ -118,15 +141,20 @@ Pass::endPass()
   }
   api.setRenderTargets(nullTargets);
   api.setInputLayout(nullptr);
-  api.setVSShader(nullptr);
-  api.setPSShader(nullptr);
+  api.setVShader(nullptr);
+  api.setPShader(nullptr);
+  api.setCShader(nullptr);
   for (uint32 i = 0; i < m_inputTex.size(); ++i) {
     api.pSSetShaderResourceView(nullptr, i);
+  }
+  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
+    api.cSSetShaderResourceView(nullptr, i, 1);
   }
   api.setSampler(nullptr);
   Vector<SPtr<ConstantBuffer>> vector = { nullptr };
   api.vSSetConstantBuffers(vector);
   api.pSSetConstantBuffers(vector);
+  api.cSSetConstantBuffers(vector);
 }
 
 void

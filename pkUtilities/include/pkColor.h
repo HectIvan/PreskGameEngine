@@ -34,7 +34,6 @@ struct PK_UTILITY_EXPORT Color final
     _color.G = g;
     _color.B = b;
     _color.A = a;
-
   }
   Color(const Color& other)
   {

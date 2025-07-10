@@ -44,14 +44,17 @@ namespace pkEngineSDK
 
 struct PassDesc
 {
-  WString vSDirectory;
-  WString pSDirectory;
+  Path vSDirectory;
+  Path pSDirectory;
+  Path cSDirectory;
 
   const char* vSEntry;
   const char* pSEntry;
+  const char* cSEntry;
 
   const char* vSModel;
   const char* pSModel;
+  const char* cSModel;
 
   SAM_STATE_ADRESS::E samAdress;
   SAM_STATE_FILTERS::E samFilters;

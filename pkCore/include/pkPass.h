@@ -24,8 +24,6 @@
 namespace pkEngineSDK
 {
 
-// class Shader;
-
 class Pass
 {
 public:
@@ -56,15 +54,30 @@ public:
 
   /**
    * @brief Create the vertex shader.
+   * @param _directory Directory of the shader.
+   * @param _entry Name of function to execute.
+   * @param _sModel Shader model.
    */
   void
-  createVShader(const WString _directory, const char* _entry, const char* _sModel);
+  createVShader(const Path _directory, const char* _entry, const char* _sModel);
 
   /**
    * @brief Create the pixel shader.
+   * @param _directory Directory of the shader.
+   * @param _entry Name of function to execute.
+   * @param _sModel Shader model.
    */
   void
-  createPShader(const WString _directory, const char* _entry, const char* _sModel);
+  createPShader(const Path _directory, const char* _entry, const char* _sModel);
+
+  /**
+   * @brief Create the compute shader.
+   * @param _directory Directory of the shader.
+   * @param _entry Name of function to execute.
+   * @param _sModel Shader model.
+   */
+  void
+  createCShader(const Path _directory, const char* _entry, const char* _sModel);
 
   /**
    * @brief Compile both pixel and vertex shaders;
@@ -85,6 +98,13 @@ public:
    */
   SPtr<Shader>&
   getPShader() { return m_pPShader; }
+
+  /**
+   * @brief Get the compute shader.
+   * @return The pointer to the compute shader.
+   */
+  SPtr<Shader>&
+  getCShader() { return m_pCShader; }
 
   /**
    * @brief Get the constant buffer vector.
@@ -120,24 +140,26 @@ public:
    * @param _color Color to clear with.
    */
   void
-  clearRenderTargets(Color _color = Color(1.0f, 1.0f, 1.0f, 0.0f));
+  clearRenderTargets(Color _color = Color(1, 1, 1, 0));
 
  private:
   /**
    * Shader pointers
    */
-  SPtr<Shader> m_pVShader;
-  SPtr<Shader> m_pPShader;
+  SPtr<Shader> m_pVShader = nullptr;
+  SPtr<Shader> m_pPShader = nullptr;
+  SPtr<Shader> m_pCShader = nullptr;
 
-  SPtr<InputLayout> m_pInputLayout;
-  SPtr<SamplerState> m_pSamplerState;
+  SPtr<InputLayout> m_pInputLayout = nullptr;
+  SPtr<SamplerState> m_pSamplerState = nullptr;
 
   // constant buffers for the shaders.
   Vector<SPtr<ConstantBuffer>> m_cBuffers;
 
   // input and output textures of the pass
   Vector<SPtr<Texture>> m_inputTex;
-  SPtr<Texture> m_depthTex;
   Vector<SPtr<Texture>> m_outputTex;
+  Vector<SPtr<Texture>> m_uavTex;
+  SPtr<Texture> m_depthTex;
 };
 }

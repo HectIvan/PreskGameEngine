@@ -4,6 +4,12 @@
 
 namespace pkEngineSDK
 {
+void
+Camera::init(const CameraDesc& _desc)
+{
+  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.at,
+       _desc.up, _desc.camMode);
+}
 
 void
 Camera::init(uint32 _width,
@@ -16,8 +22,9 @@ Camera::init(uint32 _width,
              Vector3 _up,
              CAMERA_PROJ::E _camMode)
 {
-  m_width = _width;
-  m_height = _height;
+  // creation parameters
+  m_descriptor = CameraDesc(_width, _height, _halfFOV, _nearZ,
+                            _farZ, _eye, _at, _up, _camMode);
   m_eye = Vector4(_eye, 1.0f);
   m_at = Vector4(_at, 0.0f);
   m_up = _up;
@@ -25,6 +32,7 @@ Camera::init(uint32 _width,
   m_right = Vector3::RIGHT;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
   m_farNear = Vector2(_farZ, _nearZ);
+  m_projType = _camMode;
   if (_camMode == CAMERA_PROJ::kPerspective) {
     m_projection = Matrix4::perspectiveFOVLH(_halfFOV,
                                              static_cast<float>(_width),

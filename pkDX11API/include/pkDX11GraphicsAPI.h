@@ -100,16 +100,30 @@ class DX11GraphicsAPI : public GraphicsAPI
   createPShader(SPtr<Shader> _pShader) override;
 
   /**
+   * @brief Create a compute shader.
+   * @return Compute shader.
+   */
+  SPtr<Shader>
+  createCShader(SPtr<Shader> _pShader) override;
+
+  /**
    * @brief Set the vertex shader to the device context.
    */
   void
-  setVSShader(SPtr<Shader> _pShader) override;
+  setVShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
    */
   void
-  setPSShader(SPtr<Shader> _pShader) override;
+  setPShader(SPtr<Shader> _pShader) override;
+
+  /**
+   * @brief Set a compute shader.
+   * @return Compute shader.
+   */
+  void
+  setCShader(SPtr<Shader> _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -119,7 +133,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @return Data blob.
    */
   void **
-  compileShaderFromFile(WString _szFileName,
+  compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
                         const char* _szShaderModel) override;
 

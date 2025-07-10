@@ -19,6 +19,7 @@
 #include "pkPrerequisitesCore.h"
 
 using pkEngineSDK::Camera;
+using pkEngineSDK::CameraDesc;
 using pkEngineSDK::COMPONENT_TYPE::kCamera;
 using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
@@ -37,7 +38,6 @@ using pkEngineSDK::Vector4;
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
   Inspect(_pActor);
-  
 }
 
 void
@@ -67,9 +67,28 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   {
   case kCamera:
   {
+    bool isChanged = false;
     SPtr<Camera> cam = reinterpret_pointer_cast<Camera>(_pComponent);
+    CameraDesc cDesc(cam->m_descriptor);
     im.createText("Camera");
-    im.createInputVector4Clamp("Eye", cam->m_eye, -9999999.9f, 9999999.9f);
+    // parameter change
+    if (im.createInputF("Half FOV", cDesc.halfFOV)) {
+      isChanged = true;
+    }
+    if (im.createInputF("Near", cDesc.nearZ)) {
+      isChanged = true;
+    }
+    if (im.createInputF("Far", cDesc.farZ)) {
+      isChanged = true;
+    }
+    // initialize the camera with the new parameters
+    if (isChanged) {
+      cDesc.eye = cam->m_eye.xyz();
+      cDesc.at = cam->m_at.xyz();
+      cDesc.up = Vector3::UP;
+      cam->init(cDesc);
+    }
+    im.createText("Projection");
     break;
   }
   case kLight:

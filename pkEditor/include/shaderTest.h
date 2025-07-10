@@ -102,4 +102,6 @@ class ShaderTest : public BaseApp
   // camera sensitivity
   float m_sensX;
   float m_sensY;
+  // camera movement speed
+  float m_cameraSpeed;
 };

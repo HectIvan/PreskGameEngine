@@ -102,7 +102,7 @@ Vector3
 UInterface::createInputVector3Ret(const char* _name, Vector3 _param)
 {
   float v[3] = { _param.x, _param.y, _param.z };
-  bool change = ImGui::InputFloat3(_name, v);
+  ImGui::InputFloat3(_name, v);
   _param.x = v[0];
   _param.y = v[1];
   _param.z = v[2];

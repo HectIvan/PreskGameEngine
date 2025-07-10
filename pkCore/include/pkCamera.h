@@ -41,11 +41,44 @@ namespace CAMERA_PROJ
   };
 }
 
+struct CameraDesc
+{
+  CameraDesc() = default;
+  CameraDesc(uint32 _width, uint32 _height, float _halfFOV, float _nearZ, float _farZ,
+             Vector3 _eye, Vector3 _at, Vector3 _up, CAMERA_PROJ::E _camMode) {
+    width = _width;
+    height = _height;
+    halfFOV = _halfFOV;
+    nearZ = _nearZ;
+    farZ = _farZ;
+    eye = _eye;
+    at = _at;
+    up = _up;
+    camMode = _camMode;
+  }
+  uint32 width;
+  uint32 height;
+  float halfFOV;
+  float nearZ;
+  float farZ;
+  Vector3 eye;
+  Vector3 at;
+  Vector3 up;
+  CAMERA_PROJ::E camMode;
+};
+
 class PK_CORE_EXPORT Camera : public Component
 {
  public:
   Camera() = default;
   virtual ~Camera() = default;
+
+  /**
+   * @brief Initialize the camera based on a descriptor.
+   * @param _desc Descriptor to use.
+   */
+  void
+  init(const CameraDesc& _desc);
 
   /**
    * @brief Initialize the camera.
@@ -210,6 +243,8 @@ class PK_CORE_EXPORT Camera : public Component
   Matrix4 m_projection;
   uint32 m_width;
   uint32 m_height;
+  CAMERA_PROJ::E m_projType;
+  CameraDesc m_descriptor;
 
   // Camera position
   Vector4 m_eye;

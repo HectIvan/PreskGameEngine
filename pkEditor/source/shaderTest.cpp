@@ -90,10 +90,7 @@ ShaderTest::onInit()
   ResourceManager& resourceMan = g_ResourceManager().instance();
 
   // create camera
-  m_baseCamSpeed = 20.0f;
-  m_cameraSpeed = m_baseCamSpeed;
-  m_maxCamSpeed = 200.0f;
-  m_camAccelerate = 30.0f;
+  m_cameraSpeed = 20.0f;
   m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
@@ -181,9 +178,7 @@ ShaderTest::input()
 {
   EventQueue& eventQueue = g_eventManager().instance();
   float deltaTime = g_TimeManager().m_deltaTime;
-  // update the camera m_speed
-  m_cameraSpeed += m_camAccelerate * deltaTime * eventQueue.scrollWheel;
-  m_cameraSpeed = Math::clamp(m_cameraSpeed, 0.0f, m_maxCamSpeed);
+  // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused) {
@@ -295,10 +290,9 @@ ShaderTest::uInterfaceUpdate()
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Camera");
-  im.createSliderF("Camera Acceleration", m_camAccelerate, 0.0f, m_maxCamSpeed);
-  im.createText(camSpeed.c_str());
-  im.createInputF("X Sensitivity", m_sensX);
-  im.createInputF("Y Sensitivity", m_sensY);
+  im.createInputF("Speed", m_cameraSpeed);
+  im.createInputF("X Sensitivity", m_sensX, 1.0f, 10.0f);
+  im.createInputF("Y Sensitivity", m_sensY, 1.0f, 10.0f);
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //

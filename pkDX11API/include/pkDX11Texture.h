@@ -34,9 +34,10 @@ class DX11Texture : public Texture
   {}
   virtual ~DX11Texture()
   {
-    safeRelease(m_srv);
+    safeRelease(m_sRV);
     safeRelease(m_dSV);
     safeRelease(m_rTV);
+    safeRelease(m_uAV);
     if (m_owner) { safeRelease(m_t2d); }
   }
 
@@ -59,14 +60,28 @@ class DX11Texture : public Texture
    * @return Pointer to the resource.
    */
   ID3D11ShaderResourceView*
-  getSRV() const { return m_srv; }
+  getSRV() const { return m_sRV; }
 
   /**
    * @brief Set the shader resource view.
-   * @param _srv New shader resource view.
+   * @param _sRV New shader resource view.
    */
   void
-  setSRV(ID3D11ShaderResourceView* _srv) { m_srv = _srv; }
+  setSRV(ID3D11ShaderResourceView* _sRV) { m_sRV = _sRV; }
+
+  /**
+   * @brief Get the unordered access view.
+   * @return Pointer to the view.
+   */
+  ID3D11UnorderedAccessView*
+  getUAV() const { return m_uAV; }
+
+  /**
+   * @brief Set the unordered access view.
+   * @param _sRV New unordered access view.
+   */
+  void
+  setUAV(ID3D11UnorderedAccessView* _uAV) { m_uAV = _uAV; }
 
  public:
   ID3D11Texture2D* m_t2d = nullptr;
@@ -75,7 +90,9 @@ class DX11Texture : public Texture
 
   ID3D11DepthStencilView* m_dSV;
 
-  ID3D11ShaderResourceView* m_srv;
+  ID3D11ShaderResourceView* m_sRV;
+
+  ID3D11UnorderedAccessView* m_uAV;
 
   bool m_owner = true;
 };

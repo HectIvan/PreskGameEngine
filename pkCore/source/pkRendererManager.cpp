@@ -69,6 +69,15 @@ void RendererManager::init()
   // light depth buffer
   SPtr<Texture> shadowDepth = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Shadow, shadowDepth });
+
+  // ---------------------------------------------------------- //
+  // UNORDERED ACCESS VIEWS
+  // ---------------------------------------------------------- //
+  txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
+  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  SPtr<Texture> testUAV = api.createTexture(txDesc);
+  m_uavBuffers.insert({ UAV_BUFFERS::kDB_Test, testUAV });
   
   // create the passes needed
   createPasses();
@@ -81,8 +90,8 @@ RendererManager::createPasses()
    * Create the base pass.
    ***************************************************************************/
   PassDesc pDesc = PassDesc();
-  pDesc.vSDirectory = L"shaders/pkVShader.hlsl";
-  pDesc.pSDirectory = L"shaders/pkPShader.hlsl";
+  pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
   pDesc.vSEntry = "VS";
   pDesc.pSEntry = "PS";
   pDesc.vSModel = "vs_5_0";
@@ -122,8 +131,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Quad pass
    ***************************************************************************/
-  pDesc.vSDirectory = L"shaders/pkQuadShader.hlsl";
-  pDesc.pSDirectory = L"shaders/pkShadowMapping.hlsl";
+  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Matrix4), sizeof(CBShadowParam) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
@@ -140,7 +149,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkLuminanceQuad.hlsl";
+  pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
   pDesc.cBSizes = { sizeof(CBLuminance) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
@@ -151,7 +160,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Horizontal Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkHBlur.hlsl";
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
@@ -162,7 +171,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Vertical Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkVBlur.hlsl";
+  pDesc.pSDirectory = Path("shaders/pkVBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_HBlurredLuminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_VBlurredLuminance) };
@@ -173,15 +182,36 @@ RendererManager::createPasses()
   /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = L"shaders/pkToneMapQuadShader.hlsl";
+  pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
+  //         pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
+  //         pDesc.cSEntry = "CSMain";
+  //         pDesc.cSModel = "c_5_0";
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
                    getGBuffer(G_BUFFERS::kGB_Shadow) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
-  SPtr<Pass> testPass = make_shared<Pass>(pDesc);
+  SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_Tone, testPass });
+  m_passes.insert({ PASS_TYPE::kP_Tone, tonePass });
+
+  /****************************************************************************
+   * Test for compute shader
+   ***************************************************************************/
+  pDesc.vSDirectory = Path("");
+  pDesc.pSDirectory = Path("");
+  pDesc.vSEntry = "";
+  pDesc.pSEntry = "";
+  pDesc.vSModel = "";
+  pDesc.pSModel = "";
+  pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
+  pDesc.cSEntry = "CSMain";
+  pDesc.cSModel = "cs_5_0";
+  pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
+  SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_TestCompute, testCompute });
+
 }
 
 SPtr<Pass>
@@ -228,6 +258,12 @@ SPtr<Texture>&
 RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
   return m_depthBuffers.find(_type)->second;
+}
+
+SPtr<Texture>&
+RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
+{
+  return m_uavBuffers.find(_type)->second;
 }
 
 void

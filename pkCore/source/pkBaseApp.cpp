@@ -153,6 +153,10 @@ BaseApp::render()
     api.draw(3, 0);
     renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
   }
+
+  renderManager.getPass(PASS_TYPE::kP_TestCompute)->beginPass();
+  api.dispatch(16, 16, 1);
+  renderManager.getPass(PASS_TYPE::kP_TestCompute)->endPass();
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
   // api.draw(3, 0);

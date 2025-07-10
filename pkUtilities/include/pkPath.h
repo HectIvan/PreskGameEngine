@@ -42,6 +42,14 @@ class PK_UTILITY_EXPORT Path
     return m_path;
   }
 
+  FORCEINLINE WString
+  getPathWStr()
+  {
+    WString_Conv<Codecvt_utf8<WCHAR>> converter;
+    WString str = converter.from_bytes(m_path.c_str());
+    return str;
+  }
+
   /**
    * @brief Set the path.
    * @param _path Path to set.
@@ -103,6 +111,19 @@ class PK_UTILITY_EXPORT Path
       return ""; // no directory
     }
     return m_path.substr(0, lastSlash);
+  }
+
+  WString
+  getDirectoryWStr() const
+  {
+    SIZE_T lastSlash = m_path.find_last_of("/\\");
+    if (lastSlash == String::npos) {
+      return L""; // no directory
+    }
+    WString_Conv<Codecvt_utf8<WCHAR>> converter;
+    String path = m_path.substr(0, lastSlash);
+    WString str = converter.from_bytes(path);
+    return str;
   }
 
  protected:

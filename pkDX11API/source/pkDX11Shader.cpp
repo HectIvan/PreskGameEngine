@@ -21,7 +21,7 @@ DX11Shader::compile()
 }
 
 void
-DX11Shader::setData(const WString _directory, const char* _entry, const char* _sModel)
+DX11Shader::setData(const Path _directory, const char* _entry, const char* _sModel)
 {
   m_shaderDirectory = _directory;
   m_sEntryPoint = _entry;

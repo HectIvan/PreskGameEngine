@@ -44,7 +44,7 @@ class DX11Shader : public Shader
    * @param _directory Directory of the shader.
    */
   void
-  setShaderDirectory(const WString _directory) override { m_shaderDirectory = _directory; }
+  setShaderDirectory(const Path _directory) override { m_shaderDirectory = _directory; }
 
   /**
    * @brief Set the entry point of the shader.
@@ -67,13 +67,13 @@ class DX11Shader : public Shader
    * @param _sModel Shader model.
    */
   void
-  setData(const WString _directory, const char* _entry, const char* _sModel) override;
+  setData(const Path _directory, const char* _entry, const char* _sModel) override;
 
   /**
    * @brief get the current shader directory.
    * @return the Shader directory.
    */
-  const WString&
+  const Path&
   getShaderDirectory() override { return m_shaderDirectory; }
 
   /**
@@ -100,7 +100,7 @@ class DX11Shader : public Shader
   /**
    * Data used to compile the shader
    */
-  WString m_shaderDirectory;
+  Path m_shaderDirectory;
 
   const char* m_sEntryPoint;
 

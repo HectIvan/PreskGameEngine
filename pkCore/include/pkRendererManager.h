@@ -52,6 +52,13 @@ namespace D_BUFFERS
   };
 }
 
+namespace UAV_BUFFERS
+{
+  enum E {
+    kDB_Test = 0,
+  };
+}
+
 namespace PASS_TYPE
 {
   enum E {
@@ -63,6 +70,7 @@ namespace PASS_TYPE
     kP_HBlur,
     kP_VBlur,
     kP_Tone,
+    kP_TestCompute,
   };
 }
 
@@ -126,6 +134,14 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   getDepthBuffer(const D_BUFFERS::E _type);
 
   /**
+   * @brief Get a specific unordered view buffer.
+   * @param _type Type of buffer.
+   * @return Pointer to the buffer.
+   */
+  SPtr<Texture>&
+  getUAVBuffer(const UAV_BUFFERS::E _type);
+
+  /**
    * @brief Compile the shaders of all passes.
    */
   void
@@ -164,6 +180,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // render targets
   UMap<G_BUFFERS::E, SPtr<Texture>> m_gBuffers;
   UMap<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
+  UMap<UAV_BUFFERS::E, SPtr<Texture>> m_uavBuffers;
 
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;

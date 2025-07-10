@@ -62,6 +62,7 @@ Pass::Pass(PassDesc& _desc)
   // set input, output and depth
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
+  m_uavTex = _desc.uavs;
   m_depthTex = _desc.pDepth;
 }
 
@@ -115,12 +116,9 @@ Pass::beginPass(Color _color)
   api.setPShader(getPShader());
   api.setCShader(getCShader());
   // set resources
-  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
-    api.pSSetShaderResourceView(m_inputTex[i], i);
-  }
-  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
-    api.cSSetShaderResourceView(m_uavTex[i], i, 1);
-  }
+  api.vSSetShaderResourceViews(m_inputTex);
+  api.pSSetShaderResourceViews(m_inputTex);
+  api.cSSetUnorderedAccessViews(m_uavTex);
   // set the sampler state
   api.setSampler(getSamplerState());
   // set constant buffers
@@ -144,12 +142,10 @@ Pass::endPass()
   api.setVShader(nullptr);
   api.setPShader(nullptr);
   api.setCShader(nullptr);
-  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
-    api.pSSetShaderResourceView(nullptr, i);
-  }
-  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
-    api.cSSetShaderResourceView(nullptr, i, 1);
-  }
+  Vector<SPtr<Texture>> vecTex = { nullptr };
+  api.vSSetShaderResourceViews(vecTex);
+  api.pSSetShaderResourceViews(vecTex);
+  api.cSSetUnorderedAccessViews(vecTex);
   api.setSampler(nullptr);
   Vector<SPtr<ConstantBuffer>> vector = { nullptr };
   api.vSSetConstantBuffers(vector);

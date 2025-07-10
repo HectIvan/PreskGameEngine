@@ -981,74 +981,100 @@ DX11GraphicsAPI::setSampler(SPtr<SamplerState> _pSamLinear,
 }
 
 void
-DX11GraphicsAPI::pSSetShaderResourceView(SPtr<Texture> _pTexture,
-                                         uint32 _start,
-                                         uint32 _numViews)
+DX11GraphicsAPI::pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
 {
-  // cast to a directX texture
-  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
-  // if failed to cast to the texture
-  if (_pTexture && !dxTX) {
-    g_Logger().print("Failed to get a DX Texture in setting of a pixel shader resource");
-    return;
-  }
-  // set the shader resource view 
+  // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a pixel " \
-                     "shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a pixel shader" \
+                     " resource view.");
     return;
   }
-  device->m_pImmediateContext->PSSetShaderResources(_start,
-                                                    _pTexture ? _numViews : 0,
-                                                    _pTexture ? &dxTX->m_sRV : nullptr);
+
+  uint32 count = static_cast<uint32>(_pTextures.size());
+  Vector<ID3D11ShaderResourceView*> vResourceVector(count);
+
+  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+    // Recast to a DirectX Texture
+    auto dxSRV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
+    // set the resource
+    vResourceVector[i] = dxSRV ? dxSRV->m_sRV : nullptr;
+  }
+  device->m_pImmediateContext->PSSetShaderResources(_start, count, vResourceVector.data());
 }
 
 void
-DX11GraphicsAPI::vSSetShaderResourceView(SPtr<Texture> _pTexture,
-                                         uint32 _start,
-                                         uint32 _numViews)
+DX11GraphicsAPI::vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
 {
-  // cast to a directX texture
-  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
-  // if failed to cast to the texture
-  if (_pTexture && !dxTX) {
-    g_Logger().print("Failed to get a DX Texture in setting of a vertex shader resource");
-    return;
-  }
-  // set the shader resource view 
+  // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     g_Logger().print("Failed to utilize the DX device in the setting of a vertex shader" \
                      " resource view.");
     return;
   }
-  device->m_pImmediateContext->VSSetShaderResources(_start,
-                                                    _pTexture ? _numViews : 0,
-                                                    _pTexture ? &dxTX->m_sRV : nullptr);
+
+  uint32 count = static_cast<uint32>(_pTextures.size());
+  Vector<ID3D11ShaderResourceView*> vResourceVector(count);
+
+  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+    // Recast to a DirectX Texture
+    auto dxSRV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
+    // set the resource
+    vResourceVector[i] = dxSRV ? dxSRV->m_sRV : nullptr;
+  }
+  device->m_pImmediateContext->VSSetShaderResources(_start, count, vResourceVector.data());
 }
 
 void
-DX11GraphicsAPI::cSSetShaderResourceView(SPtr<Texture> _pTexture,
-                                         uint32 _start,
-                                         uint32 _numViews)
+DX11GraphicsAPI::cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
 {
-  // cast to a directX texture
-  auto dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
-  // if failed to cast to the texture
-  if (_pTexture && !dxTX) {
-    g_Logger().print("Failed to get a DX Texture in setting of a compute shader resource");
-    return;
-  }
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the setting of a compute shader resource view.");
+    g_Logger().print("Failed to utilize the DX device in the setting of a compute shader" \
+                     " resource view.");
     return;
   }
-  device->m_pImmediateContext->CSSetShaderResources(_start,
-                                                    _pTexture ? _numViews : 0,
-                                                    _pTexture ? &dxTX->m_sRV : nullptr);
+
+  uint32 count = static_cast<uint32>(_pTextures.size());
+  Vector<ID3D11ShaderResourceView*> uavVector(count);
+
+  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+    // Recast to a DirectX Texture
+    auto dxUAV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
+    // set the resource
+    uavVector[i] = dxUAV ? dxUAV->m_sRV : nullptr;
+  }
+  device->m_pImmediateContext->CSSetShaderResources(_start, count, uavVector.data());
+}
+
+void
+DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+                                           uint32 _start,
+                                           uint32* _initialCounts)
+{
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a compute shader" \
+                     " resource view.");
+    return;
+  }
+
+  uint32 count = static_cast<uint32>(_pTextures.size());
+  Vector<ID3D11UnorderedAccessView*> uavVector(count);
+
+  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+    // Recast to a DirectX Texture
+    auto dxUAV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
+    // set the resource
+    uavVector[i] = dxUAV ? dxUAV->m_uAV : nullptr;
+  }
+  device->m_pImmediateContext->CSSetUnorderedAccessViews(_start,
+                                                         count,
+                                                         uavVector.data(),
+                                                         _initialCounts);
 }
 
 // to do: currently, texture loading is taking the old directory from
@@ -1177,7 +1203,6 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     if (FAILED(hr)) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a shader resource view. Error: " + errMsg);
-      return nullptr;
     }
   }
   /**
@@ -1209,7 +1234,6 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     if (!tex->m_dSV) {
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create the depth stencil. Error: " + errMsg);
-      return nullptr;
     }
   }
   /**
@@ -1229,17 +1253,21 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
       String errMsg = g_Logger().getMessageError(hr);
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);
     }
-    /**
-     * Create unordered access
-     */
-    if ((_bindFlags & D3D11_BIND_UNORDERED_ACCESS) == D3D11_BIND_UNORDERED_ACCESS) {
-      D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-      memset(&uavDesc, 0, sizeof(uavDesc));
-      uavDesc.Format = desc.Format;
-      uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-      uavDesc.Texture2D.MipSlice = 0;
+  }
+  /**
+   * Create unordered access
+   */
+  if ((_bindFlags & D3D11_BIND_UNORDERED_ACCESS) == D3D11_BIND_UNORDERED_ACCESS) {
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+    memset(&uavDesc, 0, sizeof(uavDesc));
+    uavDesc.Format = desc.Format;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
 
-      hr = device->m_pd3dDevice->CreateUnorderedAccessView(tex->m_t2d, &uavDesc, &tex->m_uAV);
+    hr = device->m_pd3dDevice->CreateUnorderedAccessView(tex->m_t2d, &uavDesc, &tex->m_uAV);
+    if (FAILED(hr)) {
+      String errMsg = g_Logger().getMessageError(hr);
+      g_Logger().print("Failed to create an unordered access view. Error: " + errMsg);
     }
   }
   return tex;

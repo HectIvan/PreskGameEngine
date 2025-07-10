@@ -62,6 +62,7 @@ struct PassDesc
   Vector<SIZE_T> cBSizes;
   Vector<SPtr<Texture>> inputs;
   Vector<SPtr<Texture>> outputs;
+  Vector<SPtr<Texture>> uavs;
   SPtr<Texture> pDepth;
 };
 }

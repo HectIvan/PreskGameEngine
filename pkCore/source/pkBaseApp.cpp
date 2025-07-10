@@ -154,9 +154,16 @@ BaseApp::render()
     renderManager.getPass(PASS_TYPE::kP_ShadowDef)->endPass();
   }
 
+  // test compute pass
   renderManager.getPass(PASS_TYPE::kP_TestCompute)->beginPass();
-  api.dispatch(16, 16, 1);
+  Vector2 texSize = api.getSwapChain()->getSize();
+  uint32 threadWidth = 16;
+  uint32 threadHeight = 16;
+  uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+  api.dispatch(x, y, 1);
   renderManager.getPass(PASS_TYPE::kP_TestCompute)->endPass();
+
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
   // api.draw(3, 0);

@@ -12,5 +12,5 @@ RWTexture2D<float4> outputTexture : register(u0);
 void CSMain(uint3 DTid : SV_DispatchThreadID)
 {
   // write white for testing
-  outputTexture[DTid.xy] = float4(1, 1, 1, 1);
+  outputTexture[DTid.xy] = float4(0.25, 0.5, 0.75, 1);
 }

@@ -255,31 +255,38 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set a resource to the vertex shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the vertex shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  vSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) override;
+  vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
-   * @brief Set a texture to the resource view of a pixel shader.
-   * @param _pTexture Pointer to the texture.
-   * @param _start In what slot of the pixel shader will the resource be allocated.
-   * @param _numViews The number of resources that will be passed
+   * @brief Set resources to a pixel shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  pSSetShaderResourceView(SPtr<Texture> _pTexture,
-                          uint32 _start = 0,
-                          uint32 _numViews = 1) override;
+  pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
-   * @brief Set a 
+   * @brief Set resources to a compute shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  cSSetShaderResourceView(SPtr<Texture> _pTexture, uint32 _start, uint32 _numViews) override;
+  cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+
+  /**
+   * @brief Set unordered views to a compute shader.
+   * @param _pTextures Textures to set.
+   * @param _start In what slot of the compute shader will the resources be allocated.
+   * @param _initialCounts Array of initial values for append or consume UAVs.
+   */
+  void
+  cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+                            uint32 _start = 0,
+                            uint32* _initialCounts = nullptr) override;
 
   /**
    * @brief Create the device and swap chain.

@@ -42,28 +42,38 @@ class SwapChain
    * @brief Get the back buffer width.
    * @return The buffer width.
    */
-  uint32
+  FORCEINLINE uint32
   getWidth() const { return m_width; }
 
   /**
    * @brief Get the back buffer height.
    * @return The buffer height.
    */
-  uint32
+  FORCEINLINE uint32
   getHeight() const { return m_height; }
+
+  /**
+   * @brief Get the swap chain size.
+   * @return The swap chain size.
+   */
+  FORCEINLINE Vector2
+  getSize() const
+  {
+    return Vector2(static_cast<float>(m_width), static_cast<float>(m_height));
+  }
 
   /**
    * @brief Set the back buffer width.
    * @param _width Width of the buffer.
    */
-  void
+  FORCEINLINE void
   setWidth(uint32 _width) { m_width = _width; }
 
   /**
    * @brief Set the back buffer height.
    * @param _width Height of the buffer.
    */
-  void
+  FORCEINLINE void
   setHeight(uint32 _height) { m_height = _height; }
 
  public:

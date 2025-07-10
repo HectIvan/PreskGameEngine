@@ -207,7 +207,7 @@ RendererManager::createPasses()
   pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
   pDesc.cSEntry = "CSMain";
   pDesc.cSModel = "cs_5_0";
-  pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
+  pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
   SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_TestCompute, testCompute });
@@ -355,11 +355,9 @@ RendererManager::renderModel(Model& _model)
     // get the material
     SPtr<Material> material = _model.meshes[i]->material;
     // set the material textures to the shader
-    api.pSSetShaderResourceView(material->diffuse, 0);
-    api.pSSetShaderResourceView(material->normal, 1);
-    api.pSSetShaderResourceView(material->height, 2);
-    api.pSSetShaderResourceView(material->metallic, 3);
-    api.pSSetShaderResourceView(material->occlusion, 4);
+    Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
+                                       material->metallic, material->occlusion };
+    api.pSSetShaderResourceViews(textures);
     // draw the mesh
     api.drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
                                currentIndexOrigin,

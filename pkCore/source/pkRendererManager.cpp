@@ -207,6 +207,8 @@ RendererManager::createPasses()
   pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
   pDesc.cSEntry = "CSMain";
   pDesc.cSModel = "cs_5_0";
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.outputs = {};
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kDB_Test) };
   SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
   // insert to the passes

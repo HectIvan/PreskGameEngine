@@ -118,6 +118,7 @@ Pass::beginPass(Color _color)
   // set resources
   api.vSSetShaderResourceViews(m_inputTex);
   api.pSSetShaderResourceViews(m_inputTex);
+  api.cSSetShaderResourceViews(m_inputTex);
   api.cSSetUnorderedAccessViews(m_uavTex);
   // set the sampler state
   api.setSampler(getSamplerState());
@@ -145,6 +146,7 @@ Pass::endPass()
   Vector<SPtr<Texture>> vecTex = { nullptr };
   api.vSSetShaderResourceViews(vecTex);
   api.pSSetShaderResourceViews(vecTex);
+  api.cSSetShaderResourceViews(vecTex);
   api.cSSetUnorderedAccessViews(vecTex);
   api.setSampler(nullptr);
   Vector<SPtr<ConstantBuffer>> vector = { nullptr };

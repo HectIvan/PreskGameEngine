@@ -390,7 +390,7 @@ Vector3 PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
 }
 
 Vector3
-PlatformMath::supportPointConvex(Vector3& _direction, Vector<Vector3>& _points)
+PlatformMath::supportPointConvex(Vector3 _direction, Vector<Vector3>& _points)
 {
   Vector3 direction = _direction.normalized();
   // if the points list has nothing

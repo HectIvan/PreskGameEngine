@@ -368,7 +368,7 @@ class PK_UTILITY_EXPORT Vector3
    * @brief Get a Vector3 with random values.
    * @return A random Vector3.
    */
-  Vector3
+  static Vector3
   random();
 
   /**

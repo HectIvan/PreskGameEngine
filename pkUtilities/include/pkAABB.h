@@ -22,15 +22,25 @@
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
 #include "pkMatrix4.h"
+#include "pkFigure.h"
 
 namespace pkEngineSDK {
 
-class PK_UTILITY_EXPORT AABB
+class PK_UTILITY_EXPORT AABB : public Figure
 {
 public:
   AABB() = default;
   ~AABB() = default;
 
+  /**
+   * @brief Get the support point of a shape in a direction.
+   * @param _direction Direction to take the point from.
+   * @return The final support point.
+   */
+  Vector3
+  supportPoint(Vector3& _direction) override;
+
   Matrix4 m_transform;
+  Vector3 m_halfSize;
 };
 }

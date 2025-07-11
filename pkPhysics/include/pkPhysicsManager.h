@@ -127,7 +127,7 @@ class PhysicsManager : public Module<PhysicsManager>
    * @param _info Info of the collision.
    */
   void
-  resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info);
+  resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo& _info);
 };
 PhysicsManager&
 g_physicsManager()

@@ -199,7 +199,7 @@ PhysicsManager::getEffectiveMass(Vector3& _normalHit,
 }
 
 void
-PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info)
+PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo& _info)
 {
   /* ----- Restitution ----- */
   Vector3 r1 = _info.m_contactPoint1 - _rb1.getWorldPosition();
@@ -209,9 +209,9 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
                   - (_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
 
   float v_alongNormal = v_rel.dotProd(_info.m_normalHit);
-  if (v_alongNormal > 0) { return; }  // do not resolve if they separate
+  if (v_alongNormal > 0.0f) { return; }  // do not resolve if they separate
 
-  float impulseNormal = -(1 + getElasticity(_rb1, _rb2)) * v_alongNormal;
+  float impulseNormal = -(1.0f + _rb1.getElasticity(_rb2)) * v_alongNormal;
   impulseNormal /= getEffectiveMass(_info.m_normalHit, _rb1, _rb2, r1, r2);
 
   Vector3 j_normal = _info.m_normalHit * impulseNormal;
@@ -222,7 +222,7 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
 
   /* ----- Recalculare velocity ----- */
   v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
-          - (_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
+          -(_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
 
   v_alongNormal = v_rel.dotProd(_info.m_normalHit);
 
@@ -239,7 +239,8 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
   float impulseIdeal = v_rel.dotProd(d_tan);
   impulseIdeal /= getEffectiveMass(d_tan, _rb1, _rb2, r1, r2);
 
-  float maxFriction = getFriction(_rb1, _rb2) * impulseNormal;
+  float maxFriction = _rb1.getFriction(_rb2, v_tan.normalized(), v_tan.magnitude()) *
+                      impulseNormal;
   float impulseTan = Math::clamp(impulseIdeal, -maxFriction, maxFriction);
 
   Vector3 j_tan = d_tan * impulseTan;
@@ -248,5 +249,15 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
   _rb1.applyImpulse(j_tan, _info.m_contactPoint1);
   Vector3 j_invTan = j_tan * -1.0f;
   _rb2.applyImpulse(j_invTan, _info.m_contactPoint2);
+
+  /*------------------------ Positional correction ---------------------------*/
+  float percent = 0.2f; // 20 percent overlap
+  float threshold = 0.01f;   // small threshold for collision overlap
+  // vector of difference with the normal hit and magnitude needed for it
+  Vector3 correction = _info.m_normalHit *
+                       Math::max(_info.m_penDistance - threshold, 0.0f);
+  // modify world positions for both object
+  _rb1.setWorldPosition(_rb1.getWorldPosition() - correction * _rb1.m_inverseMass);
+  _rb2.setWorldPosition(_rb2.getWorldPosition() + correction * _rb2.m_inverseMass);
 }
 }

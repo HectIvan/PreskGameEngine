@@ -1,4 +1,5 @@
 #include "pkRigidBody.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -9,6 +10,31 @@ RigidBody::getInvInertiaWorld()
   Matrix3 rotationMat = m_transform.getRotation().getMatrix3();
   // to do: work on this to fix it
   return (rotationMat * m_invAngularInertia) * rotationMat.getTransposed();
+}
+
+float
+RigidBody::getFriction(Vector3 _dir, float _magnitude)
+{
+  return ((_dir * _magnitude) * m_frictionCoeff).magnitude();
+}
+
+float
+RigidBody::getFriction(Vector3 _vector)
+{
+  return getFriction(_vector.normalized(), _vector.magnitude());
+}
+
+float
+RigidBody::getFriction(RigidBody& _rb, Vector3 _dir, float _magnitude)
+{
+  float mergedFrictCoeff = (m_frictionCoeff + _rb.m_frictionCoeff) * 0.5f;
+  return ((_dir) *mergedFrictCoeff).magnitude();
+}
+
+float
+RigidBody::getElasticity(RigidBody& _rb)
+{
+  return (m_elasticity + _rb.getElasticity()) * 0.5f;
 }
 
 void

@@ -36,10 +36,59 @@ class RigidBody
   getWorldPosition() { return m_position; }
 
   /**
+   * @brief Set the rigid body world position.
+   * @param _position New position.
+   */
+  FORCEINLINE void
+  setWorldPosition(Vector3 _position) { m_position = _position; }
+
+  /**
    * @brief Get the inverse inertia world.
    */
   Matrix3
   getInvInertiaWorld();
+
+  /**
+   * @brief Get the friction of the body on a direction and force.
+   * @param _dir direction of the force.
+   * @param _magnitude Magnitude of the force
+   * @return Final friction;
+   */
+  float
+  getFriction(Vector3 _dir, float _magnitude);
+
+  /**
+   * @brief Get the friction of the body with a vector.
+   * @param _vector Vector to use.
+   * @return Final friction.
+   */
+  float
+  getFriction(Vector3 _vector);
+
+  /**
+   * @brief Calculate the friction between 2 RigidBodies.
+   * @param _rb Other RigidBody.
+   * @param _dir Direction of the object.
+   * @param _magnitude Magnitude of the force.
+   * @return Final friction
+   */
+  float 
+  getFriction(RigidBody& _rb, Vector3 _dir, float _magnitude);
+
+  /**
+   * @brief Get the body elasticity.
+   * @return Elasticity.
+   */
+  FORCEINLINE float
+  getElasticity() { return m_elasticity; }
+
+  /**
+   * @brief Get the elasticity between 2 RigidBodies.
+   * @param _rb Other RigidBody
+   * @return Final elasticity.
+   */
+  float
+  getElasticity(RigidBody& _rb);
 
   /**
    * @brief Apply impulse to the rigid body
@@ -60,7 +109,10 @@ class RigidBody
  public:
   float m_drag;
   float m_gravity;
+  float m_mass;
   float m_inverseMass;
+  float m_frictionCoeff;
+  float m_elasticity;
   Vector3 m_linearVelocity;
   Vector3 m_angularVelocity;
   Vector3 m_invAngularInertia;

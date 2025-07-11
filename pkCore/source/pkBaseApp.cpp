@@ -174,9 +174,9 @@ BaseApp::render()
   }
 
   // render the skybox
-  //        skyBoxPass->beginPass();
-  //        api.draw(36, 0);
-  //        skyBoxPass->endPass();
+  //skyBoxPass->beginPass();
+  //api.draw(36, 0);
+  //skyBoxPass->endPass();
 
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();

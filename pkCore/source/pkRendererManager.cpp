@@ -200,14 +200,10 @@ RendererManager::createPasses()
    ***************************************************************************/
   SPtr<Texture> skyboxTex = tm.loadTexture(Path("textures/skybox.hdr"));
   pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
-  //         pDesc.cSDirectory = Path("shaders/pkCShaderTest.hlsl");
-  //         pDesc.cSEntry = "CSMain";
-  //         pDesc.cSModel = "c_5_0";
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
-                   getUAVBuffer(UAV_BUFFERS::kDB_Test),
-                   skyboxTex };
+                   getUAVBuffer(UAV_BUFFERS::kDB_Test) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
   // insert to the passes

@@ -1183,7 +1183,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                              width,
                                              height,
                                              _format,
-                                             0,
+                                             PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
                                              _mipLevels,
                                              _format,
@@ -1226,8 +1226,9 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   }
 
   // how wide each line of the texture will be
-  bpp = 4;
-  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  bpp = channels * sizeof(float);
+  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
+  if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTexture(bpp,

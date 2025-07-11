@@ -164,7 +164,9 @@ public:
   SPtr<Shader> m_pCShader = nullptr;
 
   SPtr<InputLayout> m_pInputLayout = nullptr;
+  // states
   SPtr<SamplerState> m_pSamplerState = nullptr;
+  SPtr<RasterizerState> m_pRasterizerState = nullptr;
 
   // constant buffers for the shaders.
   Vector<SPtr<ConstantBuffer>> m_cBuffers;

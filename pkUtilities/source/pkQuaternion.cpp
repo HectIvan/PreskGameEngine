@@ -39,5 +39,4 @@ Quaternion::normalize()
   z *= mag;
   w *= mag;
 }
-
 }

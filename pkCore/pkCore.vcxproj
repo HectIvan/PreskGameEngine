@@ -200,6 +200,7 @@
     <ClInclude Include="include\pkPass.h" />
     <ClInclude Include="include\pkPassDesc.h" />
     <ClInclude Include="include\pkPrerequisitesCore.h" />
+    <ClInclude Include="include\pkRasterizerState.h" />
     <ClInclude Include="include\pkRendererManager.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
     <ClInclude Include="include\pkResourceManager.h" />

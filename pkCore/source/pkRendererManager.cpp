@@ -89,6 +89,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
+  // pass description
   PassDesc pDesc = PassDesc();
   pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
@@ -104,6 +105,13 @@ RendererManager::createPasses()
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal),
                     getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
+  // rasterizer state
+  pDesc.rSExists = true;
+  pDesc.rSCullMode = RS_CULL_MODE::kPK_CULL_NONE;
+  pDesc.rSFillMode = RS_FILL_MODE::kPK_FILL_SOLID;
+  pDesc.rSFrontCounterClockwise = false;
+  pDesc.rSDepthClipEnable = true;
+  // make the pass
   SPtr<Pass> basePass = make_shared<Pass>(pDesc);
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Base, basePass });
@@ -116,6 +124,9 @@ RendererManager::createPasses()
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Shadow);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
+
+  // cancel rasterizer pass
+  pDesc.rSExists = false;
 
   /****************************************************************************
    * Ambient Occlussion Pass

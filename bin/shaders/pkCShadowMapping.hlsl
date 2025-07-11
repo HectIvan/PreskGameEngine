@@ -107,7 +107,7 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
   
-  float3 normal = normalTex.xyz;
+  float3 normal = normalize(normalTex.xyz);
   
   // get world position from depth map
   float3 worldPos = WorldPosFromDepth(DTid.xy, depthTex.r);

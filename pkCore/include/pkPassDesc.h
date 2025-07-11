@@ -19,6 +19,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkRasterizerState.h"
 #include "pkTexture.h"
 #include "pkSamplerState.h"
 
@@ -58,6 +59,13 @@ struct PassDesc
 
   SAM_STATE_ADRESS::E samAdress;
   SAM_STATE_FILTERS::E samFilters;
+
+  // rasterizer state
+  bool rSExists;
+  RS_CULL_MODE::E rSCullMode;
+  RS_FILL_MODE::E rSFillMode;
+  bool rSFrontCounterClockwise;
+  bool rSDepthClipEnable;
 
   Vector<SIZE_T> cBSizes;
   Vector<SPtr<Texture>> inputs;

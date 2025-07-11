@@ -59,6 +59,16 @@ Pass::Pass(PassDesc& _desc)
   for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
     m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
   }
+  if (_desc.rSExists) {
+    // rasterizer state
+    RASTERIZER_DESC rDesc = {};
+    rDesc.fillMode = _desc.rSFillMode;
+    rDesc.cullMode = _desc.rSCullMode;
+    rDesc.frontCounterClockwise = _desc.rSFrontCounterClockwise;
+    rDesc.depthClipEnable = _desc.rSDepthClipEnable;
+    // create the rasterizer state
+    m_pRasterizerState = api.createRasterizerState(rDesc);
+  }
   // set input, output and depth
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
@@ -126,6 +136,8 @@ Pass::beginPass(Color _color)
   api.pSSetConstantBuffers(getCBuffers());
   api.vSSetConstantBuffers(getCBuffers());
   api.cSSetConstantBuffers(getCBuffers());
+  // set the rasterizer state
+  api.setRasterizerState(m_pRasterizerState);
 }
 
 void
@@ -153,5 +165,6 @@ Pass::endPass()
   api.vSSetConstantBuffers(vector);
   api.pSSetConstantBuffers(vector);
   api.cSSetConstantBuffers(vector);
+  api.setRasterizerState(nullptr);
 }
 }

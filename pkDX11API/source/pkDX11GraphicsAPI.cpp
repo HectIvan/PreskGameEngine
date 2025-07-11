@@ -24,6 +24,7 @@
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11PixelShader.h"
 #include "pkDX11Prerequisites.h"
+#include "pkDX11RasterizerState.h"
 #include "pkDX11RenderTargetView.h"
 #include "pkDX11SamplerState.h"
 #include "pkDX11SwapChain.h"
@@ -94,10 +95,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            numFeatureLevels);
 
   setViewport(width, height);
-  // uint32 vpX = static_cast<uint32>(getViewportSize(1).x);
-  // uint32 vpY = static_cast<uint32>(getViewportSize(1).y);
 
-  // create the render targets
+  // create the swap chain
   auto dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
   dxSCh->createRenderTargetView(m_pDevice);
   
@@ -646,6 +645,35 @@ DX11GraphicsAPI::createBlendState()
   return pBlendState;
 }
 
+SPtr<RasterizerState>
+DX11GraphicsAPI::createRasterizerState(RASTERIZER_DESC& _desc)
+{
+  // create the rasterizer state
+  SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
+  dxRS->m_pRasterizer = nullptr;
+  // rasterizer description for directx
+  D3D11_RASTERIZER_DESC rDesc = {};
+  rDesc.FillMode = static_cast<D3D11_FILL_MODE>(_desc.fillMode);
+  rDesc.CullMode = static_cast<D3D11_CULL_MODE>(_desc.cullMode);
+  rDesc.FrontCounterClockwise = _desc.frontCounterClockwise;
+  rDesc.DepthClipEnable = _desc.depthClipEnable;
+
+  // Create the rasterizer state.
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the creation of a rasterizer state.");
+    return nullptr;
+  }
+
+  HRESULT hr = device->m_pd3dDevice->CreateRasterizerState(&rDesc, &dxRS->m_pRasterizer);
+  if (FAILED(hr)) {
+    String errMsg = g_Logger().getMessageError(hr);
+    g_Logger().print("Failed to create rasterizer state. Error: " + errMsg);
+    return nullptr;
+  }
+  return dxRS;
+}
+
 void
 DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
 {
@@ -664,6 +692,22 @@ DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
     return;
   }
   device->m_pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
+}
+
+void
+DX11GraphicsAPI::setRasterizerState(SPtr<RasterizerState> _pRasterizerState)
+{
+  PK_ASSERT(m_pDevice);
+  // Reinterpret to a DirectX Rasterizer State
+  SPtr<DX11RasterizerState> dxRS =
+       reinterpret_pointer_cast<DX11RasterizerState>(_pRasterizerState);
+  // Set the rasterizer state
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a Rasterizer state.");
+    return;
+  }
+  device->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
 }
 
 void**

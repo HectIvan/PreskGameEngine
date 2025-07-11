@@ -72,11 +72,26 @@ class DX11GraphicsAPI : public GraphicsAPI
   createBlendState() override;
 
   /**
+   * @brief Create the Rasterizer state.
+   * @param _desc Rasterizer description.
+   * @return Rasterizer state pointer.
+   */
+  SPtr<RasterizerState>
+  createRasterizerState(RASTERIZER_DESC& _desc) override;
+
+  /**
    * @brief Set the blend state.
    * @param _pBlendState Blend state to set.
    */
   void
   setBlendState(SPtr<BlendState> _pBlendState) override;
+
+  /**
+   * @brief Set the rasterizer state.
+   * @param _pRasterizerState Rasterizer state to set.
+   */
+  void
+  setRasterizerState(SPtr<RasterizerState> _pRasterizerState) override;
 
   /**
    * @brief Creates a shader of the specific graphic API.

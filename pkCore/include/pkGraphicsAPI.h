@@ -23,6 +23,7 @@
 #include "pkModule.h"
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
+#include "pkRasterizerState.h"
 #include "pkRenderTargetView.h"
 #include "pkTexture.h"
 #include "pkSwapChain.h"
@@ -40,7 +41,7 @@ class VertexBuffer;
 
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
-public:
+ public:
   GraphicsAPI() = default;
   virtual ~GraphicsAPI() = default;
 
@@ -73,6 +74,21 @@ public:
    */
   virtual SPtr<BlendState>
   createBlendState() = 0;
+
+  /**
+   * @brief Create the Rasterizer state.
+   * @param _desc Rasterizer description.
+   * @return Rasterizer state pointer.
+   */
+  virtual SPtr<RasterizerState>
+  createRasterizerState(RASTERIZER_DESC& _desc) = 0;
+
+  /**
+   * @brief Set the rasterizer state.
+   * @param _pRasterizerState Rasterizer state to set.
+   */
+  virtual void
+  setRasterizerState(SPtr<RasterizerState> _pRasterizerState) = 0;
 
   /**
    * @brief Set the blend state.

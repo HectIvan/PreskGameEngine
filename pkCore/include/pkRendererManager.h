@@ -41,6 +41,7 @@ namespace G_BUFFERS
     kGB_Metallic,
     kGB_HBlurredLuminance,
     kGB_VBlurredLuminance,
+    kGB_Skybox,
   };
 };
 
@@ -71,6 +72,7 @@ namespace PASS_TYPE
     kP_VBlur,
     kP_Tone,
     kP_CShadows, // compute shadows
+    kP_SkyBox,
   };
 }
 

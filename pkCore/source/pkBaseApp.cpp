@@ -24,6 +24,7 @@ using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_VBlur;
 
@@ -137,6 +138,7 @@ BaseApp::render()
   SPtr<Pass> hBlurPass = renderManager.getPass(kP_HBlur);
   SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
+  //        SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
 
   // first shadow pass
   if (m_shadows) {
@@ -170,6 +172,11 @@ BaseApp::render()
     api.dispatch(x, y, 1);
     pCShadowPass->endPass();
   }
+
+  // render the skybox
+  //        skyBoxPass->beginPass();
+  //        api.draw(36, 0);
+  //        skyBoxPass->endPass();
 
   // vertical blur quad pass
   // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();

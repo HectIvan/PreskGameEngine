@@ -47,6 +47,7 @@ using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_VBlur;
 using pkEngineSDK::PKWindowDesc;
@@ -400,6 +401,9 @@ ShaderTest::onUpdate()
   // update the Horizontal/Vertical blur pass buffer
   api.updateConstantBuffer(rm.getPass(kP_HBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
   api.updateConstantBuffer(rm.getPass(kP_VBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
+
+  // skybox constant buffer
+  //        api.updateConstantBuffer(rm.getPass(kP_SkyBox)->getCBuffer(0), &camData, camSize);
 }
 
 void

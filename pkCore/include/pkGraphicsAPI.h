@@ -416,6 +416,18 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                         uint32 _format) = 0;
 
   /**
+   * @brief Create a texture from file as float.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @return Pointer to the texture.
+   */
+  virtual SPtr<Texture>
+  createTextureFromFileF(const Path& _directory,
+                         uint32 _bindFlags,
+                         bool _mipLevels) = 0;
+
+  /**
    * @brief Get the api device.
    * @return The Pointer to the device
    */

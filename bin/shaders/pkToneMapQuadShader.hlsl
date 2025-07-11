@@ -1,6 +1,7 @@
 Texture2D albedoTex : register(t0);
 Texture2D luminanceTex : register(t1);
 Texture2D shadowTex : register(t2);
+Texture2D testSkyboxTex : register(t3);
 
 SamplerState samState : register(s0);
 

@@ -8,14 +8,15 @@
  * @bug    No known bugs.
  */
  /*****************************************************************************/
-#define STB_IMAGE_IMPLEMENTATION
 
 /*********************************************/
 /**
 * Includes
 **/
 /*********************************************/
-#include <stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ENABLE_OPENEXR
+#include "stb_image.h"
 
 #include "pkLogger.h"
 #include "pkDX11BlendState.h"
@@ -1153,7 +1154,6 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
                                                          _initialCounts);
 }
 
-// to do: currently, texture loading is taking the old directory from
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
@@ -1188,6 +1188,57 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                              _mipLevels,
                                              _format,
                                              data);
+
+  // if creating the texture failed
+  if (!temptTexture) {
+    g_Logger().print("Failed to create a texture.");
+    return nullptr;
+  }
+
+  // free the texture data if there's data to release
+  if (data) { stbi_image_free(data); }
+
+  // set the path
+  temptTexture->setName(_fileName);
+
+  // return the texture
+  return temptTexture;
+}
+
+SPtr<Texture>
+DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
+                                        uint32 _bindFlags,
+                                        bool _mipLevels)
+{
+  // values
+  int32 width, height, channels, bpp;
+
+  // load the image data into a storage variable
+  float* data = stbi_loadf(_fileName.toString().c_str(), &width, &height, &channels, 0);
+
+  // check if the texture was found
+  if (!data) {
+    delete data;
+    data = nullptr;
+    g_Logger().print("Can't open " + _fileName.getFileName() + ", unable to open file."
+                     + " Reason: " + stbi_failure_reason());
+    return nullptr;
+  }
+
+  // how wide each line of the texture will be
+  bpp = 4;
+  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+
+  // create a default texture using the received parameters
+  SPtr<Texture> temptTexture = createTexture(bpp,
+                                             width,
+                                             height,
+                                             format,
+                                             PK_USAGE::kPK_USAGE_DEFAULT,
+                                             _bindFlags,
+                                             _mipLevels,
+                                             format,
+                                             reinterpret_cast<unsigned char*>(data));
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -1434,10 +1485,10 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
     return;
   }
   device->m_pImmediateContext->IASetVertexBuffers(_start,
-                                                _bufferCount,
-                                                &dxVB->pBuffer,
-                                                &stride,
-                                                &_offset);
+                                                  _bufferCount,
+                                                  &dxVB->pBuffer,
+                                                  &stride,
+                                                  &_offset);
 }
 
 SPtr<IndexBuffer>

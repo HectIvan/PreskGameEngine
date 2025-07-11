@@ -360,6 +360,18 @@ class DX11GraphicsAPI : public GraphicsAPI
                         uint32 _format) override;
 
   /**
+   * @brief Create a texture from file as float.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @return Pointer to the texture.
+   */
+  SPtr<Texture>
+  createTextureFromFileF(const Path& _directory,
+                         uint32 _bindFlags,
+                         bool _mipLevels) override;
+
+  /**
    * @brief Get the device pointer.
    * @return Return te pointer to the device.
    */

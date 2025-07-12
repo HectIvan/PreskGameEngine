@@ -40,19 +40,22 @@ RigidBody::getElasticity(RigidBody& _rb)
 void
 RigidBody::applyImpulse(const Vector3& _impulse, const Vector3& _point)
 {
-  if (m_inverseMass == 0.0f) { return; }
+  // cannot be moved 
+  if (getInverseMass() == 0.0f) { return; }
 
   Vector3 r = _point - getWorldPosition();
 
-  m_linearVelocity += _impulse * m_inverseMass;
+  m_linearVelocity += _impulse * getInverseMass();
   m_angularVelocity += getInvInertiaWorld() * r.cross(_impulse);
 }
 
 void
-RigidBody::applyPositionalImpulse(const Vector3& impulse, const Vector3& point) {
-  if (m_inverseMass == 0.0f) { return; }
+RigidBody::applyPositionalImpulse(const Vector3& impulse, const Vector3& point)
+{
+  // cannot be moved
+  if (getInverseMass() == 0.0f) { return; }
   Vector3 r = point - getWorldPosition();
-  m_position += impulse * m_inverseMass;
+  m_position += impulse * getInverseMass();
   m_orientation += Quaternion::fromBiVector(getInvInertiaWorld() * r.cross(impulse));
 }
 

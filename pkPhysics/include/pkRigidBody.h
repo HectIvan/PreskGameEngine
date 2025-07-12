@@ -114,11 +114,17 @@ class RigidBody
   integrateRotation(const Vector3& angularAcceleration,
                     float deltaTime);
 
+  /**
+   * @brief Get the inverse mass.
+   * @return 1 / Mass.
+   */
+  FORCEINLINE float
+  getInverseMass() { return 1/m_mass; }
+
  public:
   float m_drag;
   float m_gravity;
   float m_mass;
-  float m_inverseMass;
   float m_frictionCoeff;
   float m_elasticity;
   Vector3 m_linearVelocity;

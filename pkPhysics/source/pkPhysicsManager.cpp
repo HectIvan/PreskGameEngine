@@ -190,12 +190,14 @@ PhysicsManager::getEffectiveMass(Vector3& _normalHit,
                                  Vector3 _contactPoint1,
                                  Vector3 _contactPoint2)
 {
+  // get the rotational resistance.
   Vector3 angularEffect = _rb1.getInvInertiaWorld() *
                           (_contactPoint1.cross(_normalHit)).cross(_contactPoint1)
                           + _rb2.getInvInertiaWorld() *
                           (_contactPoint2.cross(_normalHit)).cross(_contactPoint2);
 
-  return _rb1.m_inverseMass + _rb2.m_inverseMass + angularEffect.dotProd(_normalHit);
+  // uses linear and rotational resistance
+  return _rb1.getInverseMass() + _rb2.getInverseMass() + angularEffect.dotProd(_normalHit);
 }
 
 void
@@ -211,6 +213,7 @@ PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo
   float v_alongNormal = v_rel.dotProd(_info.m_normalHit);
   if (v_alongNormal > 0.0f) { return; }  // do not resolve if they separate
 
+  // get the impulse due to elasticity in between 2 objects
   float impulseNormal = -(1.0f + _rb1.getElasticity(_rb2)) * v_alongNormal;
   impulseNormal /= getEffectiveMass(_info.m_normalHit, _rb1, _rb2, r1, r2);
 
@@ -220,13 +223,8 @@ PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo
   Vector3 j_inNormal = j_normal * -1.0f;
   _rb2.applyImpulse(j_inNormal, _info.m_contactPoint2);
 
-  /* ----- Recalculare velocity ----- */ // doesnt seem to change anything at the moment
-  // v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
-  //         -(_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
-  // 
-  // v_alongNormal = v_rel.dotProd(_info.m_normalHit);
-
   /* ----- Friction (Coulomb model) ----- */
+  // get the pure tangential velocity
   Vector3 v_tan = v_rel - (_info.m_normalHit * v_alongNormal);
   float v_tanMagnitude = v_tan.magnitudeSquare();
   // if the magnitude of the tangent is incredibly small, there is no friction
@@ -239,6 +237,7 @@ PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo
   float impulseIdeal = v_rel.dotProd(d_tan);
   impulseIdeal /= getEffectiveMass(d_tan, _rb1, _rb2, r1, r2);
 
+  // coulomb friction cone
   float maxFriction = _rb1.getFriction(_rb2, v_tan.normalized(), v_tan.magnitude()) *
                       impulseNormal;
   float impulseTan = Math::clamp(impulseIdeal, -maxFriction, maxFriction);
@@ -257,7 +256,7 @@ PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo
   Vector3 correction = _info.m_normalHit *
                        Math::max(_info.m_penDistance - threshold, 0.0f);
   // modify world positions for both object
-  _rb1.setWorldPosition(_rb1.getWorldPosition() - correction * _rb1.m_inverseMass);
-  _rb2.setWorldPosition(_rb2.getWorldPosition() + correction * _rb2.m_inverseMass);
+  _rb1.setWorldPosition(_rb1.getWorldPosition() - correction * _rb1.getInverseMass());
+  _rb2.setWorldPosition(_rb2.getWorldPosition() + correction * _rb2.getInverseMass());
 }
 }

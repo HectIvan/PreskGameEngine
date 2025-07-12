@@ -46,12 +46,13 @@ struct CBTransform
 
 struct CBCamera
 {
-  Vector4 eye;
-  Vector3 forward;
-  Matrix4 view;
-  Matrix4 projection;
-  float unused;
-};
+  Vector4 eye; // 16
+  Vector3 forward; // 12
+  Matrix4 view; // 64
+  Matrix4 projection; // 64
+  float unused; // 4
+  Vector4 _padding; // 12
+}; // 176 bytes
 
 struct CBLight
 {

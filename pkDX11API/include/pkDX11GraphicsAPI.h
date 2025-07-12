@@ -15,6 +15,8 @@
 * Includes
 **/
 /*********************************************/
+#include "DDSTextureLoader.h"
+
 #include "pkDX11ConstantBuffer.h"
 #include "pkDX11DepthStencilView.h"
 #include "pkDX11Device.h"
@@ -186,6 +188,7 @@ class DX11GraphicsAPI : public GraphicsAPI
                 int32 _bindFlags,
                 bool _mipLevels,
                 int32 _shaderResourceFormat,
+                int32 _miscFlags = 0,
                 unsigned char* _data = nullptr) override;
 
   /**
@@ -357,7 +360,11 @@ class DX11GraphicsAPI : public GraphicsAPI
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
-                        uint32 _format) override;
+                        uint32 _format,
+                        int32 _miscFlags = 0) override;
+
+  SPtr<Texture>
+  createDDSTextureFromFile(const Path& _directory) override;
 
   /**
    * @brief Create a texture from file as float.
@@ -369,7 +376,8 @@ class DX11GraphicsAPI : public GraphicsAPI
   SPtr<Texture>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
-                         bool _mipLevels) override;
+                         bool _mipLevels,
+                         int32 _miscFlags = 0) override;
 
   /**
    * @brief Get the device pointer.

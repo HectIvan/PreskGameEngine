@@ -126,7 +126,7 @@ public:
    * @param _color Clear color.
    */
   void
-  beginPass(Color _color = Color(0, 30, 76, 255));
+  beginPass(Color _color = Color(0, 1, 1, 0));
 
   /**
    * @brief Set all parameters to null;

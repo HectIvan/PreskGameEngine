@@ -38,6 +38,7 @@ cbuffer Camera : register(b1)
   float4x4 ViewCam; // 92
   float4x4 ProjectionCam; // 156
   float _unusedCam0; // 160
+  float4 _paddingC;
 }
 
 cbuffer LightCamera : register(b2)
@@ -47,6 +48,7 @@ cbuffer LightCamera : register(b2)
   float4x4 ViewLight; // 92
   float4x4 ProjectionLight; // 156
   float _unusedLightCam0; // 160
+  float4 _paddingL2;
 }
 
 cbuffer CamInvProj : register(b3)
@@ -118,13 +120,21 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float diff = max(dot(lightDir, normal), shadowColor);
   float3 diffuse = lightColor * diff;
   // specular
-  float3 viewDir = normalize(Eye.xyz - worldPos);
+  float3 viewDir = normalize(ForwardCam);
   float spec = 0.0;
   float3 halfwayDir = normalize(lightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), 0.0f), spotExponent);
   float3 specular = lightColor * spec;
-    
+  
   float3 finalColor = diffuse + specular;
   
-  outputTexture[DTid.xy] = float4(finalColor, 1.0f);
+  float alpha = 1.0f;
+
+  // if its the max depth value
+  if (depthTex.r == 1) 
+  {
+    alpha = 0.0f;
+  }
+  
+  outputTexture[DTid.xy] = float4(finalColor, alpha);
 }

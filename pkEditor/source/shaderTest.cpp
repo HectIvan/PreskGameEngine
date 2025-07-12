@@ -100,7 +100,7 @@ ShaderTest::onInit()
                                          m_window.getHeight(),
                                          3.1416f / 4.0f,
                                          0.01f,
-                                         3000.0f,
+                                         5000.0f,
                                          camPos, // position
                                          Vector3::FORWARD + camPos * -1.0f, // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
@@ -355,55 +355,54 @@ ShaderTest::onUpdate()
   uint32 camSize = sizeof(Camera);
   uint32 lightSize = sizeof(Light);
 
+  // get all passes
+  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
+  SPtr<Pass> basePass = rm.getPass(kP_Base);
+  SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
+  SPtr<Pass> hBlurPass = rm.getPass(kP_HBlur);
+  SPtr<Pass> vBlurPass = rm.getPass(kP_VBlur);
+  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
+  SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
+  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+
   // update normal pass buffers
-  api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(0), &view, m4x4Size);
-  api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(1), &proj, m4x4Size);
-  api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(3), &lightData, lightSize);
-  api.updateConstantBuffer(rm.getPass(kP_Base)->getCBuffer(4), &camData, camSize);
+  api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
+  api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
+  api.updateConstantBuffer(basePass->getCBuffer(3), &lightData, lightSize);
+  api.updateConstantBuffer(basePass->getCBuffer(4), &camData, camSize);
 
   // update shadow depth map buffers
   SPtr<Camera> lightCam = light->getComponent<Camera>();
   Matrix4 lightView = lightCam->m_view.getTransposed();
   Matrix4 lightProj = lightCam->m_projection.getTransposed();
-  api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(0), &lightView, m4x4Size);
-  api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(1), &lightProj, m4x4Size);
-  api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(3), &lightData, lightSize);
-  api.updateConstantBuffer(rm.getPass(kP_Shadow)->getCBuffer(4), &lightCam,  camSize);
+  api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
+  api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
+  api.updateConstantBuffer(baseShadow->getCBuffer(3), &lightData, lightSize);
+  api.updateConstantBuffer(baseShadow->getCBuffer(4), &lightCam,  camSize);
 
   // update shadow compute buffers
   // light buffer data
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(0),
-                           &lData,
-                           sizeof(CBLight));
-  // main camera data
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(1), &camData, sizeof(camData));
-  // light camera data
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(2),
-                           &lightCam,
-                           sizeof(Camera));
-  // inverse projection data
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(3),
-                           &invProj,
-                           sizeof(Matrix4));
-  // inverse view data
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(4),
-                           &invView,
-                           sizeof(Matrix4));
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &lData, sizeof(CBLight));
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &camData, camSize);
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &lightCam, camSize);
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
   // get the shadow data needed
   CBShadowParam shadowsParam;
   shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
   shadowsParam.winSize = api.getSwapChain()->getBuffer(0)->getSize();
-  api.updateConstantBuffer(rm.getPass(kP_CShadows)->getCBuffer(5),
-                           &shadowsParam,
-                           sizeof(CBShadowParam));
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+
   // update the luminance pass buffer
-  api.updateConstantBuffer(rm.getPass(kP_Luminance)->getCBuffer(0), &lum, sizeof(CBLuminance));
+  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
   // update the Horizontal/Vertical blur pass buffer
-  api.updateConstantBuffer(rm.getPass(kP_HBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
-  api.updateConstantBuffer(rm.getPass(kP_VBlur)->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 
   // skybox constant buffer
-  //        api.updateConstantBuffer(rm.getPass(kP_SkyBox)->getCBuffer(0), &camData, camSize);
+  Matrix4 transform = Matrix4::IDENTITY;
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &camData, camSize);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
 }
 
 void

@@ -90,7 +90,7 @@ void RendererManager::init()
 void
 RendererManager::createPasses()
 {
-  TextureManager& tm = g_TextureManager().instance();
+  GraphicsAPI& api = g_GraphicAPI().instance();
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -130,9 +130,6 @@ RendererManager::createPasses()
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
-  // cancel rasterizer state
-  pDesc.rSExists = false;
-
   /****************************************************************************
    * Ambient Occlussion Pass
    ***************************************************************************/
@@ -147,25 +144,26 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Quad pass
    ***************************************************************************/
-  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
-  pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
-                    sizeof(Matrix4), sizeof(CBShadowParam) };
-  pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
-                   getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Metallic) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
-  pDesc.pDepth = nullptr;
-  pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
-  SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
-  // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
+  // pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
+  // pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
+  // pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
+  //                   sizeof(Matrix4), sizeof(CBShadowParam) };
+  // pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Shadow),
+  //                  getDepthBuffer(D_BUFFERS::kDB_Base),
+  //                  getGBuffer(G_BUFFERS::kGB_Normal),
+  //                  getGBuffer(G_BUFFERS::kGB_Metallic) };
+  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow) };
+  // pDesc.pDepth = nullptr;
+  // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
+  // SPtr<Pass> shadowDef = make_shared<Pass>(pDesc);
+  // // insert to the passes
+  // m_passes.insert({ PASS_TYPE::kP_ShadowDef, shadowDef });
 
   /****************************************************************************
    * Luminance Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
+  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.cBSizes = { sizeof(CBLuminance) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
@@ -196,29 +194,32 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_VBlur, vBlurPass });
 
   /****************************************************************************
+   * Skybox Quad pass
+   ***************************************************************************/
+  SPtr<Texture> skyboxTex = api.createDDSTextureFromFile(Path("textures/skybox.hdr"));
+  pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
+  pDesc.vSDirectory = Path("shaders/pkSkyboxShader.hlsl");
+  pDesc.cBSizes = { sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
+  pDesc.inputs = { skyboxTex, getDepthBuffer(D_BUFFERS::kDB_Base) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
+  SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
+
+  /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
-  SPtr<Texture> skyboxTex = tm.loadTexture(Path("textures/skybox.hdr"));
   pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
+  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_VBlurredLuminance),
-                   getUAVBuffer(UAV_BUFFERS::kDB_Test) };
+                   getUAVBuffer(UAV_BUFFERS::kDB_Test),
+                   skyboxTex };// getGBuffer(G_BUFFERS::kGB_Skybox) }; //
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, tonePass });
-
-  //        pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
-  //        pDesc.vSDirectory = pDesc.pSDirectory;
-  //        pDesc.pSEntry = "PS";
-  //        pDesc.vSEntry = "VS";
-  //        pDesc.cBSizes = { sizeof(CBCamera) };
-  //        pDesc.inputs = { skyboxTex };
-  //        pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
-  //        SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
-  //        // insert to the passes
-  //        m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
    * Shadow Compute
@@ -243,7 +244,7 @@ RendererManager::createPasses()
   SPtr<Pass> testCompute = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_CShadows, testCompute });
-
+  pDesc.uavs = {};
 }
 
 SPtr<Pass>

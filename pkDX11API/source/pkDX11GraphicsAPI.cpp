@@ -857,7 +857,7 @@ DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
   return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
                        _desc.bindFlags, _desc.mipLevels, _desc.shaderResourceFormat,
-                       _desc.data);
+                       _desc.miscFlags, _desc.data);
 }
 
 SPtr<InputLayout>
@@ -1158,7 +1158,8 @@ SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
                                        bool _mipLevels,
-                                       uint32 _format)
+                                       uint32 _format,
+                                       int32 _miscFlags)
 {
   // values
   int32 width, height, bpp, pitch;
@@ -1187,6 +1188,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                              _bindFlags,
                                              _mipLevels,
                                              _format,
+                                             _miscFlags,
                                              data);
 
   // if creating the texture failed
@@ -1206,15 +1208,38 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 }
 
 SPtr<Texture>
+DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
+{
+  SPtr<DX11Texture> texture = make_shared<DX11Texture>();
+  // set to the device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the creation of a DSS texture.");
+    return nullptr;
+  }
+  uint32 hr = DirectX::CreateDDSTextureFromFile(device->m_pd3dDevice,
+                                                _directory.getDirectoryWStr().c_str(),
+                                                nullptr,
+                                                &texture->m_sRV);
+  if (FAILED(hr)) {
+    String errMsg = g_Logger().getMessageError(hr);
+    g_Logger().print("Failed to create a DSS texture. Error: " + errMsg);
+    return nullptr;
+  }
+  return texture;
+}
+
+SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                         uint32 _bindFlags,
-                                        bool _mipLevels)
+                                        bool _mipLevels,
+                                        int32 _miscFlags)
 {
   // values
   int32 width, height, channels, bpp;
 
   // load the image data into a storage variable
-  float* data = stbi_loadf(_fileName.toString().c_str(), &width, &height, &channels, 0);
+  float* data = stbi_loadf(_fileName.toString().c_str(), &width, &height, &channels, 4);
 
   // check if the texture was found
   if (!data) {
@@ -1226,9 +1251,9 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   }
 
   // how wide each line of the texture will be
-  bpp = channels * sizeof(float);
-  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
-  if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
+  bpp = 4 * sizeof(float);
+  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  // if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTexture(bpp,
@@ -1239,6 +1264,7 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                              _bindFlags,
                                              _mipLevels,
                                              format,
+                                             _miscFlags,
                                              reinterpret_cast<unsigned char*>(data));
 
   // if creating the texture failed
@@ -1266,6 +1292,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                int32 _bindFlags,
                                bool _mipLevels,
                                int32 _shaderResourceFormat,
+                               int32 _miscFlags,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);

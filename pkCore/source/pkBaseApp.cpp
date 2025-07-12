@@ -56,6 +56,11 @@ BaseApp::init(const char** _argv, int32 _count)
 
   g_SceneManager().init();
   g_RenderManager().init();
+
+  SPtr<Actor> skybox = g_SceneManager().getActiveScene()->instantiate("SkyBox");
+  skybox->addComponent(g_ResourceManager().loadModel(Path("models/cube.obj")));
+  skybox->setScale(2000.0f);
+  skybox->setPosition(0.0f, -100.0f, 0.0f);
   onInit();
 }
 
@@ -138,7 +143,7 @@ BaseApp::render()
   SPtr<Pass> hBlurPass = renderManager.getPass(kP_HBlur);
   SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
-  //        SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
+  SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
 
   // first shadow pass
   if (m_shadows) {
@@ -174,14 +179,14 @@ BaseApp::render()
   }
 
   // render the skybox
-  //skyBoxPass->beginPass();
-  //api.draw(36, 0);
-  //skyBoxPass->endPass();
-
-  // vertical blur quad pass
-  // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
-  // api.draw(3, 0);
-  // renderManager.getPass(PASS_TYPE::kP_VBlur)->endPass();
+  skyBoxPass->beginPass();
+  SPtr<Actor> skybox = g_SceneManager().getActiveScene()->actorFind("SkyBox");
+  SPtr<VertexBuffer> vB = skybox->getComponent<Model>()->getVertexBuffer();
+  SPtr<IndexBuffer> iB = skybox->getComponent<Model>()->getIndexBuffer();
+  api.setVertexBuffer(vB);
+  api.setIndexBuffer(iB);
+  api.draw(3, 0);
+  skyBoxPass->endPass();
   // Quad tone map pass
   tonePass->beginPass();
   api.draw(3, 0);

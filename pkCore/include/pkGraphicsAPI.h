@@ -200,6 +200,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                 int32 _bindFlags,
                 bool _mipLevels,
                 int32 _shaderResourceFormat,
+                int32 _miscflags = 0,
                 unsigned char* _data = nullptr) = 0;
 
   /**
@@ -413,7 +414,8 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         bool _mipLevels,
-                        uint32 _format) = 0;
+                        uint32 _format,
+                        int32 _miscFlags = 0) = 0;
 
   /**
    * @brief Create a texture from file as float.
@@ -425,7 +427,11 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual SPtr<Texture>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
-                         bool _mipLevels) = 0;
+                         bool _mipLevels,
+                         int32 _miscFlags = 0) = 0;
+
+  virtual SPtr<Texture>
+  createDDSTextureFromFile(const Path& _directory) = 0;
 
   /**
    * @brief Get the api device.

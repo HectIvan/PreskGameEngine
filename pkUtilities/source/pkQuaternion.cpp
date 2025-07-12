@@ -102,6 +102,15 @@ Quaternion::operator*=(const Quaternion& _quat)
   return *this;
 }
 
+void
+Quaternion::operator+=(const Quaternion& _quat)
+{
+  w += _quat.w;
+  x += _quat.x;
+  y += _quat.y;
+  z += _quat.z;
+}
+
 inline Quaternion
 Quaternion::rotate(const Quaternion& _quat) const
 {
@@ -148,4 +157,51 @@ Quaternion::normalized()
   return newQuat;
 }
 
+Quaternion
+Quaternion::expMap(const Vector3& _vector) {
+  float angle = Math::sqrt(_vector.x * _vector.x +
+                           _vector.y * _vector.y +
+                           _vector.z * _vector.z);
+
+  if (angle < Math::SMALL_NUMBER) {
+    // Small-angle approximation
+    return Quaternion(1.0f, _vector.x * 0.5f, _vector.y * 0.5f, _vector.z * 0.5f);
+  }
+  else {
+    Vector3 axis = Vector3(_vector.x / angle, _vector.y / angle, _vector.z / angle);
+    return Quaternion::fromAxisAngle(axis, angle);
+  }
+}
+
+Quaternion
+Quaternion::fromBiVector(const Vector3& _bivector)
+{
+  float angle = Math::sqrt(_bivector.x * _bivector.x +  _bivector.y *
+                           _bivector.y + _bivector.z * _bivector.z);
+
+  if (angle < Math::SMALL_NUMBER) {
+    // Use small-angle approximation
+    return Quaternion(1.0f, 0.5f * _bivector.x, 0.5f * _bivector.y, 0.5f * _bivector.z);
+  }
+  else {
+    Vector3 axis = Vector3(_bivector.x / angle, _bivector.y / angle, _bivector.z / angle);
+
+    float half = 0.5f * angle;
+    float sinHalf = std::sin(half);
+    return Quaternion(Math::cos(half), axis.x * sinHalf, axis.y * sinHalf, axis.z * sinHalf);
+  }
+}
+
+Quaternion
+Quaternion::fromAxisAngle(const Vector3& _axis, float _angle)
+{
+  Vector3 normAxis = _axis.normalized(); // ensure it's a unit vector
+  float halfAngle = 0.5f * _angle;
+  float sinHalf = Math::sin(halfAngle);
+
+  return Quaternion(Math::cos(halfAngle),
+                    normAxis.x * sinHalf,
+                    normAxis.y * sinHalf,
+                    normAxis.z * sinHalf);
+}
 }

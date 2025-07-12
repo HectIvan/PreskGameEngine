@@ -1,4 +1,4 @@
-#include "pkRigidBody.h"
+﻿#include "pkRigidBody.h"
 #include "pkPlatformMath.h"
 
 namespace pkEngineSDK
@@ -53,6 +53,24 @@ RigidBody::applyPositionalImpulse(const Vector3& impulse, const Vector3& point) 
   if (m_inverseMass == 0.0f) { return; }
   Vector3 r = point - getWorldPosition();
   m_position += impulse * m_inverseMass;
-  m_orientation += Quaternion::fromBivector(getInvInertiaWorld() * r.cross(impulse));
+  m_orientation += Quaternion::fromBiVector(getInvInertiaWorld() * r.cross(impulse));
+}
+
+void
+RigidBody::integrateRotation(const Vector3& angularAcceleration,
+                             float deltaTime)
+{
+  // Midpoint angular velocity 
+  Vector3 omegaMid = m_angularVelocity + angularAcceleration * (0.5f * deltaTime);
+
+  // Exponential map to get the rotation delta
+  Quaternion deltaR = m_orientation.expMap(omegaMid * (0.5f * deltaTime)); // e^(Ω_mid * Δt/2)
+
+  // Apply the new rotation
+  m_orientation *= deltaR;
+  m_orientation.normalize();
+
+  // update the angular velocity
+  m_angularVelocity = omegaMid + (angularAcceleration * deltaTime) * (0.5f * deltaTime);
 }
 }

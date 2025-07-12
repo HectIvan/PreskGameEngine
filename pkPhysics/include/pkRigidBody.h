@@ -106,6 +106,14 @@ class RigidBody
   void
   applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point);
 
+  /**
+   * @brief Apply physics based rotation to the rigid body
+   * @brief _orientation Body rotation
+   */
+  void
+  integrateRotation(const Vector3& angularAcceleration,
+                    float deltaTime);
+
  public:
   float m_drag;
   float m_gravity;

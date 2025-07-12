@@ -92,3 +92,4 @@ Shape::computeMassProperties(const Shape& _mesh, float _mass, Vector3 _cm, Matri
     _inertia.matrix[2][0] = _inertia.matrix[0][2];
   }
 }
+}

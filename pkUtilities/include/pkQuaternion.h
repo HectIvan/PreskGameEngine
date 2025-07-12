@@ -70,6 +70,14 @@ class PK_UTILITY_EXPORT Quaternion
   operator*=(const Quaternion& _quat);
 
   /**
+   * @brief Sum this quaternion with another.
+   * @param _quat other quaternion to use.
+   * @return Ending quaternion.
+   */
+  void
+  operator+=(const Quaternion& _quat);
+
+  /**
    * @brief Rotate the quaternion respective to another quaternion.
    * @param _quat Quaternion to use for rotation.
    * @return The rotated quaternion
@@ -115,6 +123,30 @@ class PK_UTILITY_EXPORT Quaternion
    */
   Quaternion
   normalized();
+
+  /**
+   * @brief Convert a rotation vector into a quaternion or rotation matrix.
+   * @param _vector Vector to use
+   */
+  Quaternion
+  expMap(const Vector3& _vector);
+
+  /**
+   * @brief Get a quaternion from a BiVector.
+   * @param _bivector Bivector to use.
+   * @return Generated quaternion.
+   */
+  static Quaternion
+  fromBiVector(const Vector3& _bivector);
+
+  /**
+   * @brief Get a quaternion from a specific axis and with an angle.
+   * @param _axis Axis to use.
+   * @param _angle Angle to use.
+   * @return Generated Quaternion.
+   */
+  static Quaternion
+  fromAxisAngle(const Vector3& _axis, float _angle);
 
   float w;
   float x;

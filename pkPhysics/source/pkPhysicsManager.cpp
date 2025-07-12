@@ -220,11 +220,11 @@ PhysicsManager::resolveCollision(RigidBody& _rb1, RigidBody& _rb2, CollisionInfo
   Vector3 j_inNormal = j_normal * -1.0f;
   _rb2.applyImpulse(j_inNormal, _info.m_contactPoint2);
 
-  /* ----- Recalculare velocity ----- */
-  v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
-          -(_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
-
-  v_alongNormal = v_rel.dotProd(_info.m_normalHit);
+  /* ----- Recalculare velocity ----- */ // doesnt seem to change anything at the moment
+  // v_rel = _rb1.m_linearVelocity + _rb1.m_angularVelocity.cross(r1)
+  //         -(_rb2.m_linearVelocity + _rb2.m_angularVelocity.cross(r2));
+  // 
+  // v_alongNormal = v_rel.dotProd(_info.m_normalHit);
 
   /* ----- Friction (Coulomb model) ----- */
   Vector3 v_tan = v_rel - (_info.m_normalHit * v_alongNormal);

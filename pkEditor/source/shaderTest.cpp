@@ -3,7 +3,6 @@
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
 #include "pkUInterface.h"
-#include "pkLogger.h"
 #include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
@@ -11,7 +10,6 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
-#include "pkGraphicsAPI.h"
 #include "ShaderTest.h"
 
 using pkEngineSDK::CBBlur;
@@ -43,13 +41,14 @@ using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_CSpecular;
+using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_VBlur;
+using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
@@ -109,16 +108,9 @@ ShaderTest::onInit()
   m_sensY = 0.3f;
 
   // create light
-  light = g_SceneManager().getActiveScene()->instantiate("Test Light");
+  light = g_SceneManager().getActiveScene()->instantiate("Light");
   light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = light->getComponent<Light>();
-  lightCom->Type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-  lightCom->SpotCutoff = 0.90f;
-  lightCom->SpotExponent = 32.0f;
-  lightCom->LightDir = Vector3(0, 1.0f, 0);
-  lightCom->LightPos = Vector3(0.0f, 50.0f, 0.0f);
-  lightCom->LightColor = Vector3(1.0f);
-  lightCom->shadowIntensity = 0.85f;
 
   // add camera component
   light->addComponent(make_shared<Camera>());
@@ -127,8 +119,8 @@ ShaderTest::onInit()
                                       3.1416f / 4.0f,
                                       0.01f,
                                       2000.0f,
-                                      lightCom->LightPos, // position
-                                      lightCom->LightDir, // target
+                                      lightCom->m_lightPos, // position
+                                      lightCom->m_lightDir, // target
                                       Vector3::FORWARD,
                                       pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
@@ -150,6 +142,9 @@ ShaderTest::onInit()
   // rpd->setPosition(0, 0, -100);
 
   m_shadows = true;
+  m_specular = true;
+
+  m_fpsSize = 20;
 }
 
 void
@@ -179,6 +174,8 @@ void
 ShaderTest::input()
 {
   EventQueue& eventQueue = g_eventManager().instance();
+  UInterface& im = g_uInterface().instance();
+  bool interfaceHovered = im.isHoveredWithItems();
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
@@ -204,7 +201,8 @@ ShaderTest::input()
     m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
   // rotate camera
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
+      !interfaceHovered) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
@@ -272,9 +270,19 @@ ShaderTest::uInterfaceUpdate()
 
 
   // get framerate
-  uint32 fps = static_cast<uint32>(1.0f / g_TimeManager().m_deltaTime);
+  float f_fps = 1.0f / g_TimeManager().m_deltaTime;
+  uint32 fps = static_cast<uint32>(f_fps);
   String fpsStr = "FPS: " + to_string(fps);
   String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
+
+  // FPS parameters
+  static const int fpsListSize = 100;
+  static float fpsHistory[fpsListSize] = {};
+  static int fpsOffset = 0;
+
+  // Record the current FPS
+  fpsHistory[fpsOffset] = f_fps;
+  fpsOffset = (fpsOffset + 1) % fpsListSize;
 
   // --- Display window --- //
   winHeight = 75.0f;
@@ -282,6 +290,8 @@ ShaderTest::uInterfaceUpdate()
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Display");
   im.createText(fpsStr.c_str());
+  im.sameLine();
+  im.plotLines("|", fpsHistory, fpsListSize, fpsOffset);
   im.createCheckBox("vSync", m_vSync);
   im.endWindowCreate();
   yOffset += winHeight;
@@ -291,10 +301,10 @@ ShaderTest::uInterfaceUpdate()
   winHeight = 125.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.startWindowCreate("Camera");
-  im.createInputF("Speed", m_cameraSpeed);
-  im.createInputF("X Sensitivity", m_sensX, 1.0f, 10.0f);
-  im.createInputF("Y Sensitivity", m_sensY, 1.0f, 10.0f);
+  im.startWindowCreate("Editor Camera");
+  im.createDragF("Speed", m_cameraSpeed);
+  im.createDragF("X Sensitivity", m_sensX, 0.1f);
+  im.createDragF("Y Sensitivity", m_sensY, 0.1f);
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //
@@ -305,6 +315,7 @@ ShaderTest::uInterfaceUpdate()
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Render");
   im.createCheckBox("Shadows", m_shadows);
+  im.createCheckBox("Specular", m_specular);
   im.createCheckBox("Ambient Oclussion", m_AO);
   im.createCheckBox("Luminance", m_luminance);
   if (im.createButton("Compile Shaders")) {
@@ -329,6 +340,8 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
+  Vector2 winSize = api.getSwapChain()->getBuffer(0)->getSize();
+
   // camera data
   SPtr<Camera> camData = m_camera->getComponent<Camera>();
   Matrix4 view = camData->m_view.getTransposed();
@@ -338,17 +351,19 @@ ShaderTest::onUpdate()
   // light data
   SPtr<Light> lightData = light->getComponent<Light>();
   CBLight lData;
-  lData.LightDir = Vector4(lightData->LightDir, 1.0f);
-  lData.LightPos = Vector4(lightData->LightPos, 1.0f);
-  lData.LightColor = Vector4(lightData->LightColor, 1.0f);
-  lData.shadowIntensity = lightData->shadowIntensity;
-  lData.spotExponent = lightData->SpotExponent;
+  lData.LightDir = Vector4(lightData->m_lightDir, 1.0f);
+  lData.LightPos = Vector4(lightData->m_lightPos, 1.0f);
+  lData.LightColor = Vector4(lightData->m_lightColor, 1.0f);
+  lData.shadowIntensity = lightData->m_shadowIntensity;
+  lData.spotExponent = lightData->m_spotExponent;
+  lData.spotCutoff = lightData->m_spotCutoff;
+  lData.specIntensity = lightData->m_specIntensity;
   // luminance parameters
   CBLuminance lum;
   lum.tolerance = 0.9f;
   // blur parameters
   CBBlur blur;
-  blur.targetSize = Vector2(10.0f, 10.0f);
+  blur.winSize = winSize;
 
   // data type sizes
   uint32 m4x4Size = sizeof(Matrix4);
@@ -359,10 +374,11 @@ ShaderTest::onUpdate()
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = rm.getPass(kP_HBlur);
-  SPtr<Pass> vBlurPass = rm.getPass(kP_VBlur);
+  SPtr<Pass> hBlurPass = rm.getPass(kP_CHBlur);
+  // SPtr<Pass> vBlurPass = rm.getPass(kP_CVBlur);
   SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
+  SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
 
   // update normal pass buffers
@@ -381,7 +397,6 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(baseShadow->getCBuffer(4), &lightCam,  camSize);
 
   // update shadow compute buffers
-  // light buffer data
   api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &lData, sizeof(CBLight));
   api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &camData, camSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &lightCam, camSize);
@@ -390,14 +405,22 @@ ShaderTest::onUpdate()
   // get the shadow data needed
   CBShadowParam shadowsParam;
   shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
-  shadowsParam.winSize = api.getSwapChain()->getBuffer(0)->getSize();
+  shadowsParam.winSize = winSize;
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+
+  // update specular compute buffers
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &lData, sizeof(CBLight));
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(1), &camData, camSize);
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &lightCam, camSize);
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
   // update the luminance pass buffer
   api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
   // update the Horizontal/Vertical blur pass buffer
   api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
-  api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 
   // skybox constant buffer
   Matrix4 transform = Matrix4::IDENTITY;

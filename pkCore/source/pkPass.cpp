@@ -147,24 +147,31 @@ Pass::endPass()
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set all to nullptr
   Vector<SPtr<Texture>> nullTargets;
-  for (uint32 i = 0; i < m_outputTex.size(); ++i) {
+  for (uint32 i = 0; i < 8; ++i) {
     nullTargets.push_back(nullptr);
   }
   api.setRenderTargets(nullTargets);
+  nullTargets.clear();
   api.setInputLayout(nullptr);
   api.setVShader(nullptr);
   api.setPShader(nullptr);
   api.setCShader(nullptr);
-  Vector<SPtr<Texture>> vecTex = { nullptr };
+  Vector<SPtr<Texture>> vecTex;
+  for (uint32 i = 0; i < 8; ++i) {
+    vecTex.push_back(nullptr);
+  }
   api.vSSetShaderResourceViews(vecTex);
   api.pSSetShaderResourceViews(vecTex);
   api.cSSetShaderResourceViews(vecTex);
   api.cSSetUnorderedAccessViews(vecTex);
   api.setSampler(nullptr);
-  Vector<SPtr<ConstantBuffer>> vector = { nullptr };
-  api.vSSetConstantBuffers(vector);
-  api.pSSetConstantBuffers(vector);
-  api.cSSetConstantBuffers(vector);
+  Vector<SPtr<ConstantBuffer>> vecCB;
+  for (uint32 i = 0; i < 8; ++i) {
+    vecCB.push_back(nullptr);
+  }
+  api.vSSetConstantBuffers(vecCB);
+  api.pSSetConstantBuffers(vecCB);
+  api.cSSetConstantBuffers(vecCB);
   api.setRasterizerState(nullptr);
 }
 }

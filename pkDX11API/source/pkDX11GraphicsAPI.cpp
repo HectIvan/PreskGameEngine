@@ -1148,6 +1148,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
     // set the resource
     uavVector[i] = dxUAV ? dxUAV->m_uAV : nullptr;
   }
+
   device->m_pImmediateContext->CSSetUnorderedAccessViews(_start,
                                                          count,
                                                          uavVector.data(),
@@ -1296,6 +1297,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
+  _miscFlags = _miscFlags;
 
   // texture description
   D3D11_TEXTURE2D_DESC desc;

@@ -34,6 +34,7 @@ TextureManager::loadTexture(const Path& _directory)
     texture = nullptr;
     return nullptr;
   }
+  texture->setName(_directory.getFileNameWithoutExtension());
 
   // store the new texture in the memory
   SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();

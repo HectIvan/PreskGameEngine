@@ -40,8 +40,17 @@ namespace LIGHT_TYPE
 class PK_CORE_EXPORT Light : public Component
 {
  public:
-  Light() = default;
-  ~Light() = default;
+  Light() {
+    m_type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+    m_spotCutoff = 0.90f;
+    m_spotExponent = 32.0f;
+    m_lightDir = Vector3(0, 1.0f, 0);
+    m_lightPos = Vector3(0.0f, 50.0f, 0.0f);
+    m_lightColor = Vector3(1.0f);
+    m_shadowIntensity = 0.65f;
+    m_specIntensity = 1.0f;
+  }
+  virtual ~Light() = default;
 
   /**
    * @brief Get the component type of this component.
@@ -64,13 +73,14 @@ class PK_CORE_EXPORT Light : public Component
   getObjType() { return COMPONENT_TYPE::kLight; }
 
  public:
-  float Type;
-  float SpotCutoff;
-  float SpotExponent;
-  float shadowIntensity;
-  Vector3 LightDir = Vector3::FORWARD;
-  Vector3 LightPos;
-  Vector3 LightColor = Vector3(1.0f);
+  float m_type;
+  float m_spotCutoff;
+  float m_spotExponent;
+  float m_shadowIntensity;
+  float m_specIntensity;
+  Vector3 m_lightDir = Vector3::FORWARD;
+  Vector3 m_lightPos;
+  Vector3 m_lightColor = Vector3(1.0f);
   Vector2 unused;
 };
 }

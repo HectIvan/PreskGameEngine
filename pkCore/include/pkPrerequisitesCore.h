@@ -61,7 +61,8 @@ struct CBLight
   Vector4 LightColor; // 48
   float shadowIntensity; // 52
   float spotExponent; // 56
-  Vector2 unused1; // 64
+  float spotCutoff; // 60
+  float specIntensity; // 64
 };
 
 struct CBAOData
@@ -84,7 +85,7 @@ struct CBLuminance
 
 struct CBBlur
 {
-  Vector2 targetSize;
+  Vector2 winSize;
   Vector2 unused;
 };
 

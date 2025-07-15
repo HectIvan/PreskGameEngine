@@ -90,6 +90,12 @@ PlatformMath::sin(const float _x)
 }
 
 float
+PlatformMath::sinf(const float _x)
+{
+  return static_cast<float>(std::sinf(_x));
+}
+
+float
 PlatformMath::asin(const float _x)
 {
   return static_cast<float>(std::asin(_x));

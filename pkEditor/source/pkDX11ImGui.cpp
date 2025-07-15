@@ -2,6 +2,7 @@
 #include "pkGraphicsAPI.h"
 #include "externals/imgui_impl_dx11.h"
 #include "pkPlatformMath.h"
+#include "pkTexture.h";
 
 namespace pkEngineSDK
 {
@@ -169,6 +170,23 @@ UInterface::createSliderVector3(const char* _name,
   return _param;
 }
 
+bool
+UInterface::createDragF(const char* _name, float& _value, float _speed, float _min, float _max)
+{
+  return ImGui::DragFloat(_name, &_value, _speed, _min, _max);
+}
+
+bool
+UInterface::createDrag3(const char* _name, Vector3& _value, float _speed, float _min, float _max)
+{
+  float value[3] = { _value.x, _value.y, _value.z };
+  bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
+  _value.x = value[0];
+  _value.y = value[1];
+  _value.z = value[2];
+  return result;
+}
+
 void
 UInterface::createCheckBox(const char* _name, bool& _param)
 {
@@ -179,6 +197,81 @@ bool
 UInterface::createButton(const char* _name)
 {
   return ImGui::Button(_name);
+}
+
+bool
+UInterface::createButtonImage(const char* _name, SPtr<Texture>& _pTexture)
+{
+  // auto& dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  return false;
+}
+
+bool
+UInterface::colorEdit(const char* _name, Color& _color)
+{
+  float color[4] = { static_cast<float>(_color.getR()),
+                     static_cast<float>(_color.getB()),
+                     static_cast<float>(_color.getG()),
+                     static_cast<float>(_color.getA())};
+  bool result = ImGui::ColorEdit4(_name, color);
+  _color.setA(static_cast<uint8>(color[3]));
+  _color.setR(static_cast<uint8>(color[0]));
+  _color.setG(static_cast<uint8>(color[1]));
+  _color.setB(static_cast<uint8>(color[2]));
+  return result;
+}
+
+bool
+UInterface::colorEdit(const char* _name, Vector3& _color)
+{
+  float color[3] = { _color.x, _color.y, _color.z };
+  bool result = ImGui::ColorEdit3(_name, color);
+  _color.x = color[0];
+  _color.y = color[1];
+  _color.z = color[2];
+  return result;
+}
+
+void
+UInterface::plotLines(const char* _name,
+                      float _values[],
+                      uint32 _size,
+                      int32 _valuesOffset,
+                      const char* _overlayText,
+                      float _scaleMin,
+                      float _scaleMax)
+{
+  ImGui::PlotLines(_name, _values, _size, _valuesOffset, _overlayText, _scaleMin, _scaleMax);
+}
+
+bool
+UInterface::beginChild(const char* _name)
+{
+  return ImGui::BeginChild(_name);
+}
+
+void
+UInterface::endChild()
+{
+  ImGui::EndChild();
+}
+
+bool
+UInterface::isHovered()
+{
+  return ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+}
+
+bool
+UInterface::isHoveredWithItems()
+{
+  return (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemActive());
+}
+
+void
+UInterface::sameLine()
+{
+  ImGui::SameLine();
 }
 
 void

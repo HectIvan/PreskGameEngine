@@ -56,7 +56,9 @@ namespace D_BUFFERS
 namespace UAV_BUFFERS
 {
   enum E {
-    kDB_Test = 0,
+    kCB_Shadows = 0,
+    kCB_Specular,
+    kCB_SpecHBlur,
   };
 }
 
@@ -68,10 +70,11 @@ namespace PASS_TYPE
     kP_AO,
     kP_ShadowDef,
     kP_Luminance,
-    kP_HBlur,
-    kP_VBlur,
+    kP_CHBlur,
+    kP_CVBlur,
     kP_Tone,
     kP_CShadows, // compute shadows
+    kP_CSpecular, // comptue specular
     kP_SkyBox,
   };
 }

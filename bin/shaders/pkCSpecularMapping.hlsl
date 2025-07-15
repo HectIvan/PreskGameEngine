@@ -1,22 +1,21 @@
 /***************************************************************************************
-* Shadows Compute shader
+* Constant Buffer Structures
 ***************************************************************************************/
 
 #pragma kernel CS_Main
 
 // unordered texture for reading/writing.
-RWTexture2D<float4>shadowTexture : register(u0);
+RWTexture2D<float4> specTexture : register(u0);
 
 // resources
 Texture2D<float4> normalMap : register(t0);
 Texture2D<float4> metallicMap : register(t1);
-Texture2D<float4> shadowMap : register(t2);
-Texture2D<float4> depthMap : register(t3);
+Texture2D<float4> depthMap : register(t2);
 // sampler state
 SamplerState samState : register(s0);
 
 /*******************************************/
-/*         CONSTANT BUFEFRS                */
+/*      CONSTANT BUFEFRS                   */
 /*******************************************/
 
 cbuffer cbLight : register(b0)
@@ -105,7 +104,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   /**
    * texture data
    */
-  float4 shadowTex = shadowMap.Load(int3(DTid.xy, 0));
   float4 depthTex = depthMap.Load(int3(DTid.xy, 0));
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
@@ -115,14 +113,18 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   // get world position from depth map
   float2 texCoord = (DTid.xy / winSize);
   float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
+  // base color
+  float3 color = float3(1, 1, 1);
+
+  // specular
+  float spec = 0.0;
+  float3 lightDir = normalize(LightDir + lightPos);
+  float3 viewDir = normalize(ForwardCam + Eye.xyz);
+  float3 halfwayDir = normalize(lightDir + viewDir);
+  spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
+  float3 specular = (color * (spec * SpecIntensity)) * lightColor;
   
-  // diffuse
-  float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(lightPos - worldPos);
-  float diff = max(dot(lightDir, normal), shadowColor);
-  diff = lerp(diff, shadowColor, 1.0f - diff);
-  float3 diffuse = lightColor * diff;
-  
+  // set to opaque
   float alpha = 1.0f;
 
   // if its the max depth value
@@ -131,5 +133,5 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
     alpha = 0.0f;
   }
   
-  shadowTexture[DTid.xy] = float4(diffuse, alpha);
+  specTexture[DTid.xy] = float4(specular, alpha);
 }

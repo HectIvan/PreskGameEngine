@@ -93,6 +93,14 @@ class PK_UTILITY_EXPORT PlatformMath
   sin(const float _x);
 
   /**
+   * @brief Get the sin of _x.
+   * @param _x Value to calculate sin.
+   * @return sin of _x.
+   */
+  static float
+  sinf(const float _x);
+
+  /**
    * @brief Get the asin of _x.
    * @param _x Value to calculate asin.
    * @return asin of _x.

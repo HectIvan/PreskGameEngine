@@ -20,13 +20,14 @@ using pkEngineSDK::G_BUFFERS::kGB_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_CSpecular;
+using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_VBlur;
+using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 
 namespace pkEngineSDK
 {
@@ -140,9 +141,10 @@ BaseApp::render()
   SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   SPtr<Pass> luminancePass = renderManager.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = renderManager.getPass(kP_HBlur);
+  SPtr<Pass> hBlurPass = renderManager.getPass(kP_CHBlur);
   SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
+  SPtr<Pass> pCSpecPass = renderManager.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
 
   // first shadow pass
@@ -160,22 +162,31 @@ BaseApp::render()
     luminancePass->beginPass();
     api.draw(3, 0);
     luminancePass->endPass();
-    // horizontal blur quad pass
-    hBlurPass->beginPass();
-    api.draw(3, 0);
-    hBlurPass->endPass();
   }
+  api.clearUnorderedAccessViews(pCSpecPass->getUAVTextures(), Color(0, 0, 0, 0));
+  api.clearUnorderedAccessViews(hBlurPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
+  // get texel size of compute passes
+  Vector2 texSize = api.getSwapChain()->getSize();
+  uint32 threadWidth = 16;
+  uint32 threadHeight = 16;
+  uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
   if (m_shadows) {
     pCShadowPass->beginPass();
-    Vector2 texSize = api.getSwapChain()->getSize();
-    uint32 threadWidth = 16;
-    uint32 threadHeight = 16;
-    uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-    uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
     api.dispatch(x, y, 1);
     pCShadowPass->endPass();
+  }
+  // if specular is set to be rendered
+  if (m_specular) {
+    pCSpecPass->beginPass();
+    api.dispatch(x, y, 1);
+    pCSpecPass->endPass();
+    // horizontal blur quad pass
+    hBlurPass->beginPass();
+    api.dispatch(x, y, 1);
+    hBlurPass->endPass();
   }
 
   // render the skybox

@@ -225,6 +225,12 @@
     <ClInclude Include="include\pkRasterizerState.h">
       <Filter>include\api</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkCBuffers.h">
+      <Filter>include\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkUsings.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

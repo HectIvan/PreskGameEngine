@@ -65,14 +65,9 @@ using int64 = int64_t;
  * Character types
 **/
 /**************************************************************/
-#if PK_COMPILER == PK_COMPILER_MSVC
 using WCHAR = wchar_t;
-#else
-using WCHAR = unsigned short;
-#endif
 using ANSICHAR = char;
 using UNICHAR = WCHAR;
-using unchar = unsigned char;
 
 /**************************************************************/
 /**

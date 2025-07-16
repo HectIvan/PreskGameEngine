@@ -31,6 +31,7 @@ cbuffer cbLight : register(b0)
   float SpotCutoff; // 60
   float SpecIntensity; // 64
 }
+
 cbuffer Camera : register(b1)
 {
   float4 Eye; // 16
@@ -38,7 +39,6 @@ cbuffer Camera : register(b1)
   float4x4 ViewCam; // 92
   float4x4 ProjectionCam; // 156
   float _unusedCam0; // 160
-  float4 _paddingC;
 }
 
 cbuffer LightCamera : register(b2)
@@ -48,7 +48,7 @@ cbuffer LightCamera : register(b2)
   float4x4 ViewLight; // 92
   float4x4 ProjectionLight; // 156
   float _unusedLightCam0; // 160
-  float4 _paddingL2;
+  float2 cbLightCamPadd1;
 }
 
 cbuffer CamInvProj : register(b3)
@@ -113,16 +113,13 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   // get world position from depth map
   float2 texCoord = (DTid.xy / winSize);
   float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
-  // base color
-  float3 color = float3(1, 1, 1);
 
   // specular
   float spec = 0.0;
-  float3 lightDir = normalize(LightDir + lightPos);
-  float3 viewDir = normalize(ForwardCam + Eye.xyz);
-  float3 halfwayDir = normalize(lightDir + viewDir);
+  float3 viewDir = normalize(Eye.xyz - worldPos);
+  float3 halfwayDir = normalize(-LightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
-  float3 specular = (color * (spec * SpecIntensity)) * lightColor;
+  float3 specular = (lightColor * (spec * SpecIntensity));
   
   // set to opaque
   float alpha = 1.0f;

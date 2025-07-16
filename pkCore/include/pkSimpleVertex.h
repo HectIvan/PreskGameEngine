@@ -36,7 +36,7 @@ struct SimpleVertex
   Vector3 tangent;
   Vector3 bitangent;
 
-  // int32 boneIDs[MAX_BONE_INFLUENCE];
-  // float weights[MAX_BONE_INFLUENCE];
+  int32 boneIDs[MAX_BONE_INFLUENCE];
+  float weights[MAX_BONE_INFLUENCE];
 };
 }

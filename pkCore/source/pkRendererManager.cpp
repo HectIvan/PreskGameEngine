@@ -25,6 +25,7 @@ void RendererManager::init()
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
   txDesc.usage = kPK_USAGE_DEFAULT;
   txDesc.mipLevels = false;
+  txDesc.miscFlags = 0;
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
   // render target for scene colors
@@ -176,7 +177,10 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  SPtr<Texture> skyboxTex = api.createDDSTextureFromFile(Path("textures/skybox.hdr"));
+  // SPtr<Texture> skyboxTex = api.createDDSTextureFromFile(Path("textures/skybox.hdr"));
+  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/skybox.hdr"),
+                                                       kPK_BIND_RENDER_TARGET | kPK_BIND_SHADER_RESOURCE,
+                                                       false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
   pDesc.vSDirectory = Path("shaders/pkSkyboxShader.hlsl");
   pDesc.cBSizes = { sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };

@@ -184,6 +184,17 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         meshProcess->material->setMetallic(tm.loadTexture(newPath));
       }
     }
+
+    // get all roughness maps of the material
+    uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS);
+    for (uint32 i = 0; i < roughnessCount; ++i) {
+      aiString path;
+      // diffuse texture loading.
+      if (materialA->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, i, &path) == AI_SUCCESS) {
+        Path newPath(path.C_Str());
+        meshProcess->material->setMetallic(tm.loadTexture(newPath));
+      }
+    }
     // materialA->GetTexture(aiTextureType_DIFFUSE);
     // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
@@ -214,8 +225,8 @@ Model::setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight)
   _boneId = 0;
   _weight = 0;
   /**************************/
-  for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
-  }
+  // for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
+  // }
 }
 
 void

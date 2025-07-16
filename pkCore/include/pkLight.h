@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkLight pkLight.h
-* @Hector Ivan Muñoz Ceballos
-* @date 22/11/2024
-* @Light file for the Presk Game Engine.
-*
-* Light struct for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 22/11/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkLight.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    22/11/2024
+ * @brief   Light Component file for the Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -44,9 +39,9 @@ class PK_CORE_EXPORT Light : public Component
     m_type = pkEngineSDK::LIGHT_TYPE::kDirectional;
     m_spotCutoff = 0.90f;
     m_spotExponent = 32.0f;
-    m_lightDir = Vector3(0, 1.0f, 0);
-    m_lightPos = Vector3(0.0f, 50.0f, 0.0f);
-    m_lightColor = Vector3(1.0f);
+    m_direction = Vector3(0, -1.0f, 0);
+    m_position = Vector3(0.0f, 50.0f, 0.0f);
+    m_color = Vector3(1.0f);
     m_shadowIntensity = 0.65f;
     m_specIntensity = 1.0f;
   }
@@ -78,9 +73,8 @@ class PK_CORE_EXPORT Light : public Component
   float m_spotExponent;
   float m_shadowIntensity;
   float m_specIntensity;
-  Vector3 m_lightDir = Vector3::FORWARD;
-  Vector3 m_lightPos;
-  Vector3 m_lightColor = Vector3(1.0f);
-  Vector2 unused;
+  Vector3 m_direction = Vector3::FORWARD;
+  Vector3 m_position;
+  Vector3 m_color = Vector3(1.0f);
 };
 }

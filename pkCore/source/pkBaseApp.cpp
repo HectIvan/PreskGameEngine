@@ -58,10 +58,10 @@ BaseApp::init(const char** _argv, int32 _count)
   g_SceneManager().init();
   g_RenderManager().init();
 
-  SPtr<Actor> skybox = g_SceneManager().getActiveScene()->instantiate("SkyBox");
-  skybox->addComponent(g_ResourceManager().loadModel(Path("models/cube.obj")));
-  skybox->setScale(2000.0f);
-  skybox->setPosition(0.0f, -100.0f, 0.0f);
+  // SPtr<Actor> skybox = g_SceneManager().getActiveScene()->instantiate("SkyBox");
+  // skybox->addComponent(g_ResourceManager().loadModel(Path("models/cube.obj")));
+  // skybox->setScale(2000.0f);
+  // skybox->setPosition(0.0f, -100.0f, 0.0f);
   onInit();
 }
 
@@ -190,14 +190,14 @@ BaseApp::render()
   }
 
   // render the skybox
-  skyBoxPass->beginPass();
-  SPtr<Actor> skybox = g_SceneManager().getActiveScene()->actorFind("SkyBox");
-  SPtr<VertexBuffer> vB = skybox->getComponent<Model>()->getVertexBuffer();
-  SPtr<IndexBuffer> iB = skybox->getComponent<Model>()->getIndexBuffer();
-  api.setVertexBuffer(vB);
-  api.setIndexBuffer(iB);
-  api.draw(3, 0);
-  skyBoxPass->endPass();
+  //        skyBoxPass->beginPass();
+  //        SPtr<Actor> skybox = g_SceneManager().getActiveScene()->actorFind("SkyBox");
+  //        SPtr<VertexBuffer> vB = skybox->getComponent<Model>()->getVertexBuffer();
+  //        SPtr<IndexBuffer> iB = skybox->getComponent<Model>()->getIndexBuffer();
+  //        api.setVertexBuffer(vB);
+  //        api.setIndexBuffer(iB);
+  //        api.draw(3, 0);
+  //        skyBoxPass->endPass();
   // Quad tone map pass
   tonePass->beginPass();
   api.draw(3, 0);

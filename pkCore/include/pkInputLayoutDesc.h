@@ -20,7 +20,7 @@
 
 namespace INPUT_LAYOUT
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPosition = 0,
     kNormal,

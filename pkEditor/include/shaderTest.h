@@ -100,7 +100,7 @@ class ShaderTest : public BaseApp
   uint32 m_fpsSize;
 
   // light source
-  SPtr<Actor> light;
+  SPtr<Actor> m_light;
   SPtr<Actor> m_camera;
 
   // camera sensitivity

@@ -87,6 +87,7 @@ void
 Actor::setPosition(float _x, float _y, float _z)
 {
   m_transform.setTranslation(_x, _y, _z);
+  m_position = Vector3(_x, _y, _z);
 }
 
 void

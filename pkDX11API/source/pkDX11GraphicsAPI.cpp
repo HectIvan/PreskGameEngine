@@ -1163,7 +1163,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        int32 _miscFlags)
 {
   // values
-  int32 width, height, bpp, pitch;
+  int32 width, height, bpp;
 
   // load the image data into a storage variable
   unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
@@ -1178,7 +1178,6 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 
   // how wide each line of the texture will be
   if (bpp == 3) { ++bpp; }
-  pitch = width * bpp;
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTexture(bpp,
@@ -1297,7 +1296,6 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
-  _miscFlags = _miscFlags;
 
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -1312,7 +1310,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
   desc.Usage = static_cast<D3D11_USAGE>(_usage);
   desc.BindFlags = _bindFlags;
   desc.CPUAccessFlags = 0;
-  desc.MiscFlags = 0;
+  desc.MiscFlags = _miscFlags;
 
   // data of the texture
   D3D11_SUBRESOURCE_DATA* initData = nullptr;

@@ -16,6 +16,7 @@
 **/
 /*********************************************/
 #include "pkCamera.h"
+#include "pkCBuffers.h"
 #include "pkEventQueue.h"
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"

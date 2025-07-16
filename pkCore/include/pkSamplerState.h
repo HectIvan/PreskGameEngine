@@ -14,22 +14,22 @@
 
 namespace SAM_STATE_FILTERS
 {
-enum PK_CORE_EXPORT E
-{
-  kFilterMigMagMipLinear = 21,
-};
+  enum E
+  {
+    kFilterMigMagMipLinear = 21,
+  };
 }
 
 namespace SAM_STATE_ADRESS
 {
-enum PK_CORE_EXPORT E
-{
-  kWrap = 1,
-  kMirror,
-  kClamp,
-  kBorder,
-  kMirrorOnce
-};
+  enum E
+  {
+    kWrap = 1,
+    kMirror,
+    kClamp,
+    kBorder,
+    kMirrorOnce
+  };
 }
 
 namespace pkEngineSDK

@@ -32,6 +32,7 @@ cbuffer cbLight : register(b0)
   float SpotCutoff; // 60
   float SpecIntensity; // 64
 }
+
 cbuffer Camera : register(b1)
 {
   float4 Eye; // 16
@@ -39,7 +40,6 @@ cbuffer Camera : register(b1)
   float4x4 ViewCam; // 92
   float4x4 ProjectionCam; // 156
   float _unusedCam0; // 160
-  float4 _paddingC;
 }
 
 cbuffer LightCamera : register(b2)
@@ -49,7 +49,7 @@ cbuffer LightCamera : register(b2)
   float4x4 ViewLight; // 92
   float4x4 ProjectionLight; // 156
   float _unusedLightCam0; // 160
-  float4 _paddingL2;
+  float2 cbLightCamPadd1;
 }
 
 cbuffer CamInvProj : register(b3)
@@ -118,7 +118,8 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(lightPos - worldPos);
+  // float3 lightDir = normalize(lightPos - worldPos);
+  float3 lightDir = normalize(-LightDir);
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;

@@ -15,7 +15,7 @@
 #include "pkMaterial.h"
 #include "pkModel.h"
 #include "pkPath.h"
-#include "pkPlatformMath.h";
+#include "pkPlatformMath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkUInterface.h"
 #include "pkVector3.h"
@@ -98,7 +98,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     if (im.createDragF("Far", cDesc.farZ, 1.0f)) {
       isChanged = true;
     }
-    bool selected = false;
+    // bool selected = false;
     // im.beginCombo("Projections", "Profile: ");
     // im.selectable("Perspective", &selected);
     // im.selectable("Orthographic", &selected);
@@ -117,15 +117,15 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   {
     SPtr<Light> light = reinterpret_pointer_cast<Light>(_pComponent);
     im.createText("Light");
-    im.colorEdit("Color", light->m_lightColor);
-    im.createDrag3("Direction", light->m_lightDir, 0.1f);
-    if (light->m_lightDir.magnitude() > Math::SMALL_NUMBER) {
-      light->m_lightDir.normalize();
+    im.colorEdit("Color", light->m_color);
+    im.createDrag3("Direction", light->m_direction, 0.1f);
+    if (light->m_direction.magnitude() > Math::SMALL_NUMBER) {
+      light->m_direction.normalize();
     }
-    im.createDrag3("Position", light->m_lightPos, 0.1f);
+    im.createDrag3("Position", light->m_position, 0.1f);
 
     im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
-    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f);
+    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 1.0f);
     im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
     im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
     break;

@@ -19,6 +19,7 @@
 /*********************************************/
 #include "pkActor.h"
 #include "pkCamera.h"
+#include "pkCBuffers.h"
 #include "pkConstantBuffer.h"
 #include "pkDepthStencilView.h"
 #include "pkLight.h"

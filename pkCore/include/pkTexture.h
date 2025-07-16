@@ -20,7 +20,7 @@
 
 namespace PK_BIND_FLAG
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_BIND_VERTEX_BUFFER = 0x1L,
     kPK_BIND_INDEX_BUFFER = 0x2L,
@@ -37,7 +37,7 @@ namespace PK_BIND_FLAG
 
 namespace PK_USAGE
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_USAGE_DEFAULT = 0,
     kPK_USAGE_IMMUTABLE = 1,
@@ -48,7 +48,7 @@ namespace PK_USAGE
 
 namespace TEXTURE_FORMAT
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_FORMAT_UNKNOWN = 0,
     kPK_FORMAT_R32G32B32A32_TYPELESS = 1,
@@ -282,8 +282,8 @@ class PK_CORE_EXPORT Texture
    * @brief Get texture type.
    * @return Type as an uint32.
    */
-  const uint32
-  getType() { return m_type; }
+  const uint32&
+  getType() const { return m_type; }
 
   /**
    * @brief Set texture type.

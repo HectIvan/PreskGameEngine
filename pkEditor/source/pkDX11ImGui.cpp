@@ -2,7 +2,7 @@
 #include "pkGraphicsAPI.h"
 #include "externals/imgui_impl_dx11.h"
 #include "pkPlatformMath.h"
-#include "pkTexture.h";
+#include "pkTexture.h"
 
 namespace pkEngineSDK
 {

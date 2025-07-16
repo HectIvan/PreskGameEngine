@@ -14,6 +14,8 @@ Actor::Actor()
   setActive(true);
   m_forward = Vector3::FORWARD;
   m_scale = Vector3(1.0f);
+  m_position = Vector3(0.0f);
+  m_rotation = Vector3(0.0f);
 }
 
 void

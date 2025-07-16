@@ -32,6 +32,7 @@ using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
 using pkEngineSDK::Math;
+using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
 using pkEngineSDK::reinterpret_pointer_cast;
@@ -51,18 +52,26 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
+  Matrix4 transform = Matrix4::IDENTITY;
   // change the position
-  Vector3 newTranslation = _pActor->getPosition3();
+  Vector3 newTranslation = _pActor->m_position;
   im.createDrag3("Position", newTranslation);
+  transform.setTranslation(newTranslation);
   // change the rotation
-  _pActor->setPosition(newTranslation);
-  Vector3 newRotation = Vector3(0.0f);
-  im.createDrag3("Rotation",newRotation);
-  //            _pActor->setRotation(newRotation);
+  Vector3 newRotation = _pActor->m_rotation;
+  im.createDrag3("Rotation",newRotation, 1.0f);
+  newRotation *= Math::DEG2RAD;
+  transform.setRotation(Matrix4::rotation(newRotation));
   // change the scale
-  Vector3 newScale = _pActor->getScale();
+  Vector3 newScale = _pActor->m_scale;
   im.createDrag3("Scale", newScale);
-  _pActor->setScale(newScale);
+  transform.setScale(newScale);
+
+  _pActor->m_rotation = newRotation;
+  _pActor->m_position = newTranslation;
+  _pActor->m_scale = newScale;
+
+  _pActor->m_transform = transform;
 }
 
 void
@@ -89,6 +98,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     if (im.createDragF("Far", cDesc.farZ, 1.0f)) {
       isChanged = true;
     }
+    bool selected = false;
+    // im.beginCombo("Projections", "Profile: ");
+    // im.selectable("Perspective", &selected);
+    // im.selectable("Orthographic", &selected);
+    // im.endCombo();
+
     // initialize the camera with the new parameters
     if (isChanged) {
       cDesc.eye = cam->m_eye.xyz();
@@ -96,7 +111,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
       cDesc.up = Vector3::UP;
       cam->init(cDesc);
     }
-    im.createText("Projection");
     break;
   }
   case kLight:

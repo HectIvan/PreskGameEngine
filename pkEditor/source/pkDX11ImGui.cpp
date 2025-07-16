@@ -200,6 +200,24 @@ UInterface::createButton(const char* _name)
 }
 
 bool
+UInterface::beginCombo(const char* _name, const char* _previewVal)
+{
+  return ImGui::BeginCombo(_name, _previewVal);
+}
+
+bool
+UInterface::selectable(const char* _name, bool* _selected)
+{
+  return ImGui::Selectable(_name, _selected);
+}
+
+void
+UInterface::endCombo()
+{
+  ImGui::EndCombo();
+}
+
+bool
 UInterface::createButtonImage(const char* _name, SPtr<Texture>& _pTexture)
 {
   // auto& dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);

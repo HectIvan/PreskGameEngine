@@ -304,6 +304,30 @@ class UInterface : public Module<UInterface>
   createButton(const char* _name);
 
   /**
+   * @brief Start the creation of a dropdown combo.
+   * @param _name Name of the dropdown.
+   * @param _previewVal Preview value.
+   * @return If the combo is opened.
+   */
+  bool
+  beginCombo(const char* _name, const char* _previewVal);
+
+  /**
+   * @brief Create a selectable for a dropdown combo.
+   * @param _name Name of the selectable.
+   * @param _selected If the selectable is selected.
+   * @return If it was selected.
+   */
+  bool
+  selectable(const char* _name, bool* _selected = nullptr);
+
+  /**
+   * @brief End the creation of a dropdown combo.
+   */
+  void
+  endCombo();
+
+  /**
    * @brief create a button with an image.
    * @param _name Name of the button.
    * @param _texture Texture to use.

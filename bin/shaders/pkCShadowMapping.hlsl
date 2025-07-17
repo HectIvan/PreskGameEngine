@@ -7,6 +7,8 @@
 // unordered texture for reading/writing.
 RWTexture2D<float4>shadowTexture : register(u0);
 
+#define PI 3.14159265359
+
 // resources
 Texture2D<float4> normalMap : register(t0);
 Texture2D<float4> metallicMap : register(t1);
@@ -92,6 +94,14 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   return worldSpacePosition.xyz;
 }
 
+float magnitude(float3 _vector)
+{
+  float x2 = _vector.x * _vector.x;
+  float y2 = _vector.y * _vector.y;
+  float z2 = _vector.z * _vector.z;
+  return sqrt(x2 + y2 + z2);
+}
+
 // write directly onto the texture.
 [numthreads(16, 16, 1)]
 void CSMain(uint3 DTid : SV_DispatchThreadID)
@@ -118,11 +128,23 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
-  // float3 lightDir = normalize(lightPos - worldPos);
   float3 lightDir = normalize(-LightDir);
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;
+  
+  /** i have not been able to get this to work
+  float3 lightDirection = normalize(-LightDir);
+  float3 worldVector = normalize(worldPos - LightPos);
+  // get angle between position and light direction
+  float angle = dot(lightDirection, worldVector);
+  // get the acos and multiply to convert to degrees
+  angle = degrees(acos(angle));
+  // if the angle is greater than the allowed spot area
+  if (angle > SpotCutoff)
+  {
+    diffuse = worldPos; // float3(shadowColor, shadowColor, shadowColor);
+  }*/
   
   float alpha = 1.0f;
 

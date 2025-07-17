@@ -18,7 +18,7 @@ using pkEngineSDK::CBShadowParam;
 using pkEngineSDK::CreateCBCamera;
 using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Shadow;
+using pkEngineSDK::D_BUFFERS::kDB_Light;
 using pkEngineSDK::EventQueue;
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
@@ -206,6 +206,7 @@ ShaderTest::input()
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
       !interfaceHovered) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
+    // m_selectedActor = nullptr;
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
     m_lastCursorPos = eventQueue.mousePosition;
@@ -324,7 +325,6 @@ ShaderTest::uInterfaceUpdate()
     g_RenderManager().compileShaders();
   }
   im.endWindowCreate();
-  yOffset += winHeight;
   // -------------------------- //
 
   im.render();

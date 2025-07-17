@@ -125,7 +125,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     im.createDrag3("Position", light->m_position, 0.1f);
 
     im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
-    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 1.0f);
+    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
     im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
     im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
     break;

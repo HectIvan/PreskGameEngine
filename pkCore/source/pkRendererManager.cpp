@@ -73,7 +73,7 @@ void RendererManager::init()
 
   // light depth buffer
   SPtr<Texture> shadowDepth = api.createTexture(txDesc);
-  m_depthBuffers.insert({ D_BUFFERS::kDB_Shadow, shadowDepth });
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Light, shadowDepth });
 
   // ---------------------------------------------------------- //
   // UNORDERED ACCESS VIEWS
@@ -117,7 +117,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
                     sizeof(CBCamera) };
   pDesc.inputs = {};
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo), getGBuffer(G_BUFFERS::kGB_Normal),
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
+                    getGBuffer(G_BUFFERS::kGB_Normal),
                     getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   // rasterizer state
@@ -136,7 +137,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   // pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
   // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
-  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Shadow);
+  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
@@ -221,11 +222,12 @@ RendererManager::createPasses()
   pDesc.cSModel = "cs_5_0";
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getDepthBuffer(D_BUFFERS::kDB_Shadow),
+                   getDepthBuffer(D_BUFFERS::kDB_Light),
                    getDepthBuffer(D_BUFFERS::kDB_Base) };
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
                     sizeof(Matrix4), sizeof(CBShadowParam) };
   pDesc.outputs = {};
+  pDesc.pDepth = nullptr;
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_Shadows) };
   SPtr<Pass> computeShadows = make_shared<Pass>(pDesc);
   // insert to the passes

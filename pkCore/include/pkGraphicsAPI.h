@@ -61,6 +61,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) = 0;
 
   /**
+   * @brief Unbinds all render targets.
+   */
+  virtual void
+  unbindRenderTargets() = 0;
+
+  /**
    * @brief Set the render target to the device.
    * @param _rTargets Target to set.
    * @param _DepthSV Depth stencil view to use.
@@ -294,6 +300,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
+   * @brief Unbind resources from a vertex shader.
+   */
+  virtual void
+  vSUnbindShaderResourceViews() = 0;
+
+  /**
    * @brief Set resources to a pixel shader.
    * @param _pTextures Textures to set.
    * @param _start In what slot of the pixel shader will the resources be allocated.
@@ -302,12 +314,24 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
+   * @brief Unbind resources from a pixel shader.
+   */
+  virtual void
+  pSUnbindShaderResourceViews() = 0;
+
+  /**
    * @brief Set resources to a pixel shader.
    * @param _pTextures Textures to set.
    * @param _start In what slot of the pixel shader will the resources be allocated
    */
   virtual void
   cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+
+  /**
+   * @brief Unbind resources from a compute shader.
+   */
+  virtual void
+  cSUnbindShaderResourceViews() = 0;
 
   /**
    * @brief Set unordered views to a compute shader.
@@ -319,6 +343,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
                             uint32* _initialCounts = nullptr) = 0;
+
+  /**
+   * @brief Unbind unordered views from a compute shader.
+   */
+  virtual void
+  cSUnbindUnorderedAccessViews() = 0;
 
   /**
    * @brief Clear all render target views of a vector.
@@ -368,13 +398,19 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
 
   /**
-   * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffers Pointer to the constant buffer.
+   * @brief Set the Vertex Shader constant buffers.
+   * @param _pCBuffers Vector of pointer to the constant buffers.
    * @param _startSlot Start position of the buffers.
    */
   virtual void
   vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                        const uint32 _startSlot = 0) = 0;
+
+  /**
+   * @brief Unbind the Vertex Shader constant buffers.
+   */
+  virtual void
+  vSUnbindConstantBuffers() = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -386,6 +422,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                        const uint32 _startSlot = 0) = 0;
 
   /**
+   * @brief Unbind the Pixel Shader constant buffers.
+   */
+  virtual void
+  pSUnbindConstantBuffers() = 0;
+
+  /**
    * @brief Set the Compute Shader Constant Buffer.
    * @param _pCBuffers Pointer to the constant buffer.
    * @param _startSlot Start position of the buffers.
@@ -393,6 +435,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                        const uint32 _startSlot = 0) = 0;
+
+  /**
+   * @brief Unbind the compute Shader constant buffers.
+   */
+  virtual void
+  cSUnbindConstantBuffers() = 0;
 
   /**
   * Set the sampler state.

@@ -59,6 +59,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
 
   /**
+   * @brief Unbinds all render targets.
+   */
+  void
+  unbindRenderTargets() override;
+
+  /**
    * @brief Set the render target to the device.
    * @param _rTargets Target to set.
    * @param _DepthSV Depth stencil view to use.
@@ -272,12 +278,18 @@ class DX11GraphicsAPI : public GraphicsAPI
                        SIZE_T _size) override;
 
   /**
-   * @brief Set a resource to the vertex shader.
+   * @brief Set resources to a vertex shader.
    * @param _pTextures Textures to set.
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
   vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+
+  /**
+   * @brief Unbind resources from a vertex shader.
+   */
+  void
+  vSUnbindShaderResourceViews() override;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -288,12 +300,24 @@ class DX11GraphicsAPI : public GraphicsAPI
   pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
+   * @brief Unbind resources from a pixel shader.
+   */
+  void
+  pSUnbindShaderResourceViews() override;
+
+  /**
    * @brief Set resources to a compute shader.
    * @param _pTextures Textures to set.
    * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
   cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+
+  /**
+   * @brief Unbind resources of a compute shader.
+   */
+  void
+  cSUnbindShaderResourceViews() override;
 
   /**
    * @brief Set unordered views to a compute shader.
@@ -305,6 +329,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
                             uint32* _initialCounts = nullptr) override;
+
+  /**
+   * @brief Unbind unordered views of a compute shader.
+   */
+  void
+  cSUnbindUnorderedAccessViews() override;
 
   /**
    * @brief Create the device and swap chain.
@@ -459,13 +489,19 @@ class DX11GraphicsAPI : public GraphicsAPI
   createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) override;
 
   /**
-   * @brief Set the Vertex Shader constant buffer.
-   * @param _pCBuffers Pointer to the constant buffer.
+   * @brief Set the Vertex Shader constant buffers.
+   * @param _pCBuffers Vector of pointers to the constant buffers.
    * @param _startSlot Start position of the buffers.
    */
   void
   vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                        const uint32 _startSlot = 0) override;
+
+  /**
+   * @brief Unbind the Vertex Shader constant buffers.
+   */
+  void
+  vSUnbindConstantBuffers() override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -477,6 +513,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                        const uint32 _startSlot = 0) override;
 
   /**
+   * @brief Unbind the Pixel Shader constant buffers.
+   */
+  void
+  pSUnbindConstantBuffers() override;
+
+  /**
    * @brief Set the Compute Shader Constant Buffer
    * @param _pCBuffers Vertex of Pointers to a constant buffer.
    * @param _startSlot Start position of the buffers.
@@ -484,6 +526,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                        const uint32 _startSlot = 0) override;
+
+  /**
+   * @brief Unbind the compute Shader constant buffers.
+   */
+  void
+  cSUnbindConstantBuffers() override;
 
   /**
    * @brief Get the API Swap chain

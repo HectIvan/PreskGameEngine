@@ -126,10 +126,14 @@ Pass::beginPass(Color _color)
   api.setPShader(getPShader());
   api.setCShader(getCShader());
   // set resources
-  api.vSSetShaderResourceViews(m_inputTex);
-  api.pSSetShaderResourceViews(m_inputTex);
-  api.cSSetShaderResourceViews(m_inputTex);
-  api.cSSetUnorderedAccessViews(m_uavTex);
+  if (!m_inputTex.empty()) {
+    api.vSSetShaderResourceViews(m_inputTex);
+    api.pSSetShaderResourceViews(m_inputTex);
+    api.cSSetShaderResourceViews(m_inputTex);
+  }
+  if (!m_uavTex.empty()) {
+    api.cSSetUnorderedAccessViews(m_uavTex);
+  }
   // set the sampler state
   api.setSampler(getSamplerState());
   // set constant buffers
@@ -146,32 +150,19 @@ Pass::endPass()
   // get managers
   GraphicsAPI& api = g_GraphicAPI().instance();
   // set all to nullptr
-  Vector<SPtr<Texture>> nullTargets;
-  for (uint32 i = 0; i < 8; ++i) {
-    nullTargets.push_back(nullptr);
-  }
-  api.setRenderTargets(nullTargets);
-  nullTargets.clear();
+  api.unbindRenderTargets();
   api.setInputLayout(nullptr);
   api.setVShader(nullptr);
   api.setPShader(nullptr);
   api.setCShader(nullptr);
-  Vector<SPtr<Texture>> vecTex;
-  for (uint32 i = 0; i < 8; ++i) {
-    vecTex.push_back(nullptr);
-  }
-  api.vSSetShaderResourceViews(vecTex);
-  api.pSSetShaderResourceViews(vecTex);
-  api.cSSetShaderResourceViews(vecTex);
-  api.cSSetUnorderedAccessViews(vecTex);
+  api.vSUnbindShaderResourceViews();
+  api.pSUnbindShaderResourceViews();
+  api.cSUnbindShaderResourceViews();
+  api.cSUnbindUnorderedAccessViews();
   api.setSampler(nullptr);
-  Vector<SPtr<ConstantBuffer>> vecCB;
-  for (uint32 i = 0; i < 8; ++i) {
-    vecCB.push_back(nullptr);
-  }
-  api.vSSetConstantBuffers(vecCB);
-  api.pSSetConstantBuffers(vecCB);
-  api.cSSetConstantBuffers(vecCB);
+  api.vSUnbindConstantBuffers();
+  api.pSUnbindConstantBuffers();
+  api.cSUnbindConstantBuffers();
   api.setRasterizerState(nullptr);
 }
 }

@@ -13,7 +13,7 @@
 #include "pkWindowDesc.h"
 
 using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Shadow;
+using pkEngineSDK::D_BUFFERS::kDB_Light;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
@@ -205,5 +205,6 @@ BaseApp::render()
   onRender();
   // Present the final result to the screen
   g_GraphicAPI().present(m_vSync, 0);
+  tonePass->endPass();
 }
 }

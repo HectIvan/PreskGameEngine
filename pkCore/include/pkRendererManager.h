@@ -50,7 +50,7 @@ namespace D_BUFFERS
 {
   enum E {
     kDB_Base = 0,
-    kDB_Shadow,
+    kDB_Light,
   };
 }
 

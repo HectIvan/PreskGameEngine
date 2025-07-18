@@ -200,7 +200,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor name.
    * @return Name of the actor
    */
-  String
+  String&
   getName() { return m_name; }
 
   /**
@@ -208,7 +208,7 @@ class PK_CORE_EXPORT Actor
    * @param _name Name of the actor
    */
   void
-  setName(String _name) { m_name = _name; }
+  setName(String _name) { m_name = _name.c_str(); }
 
   /**
    * @brief Get the actor name as a const char*.

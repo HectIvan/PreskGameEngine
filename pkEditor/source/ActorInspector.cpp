@@ -55,17 +55,29 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
+  String name = _pActor->getName();
+  im.createText("Name:   ");
+  im.sameLine();
+  if (im.createInputText("##Name", &name)) {
+    _pActor->setName(name);
+  }
   // change the position
   Vector3 newTranslation = _pActor->m_position;
-  im.createDrag3("Position", newTranslation);
+  im.createText("Position");
+  im.sameLine();
+  im.createDrag3("##Position", newTranslation);
   _pActor->setPosition(newTranslation);
   // change the rotation
   Vector3 newRotation = _pActor->m_rotation;
-  im.createDrag3("Rotation",newRotation, 1.0f);
+  im.createText("Rotation");
+  im.sameLine();
+  im.createDrag3("##Rotation",newRotation, 1.0f);
   _pActor->setRotation(newRotation);
   // change the scale
   Vector3 newScale = _pActor->m_scale;
-  im.createDrag3("Scale", newScale);
+  im.createText("Scale   ");
+  im.sameLine();
+  im.createDrag3("##Scale", newScale);
   _pActor->setScale(newScale);
 }
 
@@ -84,13 +96,19 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     CameraDesc cDesc(cam->m_descriptor);
     im.createText("Camera");
     // parameter change
-    if (im.createDragF("Half FOV", cDesc.halfFOV, 1.0f)) {
+    im.createText("Half FOV");
+    im.sameLine();
+    if (im.createDragF("##HFOV", cDesc.halfFOV, 1.0f)) {
       isChanged = true;
     }
-    if (im.createDragF("Near", cDesc.nearZ, 1.0f)) {
+    im.createText("Near    ");
+    im.sameLine();
+    if (im.createDragF("##Near", cDesc.nearZ, 1.0f)) {
       isChanged = true;
     }
-    if (im.createDragF("Far", cDesc.farZ, 1.0f)) { 
+    im.createText("Far     ");
+    im.sameLine();
+    if (im.createDragF("##Far", cDesc.farZ, 1.0f)) { 
       isChanged = true;
     }
     // bool selected = false;
@@ -112,16 +130,33 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   {
     SPtr<Light> light = reinterpret_pointer_cast<Light>(_pComponent);
     im.createText("Light");
-    im.colorEdit("Color", light->m_color);
-    im.createDrag3("Direction", light->m_direction, 0.1f);
+    // Light color
+    im.createText("Color             ");
+    im.sameLine();
+    im.colorEdit("##Color", light->m_color);
+    // Light direction
+    im.createText("Direction         ");
+    im.sameLine();
+    im.createDrag3("##Direction", light->m_direction, 0.1f);
     if (light->m_direction.magnitude() > Math::SMALL_NUMBER) {
       light->m_direction.normalize();
     }
-
-    im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
-    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
-    im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
-    im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
+    // spot exponent
+    im.createText("Spot Exponent     ");
+    im.sameLine();
+    im.createDragF("##Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
+    // Spot cutoff
+    im.createText("Spot Cutoff       ");
+    im.sameLine();
+    im.createDragF("##Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
+    // shadow intensity
+    im.createText("Shadow Intensity  ");
+    im.sameLine();
+    im.createDragF("##Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
+    // Specular Intensity
+    im.createText("Specular Intensity");
+    im.sameLine();
+    im.createDragF("##Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
     break;
   }
   case kMaterial:

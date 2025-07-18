@@ -46,10 +46,22 @@ UInterface::createText(const char* _text)
   ImGui::Text(_text);
 }
 
-bool
-UInterface::createInputText(const char* _name, String& _param)
+static int
+InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-  return ImGui::InputText(_name, strdup(_param.c_str()), sizeof(_param));
+  if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+  {
+    auto str = static_cast<String*>(data->UserData);
+    str->resize(data->BufTextLen);
+    data->Buf = str->data();
+  }
+  return 0;
+}
+
+bool
+UInterface::createInputText(const char* _name, String* _param)
+{
+  return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
 }
 
 bool
@@ -194,9 +206,12 @@ UInterface::createCheckBox(const char* _name, bool& _param)
 }
 
 bool
-UInterface::createButton(const char* _name)
+UInterface::createButton(String _name)
 {
-  return ImGui::Button(_name);
+  if (_name.empty()) {
+    _name = "--Default--";
+  }
+  return ImGui::Button(_name.c_str());
 }
 
 bool
@@ -284,6 +299,12 @@ bool
 UInterface::isHoveredWithItems()
 {
   return (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemActive());
+}
+
+bool
+UInterface::isItemActive()
+{
+  return ImGui::IsAnyItemActive();
 }
 
 void

@@ -129,7 +129,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputText(const char* _name, String& _param);
+  createInputText(const char* _name, String* _param);
 
   /**
    * @brief Create an input float.
@@ -301,7 +301,7 @@ class UInterface : public Module<UInterface>
    * @param _name Name of the button.
    */
   bool
-  createButton(const char* _name);
+  createButton(String _name);
 
   /**
    * @brief Start the creation of a dropdown combo.
@@ -394,11 +394,18 @@ class UInterface : public Module<UInterface>
   isHovered();
 
   /**
-   * @brief Check if thhe cursor is on top of a window or item.
+   * @brief Check if the cursor is on top of a window or item.
    * @return Hovered or not.
    */
   bool
   isHoveredWithItems();
+
+  /**
+   * @brief Check if an item is active.
+   * @return Active or not.
+   */
+  bool
+  isItemActive();
 
   /**
    * @brief Create 2 parts in the same line.

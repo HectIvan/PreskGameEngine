@@ -143,6 +143,10 @@ ShaderTest::onInit()
   // // rpd->setScale(1.0f);
   // rpd->setPosition(0, 0, -100);
 
+  SPtr<Actor> coat = g_SceneManager().getActiveScene()->instantiate("Coat");
+  coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
+  coat->setPosition(11.0f, 5.2f, 0.0f);
+
   m_shadows = true;
   m_specular = true;
 
@@ -178,33 +182,40 @@ ShaderTest::input()
   EventQueue& eventQueue = g_eventManager().instance();
   UInterface& im = g_uInterface().instance();
   bool interfaceHovered = im.isHoveredWithItems();
+  bool itemActive = im.isItemActive();
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
   // move forward/backward
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
   }
   // move left/right
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(-speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(speed);
   }
   // move up/down
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && m_window.m_isFocused &&
+      !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
-      !interfaceHovered) {
+      !itemActive) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     // m_selectedActor = nullptr;
     posDif.x *= m_sensX;
@@ -228,7 +239,7 @@ ShaderTest::uInterfaceUpdate()
   im.uINewFrame();
 
   float yOffset = 0.0f;
-  float winWidth = 420.0f;
+  float winWidth = 450.0f;
   Vector2 winRect = m_window.getClientWidthHeight();
   
   // --- Scene graph window --- //
@@ -237,7 +248,7 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate("Scene");
   uint32 actorCount = sm.getActiveScene()->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
-    if (im.createButton(sm.getActiveScene()->getActor(i)->getNameCSTR())) {
+    if (im.createButton(sm.getActiveScene()->getActor(i)->getName())) {
       m_selectedActor = sm.getActiveScene()->getActor(i);
     }
   }
@@ -247,7 +258,7 @@ ShaderTest::uInterfaceUpdate()
   float winHeight = 0.0f;
   // --- Transform window --- //
   if (m_selectedActor) {
-    winHeight = 100.0f;
+    winHeight = 120.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.startWindowCreate("Transform");
@@ -295,7 +306,10 @@ ShaderTest::uInterfaceUpdate()
   im.createText(fpsStr.c_str());
   im.sameLine();
   im.plotLines("|", fpsHistory, fpsListSize, fpsOffset);
-  im.createCheckBox("vSync", m_vSync);
+  // vSync
+  im.createText("vSync");
+  im.sameLine();
+  im.createCheckBox("##vSync", m_vSync);
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //
@@ -305,22 +319,44 @@ ShaderTest::uInterfaceUpdate()
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Editor Camera");
-  im.createDragF("Speed", m_cameraSpeed);
-  im.createDragF("X Sensitivity", m_sensX, 0.1f);
-  im.createDragF("Y Sensitivity", m_sensY, 0.1f);
+  // camera speed
+  im.createText("Speed        ");
+  im.sameLine();
+  im.createDragF("##Speed", m_cameraSpeed);
+  // X Sensitivity
+  im.createText("X Sensitivity");
+  im.sameLine();
+  im.createDragF("##XSens", m_sensX, 0.1f);
+  // Y Sensitivity
+  im.createText("Y Sensitivity");
+  im.sameLine();
+  im.createDragF("##YSens", m_sensY, 0.1f);
   im.endWindowCreate();
   yOffset += winHeight;
   // -------------------------- //
 
   // --- Post-Process window --- //
-  winHeight = 125.0f;
+  winHeight = 150.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
   im.startWindowCreate("Render");
-  im.createCheckBox("Shadows", m_shadows);
-  im.createCheckBox("Specular", m_specular);
-  im.createCheckBox("Ambient Oclussion", m_AO);
-  im.createCheckBox("Luminance", m_luminance);
+  // shadows option
+  im.createText("shadows  ");
+  im.sameLine();
+  im.createCheckBox("##Shadows", m_shadows);
+  // Specular option
+  im.createText("Specular ");
+  im.sameLine();
+  im.createCheckBox("##Specular", m_specular);
+  // AO
+  im.createText("AO       ");
+  im.sameLine();
+  im.createCheckBox("##AO", m_AO);
+  // Luminance
+  im.createText("Luminance");
+  im.sameLine();
+  im.createCheckBox("##Luminance", m_luminance);
+  // compile shaders
   if (im.createButton("Compile Shaders")) {
     g_RenderManager().compileShaders();
   }

@@ -20,6 +20,7 @@
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkLogger.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -42,6 +43,8 @@ using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
 
+using pkEngineSDK::g_Logger;
+
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
   Inspect(_pActor);
@@ -52,26 +55,18 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
-  Matrix4 transform = Matrix4::IDENTITY;
   // change the position
   Vector3 newTranslation = _pActor->m_position;
   im.createDrag3("Position", newTranslation);
-  transform.setTranslation(newTranslation);
+  _pActor->setPosition(newTranslation);
   // change the rotation
   Vector3 newRotation = _pActor->m_rotation;
   im.createDrag3("Rotation",newRotation, 1.0f);
-  newRotation *= Math::DEG2RAD;
-  transform.setRotation(Matrix4::rotation(newRotation));
+  _pActor->setRotation(newRotation);
   // change the scale
   Vector3 newScale = _pActor->m_scale;
   im.createDrag3("Scale", newScale);
-  transform.setScale(newScale);
-
-  _pActor->m_rotation = newRotation;
-  _pActor->m_position = newTranslation;
-  _pActor->m_scale = newScale;
-
-  _pActor->m_transform = transform;
+  _pActor->setScale(newScale);
 }
 
 void
@@ -95,7 +90,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     if (im.createDragF("Near", cDesc.nearZ, 1.0f)) {
       isChanged = true;
     }
-    if (im.createDragF("Far", cDesc.farZ, 1.0f)) {
+    if (im.createDragF("Far", cDesc.farZ, 1.0f)) { 
       isChanged = true;
     }
     // bool selected = false;
@@ -122,7 +117,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     if (light->m_direction.magnitude() > Math::SMALL_NUMBER) {
       light->m_direction.normalize();
     }
-    im.createDrag3("Position", light->m_position, 0.1f);
 
     im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
     im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);

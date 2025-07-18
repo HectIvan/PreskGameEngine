@@ -5,6 +5,7 @@
 /*********************************************/
 #include "pkActor.h"
 #include "pkPlatformMath.h"
+#include "pkLight.h"
 
 namespace pkEngineSDK
 {
@@ -33,6 +34,7 @@ Actor::setPosition(Matrix4 _translation)
 void
 Actor::setPosition(Vector3 _position)
 {
+  m_position = _position;
   m_transform.setTranslation(_position);
 }
 
@@ -71,16 +73,28 @@ Actor::setRotation(Matrix4 _rotation)
 void
 Actor::setRotation(Vector3 _rotation)
 {
-  m_transform.setRotation(Matrix4::rotation(_rotation));
+  setRotation(_rotation.x, _rotation.y, _rotation.z);
 }
 
 void
 Actor::setRotation(float _x, float _y, float _z)
 {
+  m_rotation = Vector3(_x, _y, _z);
+
+  // reset to default scale
+  m_transform.matrix[0][0] /= m_scale.x;
+  m_transform.matrix[1][1] /= m_scale.y;
+  m_transform.matrix[2][2] /= m_scale.z;
+
   _x *= Math::DEG2RAD;
   _y *= Math::DEG2RAD;
   _z *= Math::DEG2RAD;
   m_transform.setRotation(Matrix4::rotation(_x, _y, _z));
+
+  // return to set scale
+  m_transform.matrix[0][0] *= m_scale.x;
+  m_transform.matrix[1][1] *= m_scale.y;
+  m_transform.matrix[2][2] *= m_scale.z;
 }
 
 void
@@ -125,8 +139,33 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float _deltaTime)
 {
-  // to stop warnings.
   _deltaTime = _deltaTime;
+  // to do: maybe it can be done with a switch statement, but 
+  for (uint32 i = 0; i < m_components.size(); ++i) {
+    switch (m_components[i]->getType()) {
+      case COMPONENT_TYPE::kLight: {
+        SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
+        light->m_position = getPosition3();
+        light->m_transform *= m_transform;
+        break;
+      }
+      case COMPONENT_TYPE::kCamera: {
+        break;
+      }
+      case COMPONENT_TYPE::kMaterial: {
+        break;
+      }
+      case COMPONENT_TYPE::kModel: {
+        break;
+      }
+      case COMPONENT_TYPE::kUnknown: {
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
 }
 
 SPtr<Actor>

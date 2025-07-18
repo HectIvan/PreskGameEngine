@@ -203,8 +203,8 @@ BaseApp::render()
   api.draw(3, 0);
   // Scene specific app render
   onRender();
+  tonePass->endPass();
   // Present the final result to the screen
   g_GraphicAPI().present(m_vSync, 0);
-  tonePass->endPass();
 }
 }

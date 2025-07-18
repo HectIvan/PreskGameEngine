@@ -17,6 +17,7 @@
 /*********************************************/
 #include "pkComponent.h"
 #include "pkPrerequisitesCore.h"
+#include "pkMatrix4.h"
 #include "pkVector3.h"
 
 namespace pkEngineSDK
@@ -76,5 +77,7 @@ class PK_CORE_EXPORT Light : public Component
   Vector3 m_direction = Vector3::FORWARD;
   Vector3 m_position;
   Vector3 m_color = Vector3(1.0f);
+
+  Matrix4 m_transform;
 };
 }

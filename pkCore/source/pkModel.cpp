@@ -15,6 +15,7 @@
 #include "pkModel.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
+#include "pkResourceManager.h"
 
 #include "stb_image.h"
 
@@ -75,8 +76,15 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
+  ResourceManager& rm = g_ResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
-  SPtr<Mesh> meshProcess = make_shared<Mesh>();
+
+  SPtr<Mesh> meshProcess = rm.searchMesh(_mesh->mName.C_Str());
+  if (meshProcess) {
+    return meshProcess;
+  }
+
+  meshProcess = make_shared<Mesh>();
   meshProcess->setName(_mesh->mName.C_Str());
   meshProcess->vertexCount = _mesh->mNumVertices;
   // process vertex

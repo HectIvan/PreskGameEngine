@@ -125,5 +125,11 @@
     <ClInclude Include="include\pkDX11ComputeShader.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDX11RasterizerState.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DDSTextureLoader.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -263,7 +263,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if they are the same.
   **/
-  FORCEINLINE const bool
+  FORCEINLINE bool
   operator==(const Vector4& other) const
   {
     return (x != other.x ||
@@ -283,7 +283,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if any discrepancies were found.
   **/
-  FORCEINLINE const bool
+  FORCEINLINE bool
   operator!=(const Vector4& other) const
   {
     return !operator==(other);

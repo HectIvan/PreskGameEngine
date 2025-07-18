@@ -153,8 +153,15 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor scale.
    * @return The actor scale.
    */
-  FORCEINLINE Vector3
+  FORCEINLINE Vector3&
   getScale() { return m_scale; }
+
+  /**
+   * @brief Get the actor rotation.
+   * @return The actor rotation.
+   */
+  FORCEINLINE Vector3&
+  getRotation() { return m_rotation; }
 
   /**
    * @brief adds a component of type T.
@@ -260,8 +267,11 @@ class PK_CORE_EXPORT Actor
   Matrix4 m_transform;
   Matrix4 m_prevTransform;
 
- private:
   Vector3 m_scale;
+  Vector3 m_rotation;
+  Vector3 m_position;
+
+ private:
   bool m_active = true;
   String m_name;
 };

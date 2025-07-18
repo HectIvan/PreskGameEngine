@@ -126,7 +126,7 @@ public:
    * @param _color Clear color.
    */
   void
-  beginPass(Color _color = Color(0, 30, 76, 255));
+  beginPass(Color _color = Color(0, 1, 1, 0));
 
   /**
    * @brief Set all parameters to null;
@@ -164,7 +164,9 @@ public:
   SPtr<Shader> m_pCShader = nullptr;
 
   SPtr<InputLayout> m_pInputLayout = nullptr;
+  // states
   SPtr<SamplerState> m_pSamplerState = nullptr;
+  SPtr<RasterizerState> m_pRasterizerState = nullptr;
 
   // constant buffers for the shaders.
   Vector<SPtr<ConstantBuffer>> m_cBuffers;

@@ -13,19 +13,21 @@
 #include "pkWindowDesc.h"
 
 using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Shadow;
+using pkEngineSDK::D_BUFFERS::kDB_Light;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_CSpecular;
+using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_VBlur;
+using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 
 namespace pkEngineSDK
 {
@@ -55,6 +57,11 @@ BaseApp::init(const char** _argv, int32 _count)
 
   g_SceneManager().init();
   g_RenderManager().init();
+
+  // SPtr<Actor> skybox = g_SceneManager().getActiveScene()->instantiate("SkyBox");
+  // skybox->addComponent(g_ResourceManager().loadModel(Path("models/cube.obj")));
+  // skybox->setScale(2000.0f);
+  // skybox->setPosition(0.0f, -100.0f, 0.0f);
   onInit();
 }
 
@@ -134,9 +141,11 @@ BaseApp::render()
   SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   SPtr<Pass> luminancePass = renderManager.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = renderManager.getPass(kP_HBlur);
+  SPtr<Pass> hBlurPass = renderManager.getPass(kP_CHBlur);
   SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
+  SPtr<Pass> pCSpecPass = renderManager.getPass(kP_CSpecular);
+  SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
 
   // first shadow pass
   if (m_shadows) {
@@ -153,33 +162,48 @@ BaseApp::render()
     luminancePass->beginPass();
     api.draw(3, 0);
     luminancePass->endPass();
-    // horizontal blur quad pass
-    hBlurPass->beginPass();
-    api.draw(3, 0);
-    hBlurPass->endPass();
   }
+  api.clearUnorderedAccessViews(pCSpecPass->getUAVTextures(), Color(0, 0, 0, 0));
+  api.clearUnorderedAccessViews(hBlurPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
+  // get texel size of compute passes
+  Vector2 texSize = api.getSwapChain()->getSize();
+  uint32 threadWidth = 16;
+  uint32 threadHeight = 16;
+  uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
   if (m_shadows) {
     pCShadowPass->beginPass();
-    Vector2 texSize = api.getSwapChain()->getSize();
-    uint32 threadWidth = 16;
-    uint32 threadHeight = 16;
-    uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-    uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
     api.dispatch(x, y, 1);
     pCShadowPass->endPass();
   }
+  // if specular is set to be rendered
+  if (m_specular) {
+    pCSpecPass->beginPass();
+    api.dispatch(x, y, 1);
+    pCSpecPass->endPass();
+    // horizontal blur quad pass
+    hBlurPass->beginPass();
+    api.dispatch(x, y, 1);
+    hBlurPass->endPass();
+  }
 
-  // vertical blur quad pass
-  // renderManager.getPass(PASS_TYPE::kP_VBlur)->beginPass();
-  // api.draw(3, 0);
-  // renderManager.getPass(PASS_TYPE::kP_VBlur)->endPass();
+  // render the skybox
+  //        skyBoxPass->beginPass();
+  //        SPtr<Actor> skybox = g_SceneManager().getActiveScene()->actorFind("SkyBox");
+  //        SPtr<VertexBuffer> vB = skybox->getComponent<Model>()->getVertexBuffer();
+  //        SPtr<IndexBuffer> iB = skybox->getComponent<Model>()->getIndexBuffer();
+  //        api.setVertexBuffer(vB);
+  //        api.setIndexBuffer(iB);
+  //        api.draw(3, 0);
+  //        skyBoxPass->endPass();
   // Quad tone map pass
   tonePass->beginPass();
   api.draw(3, 0);
   // Scene specific app render
   onRender();
+  tonePass->endPass();
   // Present the final result to the screen
   g_GraphicAPI().present(m_vSync, 0);
 }

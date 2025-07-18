@@ -47,6 +47,18 @@ ResourceManager::loadModel(Path _directory)
   return model;
 }
 
+SPtr<Mesh>
+ResourceManager::searchMesh(String _name)
+{
+  for (uint32 i = 0; i < m_meshes.size(); ++i)
+  {
+    if (_name == m_meshes[i]->getName()) {
+      return m_meshes[i];
+    }
+  }
+  return nullptr;
+}
+
 PK_CORE_EXPORT ResourceManager&
 g_ResourceManager()
 {

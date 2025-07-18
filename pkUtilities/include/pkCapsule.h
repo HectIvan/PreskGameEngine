@@ -33,8 +33,8 @@ class PK_UTILITY_EXPORT Capsule : public Figure
   Capsule(Vector3 _center, Vector3 _direction, float _height, float _radius)
   : m_center(_center),
     m_direction(_direction),
-    m_radius(_radius),
-    m_height(_height) {};
+    m_height(_height),
+    m_radius(_radius) {};
   ~Capsule() = default;
 
   float

@@ -12,11 +12,15 @@
 /*********************************************/
 #include "pkCamera.h"
 #include "pkLight.h"
+#include "pkMaterial.h"
 #include "pkModel.h"
+#include "pkPath.h"
+#include "pkPlatformMath.h"
+#include "pkPrerequisitesCore.h"
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
-#include "pkPrerequisitesCore.h"
+#include "pkLogger.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -27,6 +31,10 @@ using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
+using pkEngineSDK::Material;
+using pkEngineSDK::Math;
+using pkEngineSDK::Matrix4;
+using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
@@ -34,6 +42,8 @@ using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
+
+using pkEngineSDK::g_Logger;
 
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
@@ -45,15 +55,17 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
-  // generate the transform matrix in interface
-  Vector3 newTranslation = im.createInputVector3Ret("Position",
-                                                    _pActor->getPosition3());
+  // change the position
+  Vector3 newTranslation = _pActor->m_position;
+  im.createDrag3("Position", newTranslation);
   _pActor->setPosition(newTranslation);
-  Vector3 newRotation = im.createInputVector3Ret("Rotation",
-                                                 Vector3(0));
-  // pistol->m_transform.setRotation(newRotation);
-  Vector3 newScale = im.createInputVector3Ret("Scale",
-                                              _pActor->getScale());
+  // change the rotation
+  Vector3 newRotation = _pActor->m_rotation;
+  im.createDrag3("Rotation",newRotation, 1.0f);
+  _pActor->setRotation(newRotation);
+  // change the scale
+  Vector3 newScale = _pActor->m_scale;
+  im.createDrag3("Scale", newScale);
   _pActor->setScale(newScale);
 }
 
@@ -72,15 +84,21 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     CameraDesc cDesc(cam->m_descriptor);
     im.createText("Camera");
     // parameter change
-    if (im.createInputF("Half FOV", cDesc.halfFOV)) {
+    if (im.createDragF("Half FOV", cDesc.halfFOV, 1.0f)) {
       isChanged = true;
     }
-    if (im.createInputF("Near", cDesc.nearZ)) {
+    if (im.createDragF("Near", cDesc.nearZ, 1.0f)) {
       isChanged = true;
     }
-    if (im.createInputF("Far", cDesc.farZ)) {
+    if (im.createDragF("Far", cDesc.farZ, 1.0f)) { 
       isChanged = true;
     }
+    // bool selected = false;
+    // im.beginCombo("Projections", "Profile: ");
+    // im.selectable("Perspective", &selected);
+    // im.selectable("Orthographic", &selected);
+    // im.endCombo();
+
     // initialize the camera with the new parameters
     if (isChanged) {
       cDesc.eye = cam->m_eye.xyz();
@@ -88,18 +106,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
       cDesc.up = Vector3::UP;
       cam->init(cDesc);
     }
-    im.createText("Projection");
     break;
   }
   case kLight:
   {
     SPtr<Light> light = reinterpret_pointer_cast<Light>(_pComponent);
     im.createText("Light");
-    im.createInputVector3Clamp("Color", light->LightColor, 0.0f, 1.0f);
-    im.createInputVector3Clamp("Direction", light->LightDir, -1.0f, 1.0f);
-    im.createInputVector3Clamp("Position", light->LightPos, -9999999.9f, 9999999.9f);
-    im.createInputF("Spot Exponent", light->SpotExponent, 1.0f, 1.0f);
-    im.createInputFClamp("Shadow Intensity", light->shadowIntensity, 0.0f, 1.0f, 0.05f, 0.1f);
+    im.colorEdit("Color", light->m_color);
+    im.createDrag3("Direction", light->m_direction, 0.1f);
+    if (light->m_direction.magnitude() > Math::SMALL_NUMBER) {
+      light->m_direction.normalize();
+    }
+
+    im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
+    im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
+    im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
+    im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
     break;
   }
   case kMaterial:
@@ -110,11 +132,25 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   case kModel:
   {
     SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
-    im.createText("Meshes:");
+    im.beginChild("Meshes:");
     for (uint32 i = 0; i < model->getMeshes().size(); ++i) {
-      String name = "  " + model->getMeshes()[i]->getName();
+      // get mesh
+      SPtr<Mesh> mesh = model->getMeshes()[i];
+      String name = "  " + mesh->getName();
       im.createText(name.c_str());
+      // get material
+      // SPtr<Material> meshMat = mesh->material;
+      im.createButton("Diffuse");
+      im.sameLine();
+      im.createButton("Normal");
+      im.sameLine();
+      im.createButton("AO");
+      im.sameLine();
+      im.createButton("Height");
+      im.sameLine();
+      im.createButton("Metallic");
     }
+    im.endChild();
     break;
   }
   case kUnknown:

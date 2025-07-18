@@ -43,6 +43,7 @@ using pkEngineSDK::Pass;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Texture;
+using pkEngineSDK::uint32;
 using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
@@ -95,8 +96,11 @@ class ShaderTest : public BaseApp
   SPtr<Actor> m_selectedActor;
   Vector2 m_lastCursorPos;
 
+  Vector<float> m_fpsList;
+  uint32 m_fpsSize;
+
   // light source
-  SPtr<Actor> light;
+  SPtr<Actor> m_light;
   SPtr<Actor> m_camera;
 
   // camera sensitivity

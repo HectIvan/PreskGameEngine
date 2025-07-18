@@ -17,6 +17,7 @@
 /*********************************************/
 #include "pkMaterial.h"
 #include "pkModel.h"
+#include "pkMesh.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
@@ -32,6 +33,12 @@ struct ModelMemory
 {
   Path directory;
   SPtr<Model> model;
+};
+
+struct MeshMemory
+{
+  Path directory;
+  SPtr<Mesh> mesh;
 };
 
 
@@ -56,8 +63,17 @@ class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
   SPtr<Model>
   loadModel(Path _directory);
 
+  /**
+   * @brief search for a specific mesh
+   * @param _name Name of the mesh.
+   * @return Pointer to the mesh if found;
+   */
+  SPtr<Mesh>
+  searchMesh(String _name);
+
  public:
   Vector<SPtr<ModelMemory>> m_models;
+  Vector<SPtr<Mesh>> m_meshes;
 };
 
 PK_CORE_EXPORT ResourceManager&

@@ -18,6 +18,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkMatrix3.h"
 #include "pkVector4.h"
 #include "pkVector3.h"
 
@@ -256,6 +257,26 @@ class PK_UTILITY_EXPORT Matrix4
                    matrix[0][1] + matrix[1][1] + matrix[1][1],
                    matrix[0][2] + matrix[1][2] + matrix[2][2],
                    other.w);
+  }
+
+  Matrix3
+  getMatrix3(int32 _x = 0, int32 _y = 0)
+  {
+    Matrix3 newMat = Matrix3::IDENTITY;
+
+    newMat.matrix[0 + _y][0 + _x] = matrix[0 + _y][0 + _x];
+    newMat.matrix[1 + _y][0 + _x] = matrix[1 + _y][0 + _x];
+    newMat.matrix[2 + _y][0 + _x] = matrix[2 + _y][0 + _x];
+
+    newMat.matrix[0 + _y][1 + _x] = matrix[0 + _y][1 + _x];
+    newMat.matrix[1 + _y][1 + _x] = matrix[1 + _y][1 + _x];
+    newMat.matrix[2 + _y][1 + _x] = matrix[2 + _y][1 + _x];
+
+    newMat.matrix[0 + _y][2 + _x] = matrix[0 + _y][2 + _x];
+    newMat.matrix[1 + _y][2 + _x] = matrix[1 + _y][2 + _x];
+    newMat.matrix[2 + _y][2 + _x] = matrix[2 + _y][2 + _x];
+
+    return newMat;
   }
 
   /**
@@ -525,6 +546,14 @@ class PK_UTILITY_EXPORT Matrix4
    */
   Matrix4
   getRotation();
+
+  /**
+   * @brief Get the rotation matrix without a scale.
+   * @param _scale Scale to extract from the rotation matrix.
+   * @return The rotation matrix.
+   */
+  Matrix4
+  getRotationNoScale(Vector3 _scale);
   
   /**
    * @brief The rotation matrix that is created from

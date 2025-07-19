@@ -421,6 +421,16 @@ Matrix4::getRotation()
 }
 
 Matrix4
+Matrix4::getRotationNoScale(Vector3 _scale)
+{
+  Matrix4 rotMat = getRotation();
+  rotMat.matrix[0][0] /= _scale.x;
+  rotMat.matrix[1][1] /= _scale.y;
+  rotMat.matrix[2][2] /= _scale.z;
+  return rotMat;
+}
+
+Matrix4
 Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;

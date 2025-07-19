@@ -114,6 +114,9 @@
     <ClInclude Include="include\pkPath.h">
       <Filter>include\system</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkMatrix3.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPlatformMath.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="source\pkFileSystem.cpp">
       <Filter>source\system</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMatrix3.cpp">
+      <Filter>source\math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

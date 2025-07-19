@@ -147,6 +147,8 @@ Actor::update(float _deltaTime)
         SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
         light->m_position = getPosition3();
         light->m_transform *= m_transform;
+        Matrix3 rotMat = light->m_transform.getRotationNoScale(m_scale).getMatrix3();
+        light->m_direction = (rotMat * light->m_direction).normalized();
         break;
       }
       case COMPONENT_TYPE::kCamera: {

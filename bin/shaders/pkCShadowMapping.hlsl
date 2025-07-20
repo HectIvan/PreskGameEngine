@@ -115,7 +115,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   /**
    * texture data
    */
-  float4 shadowTex = shadowMap.Load(int3(DTid.xy, 0));
   float4 depthTex = depthMap.Load(int3(DTid.xy, 0));
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
@@ -132,6 +131,26 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;
+  
+  /**
+   * Shadow mapping
+   */
+  // convert from world space to clip space relative to the light camera
+  float4 clipSpace = mul(ProjectionLight, mul(ViewLight, float4(worldPos, 1.0f)));
+  // do a perspective division
+  float3 projCoords = clipSpace.xyz / clipSpace.w;
+  // convert to a [0, 1] range
+  projCoords = projCoords * 0.5f + 0.5f;
+  // convert from UV to texel coordinate
+  int2 texelCoord = int2(projCoords.xy * winSize);
+  float closestDepth = shadowMap.Load(int3(texelCoord, 0)).r;
+  
+  float currentDepth = projCoords.z;
+  
+  if (currentDepth > closestDepth)
+  {
+    diffuse = float3(0,0,0);
+  }
   
   /** i have not been able to get this to work
   float3 lightDirection = normalize(-LightDir);

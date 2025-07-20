@@ -446,7 +446,7 @@ ShaderTest::onUpdate()
   // get the shadow data needed
   CBShadowParam shadowsParam;
   shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
-  shadowsParam.winSize = winSize;
+  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
   // update specular compute buffers

@@ -1,4 +1,5 @@
 #include "pkMatrix3.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -55,5 +56,70 @@ Matrix3::Matrix3(float m00, float m01, float m02,
   matrix[0][0] = m00; matrix[0][1] = m01; matrix[0][2] = m02;
   matrix[1][0] = m10; matrix[1][1] = m11;	matrix[1][2] = m12;
   matrix[2][0] = m20; matrix[2][1] = m21;	matrix[2][2] = m22;
+}
+
+Matrix3
+Matrix3::rotation(Vector3 _rot)
+{
+  return rotation(_rot.x, _rot.y, _rot.z);
+}
+
+Matrix3
+Matrix3::rotation(float _x, float _y, float _z)
+{
+  return rotationX(_x) * rotationY(_y) * rotationZ(_z);
+}
+
+Matrix3
+Matrix3::rotationX(float& _angle)
+{
+  Matrix3 M = Matrix3::IDENTITY;
+
+  float angle = _angle * Math::DEG2RAD;
+  float fSinAngle = sinf(angle);
+  float fCosAngle = cosf(angle);
+
+  M.matrix[1][1] = fCosAngle;
+  M.matrix[1][2] = -fSinAngle;
+
+  M.matrix[2][1] = fSinAngle;
+  M.matrix[2][2] = fCosAngle;
+
+  return M;
+}
+
+Matrix3
+Matrix3::rotationY(float& _angle)
+{
+  Matrix3 M = Matrix3::IDENTITY;
+
+  float angle = _angle * Math::DEG2RAD;
+  float fSinAngle = sinf(angle);
+  float fCosAngle = cosf(angle);
+
+  M.matrix[0][0] = fCosAngle;
+  M.matrix[0][2] = fSinAngle;
+
+  M.matrix[2][0] = -fSinAngle;
+  M.matrix[2][2] = fCosAngle;
+
+  return M;
+}
+
+Matrix3
+Matrix3::rotationZ(float& _angle)
+{
+  Matrix3 M = Matrix3::IDENTITY;
+
+  float angle = _angle * Math::DEG2RAD;
+  float fSinAngle = sinf(angle);
+  float fCosAngle = cosf(angle);
+
+  M.matrix[0][0] = fCosAngle;
+  M.matrix[0][1] = -fSinAngle;
+
+  M.matrix[1][0] = fSinAngle;
+  M.matrix[1][1] = fCosAngle;
+  return M;
 }
 }

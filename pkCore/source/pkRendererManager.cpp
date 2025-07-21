@@ -217,7 +217,7 @@ RendererManager::createPasses()
   pDesc.pSEntry = "";
   pDesc.vSModel = "";
   pDesc.pSModel = "";
-  pDesc.cSDirectory = Path("shaders/pkCShadowMapping.hlsl");
+  pDesc.cSDirectory = Path("shaders/pkCToonShadowMapping.hlsl");
   pDesc.cSEntry = "CSMain";
   pDesc.cSModel = "cs_5_0";
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
@@ -236,7 +236,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Specular Compute
    ***************************************************************************/
-  pDesc.cSDirectory = Path("shaders/pkCSpecularMapping.hlsl");
+  pDesc.cSDirectory = Path("shaders/pkCToonSpecularMapping.hlsl");
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Metallic),
                    getDepthBuffer(D_BUFFERS::kDB_Base) };

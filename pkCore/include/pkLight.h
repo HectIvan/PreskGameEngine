@@ -45,7 +45,6 @@ class PK_CORE_EXPORT Light : public Component
     m_color = Vector3(1.0f);
     m_shadowIntensity = 0.65f;
     m_specIntensity = 1.0f;
-    m_transform = Matrix4::IDENTITY;
   }
   virtual ~Light() = default;
 
@@ -78,7 +77,5 @@ class PK_CORE_EXPORT Light : public Component
   Vector3 m_direction = Vector3::FORWARD;
   Vector3 m_position;
   Vector3 m_color = Vector3(1.0f);
-
-  Matrix4 m_transform;
 };
 }

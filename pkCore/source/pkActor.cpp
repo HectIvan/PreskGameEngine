@@ -6,6 +6,7 @@
 #include "pkActor.h"
 #include "pkPlatformMath.h"
 #include "pkLight.h"
+#include "pkLogger.h"
 
 namespace pkEngineSDK
 {
@@ -146,9 +147,9 @@ Actor::update(float _deltaTime)
       case COMPONENT_TYPE::kLight: {
         SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
         light->m_position = getPosition3();
-        light->m_transform *= m_transform;
-        Matrix3 rotMat = light->m_transform.getRotationNoScale(m_scale).getMatrix3();
-        light->m_direction = (rotMat * light->m_direction).normalized();
+        Matrix3 rotMat = Matrix3::rotation(m_rotation * _deltaTime);
+        Vector3 newDir = rotMat * light->m_direction;
+        light->m_direction = newDir;
         break;
       }
       case COMPONENT_TYPE::kCamera: {

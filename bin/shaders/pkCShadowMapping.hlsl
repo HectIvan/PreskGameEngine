@@ -135,22 +135,22 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   /**
    * Shadow mapping
    */
-  // convert from world space to clip space relative to the light camera
-  float4 clipSpace = mul(ProjectionLight, mul(ViewLight, float4(worldPos, 1.0f)));
-  // do a perspective division
-  float3 projCoords = clipSpace.xyz / clipSpace.w;
-  // convert to a [0, 1] range
-  projCoords = projCoords * 0.5f + 0.5f;
-  // convert from UV to texel coordinate
-  int2 texelCoord = int2(projCoords.xy * winSize);
-  float closestDepth = shadowMap.Load(int3(texelCoord, 0)).r;
-  
-  float currentDepth = projCoords.z;
-  
-  if (currentDepth > closestDepth)
-  {
-    diffuse = float3(0,0,0);
-  }
+  //        // convert from world space to clip space relative to the light camera
+  //        float4 clipSpace = mul(ProjectionLight, mul(ViewLight, float4(worldPos, 1.0f)));
+  //        // do a perspective division
+  //        float3 projCoords = clipSpace.xyz / clipSpace.w;
+  //        // convert to a [0, 1] range
+  //        projCoords = projCoords * 0.5f + 0.5f;
+  //        // convert from UV to texel coordinate
+  //        int2 texelCoord = int2(projCoords.xy * winSize);
+  //        float closestDepth = shadowMap.Load(int3(texelCoord, 0)).r;
+  //        
+  //        float currentDepth = projCoords.z;
+  //        
+  //        if (currentDepth > closestDepth)
+  //        {
+  //          diffuse = float3(0,0,0);
+  //        }
   
   /** i have not been able to get this to work
   float3 lightDirection = normalize(-LightDir);

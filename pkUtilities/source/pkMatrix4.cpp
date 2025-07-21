@@ -453,9 +453,9 @@ Matrix4::rotationZ(float& _angle)
   float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
-  M.matrix[0][1] = fSinAngle;
+  M.matrix[0][1] = -fSinAngle;
 
-  M.matrix[1][0] = -fSinAngle;
+  M.matrix[1][0] = fSinAngle;
   M.matrix[1][1] = fCosAngle;
   return M;
 }
@@ -469,9 +469,9 @@ Matrix4::rotationY(float& _angle)
   float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
-  M.matrix[0][2] = -fSinAngle;
+  M.matrix[0][2] = fSinAngle;
 
-  M.matrix[2][0] = fSinAngle;
+  M.matrix[2][0] = -fSinAngle;
   M.matrix[2][2] = fCosAngle;
 
   return M;

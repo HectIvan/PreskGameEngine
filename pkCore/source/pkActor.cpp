@@ -140,7 +140,6 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float _deltaTime)
 {
-  _deltaTime = _deltaTime;
   // to do: maybe it can be done with a switch statement, but 
   for (uint32 i = 0; i < m_components.size(); ++i) {
     switch (m_components[i]->getType()) {
@@ -149,7 +148,7 @@ Actor::update(float _deltaTime)
         light->m_position = getPosition3();
         Matrix3 rotMat = Matrix3::rotation(m_rotation * _deltaTime);
         Vector3 newDir = rotMat * light->m_direction;
-        light->m_direction = newDir;
+        light->m_direction = newDir.normalized();
         break;
       }
       case COMPONENT_TYPE::kCamera: {

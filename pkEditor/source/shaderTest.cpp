@@ -221,8 +221,8 @@ ShaderTest::input()
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
     m_lastCursorPos = eventQueue.mousePosition;
-    m_camera->getComponent<Camera>()->rotate(-posDif.y * Math::DEG2RAD, 0.0f, 0.0f);
-    m_camera->getComponent<Camera>()->rotate(0.0f, posDif.x * Math::DEG2RAD, 0.0f);
+    posDif *= Math::DEG2RAD;
+    m_camera->getComponent<Camera>()->rotate(-posDif.y, -posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }

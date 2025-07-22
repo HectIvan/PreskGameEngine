@@ -181,7 +181,7 @@ ShaderTest::input()
 {
   EventQueue& eventQueue = g_eventManager().instance();
   UInterface& im = g_uInterface().instance();
-  bool interfaceHovered = im.isHoveredWithItems();
+  // bool interfaceHovered = im.isHoveredWithItems();
   bool itemActive = im.isItemActive();
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
@@ -241,10 +241,13 @@ ShaderTest::uInterfaceUpdate()
   float yOffset = 0.0f;
   float winWidth = 450.0f;
   Vector2 winRect = m_window.getClientWidthHeight();
+
+  float winAlpha = 0.4f;
   
   // --- Scene graph window --- //
   im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
   im.setNextWindowPos(Vector2(0.0f));
+  im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
   uint32 actorCount = sm.getActiveScene()->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
@@ -261,6 +264,7 @@ ShaderTest::uInterfaceUpdate()
     winHeight = 120.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+    im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Transform");
 
     ActorInspector inspector(m_selectedActor);
@@ -272,6 +276,7 @@ ShaderTest::uInterfaceUpdate()
     winHeight = 180.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+    im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Components");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
       inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
@@ -302,6 +307,7 @@ ShaderTest::uInterfaceUpdate()
   winHeight = 75.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+  im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Display");
   im.createText(fpsStr.c_str());
   im.sameLine();
@@ -318,6 +324,7 @@ ShaderTest::uInterfaceUpdate()
   winHeight = 125.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+  im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Editor Camera");
   // camera speed
   im.createText("Speed        ");
@@ -339,6 +346,7 @@ ShaderTest::uInterfaceUpdate()
   winHeight = 150.0f;
   im.setNewWindowSize(Vector2(winWidth, winHeight));
   im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
+  im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Render");
   // shadows option
   im.createText("shadows  ");

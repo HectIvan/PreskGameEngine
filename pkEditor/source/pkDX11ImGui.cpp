@@ -314,6 +314,12 @@ UInterface::sameLine()
 }
 
 void
+UInterface::SetNextWindowAlpha(float _alpha)
+{
+  ImGui::SetNextWindowBgAlpha(_alpha);
+}
+
+void
 UInterface::endWindowCreate()
 {
   ImGui::End();

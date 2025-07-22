@@ -412,6 +412,12 @@ class UInterface : public Module<UInterface>
    */
   void
   sameLine();
+
+  /**
+   * @brief Set window background transparency.
+   */
+  void
+  SetNextWindowAlpha(float _alpha);
   
   /**
    * @brief End the window creation process.

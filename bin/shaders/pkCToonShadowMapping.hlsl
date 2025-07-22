@@ -33,6 +33,7 @@ cbuffer cbLight : register(b0)
   float SpotExponent; // 56
   float SpotCutoff; // 60
   float SpecIntensity; // 64
+  float4x4 lightTransform; // 128
 }
 
 cbuffer Camera : register(b1)
@@ -127,7 +128,7 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(-LightDir);
+  float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
   float dotVal = dot(lightDir, normal);
   float diff = 1.0f;
   if (dotVal < 0.3f)

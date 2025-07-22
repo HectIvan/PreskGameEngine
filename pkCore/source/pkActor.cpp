@@ -140,15 +140,12 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float _deltaTime)
 {
-  // to do: fix light rotation
   for (uint32 i = 0; i < m_components.size(); ++i) {
     switch (m_components[i]->getType()) {
       case COMPONENT_TYPE::kLight: {
         SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
         light->m_position = getPosition3();
-        Matrix3 rotMat = m_transform.getRotationNoScale(m_scale).getMatrix3();
-        Vector3 newDir = rotMat * light->m_direction;
-        light->m_direction = newDir.normalized();
+        light->m_transform = m_transform;
         break;
       }
       case COMPONENT_TYPE::kCamera: {

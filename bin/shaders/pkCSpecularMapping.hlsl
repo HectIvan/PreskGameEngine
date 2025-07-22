@@ -30,6 +30,7 @@ cbuffer cbLight : register(b0)
   float SpotExponent; // 56
   float SpotCutoff; // 60
   float SpecIntensity; // 64
+  float4x4 lightTransform; // 128
 }
 
 cbuffer Camera : register(b1)
@@ -117,7 +118,8 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   // specular
   float spec = 0.0;
   float3 viewDir = normalize(Eye.xyz - worldPos);
-  float3 halfwayDir = normalize(-LightDir + viewDir);
+  float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
+  float3 halfwayDir = normalize(lightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
   float3 specular = (lightColor * (spec * SpecIntensity));
   

@@ -11,7 +11,9 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "ShaderTest.h"
+#include "pkColor.h"
 
+using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBLuminance;
 using pkEngineSDK::CBShadowParam;
@@ -243,16 +245,22 @@ ShaderTest::uInterfaceUpdate()
   Vector2 winRect = m_window.getClientWidthHeight();
 
   float winAlpha = 0.4f;
+  SPtr<Scene> currentScene = sm.getActiveScene();
   
   // --- Scene graph window --- //
   im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
   im.setNextWindowPos(Vector2(0.0f));
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
-  uint32 actorCount = sm.getActiveScene()->getActorCount();
+  uint32 actorCount = currentScene->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
-    if (im.createButton(sm.getActiveScene()->getActor(i)->getName())) {
-      m_selectedActor = sm.getActiveScene()->getActor(i);
+    SPtr<Actor> currentActor = currentScene->getActor(i);
+    if (im.createButton(currentActor->getName(),
+                        Color(0, 0, 0, 0),
+                        Color(50, 50, 50, 50),
+                        Color(100, 100, 100, 50),
+                        true)) {
+      m_selectedActor = currentActor;
     }
   }
   im.endWindowCreate();

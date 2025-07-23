@@ -299,9 +299,15 @@ class UInterface : public Module<UInterface>
   /**
    * @brief Create a Button.
    * @param _name Name of the button.
+   * @param _transparent If the button color is supposed to be transparent.
+   * @return If the button is clicked.
    */
   bool
-  createButton(String _name);
+  createButton(String _name,
+               Color _normal = Color(0,0,0,0),
+               Color _hover = Color(0,0,0,0),
+               Color _active = Color(0,0,0,0),
+               bool _newcolor = false);
 
   /**
    * @brief Start the creation of a dropdown combo.

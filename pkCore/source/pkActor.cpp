@@ -46,6 +46,12 @@ Actor::move(Vector3 _addPos)
 }
 
 void
+Actor::moveLocal(Vector3 _offset)
+{
+
+}
+
+void
 Actor::moveVerlet(Vector3 _direction, float _force)
 {
   m_transform.setTranslation((m_transform.getTranslation3() * 2) -

@@ -73,6 +73,12 @@ class PK_CORE_EXPORT Actor
   move(Vector3 _addPos);
 
   /**
+   * @brief Move the actor relative to its local axis.
+   */
+  void
+  moveLocal(Vector3 _offset);
+
+  /**
    * @brief Move the actor using the verlet integration.
    * @param _direction Direction in which the object will move.
    * @param _force Force that the object will move with.

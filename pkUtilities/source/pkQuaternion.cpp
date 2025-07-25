@@ -11,7 +11,7 @@ namespace pkEngineSDK
 
 Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
 {
-  float a = 1 + _vTo.dotProd(_vFrom);
+  // float a = 1 + _vTo.dotProd(_vFrom);
 
   Vector3 vec = _vFrom.cross(_vTo);
   x = vec.x;

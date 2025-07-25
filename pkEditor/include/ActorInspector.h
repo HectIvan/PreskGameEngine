@@ -20,6 +20,7 @@
 using pkEngineSDK::Actor;
 using pkEngineSDK::Component;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::Matrix4;
 
 class ActorInspector
 {

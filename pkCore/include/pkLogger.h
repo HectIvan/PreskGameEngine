@@ -73,11 +73,19 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   print(Vector4 _vec);
   
   /**
-   * @brief Print a matrux4.
+   * @brief Print a matrix4.
    * @param _matrix Matrix to print to the console.
    */
   static void
   print(Matrix4 _matrix);
+
+  /**
+   * @brief Convert a vector3 to String.
+   * @param _vec Vector to read.
+   * @return A String.
+   */
+  static String
+  toString(const Vector3 _vec);
 };
 PK_CORE_EXPORT Logger&
 g_Logger();

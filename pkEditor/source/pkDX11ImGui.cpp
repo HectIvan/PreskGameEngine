@@ -46,10 +46,22 @@ UInterface::createText(const char* _text)
   ImGui::Text(_text);
 }
 
-bool
-UInterface::createInputText(const char* _name, String& _param)
+static int
+InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-  return ImGui::InputText(_name, strdup(_param.c_str()), sizeof(_param));
+  if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+  {
+    auto str = static_cast<String*>(data->UserData);
+    str->resize(data->BufTextLen);
+    data->Buf = str->data();
+  }
+  return 0;
+}
+
+bool
+UInterface::createInputText(const char* _name, String* _param)
+{
+  return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
 }
 
 bool
@@ -194,9 +206,33 @@ UInterface::createCheckBox(const char* _name, bool& _param)
 }
 
 bool
-UInterface::createButton(const char* _name)
+UInterface::createButton(String _name,
+                         Color _normal,
+                         Color _hover,
+                         Color _active,
+                         bool _newcolor)
 {
-  return ImGui::Button(_name);
+  if (_name.empty()) {
+    _name = "--Default--";
+  }
+
+  if (_newcolor) {
+    bool result = false;
+    Vector4 tC = _normal.colorTo01();
+    Vector4 hC = _hover.colorTo01();
+    Vector4 cC = _active.colorTo01();
+    ImVec4 tColor = ImVec4(tC.x, tC.y, tC.y, tC.w);
+    ImVec4 hColor = ImVec4(hC.x, hC.y, hC.y, hC.w);
+    ImVec4 cColor = ImVec4(cC.x, cC.y, cC.y, cC.w);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, tColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, cColor);
+    result = ImGui::Button(_name.c_str());
+    ImGui::PopStyleColor(3);
+    return result;
+  }
+  return ImGui::Button(_name.c_str());
 }
 
 bool
@@ -286,10 +322,22 @@ UInterface::isHoveredWithItems()
   return (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemActive());
 }
 
+bool
+UInterface::isItemActive()
+{
+  return ImGui::IsAnyItemActive();
+}
+
 void
 UInterface::sameLine()
 {
   ImGui::SameLine();
+}
+
+void
+UInterface::SetNextWindowAlpha(float _alpha)
+{
+  ImGui::SetNextWindowBgAlpha(_alpha);
 }
 
 void

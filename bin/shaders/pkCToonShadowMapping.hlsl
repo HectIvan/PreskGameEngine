@@ -1,23 +1,24 @@
 /***************************************************************************************
-* Constant Buffer Structures
+* Shadows Compute shader
 ***************************************************************************************/
 
 #pragma kernel CS_Main
 
 // unordered texture for reading/writing.
-RWTexture2D<float4> specTexture : register(u0);
+RWTexture2D<float4>shadowTexture : register(u0);
+
+#define PI 3.14159265359
 
 // resources
 Texture2D<float4> normalMap : register(t0);
 Texture2D<float4> metallicMap : register(t1);
-Texture2D<float4> depthMap : register(t2);
+Texture2D<float4> shadowMap : register(t2);
+Texture2D<float4> depthMap : register(t3);
 // sampler state
 SamplerState samState : register(s0);
 
-#define PI 3.14159265359
-
 /*******************************************/
-/*      CONSTANT BUFEFRS                   */
+/*         CONSTANT BUFEFRS                */
 /*******************************************/
 
 cbuffer cbLight : register(b0)
@@ -94,34 +95,12 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   return worldSpacePosition.xyz;
 }
 
-float fresnelSchlick(float refractionIndex, float3 lightVec, float3 normal)
+float magnitude(float3 _vector)
 {
-  float helperFunct = pow(1 - dot(lightVec, normal), 5);
-  float pSchlick = (refractionIndex + (1 - refractionIndex)) * helperFunct;
-  return pSchlick;
-}
-
-
-float GeometrySchlickGGX(float NoV, float roughness)
-{
-  float k = (roughness * roughness) * 0.5f;
-  float denom = NoV * (1.0f - k) + k;
-  return NoV / denom;
-}
-
-float GeometrySmith(float NoV, float NoL, float roughness)
-{
-  float ggx2 = GeometrySchlickGGX(NoV, roughness);
-  float ggx1 = GeometrySchlickGGX(NoL, roughness);
-  
-  return ggx1 * ggx2;
-}
-
-float ndf_GGX(float NoH, float alpha)
-{
-  float a = NoH * alpha;
-  float k = alpha / (1.0f - NoH * NoH + a * a);
-  return k * k * PI;  
+  float x2 = _vector.x * _vector.x;
+  float y2 = _vector.y * _vector.y;
+  float z2 = _vector.z * _vector.z;
+  return sqrt(x2 + y2 + z2);
 }
 
 // write directly onto the texture.
@@ -146,30 +125,29 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   // get world position from depth map
   float2 texCoord = (DTid.xy / winSize);
   float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
-
-  // specular
-  float spec = 0.0;
-  float3 viewDir = normalize(Eye.xyz - worldPos);
+  
+  // diffuse
+  float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
-  float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
+  float dotVal = dot(lightDir, normal);
+  float diff = 1.0f;
+  if (dotVal < 0.3f)
+  {
+    diff = 0.2f;
+  }
+  else if (dotVal < 0.55f)
+  {
+    diff = 0.4f;
+  }
+  float3 diffuse = lightColor * diff;
   
-  //      float NoV = saturate(dot(normal, ))
-  // Fresnel Schlic specular calculation
-  float lightVecFromWorld = normalize(LightPos - worldPos);
-  float FS = fresnelSchlick(0.3f, lightVecFromWorld, normal);
-  // float D = ndf_GGX()
-  float3 specular = (lightColor * (spec * SpecIntensity));
-  
-  
-  // set to opaque
   float alpha = 1.0f;
 
   // if its the max depth value
-  if (depthTex.r == 1) 
-  {
-    alpha = 0.0f;
-  }
+    if (depthTex.r == 1)
+    {
+      alpha = 0.0f;
+    }
   
-  specTexture[DTid.xy] = float4(specular, alpha);
-}
+    shadowTexture[DTid.xy] = float4(diffuse, alpha);
+  }

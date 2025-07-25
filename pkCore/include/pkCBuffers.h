@@ -51,6 +51,7 @@ struct CBLight
   float spotExponent; // 56
   float spotCutoff; // 60
   float specIntensity; // 64
+  Matrix4 transform; // 128
 };
 
 /* to do: find a better way of creating the buffers from the object, i feel like they'll have
@@ -66,6 +67,7 @@ struct CreateCBLight
     _lightDesc.spotExponent = _pLight->m_spotExponent;
     _lightDesc.spotCutoff = _pLight->m_spotCutoff;
     _lightDesc.specIntensity = _pLight->m_specIntensity;
+    _lightDesc.transform = _pLight->m_transform;
   }
 };
 

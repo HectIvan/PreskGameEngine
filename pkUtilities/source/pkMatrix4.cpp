@@ -421,6 +421,16 @@ Matrix4::getRotation()
 }
 
 Matrix4
+Matrix4::getRotationNoScale(Vector3 _scale)
+{
+  Matrix4 rotMat = getRotation();
+  rotMat.matrix[0][0] /= _scale.x;
+  rotMat.matrix[1][1] /= _scale.y;
+  rotMat.matrix[2][2] /= _scale.z;
+  return rotMat;
+}
+
+Matrix4
 Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
@@ -443,9 +453,9 @@ Matrix4::rotationZ(float& _angle)
   float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
-  M.matrix[0][1] = fSinAngle;
+  M.matrix[0][1] = -fSinAngle;
 
-  M.matrix[1][0] = -fSinAngle;
+  M.matrix[1][0] = fSinAngle;
   M.matrix[1][1] = fCosAngle;
   return M;
 }
@@ -459,9 +469,9 @@ Matrix4::rotationY(float& _angle)
   float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
-  M.matrix[0][2] = -fSinAngle;
+  M.matrix[0][2] = fSinAngle;
 
-  M.matrix[2][0] = fSinAngle;
+  M.matrix[2][0] = -fSinAngle;
   M.matrix[2][2] = fCosAngle;
 
   return M;

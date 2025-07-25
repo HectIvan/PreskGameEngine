@@ -73,6 +73,12 @@ class PK_CORE_EXPORT Actor
   move(Vector3 _addPos);
 
   /**
+   * @brief Move the actor relative to its local axis.
+   */
+  void
+  moveLocal(Vector3 _offset);
+
+  /**
    * @brief Move the actor using the verlet integration.
    * @param _direction Direction in which the object will move.
    * @param _force Force that the object will move with.
@@ -200,7 +206,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor name.
    * @return Name of the actor
    */
-  String
+  String&
   getName() { return m_name; }
 
   /**
@@ -208,7 +214,7 @@ class PK_CORE_EXPORT Actor
    * @param _name Name of the actor
    */
   void
-  setName(String _name) { m_name = _name; }
+  setName(String _name) { m_name = _name.c_str(); }
 
   /**
    * @brief Get the actor name as a const char*.

@@ -164,7 +164,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // normal texture loading.
       if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setNormal(tm.loadTexture(newPath));
@@ -175,7 +175,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION);
     for (uint32 i = 0; i < aoCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // ambient occlusion texture loading.
       if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setOcclusion(tm.loadTexture(newPath));
@@ -186,7 +186,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
     for (uint32 i = 0; i < metallicCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // metallic texture loading.
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setMetallic(tm.loadTexture(newPath));
@@ -194,11 +194,11 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     }
 
     // get all roughness maps of the material
-    uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS);
+    uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_REFLECTION);
     for (uint32 i = 0; i < roughnessCount; ++i) {
       aiString path;
-      // diffuse texture loading.
-      if (materialA->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, i, &path) == AI_SUCCESS) {
+      // roughness texture loading.
+      if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setMetallic(tm.loadTexture(newPath));
       }

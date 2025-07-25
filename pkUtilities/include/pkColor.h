@@ -21,6 +21,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector4.h"
 
 namespace pkEngineSDK
 {
@@ -47,7 +48,7 @@ struct PK_UTILITY_EXPORT Color final
     _color.fullColor = other;
   }
 
-  virtual ~Color();
+  virtual ~Color() = default;
 
   operator uint8() const
   {
@@ -55,76 +56,67 @@ struct PK_UTILITY_EXPORT Color final
   }
 
   /**
-  * Gets the red value of the color.
-  * 
-  * @return
-  * The red value as an uint8.
-  **/
+   * @brief Get the red value of the color.
+   * @return The red value as an uint8.
+   */
   uint8
   getR() const { return _color.R; }
 
   /**
-  * Sets the red value of the color.
-  *
-  * @param _r
-  * The red value as an uint8.
-  **/
+   * @brief Set the red value of the color.
+   * @param _r The red value as an uint8.
+   */
   void
   setR(uint8 _r) { _color.R = _r; }
 
   /**
-  * Gets the green value of the color.
-  *
-  * @return
-  * The green value as an uint8.
-  **/
+   * @brief Get the green value of the color.
+   * @return The green value as an uint8.
+   */
   uint8
   getG() const { return _color.G; }
 
   /**
-  * Sets the green value of the color.
-  *
-  * @param _g
-  * The green value as an uint8.
-  **/
+   * @brief Set the green value of the color.
+   * @param _g The green value as an uint8.
+   */
   void
   setG(uint8 _g) { _color.G = _g; }
 
   /**
-  * Gets the blue value of the color.
-  *
-  * @return
-  * The blue value as an uint8.
-  **/
+   * @brief Get the blue value of the color.
+   * @return The blue value as an uint8.
+   */
   uint8
   getB() const { return _color.B; }
 
   /**
-  * Sets the blue value of the color.
-  *
-  * @param _b
-  * The blue value as an uint8.
-  **/
+   * @brief Set the blue value of the color.
+   * @param _b The blue value as an uint8.
+   */
   void
   setB(uint8 _b) { _color.B = _b; }
 
   /**
-  * Gets the alpha value of the color.
-  *
-  * @return
-  * The alpha value as an uint8.
-  **/
+   * @brief Get the alpha value of the color.
+   * @return The alpha value as an uint8.
+   */
   uint8
   getA() const { return _color.A; }
 
   /**
-  * Sets the alpha value of the color.
-  *
-  * @param _a
-  * The alpha value as an uint8.
-  **/
+   * @brief Set the alpha value of the color.
+   * @param _a The alpha value as an uint8.
+   */
   void
   setA(uint8 _a) { _color.A = _a; }
+
+  /**
+   * @brief Get a Vector4 float from the color.
+   * @return The vector.
+   */
+  Vector4
+  colorTo01();
 
   union
   {

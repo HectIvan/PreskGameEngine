@@ -36,6 +36,7 @@ using pkEngineSDK::CBProjection;
 using pkEngineSDK::CBTransform;
 using pkEngineSDK::CBLight;
 using pkEngineSDK::CBCamera;
+using pkEngineSDK::int32;
 using pkEngineSDK::make_shared;
 using pkEngineSDK::ConstantBuffer;
 using pkEngineSDK::Light;
@@ -94,6 +95,7 @@ class ShaderTest : public BaseApp
 
  public:
   SPtr<Actor> m_selectedActor;
+  int32 m_sActorIndex;
   Vector2 m_lastCursorPos;
 
   Vector<float> m_fpsList;

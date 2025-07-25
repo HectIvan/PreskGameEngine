@@ -145,21 +145,21 @@ class PK_UTILITY_EXPORT Matrix3
   Vector3
   operator*(const Vector3& other)
   {
-    matrix[0][0] *= other.x;
-    matrix[1][0] *= other.x;
-    matrix[2][0] *= other.x;
+    float x00 = matrix[0][0] * other.x;
+    float x10 = matrix[1][0] * other.x;
+    float x20 = matrix[2][0] * other.x;
 
-    matrix[0][1] *= other.y;
-    matrix[1][1] *= other.y;
-    matrix[2][1] *= other.y;
+    float y01 = matrix[0][1] * other.y;
+    float y11 = matrix[1][1] * other.y;
+    float y21 = matrix[2][1] * other.y;
 
-    matrix[0][2] *= other.z;
-    matrix[1][2] *= other.z;
-    matrix[2][2] *= other.z;
+    float z02 = matrix[0][2] * other.z;
+    float z12 = matrix[1][2] * other.z;
+    float z22 = matrix[2][2] * other.z;
 
-    return Vector3(matrix[0][0] + matrix[1][0] + matrix[2][0],
-                   matrix[0][1] + matrix[1][1] + matrix[1][1],
-                   matrix[0][2] + matrix[1][2] + matrix[2][2]);
+    return Vector3(x00 + y01 + z02,
+                   x10 + y11 + z12,
+                   x20 + y21 + z22);
   }
 
   FORCEINLINE Matrix3
@@ -299,6 +299,48 @@ class PK_UTILITY_EXPORT Matrix3
     }
     return result;
   }
+
+  /**
+   * @brief Get the rotation matrix on 3 axis.
+   * @param _rot Full rotation.
+   * @return The rotation matrix.
+   */
+  static Matrix3
+  rotation(Vector3 _rot);
+
+  /**
+   * @brief Get the rotation matrix on 3 axis.
+   * @param _x X angle rotation.
+   * @param _y Y angle rotation.
+   * @param _z Z angle rotation.
+   * @return The rotation matrix.
+   */
+  static Matrix3
+  rotation(float _x, float _y, float _z);
+
+  /**
+   * @brief Get the X rotation matrix;
+   * @param _angle Angle ammount to rotate.
+   * @return The rotation matrix.
+   */
+  static Matrix3
+  rotationX(float& _angle);
+
+  /**
+   * @brief Get the Y rotation matrix;
+   * @param _angle Angle ammount to rotate.
+   * @return The rotation matrix.
+   */
+  static Matrix3
+  rotationY(float& _angle);
+
+  /**
+   * @brief Get the Z rotation matrix;
+   * @param _angle Angle ammount to rotate.
+   * @return The rotation matrix.
+   */
+  static Matrix3
+  rotationZ(float& _angle);
 
   float matrix[3][3];
   static const Matrix3 IDENTITY;

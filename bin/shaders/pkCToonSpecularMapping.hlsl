@@ -14,8 +14,6 @@ Texture2D<float4> depthMap : register(t2);
 // sampler state
 SamplerState samState : register(s0);
 
-#define PI 3.14159265359
-
 /*******************************************/
 /*      CONSTANT BUFEFRS                   */
 /*******************************************/
@@ -94,36 +92,6 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   return worldSpacePosition.xyz;
 }
 
-float fresnelSchlick(float refractionIndex, float3 lightVec, float3 normal)
-{
-  float helperFunct = pow(1 - dot(lightVec, normal), 5);
-  float pSchlick = (refractionIndex + (1 - refractionIndex)) * helperFunct;
-  return pSchlick;
-}
-
-
-float GeometrySchlickGGX(float NoV, float roughness)
-{
-  float k = (roughness * roughness) * 0.5f;
-  float denom = NoV * (1.0f - k) + k;
-  return NoV / denom;
-}
-
-float GeometrySmith(float NoV, float NoL, float roughness)
-{
-  float ggx2 = GeometrySchlickGGX(NoV, roughness);
-  float ggx1 = GeometrySchlickGGX(NoL, roughness);
-  
-  return ggx1 * ggx2;
-}
-
-float ndf_GGX(float NoH, float alpha)
-{
-  float a = NoH * alpha;
-  float k = alpha / (1.0f - NoH * NoH + a * a);
-  return k * k * PI;  
-}
-
 // write directly onto the texture.
 [numthreads(16, 16, 1)]
 void CSMain(uint3 DTid : SV_DispatchThreadID)
@@ -152,15 +120,12 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
   float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
-  
-  //      float NoV = saturate(dot(normal, ))
-  // Fresnel Schlic specular calculation
-  float lightVecFromWorld = normalize(LightPos - worldPos);
-  float FS = fresnelSchlick(0.3f, lightVecFromWorld, normal);
-  // float D = ndf_GGX()
+  float dotVal = dot(normal, halfwayDir);
+  if (dotVal > 0.95f)
+  {
+    spec = 1.0f;
+  }
   float3 specular = (lightColor * (spec * SpecIntensity));
-  
   
   // set to opaque
   float alpha = 1.0f;

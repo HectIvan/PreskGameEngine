@@ -6,6 +6,7 @@
 #include "pkActor.h"
 #include "pkPlatformMath.h"
 #include "pkLight.h"
+#include "pkLogger.h"
 
 namespace pkEngineSDK
 {
@@ -42,6 +43,12 @@ void
 Actor::move(Vector3 _addPos)
 {
   move(_addPos.x, _addPos.y, _addPos.z);
+}
+
+void
+Actor::moveLocal(Vector3 _offset)
+{
+
 }
 
 void
@@ -139,14 +146,12 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float _deltaTime)
 {
-  _deltaTime = _deltaTime;
-  // to do: maybe it can be done with a switch statement, but 
   for (uint32 i = 0; i < m_components.size(); ++i) {
     switch (m_components[i]->getType()) {
       case COMPONENT_TYPE::kLight: {
         SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
         light->m_position = getPosition3();
-        light->m_transform *= m_transform;
+        light->m_transform = m_transform;
         break;
       }
       case COMPONENT_TYPE::kCamera: {

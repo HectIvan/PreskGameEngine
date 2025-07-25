@@ -152,6 +152,7 @@ ShaderTest::onInit()
   m_shadows = true;
   m_specular = true;
 
+  m_sActorIndex = 0;
   m_fpsSize = 20;
 }
 
@@ -252,6 +253,23 @@ ShaderTest::uInterfaceUpdate()
   im.setNextWindowPos(Vector2(0.0f));
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
+  if (im.createButton("+")) {
+    sm.getActiveScene()->instantiate("Actor");
+  }
+  if (m_selectedActor) { 
+    im.sameLine();
+    if (im.createButton("Delete")) {
+      m_selectedActor->~Actor();
+      m_selectedActor = nullptr;
+      m_sActorIndex = 0;
+      currentScene->m_actors.erase(currentScene->m_actors.begin() + m_sActorIndex);
+    }
+    im.sameLine();
+    if (im.createButton("^")) {
+      m_selectedActor = nullptr;
+      m_sActorIndex = 0;
+    }
+  }
   uint32 actorCount = currentScene->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
     SPtr<Actor> currentActor = currentScene->getActor(i);
@@ -261,6 +279,7 @@ ShaderTest::uInterfaceUpdate()
                         Color(100, 100, 100, 50),
                         true)) {
       m_selectedActor = currentActor;
+      m_sActorIndex = i;
     }
   }
   im.endWindowCreate();
@@ -286,6 +305,7 @@ ShaderTest::uInterfaceUpdate()
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Components");
+    im.createButton("Add Component(non-functional)");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
       inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
     }
@@ -398,23 +418,42 @@ ShaderTest::onUpdate()
 
   // camera data
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
-  Matrix4 view = camera->m_view.getTransposed();
-  Matrix4 proj = camera->m_projection.getTransposed();
-  Matrix4 invView = view.inverse();
-  Matrix4 invProj = proj.inverse();
+  Matrix4 view = Matrix4::IDENTITY;
+  Matrix4 proj = Matrix4::IDENTITY;
+  Matrix4 invView = Matrix4::IDENTITY;
+  Matrix4 invProj = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
+  CBShadowParam shadowsParam;
+  shadowsParam.farNear = Vector2(0.0f);
+  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
   // to do: change this to another method
-  CreateCBCamera::create(cBCamera, camera);
+  if (camera) {
+    view = camera->m_view.getTransposed();
+    proj = camera->m_projection.getTransposed();
+    invView = view.inverse();
+    invProj = proj.inverse();
+    CreateCBCamera::create(cBCamera, camera);
+
+    shadowsParam.farNear = camera->m_farNear;
+  }
   // light data
   SPtr<Light> light = m_light->getComponent<Light>();
   SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
   // light buffers
   CBLight cBLight;
   CBCamera cBLightCam;
+
+  // update shadow depth map buffers
+  Matrix4 lightView = Matrix4::IDENTITY;
+  Matrix4 lightProj = Matrix4::IDENTITY;
   // to do: change this to another method
-  CreateCBLight::create(cBLight, light);
-  CreateCBCamera::create(cBLightCam, lightCamera);
+  if (light) {
+    lightView = lightCamera->m_view.getTransposed();
+    lightProj = lightCamera->m_projection.getTransposed();
+    CreateCBLight::create(cBLight, light);
+    CreateCBCamera::create(cBLightCam, lightCamera);
+  }
 
   // luminance parameters
   CBLuminance lum;
@@ -445,9 +484,6 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
   api.updateConstantBuffer(basePass->getCBuffer(4), &cBCamera, cBCamSize);
 
-  // update shadow depth map buffers
-  Matrix4 lightView = lightCamera->m_view.getTransposed();
-  Matrix4 lightProj = lightCamera->m_projection.getTransposed();
   api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
   api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
   api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
@@ -460,9 +496,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
   // get the shadow data needed
-  CBShadowParam shadowsParam;
-  shadowsParam.farNear = m_camera->getComponent<Camera>()->m_farNear;
-  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
+  
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
   // update specular compute buffers

@@ -94,10 +94,11 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   return worldSpacePosition.xyz;
 }
 
-float3 fresnelSchlick(float refractionIndex, float cosTheta)
+float fresnelSchlick(float refractionIndex, float3 lightVec, float3 normal)
 {
-  float F0 = pow((refractionIndex - 1.0f), 2.0f) / pow((refractionIndex + 1.0f), 2.0f);
-  return F0 + (1. - F0) * pow(1. - cosTheta, 5.);
+  float helperFunct = pow(1 - dot(lightVec, normal), 5);
+  float pSchlick = (refractionIndex + (1 - refractionIndex)) * helperFunct;
+  return pSchlick;
 }
 
 
@@ -153,8 +154,11 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float3 halfwayDir = normalize(lightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
   
-  // 1 is temporart for refraction index
-  spec = fresnelSchlick(1.0f, max(dot(normal, halfwayDir), 0.0f));
+  //      float NoV = saturate(dot(normal, ))
+  // Fresnel Schlic specular calculation
+  float lightVecFromWorld = normalize(LightPos - worldPos);
+  float FS = fresnelSchlick(0.3f, lightVecFromWorld, normal);
+  // float D = ndf_GGX()
   float3 specular = (lightColor * (spec * SpecIntensity));
   
   

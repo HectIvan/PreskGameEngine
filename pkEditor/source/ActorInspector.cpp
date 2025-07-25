@@ -137,10 +137,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     // Light direction
     im.createText("Direction         ");
     im.sameLine();
-    im.createDrag3("##Direction", light->m_direction, 0.1f);
-    if (light->m_direction.magnitude() > Math::SMALL_NUMBER) {
-      light->m_direction.normalize();
-    }
+    // Vector3 dir = light->m_direction;
     // spot exponent
     im.createText("Spot Exponent     ");
     im.sameLine();

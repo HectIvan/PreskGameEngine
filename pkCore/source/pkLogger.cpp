@@ -111,6 +111,12 @@ Logger::print(Matrix4 _matrix)
        << _matrix.matrix[3][2] << " "
        << _matrix.matrix[3][3] << " " << endl << endl;
 }
+
+String
+Logger::toString(const Vector3 _vec)
+{
+   return String(to_string(_vec.x) + " " + to_string(_vec.y) + " " + to_string(_vec.z));
+}
 PK_CORE_EXPORT Logger&
 g_Logger()
 {

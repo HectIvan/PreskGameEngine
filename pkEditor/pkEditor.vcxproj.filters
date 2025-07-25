@@ -29,6 +29,12 @@
     <Filter Include="include\Editor">
       <UniqueIdentifier>{8bb4215f-047b-47b5-b23c-13df7106fb10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PhysicsApp">
+      <UniqueIdentifier>{f170020d-da58-4dfc-af0e-6571307fe531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\PhysicsApp">
+      <UniqueIdentifier>{853d309a-7e4f-41ab-aba8-e4db64f58827}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\shaderTest.cpp">
@@ -70,6 +76,9 @@
     <ClCompile Include="source\ActorInspector.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="source\PhysicsApp.cpp">
+      <Filter>Source Files\PhysicsApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -101,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="include\ActorInspector.h">
       <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhysicsApp.h">
+      <Filter>include\PhysicsApp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

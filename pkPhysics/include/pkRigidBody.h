@@ -18,15 +18,22 @@
 #include "pkPrerequisitesCore.h"
 #include "pkMatrix3.h"
 #include "pkQuaternion.h"
+#include "pkComponent.h"
 
 namespace pkEngineSDK
 {
 
-class RigidBody
+class RigidBody : public Component
 {
  public:
   RigidBody() = default;
   virtual ~RigidBody() = default;
+
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kRigidBody; }
+
+  const char*
+  getName() override { return "RigidBody"; }
 
   /**
    * @brief Get the rigid body world position.
@@ -58,8 +65,8 @@ class RigidBody
   applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point);
 
  public:
-  float m_drag;
   float m_gravity;
+  float m_drag;
   float m_inverseMass;
   Vector3 m_linearVelocity;
   Vector3 m_angularVelocity;

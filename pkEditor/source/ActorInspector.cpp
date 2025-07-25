@@ -21,6 +21,7 @@
 #include "pkVector3.h"
 #include "pkVector4.h"
 #include "pkLogger.h"
+#include "pkRigidBody.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -28,6 +29,7 @@ using pkEngineSDK::COMPONENT_TYPE::kCamera;
 using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
 using pkEngineSDK::COMPONENT_TYPE::kModel;
+using pkEngineSDK::COMPONENT_TYPE::kRigidBody;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
@@ -37,6 +39,7 @@ using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
 using pkEngineSDK::reinterpret_pointer_cast;
+using pkEngineSDK::RigidBody;
 using pkEngineSDK::String;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
@@ -182,6 +185,19 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
       im.sameLine();
       im.createButton("Metallic");
     }
+    im.endChild();
+    break;
+  }
+  case kRigidBody:
+  {
+    SPtr<RigidBody> rb = reinterpret_pointer_cast<RigidBody>(_pComponent);
+    im.beginChild("Rigid Body");
+    im.createText("Gravity           ");
+    im.sameLine();
+    im.createDragF("##Gravity", rb->m_gravity);
+    im.createText("Drag              ");
+    im.sameLine();
+    im.createDragF("##Drag", rb->m_drag);
     im.endChild();
     break;
   }

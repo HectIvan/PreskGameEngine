@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;../pkPhysics/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;../pkPhysics/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,7 +132,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;../pkPhysics/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,7 +150,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;../pkUtilities/include/;../pkCore/include/;../pkPhysics/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +171,7 @@
     <ClCompile Include="source\externals\imgui_impl_win32.cpp" />
     <ClCompile Include="source\externals\imgui_tables.cpp" />
     <ClCompile Include="source\externals\imgui_widgets.cpp" />
+    <ClCompile Include="source\PhysicsApp.cpp" />
     <ClCompile Include="source\pkDX11ImGui.cpp" />
     <ClCompile Include="source\pkEditorApp.cpp" />
     <ClCompile Include="source\pkImGui_win32.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="include\externals\imstb_rectpack.h" />
     <ClInclude Include="include\externals\imstb_textedit.h" />
     <ClInclude Include="include\externals\imstb_truetype.h" />
+    <ClInclude Include="include\PhysicsApp.h" />
     <ClInclude Include="include\pkUInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

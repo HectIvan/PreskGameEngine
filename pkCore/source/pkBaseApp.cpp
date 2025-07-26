@@ -190,14 +190,9 @@ BaseApp::render()
   }
 
   // render the skybox
-  //        skyBoxPass->beginPass();
-  //        SPtr<Actor> skybox = g_SceneManager().getActiveScene()->actorFind("SkyBox");
-  //        SPtr<VertexBuffer> vB = skybox->getComponent<Model>()->getVertexBuffer();
-  //        SPtr<IndexBuffer> iB = skybox->getComponent<Model>()->getIndexBuffer();
-  //        api.setVertexBuffer(vB);
-  //        api.setIndexBuffer(iB);
-  //        api.draw(3, 0);
-  //        skyBoxPass->endPass();
+  skyBoxPass->beginPass();
+  api.draw(3, 0);
+  skyBoxPass->endPass();
   // Quad tone map pass
   tonePass->beginPass();
   api.draw(3, 0);

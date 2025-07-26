@@ -515,8 +515,10 @@ ShaderTest::onUpdate()
 
   // skybox constant buffer
   Matrix4 transform = Matrix4::IDENTITY;
+  Matrix4 invViewProj = (camera->m_projection * camera->m_view).inverse();
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invViewProj, m4x4Size);
 }
 
 void

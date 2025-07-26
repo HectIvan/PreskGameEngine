@@ -7,7 +7,6 @@ Matrix3
 RigidBody::getInvInertiaWorld()
 {
   Matrix3 rotationMat = m_transform.getRotation().getMatrix3();
-  // to do: work on this to fix it
   return (rotationMat * m_invAngularInertia) * rotationMat.getTransposed();
 }
 
@@ -22,11 +21,50 @@ RigidBody::applyImpulse(const Vector3& _impulse, const Vector3& _point)
   m_angularVelocity += getInvInertiaWorld() * r.cross(_impulse);
 }
 
-void
-RigidBody::applyPositionalImpulse(const Vector3& impulse, const Vector3& point) {
-  if (m_inverseMass == 0.0f) { return; }
-  Vector3 r = point - getWorldPosition();
-  m_position += impulse * m_inverseMass;
-  m_orientation += Quaternion::fromBivector(getInvInertiaWorld() * r.cross(impulse));
+float
+RigidBody::getElasticity() const
+{
+  if (m_physMat) {
+    return m_physMat->getElasticity();
+  }
+  return 0.0f;
 }
+
+void
+RigidBody::setElasticity(const float _elasticity)
+{
+  if (m_physMat) {
+    m_physMat->setElasticity(_elasticity);
+  }
+}
+
+float
+RigidBody::getFrictionCoefficient() const
+{
+  if (m_physMat) {
+    return m_physMat->getFriction();
+  }
+  return 0.0f;
+}
+
+void
+RigidBody::setFrictionCoef(const float _friction)
+{
+  if (m_physMat) {
+    m_physMat->setFriction(_friction);
+  }
+}
+
+void
+RigidBody::applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point) {
+  if (m_inverseMass == 0.0f) { return; }
+
+  Vector3 r = _point - getWorldPosition();
+
+  m_position += _impulse * m_inverseMass;
+  Vector3 pseudoVector = getInvInertiaWorld() * r.cross(_impulse);
+  Quaternion deltaRot = Quaternion::axisAngle(pseudoVector, pseudoVector.magnitude());
+  m_orientation = (deltaRot * m_orientation).normalized();
+}
+
 }

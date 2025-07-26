@@ -21,6 +21,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
 
@@ -41,7 +42,7 @@ class PK_UTILITY_EXPORT Quaternion
   // angle+axis, axis must be normalized
   Quaternion(float _angleRadian, const Vector3& _axis);
   // create quaternion from axis and angle
-  Quaternion
+  static Quaternion
   axisAngle(Vector3 _axis, float _angle);
   
   /**

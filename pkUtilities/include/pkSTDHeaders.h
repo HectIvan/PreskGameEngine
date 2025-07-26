@@ -33,8 +33,8 @@ using std::to_string;
 template <class T>
 using WString_Conv = std::wstring_convert<T>;
 
-  template <class T>
-  using Codecvt_utf8 = std::codecvt_utf8<T>;  
+template <class T>
+using Codecvt_utf8 = std::codecvt_utf8<T>;
 
 template <class T>
 using Queue = std::queue<T>;

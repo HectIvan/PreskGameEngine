@@ -27,7 +27,7 @@
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkWindowDesc.h"
-#include "pkRigidbody.h"
+#include "pkRigidBody.h"
 
 using pkEngineSDK::Actor;
 using pkEngineSDK::BaseApp;

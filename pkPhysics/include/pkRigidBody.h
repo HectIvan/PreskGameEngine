@@ -5,7 +5,7 @@
  * @date    05/06/2025
  * @brief   Rigid body for the physics library.
  *
- * @bug    no knon bugs.
+ * @bug    no known bugs.
  */
  /*****************************************************************************/
 #pragma once
@@ -15,7 +15,7 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
+#include "pkPhysicsMaterial.h"
 #include "pkMatrix3.h"
 #include "pkQuaternion.h"
 #include "pkComponent.h"
@@ -23,10 +23,15 @@
 namespace pkEngineSDK
 {
 
-class RigidBody : public Component
+class PK_PHYSICS_EXPORT RigidBody : public Component
 {
  public:
-  RigidBody() = default;
+  RigidBody() {
+    m_gravity = 1.0f;
+    m_drag = 0.0f;
+    // physics material
+    m_physMat = make_shared<PhysicsMaterial>();
+  }
   virtual ~RigidBody() = default;
 
   COMPONENT_TYPE::E
@@ -64,16 +69,46 @@ class RigidBody : public Component
   void
   applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point);
 
+  /**
+   * @brief Get the rigid body elasticity.
+   * @return The body elasticity.
+   */
+  float
+  getElasticity() const;
+
+  /**
+   * @brief Set the rigid body elasticity.
+   * @param _elasticity The new body elasticity.
+   */
+  void
+  setElasticity(const float _elasticity);
+
+  /**
+   * @brief Get the friction coefficient.
+   * @return The body friction.
+   */
+  float
+  getFrictionCoefficient() const;
+
+  /**
+   * @brief Set the friction coefficient.
+   * @param _friction The new friction of the object.
+   */
+  void
+  setFrictionCoef(const float _friction);
+
  public:
   float m_gravity;
   float m_drag;
   float m_inverseMass;
   Vector3 m_linearVelocity;
   Vector3 m_angularVelocity;
-  Vector3 m_invAngularInertia;
+  Matrix3 m_invAngularInertia;
   Vector3 m_prevPos;
   Vector3 m_position;
   Quaternion m_orientation;
   Matrix4 m_transform;
+
+  SPtr<PhysicsMaterial> m_physMat;
 };
 }

@@ -198,6 +198,18 @@ PhysicsManager::getEffectiveMass(Vector3& _normalHit,
   return _rb1.m_inverseMass + _rb2.m_inverseMass + angularEffect.dotProd(_normalHit);
 }
 
+float
+PhysicsManager::getElasticity(const RigidBody& _rb1, const RigidBody& _rb2)
+{
+  return (_rb1.getElasticity() + _rb2.getElasticity()) * 0.5f;
+}
+
+float
+PhysicsManager::getFriction(const RigidBody& _rb1, const RigidBody& _rb2)
+{
+  return (_rb1.getFrictionCoefficient() + _rb2.getFrictionCoefficient()) * 0.5f;
+}
+
 void
 PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info)
 {

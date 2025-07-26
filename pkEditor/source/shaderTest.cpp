@@ -10,7 +10,7 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
-#include "ShaderTest.h"
+#include "shaderTest.h"
 #include "pkColor.h"
 
 using pkEngineSDK::Color;

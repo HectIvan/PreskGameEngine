@@ -269,20 +269,20 @@ class PK_CORE_EXPORT Texture
    * @return the texture height.
    */
   uint32
-  getHeight() { return m_height; }
+  getHeight() const { return m_height; }
 
   /**
    * @brief Get the texture size.
    * @return Texture size.
    */
   Vector2
-  getSize() { return Vector2(m_width, m_height); }
+  getSize() const { return Vector2(m_width, m_height); }
 
   /**
    * @brief Get texture type.
-   * @return Type as an uint32.
+   * @return Type as a TEXTURE_TYPE::E.
    */
-  const uint32&
+  TEXTURE_TYPE::E
   getType() const { return m_type; }
 
   /**

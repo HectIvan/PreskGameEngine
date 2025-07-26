@@ -22,6 +22,12 @@
     <ClInclude Include="include\pkPhysicsManager.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkPhysicsMaterial.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkPhysicsDefines.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkShape.cpp">

@@ -198,6 +198,21 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     im.createText("Drag              ");
     im.sameLine();
     im.createDragF("##Drag", rb->m_drag);
+    if (rb->m_physMat) {
+      im.createText("Physics Material");
+      // friction
+      im.createText("Friction          ");
+      im.sameLine();
+      float friction = rb->getFrictionCoefficient();
+      im.createDragF("##Friction", friction, 0.1f, 0.0f, 1.0f);
+      rb->setFrictionCoef(friction);
+      // elasticity
+      im.createText("Elasticity        ");
+      im.sameLine();
+      float elasticity = rb->getElasticity();
+      im.createDragF("##Elasticity", elasticity, 0.1f, 0.0f, 1.0f);
+      rb->setElasticity(elasticity);
+    }
     im.endChild();
     break;
   }

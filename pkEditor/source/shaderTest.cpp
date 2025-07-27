@@ -307,7 +307,7 @@ ShaderTest::uInterfaceUpdate()
     im.startWindowCreate("Components");
     im.createButton("Add Component(non-functional)");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor->m_transform);
     }
     im.endWindowCreate();
     yOffset += winHeight;

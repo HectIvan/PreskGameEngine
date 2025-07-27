@@ -41,5 +41,5 @@ class ActorInspector
    * @param _pComponent Component to use.
    */
   void
-  createComponentWindow(SPtr<Component>& _pComponent);
+  createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _transform);
 };

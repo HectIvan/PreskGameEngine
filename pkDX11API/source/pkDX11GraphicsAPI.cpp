@@ -1103,7 +1103,7 @@ DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
 }
 
 void
-DX11GraphicsAPI::setSampler(SPtr<SamplerState> _pSamLinear,
+DX11GraphicsAPI::setSampler(const SPtr<SamplerState> _pSamLinear,
                             uint32 _startSlot,
                             uint32 _numSamplers)
 {
@@ -1125,7 +1125,8 @@ DX11GraphicsAPI::setSampler(SPtr<SamplerState> _pSamLinear,
 }
 
 void
-DX11GraphicsAPI::pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
+DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
+                                          uint32 _start)
 {
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -1167,7 +1168,8 @@ DX11GraphicsAPI::pSUnbindShaderResourceViews()
 }
 
 void
-DX11GraphicsAPI::vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
+DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
+                                          uint32 _start)
 {
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -1209,7 +1211,8 @@ DX11GraphicsAPI::vSUnbindShaderResourceViews()
 }
 
 void
-DX11GraphicsAPI::cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
+DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
+                                          uint32 _start)
 {
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -1251,7 +1254,7 @@ DX11GraphicsAPI::cSUnbindShaderResourceViews()
 }
 
 void
-DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                                            uint32 _start,
                                            uint32* _initialCounts)
 {
@@ -1573,7 +1576,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 }
 
 void
-DX11GraphicsAPI::setInputLayout(SPtr<InputLayout> _pInputLayout)
+DX11GraphicsAPI::setInputLayout( const SPtr<InputLayout> _pInputLayout)
 {
   // reinterpret to a DirectX input layout
   SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
@@ -1635,7 +1638,7 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
 }
 
 void
-DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
                                  uint32 _start,
                                  uint32 _bufferCount,
                                  uint32 _offset)
@@ -1702,7 +1705,7 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
 }
 
 void
-DX11GraphicsAPI::setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+DX11GraphicsAPI::setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
                                 uint32 _format,
                                 uint32 _offset)
 {

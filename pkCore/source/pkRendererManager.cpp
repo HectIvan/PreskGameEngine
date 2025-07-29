@@ -85,11 +85,11 @@ void RendererManager::init()
   SPtr<Texture> shadowsUAV = api.createTexture(txDesc);
   m_uavBuffers.insert({ UAV_BUFFERS::kCB_Shadows, shadowsUAV });
 
-  // specular
+  // specular uav
   SPtr<Texture> specularUAV = api.createTexture(txDesc);
   m_uavBuffers.insert({ UAV_BUFFERS::kCB_Specular, specularUAV });
 
-  // specular
+  // specular horizontal blur
   SPtr<Texture> specHBlur = api.createTexture(txDesc);
   m_uavBuffers.insert({ UAV_BUFFERS::kCB_SpecHBlur, specHBlur });
   
@@ -262,13 +262,13 @@ RendererManager::createPasses()
 }
 
 SPtr<Pass>
-RendererManager::getPass(PASS_TYPE::E _type)
+RendererManager::getPass(const PASS_TYPE::E _type)
 {
   return m_passes.find(_type)->second;
 }
 
 SPtr<Texture>&
-RendererManager::getGBuffer(G_BUFFERS::E _type)
+RendererManager::getGBuffer(const G_BUFFERS::E _type)
 {
   return m_gBuffers.find(_type)->second;
 }
@@ -324,7 +324,7 @@ RendererManager::compileShaders()
 }
 
 template<class T> void
-RendererManager::updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer)
+RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuffer)
 {
   g_GraphicAPI().updateConstantBuffer(_pCBuffer, &_data, 0);
 }
@@ -336,13 +336,16 @@ RendererManager::setActorsBuffers()
   GraphicsAPI& api = g_GraphicAPI().instance();
   SceneManager& sm = g_SceneManager().instance();
   // for each actor in the world
-  for (uint32 i = 0; i < sm.getActiveScene()->getAllActors().size(); ++i) {
+  SPtr<Scene> activeScene = sm.getActiveScene();
+  SIZE_T actorCount = activeScene->getAllActors().size();
+  for (uint32 i = 0; i < actorCount; ++i) {
     // Cast to a gameObject, if it fails, do none of the following process
-    SPtr<Actor> actor = sm.getActiveScene()->getActor(i);
-    // if the actor has a model component
-    if (actor->getComponent<Model>()) {
-      api.setVertexBuffer(actor->getComponent<Model>()->m_vertexB);
-      api.setIndexBuffer(actor->getComponent<Model>()->m_indexB);
+    SPtr<Actor> actor = activeScene->getActor(i);
+    // if the actor has a model 
+    SPtr<Model> model = actor->getComponent<Model>();
+    if (model) {
+      api.setVertexBuffer(model->m_vertexB);
+      api.setIndexBuffer(model->m_indexB);
     }
   }
 }
@@ -354,6 +357,7 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
   GraphicsAPI& api = g_GraphicAPI().instance();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
+    // if actor is not active
     if (!_gameActors[i]->isActive()) {
       continue;
     }
@@ -367,17 +371,16 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       // the next parent will be the parent of this parent
       parent = parent->m_parent;
     }
-    // set the current actor transform as the world in which the shader will work in
-    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Base)->getCBuffer(2),
-                             &transform,
-                             static_cast<uint32>(sizeof(CBTransform)));
-    api.updateConstantBuffer(rManager.getPass(PASS_TYPE::kP_Shadow)->getCBuffer(2),
-                             &transform,
-                             static_cast<uint32>(sizeof(CBTransform)));
+    // set the current actor transform as the world in which the shader will work 
+    SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+    SPtr<Pass> shadowPass = rManager.getPass(PASS_TYPE::kP_Shadow);
+    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(CBTransform));
+    api.updateConstantBuffer(shadowPass->getCBuffer(2), &transform, sizeof(CBTransform));
 
     // render the model of the actor
-    if (_gameActors[i]->getComponent<Model>()) {
-      renderModel(*_gameActors[i]->getComponent<Model>());
+    SPtr<Model> model = _gameActors[i]->getComponent<Model>();
+    if (model) {
+      renderModel(model);
     }
     // if the actor has children, do the same for them (recursive)
     if (!_gameActors[i]->m_children.empty()) {
@@ -388,30 +391,29 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 
 
 void
-RendererManager::renderModel(Model& _model)
+RendererManager::renderModel(const SPtr<Model>& _model)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   // get a reference from the api
-  api.setVertexBuffer(_model.m_vertexB);
-  api.setIndexBuffer(_model.m_indexB);
+  api.setVertexBuffer(_model->m_vertexB);
+  api.setIndexBuffer(_model->m_indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
-  for (uint32 i = 0; i < _model.meshes.size(); ++i) {
+  for (uint32 i = 0; i < _model->meshes.size(); ++i) {
     // get the material
-    SPtr<Material> material = _model.meshes[i]->material;
+    SPtr<Mesh> mesh = _model->meshes[i];
+    SPtr<Material> material = mesh->material;
     // set the material textures to the shader
     Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
                                        material->metallic, material->occlusion };
     api.pSSetShaderResourceViews(textures);
     // draw the mesh
-    api.drawIndexed(static_cast<uint32>(_model.meshes[i]->numIndex),
-                               currentIndexOrigin,
-                               currentVertexOrigin);
+    api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     // update the offsets
-    currentIndexOrigin += static_cast<uint32>(_model.meshes[i]->numIndex);
-    currentVertexOrigin += static_cast<uint32>(_model.meshes[i]->vertexCount);
+    currentIndexOrigin += mesh->numIndex;
+    currentVertexOrigin += mesh->vertexCount;
   }
 }
 PK_CORE_EXPORT RendererManager&

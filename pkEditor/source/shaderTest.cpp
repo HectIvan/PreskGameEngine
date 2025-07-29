@@ -478,7 +478,7 @@ ShaderTest::onUpdate()
   SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
 
-  // update normal pass buffers
+  // update normal && base shadow pass buffers
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
@@ -495,8 +495,6 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  // get the shadow data needed
-  
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
   // update specular compute buffers

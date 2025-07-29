@@ -106,7 +106,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @return Pointer to the pass.
    */
   SPtr<Pass>
-  getPass(PASS_TYPE::E _type);
+  getPass(const PASS_TYPE::E _type);
 
   /**
    * @brief Get a specific G-buffer.
@@ -114,7 +114,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @return Pointer to the buffer.
    */
   SPtr<Texture>&
-  getGBuffer(G_BUFFERS::E _type);
+  getGBuffer(const G_BUFFERS::E _type);
 
   /**
    * @brief Get all the buffers in the manager.
@@ -168,10 +168,10 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
 
   /**
    * @brief Render a given model
-   * @param _model The model to render
+   * @param _model Pointer to the model to render
    */
   void
-  renderModel(Model& _model);
+  renderModel(const SPtr<Model>& _model);
 
   /**
    * @brief Update a constant buffer.
@@ -179,7 +179,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _pCBuffer Constant buffer to update.
    */
   template<class T> void
-  updateBuffer(T& _data, SPtr<ConstantBuffer> _pCBuffer);
+  updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuffer);
 
  public:
 

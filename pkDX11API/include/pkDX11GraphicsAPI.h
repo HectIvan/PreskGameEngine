@@ -207,7 +207,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Set input layout
    */
   void
-  setInputLayout(SPtr<InputLayout> _pInputLayout) override;
+  setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -226,7 +226,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _offset buffer offsets.
    */
   void
-  setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+  setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
                   uint32 _bufferCount = 1,
                   uint32 _offset = 0) override;
@@ -241,16 +241,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                     uint32 _usage = 0) override;
 
   /**
-  * Set the index buffer.
-  *
-  * @param _format
-  * What kind of format will the buffer use.
-  *
-  * @param _offset
-  * Distance between blobs of data.
-  **/
+   * @brief Set the index buffer.
+   * @param _format What kind of format will the buffer use.
+   * @param _offset Distance between blobs of data.
+   */
   void
-  setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
+  setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
                  uint32 _format = 42,
                  uint32 _offset = 0) override;
 
@@ -283,7 +279,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -297,7 +293,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -311,7 +307,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources of a compute shader.
@@ -326,7 +322,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   void
-  cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
                             uint32* _initialCounts = nullptr) override;
 
@@ -375,7 +371,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * Set the sampler state.
    */
   void
-  setSampler(SPtr<SamplerState> _pSamLinear,
+  setSampler(const SPtr<SamplerState> _pSamLinear,
              uint32 _startSlot = 0,
              uint32 _numSamplers = 1) override;
 

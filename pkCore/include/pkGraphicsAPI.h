@@ -17,6 +17,7 @@
 /*********************************************/
 #include "pkBlendState.h"
 #include "pkDepthStencilView.h"
+#include "pkGraphicTypes.h"
 #include "pkInputLayout.h"
 #include "pkInputLayoutDesc.h"
 #include "pkModel.h"
@@ -223,7 +224,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _pInputLayout What input layout to use.
    */
   virtual void
-  setInputLayout(SPtr<InputLayout> _pInputLayout) = 0;
+  setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
    * @brief Create a VertexBuffer.
@@ -243,7 +244,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _offset Difference in size between buffers.
    */
   virtual void
-  setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
+  setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
                   uint32 _start = 0,
                   uint32 _bufferCount = 1,
                   uint32 _offset = 0) = 0;
@@ -264,8 +265,8 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _offset Distance between blobs of data.
    */
   virtual void
-  setIndexBuffer(SPtr<IndexBuffer>& _pIndexB,
-                 uint32 _format = 42,
+  setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
+                 uint32 _format = 42, // kPK_FORMAT_R32_UINT
                  uint32 _offset = 0) = 0;
 
   /**
@@ -297,7 +298,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   virtual void
-  vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -311,7 +312,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   virtual void
-  pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -325,7 +326,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _start In what slot of the pixel shader will the resources be allocated
    */
   virtual void
-  cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a compute shader.
@@ -340,7 +341,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   virtual void
-  cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
                             uint32* _initialCounts = nullptr) = 0;
 
@@ -446,7 +447,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   * Set the sampler state.
   **/
   virtual void
-  setSampler(SPtr<SamplerState> _pSamLinear,
+  setSampler(const SPtr<SamplerState> _pSamLinear,
              uint32 _startSlot = 0,
              uint32 _numSamplers = 1) = 0;
 

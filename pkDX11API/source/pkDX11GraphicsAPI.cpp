@@ -388,7 +388,7 @@ DX11GraphicsAPI::createCShader(SPtr<Shader> _pShader)
 
 
 void
-DX11GraphicsAPI::setVShader(SPtr<Shader> _pShader)
+DX11GraphicsAPI::setVShader(const SPtr<Shader> _pShader)
 {
   PK_ASSERT(m_pDevice);
   // reinterpret as a DirectX vertex shader
@@ -409,7 +409,7 @@ DX11GraphicsAPI::setVShader(SPtr<Shader> _pShader)
 }
 
 void
-DX11GraphicsAPI::setPShader(SPtr<Shader> _pShader)
+DX11GraphicsAPI::setPShader(const SPtr<Shader> _pShader)
 {
   PK_ASSERT(m_pDevice);
   // reinterpret as a DirectX pixel shader
@@ -430,7 +430,7 @@ DX11GraphicsAPI::setPShader(SPtr<Shader> _pShader)
 }
 
 void
-DX11GraphicsAPI::setCShader(SPtr<Shader> _pShader)
+DX11GraphicsAPI::setCShader(const SPtr<Shader> _pShader)
 {
   PK_ASSERT(m_pDevice);
   // reinterpret as a DirectX compute shader
@@ -560,7 +560,7 @@ DX11GraphicsAPI::unbindRenderTargets()
 }
 
 void
-DX11GraphicsAPI::setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
+DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
 {
   // reinterpet render target
   auto rTarget = reinterpret_pointer_cast<DX11Texture>(_pRTarget);
@@ -666,7 +666,7 @@ DX11GraphicsAPI::createBlendState()
 }
 
 SPtr<RasterizerState>
-DX11GraphicsAPI::createRasterizerState(RASTERIZER_DESC& _desc)
+DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
 {
   // create the rasterizer state
   SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
@@ -695,7 +695,7 @@ DX11GraphicsAPI::createRasterizerState(RASTERIZER_DESC& _desc)
 }
 
 void
-DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
+DX11GraphicsAPI::setBlendState(const SPtr<BlendState> _pBlendState)
 {
   PK_ASSERT(_pBlendState);
   PK_ASSERT(m_pDevice);
@@ -715,7 +715,7 @@ DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
 }
 
 void
-DX11GraphicsAPI::setRasterizerState(SPtr<RasterizerState> _pRasterizerState)
+DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState> _pRasterizerState)
 {
   PK_ASSERT(m_pDevice);
   // Reinterpret to a DirectX Rasterizer State
@@ -770,7 +770,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
 }
 
 SPtr<InputLayout>
-DX11GraphicsAPI::createInputLayoutFromVShader(SPtr<Shader> _pShader)
+DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
 {
   PK_ASSERT(_pShader);
   PK_ASSERT(m_pDevice);

@@ -54,6 +54,89 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   initApi(const Window& _window) = 0;
 
   /**
+   * @brief Get the API Swap chain
+   * @return Swap chain.
+   */
+  virtual SPtr<SwapChain>
+  getSwapChain() = 0;
+
+  /**
+   * @brief Get the api device.
+   * @return The Pointer to the device
+   */
+  virtual SPtr<Device>
+  getDevice() = 0;
+
+  /**
+   * @brief Set the Client viewport.
+   * @param _width Client width.
+   * @param _height Client height.
+   */
+  virtual void
+  setViewport(uint32 _width, uint32 _height) = 0;
+
+  /**
+   * @brief Get the client viewport size.
+   * @param _vpPos What viewport to get.
+   */
+  virtual Vector2
+  getViewportSize(uint32 _vpPos) = 0;
+
+  /**
+   * @brief Create the blend state.
+   * @return Blend state pointer
+   */
+  virtual SPtr<BlendState>
+  createBlendState() = 0;
+
+  /**
+   * @brief Set the blend state.
+   * @param _pBlendState Blend state to set.
+   */
+  virtual void
+  setBlendState(const SPtr<BlendState> _pBlendState) = 0;
+
+  /**
+   * @brief Create the Rasterizer state.
+   * @param _desc Rasterizer description.
+   * @return Rasterizer state pointer.
+   */
+  virtual SPtr<RasterizerState>
+  createRasterizerState(const RASTERIZER_DESC& _desc) = 0;
+
+  /**
+   * @brief Set the rasterizer state.
+   * @param _pRasterizerState Rasterizer state to set.
+   */
+  virtual void
+  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) = 0;
+
+  /**
+   * @brief Create the sampler state.
+   * @param _mode Mode of the sampler.
+   * @param _filter What filter will be used.
+   * @return Pointer to the new sampler state.
+   */
+  virtual SPtr<SamplerState>
+  createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
+
+  /**
+  * Set the sampler state.
+  **/
+  virtual void
+  setSampler(const SPtr<SamplerState> _pSamLinear,
+             uint32 _startSlot = 0,
+             uint32 _numSamplers = 1) = 0;
+
+  /**
+   * @brief Set the render target to the device.
+   * @param _rTargets Target to set.
+   * @param _DepthSV Depth stencil view to use.
+   */
+  virtual void
+  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
+
+  /**
    * @brief Set the render targets to the device.
    * @param _rTargets List of targets to set.
    * @param _DepthSV Depth stencil view to use.
@@ -66,43 +149,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    */
   virtual void
   unbindRenderTargets() = 0;
-
-  /**
-   * @brief Set the render target to the device.
-   * @param _rTargets Target to set.
-   * @param _DepthSV Depth stencil view to use.
-   */
-  virtual void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
-
-  /**
-   * @brief Create the blend state.
-   * @return Blend state pointer
-   */
-  virtual SPtr<BlendState>
-  createBlendState() = 0;
-
-  /**
-   * @brief Create the Rasterizer state.
-   * @param _desc Rasterizer description.
-   * @return Rasterizer state pointer.
-   */
-  virtual SPtr<RasterizerState>
-  createRasterizerState(RASTERIZER_DESC& _desc) = 0;
-
-  /**
-   * @brief Set the rasterizer state.
-   * @param _pRasterizerState Rasterizer state to set.
-   */
-  virtual void
-  setRasterizerState(SPtr<RasterizerState> _pRasterizerState) = 0;
-
-  /**
-   * @brief Set the blend state.
-   * @param _pBlendState Blend state to set.
-   */
-  virtual void
-  setBlendState(SPtr<BlendState> _pBlendState) = 0;
 
   /**
    * @brief Creates a shader of the specific graphic API.
@@ -137,28 +183,21 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _pShader Shader to set.
    */
   virtual void
-  setVShader(SPtr<Shader> _pShader) = 0;
+  setVShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setPShader(SPtr<Shader> _pShader) = 0;
+  setPShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set a compute shader.
    * @param _pShader Compute shader.
    */
   virtual void
-  setCShader(SPtr<Shader> _pShader) = 0;
-
-  /**
-   * @brief Get the API Swap chain
-   * @return Swap chain.
-   */
-  virtual SPtr<SwapChain>
-  getSwapChain() = 0;
+  setCShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -178,7 +217,23 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @return Input layout pointer
    */
   virtual SPtr<InputLayout>
-  createInputLayoutFromVShader(SPtr<Shader> _pShader) = 0;
+  createInputLayoutFromVShader(const SPtr<Shader> _pShader) = 0;
+
+  /**
+   * @brief Create the Input Layout.
+   * @param _vDesc Description of the input layout.
+   * @param _pVShader Shader to use.
+   * @return Pointer to the new input layout
+   */
+  virtual SPtr<InputLayout>
+  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
+
+  /**
+   * @brief Set input layout.
+   * @param _pInputLayout What input layout to use.
+   */
+  virtual void
+  setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
    * @brief Create a texture.
@@ -211,20 +266,40 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                 unsigned char* _data = nullptr) = 0;
 
   /**
-   * @brief Create the sampler state.
-   * @param _mode Mode of the sampler.
-   * @param _filter What filter will be used.
-   * @return Pointer to the new sampler state.
+   * @brief Create a texture from file.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _bindFlags Bind flags of the texture.
+   * @param _format Format of the texture.
+   * @return Pointer to the texture.
    */
-  virtual SPtr<SamplerState>
-  createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
+  virtual SPtr<Texture>
+  createTextureFromFile(const Path& _directory,
+                        uint32 _bindFlags,
+                        bool _mipLevels,
+                        uint32 _format,
+                        int32 _miscFlags = 0) = 0;
 
   /**
-   * @brief Set input layout.
-   * @param _pInputLayout What input layout to use.
+   * @brief Create a texture from a DDS file.
+   * @param _directory Directory of the file.
+   * @return The texture created.
    */
-  virtual void
-  setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
+  virtual SPtr<Texture>
+  createDDSTextureFromFile(const Path& _directory) = 0;
+
+  /**
+   * @brief Create a texture from file as float.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @return Pointer to the texture.
+   */
+  virtual SPtr<Texture>
+  createTextureFromFileF(const Path& _directory,
+                         uint32 _bindFlags,
+                         bool _mipLevels,
+                         int32 _miscFlags = 0) = 0;
 
   /**
    * @brief Create a VertexBuffer.
@@ -366,6 +441,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
 
   /**
+   * @brief Clear access view.
+   * @param _color New view color.
+   */
+  virtual void
+  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
+
+  /**
    * @brief Clear all unordered access views of a vector.
    * @param _uavs Vector of UAVs.
    * @param _color New view color.
@@ -375,28 +457,12 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                             const Color& _color = Color(1,1,1,0)) = 0;
 
   /**
-   * @brief Clear access view.
-   * @param _color New view color.
-   */
-  virtual void
-  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
-
-  /**
    * @brief clear the depth buffer.
    * @param _depth Default depth of the stencil.
    * @param _pDepthSV Depth stencil view to clear.
    */
   virtual void
   clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) = 0;
-
-  /**
-   * @brief Create the Input Layout.
-   * @param _vDesc Description of the input layout.
-   * @param _pVShader Shader to use.
-   * @return Pointer to the new input layout
-   */
-  virtual SPtr<InputLayout>
-  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
 
   /**
    * @brief Set the Vertex Shader constant buffers.
@@ -444,50 +510,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   cSUnbindConstantBuffers() = 0;
 
   /**
-  * Set the sampler state.
-  **/
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   */
   virtual void
-  setSampler(const SPtr<SamplerState> _pSamLinear,
-             uint32 _startSlot = 0,
-             uint32 _numSamplers = 1) = 0;
-
-  /**
-   * @brief Create a texture from file.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _bindFlags Bind flags of the texture.
-   * @param _format Format of the texture.
-   * @return Pointer to the texture.
-   */
-  virtual SPtr<Texture>
-  createTextureFromFile(const Path& _directory,
-                        uint32 _bindFlags,
-                        bool _mipLevels,
-                        uint32 _format,
-                        int32 _miscFlags = 0) = 0;
-
-  /**
-   * @brief Create a texture from file as float.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
-   * @return Pointer to the texture.
-   */
-  virtual SPtr<Texture>
-  createTextureFromFileF(const Path& _directory,
-                         uint32 _bindFlags,
-                         bool _mipLevels,
-                         int32 _miscFlags = 0) = 0;
-
-  virtual SPtr<Texture>
-  createDDSTextureFromFile(const Path& _directory) = 0;
-
-  /**
-   * @brief Get the api device.
-   * @return The Pointer to the device
-   */
-  virtual SPtr<Device>
-  getDevice() = 0;
+  draw(uint32 _indexCount,
+       uint32 _startIndexLocation) = 0;
 
   /**
    * @brief Draw the indexed data.
@@ -499,15 +528,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   drawIndexed(uint32 _indexCount,
               uint32 _startIndexLocation,
               uint32 _baseVertexLocation) = 0;
-
-  /**
-   * @brief Draw the indexed data.
-   * @param _indexCount The ammount of index to draw.
-   * @param _startIndexLocation Which index will be the starting point.
-   */
-  virtual void
-  draw(uint32 _indexCount,
-       uint32 _startIndexLocation) = 0;
 
   /**
    * @brief Compute shader draw call.

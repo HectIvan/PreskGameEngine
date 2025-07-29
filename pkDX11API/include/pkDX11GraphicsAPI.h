@@ -51,26 +51,53 @@ class DX11GraphicsAPI : public GraphicsAPI
   initApi(const Window& _window) override;
 
   /**
-   * @brief Set the render targets to the device.
-   * @param _rTargets List of targets to set.
-   * @param _DepthSV Depth stencil view to use.
+   * @brief Create the device and swap chain.
+   * @param _width Client width.
+   * @param _height Client height.
+   * @param _wHnd Handler to the window.
+   * @param _numDriverTypes Number of available types of driver.
+   * @param _createDeviceFlags Flags that can be used in the creation of the device.
+   * @param _featureLevels Levels that can be used.
+   * @param _numFeatureLevels Number of feature levels.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
+  createDeviceAndSwapChain(uint32& _width,
+                           uint32& _height,
+                           WindowHandle& _wHnd,
+                           uint32& _numDriverTypes,
+                           D3D_DRIVER_TYPE _driverTypes[],
+                           uint32& _createDeviceFlags,
+                           D3D_FEATURE_LEVEL _featureLevels[],
+                           uint32& _numFeatureLevels);
 
   /**
-   * @brief Unbinds all render targets.
+   * @brief Get the API Swap chain
+   * @return Swap chain.
    */
-  void
-  unbindRenderTargets() override;
+  SPtr<SwapChain>
+  getSwapChain() override { return m_pSwapChain; }
 
   /**
-   * @brief Set the render target to the device.
-   * @param _rTargets Target to set.
-   * @param _DepthSV Depth stencil view to use.
+   * @brief Get the device pointer.
+   * @return Return te pointer to the device.
+   */
+  SPtr<Device>
+  getDevice() override { return m_pDevice; }
+
+  /**
+   * @brief Set the Client viewport.
+   * @param _width Client width.
+   * @param _height Client height.
    */
   void
-  setRenderTarget(SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
+  setViewport(uint32 _width, uint32 _height);
+
+  /**
+   * @brief Get the client viewport size.
+   * @param _vpPos What viewport to get.
+   */
+  Vector2
+  getViewportSize(uint32 _vpPos) override;
 
   /**
    * @brief Create the blend state.
@@ -80,26 +107,66 @@ class DX11GraphicsAPI : public GraphicsAPI
   createBlendState() override;
 
   /**
+   * @brief Set the blend state.
+   * @param _pBlendState Blend state to set.
+   */
+  void
+  setBlendState(const SPtr<BlendState> _pBlendState) override;
+
+  /**
    * @brief Create the Rasterizer state.
    * @param _desc Rasterizer description.
    * @return Rasterizer state pointer.
    */
   SPtr<RasterizerState>
-  createRasterizerState(RASTERIZER_DESC& _desc) override;
-
-  /**
-   * @brief Set the blend state.
-   * @param _pBlendState Blend state to set.
-   */
-  void
-  setBlendState(SPtr<BlendState> _pBlendState) override;
+  createRasterizerState(const RASTERIZER_DESC& _desc) override;
 
   /**
    * @brief Set the rasterizer state.
    * @param _pRasterizerState Rasterizer state to set.
    */
   void
-  setRasterizerState(SPtr<RasterizerState> _pRasterizerState) override;
+  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) override;
+
+  /**
+   * @brief Create the sampler state.
+   * @param _mode Mode of the sampler.
+   * @param _filter What filter will be used.
+   * @return Pointer to the new sampler state.
+   */
+  SPtr<SamplerState>
+  createSamplerState(const uint32 _mode, const uint32 _filter) override;
+
+  /**
+   * Set the sampler state.
+   */
+  void
+  setSampler(const SPtr<SamplerState> _pSamLinear,
+             uint32 _startSlot = 0,
+             uint32 _numSamplers = 1) override;
+
+  /**
+   * @brief Set the render target to the device.
+   * @param _rTargets Target to set.
+   * @param _DepthSV Depth stencil view to use.
+   */
+  void
+  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
+
+  /**
+   * @brief Set the render targets to the device.
+   * @param _rTargets List of targets to set.
+   * @param _DepthSV Depth stencil view to use.
+   */
+  void
+  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
+
+  // to do:change this to allow a specific ammount to be unbound.
+  /**
+   * @brief Unbinds all render targets.
+   */
+  void
+  unbindRenderTargets() override;
 
   /**
    * @brief Creates a shader of the specific graphic API.
@@ -133,20 +200,20 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Set the vertex shader to the device context.
    */
   void
-  setVShader(SPtr<Shader> _pShader) override;
+  setVShader(const SPtr<Shader> _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
    */
   void
-  setPShader(SPtr<Shader> _pShader) override;
+  setPShader(const SPtr<Shader> _pShader) override;
 
   /**
    * @brief Set a compute shader.
    * @return Compute shader.
    */
   void
-  setCShader(SPtr<Shader> _pShader) override;
+  setCShader(const SPtr<Shader> _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -165,7 +232,22 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pShader Shader to use.
    */
   SPtr<InputLayout>
-  createInputLayoutFromVShader(SPtr<Shader> _pShader) override;
+  createInputLayoutFromVShader(const SPtr<Shader> _pShader) override;
+
+  /**
+   * @brief Create the Input Layout.
+   * @param _vDesc Description of the input layout.
+   * @param _pVShader Shader to use.
+   * @return Pointer to the new input layout
+   */
+  SPtr<InputLayout>
+  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) override;
+
+  /**
+   * @brief Set input layout
+   */
+  void
+  setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
 
   /**
    * @brief Create a texture.
@@ -198,16 +280,39 @@ class DX11GraphicsAPI : public GraphicsAPI
                 unsigned char* _data = nullptr) override;
 
   /**
-   * @brief Create the sampler state.
+   * @brief Create a texture from file.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @param _format What format will the texture be.
    */
-  SPtr<SamplerState>
-  createSamplerState(const uint32 _mode, const uint32 _filter) override;
+  SPtr<Texture>
+  createTextureFromFile(const Path& _directory,
+                        uint32 _bindFlags,
+                        bool _mipLevels,
+                        uint32 _format,
+                        int32 _miscFlags = 0) override;
 
   /**
-   * @brief Set input layout
+   * @brief Create a texture from a DDS file.
+   * @param _directory Directory of the file.
+   * @return The texture created.
    */
-  void
-  setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
+  SPtr<Texture>
+  createDDSTextureFromFile(const Path& _directory) override;
+
+  /**
+   * @brief Create a texture from file as float.
+   * @param _directory Directory of the texture.
+   * @param _bindFlags What kind of binding will it have.
+   * @param _mipLevels If the texture has mip levels.
+   * @return Pointer to the texture.
+   */
+  SPtr<Texture>
+  createTextureFromFileF(const Path& _directory,
+                         uint32 _bindFlags,
+                         bool _mipLevels,
+                         int32 _miscFlags = 0) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -333,115 +438,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   cSUnbindUnorderedAccessViews() override;
 
   /**
-   * @brief Create the device and swap chain.
-   * @param _width Client width.
-   * @param _height Client height.
-   * @param _wHnd Handler to the window.
-   * @param _numDriverTypes Number of available types of driver.
-   * @param _createDeviceFlags Flags that can be used in the creation of the device.
-   * @param _featureLevels Levels that can be used.
-   * @param _numFeatureLevels Number of feature levels.
-   */
-  void
-  createDeviceAndSwapChain(uint32& _width,
-                           uint32& _height,
-                           WindowHandle& _wHnd,
-                           uint32& _numDriverTypes,
-                           D3D_DRIVER_TYPE _driverTypes[],
-                           uint32& _createDeviceFlags,
-                           D3D_FEATURE_LEVEL _featureLevels[],
-                           uint32& _numFeatureLevels);
-
-  /**
-   * @brief Set the Client viewport.
-   * @param _width Client width.
-   * @param _height Client height.
-   */
-  void
-  setViewport(uint32 _width, uint32 _height);
-
-  /**
-   * @brief Get the client viewport size.
-   * @pa
-   */
-  Vector2
-  getViewportSize(uint32 _vpPos);
-
-  /**
-   * Set the sampler state.
-   */
-  void
-  setSampler(const SPtr<SamplerState> _pSamLinear,
-             uint32 _startSlot = 0,
-             uint32 _numSamplers = 1) override;
-
-  /**
-   * @brief Create a texture from file.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
-   * @param _format What format will the texture be.
-   */
-  SPtr<Texture>
-  createTextureFromFile(const Path& _directory,
-                        uint32 _bindFlags,
-                        bool _mipLevels,
-                        uint32 _format,
-                        int32 _miscFlags = 0) override;
-
-  SPtr<Texture>
-  createDDSTextureFromFile(const Path& _directory) override;
-
-  /**
-   * @brief Create a texture from file as float.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
-   * @return Pointer to the texture.
-   */
-  SPtr<Texture>
-  createTextureFromFileF(const Path& _directory,
-                         uint32 _bindFlags,
-                         bool _mipLevels,
-                         int32 _miscFlags = 0) override;
-
-  /**
-   * @brief Get the device pointer.
-   * @return Return te pointer to the device.
-   */
-  SPtr<Device>
-  getDevice() override { return m_pDevice; }
-
-  /**
-   * @brief Draw the indexed data.
-   * @param _indexCount The ammount of index to draw.
-   * @param _startIndexLocation Which index will be the starting point.
-   * @param _baseVertexLocation Which vertex will be the starting point.
-   */
-  void
-  drawIndexed(uint32 _indexCount,
-              uint32 _startIndexLocation,
-              uint32 _baseVertexLocation) override;
-
-  /**
-   * @brief Draw the indexed data.
-   * @param _indexCount The ammount of index to draw.
-   * @param _startIndexLocation Which index will be the starting point.
-   */
-  void
-  draw(uint32 _indexCount,
-      uint32 _startIndexLocation) override;
-
-  /**
-   * @brief Compute shader draw call.
-   * @param _countX Thread group size in the X axis.
-   * @param _countY Thread group size in the Y axis.
-   * @param _countZ Thread group size in the Z axis.
-   */
-  void
-  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
-
-  /**
    * @brief Clear all render target views of a vector.
    * @param _color New render target color.
    */
@@ -456,14 +452,6 @@ class DX11GraphicsAPI : public GraphicsAPI
   clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
 
   /**
-   * @brief Clear all unordered access views of a vector.
-   * @param _color New view color.
-   */
-  void
-  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
-                            const Color& _color = Color(1, 1, 1, 0)) override;
-
-  /**
    * @brief Clear access view.
    * @param _color New view color.
    */
@@ -472,17 +460,19 @@ class DX11GraphicsAPI : public GraphicsAPI
                            const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**
+   * @brief Clear all unordered access views of a vector.
+   * @param _color New view color.
+   */
+  void
+  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+                            const Color& _color = Color(1, 1, 1, 0)) override;
+
+  /**
    * @brief Clear the depth buffer.
    * @param _pDepthSV Depth stencil to clear.s
    */
   void
   clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) override;
-
-  /**
-   * @brief Create the Input Layout.
-   */
-  SPtr<InputLayout>
-  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) override;
 
   /**
    * @brief Set the Vertex Shader constant buffers.
@@ -530,11 +520,33 @@ class DX11GraphicsAPI : public GraphicsAPI
   cSUnbindConstantBuffers() override;
 
   /**
-   * @brief Get the API Swap chain
-   * @return Swap chain.
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
    */
-  SPtr<SwapChain>
-  getSwapChain() override { return m_pSwapChain; }
+  void
+  draw(uint32 _indexCount,
+       uint32 _startIndexLocation) override;
+
+  /**
+   * @brief Draw the indexed data.
+   * @param _indexCount The ammount of index to draw.
+   * @param _startIndexLocation Which index will be the starting point.
+   * @param _baseVertexLocation Which vertex will be the starting point.
+   */
+  void
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) override;
+
+  /**
+   * @brief Compute shader draw call.
+   * @param _countX Thread group size in the X axis.
+   * @param _countY Thread group size in the Y axis.
+   * @param _countZ Thread group size in the Z axis.
+   */
+  void
+  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
 
   /**
    * @brief Present the result to the screen.
@@ -548,9 +560,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   // swap chain
   SPtr<SwapChain> m_pSwapChain;
-
-  // mesh color
-  Vector4 vMeshColor;
 
  private:
   // api device

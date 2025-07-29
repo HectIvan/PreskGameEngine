@@ -190,35 +190,28 @@ ShaderTest::input()
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
   // move forward/backward
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
   }
   // move left/right
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(-speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(speed);
   }
   // move up/down
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
   // rotate camera
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     // m_selectedActor = nullptr;
     posDif.x *= m_sensX;

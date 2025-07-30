@@ -430,6 +430,8 @@ ShaderTest::onUpdate()
 
     shadowsParam.farNear = camera->m_farNear;
   }
+  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
+
   // light data
   SPtr<Light> light = m_light->getComponent<Light>();
   SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
@@ -506,10 +508,11 @@ ShaderTest::onUpdate()
 
   // skybox constant buffer
   Matrix4 transform = Matrix4::IDENTITY;
-  Matrix4 invViewProj = (camera->m_projection * camera->m_view).inverse();
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invViewProj, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invView, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(4), &SkyBoxWinSize, sizeof(Vector4));
 }
 
 void

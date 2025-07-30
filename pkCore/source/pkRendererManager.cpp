@@ -184,7 +184,8 @@ RendererManager::createPasses()
                                                        false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
   pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
-  pDesc.cBSizes = { sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4) };
+  pDesc.cBSizes = { sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4), sizeof(Matrix4),
+                    sizeof(Vector4) };
   pDesc.inputs = { skyboxTex, getDepthBuffer(D_BUFFERS::kDB_Base) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);

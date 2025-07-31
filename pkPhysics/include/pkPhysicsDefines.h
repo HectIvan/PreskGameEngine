@@ -15,7 +15,7 @@
 #   if defined( PK_STATIC_LIB )
 #     define PK_PHYSICS_EXPORT
 #   else
-#     if defined ( PK_PHYSICS_EXPORTS)
+#     if defined ( PK_PHYSICS_EXPORTS )
 #       define PK_PHYSICS_EXPORT __attribute__ ((dllexport))
 #     else
 #       define PK_PHYSICS_EXPORT __attribute__ ((dllimport))

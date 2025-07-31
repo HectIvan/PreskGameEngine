@@ -1,4 +1,5 @@
 #include "ActorInspector.h"
+#include "pkPhysicsManager.h"
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
@@ -54,6 +55,7 @@ using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::PhysicsManager;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
@@ -89,6 +91,7 @@ PhysicsApp::onInit()
 {
   //start the interface
   UInterface::startUp();
+  PhysicsManager::startUp();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager

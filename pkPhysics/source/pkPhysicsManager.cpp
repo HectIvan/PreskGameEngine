@@ -26,11 +26,11 @@ PhysicsManager::sortByLeft(Vector<Shape>& _shapes)
 {
   Vector<Shape> returnShapes = _shapes;
   // sort in ascending order using the x axis
-  std::sort(returnShapes.begin(),
-            returnShapes.end(),
-            [](const Vector3& a, const Vector3& b) {
-              return a.x < b.x;
-            });
+  // std::sort(returnShapes.begin(),
+  //           returnShapes.end(),
+  //           [](const Vector3& a, const Vector3& b) {
+  //             return a.x < b.x;
+  //           });
   return returnShapes;
 }
 

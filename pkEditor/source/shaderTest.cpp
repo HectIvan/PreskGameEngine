@@ -10,7 +10,7 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
-#include "ShaderTest.h"
+#include "shaderTest.h"
 #include "pkColor.h"
 
 using pkEngineSDK::Color;
@@ -38,6 +38,9 @@ using pkEngineSDK::int32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
+using pkEngineSDK::LOG_MSG_TYPE::kError;
+using pkEngineSDK::LOG_MSG_TYPE::kLog;
+using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
@@ -93,10 +96,12 @@ ShaderTest::onInit()
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
   ResourceManager& resourceMan = g_ResourceManager().instance();
+  SceneManager& sceneMan = g_SceneManager().instance();
+  SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
   // create camera
   m_cameraSpeed = 20.0f;
-  m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
+  m_camera = activeScene->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
@@ -112,7 +117,7 @@ ShaderTest::onInit()
   m_sensY = 0.3f;
 
   // create light
-  m_light = g_SceneManager().getActiveScene()->instantiate("Light");
+  m_light = activeScene->instantiate("Light");
   m_light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = m_light->getComponent<Light>();
 
@@ -128,24 +133,24 @@ ShaderTest::onInit()
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
-  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
+  SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(10.0f);
   pistol->setPosition(0.0f, 5.0f, 0.0f);
 
-  // SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
+  // SPtr<Actor> leon = activeScene->instantiate("Leon");
   // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
 
-  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
+  SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
-  // SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
+  // SPtr<Actor> rpd = activeScene->instantiate("RPD");
   // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
   // rpd->setRotation(0, 90, 0);
   // // rpd->setScale(1.0f);
   // rpd->setPosition(0, 0, -100);
 
-  SPtr<Actor> coat = g_SceneManager().getActiveScene()->instantiate("Coat");
+  SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
@@ -154,6 +159,8 @@ ShaderTest::onInit()
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
+
+  g_Logger().printMessageLogOfType(kLog);
 }
 
 void

@@ -49,6 +49,7 @@ Camera::init(uint32 _width,
                                               _farZ);
   }
   m_rotation = Vector3(0.0f);
+  g_Logger().registerMessage("Created Camera component.");
 }
 
 void

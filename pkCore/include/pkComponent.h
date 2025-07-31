@@ -37,7 +37,7 @@ namespace COMPONENT_TYPE
   };
 }
 
-class PK_CORE_EXPORT Component
+class Component
 {
  public:
   Component() = default;

@@ -1,4 +1,4 @@
-#include "ShaderTest.h"
+#include "shaderTest.h"
 
 int
 main(int argc, const char** argv)

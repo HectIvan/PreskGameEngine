@@ -23,6 +23,25 @@
 namespace pkEngineSDK
 {
 
+namespace LOG_MSG_TYPE
+{
+  enum E {
+    kNone = 0, // smth idk
+    kWarning, // warning log registry.
+    kError, // error log registry.
+    kLog, // normal log registry.
+  };
+}
+
+struct LogMSG
+{
+  LogMSG(String _message, LOG_MSG_TYPE::E _type) :
+    message(_message),
+    type(_type) {}
+  String message;
+  LOG_MSG_TYPE::E type;
+};
+
 class PK_CORE_EXPORT Logger : public Module<Logger>
 {
  public:
@@ -86,6 +105,40 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    */
   static String
   toString(const Vector3 _vec);
+
+  /**
+   * @brief Register a log message into the logger.
+   * @param _msg Message.
+   * @param _type Message type.
+   */
+  void
+  registerMessage(const String _msg, const LOG_MSG_TYPE::E _type = LOG_MSG_TYPE::kLog);
+
+  /**
+   * @brief Get the message logs.
+   * @return All the messages.
+   */
+  Vector<LogMSG>&
+  getMessageLog() { return m_messages; }
+
+  // to do: maybe swap this to a template or not.
+  /**
+   * @brief Get the messages from a specific type.
+   * @param _type Message type.
+   * @return All messages of a type.
+   */
+  Vector<LogMSG>
+  getMessageLogOfType(const LOG_MSG_TYPE::E _type);
+
+  /**
+   * @brief Print the messages from a specific type.
+   * @param _type Message type.
+   */
+  void
+  printMessageLogOfType(const LOG_MSG_TYPE::E _type);
+
+ public:
+  Vector<LogMSG> m_messages;
 };
 PK_CORE_EXPORT Logger&
 g_Logger();

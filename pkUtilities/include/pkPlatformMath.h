@@ -171,6 +171,16 @@ class PK_UTILITY_EXPORT PlatformMath
   isInRange(const float _t, float _x, float _y);
 
   /**
+   * @brief Check if an uint32 number is in range of 2 values.
+   * @param _t value to check for.
+   * @param _x minimum value.
+   * @param _y maximum value.
+   * @return If it's in range or not.
+   */
+  static bool
+  isInRange(const uint32 _t, uint32 _x, uint32 _y);
+
+  /**
    * @brief Gets the lerped number between 2 numbers in a specific timestamp.
    * @param _x The first number.
    * @param _y The second number.

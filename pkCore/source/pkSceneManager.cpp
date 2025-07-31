@@ -20,6 +20,7 @@ SceneManager::init()
   clear();
   createScene();
   setActive(0);
+  g_Logger().registerMessage("Initialized Scene Manager.");
 }
 
 void
@@ -29,30 +30,33 @@ SceneManager::createScene(String _name)
   scene->m_name = _name;
   scene->setActive(false);
   m_scenes.push_back(scene);
+  g_Logger().registerMessage("Created scene " + _name + ".");
 }
 
 void
 SceneManager::deleteScene(uint32 _index)
 {
-  if (Math::isInRange(static_cast<float>(_index),
-                      static_cast<float>(0),
-                      static_cast<float>(m_scenes.size()))) {
-    m_scenes[_index]->clear();
+  Logger& log = g_Logger().instance();
+  // check if the index is inside the range of existing scenes.
+  if (_index >= m_scenes.size() - 1 && !(_index < 0)) {
+    SPtr<Scene> scene = m_scenes[_index];
+    log.registerMessage("Deleted Scene " + scene->m_name + ".");
+    scene->clear();
     m_scenes.erase(m_scenes.begin() + _index);
   }
   else {
-    g_Logger().print("WARNING:: Trying to delete an out of range scene.");
+    log.registerMessage("Trying to delete an out of range scene.", LOG_MSG_TYPE::kWarning);
   }
 }
 
 void
 SceneManager::setActive(uint32 _index)
 {
-  // check if index is in array size
-  if (_index >= m_scenes.size()) {
-    String errMsg = "ERROR: setActive call out of bounds. index accesed: " + _index;
-    errMsg += ". Current scene count: " + static_cast<uint32>(m_scenes.size());
-    g_Logger().print(errMsg);
+  // check if the index is inside the range of existing scenes.
+  if (_index > m_scenes.size() - 1 && !(_index < 0)) {
+    String errMsg = "setActive call out of bounds. index accesed: " + to_string(_index);
+    errMsg += ". Current scene count: " + to_string(static_cast<uint32>(m_scenes.size()));
+    g_Logger().registerMessage(errMsg, LOG_MSG_TYPE::kWarning);
     return;
   }
 

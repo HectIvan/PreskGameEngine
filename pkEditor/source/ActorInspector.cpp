@@ -61,6 +61,9 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
   if (im.createInputText("##Name", &name)) {
     _pActor->setName(name);
   }
+  // activity checkbox
+  im.sameLine();
+  im.createCheckBox("|", _pActor->isActive());
   // change the position
   Vector3 newTranslation = _pActor->m_position;
   im.createText("Position");
@@ -171,11 +174,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
       // get mesh
       SPtr<Mesh> mesh = model->getMeshes()[i];
       String name = "  " + mesh->getName();
+      SPtr<Material> material = mesh->material;
       im.createText(name.c_str());
       // get material
       // SPtr<Material> meshMat = mesh->material;
-      im.createButton("Diffuse");
-      im.sameLine();
+      // im.createButtonImage("Diffuse", material->diffuse);
+      // im.sameLine();
       im.createButton("Normal");
       im.sameLine();
       im.createButton("AO");

@@ -117,6 +117,35 @@ Logger::toString(const Vector3 _vec)
 {
    return String(to_string(_vec.x) + " " + to_string(_vec.y) + " " + to_string(_vec.z));
 }
+
+void
+Logger::registerMessage(String _msg, LOG_MSG_TYPE::E _type)
+{
+  LogMSG message(_msg, _type);
+  m_messages.emplace_back(message);
+}
+
+Vector<LogMSG>
+Logger::getMessageLogOfType(const LOG_MSG_TYPE::E _type)
+{
+  Vector<LogMSG> messages;
+  for (uint32 i = 0; i < m_messages.size(); ++i) {
+    if (m_messages[i].type == _type) {
+      messages.emplace_back(m_messages[i]);
+    }
+  }
+  return messages;
+}
+
+void
+Logger::printMessageLogOfType(const LOG_MSG_TYPE::E _type)
+{
+  Vector<LogMSG> messages = getMessageLogOfType(_type);
+  for (uint32 i = 0; i < messages.size(); ++i) {
+    print(messages[i].message);
+  }
+}
+
 PK_CORE_EXPORT Logger&
 g_Logger()
 {

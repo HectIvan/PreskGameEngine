@@ -44,6 +44,10 @@ class Component
   Component() = default;
   virtual ~Component() = default;
 
+  /**
+   * @brief Get component type.
+   * @return The component type.
+   */
   virtual COMPONENT_TYPE::E
   getType() = 0;
 
@@ -52,5 +56,22 @@ class Component
    */
   virtual const char*
   getName() = 0;
+
+  /**
+   * @brief Set the component activity.
+   * @param _enabled New component activity.
+   */
+  void
+  setActive(bool _enabled) { m_active = _enabled; }
+
+  /**
+   * @brief Check if the component is active.
+   * @return Component activity.
+   */
+  bool&
+  isActive() { return m_active; }
+
+ public:
+  bool m_active = true;
 };
 }

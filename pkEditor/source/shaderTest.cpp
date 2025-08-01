@@ -38,6 +38,11 @@ using pkEngineSDK::int32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
+using pkEngineSDK::LogMSG;
+using pkEngineSDK::LOG_MSG_TYPE::E;
+using pkEngineSDK::LOG_MSG_TYPE::kError;
+using pkEngineSDK::LOG_MSG_TYPE::kLog;
+using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
@@ -93,10 +98,12 @@ ShaderTest::onInit()
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
   ResourceManager& resourceMan = g_ResourceManager().instance();
+  SceneManager& sceneMan = g_SceneManager().instance();
+  SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
   // create camera
   m_cameraSpeed = 20.0f;
-  m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
+  m_camera = activeScene->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
@@ -112,7 +119,7 @@ ShaderTest::onInit()
   m_sensY = 0.3f;
 
   // create light
-  m_light = g_SceneManager().getActiveScene()->instantiate("Light");
+  m_light = activeScene->instantiate("Light");
   m_light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = m_light->getComponent<Light>();
 
@@ -128,24 +135,24 @@ ShaderTest::onInit()
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
-  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
+  SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(10.0f);
   pistol->setPosition(0.0f, 5.0f, 0.0f);
 
-  // SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
+  // SPtr<Actor> leon = activeScene->instantiate("Leon");
   // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
 
-  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
+  SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
-  // SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
+  // SPtr<Actor> rpd = activeScene->instantiate("RPD");
   // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
   // rpd->setRotation(0, 90, 0);
   // // rpd->setScale(1.0f);
   // rpd->setPosition(0, 0, -100);
 
-  SPtr<Actor> coat = g_SceneManager().getActiveScene()->instantiate("Coat");
+  SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
@@ -154,6 +161,10 @@ ShaderTest::onInit()
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
+
+  m_showErrors = true;
+  m_showWarnings = false;
+  m_showActions = false;
 }
 
 void
@@ -190,35 +201,28 @@ ShaderTest::input()
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
   // move forward/backward
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
   }
   // move left/right
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(-speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(speed);
   }
   // move up/down
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
   // rotate camera
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     // m_selectedActor = nullptr;
     posDif.x *= m_sensX;
@@ -249,7 +253,7 @@ ShaderTest::uInterfaceUpdate()
   SPtr<Scene> currentScene = sm.getActiveScene();
   
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
+  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y * 0.7f));
   im.setNextWindowPos(Vector2(0.0f));
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
@@ -285,6 +289,22 @@ ShaderTest::uInterfaceUpdate()
   im.endWindowCreate();
   // -------------------------- //
 
+  // -------------------------- //
+  // Create log window
+  im.setNewWindowSize(winRect.x, winRect.y * 0.3f);
+  im.setNextWindowPos(Vector2(0.0f, winRect.y * 0.7f));
+  im.SetNextWindowAlpha(winAlpha);
+  im.startWindowCreate("Logger.");
+  im.createCheckBox("Errors", m_showErrors);
+  im.sameLine();
+  im.createCheckBox("Warnings", m_showWarnings);
+  im.sameLine();
+  im.createCheckBox("Logs", m_showActions);
+  showLogType(m_showErrors, kError);
+  showLogType(m_showWarnings, kWarning);
+  showLogType(m_showActions, kLog);
+  im.endWindowCreate();
+
   float winHeight = 0.0f;
   // --- Transform window --- //
   if (m_selectedActor) {
@@ -307,7 +327,7 @@ ShaderTest::uInterfaceUpdate()
     im.startWindowCreate("Components");
     im.createButton("Add Component(non-functional)");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i]);
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor->m_transform);
     }
     im.endWindowCreate();
     yOffset += winHeight;
@@ -403,6 +423,18 @@ ShaderTest::uInterfaceUpdate()
 }
 
 void
+ShaderTest::showLogType(bool& _active, uint32 _type)
+{
+  UInterface& im = g_uInterface().instance();
+  if (_active) {
+    Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
+    for (uint32 i = 0; i < messages.size(); ++i) {
+      im.createText(messages[i].message.c_str());
+    }
+  }
+}
+
+void
 ShaderTest::onUpdate()
 {
   // user input
@@ -437,6 +469,8 @@ ShaderTest::onUpdate()
 
     shadowsParam.farNear = camera->m_farNear;
   }
+  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
+
   // light data
   SPtr<Light> light = m_light->getComponent<Light>();
   SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
@@ -478,7 +512,7 @@ ShaderTest::onUpdate()
   SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
 
-  // update normal pass buffers
+  // update normal && base shadow pass buffers
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
@@ -495,8 +529,6 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  // get the shadow data needed
-  
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
   // update specular compute buffers
@@ -517,6 +549,9 @@ ShaderTest::onUpdate()
   Matrix4 transform = Matrix4::IDENTITY;
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invView, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(4), &SkyBoxWinSize, sizeof(Vector4));
 }
 
 void

@@ -98,42 +98,49 @@ class Material : public Component
    * @param _pTexture New diffuse texture.
    */
   FORCEINLINE void
-  setDiffuse(SPtr<Texture> _pTexture) { diffuse = _pTexture; }
+  setDiffuse(const SPtr<Texture>& _pTexture) { diffuse = _pTexture; }
 
   /**
    * @brief Set the normal texture.
    * @param _pTexture New normal texture.
    */
   FORCEINLINE void
-  setNormal(SPtr<Texture> _pTexture) { normal = _pTexture; }
+  setNormal(const SPtr<Texture>& _pTexture) { normal = _pTexture; }
 
   /**
    * @brief Set the height texture.
    * @param _pTexture New height texture.
    */
   FORCEINLINE void
-  setHeight(SPtr<Texture> _pTexture) { height = _pTexture; }
+  setHeight(const SPtr<Texture>& _pTexture) { height = _pTexture; }
 
   /**
    * @brief Set the metallic texture.
    * @param _pTexture New metallic texture.
    */
   FORCEINLINE void
-  setMetallic(SPtr<Texture> _pTexture) { metallic = _pTexture; }
+  setMetallic(const SPtr<Texture>& _pTexture) { metallic = _pTexture; }
 
   /**
    * @brief Set the occlusion texture.
    * @param _pTexture New occlusion texture.
    */
   FORCEINLINE void
-  setOcclusion(SPtr<Texture> _pTexture) { occlusion = _pTexture; }
+  setOcclusion(const SPtr<Texture>& _pTexture) { occlusion = _pTexture; }
+
+  /**
+   * @brief Set the roughness texture.
+   * @param _pTexture New roughness texture.
+   */
+  FORCEINLINE void
+  setroughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
 
   /**
    * @brief Set the material name.
    * @param _name The material name.
    */
   void
-  setName(String _name) { m_name = _name; }
+  setName(const String _name) { m_name = _name; }
 
   /**
    * @brief Get the material name.
@@ -152,5 +159,6 @@ class Material : public Component
   SPtr<Texture> height;
   SPtr<Texture> metallic;
   SPtr<Texture> occlusion;
+  SPtr<Texture> roughness;
 };
 }

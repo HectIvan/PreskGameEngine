@@ -306,6 +306,13 @@ class PK_CORE_EXPORT Texture
   Path&
   getName() { return m_name; }
 
+  /**
+   * @brief Get the raw texture data.
+   * @return The raw texture data.
+   */
+  virtual void*
+  getRawData() {}
+
  private:
   uint32 m_id;
   TEXTURE_TYPE::E m_type;

@@ -1,5 +1,6 @@
 #include "pkResourceManager.h"
 #include "pkGraphicsAPI.h"
+#include "pkLogger.h"
 
 namespace pkEngineSDK
 {
@@ -16,10 +17,15 @@ ResourceManager::newMaterial()
 SPtr<Model>
 ResourceManager::loadModel(Path _directory)
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
+
+  // Get model directory
+  String dir = _directory.toString();
   // search if the model has been stored before
   for (uint32 i = 0; i < m_models.size(); ++i) {
-    if (m_models[i]->directory.toString() == _directory.toString()) {
+    if (m_models[i]->directory.toString() == dir) {
       return m_models[i]->model;
+      g_Logger().registerMessage("Found pre-loaded model of directory " + dir + ".");
     }
   }
 
@@ -28,10 +34,10 @@ ResourceManager::loadModel(Path _directory)
   // load the model from the path
   if (model->load(_directory)) {
     // create the index and vertex buffers
-    model->m_vertexB = g_GraphicAPI().createVertexBuffer(model->vertex);
-    model->m_indexB = g_GraphicAPI().createIndexBuffer(model->index);
-    g_GraphicAPI().setIndexBuffer(model->m_indexB);
-    g_GraphicAPI().setVertexBuffer(model->m_vertexB);
+    model->m_vertexB = api.createVertexBuffer(model->vertex);
+    model->m_indexB = api.createIndexBuffer(model->index);
+    api.setIndexBuffer(model->m_indexB);
+    api.setVertexBuffer(model->m_vertexB);
   }
   else { // if the model could not be loaded, destroy the pointer and return null.
     model = nullptr;
@@ -50,10 +56,10 @@ ResourceManager::loadModel(Path _directory)
 SPtr<Mesh>
 ResourceManager::searchMesh(String _name)
 {
-  for (uint32 i = 0; i < m_meshes.size(); ++i)
-  {
-    if (_name == m_meshes[i]->getName()) {
-      return m_meshes[i];
+  for (uint32 i = 0; i < m_meshes.size(); ++i) {
+    SPtr<Mesh> mesh = m_meshes[i];
+    if (_name == mesh->getName()) {
+      return mesh;
     }
   }
   return nullptr;

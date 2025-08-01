@@ -80,6 +80,12 @@ class ShaderTest : public BaseApp
   uInterfaceUpdate();
 
   /**
+   * @brief Show the log type in the UI.
+   */
+  void
+  showLogType(bool& _active, uint32 _type);
+
+  /**
    * @brief Update the shader test.
    * @param _deltatime Time between frames.
    */
@@ -110,4 +116,8 @@ class ShaderTest : public BaseApp
   float m_sensY;
   // camera movement speed
   float m_cameraSpeed;
+
+  bool m_showErrors;
+  bool m_showWarnings;
+  bool m_showActions;
 };

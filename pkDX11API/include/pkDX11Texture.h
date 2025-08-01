@@ -91,6 +91,13 @@ class DX11Texture : public Texture
   void
   setUAV(ID3D11UnorderedAccessView* _uAV) { m_uAV = _uAV; }
 
+  /**
+   * @brief Get the raw texture data.
+   * @return The raw texture data.
+   */
+  void*
+  getRawData() override { return static_cast<void*>(m_sRV); }
+
  public:
   ID3D11Texture2D* m_t2d = nullptr;
 

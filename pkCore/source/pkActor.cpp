@@ -147,9 +147,10 @@ void
 Actor::update(float _deltaTime)
 {
   for (uint32 i = 0; i < m_components.size(); ++i) {
-    switch (m_components[i]->getType()) {
+    SPtr<Component> component = m_components[i];
+    switch (component->getType()) {
       case COMPONENT_TYPE::kLight: {
-        SPtr<Light> light = reinterpret_pointer_cast<Light>(m_components[i]);
+        SPtr<Light> light = reinterpret_pointer_cast<Light>(component);
         light->m_position = getPosition3();
         light->m_transform = m_transform;
         break;
@@ -176,8 +177,8 @@ Actor::update(float _deltaTime)
 SPtr<Actor>
 Actor::getChild(uint32 _index)
 {
-  if (!m_children.empty() && _index < m_children.size())
-  {
+  // if there are children and the index is inside the range of existing children.
+  if (!m_children.empty() && _index < m_children.size()) {
     return m_children[_index];
   }
   return nullptr;
@@ -196,8 +197,12 @@ Actor::clear()
 void
 Actor::addComponent(SPtr<Component> _pComponent)
 {
+  // if the component exists, insert it into the list.
   if (_pComponent) {
     m_components.push_back(_pComponent);
+    // log registry.
+    String message = "Inserted Actor component: " + String(_pComponent->getName());
+    g_Logger().registerMessage(message);
   }
 }
 }

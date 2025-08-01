@@ -23,6 +23,7 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void
 Window::create(const PKWindowDesc& _desc)
 {
+  Logger& log = g_Logger().instance();
   /************************************************************************************/
   WNDCLASSEXA wcex;
   m_hInstance = InstanceHandle();
@@ -40,7 +41,7 @@ Window::create(const PKWindowDesc& _desc)
   wcex.lpszMenuName = nullptr;
   wcex.lpszClassName = "WindowClass";
   if (!RegisterClassEx(&wcex)) {
-    g_Logger().print("Failed to register a window class");
+    log.registerMessage("Failed to register a window class.", LOG_MSG_TYPE::kError);
     return;
   }
   /************************************************************************************/
@@ -70,12 +71,13 @@ Window::create(const PKWindowDesc& _desc)
    * Check if creation failed. 
    */
   if (!m_windowH) {
-    g_Logger().print("Failed to create the window.");
+    log.registerMessage("Failed to create the window.", LOG_MSG_TYPE::kError);
     return;
   }
   auto* eventFunct = new WinFunctEvent(_desc.funct);
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(eventFunct));
   ShowWindow(m_windowH, 1);
+  log.registerMessage("Created Window.");
 }
 
 Vector2
@@ -91,6 +93,7 @@ Window::getClientWidthHeight() const
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+  EventQueue& eventManager = g_eventManager().instance();
   WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
   if (winEvent) {
     PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),
@@ -122,10 +125,10 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   }
   case WM_MOUSEWHEEL:
   {
-    g_eventManager().scrollWheel = static_cast<int8>(GET_WHEEL_DELTA_WPARAM(wParam));
-    g_eventManager().scrollWheel = static_cast<int8>(Math::clamp(g_eventManager().scrollWheel,
-                                                     -1.0f,
-                                                     1.0f));
+    eventManager.scrollWheel = static_cast<int8>(GET_WHEEL_DELTA_WPARAM(wParam));
+    eventManager.scrollWheel = static_cast<int8>(Math::clamp(eventManager.scrollWheel,
+                                                 -1.0f,
+                                                 1.0f));
     break;
   }
   default:
@@ -157,8 +160,7 @@ Window::setSize(uint32 _width, uint32 _height)
 void
 Window::setSize(Vector2 _size)
 {
-  setWidth(static_cast<uint32>(_size.x));
-  setHeight(static_cast<uint32>(_size.y));
+  setSize(static_cast<uint32>(_size.x), static_cast<uint32>(_size.y));
 }
 
 void
@@ -167,6 +169,8 @@ Window::setWidth(uint32 _width)
   m_width = _width;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
+  String message = "Set window width to: " + to_string(_width);
+  g_Logger().registerMessage(message);
 }
 
 void
@@ -175,6 +179,8 @@ Window::setHeight(uint32 _height)
   m_height = _height;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
+  String message = "Set window height to: " + to_string(_height);
+  g_Logger().registerMessage(message);
 }
 
 Vector2

@@ -256,8 +256,9 @@ UInterface::endCombo()
 bool
 UInterface::createButtonImage(const char* _name, SPtr<Texture>& _pTexture)
 {
-  // auto& dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
-  return false;
+  ImTextureID* texture = static_cast<ImTextureID*>(_pTexture->getRawData());
+  ImVec2 size = ImVec2(_pTexture->getWidth(), _pTexture->getHeight());
+  return ImGui::ImageButton(_name, *texture, size);
 }
 
 bool

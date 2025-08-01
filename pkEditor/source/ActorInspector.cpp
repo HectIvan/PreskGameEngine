@@ -64,6 +64,9 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
   if (im.createInputText("##Name", &name)) {
     _pActor->setName(name);
   }
+  // activity checkbox
+  im.sameLine();
+  im.createCheckBox("|", _pActor->isActive());
   // change the position
   Vector3 newTranslation = _pActor->m_position;
   im.createText("Position");
@@ -85,10 +88,12 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 }
 
 void
-ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
+ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _transform)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
+  // Component activity
+  im.createCheckBox("Active ", _pComponent->isActive());
   // for each type of component
   switch (_pComponent->getType())
   {
@@ -140,7 +145,9 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
     // Light direction
     im.createText("Direction         ");
     im.sameLine();
-    // Vector3 dir = light->m_direction;
+    Vector4 dir4 = _transform * Vector4(light->m_direction, 1.0f);
+    Vector3 dir = dir4.xyz().normalized();
+    im.createDrag3("##Direction", dir, 0.0f);
     // spot exponent
     im.createText("Spot Exponent     ");
     im.sameLine();
@@ -168,10 +175,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent)
   {
     SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
     im.beginChild("Meshes:");
+    im.createText("Meshes: ");
     for (uint32 i = 0; i < model->getMeshes().size(); ++i) {
       // get mesh
       SPtr<Mesh> mesh = model->getMeshes()[i];
       String name = "  " + mesh->getName();
+      SPtr<Material> material = mesh->material;
       im.createText(name.c_str());
       // get material
       // SPtr<Material> meshMat = mesh->material;

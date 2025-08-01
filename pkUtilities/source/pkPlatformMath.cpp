@@ -153,6 +153,15 @@ PlatformMath::isInRange(const float _t, float _x, float _y)
   return false;
 }
 
+bool
+PlatformMath::isInRange(const uint32 _t, uint32 _x, uint32 _y)
+{
+  if (_t >= _x && _t <= _y) {
+    return true;
+  }
+  return false;
+}
+
 float
 PlatformMath::lerp(const float _x, const float _y, const float _t)
 {

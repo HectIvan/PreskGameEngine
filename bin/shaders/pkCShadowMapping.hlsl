@@ -85,12 +85,12 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   float z = DepthSample * 2.0f - 1.0f;
 
   float4 clipSpacePosition = float4(TexCoord * 2.0f - 1.0f, z, 1.0f);
-  float4 viewSpacePosition = mul(camInvProj, clipSpacePosition);
+  float4 VSP = mul(camInvProj, clipSpacePosition);
 
   // Perspective division
-  float3 VSP = viewSpacePosition.xyz /= viewSpacePosition.w;
+  VSP.xyz /= VSP.w;
 
-  float4 worldSpacePosition = mul(camInvView, float4(VSP, 1.0f));
+  float4 worldSpacePosition = mul(camInvView, VSP);
 
   return worldSpacePosition.xyz;
 }
@@ -120,6 +120,15 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
   
+  /**
+   * alpha values
+   */
+  // if its the max depth value
+  float alpha = 1.0f;
+  if (depthTex.r == 1) {
+    alpha = 0.0f;
+  }
+  
   float3 normal = normalize(normalTex.xyz);
   
   // get world position from depth map
@@ -128,7 +137,16 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
+  float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
+  
+  // see if the point in the world is outside of the range of the spotlight
+  // float3 worldVector = normalize(lightPos - worldPos);
+  // float angle = dot(lightDir, worldVector);
+  // if (angle < SpotCutoff) {
+  //   shadowTexture[DTid.xy] = float4(angle.xxx, alpha);
+  //   return;
+  // }
+  
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;
@@ -165,14 +183,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   {
     diffuse = worldPos; // float3(shadowColor, shadowColor, shadowColor);
   }*/
-  
-  float alpha = 1.0f;
-
-  // if its the max depth value
-  if (depthTex.r == 1) 
-  {
-    alpha = 0.0f;
-  }
   
   shadowTexture[DTid.xy] = float4(diffuse, alpha);
 }

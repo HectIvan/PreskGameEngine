@@ -161,6 +161,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkBasePhysicsConstrain.h" />
     <ClInclude Include="include\pkPhysicsDefines.h" />
     <ClInclude Include="include\pkPhysicsManager.h" />
     <ClInclude Include="include\pkPhysicsMaterial.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="include\pkShape.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkBasePhysicsConstrain.cpp" />
     <ClCompile Include="source\pkPhysicsManager.cpp" />
     <ClCompile Include="source\pkRigidBody.cpp" />
     <ClCompile Include="source\pkShape.cpp" />

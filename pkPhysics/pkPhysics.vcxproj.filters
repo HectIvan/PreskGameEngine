@@ -28,6 +28,9 @@
     <ClInclude Include="include\pkPhysicsDefines.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkBasePhysicsConstrain.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkShape.cpp">
@@ -37,6 +40,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\pkRigidBody.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBasePhysicsConstrain.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

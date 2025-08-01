@@ -103,7 +103,8 @@ struct CBLuminance
 struct CBBlur
 {
   Vector2 winSize;
-  Vector2 unused;
+  float blurXOffset;
+  float unused;
 };
 
 struct CBShadowParam

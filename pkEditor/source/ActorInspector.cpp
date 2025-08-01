@@ -142,7 +142,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
     // Light direction
     im.createText("Direction         ");
     im.sameLine();
-    Vector4 dir4 = _transform * Vector4(light->m_direction, 1.0f);
+    Vector4 dir4 = _transform * Vector4(light->m_direction, 0.0f);
     Vector3 dir = dir4.xyz().normalized();
     im.createDrag3("##Direction", dir, 0.0f);
     // spot exponent

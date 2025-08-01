@@ -40,6 +40,7 @@ namespace G_BUFFERS
     kGB_Shadow,
     kGB_Luminance,
     kGB_Metallic,
+    kGB_Positions,
     kGB_HBlurredLuminance,
     kGB_VBlurredLuminance,
     kGB_Skybox,
@@ -73,6 +74,8 @@ namespace PASS_TYPE
     kP_Luminance,
     kP_CHBlur,
     kP_CVBlur,
+    kP_HBlur,
+    kP_VBlur,
     kP_Tone,
     kP_CShadows, // compute shadows
     kP_CSpecular, // comptue specular

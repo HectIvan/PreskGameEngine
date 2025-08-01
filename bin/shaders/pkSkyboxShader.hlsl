@@ -36,6 +36,11 @@ cbuffer ViewPort : register(b4)
   float2 _VPPadding;
 }
 
+cbuffer InViewProj : register(b5)
+{
+  matrix InvViewProj;
+}
+
 struct PS_INPUT
 {
   float4 Position : SV_Position;
@@ -45,8 +50,8 @@ struct PS_INPUT
 float2 getSkyBoxUV(float3 dir)
 {
   // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
-  float u = 0.5f + atan2(dir.z, dir.x) / (PI * 2.0f);
-  float v = 0.5f + asin(dir.y) / PI;
+  float u = 0.5f + atan2(-dir.z, dir.x) / (PI * 2.0f);
+  float v = 0.5f - asin(dir.y) / PI;
   return float2(u, v);
 }
 
@@ -54,15 +59,15 @@ float4 PS(PS_INPUT input) : SV_Target
 {
   // Reconstruct view-space direction
   float2 ndc = input.TexCoord * 2.0f - 1.0f;
-  float4 viewDir = float4(ndc, 1.0f, 0.0f);
-  viewDir.y *= -1.0f;
-
-  // use the view matrix to convert from viewspace to world space
-  float3 worldDir = normalize(mul(viewDir, InvView).xyz);
+  ndc.y = -ndc.y;
   
-  // get the uv specific depending on the direction
-  float2 skyboxUV = getSkyBoxUV(worldDir);
+  float3 clipPos = normalize(float3(ndc.x, ndc.y, 1.0f));
+  
+  float3 viewPos = mul(clipPos, (float3x3) InvView);
+  
+  float3 viewDir = normalize(viewPos);
+  float2 skyboxUV = getSkyBoxUV(viewDir);
   float3 color = skyboxMap.Sample(samState, skyboxUV).rgb;
-
+  
   return float4(color, 1.0f);
 }

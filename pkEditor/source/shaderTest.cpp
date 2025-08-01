@@ -454,6 +454,7 @@ ShaderTest::onUpdate()
   Matrix4 proj = Matrix4::IDENTITY;
   Matrix4 invView = Matrix4::IDENTITY;
   Matrix4 invProj = Matrix4::IDENTITY;
+  Matrix4 invViewProj = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
   CBShadowParam shadowsParam;
@@ -466,6 +467,7 @@ ShaderTest::onUpdate()
     invView = view.inverse();
     invProj = proj.inverse();
     CreateCBCamera::create(cBCamera, camera);
+    invViewProj = (proj * view).inverse();
 
     shadowsParam.farNear = camera->m_farNear;
   }
@@ -495,6 +497,7 @@ ShaderTest::onUpdate()
   // blur parameters
   CBBlur blur;
   blur.winSize = winSize;
+  blur.blurXOffset = 1.0f;
 
   // data type sizes
   uint32 m4x4Size = sizeof(Matrix4);
@@ -549,9 +552,11 @@ ShaderTest::onUpdate()
   Matrix4 transform = Matrix4::IDENTITY;
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
+  invView.setTranslation(0.0f, 0.0f, 0.0f);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invView, m4x4Size);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(4), &SkyBoxWinSize, sizeof(Vector4));
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(5), &invViewProj, m4x4Size);
 }
 
 void

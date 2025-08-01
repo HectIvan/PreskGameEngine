@@ -22,6 +22,7 @@ using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_CShadows;
 using pkEngineSDK::PASS_TYPE::kP_CSpecular;
 using pkEngineSDK::PASS_TYPE::kP_CHBlur;
+using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;

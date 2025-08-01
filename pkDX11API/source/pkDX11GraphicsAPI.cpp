@@ -750,7 +750,6 @@ DX11GraphicsAPI::setBlendState(const SPtr<BlendState> _pBlendState)
     return;
   }
   device->m_pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
-  log.registerMessage("Set a DirectX Blend State.");
 }
 
 void
@@ -770,7 +769,6 @@ DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState> _pRasterizerStat
     return;
   }
   device->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
-  log.registerMessage("Set a DirectX Rasterizer State.");
 }
 
 void**

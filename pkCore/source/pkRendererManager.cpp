@@ -380,7 +380,7 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 
     // render the model of the actor
     SPtr<Model> model = _gameActors[i]->getComponent<Model>();
-    if (model) {
+    if (model && model->isActive()) {
       renderModel(model);
     }
     // if the actor has children, do the same for them (recursive)

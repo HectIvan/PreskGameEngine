@@ -38,6 +38,8 @@ using pkEngineSDK::int32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
+using pkEngineSDK::LogMSG;
+using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
 using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
@@ -160,7 +162,9 @@ ShaderTest::onInit()
   m_sActorIndex = 0;
   m_fpsSize = 20;
 
-  g_Logger().printMessageLogOfType(kLog);
+  m_showErrors = true;
+  m_showWarnings = false;
+  m_showActions = false;
 }
 
 void
@@ -249,7 +253,7 @@ ShaderTest::uInterfaceUpdate()
   SPtr<Scene> currentScene = sm.getActiveScene();
   
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
+  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y * 0.7f));
   im.setNextWindowPos(Vector2(0.0f));
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
@@ -284,6 +288,22 @@ ShaderTest::uInterfaceUpdate()
   }
   im.endWindowCreate();
   // -------------------------- //
+
+  // -------------------------- //
+  // Create log window
+  im.setNewWindowSize(winRect.x, winRect.y * 0.3f);
+  im.setNextWindowPos(Vector2(0.0f, winRect.y * 0.7f));
+  im.SetNextWindowAlpha(winAlpha);
+  im.startWindowCreate("Logger.");
+  im.createCheckBox("Errors", m_showErrors);
+  im.sameLine();
+  im.createCheckBox("Warnings", m_showWarnings);
+  im.sameLine();
+  im.createCheckBox("Logs", m_showActions);
+  showLogType(m_showErrors, kError);
+  showLogType(m_showWarnings, kWarning);
+  showLogType(m_showActions, kLog);
+  im.endWindowCreate();
 
   float winHeight = 0.0f;
   // --- Transform window --- //
@@ -400,6 +420,18 @@ ShaderTest::uInterfaceUpdate()
   // -------------------------- //
 
   im.render();
+}
+
+void
+ShaderTest::showLogType(bool& _active, uint32 _type)
+{
+  UInterface& im = g_uInterface().instance();
+  if (_active) {
+    Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
+    for (uint32 i = 0; i < messages.size(); ++i) {
+      im.createText(messages[i].message.c_str());
+    }
+  }
 }
 
 void

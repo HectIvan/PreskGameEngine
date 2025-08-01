@@ -89,6 +89,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
+  // Component activity
+  im.createCheckBox("Active ", _pComponent->isActive());
   // for each type of component
   switch (_pComponent->getType())
   {
@@ -170,6 +172,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
   {
     SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
     im.beginChild("Meshes:");
+    im.createText("Meshes: ");
     for (uint32 i = 0; i < model->getMeshes().size(); ++i) {
       // get mesh
       SPtr<Mesh> mesh = model->getMeshes()[i];
@@ -178,8 +181,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
       im.createText(name.c_str());
       // get material
       // SPtr<Material> meshMat = mesh->material;
-      // im.createButtonImage("Diffuse", material->diffuse);
-      // im.sameLine();
+      im.createButton("Diffuse");
+      im.sameLine();
       im.createButton("Normal");
       im.sameLine();
       im.createButton("AO");

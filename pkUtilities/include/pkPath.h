@@ -126,6 +126,20 @@ class PK_UTILITY_EXPORT Path
     return str;
   }
 
+  /**
+   * @brief Get the extension of the path.
+   * @return Extension type.
+   */
+  String
+  getExtension() const
+  {
+    SIZE_T lastDot = m_path.find_last_of(".");
+    if (lastDot == String::npos) {
+      return ""; // no extension
+    }
+    return m_path.substr(lastDot + 1);
+  }
+
  protected:
   String m_path;
 };

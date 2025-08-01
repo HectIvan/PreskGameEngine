@@ -241,21 +241,21 @@ class PK_UTILITY_EXPORT Matrix4
   FORCEINLINE Vector4
   operator*(const Vector4& other)
   {
-    matrix[0][0] *= other.x;
-    matrix[1][0] *= other.x;
-    matrix[2][0] *= other.x;
+    float x00 = matrix[0][0] * other.x;
+    float x10 = matrix[1][0] * other.x;
+    float x20 = matrix[2][0] * other.x;
+
+    float y01 = matrix[0][1] * other.y;
+    float y11 = matrix[1][1] * other.y;
+    float y21 = matrix[2][1] * other.y;
+
+    float z02 = matrix[0][2] * other.z;
+    float z12 = matrix[1][2] * other.z;
+    float z22 = matrix[2][2] * other.z;
     
-    matrix[0][1] *= other.y;
-    matrix[1][1] *= other.y;
-    matrix[2][1] *= other.y;
-    
-    matrix[0][2] *= other.z;
-    matrix[1][2] *= other.z;
-    matrix[2][2] *= other.z;
-    
-    return Vector4(matrix[0][0] + matrix[1][0] + matrix[2][0],
-                   matrix[0][1] + matrix[1][1] + matrix[1][1],
-                   matrix[0][2] + matrix[1][2] + matrix[2][2],
+    return Vector4(x00 + y01 + z02,
+                   x10 + y11 + z12,
+                   x20 + y21 + z22,
                    other.w);
   }
 
@@ -546,6 +546,14 @@ class PK_UTILITY_EXPORT Matrix4
    */
   Matrix4
   getRotation();
+
+  /**
+   * @brief Get the rotation matrix without a scale.
+   * @param _scale Scale to extract from the rotation matrix.
+   * @return The rotation matrix.
+   */
+  Matrix4
+  getRotationNoScale(Vector3 _scale);
   
   /**
    * @brief The rotation matrix that is created from

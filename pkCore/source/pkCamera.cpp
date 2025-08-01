@@ -64,7 +64,7 @@ Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 void
 Camera::move(Vector3 _dist)
 {
-  Vector3 offset = getRight() * _dist.x + getUp() * _dist.y + getForward() * _dist.z;
+ //  Vector3 offset = getRight() * _dist.x + getUp() * _dist.y + getForward() * _dist.z;
   m_eye += _dist;
   m_at += _dist;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);

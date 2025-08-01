@@ -8,14 +8,15 @@
  * @bug    No known bugs.
  */
  /*****************************************************************************/
-#define STB_IMAGE_IMPLEMENTATION
 
 /*********************************************/
 /**
 * Includes
 **/
 /*********************************************/
-#include <stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ENABLE_OPENEXR
+#include "stb_image.h"
 
 #include "pkLogger.h"
 #include "pkDX11BlendState.h"
@@ -24,6 +25,7 @@
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11PixelShader.h"
 #include "pkDX11Prerequisites.h"
+#include "pkDX11RasterizerState.h"
 #include "pkDX11RenderTargetView.h"
 #include "pkDX11SamplerState.h"
 #include "pkDX11SwapChain.h"
@@ -94,10 +96,8 @@ DX11GraphicsAPI::initApi(const Window& _window)
                            numFeatureLevels);
 
   setViewport(width, height);
-  // uint32 vpX = static_cast<uint32>(getViewportSize(1).x);
-  // uint32 vpY = static_cast<uint32>(getViewportSize(1).y);
 
-  // create the render targets
+  // create the swap chain
   auto dxSCh = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
   dxSCh->createRenderTargetView(m_pDevice);
   
@@ -470,7 +470,8 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   **/
   DXGI_SWAP_CHAIN_DESC sd;
   ZeroMemory(&sd, sizeof(sd));
-  sd.BufferCount = 1;
+  sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+  sd.BufferCount = 2;
   sd.BufferDesc.Width = _width;
   sd.BufferDesc.Height = _height;
   sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -538,6 +539,24 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   device->m_pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
                                                   rTVector.data(),
                                                   (pDSV) ? pDSV->m_dSV : nullptr);
+}
+
+void
+DX11GraphicsAPI::unbindRenderTargets()
+{
+  static Vector<ID3D11RenderTargetView*> unbindRT = { nullptr, nullptr, nullptr, nullptr,
+                                                      nullptr, nullptr, nullptr, nullptr };
+  // set the render targets
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of the render targets.");
+    return;
+  }
+
+  // const uint32 size = static_cast<uint32>(unbindRT.size());
+  device->m_pImmediateContext->OMSetRenderTargets(0,
+                                                  unbindRT.data(),
+                                                  nullptr);
 }
 
 void
@@ -646,6 +665,35 @@ DX11GraphicsAPI::createBlendState()
   return pBlendState;
 }
 
+SPtr<RasterizerState>
+DX11GraphicsAPI::createRasterizerState(RASTERIZER_DESC& _desc)
+{
+  // create the rasterizer state
+  SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
+  dxRS->m_pRasterizer = nullptr;
+  // rasterizer description for directx
+  D3D11_RASTERIZER_DESC rDesc = {};
+  rDesc.FillMode = static_cast<D3D11_FILL_MODE>(_desc.fillMode);
+  rDesc.CullMode = static_cast<D3D11_CULL_MODE>(_desc.cullMode);
+  rDesc.FrontCounterClockwise = _desc.frontCounterClockwise;
+  rDesc.DepthClipEnable = _desc.depthClipEnable;
+
+  // Create the rasterizer state.
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the creation of a rasterizer state.");
+    return nullptr;
+  }
+
+  HRESULT hr = device->m_pd3dDevice->CreateRasterizerState(&rDesc, &dxRS->m_pRasterizer);
+  if (FAILED(hr)) {
+    String errMsg = g_Logger().getMessageError(hr);
+    g_Logger().print("Failed to create rasterizer state. Error: " + errMsg);
+    return nullptr;
+  }
+  return dxRS;
+}
+
 void
 DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
 {
@@ -664,6 +712,22 @@ DX11GraphicsAPI::setBlendState(SPtr<BlendState> _pBlendState)
     return;
   }
   device->m_pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
+}
+
+void
+DX11GraphicsAPI::setRasterizerState(SPtr<RasterizerState> _pRasterizerState)
+{
+  PK_ASSERT(m_pDevice);
+  // Reinterpret to a DirectX Rasterizer State
+  SPtr<DX11RasterizerState> dxRS =
+       reinterpret_pointer_cast<DX11RasterizerState>(_pRasterizerState);
+  // Set the rasterizer state
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the setting of a Rasterizer state.");
+    return;
+  }
+  device->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
 }
 
 void**
@@ -812,7 +876,7 @@ DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
   return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
                        _desc.bindFlags, _desc.mipLevels, _desc.shaderResourceFormat,
-                       _desc.data);
+                       _desc.miscFlags, _desc.data);
 }
 
 SPtr<InputLayout>
@@ -897,7 +961,7 @@ DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
 
   // local array of directx buffers
-  uint32 count = static_cast<uint32>(_pCBuffers.size());
+  const uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
   // set all buffers
@@ -909,6 +973,22 @@ DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
   // set the buffers
   device->m_pImmediateContext->VSSetConstantBuffers(_startSlot, count, buffers.data());
+}
+
+void
+DX11GraphicsAPI::vSUnbindConstantBuffers()
+{
+  Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                                    nullptr, nullptr };
+  const uint32 count = static_cast<uint32>(buffers.size());
+  // convert the device to a directx device.
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a vertex CBuffer.");
+    return;
+  }
+  // set the buffers
+  device->m_pImmediateContext->VSSetConstantBuffers(0, count, buffers.data());
 }
 
 void
@@ -938,6 +1018,22 @@ DX11GraphicsAPI::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
 }
 
 void
+DX11GraphicsAPI::pSUnbindConstantBuffers()
+{
+  Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                                    nullptr, nullptr };
+  const uint32 count = static_cast<uint32>(buffers.size());
+  // convert the device to a directx device.
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a pixel CBuffer.");
+    return;
+  }
+  // set the buffers
+  device->m_pImmediateContext->PSSetConstantBuffers(0, count, buffers.data());
+}
+
+void
 DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                                       const uint32 _startSlot)
 {
@@ -961,6 +1057,22 @@ DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   }
   // set the buffers
   device->m_pImmediateContext->CSSetConstantBuffers(_startSlot, count, buffers.data());
+}
+
+void
+DX11GraphicsAPI::cSUnbindConstantBuffers()
+{
+  Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                                    nullptr, nullptr };
+  const uint32 count = static_cast<uint32>(buffers.size());
+  // convert the device to a directx device.
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a compute CBuffer.");
+    return;
+  }
+  // set the buffers
+  device->m_pImmediateContext->CSSetConstantBuffers(0, count, buffers.data());
 }
 
 void
@@ -1036,6 +1148,25 @@ DX11GraphicsAPI::pSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint
 }
 
 void
+DX11GraphicsAPI::pSUnbindShaderResourceViews()
+{
+  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
+                                                          nullptr, nullptr, nullptr, nullptr };
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a pixel shader" \
+                     " resource view.");
+    return;
+  }
+
+  uint32 size = static_cast<uint32>(_unbindSRV.size());
+  device->m_pImmediateContext->PSSetShaderResources(0,
+                                                    size,
+                                                    _unbindSRV.data());
+}
+
+void
 DX11GraphicsAPI::vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
 {
   // cast to a directX device
@@ -1059,6 +1190,25 @@ DX11GraphicsAPI::vSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint
 }
 
 void
+DX11GraphicsAPI::vSUnbindShaderResourceViews()
+{
+  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
+                                                          nullptr, nullptr, nullptr, nullptr };
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a vertex shader" \
+                     " resource view.");
+    return;
+  }
+
+  const uint32 size = static_cast<uint32>(_unbindSRV.size());
+  device->m_pImmediateContext->VSSetShaderResources(0,
+                                                    size,
+                                                    _unbindSRV.data());
+}
+
+void
 DX11GraphicsAPI::cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint32 _start)
 {
   // cast to a directX device
@@ -1069,7 +1219,7 @@ DX11GraphicsAPI::cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint
     return;
   }
 
-  uint32 count = static_cast<uint32>(_pTextures.size());
+  const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> uavVector(count);
 
   for (uint32 i = 0; i < _pTextures.size(); ++i) {
@@ -1079,6 +1229,25 @@ DX11GraphicsAPI::cSSetShaderResourceViews(Vector<SPtr<Texture>> _pTextures, uint
     uavVector[i] = dxUAV ? dxUAV->m_sRV : nullptr;
   }
   device->m_pImmediateContext->CSSetShaderResources(_start, count, uavVector.data());
+}
+
+void
+DX11GraphicsAPI::cSUnbindShaderResourceViews()
+{
+  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
+                                                          nullptr, nullptr, nullptr, nullptr };
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a compute shader" \
+                     " resource view.");
+    return;
+  }
+
+  const uint32 size = static_cast<uint32>(_unbindSRV.size());
+  device->m_pImmediateContext->CSSetShaderResources(0,
+                                                    size,
+                                                    _unbindSRV.data());
 }
 
 void
@@ -1094,7 +1263,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
     return;
   }
 
-  uint32 count = static_cast<uint32>(_pTextures.size());
+  const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11UnorderedAccessView*> uavVector(count);
 
   for (uint32 i = 0; i < _pTextures.size(); ++i) {
@@ -1103,21 +1272,42 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(Vector<SPtr<Texture>> _pTextures,
     // set the resource
     uavVector[i] = dxUAV ? dxUAV->m_uAV : nullptr;
   }
+
   device->m_pImmediateContext->CSSetUnorderedAccessViews(_start,
                                                          count,
                                                          uavVector.data(),
                                                          _initialCounts);
 }
 
-// to do: currently, texture loading is taking the old directory from
+void
+DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
+{
+  static Vector<ID3D11UnorderedAccessView*> _unbindUAV = {nullptr, nullptr, nullptr, nullptr,
+                                                          nullptr, nullptr, nullptr, nullptr };
+  // cast to a directX device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the unbinding of a compute shader" \
+                     " unordered access view.");
+    return;
+  }
+
+  const uint32 numViews = static_cast<uint32>(_unbindUAV.size());
+  device->m_pImmediateContext->CSSetUnorderedAccessViews(0,
+                                                         numViews,
+                                                         _unbindUAV.data(),
+                                                         nullptr);
+}
+
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
                                        bool _mipLevels,
-                                       uint32 _format)
+                                       uint32 _format,
+                                       int32 _miscFlags)
 {
   // values
-  int32 width, height, bpp, pitch;
+  int32 width, height, bpp;
 
   // load the image data into a storage variable
   unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
@@ -1132,18 +1322,94 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 
   // how wide each line of the texture will be
   if (bpp == 3) { ++bpp; }
-  pitch = width * bpp;
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTexture(bpp,
                                              width,
                                              height,
                                              _format,
-                                             0,
+                                             PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
                                              _mipLevels,
                                              _format,
+                                             _miscFlags,
                                              data);
+
+  // if creating the texture failed
+  if (!temptTexture) {
+    g_Logger().print("Failed to create a texture.");
+    return nullptr;
+  }
+
+  // free the texture data if there's data to release
+  if (data) { stbi_image_free(data); }
+
+  // set the path
+  temptTexture->setName(_fileName);
+
+  // return the texture
+  return temptTexture;
+}
+
+SPtr<Texture>
+DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
+{
+  SPtr<DX11Texture> texture = make_shared<DX11Texture>();
+  // set to the device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    g_Logger().print("Failed to utilize the DX device in the creation of a DSS texture.");
+    return nullptr;
+  }
+  uint32 hr = DirectX::CreateDDSTextureFromFile(device->m_pd3dDevice,
+                                                _directory.getDirectoryWStr().c_str(),
+                                                nullptr,
+                                                &texture->m_sRV);
+  if (FAILED(hr)) {
+    String errMsg = g_Logger().getMessageError(hr);
+    g_Logger().print("Failed to create a DSS texture. Error: " + errMsg);
+    return nullptr;
+  }
+  return texture;
+}
+
+SPtr<Texture>
+DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
+                                        uint32 _bindFlags,
+                                        bool _mipLevels,
+                                        int32 _miscFlags)
+{
+  // values
+  int32 width, height, channels, bpp;
+
+  // load the image data into a storage variable
+  float* data = stbi_loadf(_fileName.toString().c_str(), &width, &height, &channels, 4);
+
+  // check if the texture was found
+  if (!data) {
+    delete data;
+    data = nullptr;
+    g_Logger().print("Can't open " + _fileName.getFileName() + ", unable to open file."
+                     + " Reason: " + stbi_failure_reason());
+    return nullptr;
+  }
+
+  // how wide each line of the texture will be
+  bpp = 4 * sizeof(float);
+  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  // if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
+
+  // create a default texture using the received parameters
+  SPtr<Texture> temptTexture = createTexture(bpp,
+                                             width,
+                                             height,
+                                             format,
+                                             PK_USAGE::kPK_USAGE_DEFAULT,
+                                             _bindFlags,
+                                             _mipLevels,
+                                             format,
+                                             _miscFlags,
+                                             reinterpret_cast<unsigned char*>(data));
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -1170,6 +1436,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                int32 _bindFlags,
                                bool _mipLevels,
                                int32 _shaderResourceFormat,
+                               int32 _miscFlags,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
@@ -1187,7 +1454,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
   desc.Usage = static_cast<D3D11_USAGE>(_usage);
   desc.BindFlags = _bindFlags;
   desc.CPUAccessFlags = 0;
-  desc.MiscFlags = 0;
+  desc.MiscFlags = _miscFlags;
 
   // data of the texture
   D3D11_SUBRESOURCE_DATA* initData = nullptr;
@@ -1390,10 +1657,10 @@ DX11GraphicsAPI::setVertexBuffer(SPtr<VertexBuffer>& _pVertexB,
     return;
   }
   device->m_pImmediateContext->IASetVertexBuffers(_start,
-                                                _bufferCount,
-                                                &dxVB->pBuffer,
-                                                &stride,
-                                                &_offset);
+                                                  _bufferCount,
+                                                  &dxVB->pBuffer,
+                                                  &stride,
+                                                  &_offset);
 }
 
 SPtr<IndexBuffer>

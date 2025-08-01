@@ -16,6 +16,7 @@
 **/
 /*********************************************/
 #include "pkCamera.h"
+#include "pkCBuffers.h"
 #include "pkEventQueue.h"
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"
@@ -102,6 +103,7 @@ class PK_CORE_EXPORT BaseApp
   bool m_vSync;
 
   bool m_shadows;
+  bool m_specular;
   bool m_AO;
   bool m_luminance;
 };

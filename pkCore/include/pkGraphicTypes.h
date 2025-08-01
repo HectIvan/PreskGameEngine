@@ -1,4 +1,5 @@
 #pragma once
+
 #include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
@@ -6,7 +7,7 @@ namespace pkEngineSDK
 
 namespace TEXTURE_FORMATS
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_FORMAT_UNKNOWN = 0,
     kPK_FORMAT_R32G32B32A32_TYPELESS = 1,

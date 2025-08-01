@@ -1,20 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkCamera pkCamera.h
-* @Hector Ivan Muñoz Ceballos
-* @date 30/09/2024
-* @Camera file for the Presk Game Engine.
-*
-* This file will contain the Camera used for the engine
-*
-* @bug.
-* Camera movement not as intended when moving to a certain Z coordinat range.
-* Erratic camera rotation when its performed constantly.
-*
-* @HectIvan 02/01/2025
-* Movement and camera rotation at the same time.
-*/
-/************************************************************************/
+ * @file    pkCamera.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    30/09/2024
+ * @brief   Camera component for the game engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

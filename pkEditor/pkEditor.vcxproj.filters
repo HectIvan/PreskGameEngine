@@ -11,9 +11,6 @@
     <Filter Include="include">
       <UniqueIdentifier>{fe17dee2-aed7-4ef6-a8ab-f7c9e7e18a54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Editor">
-      <UniqueIdentifier>{493c38ec-bff2-4524-99d4-55dc331fee09}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\Interface">
       <UniqueIdentifier>{54a6d8a2-e618-4e1b-b26c-f66d08bffca8}</UniqueIdentifier>
     </Filter>
@@ -29,13 +26,22 @@
     <Filter Include="include\Editor">
       <UniqueIdentifier>{8bb4215f-047b-47b5-b23c-13df7106fb10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PhysicsApp">
+      <UniqueIdentifier>{f170020d-da58-4dfc-af0e-6571307fe531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\PhysicsApp">
+      <UniqueIdentifier>{853d309a-7e4f-41ab-aba8-e4db64f58827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baseApp\Editor">
+      <UniqueIdentifier>{493c38ec-bff2-4524-99d4-55dc331fee09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\shaderTest.cpp">
       <Filter>Source Files\baseApp</Filter>
     </ClCompile>
     <ClCompile Include="source\pkEditorApp.cpp">
-      <Filter>Source Files\Editor</Filter>
+      <Filter>Source Files\baseApp\Editor</Filter>
     </ClCompile>
     <ClCompile Include="source\pkUInterface.cpp">
       <Filter>Source Files\interface</Filter>
@@ -68,7 +74,10 @@
       <Filter>Source Files\interface\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="source\ActorInspector.cpp">
-      <Filter>Source Files\Editor</Filter>
+      <Filter>Source Files\baseApp\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PhysicsApp.cpp">
+      <Filter>Source Files\PhysicsApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="include\ActorInspector.h">
       <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhysicsApp.h">
+      <Filter>include\PhysicsApp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -26,11 +26,11 @@ PhysicsManager::sortByLeft(Vector<Shape>& _shapes)
 {
   Vector<Shape> returnShapes = _shapes;
   // sort in ascending order using the x axis
-  std::sort(returnShapes.begin(),
-            returnShapes.end(),
-            [](const Vector3& a, const Vector3& b) {
-              return a.x < b.x;
-            });
+  // std::sort(returnShapes.begin(),
+  //           returnShapes.end(),
+  //           [](const Vector3& a, const Vector3& b) {
+  //             return a.x < b.x;
+  //           });
   return returnShapes;
 }
 
@@ -198,6 +198,18 @@ PhysicsManager::getEffectiveMass(Vector3& _normalHit,
 
   // uses linear and rotational resistance
   return _rb1.getInverseMass() + _rb2.getInverseMass() + angularEffect.dotProd(_normalHit);
+}
+
+float
+PhysicsManager::getElasticity(const RigidBody& _rb1, const RigidBody& _rb2)
+{
+  return (_rb1.getElasticity() + _rb2.getElasticity()) * 0.5f;
+}
+
+float
+PhysicsManager::getFriction(const RigidBody& _rb1, const RigidBody& _rb2)
+{
+  return (_rb1.getFrictionCoefficient() + _rb2.getFrictionCoefficient()) * 0.5f;
 }
 
 void

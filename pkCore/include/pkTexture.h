@@ -20,7 +20,7 @@
 
 namespace PK_BIND_FLAG
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_BIND_VERTEX_BUFFER = 0x1L,
     kPK_BIND_INDEX_BUFFER = 0x2L,
@@ -37,7 +37,7 @@ namespace PK_BIND_FLAG
 
 namespace PK_USAGE
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_USAGE_DEFAULT = 0,
     kPK_USAGE_IMMUTABLE = 1,
@@ -48,7 +48,7 @@ namespace PK_USAGE
 
 namespace TEXTURE_FORMAT
 {
-  enum PK_CORE_EXPORT E
+  enum E
   {
     kPK_FORMAT_UNKNOWN = 0,
     kPK_FORMAT_R32G32B32A32_TYPELESS = 1,
@@ -178,6 +178,32 @@ namespace TEXTURE_FORMAT
 namespace pkEngineSDK
 {
 
+namespace PK_RESOURCE_MISC_FLAG {
+  enum E
+  {
+    kPK_RESOURCE_MISC_GENERATE_MIPS = 0x1L,
+    kPK_RESOURCE_MISC_SHARED = 0x2L,
+    kPK_RESOURCE_MISC_TEXTURECUBE = 0x4L,
+    kPK_RESOURCE_MISC_DRAWINDIRECT_ARGS = 0x10L,
+    kPK_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS = 0x20L,
+    kPK_RESOURCE_MISC_BUFFER_STRUCTURED = 0x40L,
+    kPK_RESOURCE_MISC_RESOURCE_CLAMP = 0x80L,
+    kPK_RESOURCE_MISC_SHARED_KEYEDMUTEX = 0x100L,
+    kPK_RESOURCE_MISC_GDI_COMPATIBLE = 0x200L,
+    kPK_RESOURCE_MISC_SHARED_NTHANDLE = 0x800L,
+    kPK_RESOURCE_MISC_RESTRICTED_CONTENT = 0x1000L,
+    kPK_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE = 0x2000L,
+    kPK_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE_DRIVER = 0x4000L,
+    kPK_RESOURCE_MISC_GUARDED = 0x8000L,
+    kPK_RESOURCE_MISC_TILE_POOL = 0x20000L,
+    kPK_RESOURCE_MISC_TILED = 0x40000L,
+    kPK_RESOURCE_MISC_HW_PROTECTED = 0x80000L,
+    kPK_RESOURCE_MISC_SHARED_DISPLAYABLE,
+    kPK_RESOURCE_MISC_SHARED_EXCLUSIVE_WRITER,
+    kPK_RESOURCE_MISC_NO_SHADER_ACCESS
+  };
+}
+
 class Device;
 
 namespace TEXTURE_TYPE
@@ -200,6 +226,7 @@ struct TextureDesc
   int32 bindFlags;
   bool mipLevels;
   int32 shaderResourceFormat;
+  int32 miscFlags;
   unsigned char* data = nullptr;
 };
 
@@ -242,21 +269,21 @@ class PK_CORE_EXPORT Texture
    * @return the texture height.
    */
   uint32
-  getHeight() { return m_height; }
+  getHeight() const { return m_height; }
 
   /**
    * @brief Get the texture size.
    * @return Texture size.
    */
   Vector2
-  getSize() { return Vector2(m_width, m_height); }
+  getSize() const { return Vector2(m_width, m_height); }
 
   /**
    * @brief Get texture type.
-   * @return Type as an uint32.
+   * @return Type as a TEXTURE_TYPE::E.
    */
-  const uint32
-  getType() { return m_type; }
+  TEXTURE_TYPE::E
+  getType() const { return m_type; }
 
   /**
    * @brief Set texture type.

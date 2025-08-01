@@ -28,8 +28,16 @@ class DX11Texture : public Texture
 {
  public:
   DX11Texture() = default;
-  DX11Texture(ID3D11Texture2D* _t2d) :
+  DX11Texture(ID3D11Texture2D* _t2d,
+              ID3D11RenderTargetView* _rTV = nullptr,
+              ID3D11DepthStencilView* _dSV = nullptr,
+              ID3D11ShaderResourceView* _Srv = nullptr,
+              ID3D11UnorderedAccessView* _uAV = nullptr) :
     m_t2d(_t2d),
+    m_rTV(_rTV),
+    m_dSV(_dSV),
+    m_sRV(_Srv),
+    m_uAV(_uAV),
     m_owner(false)
   {}
   virtual ~DX11Texture()
@@ -86,13 +94,13 @@ class DX11Texture : public Texture
  public:
   ID3D11Texture2D* m_t2d = nullptr;
 
-  ID3D11RenderTargetView* m_rTV;
+  ID3D11RenderTargetView* m_rTV = nullptr;
 
-  ID3D11DepthStencilView* m_dSV;
+  ID3D11DepthStencilView* m_dSV = nullptr;
 
-  ID3D11ShaderResourceView* m_sRV;
+  ID3D11ShaderResourceView* m_sRV = nullptr;
 
-  ID3D11UnorderedAccessView* m_uAV;
+  ID3D11UnorderedAccessView* m_uAV = nullptr;
 
   bool m_owner = true;
 };

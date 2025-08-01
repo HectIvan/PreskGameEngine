@@ -90,6 +90,12 @@ PlatformMath::sin(const float _x)
 }
 
 float
+PlatformMath::sinf(const float _x)
+{
+  return static_cast<float>(std::sinf(_x));
+}
+
+float
 PlatformMath::asin(const float _x)
 {
   return static_cast<float>(std::asin(_x));
@@ -384,7 +390,7 @@ PlatformMath::sign3(Vector3& _direction)
 Vector3 PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
 {
   Vector3 dir = _dir.normalized();
-  Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
+  // Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
   Vector3 dirSigns = sign3(dir);
   return _box.m_transform * (_box.m_halfSize * dirSigns);
 }

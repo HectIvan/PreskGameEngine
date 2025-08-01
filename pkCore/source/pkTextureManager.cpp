@@ -8,6 +8,7 @@ namespace pkEngineSDK
 SPtr<Texture>
 TextureManager::loadTexture(const Path& _directory)
 {
+  GraphicsAPI& api = g_GraphicAPI().instance();
   // search if the texture has been stored before
   for (uint32 i = 0; i < m_textures.size(); ++i) {
     if (m_textures[i]->name.toString() == _directory.toString()) {
@@ -15,14 +16,25 @@ TextureManager::loadTexture(const Path& _directory)
     }
   }
 
+  SPtr<Texture> texture = nullptr;
   // create the texture
-  SPtr<Texture> texture = g_GraphicAPI().createTextureFromFile(_directory, 8, false, 28);
+  // if it is an exr image / hdr
+  // if (_directory.getExtension() == "exr" || _directory.getExtension() == "hdr") {
+  //   texture = api.createTextureFromFileF(_directory,
+  //                                        8,
+  //                                        false,
+  //                                        PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_TEXTURECUBE);
+  // }
+  // else {
+  texture = api.createTextureFromFile(_directory, 8, false, 28);
+  // }
 
   // if the texture failed to load
   if (!texture) {
     texture = nullptr;
     return nullptr;
   }
+  texture->setName(_directory.getFileNameWithoutExtension());
 
   // store the new texture in the memory
   SPtr<TextureMemory> newTexture = make_shared<TextureMemory>();

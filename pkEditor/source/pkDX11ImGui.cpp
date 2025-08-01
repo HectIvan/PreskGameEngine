@@ -2,6 +2,7 @@
 #include "pkGraphicsAPI.h"
 #include "externals/imgui_impl_dx11.h"
 #include "pkPlatformMath.h"
+#include "pkTexture.h"
 
 namespace pkEngineSDK
 {
@@ -45,10 +46,22 @@ UInterface::createText(const char* _text)
   ImGui::Text(_text);
 }
 
-bool
-UInterface::createInputText(const char* _name, String& _param)
+static int
+InputTextCallback(ImGuiInputTextCallbackData* data)
 {
-  return ImGui::InputText(_name, strdup(_param.c_str()), sizeof(_param));
+  if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+  {
+    auto str = static_cast<String*>(data->UserData);
+    str->resize(data->BufTextLen);
+    data->Buf = str->data();
+  }
+  return 0;
+}
+
+bool
+UInterface::createInputText(const char* _name, String* _param)
+{
+  return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
 }
 
 bool
@@ -169,6 +182,23 @@ UInterface::createSliderVector3(const char* _name,
   return _param;
 }
 
+bool
+UInterface::createDragF(const char* _name, float& _value, float _speed, float _min, float _max)
+{
+  return ImGui::DragFloat(_name, &_value, _speed, _min, _max);
+}
+
+bool
+UInterface::createDrag3(const char* _name, Vector3& _value, float _speed, float _min, float _max)
+{
+  float value[3] = { _value.x, _value.y, _value.z };
+  bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
+  _value.x = value[0];
+  _value.y = value[1];
+  _value.z = value[2];
+  return result;
+}
+
 void
 UInterface::createCheckBox(const char* _name, bool& _param)
 {
@@ -176,9 +206,138 @@ UInterface::createCheckBox(const char* _name, bool& _param)
 }
 
 bool
-UInterface::createButton(const char* _name)
+UInterface::createButton(String _name,
+                         Color _normal,
+                         Color _hover,
+                         Color _active,
+                         bool _newcolor)
 {
-  return ImGui::Button(_name);
+  if (_name.empty()) {
+    _name = "--Default--";
+  }
+
+  if (_newcolor) {
+    bool result = false;
+    Vector4 tC = _normal.colorTo01();
+    Vector4 hC = _hover.colorTo01();
+    Vector4 cC = _active.colorTo01();
+    ImVec4 tColor = ImVec4(tC.x, tC.y, tC.y, tC.w);
+    ImVec4 hColor = ImVec4(hC.x, hC.y, hC.y, hC.w);
+    ImVec4 cColor = ImVec4(cC.x, cC.y, cC.y, cC.w);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, tColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, cColor);
+    result = ImGui::Button(_name.c_str());
+    ImGui::PopStyleColor(3);
+    return result;
+  }
+  return ImGui::Button(_name.c_str());
+}
+
+bool
+UInterface::beginCombo(const char* _name, const char* _previewVal)
+{
+  return ImGui::BeginCombo(_name, _previewVal);
+}
+
+bool
+UInterface::selectable(const char* _name, bool* _selected)
+{
+  return ImGui::Selectable(_name, _selected);
+}
+
+void
+UInterface::endCombo()
+{
+  ImGui::EndCombo();
+}
+
+bool
+UInterface::createButtonImage(const char* _name, SPtr<Texture>& _pTexture)
+{
+  // auto& dxTX = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  return false;
+}
+
+bool
+UInterface::colorEdit(const char* _name, Color& _color)
+{
+  float color[4] = { static_cast<float>(_color.getR()),
+                     static_cast<float>(_color.getB()),
+                     static_cast<float>(_color.getG()),
+                     static_cast<float>(_color.getA())};
+  bool result = ImGui::ColorEdit4(_name, color);
+  _color.setA(static_cast<uint8>(color[3]));
+  _color.setR(static_cast<uint8>(color[0]));
+  _color.setG(static_cast<uint8>(color[1]));
+  _color.setB(static_cast<uint8>(color[2]));
+  return result;
+}
+
+bool
+UInterface::colorEdit(const char* _name, Vector3& _color)
+{
+  float color[3] = { _color.x, _color.y, _color.z };
+  bool result = ImGui::ColorEdit3(_name, color);
+  _color.x = color[0];
+  _color.y = color[1];
+  _color.z = color[2];
+  return result;
+}
+
+void
+UInterface::plotLines(const char* _name,
+                      float _values[],
+                      uint32 _size,
+                      int32 _valuesOffset,
+                      const char* _overlayText,
+                      float _scaleMin,
+                      float _scaleMax)
+{
+  ImGui::PlotLines(_name, _values, _size, _valuesOffset, _overlayText, _scaleMin, _scaleMax);
+}
+
+bool
+UInterface::beginChild(const char* _name)
+{
+  return ImGui::BeginChild(_name);
+}
+
+void
+UInterface::endChild()
+{
+  ImGui::EndChild();
+}
+
+bool
+UInterface::isHovered()
+{
+  return ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+}
+
+bool
+UInterface::isHoveredWithItems()
+{
+  return (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemActive());
+}
+
+bool
+UInterface::isItemActive()
+{
+  return ImGui::IsAnyItemActive();
+}
+
+void
+UInterface::sameLine()
+{
+  ImGui::SameLine();
+}
+
+void
+UInterface::SetNextWindowAlpha(float _alpha)
+{
+  ImGui::SetNextWindowBgAlpha(_alpha);
 }
 
 void

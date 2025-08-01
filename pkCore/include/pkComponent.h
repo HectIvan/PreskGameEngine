@@ -33,11 +33,12 @@ namespace COMPONENT_TYPE
     kMaterial,
     kLight,
     kCamera,
+    kRigidBody,
     kUnknown,
   };
 }
 
-class PK_CORE_EXPORT Component
+class Component
 {
  public:
   Component() = default;

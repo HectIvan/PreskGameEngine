@@ -161,12 +161,6 @@
     <ClCompile Include="source\pkFileSystem.cpp">
       <Filter>source\system</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkOBB.cpp">
-      <Filter>source\figures</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkAABB.cpp">
-      <Filter>source\figures</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkMatrix3.cpp">
       <Filter>source\math</Filter>
     </ClCompile>

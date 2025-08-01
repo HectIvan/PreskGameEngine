@@ -15,6 +15,8 @@
 #include "pkModel.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
+#include "pkResourceManager.h"
+
 #include "stb_image.h"
 
 namespace pkEngineSDK
@@ -74,8 +76,15 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
+  ResourceManager& rm = g_ResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
-  SPtr<Mesh> meshProcess = make_shared<Mesh>();
+
+  SPtr<Mesh> meshProcess = rm.searchMesh(_mesh->mName.C_Str());
+  if (meshProcess) {
+    return meshProcess;
+  }
+
+  meshProcess = make_shared<Mesh>();
   meshProcess->setName(_mesh->mName.C_Str());
   meshProcess->vertexCount = _mesh->mNumVertices;
   // process vertex
@@ -155,7 +164,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // normal texture loading.
       if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setNormal(tm.loadTexture(newPath));
@@ -166,7 +175,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION);
     for (uint32 i = 0; i < aoCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // ambient occlusion texture loading.
       if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setOcclusion(tm.loadTexture(newPath));
@@ -177,8 +186,19 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
     for (uint32 i = 0; i < metallicCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // metallic texture loading.
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
+        Path newPath(path.C_Str());
+        meshProcess->material->setMetallic(tm.loadTexture(newPath));
+      }
+    }
+
+    // get all roughness maps of the material
+    uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_REFLECTION);
+    for (uint32 i = 0; i < roughnessCount; ++i) {
+      aiString path;
+      // roughness texture loading.
+      if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         Path newPath(path.C_Str());
         meshProcess->material->setMetallic(tm.loadTexture(newPath));
       }
@@ -213,8 +233,8 @@ Model::setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight)
   _boneId = 0;
   _weight = 0;
   /**************************/
-  for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
-  }
+  // for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
+  // }
 }
 
 void

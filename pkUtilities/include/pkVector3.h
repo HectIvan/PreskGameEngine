@@ -237,7 +237,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the comparison will be made.
    * @return A boolean determining if they are the same.
    */
-  FORCEINLINE const bool
+  FORCEINLINE bool
   operator==(const Vector3& other) const
   {
     return (x != other.x ||

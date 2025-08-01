@@ -17,11 +17,13 @@
 * Includes
 **/
 /*********************************************/
+#include "pkColor.h"
 #include "externals/imgui.h"
-#include "pkPrerequisitesCore.h"
 #include "pkModule.h"
-#include "pkWindow.h"
+#include "pkPrerequisitesCore.h"
+#include "pkTexture.h"
 #include "pkVector2.h"
+#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
@@ -127,7 +129,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputText(const char* _name, String& _param);
+  createInputText(const char* _name, String* _param);
 
   /**
    * @brief Create an input float.
@@ -261,6 +263,32 @@ class UInterface : public Module<UInterface>
   createSliderVector3(const char* _name, Vector3 _param, const float _min, const float _max);
 
   /**
+   * @brief Create a drag input.
+   * @param _name Name of the item.
+   * @param _value Value to modify.
+   * @param _speed Modification speed.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @result If there was a change.
+   */
+  bool
+  createDragF(const char* _name, float& _value, float _speed = 1.0f, float _min = -99999.9f,
+              float _max = 99999.9f);
+
+  /**
+   * @brief Create a drag input.
+   * @param _name Name of the item.
+   * @param _value Value to modify.
+   * @param _speed Modification speed.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @result If there was a change.
+   */
+  bool
+  createDrag3(const char* _name, Vector3& _value, float _speed = 1.0f, float _min = -99999.9f,
+              float _max = 99999.9f);
+
+  /**
    * @brief Create a checkbox.
    * @param _name Name of the checkbox.
    * @param _param What parameter to change.
@@ -271,9 +299,131 @@ class UInterface : public Module<UInterface>
   /**
    * @brief Create a Button.
    * @param _name Name of the button.
+   * @param _transparent If the button color is supposed to be transparent.
+   * @return If the button is clicked.
    */
   bool
-  createButton(const char* _name);
+  createButton(String _name,
+               Color _normal = Color(0,0,0,0),
+               Color _hover = Color(0,0,0,0),
+               Color _active = Color(0,0,0,0),
+               bool _newcolor = false);
+
+  /**
+   * @brief Start the creation of a dropdown combo.
+   * @param _name Name of the dropdown.
+   * @param _previewVal Preview value.
+   * @return If the combo is opened.
+   */
+  bool
+  beginCombo(const char* _name, const char* _previewVal);
+
+  /**
+   * @brief Create a selectable for a dropdown combo.
+   * @param _name Name of the selectable.
+   * @param _selected If the selectable is selected.
+   * @return If it was selected.
+   */
+  bool
+  selectable(const char* _name, bool* _selected = nullptr);
+
+  /**
+   * @brief End the creation of a dropdown combo.
+   */
+  void
+  endCombo();
+
+  /**
+   * @brief create a button with an image.
+   * @param _name Name of the button.
+   * @param _texture Texture to use.
+   * @return If the button was pressed.
+   */
+  bool
+  createButtonImage(const char* _name, SPtr<Texture>& _pTexture);
+
+  /**
+   * @brief Create a color editor.
+   * @param _name Name of the editor.
+   * @param _color Color to set.
+   * @return Wether there was a change.
+   */
+  bool
+  colorEdit(const char* _name, Color& _color);
+
+  /**
+   * @brief Create a color editor.
+   * @param _name Name of the editor.
+   * @param _color Color to set.
+   * @return Wether there was a change.
+   */
+  bool
+  colorEdit(const char* _name, Vector3& _color);
+
+  /**
+   * @brief Create a plot line.
+   * @param _name Name.
+   * @param _size Size of the array.
+   * @param _valuesOffset Distance between values.
+   * @param _overlayText Text overlayed on top.
+   * @param _scaleMin Minimum Y size.
+   * @param _scaleMax Maximum Y size.
+   */
+  void
+  plotLines(const char* _name,
+            float _values[],
+            uint32 _size,
+            int32 _valuesOffset,
+            const char* _overlayText = nullptr,
+            float _scaleMin = 0.0f,
+            float _scaleMax = 500.0f);
+
+  /**
+   * @brief Create a child window.
+   * @param _name Name of the window.
+   * @return Wether it was successful.
+   */
+  bool
+  beginChild(const char* _name);
+
+  /**
+   * @brief End the child window.
+   */
+  void
+  endChild();
+
+  /**
+   * @brief Check if the cursor is on top of a window.
+   * @return Hovered or not.
+   */
+  bool
+  isHovered();
+
+  /**
+   * @brief Check if the cursor is on top of a window or item.
+   * @return Hovered or not.
+   */
+  bool
+  isHoveredWithItems();
+
+  /**
+   * @brief Check if an item is active.
+   * @return Active or not.
+   */
+  bool
+  isItemActive();
+
+  /**
+   * @brief Create 2 parts in the same line.
+   */
+  void
+  sameLine();
+
+  /**
+   * @brief Set window background transparency.
+   */
+  void
+  SetNextWindowAlpha(float _alpha);
   
   /**
    * @brief End the window creation process.

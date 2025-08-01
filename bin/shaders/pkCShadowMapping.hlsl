@@ -1,11 +1,13 @@
 /***************************************************************************************
-* Constant Buffer Structures
+* Shadows Compute shader
 ***************************************************************************************/
 
 #pragma kernel CS_Main
 
 // unordered texture for reading/writing.
-RWTexture2D<float4> outputTexture : register(u0);
+RWTexture2D<float4>shadowTexture : register(u0);
+
+#define PI 3.14159265359
 
 // resources
 Texture2D<float4> normalMap : register(t0);
@@ -16,7 +18,7 @@ Texture2D<float4> depthMap : register(t3);
 SamplerState samState : register(s0);
 
 /*******************************************/
-/*      CONSTANT BUFEFRS                   */
+/*         CONSTANT BUFEFRS                */
 /*******************************************/
 
 cbuffer cbLight : register(b0)
@@ -28,9 +30,12 @@ cbuffer cbLight : register(b0)
   float3 LightColor; // 44
   float lightPadd3; // 48
   float ShadowIntensity; // 52
-  float spotExponent; // 56
-  float2 lightPadd4; // 64
+  float SpotExponent; // 56
+  float SpotCutoff; // 60
+  float SpecIntensity; // 64
+  float4x4 lightTransform; // 128
 }
+
 cbuffer Camera : register(b1)
 {
   float4 Eye; // 16
@@ -47,6 +52,7 @@ cbuffer LightCamera : register(b2)
   float4x4 ViewLight; // 92
   float4x4 ProjectionLight; // 156
   float _unusedLightCam0; // 160
+  float2 cbLightCamPadd1;
 }
 
 cbuffer CamInvProj : register(b3)
@@ -89,6 +95,14 @@ float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
   return worldSpacePosition.xyz;
 }
 
+float magnitude(float3 _vector)
+{
+  float x2 = _vector.x * _vector.x;
+  float y2 = _vector.y * _vector.y;
+  float z2 = _vector.z * _vector.z;
+  return sqrt(x2 + y2 + z2);
+}
+
 // write directly onto the texture.
 [numthreads(16, 16, 1)]
 void CSMain(uint3 DTid : SV_DispatchThreadID)
@@ -102,29 +116,63 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   /**
    * texture data
    */
-  float4 shadowTex = shadowMap.Load(int3(DTid.xy, 0));
   float4 depthTex = depthMap.Load(int3(DTid.xy, 0));
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
   
-  float3 normal = normalTex.xyz;
+  float3 normal = normalize(normalTex.xyz);
   
   // get world position from depth map
-  float3 worldPos = WorldPosFromDepth(DTid.xy, depthTex.r);
+  float2 texCoord = (DTid.xy / winSize);
+  float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(lightPos - worldPos);
+  float3 lightDir = normalize(mul(float4(-LightDir, 1.0f), lightTransform).xyz);
   float diff = max(dot(lightDir, normal), shadowColor);
+  diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;
-  // specular
-  float3 viewDir = normalize(Eye.xyz - worldPos);
-  float spec = 0.0;
-  float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), 0.0f), spotExponent);
-  float3 specular = lightColor * spec;
-    
-  float3 finalColor = diffuse + specular;
   
-  outputTexture[DTid.xy] = float4(finalColor, 1.0f);
+  /**
+   * Shadow mapping
+   */
+  //        // convert from world space to clip space relative to the light camera
+  //        float4 clipSpace = mul(ProjectionLight, mul(ViewLight, float4(worldPos, 1.0f)));
+  //        // do a perspective division
+  //        float3 projCoords = clipSpace.xyz / clipSpace.w;
+  //        // convert to a [0, 1] range
+  //        projCoords = projCoords * 0.5f + 0.5f;
+  //        // convert from UV to texel coordinate
+  //        int2 texelCoord = int2(projCoords.xy * winSize);
+  //        float closestDepth = shadowMap.Load(int3(texelCoord, 0)).r;
+  //        
+  //        float currentDepth = projCoords.z;
+  //        
+  //        if (currentDepth > closestDepth)
+  //        {
+  //          diffuse = float3(0,0,0);
+  //        }
+  
+  /** i have not been able to get this to work
+  float3 lightDirection = normalize(-LightDir);
+  float3 worldVector = normalize(worldPos - LightPos);
+  // get angle between position and light direction
+  float angle = dot(lightDirection, worldVector);
+  // get the acos and multiply to convert to degrees
+  angle = degrees(acos(angle));
+  // if the angle is greater than the allowed spot area
+  if (angle > SpotCutoff)
+  {
+    diffuse = worldPos; // float3(shadowColor, shadowColor, shadowColor);
+  }*/
+  
+  float alpha = 1.0f;
+
+  // if its the max depth value
+  if (depthTex.r == 1) 
+  {
+    alpha = 0.0f;
+  }
+  
+  shadowTexture[DTid.xy] = float4(diffuse, alpha);
 }

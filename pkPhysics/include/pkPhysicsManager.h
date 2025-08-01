@@ -5,7 +5,7 @@
  * @date    05/06/2025
  * @brief   Physics manager for the physics library.
  *
- * @bug    no knon bugs.
+ * @bug     no known bugs.
  */
  /*****************************************************************************/
 #pragma once
@@ -19,13 +19,13 @@
 #include "pkShape.h"
 #include "pkOBB.h"
 #include "pkSphere.h"
-#include "pkRigidbody.h"
+#include "pkRigidBody.h"
 #include "pkCollisionInfo.h"
 
 namespace pkEngineSDK
 {
 
-class PhysicsManager : public Module<PhysicsManager>
+class PK_PHYSICS_EXPORT PhysicsManager : public Module<PhysicsManager>
 {
  public:
   PhysicsManager() = default;
@@ -119,6 +119,24 @@ class PhysicsManager : public Module<PhysicsManager>
                    RigidBody& _rb2,
                    Vector3 _contactPoint1,
                    Vector3 _contactPoint2);
+
+  /**
+   * @brief Get the average elasticity from 2 rigid bodies.
+   * @param _rb1 First rigid body.
+   * @param _rb2 Second rigid body.
+   * @return The average elasticity.
+   */
+  float
+  getElasticity(const RigidBody& _rb1, const RigidBody& _rb2);
+
+  /**
+   * @brief Get the average elasticity from 2 rigid bodies.
+   * @param _rb1 First rigid body.
+   * @param _rb2 Second rigid body.
+   * @return The average elasticity.
+   */
+  float
+  getFriction(const RigidBody& _rb1, const RigidBody& _rb2);
 
   /**
    * @brief Detect if there was a collision.

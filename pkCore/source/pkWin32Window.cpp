@@ -188,4 +188,11 @@ Window::getSize() const
 {
   return Vector2(m_width, m_height);
 }
+
+void
+Window::openFileFromExplorer()
+{
+  // IFileDialog* pfd = NULL;
+  // CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_IFileDialog, (void**)&pfd);
+}
 }

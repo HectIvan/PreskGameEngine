@@ -38,6 +38,7 @@ using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
+using pkEngineSDK::Texture;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
@@ -178,18 +179,50 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
       SPtr<Mesh> mesh = model->getMeshes()[i];
       String name = "  " + mesh->getName();
       SPtr<Material> material = mesh->material;
+      im.pushID(i);
       im.createText(name.c_str());
+      im.sameLine();
+      im.createCheckBox("Active ", mesh->getActive());
       // get material
-      // SPtr<Material> meshMat = mesh->material;
-      im.createButton("Diffuse");
+      SPtr<Material> meshMat = mesh->material;
+      // get the textures
+      SPtr<Texture> diffuse = meshMat->diffuse;
+      SPtr<Texture> normal = meshMat->normal;
+      SPtr<Texture> occlusion = meshMat->occlusion;
+      SPtr<Texture> height = meshMat->height;
+      SPtr<Texture> metallic = meshMat->metallic;
+      // get the names of the texture and material
+      String difName = diffuse->getName().toString() + meshMat->getNameS();
+      String norName = normal->getName().toString() + meshMat->getNameS();
+      String occName = occlusion->getName().toString() + meshMat->getNameS();
+      String heiName = height->getName().toString() + meshMat->getNameS();
+      String metName = metallic->getName().toString() + meshMat->getNameS();
+      // create the buttons
+      if (im.createButtonImage(difName.c_str(), diffuse)) {
+        // opened window to set diffuse texture
+        g_Logger().print("Opened diffuse set texture.");
+      }
       im.sameLine();
-      im.createButton("Normal");
+      if (im.createButtonImage(norName.c_str(), normal)) {
+        // opened window to set normal texture
+        g_Logger().print("Opened Normal set texture.");
+      }
       im.sameLine();
-      im.createButton("AO");
+      if (im.createButtonImage(occName.c_str(), occlusion)) {
+        // opened window to set occlusion texture
+        g_Logger().print("Opened occlusion set texture.");
+      }
       im.sameLine();
-      im.createButton("Height");
+      if (im.createButtonImage(heiName.c_str(), height)) {
+        // opened window to set height texture
+        g_Logger().print("Opened height set texture.");
+      }
       im.sameLine();
-      im.createButton("Metallic");
+      if (im.createButtonImage(metName.c_str(), metallic)) {
+        // opened window to set metallic texture
+        g_Logger().print("Opened metallic set texture.");
+      }
+      im.popID();
     }
     im.endChild();
     break;

@@ -337,10 +337,11 @@ class UInterface : public Module<UInterface>
    * @brief create a button with an image.
    * @param _name Name of the button.
    * @param _texture Texture to use.
+   * @param _size Size of the image.
    * @return If the button was pressed.
    */
   bool
-  createButtonImage(const char* _name, SPtr<Texture>& _pTexture);
+  createButtonImage(const char* _name, SPtr<Texture>& _pTexture, Vector2 _size = Vector2(64));
 
   /**
    * @brief Create a color editor.
@@ -418,6 +419,12 @@ class UInterface : public Module<UInterface>
    */
   void
   sameLine();
+
+  void
+  pushID(uint32 _id);
+
+  void
+  popID();
 
   /**
    * @brief Set window background transparency.

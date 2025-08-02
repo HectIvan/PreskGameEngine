@@ -96,7 +96,7 @@ class DX11Texture : public Texture
    * @return The raw texture data.
    */
   void*
-  getRawData() override { return static_cast<void*>(m_sRV); }
+  getRawData() override { return reinterpret_cast<void*>(m_sRV); }
 
  public:
   ID3D11Texture2D* m_t2d = nullptr;

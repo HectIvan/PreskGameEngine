@@ -136,6 +136,12 @@ class PK_CORE_EXPORT Window
   Vector2
   getClientWidthHeight() const;
 
+  /**
+   * @brief Open a file in a file explorer window.
+   */
+  void
+  openFileFromExplorer();
+
   bool m_isFocused;
 
  private:

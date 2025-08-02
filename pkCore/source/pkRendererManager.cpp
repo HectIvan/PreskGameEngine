@@ -402,13 +402,16 @@ RendererManager::renderModel(const SPtr<Model>& _model)
   for (uint32 i = 0; i < _model->meshes.size(); ++i) {
     // get the material
     SPtr<Mesh> mesh = _model->meshes[i];
-    SPtr<Material> material = mesh->material;
-    // set the material textures to the shader
-    Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
-                                       material->metallic, material->occlusion };
-    api.pSSetShaderResourceViews(textures);
-    // draw the mesh
-    api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+    // get if the mesh is active or not, if it's not, dont render and keep going.
+    if (mesh->getActive()) {
+      SPtr<Material> material = mesh->material;
+      // set the material textures to the shader
+      Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
+                                         material->metallic, material->occlusion };
+      api.pSSetShaderResourceViews(textures);
+      // draw the mesh
+      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+    }
     // update the offsets
     currentIndexOrigin += mesh->numIndex;
     currentVertexOrigin += mesh->vertexCount;

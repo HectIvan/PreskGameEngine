@@ -12,6 +12,7 @@
 **/
 /*********************************************/
 #include "pkUInterface.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -69,6 +70,244 @@ UInterface::getDisplaySize()
 {
   ImGuiIO& io = ImGui::GetIO();
   return Vector2(io.DisplaySize.x, io.DisplaySize.y);
+}
+
+
+void
+UInterface::endFrame()
+{
+  ImGui::EndFrame();
+}
+
+void
+UInterface::startWindowCreate(const char* _name)
+{
+  ImGui::Begin(_name, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+}
+
+void
+UInterface::createText(const char* _text)
+{
+  ImGui::Text(_text);
+}
+
+static int
+InputTextCallback(ImGuiInputTextCallbackData* data)
+{
+  if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+  {
+    auto str = static_cast<String*>(data->UserData);
+    str->resize(data->BufTextLen);
+    data->Buf = str->data();
+  }
+  return 0;
+}
+
+bool
+UInterface::createInputText(const char* _name, String* _param)
+{
+  return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
+}
+
+bool
+UInterface::createInputF(const char* _name, float& _param, float _step, float _largeStep)
+{
+  return ImGui::InputFloat(_name, &_param, _step, _largeStep);
+}
+
+bool
+UInterface::createInputFClamp(const char* _name,
+  float& _param,
+  float _min,
+  float _max,
+  float _step,
+  float _largeStep)
+{
+  bool change = createInputF(_name, _param, _step, _largeStep);
+  _param = Math::clamp(_param, _min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector2(const char* _name, Vector2& _param)
+{
+  float v[2] = { _param.x, _param.y };
+  bool change = ImGui::InputFloat2(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  return change;
+}
+
+bool UInterface::createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max)
+{
+  bool change = createInputVector2(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector3(const char* _name, Vector3& _param)
+{
+  float v[3] = { _param.x, _param.y, _param.z };
+  bool change = ImGui::InputFloat3(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  _param.z = v[2];
+  return change;
+}
+
+Vector3
+UInterface::createInputVector3Ret(const char* _name, Vector3 _param)
+{
+  float v[3] = { _param.x, _param.y, _param.z };
+  ImGui::InputFloat3(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  _param.z = v[2];
+  return _param;
+}
+
+bool
+UInterface::createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max)
+{
+  bool change = createInputVector3(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
+}
+
+bool
+UInterface::createInputVector4(const char* _name, Vector4& _param)
+{
+  float v[4] = { _param.x, _param.y, _param.z, _param.w };
+  bool change = ImGui::InputFloat4(_name, v);
+  _param.x = v[0];
+  _param.y = v[1];
+  _param.z = v[2];
+  _param.w = v[3];
+  return change;
+}
+
+bool
+UInterface::createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max)
+{
+  bool change = createInputVector4(_name, _param);
+  _param.clamp(_min, _max);
+  return change;
+}
+
+void
+UInterface::createSliderF(const char* _name, float& _param, const float _min, const float _max)
+{
+  ImGui::SliderFloat(_name, &_param, _min, _max);
+}
+
+void
+UInterface::createSliderVector2(const char* _name,
+  Vector2& _param,
+  const float _min,
+  const float _max)
+{
+  float vector[2] = { _param.x, _param.y };
+  ImGui::SliderFloat2(_name, vector, _min, _max);
+  _param.x = vector[0];
+  _param.y = vector[1];
+}
+
+Vector3
+UInterface::createSliderVector3(const char* _name,
+  Vector3 _param,
+  const float _min,
+  const float _max)
+{
+  float vector[3] = { _param.x, _param.y, _param.z };
+  ImGui::SliderFloat3(_name, vector, _min, _max);
+  _param.x = vector[0];
+  _param.y = vector[1];
+  _param.z = vector[2];
+  return _param;
+}
+
+bool
+UInterface::createDragF(const char* _name, float& _value, float _speed, float _min, float _max)
+{
+  return ImGui::DragFloat(_name, &_value, _speed, _min, _max);
+}
+
+bool
+UInterface::createDrag3(const char* _name, Vector3& _value, float _speed, float _min, float _max)
+{
+  float value[3] = { _value.x, _value.y, _value.z };
+  bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
+  _value.x = value[0];
+  _value.y = value[1];
+  _value.z = value[2];
+  return result;
+}
+
+void
+UInterface::createCheckBox(const char* _name, bool& _param)
+{
+  ImGui::Checkbox(_name, &_param);
+}
+
+bool
+UInterface::createButton(String _name,
+  Color _normal,
+  Color _hover,
+  Color _active,
+  bool _newcolor)
+{
+  if (_name.empty()) {
+    _name = "--Default--";
+  }
+
+  if (_newcolor) {
+    bool result = false;
+    Vector4 tC = _normal.colorTo01();
+    Vector4 hC = _hover.colorTo01();
+    Vector4 cC = _active.colorTo01();
+    ImVec4 tColor = ImVec4(tC.x, tC.y, tC.y, tC.w);
+    ImVec4 hColor = ImVec4(hC.x, hC.y, hC.y, hC.w);
+    ImVec4 cColor = ImVec4(cC.x, cC.y, cC.y, cC.w);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, tColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, cColor);
+    result = ImGui::Button(_name.c_str());
+    ImGui::PopStyleColor(3);
+    return result;
+  }
+  return ImGui::Button(_name.c_str());
+}
+
+bool
+UInterface::beginCombo(const char* _name, const char* _previewVal)
+{
+  return ImGui::BeginCombo(_name, _previewVal);
+}
+
+bool
+UInterface::selectable(const char* _name, bool* _selected)
+{
+  return ImGui::Selectable(_name, _selected);
+}
+
+void
+UInterface::endCombo()
+{
+  ImGui::EndCombo();
+}
+
+void
+UInterface::pushID(uint32 _id)
+{
+  ImGui::PushID(_id);
+}
+
+void
+UInterface::popID()
+{
+  ImGui::PopID();
 }
 
 UInterface&

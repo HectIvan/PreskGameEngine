@@ -109,7 +109,7 @@ ShaderTest::onInit()
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
                                          m_window.getHeight(),
                                          3.1416f / 4.0f,
-                                         0.01f,
+                                         3.0f,
                                          5000.0f,
                                          camPos, // position
                                          Vector3::FORWARD + camPos * -1.0f, // target
@@ -128,7 +128,7 @@ ShaderTest::onInit()
   m_light->getComponent<Camera>()->init(1280,
                                         720,
                                         3.1416f / 4.0f,
-                                        0.01f,
+                                        3.0f,
                                         2000.0f,
                                         lightCom->m_position, // position
                                         lightCom->m_direction, // target
@@ -137,8 +137,8 @@ ShaderTest::onInit()
 
   SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
-  pistol->setScale(10.0f);
-  pistol->setPosition(0.0f, 5.0f, 0.0f);
+  pistol->setScale(30.0f);
+  pistol->setPosition(10.0f, 15.0f, 0.0f);
 
   // SPtr<Actor> leon = activeScene->instantiate("Leon");
   // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
@@ -200,6 +200,10 @@ ShaderTest::input()
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
+  // if the user wants to exit the app.
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
+    ApplicationRun(false);
+  }
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);

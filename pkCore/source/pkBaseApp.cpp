@@ -102,8 +102,8 @@ BaseApp::messageLoop()
   EventQueue& eventQueue = g_eventManager();
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
-  // event loop, while the escape key has not been pressed
-  while (!eventQueue.iskeyPressed(KEY::kEsc)) {
+
+  while (m_run) {
     // reset scroll wheel input
     eventQueue.scrollWheel = 0;
     // event window specific input

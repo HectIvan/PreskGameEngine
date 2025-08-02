@@ -14,6 +14,7 @@ Texture2D<float4> normalMap : register(t0);
 Texture2D<float4> metallicMap : register(t1);
 Texture2D<float4> shadowMap : register(t2);
 Texture2D<float4> depthMap : register(t3);
+Texture2D<float4> positionsMap : register(t4);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -71,38 +72,6 @@ cbuffer ShadowParam : register(b5)
   float2 farNear; // 16
 }
 
-/*-------------------------------------------------------------------------------------------*/
-
-// get linear depth from a base depth map
-float LinearDepth(float z)
-{
-  return (farNear.x * farNear.y) / (farNear.y - z * (farNear.y - farNear.x));
-}
-
-// convert from depth to world position
-float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
-{
-  float z = DepthSample * 2.0f - 1.0f;
-
-  float4 clipSpacePosition = float4(TexCoord * 2.0f - 1.0f, z, 1.0f);
-  float4 VSP = mul(camInvProj, clipSpacePosition);
-
-  // Perspective division
-  VSP.xyz /= VSP.w;
-
-  float4 worldSpacePosition = mul(camInvView, VSP);
-
-  return worldSpacePosition.xyz;
-}
-
-float magnitude(float3 _vector)
-{
-  float x2 = _vector.x * _vector.x;
-  float y2 = _vector.y * _vector.y;
-  float z2 = _vector.z * _vector.z;
-  return sqrt(x2 + y2 + z2);
-}
-
 // write directly onto the texture.
 [numthreads(16, 16, 1)]
 void CSMain(uint3 DTid : SV_DispatchThreadID)
@@ -119,6 +88,7 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float4 depthTex = depthMap.Load(int3(DTid.xy, 0));
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 metallicTex = metallicMap.Load(int3(DTid.xy, 0));
+  float3 worldPos = positionsMap.Load(int3(DTid.xy, 0)).xyz;
   
   /**
    * alpha values
@@ -133,19 +103,10 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   // get world position from depth map
   float2 texCoord = (DTid.xy / winSize);
-  float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
   
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  
-  // see if the point in the world is outside of the range of the spotlight
-  // float3 worldVector = normalize(lightPos - worldPos);
-  // float angle = dot(lightDir, worldVector);
-  // if (angle < SpotCutoff) {
-  //   shadowTexture[DTid.xy] = float4(angle.xxx, alpha);
-  //   return;
-  // }
   
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
@@ -170,19 +131,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   //        {
   //          diffuse = float3(0,0,0);
   //        }
-  
-  /** i have not been able to get this to work
-  float3 lightDirection = normalize(-LightDir);
-  float3 worldVector = normalize(worldPos - LightPos);
-  // get angle between position and light direction
-  float angle = dot(lightDirection, worldVector);
-  // get the acos and multiply to convert to degrees
-  angle = degrees(acos(angle));
-  // if the angle is greater than the allowed spot area
-  if (angle > SpotCutoff)
-  {
-    diffuse = worldPos; // float3(shadowColor, shadowColor, shadowColor);
-  }*/
   
   shadowTexture[DTid.xy] = float4(diffuse, alpha);
 }

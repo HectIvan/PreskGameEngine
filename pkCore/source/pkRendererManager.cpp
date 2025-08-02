@@ -217,7 +217,8 @@ RendererManager::createPasses()
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Metallic),
                    getDepthBuffer(D_BUFFERS::kDB_Light),
-                   getDepthBuffer(D_BUFFERS::kDB_Base) };
+                   getDepthBuffer(D_BUFFERS::kDB_Base),
+                   getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
                     sizeof(Matrix4), sizeof(CBShadowParam) };
   pDesc.outputs = {};

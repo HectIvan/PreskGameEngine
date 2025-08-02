@@ -10,22 +10,6 @@ SamplerState samLinear : register(s0);
 #define M_PI 3.14159f
 #define DELTA 1.0f
 
-cbuffer cbView : register(b0)
-{
-  matrix View;
-};
-
-cbuffer cbProjection : register(b1)
-{
-  matrix Projection;
-};
-
-cbuffer cbWorld : register(b2)
-{
-  matrix World;
-};
-
-
 struct PS_INPUT
 {
   float4 PosSS : SV_POSITION;
@@ -47,19 +31,21 @@ struct PS_OUTPUT
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be able to remove this sv_target but i can't???
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
+  // texture sampling
   float4 AO = occlusionTex.Sample(samLinear, input.Tex);
-
   float4 colorSam = diffuseTex.Sample(samLinear, input.Tex);
-  if (colorSam.a <= 0.1f) {
-      clip(-1);
-  }
-  output.diffuse = colorSam * AO;
-  float3 metallicSam = metallicTex.Sample(samLinear, input.Tex);
+  float3 metallicSam = metallicTex.Sample(samLinear, input.Tex).rgb;
   float3 normalSam = normalTex.Sample(samLinear, input.Tex) * 2.0f - 1.0f;
+
+  if (colorSam.a <= 0.1f) {
+    clip(-1);
+  }
+  // modify the normal vector 
   float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
-  normalSam = normalize(mul(normalSam.xyz, TBN));
+  normalSam = normalize(mul(normalSam, TBN));
   output.normal = float4(normalSam, 1.0f);
-  output.posWS = float4(input.PosWS.xyz, 1.0f);
+  output.diffuse = colorSam * AO;
+  output.posWS = float4(input.PosWS, 1.0f);
   output.metallic = float4(metallicSam, 1.0f);
   
   return output;

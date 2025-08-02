@@ -56,7 +56,6 @@ PS_INPUT VS(VS_INPUT input)
   float4 vertexWorldPos = mul(vertexLocalPos, World);
   output.posWS = vertexWorldPos.xyz;
   
-  
   output.Tex = input.Tex;
   
   float3 normal = normalize(input.Normal);

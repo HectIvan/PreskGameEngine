@@ -15,8 +15,9 @@
 
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBLuminance;
-using pkEngineSDK::CBShadowParam;
+using pkEngineSDK::CBFloat;
+using pkEngineSDK::CBVector2x2;
+using pkEngineSDK::CBVector3;
 using pkEngineSDK::CreateCBCamera;
 using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
@@ -141,17 +142,12 @@ ShaderTest::onInit()
   pistol->setScale(30.0f);
   pistol->setPosition(10.0f, 15.0f, 0.0f);
 
-  // SPtr<Actor> leon = activeScene->instantiate("Leon");
-  // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
+  SPtr<Actor> rat = activeScene->instantiate("rat");
+  rat->addComponent(resourceMan.loadModel(Path("models/rat.fbx")));
+  rat->setScale(10.0f);
 
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-
-  // SPtr<Actor> rpd = activeScene->instantiate("RPD");
-  // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
-  // rpd->setRotation(0, 90, 0);
-  // // rpd->setScale(1.0f);
-  // rpd->setPosition(0, 0, -100);
 
   SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
@@ -159,6 +155,8 @@ ShaderTest::onInit()
 
   m_shadows = true;
   m_specular = true;
+  m_IBR = true;
+  m_IBRIntensity = 0.5f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
@@ -430,6 +428,14 @@ ShaderTest::uInterfaceUpdate()
   im.createText("Luminance");
   im.sameLine();
   im.createCheckBox("##Luminance", m_luminance);
+  // IBR
+  im.createText("IBR      ");
+  im.sameLine();
+  im.createCheckBox("##IBR", m_IBR);
+  if (m_IBR) {
+    im.sameLine();
+    im.createDragF("##ibrIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+  }
   // compile shaders
   if (im.createButton("Compile Shaders")) {
     g_RenderManager().compileShaders();
@@ -477,9 +483,9 @@ ShaderTest::onUpdate()
   Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBShadowParam shadowsParam;
-  shadowsParam.farNear = Vector2(0.0f);
-  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
+  CBVector2x2 shadowsParam;
+  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
+  shadowsParam.vec2 = Vector2(0.0f);
   // to do: change this to another method
   if (camera) {
     view = camera->m_view.getTransposed();
@@ -491,7 +497,7 @@ ShaderTest::onUpdate()
     CreateCBCamera::create(cBCamera, camera);
     invViewProj = (proj * view).inverse();
 
-    shadowsParam.farNear = camera->m_farNear;
+    shadowsParam.vec2 = camera->m_farNear;
   }
   Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
 
@@ -514,12 +520,17 @@ ShaderTest::onUpdate()
   }
 
   // luminance parameters.
-  CBLuminance lum;
-  lum.tolerance = 0.9f;
+  CBFloat lum;
+  lum.value = 0.9f;
   // blur parameters.
   CBBlur blur;
   blur.winSize = winSize;
   blur.blurXOffset = 1.0f;
+  // IBR parameters.
+  CBFloat IBRIntens;
+  IBRIntens.value = m_IBRIntensity;
+  CBVector3 viewPos;
+  viewPos.vec1 = camera->m_eye.xyz();
 
   // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
@@ -555,7 +566,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBVector2x2));
 
   // update specular compute buffers.
   api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &cBLight, cBLightSize);
@@ -563,10 +574,10 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &cBLightCam, cBCamSize);
   api.updateConstantBuffer(pCSpecPass->getCBuffer(3), &invProj, m4x4Size);
   api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBVector2x2));
 
   // update the luminance pass buffer.
-  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
+  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBFloat));
   // update the Horizontal/Vertical blur pass buffer.
   api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
   //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
@@ -576,8 +587,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
 
   // ibr constant buffers.
-  api.updateConstantBuffer(IBRPass->getCBuffer(0), &viewTransp, m4x4Size);
-  api.updateConstantBuffer(IBRPass->getCBuffer(1), &projTransp, m4x4Size);
+  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(Vector4));
 }
 
 void

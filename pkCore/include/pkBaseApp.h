@@ -114,5 +114,6 @@ class PK_CORE_EXPORT BaseApp
   bool m_specular;
   bool m_AO;
   bool m_luminance;
+  bool m_IBR;
 };
 }

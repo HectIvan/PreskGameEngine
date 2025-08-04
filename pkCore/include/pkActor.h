@@ -265,6 +265,10 @@ class PK_CORE_EXPORT Actor
   void
   clear();
 
+ private:
+  void
+  generateNewTransform();
+
  public:
   Vector3 m_forward;
   Vector<SPtr<Component>> m_components;

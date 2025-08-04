@@ -121,5 +121,7 @@ class ShaderTest : public BaseApp
   bool m_showWarnings;
   bool m_showActions;
 
+  float m_IBRIntensity;
+
   SPtr<Texture> m_eyeIcon;
 };

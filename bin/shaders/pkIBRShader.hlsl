@@ -1,18 +1,21 @@
 Texture2D skyboxMap : register(t0);
 Texture2D normalMap : register(t1);
+Texture2D posMap : register(t2);
 
 SamplerState samState : register(s0);
 
 #define PI 3.14159265f
 
-cbuffer ViewTransposed : register(b0)
+cbuffer Intensity : register(b0)
 {
-  matrix ViewTransp;
+  float Intensity;
+  float3 _unused;
 }
 
-cbuffer ProjTransposed : register(b1)
+cbuffer ViewPos : register(b1)
 {
-  matrix ProjTransp;
+  float3 ViewPosition;
+  float _unusedView;
 }
 
 struct PS_INPUT
@@ -31,12 +34,20 @@ float2 getSkyBoxUV(float3 dir)
 
 float4 PS(PS_INPUT input) : SV_Target
 {
-  // Reconstruct view-space direction
+  // get the world normals
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
+  float4 position = posMap.Sample(samState, input.TexCoord);
   
-  float3 viewDir = normalize(normalTex.xyz);
-  float2 skyboxUV = getSkyBoxUV(viewDir);
-  float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0.0f).rgb;
+  // normalize normals and view
+  float3 N = normalize(normalTex.xyz);
+  float3 V = normalize(position.xyz - ViewPosition);
   
-  return float4(color, 1.0f);
+  // reflect the view direction on the normal to get the view reflected
+  float3 view = reflect(V, N);
+  
+  // sample the skybox with the new direction
+  float2 skyboxUV = getSkyBoxUV(view);
+  float3 color = skyboxMap.Sample(samState, skyboxUV).rgb;
+  
+  return float4(color * Intensity, 1.0f);
 }

@@ -166,7 +166,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
-  pDesc.cBSizes = { sizeof(CBLuminance) };
+  pDesc.cBSizes = { sizeof(CBFloat) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   SPtr<Pass> luminancePass = make_shared<Pass>(pDesc);
@@ -176,7 +176,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/Stars.hdr"),
+  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/skyboxKoppe.hdr"),
                                                        kPK_BIND_RENDER_TARGET | kPK_BIND_SHADER_RESOURCE,
                                                        false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
@@ -191,8 +191,9 @@ RendererManager::createPasses()
    * IBR Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
-  pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
-  pDesc.inputs = { skyboxTex, getGBuffer(G_BUFFERS::kGB_Normal)};
+  pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
+  pDesc.inputs = { skyboxTex, getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
   SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -233,7 +234,7 @@ RendererManager::createPasses()
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
-                    sizeof(Matrix4), sizeof(CBShadowParam) };
+                    sizeof(Matrix4), sizeof(CBVector2x2) };
   pDesc.outputs = {};
   pDesc.pDepth = nullptr;
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_Shadows) };
@@ -250,7 +251,7 @@ RendererManager::createPasses()
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
-                    sizeof(Matrix4), sizeof(CBShadowParam) };
+                    sizeof(Matrix4), sizeof(CBVector2x2) };
   pDesc.outputs = {};
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
   SPtr<Pass> computeSpecular = make_shared<Pass>(pDesc);

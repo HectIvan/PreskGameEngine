@@ -1,24 +1,9 @@
 Texture2D skyboxMap : register(t0);
+Texture2D normalMap : register(t1);
 
 SamplerState samState : register(s0);
 
 #define PI 3.14159265f
-
-// cbuffer CameraData : register(b0)
-// {
-//   float4 Eye; // 16
-//   float3 ForwardCam; // 28
-//   float4x4 ViewCam; // 92
-//   float4x4 ProjectionCam; // 156
-//   float _unusedCam0; // 160
-//   float4 _padding; // 172
-// };
-
-// cbuffer ViewPort : register(b1)
-// {
-//   float2 ViewPortSize;
-//   float2 _VPPadding;
-// }
 
 cbuffer ViewTransposed : register(b0)
 {
@@ -47,20 +32,9 @@ float2 getSkyBoxUV(float3 dir)
 float4 PS(PS_INPUT input) : SV_Target
 {
   // Reconstruct view-space direction
-  float2 ndc = input.TexCoord * 2.0f - 1.0f;
-  ndc.y = -ndc.y;
+  float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   
-  float4 clipPos = float4(ndc, 1.0f, 1.0f);
-  
-  matrix viewMat = ViewTransp;
-  viewMat[3] = float4(0.0f, 0.0f, 0.0f, 1.0f);
-  
-  float4 viewPos = mul(clipPos, viewMat);
-  viewPos.w = 1.0f;
-  viewPos = mul(viewPos, ProjTransp);
-  viewPos.z = viewPos.w;
-  
-  float3 viewDir = normalize(viewPos.xyz);
+  float3 viewDir = normalize(normalTex.xyz);
   float2 skyboxUV = getSkyBoxUV(viewDir);
   float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0.0f).rgb;
   

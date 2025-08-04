@@ -341,7 +341,17 @@ class UInterface : public Module<UInterface>
    * @return If the button was pressed.
    */
   bool
-  createButtonImage(const char* _name, SPtr<Texture>& _pTexture, Vector2 _size = Vector2(64));
+  createButtonImage(const char* _name,
+                    const SPtr<Texture>& _pTexture,
+                    const Vector2 _size = Vector2(64));
+
+  /**
+   * @brief create an image.
+   * @param _texture Texture to use.
+   * @param _size Size of the image.
+   */
+  void
+  createImage(const SPtr<Texture>& _pTexture, const Vector2 _size);
 
   /**
    * @brief Create a color editor.

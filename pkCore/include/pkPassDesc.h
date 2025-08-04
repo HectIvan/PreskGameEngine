@@ -18,7 +18,6 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
 #include "pkRasterizerState.h"
 #include "pkTexture.h"
 #include "pkSamplerState.h"

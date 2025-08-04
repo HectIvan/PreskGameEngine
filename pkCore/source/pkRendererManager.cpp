@@ -64,6 +64,10 @@ void RendererManager::init()
   SPtr<Texture> posTex = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posTex });
 
+  // IBR texture
+  SPtr<Texture> ibr = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibr });
+
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
@@ -176,27 +180,36 @@ RendererManager::createPasses()
                                                        kPK_BIND_RENDER_TARGET | kPK_BIND_SHADER_RESOURCE,
                                                        false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
-  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
-  pDesc.cBSizes = { sizeof(CBCamera), sizeof(Matrix4), sizeof(Matrix4), sizeof(Matrix4),
-                    sizeof(Vector4), sizeof(Matrix4) };
-  pDesc.inputs = { skyboxTex, getDepthBuffer(D_BUFFERS::kDB_Base) };
+  pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
+  pDesc.inputs = { skyboxTex };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
+   * IBR Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
+  pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
+  pDesc.inputs = { skyboxTex, getGBuffer(G_BUFFERS::kGB_Normal)};
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
+  SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_IBR, ibrPass });
+
+  /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
-  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_HBlurredLuminance),
                    getUAVBuffer(UAV_BUFFERS::kCB_Shadows),
                    getUAVBuffer(UAV_BUFFERS::kCB_Specular),
                    getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur),
-                   getGBuffer(G_BUFFERS::kGB_Skybox) }; // skyboxTex };// 
+                   getGBuffer(G_BUFFERS::kGB_Skybox),
+                   getGBuffer(G_BUFFERS::kGB_IBR) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
   // insert to the passes

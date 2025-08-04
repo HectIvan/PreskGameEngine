@@ -120,4 +120,6 @@ class ShaderTest : public BaseApp
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;
+
+  SPtr<Texture> m_eyeIcon;
 };

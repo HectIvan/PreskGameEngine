@@ -44,6 +44,7 @@ namespace G_BUFFERS
     kGB_HBlurredLuminance,
     kGB_VBlurredLuminance,
     kGB_Skybox,
+    kGB_IBR,
   };
 };
 
@@ -72,14 +73,15 @@ namespace PASS_TYPE
     kP_AO,
     kP_ShadowDef,
     kP_Luminance,
-    kP_CHBlur,
-    kP_CVBlur,
+    kP_CHBlur, // compute H Blur
+    kP_CVBlur, // compute V Blur
     kP_HBlur,
     kP_VBlur,
     kP_Tone,
     kP_CShadows, // compute shadows
     kP_CSpecular, // comptue specular
     kP_SkyBox,
+    kP_IBR,
   };
 }
 

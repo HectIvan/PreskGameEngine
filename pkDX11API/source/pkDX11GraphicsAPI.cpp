@@ -132,8 +132,9 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of a CBuffer.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   hr = device->m_pd3dDevice->CreateBuffer(&bDesc,
@@ -141,8 +142,9 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
                                           &dxCB->pCBuffer);
   if (FAILED(hr)) {
     String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create the DX constant buffer. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create the DX constant buffer. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   log.registerMessage("Created a DirectX constant buffer");
@@ -320,8 +322,9 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   uint32 hr;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the VShader creation.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the VShader creation.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   hr = device->m_pd3dDevice->CreateVertexShader(dxVShader->m_pSBlob->GetBufferPointer(),
@@ -330,9 +333,10 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
                                                 &dxVShader->m_pShader);
   // check if the creation was successful
   if (hr != 0x00000000) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create a DX Vertex Shader. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a DX Vertex Shader. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     dxVShader->m_pSBlob->Release();
     return nullptr;
   }
@@ -352,8 +356,9 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
   // create the pixel shader
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the PShader creation.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the PShader creation.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   hr = device->m_pd3dDevice->CreatePixelShader(dxPShader->m_pSBlob->GetBufferPointer(),
@@ -362,9 +367,10 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
                                                &dxPShader->m_pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create a DX Pixel Shader. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a DX Pixel Shader. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     dxPShader->m_pSBlob->Release();
     return nullptr;
   }
@@ -384,8 +390,9 @@ DX11GraphicsAPI::createCShader(SPtr<Shader> _pShader)
   // create the comptue shader
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the CShader creation.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the CShader creation.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   hr = device->m_pd3dDevice->CreateComputeShader(dxCShader->m_pSBlob->GetBufferPointer(),
@@ -394,9 +401,10 @@ DX11GraphicsAPI::createCShader(SPtr<Shader> _pShader)
                                                  &dxCShader->m_pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create a DX Compute Shader. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a DX Compute Shader. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     dxCShader->m_pSBlob->Release();
     return nullptr;
   }
@@ -503,8 +511,9 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   sd.Windowed = true;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the device creation.", 
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the device creation.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++) {
@@ -537,6 +546,7 @@ void
 DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
                                   SPtr<Texture> _pDepthSV)
 {
+  Logger& log = g_Logger().instance();
   // reinterpret the depth stencil view to a DirectX texture
   auto pDSV = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
   // render target vector
@@ -554,8 +564,9 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   // set the render targets
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of the render targets.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of the render targets.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->OMSetRenderTargets(static_cast<uint32>(rTVector.size()),
@@ -566,13 +577,15 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
 void
 DX11GraphicsAPI::unbindRenderTargets()
 {
+  Logger& log = g_Logger().instance();
   static Vector<ID3D11RenderTargetView*> unbindRT = { nullptr, nullptr, nullptr, nullptr,
                                                       nullptr, nullptr, nullptr, nullptr };
   // set the render targets
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of the render targets.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of the render targets.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -585,6 +598,7 @@ DX11GraphicsAPI::unbindRenderTargets()
 void
 DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
 {
+  Logger& log = g_Logger().instance();
   // reinterpet render target
   auto rTarget = reinterpret_pointer_cast<DX11Texture>(_pRTarget);
   // reinterpret the depth stencil view
@@ -592,8 +606,9 @@ DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _p
   // reinterpet device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of the render target.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of the render target.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->OMSetRenderTargets(rTarget ? 1 : 0,
@@ -620,14 +635,17 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the" \
-                        " sampler state creation.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the sampler state creation.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    return nullptr;
   }
   int32 hr = device->m_pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->m_pSampler);
   if (hr != 0x00000000) {
     String errMsg = g_Logger().getMessageError(hr);
-    log.registerMessage("Failed to create a sampler state. Error message: " + errMsg,
-                               LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create a sampler state. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   return pSamState;
@@ -637,6 +655,7 @@ void
 DX11GraphicsAPI::setViewport(uint32 _width,
                              uint32 _height)
 {
+  Logger& log = g_Logger().instance();
   PK_ASSERT(m_pDevice);
   D3D11_VIEWPORT vp;
   vp.Width = static_cast<float>(_width);
@@ -647,8 +666,9 @@ DX11GraphicsAPI::setViewport(uint32 _width,
   vp.TopLeftY = 0;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of the viewport.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of the viewport.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->RSSetViewports(1, &vp);
@@ -680,16 +700,17 @@ DX11GraphicsAPI::createBlendState()
   // Create the blend state.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of a blend state.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a blend state.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   int32 hr = device->m_pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
 
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create Blend state. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create Blend state. Error message: " + errMsg;
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   log.registerMessage("Created a Blend State.");
@@ -713,16 +734,17 @@ DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
   // Create the rasterizer state.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation" \
-                        " of a Rasterizer State.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a Rasterizer State.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
   HRESULT hr = device->m_pd3dDevice->CreateRasterizerState(&rDesc, &dxRS->m_pRasterizer);
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create a Rasterizer State. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a Rasterizer State. Error message: " + errMsg;
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   log.registerMessage("Created a Rasterizer State.");
@@ -739,14 +761,17 @@ DX11GraphicsAPI::setBlendState(const SPtr<BlendState> _pBlendState)
   // Reinterpret to a DirectX Blend State
   SPtr<DX11BlendState> dxBS = reinterpret_pointer_cast<DX11BlendState>(_pBlendState);
   if (!dxBS) {
-    log.registerMessage("Failed to reinterpret a DX Blend State.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to reinterpret a DX Blend State.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // Set the blend state
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the setting of a blend state.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a blend state.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->OMSetBlendState(dxBS->m_pBlendState, nullptr, 0xFFFFFFFF);
@@ -764,8 +789,9 @@ DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState> _pRasterizerStat
   // Set the rasterizer state
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a Rasterizer state.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a Rasterizer state.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
@@ -776,6 +802,8 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                                        const char* _szEntryPoint,
                                        const char* _szShaderModel)
 {
+  Logger& log = g_Logger().instance();
+
   int32 hr = S_OK;
 
   DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -799,9 +827,10 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                           &pErrorBlob);
   if (FAILED(hr)) {
     if (pErrorBlob != nullptr) {
-      String error = static_cast<char*>(pErrorBlob->GetBufferPointer());
-      g_Logger().registerMessage("Shader failed to compile. Error message:" + error,
-                                 LOG_MSG_TYPE::kError);
+      const String error = static_cast<char*>(pErrorBlob->GetBufferPointer());
+      const String msg = "Shader failed to compile. Error message:" + error;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
       pErrorBlob->Release();
     }
     safeRelease(pErrorBlob);
@@ -899,8 +928,9 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
   }
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of an input layout.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of an input layout.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   device->m_pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
@@ -909,7 +939,9 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
                                           dxVShader->m_pSBlob->GetBufferSize(),
                                           &pLayout->m_pVertexLayout);
   if (!pLayout) {
-    log.registerMessage("Failed to create the input layout.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create the input layout.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   return pLayout;
@@ -977,8 +1009,9 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
   // create input layout
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of an input layout.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of an input layout.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   hr = device->m_pd3dDevice->CreateInputLayout(dxLayout.data(),
@@ -988,9 +1021,10 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                                &pInputL->m_pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create the input layout. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create the input layout. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
@@ -1001,11 +1035,13 @@ void
 DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                                       const uint32 _startSlot)
 {
+  Logger& log = g_Logger().instance();
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a vertex CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a vertex CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1027,14 +1063,16 @@ DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
 void
 DX11GraphicsAPI::vSUnbindConstantBuffers()
 {
+  Logger& log = g_Logger().instance();
   Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                                     nullptr, nullptr };
   const uint32 count = static_cast<uint32>(buffers.size());
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a vertex CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding of a vertex CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // set the buffers
@@ -1045,11 +1083,13 @@ void
 DX11GraphicsAPI::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                                       const uint32 _startSlot)
 {
+  Logger& log = g_Logger().instance();
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a pixel CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a pixel CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1071,14 +1111,16 @@ DX11GraphicsAPI::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
 void
 DX11GraphicsAPI::pSUnbindConstantBuffers()
 {
+  Logger& log = g_Logger().instance();
   Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                                     nullptr, nullptr };
   const uint32 count = static_cast<uint32>(buffers.size());
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a pixel CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding of a pixel CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // set the buffers
@@ -1089,11 +1131,13 @@ void
 DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuffers,
                                       const uint32 _startSlot)
 {
+  Logger& log = g_Logger().instance();
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a compute CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a compute CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1115,14 +1159,16 @@ DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
 void
 DX11GraphicsAPI::cSUnbindConstantBuffers()
 {
+  Logger& log = g_Logger().instance();
   Vector<ID3D11Buffer*> buffers = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                                     nullptr, nullptr };
   const uint32 count = static_cast<uint32>(buffers.size());
   // convert the device to a directx device.
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a compute CBuffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding of a compute CBuffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // set the buffers
@@ -1132,11 +1178,13 @@ DX11GraphicsAPI::cSUnbindConstantBuffers()
 void
 DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 {
+  Logger& log = g_Logger().instance();
   // reinterpret the swap chain to a DirectX swap chain
   auto dxSwapChain = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
   if (!dxSwapChain) {
-    g_Logger().registerMessage("Failed to present a result on the screen.",
-                               LOG_MSG_TYPE::kError);
+    const String msg = "Failed to present a result on the screen.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // use the swap chain to present the result
@@ -1146,10 +1194,12 @@ DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
 Vector2
 DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
 {
+  Logger& log = g_Logger().instance();
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to get the device to get the viewport size.",
-                               LOG_MSG_TYPE::kError);
+    const String msg = "Failed to get the device to get the viewport size.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return Vector2(0.0f);
   }
   D3D11_VIEWPORT viewport;
@@ -1167,14 +1217,17 @@ DX11GraphicsAPI::setSampler(const SPtr<SamplerState> _pSamLinear,
   // reinterpret to DirectX sampler state
   auto dxSS = reinterpret_pointer_cast<DX11SamplerState>(_pSamLinear);
   if (_pSamLinear && !dxSS) {
-   log.registerMessage("Failed to set a sampler.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to set a sampler.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // set to the device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the setting of a sampler.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a sampler.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->PSSetSamplers(_startSlot,
@@ -1186,11 +1239,14 @@ void
 DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
                                           uint32 _start)
 {
+  Logger& log = g_Logger().instance();
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a pixel shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting "\
+                        "of a pixel shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1209,13 +1265,16 @@ DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 void
 DX11GraphicsAPI::pSUnbindShaderResourceViews()
 {
+  Logger& log = g_Logger().instance();
   static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
                                                           nullptr, nullptr, nullptr, nullptr };
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a pixel shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding" \
+                       " of a pixel shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1229,11 +1288,14 @@ void
 DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
                                           uint32 _start)
 {
+  Logger& log = g_Logger().instance();
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a vertex shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting " \
+                       "of a vertex shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1252,13 +1314,16 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 void
 DX11GraphicsAPI::vSUnbindShaderResourceViews()
 {
+  Logger& log = g_Logger().instance();
   static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
                                                           nullptr, nullptr, nullptr, nullptr };
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a vertex shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding " \
+                       "of a vertex shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1272,11 +1337,14 @@ void
 DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
                                           uint32 _start)
 {
+  Logger& log = g_Logger().instance();
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a compute shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting " \
+                       "of a compute shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1295,13 +1363,16 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 void
 DX11GraphicsAPI::cSUnbindShaderResourceViews()
 {
+  Logger& log = g_Logger().instance();
   static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
                                                           nullptr, nullptr, nullptr, nullptr };
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a compute shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding " \
+                       "of a compute shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1316,11 +1387,14 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTexture
                                            uint32 _start,
                                            uint32* _initialCounts)
 {
+  Logger& log = g_Logger().instance();
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the setting" \
-                               " of a compute shader resource view.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting " \
+                       "of a compute shader resource view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1343,14 +1417,16 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTexture
 void
 DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
 {
+  Logger& log = g_Logger().instance();
   static Vector<ID3D11UnorderedAccessView*> _unbindUAV = {nullptr, nullptr, nullptr, nullptr,
                                                           nullptr, nullptr, nullptr, nullptr };
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().registerMessage("Failed to utilize the DX device in the unbinding" \
-                               " of a compute shader unordered access view.",
-                               LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the unbinding " \
+                       "of a compute shader unordered access view.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
 
@@ -1379,8 +1455,9 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   if (!data) {
     delete data;
     data = nullptr;
-    log.registerMessage("Can't open " + _fileName.getDirectory() + ", unable to open file.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Can't open " + _fileName.getDirectory() + ", unable to open file.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
@@ -1401,7 +1478,9 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
 
   // if creating the texture failed
   if (!temptTexture) {
-    log.registerMessage("Failed to create a texture.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create a texture.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
@@ -1423,8 +1502,9 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
   // set to the device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of a DSS texture.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a DSS texture.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   uint32 hr = DirectX::CreateDDSTextureFromFile(device->m_pd3dDevice,
@@ -1432,9 +1512,9 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
                                                 nullptr,
                                                 &texture->m_sRV);
   if (FAILED(hr)) {
-    String errMsg = g_Logger().getMessageError(hr);
-    log.registerMessage("Failed to create a DSS texture. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = g_Logger().getMessageError(hr);
+    const String msg = "Failed to create a DSS texture. Error message: " + errMsg;
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   return texture;
@@ -1457,8 +1537,10 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   if (!data) {
     delete data;
     data = nullptr;
-    log.registerMessage("Can't open " + _fileName.getFileName() + ", unable to open file."
-                        + " Reason: " + stbi_failure_reason(), LOG_MSG_TYPE::kError);
+    const String msg = "Can't open " + _fileName.getFileName() + ", unable to open file."
+                        + " Reason: " + stbi_failure_reason();
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
@@ -1481,7 +1563,9 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
 
   // if creating the texture failed
   if (!temptTexture) {
-    log.registerMessage("Failed to create a texture.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create a texture.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
 
@@ -1540,8 +1624,9 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of a texture.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a texture.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   // hresult
@@ -1562,18 +1647,20 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 
     // if texture creation failed
     if (FAILED(hr)) {
-      String errMsg = log.getMessageError(hr);
-      log.registerMessage("Failed to create a texture. Error message: " + errMsg,
-                          LOG_MSG_TYPE::kError);
+      const String errMsg = log.getMessageError(hr);
+      const String msg = "Failed to create a texture. Error message: " + errMsg;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
       return nullptr;
     }
     // create the shader resource view
     hr = device->m_pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_sRV);
     // if failed to create shader resource view
     if (FAILED(hr)) {
-      String errMsg = log.getMessageError(hr);
-      log.registerMessage("Failed to create a shader resource view. Error message: " + errMsg,
-                          LOG_MSG_TYPE::kError);
+      const String errMsg = log.getMessageError(hr);
+      const String msg = "Failed to create a shader resource view. Error message: " + errMsg;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
     }
   }
   /**
@@ -1603,9 +1690,10 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 
     hr = device->m_pd3dDevice->CreateDepthStencilView(tex->m_t2d, &dsvDesc, &tex->m_dSV);
     if (!tex->m_dSV) {
-      String errMsg = log.getMessageError(hr);
-      log.registerMessage("Failed to create the depth stencil. Error message: " + errMsg,
-                          LOG_MSG_TYPE::kError);
+      const String errMsg = log.getMessageError(hr);
+      const String msg = "Failed to create the depth stencil. Error message: " + errMsg;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
     }
   }
   /**
@@ -1622,9 +1710,10 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     // create the render target
     hr = device->m_pd3dDevice->CreateRenderTargetView(tex->m_t2d, &rtvDesc, &tex->m_rTV);
     if (FAILED(hr)) {
-      String errMsg = log.getMessageError(hr);
-      log.registerMessage("Failed to create a render target view. Error message: " + errMsg,
-                          LOG_MSG_TYPE::kError);
+      const String errMsg = log.getMessageError(hr);
+      const String msg = "Failed to create a render target view. Error message: " + errMsg;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
     }
   }
   /**
@@ -1639,9 +1728,10 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
 
     hr = device->m_pd3dDevice->CreateUnorderedAccessView(tex->m_t2d, &uavDesc, &tex->m_uAV);
     if (FAILED(hr)) {
-      String errMsg = log.getMessageError(hr);
-      log.registerMessage("Failed to create an unordered access view. Error message: " +
-                          errMsg, LOG_MSG_TYPE::kError);
+      const String errMsg = log.getMessageError(hr);
+      const String msg = "Failed to create an unordered access view. Error message: " + errMsg;
+      log.print(msg);
+      log.registerMessage(msg, LOG_MSG_TYPE::kError);
     }
   }
   return tex;
@@ -1652,21 +1742,24 @@ DX11GraphicsAPI::setInputLayout( const SPtr<InputLayout> _pInputLayout)
 {
   Logger& log = g_Logger().instance();
   // reinterpret to a DirectX input layout
-  SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
+  const SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
   // if the layout is not null but failed to reinterpret
   if (_pInputLayout && !dxIL) {
-    log.registerMessage("Failed to set the input layout.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to set the input layout.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // get the dx11 device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to get the DirectX device when setting an input layout.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to get the DirectX device when setting an input layout.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   // get the dx11 input layout
-  auto inputLayout = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
+  const auto inputLayout = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
   // set the input layout
   device->m_pImmediateContext->IASetInputLayout(inputLayout ? inputLayout->m_pVertexLayout : 
                                                               nullptr);
@@ -1699,15 +1792,17 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of a vertex buffer.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of a vertex buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  int32 hr = device->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
+  const int32 hr = device->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("Failed to create a vertex buffer. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a vertex buffer. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   return dxVB;
@@ -1721,20 +1816,23 @@ DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
 {
   Logger& log = g_Logger().instance();
   // reinterpret pointer
-  auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
+  const auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
   // if failed to cast to DX11VertexBuffer
   if (!dxVB) {
-    log.registerMessage("Failed to set the vertex buffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to set the vertex buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   
   // get the offset
-  uint32 stride = sizeof(SimpleVertex);
+  const uint32 stride = sizeof(SimpleVertex);
   //set the buffer
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  const auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the setting of a vertex buffer.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of a vertex buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->IASetVertexBuffers(_start,
@@ -1770,15 +1868,17 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   // create the buffer
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the creation of an index buffer.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the creation of an index buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   int32 hr = device->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
-    log.registerMessage("failed to create an index buffer. Error message: " + errMsg,
-                        LOG_MSG_TYPE::kError);
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "failed to create an index buffer. Error message: " + errMsg;
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
   return dxIB;
@@ -1794,13 +1894,16 @@ DX11GraphicsAPI::setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
   auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
   // if failed to cast to DX11IndexBuffer
   if (!dxIB) {
-    log.registerMessage("Failed to set the index buffer.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to set the index buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    log.registerMessage("Failed to utilize the DX device in the setting of an index buffer.",
-                        LOG_MSG_TYPE::kError);
+    const String msg = "Failed to utilize the DX device in the setting of an index buffer.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
   }
   device->m_pImmediateContext->IASetIndexBuffer(dxIB->pBuffer,

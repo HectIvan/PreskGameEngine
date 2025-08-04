@@ -52,6 +52,7 @@ using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_CShadows;
 using pkEngineSDK::PASS_TYPE::kP_CSpecular;
 using pkEngineSDK::PASS_TYPE::kP_CHBlur;
+using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
@@ -165,6 +166,8 @@ ShaderTest::onInit()
   m_showErrors = true;
   m_showWarnings = false;
   m_showActions = false;
+
+  m_eyeIcon = g_TextureManager().loadTexture(Path("textures/white-eye-icon.jpg"));
 }
 
 void
@@ -312,12 +315,24 @@ ShaderTest::uInterfaceUpdate()
   float winHeight = 0.0f;
   // --- Transform window --- //
   if (m_selectedActor) {
+    // transform window
     winHeight = 120.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Transform");
-
+    String name = m_selectedActor->getName();
+    im.createText("Name:   ");
+    im.sameLine();
+    if (im.createInputText("##Name", &name)) {
+      m_selectedActor->setName(name);
+    }
+    // activity checkbox
+    im.sameLine();
+    im.createCheckBox("##|", m_selectedActor->isActive());
+    im.sameLine();
+    im.createImage(m_eyeIcon, Vector2(15));
+    // inspect actor transform matrix
     ActorInspector inspector(m_selectedActor);
     
     im.endWindowCreate();
@@ -331,14 +346,13 @@ ShaderTest::uInterfaceUpdate()
     im.startWindowCreate("Components");
     im.createButton("Add Component(non-functional)");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor->m_transform);
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor);
     }
     im.endWindowCreate();
     yOffset += winHeight;
     // --------------------------- //
   }
   // -------------------------- //
-
 
   // get framerate
   float f_fps = 1.0f / g_TimeManager().m_deltaTime;
@@ -459,6 +473,8 @@ ShaderTest::onUpdate()
   Matrix4 invView = Matrix4::IDENTITY;
   Matrix4 invProj = Matrix4::IDENTITY;
   Matrix4 invViewProj = Matrix4::IDENTITY;
+  Matrix4 viewTransp = Matrix4::IDENTITY;
+  Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
   CBShadowParam shadowsParam;
@@ -470,6 +486,8 @@ ShaderTest::onUpdate()
     proj = camera->m_projection.getTransposed();
     invView = view.inverse();
     invProj = proj.inverse();
+    viewTransp = view.getTransposed();
+    projTransp = proj.getTransposed();
     CreateCBCamera::create(cBCamera, camera);
     invViewProj = (proj * view).inverse();
 
@@ -495,20 +513,20 @@ ShaderTest::onUpdate()
     CreateCBCamera::create(cBLightCam, lightCamera);
   }
 
-  // luminance parameters
+  // luminance parameters.
   CBLuminance lum;
   lum.tolerance = 0.9f;
-  // blur parameters
+  // blur parameters.
   CBBlur blur;
   blur.winSize = winSize;
   blur.blurXOffset = 1.0f;
 
-  // data type sizes
+  // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
 
-  // get all passes
+  // get all passes.
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
@@ -518,8 +536,9 @@ ShaderTest::onUpdate()
   SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
   SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
 
-  // update normal && base shadow pass buffers
+  // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
@@ -530,7 +549,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
   api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
 
-  // update shadow compute buffers
+  // update shadow compute buffers.
   api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
@@ -538,7 +557,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
   api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
-  // update specular compute buffers
+  // update specular compute buffers.
   api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(pCSpecPass->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &cBLightCam, cBCamSize);
@@ -546,21 +565,19 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
   api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
 
-  // update the luminance pass buffer
+  // update the luminance pass buffer.
   api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
-  // update the Horizontal/Vertical blur pass buffer
+  // update the Horizontal/Vertical blur pass buffer.
   api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
   //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 
-  // skybox constant buffer
-  Matrix4 transform = Matrix4::IDENTITY;
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
-  invView.setTranslation(0.0f, 0.0f, 0.0f);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invView, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(4), &SkyBoxWinSize, sizeof(Vector4));
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(5), &invViewProj, m4x4Size);
+  // skybox constant buffers.
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
+
+  // ibr constant buffers.
+  api.updateConstantBuffer(IBRPass->getCBuffer(0), &viewTransp, m4x4Size);
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &projTransp, m4x4Size);
 }
 
 void

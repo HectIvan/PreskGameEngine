@@ -146,7 +146,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   // float D = ndf_GGX()
   float3 specular = (lightColor * (spec * SpecIntensity));
   
-  
   // set to opaque
   float alpha = 1.0f;
 

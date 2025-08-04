@@ -23,6 +23,7 @@ using pkEngineSDK::PASS_TYPE::kP_CShadows;
 using pkEngineSDK::PASS_TYPE::kP_CSpecular;
 using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_HBlur;
+using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
@@ -147,6 +148,7 @@ BaseApp::render()
   SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
   SPtr<Pass> pCSpecPass = renderManager.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
 
   // first shadow pass
   if (m_shadows) {
@@ -194,6 +196,10 @@ BaseApp::render()
   skyBoxPass->beginPass();
   api.draw(3, 0);
   skyBoxPass->endPass();
+  // IBR Pass
+  IBRPass->beginPass();
+  api.draw(3, 0);
+  IBRPass->endPass();
   // Quad tone map pass
   tonePass->beginPass();
   api.draw(3, 0);

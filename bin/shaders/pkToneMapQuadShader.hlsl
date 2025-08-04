@@ -5,6 +5,7 @@ Texture2D shadowTex : register(t2);
 Texture2D specularTex : register(t3);
 Texture2D specularBlurTex : register(t4);
 Texture2D skyboxTex : register(t5);
+Texture2D IBRTex : register(t6);
 
 // sampler
 SamplerState samState : register(s0);
@@ -24,13 +25,14 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 specularSample = specularTex.Sample(samState, input.TexCoord);
   float4 specBlurSample = specularBlurTex.Sample(samState, input.TexCoord);
   float4 skyboxSample = skyboxTex.Sample(samState, input.TexCoord);
+  float4 IBRSample = IBRTex.Sample(samState, input.TexCoord);
   
   // base specular
   float4 specular = (specularSample * albedoSample) * shadowSample;
   // blured specular
   float4 specularBlur = (specBlurSample * albedoSample) * shadowSample;
   // mix shadows, color and both specular and blured specular
-  float4 finalColor = (albedoSample * shadowSample) + specular + specularBlur;
+  float4 finalColor = ((albedoSample * shadowSample) + specular + specularBlur) + (IBRSample * shadowSample);
   
   // check for a skybox position
   if (albedoSample.a == 0)

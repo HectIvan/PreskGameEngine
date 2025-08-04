@@ -56,15 +56,6 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
-  String name = _pActor->getName();
-  im.createText("Name:   ");
-  im.sameLine();
-  if (im.createInputText("##Name", &name)) {
-    _pActor->setName(name);
-  }
-  // activity checkbox
-  im.sameLine();
-  im.createCheckBox("|", _pActor->isActive());
   // change the position
   Vector3 newTranslation = _pActor->m_position;
   im.createText("Position");
@@ -86,14 +77,14 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 }
 
 void
-ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _transform)
+ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, const SPtr<Actor>& _pActor)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
   // Component activity
   im.createCheckBox("Active ", _pComponent->isActive());
   // for each type of component
-  switch (_pComponent->getType())
+  switch (_pComponent->getType()) 
   {
   case kCamera:
   {
@@ -143,7 +134,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, Matrix4 _tra
     // Light direction
     im.createText("Direction         ");
     im.sameLine();
-    Vector4 dir4 = _transform * Vector4(light->m_direction, 0.0f);
+    Vector4 dir4 = _pActor->m_transform * Vector4(light->m_direction, 0.0f);
     Vector3 dir = dir4.xyz().normalized();
     im.createDrag3("##Direction", dir, 0.0f);
     // spot exponent

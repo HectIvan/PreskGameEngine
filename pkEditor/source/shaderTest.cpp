@@ -244,6 +244,8 @@ ShaderTest::uInterfaceUpdate()
 {
   SceneManager& sm = g_SceneManager().instance();
   UInterface& im = g_uInterface().instance();
+  RendererManager& rm = g_RenderManager().instance();
+  TextureManager& tm = g_TextureManager().instance();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -437,6 +439,13 @@ ShaderTest::uInterfaceUpdate()
   if (m_IBR) {
     im.sameLine();
     im.createDragF("##ibrIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+  }
+  if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+    Path path = m_window.openFileFromExplorer();
+    if (path.toString() != "") {
+      SPtr<Texture> texture = tm.loadTexture(path);
+      rm.m_mainSkybox->copyFrom(texture);
+    }
   }
   // compile shaders
   if (im.createButton("Compile Shaders")) {

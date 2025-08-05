@@ -42,6 +42,8 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   SPtr<Texture>
   loadTexture(const Path& _directory);
 
+
+
  public:
   Vector<SPtr<TextureMemory>> m_textures;
 };

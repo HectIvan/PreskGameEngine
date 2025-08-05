@@ -311,7 +311,15 @@ class PK_CORE_EXPORT Texture
    * @return The raw texture data.
    */
   virtual void*
-  getRawData() {}
+  getRawData() { return nullptr; }
+
+  /**
+   * @brief Copy the content of the derived class from another class.
+   * @param _pTexture Other texture.
+   * @return If the conversion was successful.
+   */
+  virtual bool
+  copyFrom(SPtr<Texture>& _pTexture) { return false; };
 
  private:
   uint32 m_id;

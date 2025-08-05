@@ -12,6 +12,7 @@ namespace pkEngineSDK
 void RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
+  TextureManager& tm = g_TextureManager().instance();
 
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
@@ -67,6 +68,8 @@ void RendererManager::init()
   // IBR texture
   SPtr<Texture> ibr = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibr });
+
+  m_mainSkybox = tm.loadTexture(Path("textures/skybox/Skybox_papermill.hdr"));
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
@@ -176,12 +179,9 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/skybox/Skybox_papermill.hdr"),
-                                                       kPK_BIND_RENDER_TARGET | kPK_BIND_SHADER_RESOURCE,
-                                                       false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
-  pDesc.inputs = { skyboxTex };
+  pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -192,7 +192,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
-  pDesc.inputs = { skyboxTex, getGBuffer(G_BUFFERS::kGB_Normal),
+  pDesc.inputs = { m_mainSkybox, getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Positions),
                    getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };

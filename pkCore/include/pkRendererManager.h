@@ -194,7 +194,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   UMap<UAV_BUFFERS::E, SPtr<Texture>> m_uavBuffers;
 
   // skyboxes
-  Vector<SPtr<Texture>> m_skyboxes;
+  SPtr<Texture> m_mainSkybox;
 
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;

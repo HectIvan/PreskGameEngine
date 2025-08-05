@@ -156,12 +156,7 @@ BaseApp::render()
   basePass->beginPass();
   renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
   basePass->endPass();
-  // Quad luminance pass
-  if (m_luminance) {
-    luminancePass->beginPass();
-    api.draw(3, 0);
-    luminancePass->endPass();
-  }
+
   api.clearUnorderedAccessViews(pCSpecPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(hBlurPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
@@ -182,10 +177,6 @@ BaseApp::render()
     pCSpecPass->beginPass();
     api.dispatch(x, y, 1);
     pCSpecPass->endPass();
-    // horizontal blur quad pass
-    hBlurPass->beginPass();
-    api.dispatch(x, y, 1);
-    hBlurPass->endPass();
   }
 
   // render the skybox
@@ -198,6 +189,13 @@ BaseApp::render()
     IBRPass->beginPass();
     api.draw(3, 0);
     IBRPass->endPass();
+  }
+
+  // Quad luminance pass
+  if (m_luminance) {
+    luminancePass->beginPass();
+    api.draw(3, 0);
+    luminancePass->endPass();
   }
   // Quad tone map pass
   tonePass->beginPass();

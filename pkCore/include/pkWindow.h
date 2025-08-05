@@ -139,8 +139,8 @@ class PK_CORE_EXPORT Window
   /**
    * @brief Open a file in a file explorer window.
    */
-  void
-  openFileFromExplorer();
+  String
+  openFileFromExplorer() const;
 
   bool m_isFocused;
 

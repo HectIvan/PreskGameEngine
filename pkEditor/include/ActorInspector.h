@@ -16,11 +16,13 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkWindow.h"
 
 using pkEngineSDK::Actor;
 using pkEngineSDK::Component;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::Window;
 
 class ActorInspector
 {
@@ -41,5 +43,7 @@ class ActorInspector
    * @param _pComponent Component to use.
    */
   void
-  createComponentWindow(SPtr<Component>& _pComponent, const SPtr<Actor>& _pActor);
+  createComponentWindow(SPtr<Component>& _pComponent,
+                        const SPtr<Actor>& _pActor,
+                        Window& _window);
 };

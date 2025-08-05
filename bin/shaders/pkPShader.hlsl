@@ -3,7 +3,6 @@ Texture2D normalTex : register(t1);
 Texture2D heightTex : register(t2);
 Texture2D metallicTex : register(t3);
 Texture2D occlusionTex : register(t4);
-Texture2D testDepthLight : register(t5);
 
 SamplerState samLinear : register(s0);
 
@@ -46,7 +45,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   output.normal = float4(normalSam, 1.0f);
   output.diffuse = colorSam * AO;
   output.posWS = float4(input.PosWS, 1.0f);
-  output.metallic = float4(metallicSam, 1.0f);
+  output.metallic = float4(metallicSam.rrr, 1.0f);
   
   return output;
 }

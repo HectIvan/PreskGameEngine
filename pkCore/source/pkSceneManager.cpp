@@ -18,7 +18,7 @@ void
 SceneManager::init()
 {
   clear();
-  createScene();
+  createScene("Base scene");
   setActive(0);
   g_Logger().registerMessage("Initialized Scene Manager.");
 }
@@ -30,7 +30,7 @@ SceneManager::createScene(String _name)
   scene->m_name = _name;
   scene->setActive(false);
   m_scenes.push_back(scene);
-  g_Logger().registerMessage("Created scene " + _name + ".");
+  g_Logger().registerMessage("Created scene '" + _name + "'.");
 }
 
 void

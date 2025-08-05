@@ -166,8 +166,8 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
-  pDesc.cBSizes = { sizeof(CBFloat) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
+  pDesc.cBSizes = { sizeof(CBVector2x2) };
+  pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   SPtr<Pass> luminancePass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -176,7 +176,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/skyboxKoppe.hdr"),
+  SPtr<Texture> skyboxTex = api.createTextureFromFileF(Path("textures/skybox/Skybox_papermill.hdr"),
                                                        kPK_BIND_RENDER_TARGET | kPK_BIND_SHADER_RESOURCE,
                                                        false);
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
@@ -193,7 +193,8 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
   pDesc.inputs = { skyboxTex, getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Positions) };
+                   getGBuffer(G_BUFFERS::kGB_Positions),
+                   getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
   SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -205,7 +206,7 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getGBuffer(G_BUFFERS::kGB_HBlurredLuminance),
+                   getUAVBuffer(UAV_BUFFERS::kCB_Specular),
                    getUAVBuffer(UAV_BUFFERS::kCB_Shadows),
                    getUAVBuffer(UAV_BUFFERS::kCB_Specular),
                    getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur),

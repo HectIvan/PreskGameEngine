@@ -32,7 +32,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   // blured specular
   float4 specularBlur = (specBlurSample * albedoSample) * shadowSample;
   // mix shadows, color and both specular and blured specular
-  float4 finalColor = ((albedoSample * shadowSample) + specular + specularBlur) + (IBRSample * shadowSample);
+  float4 finalColor = ((albedoSample * shadowSample) + specular + specularBlur) +
+                      (IBRSample * shadowSample) + (luminanceSample * albedoSample);
   
   // check for a skybox position
   if (albedoSample.a == 0)

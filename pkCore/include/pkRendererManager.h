@@ -193,12 +193,11 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   UMap<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
   UMap<UAV_BUFFERS::E, SPtr<Texture>> m_uavBuffers;
 
+  // skyboxes
+  Vector<SPtr<Texture>> m_skyboxes;
+
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;
-
-  // shadows
-  SPtr<Texture> m_pShadowDepth;
-  SPtr<DepthStencilView> m_pShadowDepthSV;
 };
 
 PK_CORE_EXPORT RendererManager&

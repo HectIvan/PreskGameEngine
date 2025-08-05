@@ -11,6 +11,7 @@
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
+#pragma comment(lib, "Comdlg32.lib")
 
 #define IDI_ICON1 "icon.png"
 
@@ -189,10 +190,27 @@ Window::getSize() const
   return Vector2(m_width, m_height);
 }
 
-void
-Window::openFileFromExplorer()
+String
+Window::openFileFromExplorer() const
 {
-  // IFileDialog* pfd = NULL;
-  // CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_IFileDialog, (void**)&pfd);
+  OPENFILENAME ofn;       // common dialog box structure
+  char szFile[MAX_PATH] = { 0 }; // buffer for file name
+
+  // Initialize OPENFILENAME
+  ZeroMemory(&ofn, sizeof(ofn));
+  ofn.lStructSize = sizeof(ofn);
+  ofn.hwndOwner = NULL; // or your window handle
+  ofn.lpstrFile = szFile;
+  ofn.nMaxFile = sizeof(szFile);
+  ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.TXT\0";
+  ofn.nFilterIndex = 1;
+  ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+  // Display the Open dialog box
+  if (GetOpenFileNameA(&ofn) == TRUE)
+  {
+    return String(ofn.lpstrFile);
+  }
+  return String("");
 }
 }

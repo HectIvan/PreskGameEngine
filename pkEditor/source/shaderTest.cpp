@@ -141,14 +141,14 @@ ShaderTest::onInit()
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(30.0f);
   pistol->setPosition(10.0f, 15.0f, 0.0f);
-
+  
   SPtr<Actor> rat = activeScene->instantiate("rat");
   rat->addComponent(resourceMan.loadModel(Path("models/rat.fbx")));
   rat->setScale(10.0f);
-
+  
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-
+  
   SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
@@ -344,7 +344,9 @@ ShaderTest::uInterfaceUpdate()
     im.startWindowCreate("Components");
     im.createButton("Add Component(non-functional)");
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor);
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i],
+                                      m_selectedActor,
+                                      m_window);
     }
     im.endWindowCreate();
     yOffset += winHeight;
@@ -520,8 +522,8 @@ ShaderTest::onUpdate()
   }
 
   // luminance parameters.
-  CBFloat lum;
-  lum.value = 0.9f;
+  CBVector2x2 lum;
+  lum.vec1 = winSize;
   // blur parameters.
   CBBlur blur;
   blur.winSize = winSize;
@@ -577,7 +579,7 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBVector2x2));
 
   // update the luminance pass buffer.
-  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBFloat));
+  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBVector2x2));
   // update the Horizontal/Vertical blur pass buffer.
   api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
   //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));

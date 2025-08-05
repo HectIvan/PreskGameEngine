@@ -14,13 +14,14 @@
 #include "pkLight.h"
 #include "pkMaterial.h"
 #include "pkModel.h"
+#include "pkLogger.h"
 #include "pkPath.h"
 #include "pkPlatformMath.h"
 #include "pkPrerequisitesCore.h"
+#include "pkTextureManager.h"
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
-#include "pkLogger.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -29,6 +30,7 @@ using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
 using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
+using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
@@ -36,9 +38,11 @@ using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
+using pkEngineSDK::Path;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
+using pkEngineSDK::TextureManager;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
@@ -77,10 +81,13 @@ ActorInspector::Inspect(SPtr<Actor>& _pActor)
 }
 
 void
-ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, const SPtr<Actor>& _pActor)
+ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
+                                      const SPtr<Actor>& _pActor,
+                                      Window& _window)
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
+  TextureManager& tm = g_TextureManager().instance();
   // Component activity
   im.createCheckBox("Active ", _pComponent->isActive());
   // for each type of component
@@ -180,38 +187,58 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent, const SPtr<A
       SPtr<Texture> diffuse = meshMat->diffuse;
       SPtr<Texture> normal = meshMat->normal;
       SPtr<Texture> occlusion = meshMat->occlusion;
-      SPtr<Texture> height = meshMat->height;
+      SPtr<Texture> rough = meshMat->roughness;
       SPtr<Texture> metallic = meshMat->metallic;
       // get the names of the texture and material
-      String difName = diffuse->getName().toString() + meshMat->getNameS();
-      String norName = normal->getName().toString() + meshMat->getNameS();
-      String occName = occlusion->getName().toString() + meshMat->getNameS();
-      String heiName = height->getName().toString() + meshMat->getNameS();
-      String metName = metallic->getName().toString() + meshMat->getNameS();
+      String difName = diffuse->getName().toString() + meshMat->getNameS() + "diff";
+      String norName = normal->getName().toString() + meshMat->getNameS() + "norm";
+      String occName = occlusion->getName().toString() + meshMat->getNameS() + "occ";
+      String roughName = rough->getName().toString() + meshMat->getNameS() + "rough";
+      String metName = metallic->getName().toString() + meshMat->getNameS() + "metal";
       // create the buttons
       if (im.createButtonImage(difName.c_str(), diffuse)) {
         // opened window to set diffuse texture
-        g_Logger().print("Opened diffuse set texture.");
+        Path path(_window.openFileFromExplorer());
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          meshMat->setDiffuse(texture);
+        }
       }
       im.sameLine();
       if (im.createButtonImage(norName.c_str(), normal)) {
         // opened window to set normal texture
-        g_Logger().print("Opened Normal set texture.");
+        Path path(_window.openFileFromExplorer());
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          meshMat->setNormal(texture);
+        }
       }
       im.sameLine();
       if (im.createButtonImage(occName.c_str(), occlusion)) {
         // opened window to set occlusion texture
-        g_Logger().print("Opened occlusion set texture.");
+        Path path(_window.openFileFromExplorer());
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          meshMat->setOcclusion(texture);
+        }
       }
       im.sameLine();
-      if (im.createButtonImage(heiName.c_str(), height)) {
-        // opened window to set height texture
-        g_Logger().print("Opened height set texture.");
+      if (im.createButtonImage(roughName.c_str(), rough)) {
+        // opened window to set rough texture
+        Path path(_window.openFileFromExplorer());
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          meshMat->setRoughness(texture);
+        }
       }
       im.sameLine();
       if (im.createButtonImage(metName.c_str(), metallic)) {
         // opened window to set metallic texture
-        g_Logger().print("Opened metallic set texture.");
+        Path path(_window.openFileFromExplorer());
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          meshMat->setMetallic(texture);
+        }
       }
       im.popID();
     }

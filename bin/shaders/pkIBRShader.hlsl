@@ -1,6 +1,7 @@
 Texture2D skyboxMap : register(t0);
 Texture2D normalMap : register(t1);
 Texture2D posMap : register(t2);
+Texture2D metallicMap : register(t3);
 
 SamplerState samState : register(s0);
 
@@ -37,6 +38,7 @@ float4 PS(PS_INPUT input) : SV_Target
   // get the world normals
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 position = posMap.Sample(samState, input.TexCoord);
+  float metallicTex = metallicMap.Sample(samState, input.TexCoord).r;
   
   // normalize normals and view
   float3 N = normalize(normalTex.xyz);
@@ -49,5 +51,5 @@ float4 PS(PS_INPUT input) : SV_Target
   float2 skyboxUV = getSkyBoxUV(view);
   float3 color = skyboxMap.Sample(samState, skyboxUV).rgb;
   
-  return float4(color * Intensity, 1.0f);
+  return float4(color * Intensity * metallicTex, 1.0f);
 }

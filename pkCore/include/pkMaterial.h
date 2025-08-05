@@ -133,7 +133,7 @@ class Material : public Component
    * @param _pTexture New roughness texture.
    */
   FORCEINLINE void
-  setroughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
+  setRoughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
 
   /**
    * @brief Set the material name.

@@ -24,6 +24,8 @@ UInterface::init()
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); static_cast<void>(io);
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 
   // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to
   ImGuiStyle& style = ImGui::GetStyle();

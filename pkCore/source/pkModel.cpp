@@ -150,6 +150,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     meshProcess->material->setHeight(tm.loadTexture(Path("textures/default/FlatHeight.png")));
     meshProcess->material->setMetallic(tm.loadTexture(Path("textures/default/FlatMetallic.png")
                                                       ));
+    meshProcess->material->setRoughness(tm.loadTexture(Path("textures/default/FlatRoughness.png"
+                                        )));
 
     String matName = materialA->GetName().C_Str();
     meshProcess->material->setName(matName);
@@ -184,11 +186,11 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     }
 
     // get all normal maps of the material.
-    uint32 normCount = materialA->GetTextureCount(aiTextureType_SHININESS);
+    uint32 normCount = materialA->GetTextureCount(aiTextureType_HEIGHT);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
       // normal texture loading.
-      if (materialA->GetTexture(aiTextureType_SHININESS, i, &path) == AI_SUCCESS) {
+      if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
         SPtr<Texture> texture = tm.loadTexture(newPath);
@@ -208,11 +210,11 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     }
 
     // get all ambient occlusion maps of the material.
-    uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION);
+    uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT);
     for (uint32 i = 0; i < aoCount; ++i) {
       aiString path;
       // ambient occlusion texture loading.
-      if (materialA->GetTexture(aiTextureType_AMBIENT_OCCLUSION, i, &path) == AI_SUCCESS) {
+      if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
         SPtr<Texture> texture = tm.loadTexture(newPath);
@@ -246,7 +248,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
           // log registry.
           log.registerMessage("Loaded metallic texture " + newPath.getFileName() +
                               " in material " + matName + ".");
-          meshProcess->material->setOcclusion(texture);
+          meshProcess->material->setMetallic(texture);
         }
       }
       else { // register that a metallic texture was not found.
@@ -270,7 +272,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
           // log registry.
           log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
                               " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
-          meshProcess->material->setroughness(texture);
+          meshProcess->material->setRoughness(texture);
         }
       }
       else { // register that a roughness texture was not found.

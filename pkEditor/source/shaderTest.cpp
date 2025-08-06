@@ -56,7 +56,7 @@ using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_CVBlur;
@@ -141,10 +141,6 @@ ShaderTest::onInit()
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(30.0f);
   pistol->setPosition(10.0f, 15.0f, 0.0f);
-  
-  SPtr<Actor> rat = activeScene->instantiate("rat");
-  rat->addComponent(resourceMan.loadModel(Path("models/rat.fbx")));
-  rat->setScale(10.0f);
   
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
@@ -246,6 +242,7 @@ ShaderTest::uInterfaceUpdate()
   UInterface& im = g_uInterface().instance();
   RendererManager& rm = g_RenderManager().instance();
   TextureManager& tm = g_TextureManager().instance();
+  ResourceManager& resourceMan = g_ResourceManager().instance();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -265,15 +262,15 @@ ShaderTest::uInterfaceUpdate()
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
   if (im.createButton("+")) {
-    sm.getActiveScene()->instantiate("Actor");
+    currentScene->instantiate("Actor");
   }
   if (m_selectedActor) { 
     im.sameLine();
     if (im.createButton("Delete")) {
       m_selectedActor->~Actor();
       m_selectedActor = nullptr;
-      m_sActorIndex = 0;
       currentScene->m_actors.erase(currentScene->m_actors.begin() + m_sActorIndex);
+      m_sActorIndex = 0;
     }
     im.sameLine();
     if (im.createButton("^")) {
@@ -344,7 +341,18 @@ ShaderTest::uInterfaceUpdate()
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Components");
-    im.createButton("Add Component(non-functional)");
+    // to do: change this to a more efficient option
+    Vector<String> options = { "model", "light", "camera" };
+    int32 val = -1;
+    if (im.beginCombo("Components", val, options)) {
+      if (val == 0) {
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString().c_str() != "") {
+          m_selectedActor->addComponent(resourceMan.loadModel(path));
+        }
+      }
+    }
+    //
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
       inspector.createComponentWindow(m_selectedActor->getComponents()[i],
                                       m_selectedActor,
@@ -379,7 +387,7 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate("Display");
   im.createText(fpsStr.c_str());
   im.sameLine();
-  im.plotLines("|", fpsHistory, fpsListSize, fpsOffset);
+  im.plotLines("##|", fpsHistory, fpsListSize, fpsOffset);
   // vSync
   im.createText("vSync");
   im.sameLine();
@@ -559,6 +567,7 @@ ShaderTest::onUpdate()
   SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
@@ -570,6 +579,14 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
   api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
   api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
+
+  // update shadow-specular quad pass
+  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
 
   // update shadow compute buffers.
   api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &cBLight, cBLightSize);

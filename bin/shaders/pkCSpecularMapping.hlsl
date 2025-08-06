@@ -128,13 +128,7 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   // if the angle between the world to light vector and light direction is greater than the tolerance
   float angle = dot(lightDir, LightPos - worldPos);
-  // break the process and return black
-  if (angle > SpotCutoff) {
-    // specTexture[DTid.xy] = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    // return;
-  }
   
-  // continue with specular lighting
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 halfwayDir = normalize(lightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);

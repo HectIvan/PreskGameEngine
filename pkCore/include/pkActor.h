@@ -266,7 +266,6 @@ class PK_CORE_EXPORT Actor
   clear();
 
  private:
-
   /**
    * @brief Create a new transform for the actor based on translation, rotation
    *        and scale currently set.

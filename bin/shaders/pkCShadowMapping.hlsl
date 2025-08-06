@@ -101,9 +101,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   float3 normal = normalize(normalTex.xyz);
   
-  // get world position from depth map
-  float2 texCoord = (DTid.xy / winSize);
-  
   // diffuse
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
@@ -111,26 +108,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float diff = max(dot(lightDir, normal), shadowColor);
   diff = lerp(diff, shadowColor, 1.0f - diff);
   float3 diffuse = lightColor * diff;
-  
-  /**
-   * Shadow mapping
-   */
-  //        // convert from world space to clip space relative to the light camera
-  //        float4 clipSpace = mul(ProjectionLight, mul(ViewLight, float4(worldPos, 1.0f)));
-  //        // do a perspective division
-  //        float3 projCoords = clipSpace.xyz / clipSpace.w;
-  //        // convert to a [0, 1] range
-  //        projCoords = projCoords * 0.5f + 0.5f;
-  //        // convert from UV to texel coordinate
-  //        int2 texelCoord = int2(projCoords.xy * winSize);
-  //        float closestDepth = shadowMap.Load(int3(texelCoord, 0)).r;
-  //        
-  //        float currentDepth = projCoords.z;
-  //        
-  //        if (currentDepth > closestDepth)
-  //        {
-  //          diffuse = float3(0,0,0);
-  //        }
   
   shadowTexture[DTid.xy] = float4(diffuse, alpha);
 }

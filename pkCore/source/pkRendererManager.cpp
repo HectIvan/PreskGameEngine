@@ -41,6 +41,10 @@ void RendererManager::init()
   SPtr<Texture> shadowRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
 
+  // render target for the shadow result
+  SPtr<Texture> specularRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Specular, specularRT });
+
   // render target for the metallic result
   SPtr<Texture> metallicRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
@@ -111,7 +115,6 @@ void RendererManager::init()
 void
 RendererManager::createPasses()
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -154,20 +157,23 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
   /****************************************************************************
-   * Ambient Occlussion Pass
+   * Shadow Specular Quad Pass
    ***************************************************************************/
-  // pDesc.pSDirectory = L"shaders/pkPSAOshader.hlsl";
-  // pDesc.cBSizes = { sizeof(CBAOData) };
-  // pDesc.samAdress = SAM_STATE_ADRESS::kClamp;
-  // pDesc.type = PK_PASS_TYPE::kDeferred;
-  // SPtr<Pass> AOPass = make_shared<Pass>(pDesc);
-  // // insert to the passes
-  // m_passes.insert({ PASS_TYPE::kP_AO, AOPass });
+  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
+                    sizeof(Matrix4), sizeof(Vector4) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal), getGBuffer(G_BUFFERS::kGB_Albedo),
+                   getDepthBuffer(D_BUFFERS::kDB_Light), getDepthBuffer(D_BUFFERS::kDB_Base),
+                   getGBuffer(G_BUFFERS::kGB_Positions) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow), getGBuffer(G_BUFFERS::kGB_Specular) };
+  SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_ShadowQuad, shadowQuadPass });
 
   /****************************************************************************
    * Luminance Quad pass
    ***************************************************************************/
-  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
   pDesc.cBSizes = { sizeof(CBVector2x2) };
   pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
@@ -206,9 +212,9 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getUAVBuffer(UAV_BUFFERS::kCB_Specular),
-                   getUAVBuffer(UAV_BUFFERS::kCB_Shadows),
-                   getUAVBuffer(UAV_BUFFERS::kCB_Specular),
+                   getGBuffer(G_BUFFERS::kGB_Specular),
+                   getGBuffer(G_BUFFERS::kGB_Shadow),
+                   getGBuffer(G_BUFFERS::kGB_Specular),
                    getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur),
                    getGBuffer(G_BUFFERS::kGB_Skybox),
                    getGBuffer(G_BUFFERS::kGB_IBR) };
@@ -266,7 +272,7 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur) };
   pDesc.outputs = {};
-  pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Specular) };
   SPtr<Pass> hBlurPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_CHBlur, hBlurPass });
@@ -275,13 +281,19 @@ RendererManager::createPasses()
 SPtr<Pass>
 RendererManager::getPass(const PASS_TYPE::E _type)
 {
-  return m_passes.find(_type)->second;
+  if (m_passes.contains(_type)) {
+    return m_passes[_type];
+  }
+  return nullptr;
 }
 
-SPtr<Texture>&
+SPtr<Texture>
 RendererManager::getGBuffer(const G_BUFFERS::E _type)
 {
-  return m_gBuffers.find(_type)->second;
+  if (m_gBuffers.contains(_type)) {
+    return m_gBuffers[_type];
+  }
+  return nullptr;
 }
 
 Vector<SPtr<Texture>>
@@ -312,16 +324,22 @@ RendererManager::getGBuffers(const G_BUFFERS::E _types)
   return textures;
 }
 
-SPtr<Texture>&
+SPtr<Texture>
 RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
-  return m_depthBuffers.find(_type)->second;
+  if (m_depthBuffers.contains(_type)) {
+    return m_depthBuffers[_type];
+  }
+  return nullptr;
 }
 
-SPtr<Texture>&
+SPtr<Texture>
 RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
 {
-  return m_uavBuffers.find(_type)->second;
+  if (m_uavBuffers.contains(_type)) {
+    return m_uavBuffers[_type];
+  }
+  return nullptr;
 }
 
 void

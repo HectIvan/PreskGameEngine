@@ -26,7 +26,7 @@ using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_CVBlur;
@@ -145,21 +145,26 @@ BaseApp::render()
   SPtr<Pass> pCSpecPass = renderManager.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
+  SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
+  // Get all actors
+  Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
   // first shadow pass
   if (m_shadows) {
     baseShadow->beginPass();
-    renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+    renderManager.renderActors(actors);
     baseShadow->endPass();
   }
+
   // base pass
   basePass->beginPass();
-  renderManager.renderActors(g_SceneManager().getActiveScene()->getAllActors());
+  renderManager.renderActors(actors);
   basePass->endPass();
 
   api.clearUnorderedAccessViews(pCSpecPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(hBlurPass->getUAVTextures(), Color(0, 0, 0, 0));
   api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
+  api.clearRenderTargetViews(Color(1, 1, 1, 1), shadowQuad->getOutputTextures());
   // get texel size of compute passes
   Vector2 texSize = api.getSwapChain()->getSize();
   uint32 threadWidth = 16;
@@ -168,16 +173,19 @@ BaseApp::render()
   uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
   if (m_shadows) {
-    pCShadowPass->beginPass();
-    api.dispatch(x, y, 1);
-    pCShadowPass->endPass();
+    // pCShadowPass->beginPass();
+    // api.dispatch(x, y, 1);
+    // pCShadowPass->endPass();
+    shadowQuad->beginPass();
+    api.draw(3, 0);
+    shadowQuad->endPass();
   }
   // if specular is set to be rendered
-  if (m_specular) {
-    pCSpecPass->beginPass();
-    api.dispatch(x, y, 1);
-    pCSpecPass->endPass();
-  }
+  // if (m_specular) {
+  //   pCSpecPass->beginPass();
+  //   api.dispatch(x, y, 1);
+  //   pCSpecPass->endPass();
+  // }
 
   // render the skybox
   skyBoxPass->beginPass();

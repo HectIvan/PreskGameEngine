@@ -289,15 +289,26 @@ UInterface::createButton(String _name,
 }
 
 bool
-UInterface::beginCombo(const char* _name, const char* _previewVal)
+UInterface::beginCombo(const char* _name,
+                       int32& _previewVal,
+                       const Vector<String>& _options)
 {
-  return ImGui::BeginCombo(_name, _previewVal);
+  // make a string of const chars*
+  Vector<const char*> cstrs;
+  for (const auto& option : _options) {
+    cstrs.push_back(option.c_str());
+  }
+
+  if (ImGui::Combo(_name, &_previewVal, cstrs.data(), cstrs.size())) {
+    return true;
+  }
+  return false;
 }
 
 bool
-UInterface::selectable(const char* _name, bool* _selected)
+UInterface::selectable(const char* _name, const String _selected)
 {
-  return ImGui::Selectable(_name, _selected);
+  return ImGui::Selectable(_name, _selected == _name);
 }
 
 void
@@ -371,12 +382,12 @@ UInterface::colorEdit(const char* _name, Vector3& _color)
 
 void
 UInterface::plotLines(const char* _name,
-  float _values[],
-  uint32 _size,
-  int32 _valuesOffset,
-  const char* _overlayText,
-  float _scaleMin,
-  float _scaleMax)
+                      float _values[],
+                      uint32 _size,
+                      int32 _valuesOffset,
+                      const char* _overlayText,
+                      float _scaleMin,
+                      float _scaleMax)
 {
   ImGui::PlotLines(_name, _values, _size, _valuesOffset, _overlayText, _scaleMin, _scaleMax);
 }

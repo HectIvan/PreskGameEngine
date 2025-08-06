@@ -47,8 +47,28 @@ Scene::instantiate(String _name,
 {
   // insert the actor into the vector of actors.
   SPtr<Actor> actor = createActor();
+  // search for other actors with the same name in the same scene.
+  uint32 index = 0;
+  bool found;
+  do {
+    found = false;
+    // if the search name is not first, append a number to the search number
+    String searchName = _name;
+    if (index != 0) {
+      searchName += to_string(index);
+    }
+    if (actorFind(searchName)) {
+      found = true;
+      ++index;
+    }
+  } while (found);
+  // if the name is not unique in the scene
+  String newName = _name;
+  if (index != 0) {
+    newName += to_string(index);
+  }
   // set the actor name.
-  actor->setName(_name);
+  actor->setName(newName);
   // set the actor transform.
   actor->setTransform(_transform);
   // if the parent is not a nullptr (there is a parent that will have this actor).

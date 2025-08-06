@@ -40,6 +40,43 @@
 
 namespace pkEngineSDK
 {
+class ShaderInclude : public ID3DInclude
+{
+public:
+  HRESULT __stdcall Open(D3D_INCLUDE_TYPE, LPCSTR pFileName,
+                         LPCVOID, LPCVOID* ppData, UINT* pBytes) noexcept override {
+    String workingDirectory;
+    workingDirectory.resize(MAX_PATH);
+    GetCurrentDirectoryA(MAX_PATH, &workingDirectory[0]);
+    workingDirectory.resize(strlen(workingDirectory.c_str()));
+    if (workingDirectory.back() != '\\' && workingDirectory.back() != '/') {
+      workingDirectory.append("\\");
+    }
+    workingDirectory.append("shaders/");
+    workingDirectory.append(pFileName);
+
+    ifstream file(workingDirectory.c_str(), ios::binary | ios::ate);
+    if (!file.is_open()) {
+      return E_FAIL;
+    }
+
+    size_t size = file.tellg();
+    file.seekg(0, ios::beg);
+
+    char* buffer = new char[size];
+    file.read(buffer, size);
+
+    *ppData = buffer;
+    *pBytes = static_cast<UINT>(size);
+    return S_OK;
+  }
+
+  HRESULT __stdcall Close(LPCVOID pData) noexcept override {
+    delete[] static_cast<const char*>(pData);
+    return S_OK;
+  }
+};
+
 FORCEINLINE void
 throwIfFailed(HRESULT hr) {
   if (FAILED(hr)) {
@@ -814,11 +851,12 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   // the release configuration of this program.
   dwShaderFlags |= D3DCOMPILE_DEBUG;
 #endif
+  static ShaderInclude shaderInclude;
   ID3DBlob* pErrorBlob = nullptr;
   ID3DBlob* dxBlob = nullptr;
   hr = D3DCompileFromFile(_szFileName.getPathWStr().c_str(),
                           nullptr,
-                          nullptr,
+                          &shaderInclude,
                           _szEntryPoint,
                           _szShaderModel,
                           dwShaderFlags,

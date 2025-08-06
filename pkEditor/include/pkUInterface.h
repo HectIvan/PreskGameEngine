@@ -313,19 +313,19 @@ class UInterface : public Module<UInterface>
    * @brief Start the creation of a dropdown combo.
    * @param _name Name of the dropdown.
    * @param _previewVal Preview value.
-   * @return If the combo is opened.
+   * @param _options All options to use.
    */
   bool
-  beginCombo(const char* _name, const char* _previewVal);
+  beginCombo(const char* _name, int32& _previewVal, const Vector<String>& _options);
 
   /**
    * @brief Create a selectable for a dropdown combo.
    * @param _name Name of the selectable.
-   * @param _selected If the selectable is selected.
+   * @param _selected option to search for.
    * @return If it was selected.
    */
   bool
-  selectable(const char* _name, bool* _selected = nullptr);
+  selectable(const char* _name, const String _selected);
 
   /**
    * @brief End the creation of a dropdown combo.

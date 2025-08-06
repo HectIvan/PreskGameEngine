@@ -38,6 +38,7 @@ namespace G_BUFFERS
     kGB_Albedo = 0,
     kGB_Normal,
     kGB_Shadow,
+    kGB_Specular,
     kGB_Luminance,
     kGB_Metallic,
     kGB_Positions,
@@ -71,7 +72,7 @@ namespace PASS_TYPE
     kP_Base = 0,
     kP_Shadow,
     kP_AO,
-    kP_ShadowDef,
+    kP_ShadowQuad,
     kP_Luminance,
     kP_CHBlur, // compute H Blur
     kP_CVBlur, // compute V Blur
@@ -118,7 +119,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getGBuffer(const G_BUFFERS::E _type);
 
   /**
@@ -141,7 +142,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getDepthBuffer(const D_BUFFERS::E _type);
 
   /**
@@ -149,7 +150,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getUAVBuffer(const UAV_BUFFERS::E _type);
 
   /**

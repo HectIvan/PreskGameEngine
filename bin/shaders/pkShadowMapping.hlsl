@@ -4,12 +4,15 @@
 
 #define PI 3.14159265359
 
-// resources
-Texture2D normalMap : register(t0);
-Texture2D colorMap : register(t1);
-Texture2D shadowMap : register(t2);
-Texture2D depthMap : register(t3);
+// resources depth textures
+Texture2D shadowMap : register(t0);
+Texture2D depthMap : register(t1);
+// resources textures
+Texture2D normalMap : register(t2);
+Texture2D colorMap : register(t3);
 Texture2D positionsMap : register(t4);
+Texture2D metallicMap : register(t5);
+Texture2D roughnessMap : register(t6);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -78,11 +81,14 @@ struct PS_OUTPUT
   float4 specular : SV_Target1;
 };
 
-float fresnelSchlick(float refractionIndex, float3 lightVec, float3 normal)
+float3 fresnelSchlick(float3 F0, float VoH)
 {
-  float helperFunct = pow(1 - dot(lightVec, normal), 5);
-  float pSchlick = (refractionIndex + (1 - refractionIndex)) * helperFunct;
-  return pSchlick;
+  return F0 + (1.0f - F0) * pow((1.0f - VoH), 5.0f);
+}
+
+float fresnelForLut(float VoH)
+{
+  return pow(1.0f - VoH, 5.0f);
 }
 
 float GeometrySchlickGGX(float NoV, float roughness)
@@ -107,6 +113,38 @@ float ndf_GGX(float NoH, float alpha)
   return k * k * PI;
 }
 
+float D_Beckmann(float nDotH, float alpha)
+{
+  float cos2 = nDotH * nDotH;
+  float tan2 = (1.0f - cos2) / (cos2 + 1e-5f);
+  return exp(-tan2 / alpha) / (PI * alpha * cos2 * cos2 + 1e-5f);
+}
+
+float3 cookTorrenceSpecular(float3 normal,
+                            float3 viewDir,
+                            float3 lightDir,
+                            float rough,
+                            float metallic,
+                            float3 F0)
+{
+  float3 Half = normalize(viewDir + lightDir);
+  float NoL = saturate(dot(normal, lightDir));
+  float NoV = saturate(dot(normal, viewDir));
+  float NoH = saturate(dot(normal, Half));
+  float VoH = saturate(dot(viewDir, Half));
+  
+  float alpha = rough * rough;
+  float D = D_Beckmann(NoH, alpha);
+  float G = GeometrySmith(NoV, NoL, rough);
+  float3 F = fresnelSchlick(F0, VoH);
+
+  float den = max(4.0f * NoV * NoL, 1e-5f);
+  
+  float3 specular = (D * G * F) / den;
+  
+  return specular;
+}
+
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
@@ -122,6 +160,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 colorTex = colorMap.Sample(samState, input.TexCoord);
+  float4 metallicTex = metallicMap.Sample(samState, input.TexCoord);
+  float4 roughTex = roughnessMap.Sample(samState, input.TexCoord);
   float3 worldPos = positionsMap.Sample(samState, input.TexCoord);
   
   /**
@@ -146,19 +186,23 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   // specular
   float spec = 0.0;
   lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  // if the angle between the world to light vector and light direction is greater than the tolerance
-  float angle = dot(lightDir, LightPos - worldPos);
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 halfwayDir = normalize(lightDir + viewDir);
   spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
   
-  //      float NoV = saturate(dot(normal, ))
-  // Fresnel Schlic specular calculation
-  float lightVecFromWorld = normalize(LightPos - worldPos);
-  float FS = fresnelSchlick(0.3f, lightVecFromWorld, normal);
-  // float D = ndf_GGX()
-  float3 specular = (lightColor * (spec * SpecIntensity));
+  // float3 specular = (lightColor * (spec * SpecIntensity));
+  
+  float3 F0 = lerp(0.04f, colorTex.rgb, metallicTex.rgb);
+  
+  float3 specCookTorrence = cookTorrenceSpecular(normal,
+                                                 viewDir,
+                                                 lightDir,
+                                                 roughTex.r,
+                                                 metallicTex.r,
+                                                 F0);
+  
+  float3 specular = specCookTorrence * SpecIntensity;
   
   output.shadow = float4(diffuse, alpha);
   output.specular = float4(specular, alpha);

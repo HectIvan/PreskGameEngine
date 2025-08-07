@@ -39,13 +39,15 @@ namespace G_BUFFERS
     kGB_Normal,
     kGB_Shadow,
     kGB_Specular,
-    kGB_Luminance,
     kGB_Metallic,
+    kGB_Roughness,
     kGB_Positions,
-    kGB_HBlurredLuminance,
-    kGB_VBlurredLuminance,
     kGB_Skybox,
     kGB_IBR,
+    kGB_Merge,
+    kGB_Luminance,
+    kGB_LumBlurH,
+    kGB_LumBlur,
   };
 };
 
@@ -60,9 +62,7 @@ namespace D_BUFFERS
 namespace UAV_BUFFERS
 {
   enum E {
-    kCB_Shadows = 0,
-    kCB_Specular,
-    kCB_SpecHBlur,
+    kCB_Default = 0,
   };
 }
 
@@ -71,18 +71,14 @@ namespace PASS_TYPE
   enum E {
     kP_Base = 0,
     kP_Shadow,
-    kP_AO,
     kP_ShadowQuad,
-    kP_Luminance,
-    kP_CHBlur, // compute H Blur
-    kP_CVBlur, // compute V Blur
-    kP_HBlur,
-    kP_VBlur,
-    kP_Tone,
-    kP_CShadows, // compute shadows
-    kP_CSpecular, // comptue specular
     kP_SkyBox,
     kP_IBR,
+    kP_Merge,
+    kP_Luminance,
+    kP_LumBlurH,
+    kP_LumBlur,
+    kP_Tone,
   };
 }
 

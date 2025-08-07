@@ -4,7 +4,7 @@ SamplerState samState : register(s0);
 cbuffer parameters : register(b0)
 {
   float2 viewSize;
-  float2 unused;
+  float2 threshold;
 };
 
 struct PS_INPUT
@@ -18,25 +18,13 @@ struct PS_Output
   float4 diffuse : SV_Target0;
 };
 
-PS_Output PS(PS_INPUT input) : SV_Target0
+float4 PS(PS_INPUT input) : SV_Target0
 {
-  PS_Output output = (PS_Output) 0;
-    
-  float4 texPix = inputTexture.Sample(samState, input.Tex);
-  output.diffuse = float4(0.0f, 0.0f, 0.0f, 1.0f);
-  if (texPix.r > 0.95f ||
-      texPix.g > 0.95f ||
-      texPix.b > 0.95f)
-  {
-    output.diffuse = texPix; // float4(1.0f, 1.0f, 1.0f, 1.0f);
-  }
-  return output;
+  float2 uv = input.Position.xy / viewSize;
   
-  // float2 uv = input.Position.xy / viewSize;
-  // 
-  // float3 color = inputTexture.Sample(samState, uv).rgb;
-  // 
-  // float luminance = dot(color, float3(0.2126, 0.7152, 0.0722));
-  // 
-  // return float4(luminance.xxx, 1.0f);
+  float3 color = inputTexture.Sample(samState, uv).rgb;
+  
+  float luminance = pow(dot(color, float3(0.2126f, 0.7152f, 0.0722f)), threshold.x);
+  
+  return float4(luminance.xxx, 1.0f);
 }

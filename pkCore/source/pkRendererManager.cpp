@@ -49,29 +49,35 @@ void RendererManager::init()
   SPtr<Texture> metallicRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
 
-  // render target for the luminance result
-  SPtr<Texture> luminanceRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, luminanceRT });
-
-  // horizontal blur of luminance
-  SPtr<Texture> hBlurredluminanceRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_HBlurredLuminance, hBlurredluminanceRT });
-
-  // vertical blur of luminance
-  SPtr<Texture> vBlurredluminanceRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_VBlurredLuminance, vBlurredluminanceRT });
+  // render target for the roughness result
+  SPtr<Texture> roughnessRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Roughness, roughnessRT });
 
   // skybox texture
-  SPtr<Texture> skyboxTex = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxTex });
+  SPtr<Texture> skyboxRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
 
   // positions texture
-  SPtr<Texture> posTex = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posTex });
+  SPtr<Texture> posRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // IBR texture
-  SPtr<Texture> ibr = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibr });
+  SPtr<Texture> ibrRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibrRT });
+
+  // merge texture
+  SPtr<Texture> mergeRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Merge, mergeRT });
+
+  // luminance texture
+  SPtr<Texture> lumRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, lumRT });
+
+  SPtr<Texture> lumBlurHRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_LumBlurH, lumBlurHRT });
+
+  SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
   m_mainSkybox = tm.loadTexture(Path("textures/skybox/Skybox_papermill.hdr"));
 
@@ -79,9 +85,9 @@ void RendererManager::init()
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
   // depth buffer description
-  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS;
+  txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL;
-  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT;
+  txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT;
   // camera depth buffer
   SPtr<Texture> depthBuffer = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
@@ -95,18 +101,8 @@ void RendererManager::init()
   // ---------------------------------------------------------- //
   // shadows
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
-  txDesc.format = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
-  txDesc.shaderResourceFormat = TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
-  SPtr<Texture> shadowsUAV = api.createTexture(txDesc);
-  m_uavBuffers.insert({ UAV_BUFFERS::kCB_Shadows, shadowsUAV });
-
-  // specular uav
-  SPtr<Texture> specularUAV = api.createTexture(txDesc);
-  m_uavBuffers.insert({ UAV_BUFFERS::kCB_Specular, specularUAV });
-
-  // specular horizontal blur
-  SPtr<Texture> specHBlur = api.createTexture(txDesc);
-  m_uavBuffers.insert({ UAV_BUFFERS::kCB_SpecHBlur, specHBlur });
+  txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   
   // create the passes needed
   createPasses();
@@ -126,14 +122,15 @@ RendererManager::createPasses()
   pDesc.pSEntry = "PS";
   pDesc.vSModel = "vs_5_0";
   pDesc.pSModel = "ps_5_0";
-  pDesc.samAdress = SAM_STATE_ADRESS::kWrap;
-  pDesc.samFilters = SAM_STATE_FILTERS::kFilterMigMagMipLinear;
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
+  pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
   pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
                     sizeof(CBCamera), sizeof(CBTransform) };
   pDesc.inputs = {};
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                     getGBuffer(G_BUFFERS::kGB_Normal),
                     getGBuffer(G_BUFFERS::kGB_Metallic),
+                    getGBuffer(G_BUFFERS::kGB_Roughness),
                     getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   // rasterizer state
@@ -150,8 +147,6 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  // pDesc.pSDirectory = L"shaders/pkPShaderDepth.hlsl";
-  // pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
@@ -163,24 +158,17 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Matrix4), sizeof(Vector4) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal), getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getDepthBuffer(D_BUFFERS::kDB_Light), getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Positions) };
+  pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Light),
+                   getDepthBuffer(D_BUFFERS::kDB_Base),
+                   getGBuffer(G_BUFFERS::kGB_Normal),
+                   getGBuffer(G_BUFFERS::kGB_Albedo),
+                   getGBuffer(G_BUFFERS::kGB_Positions),
+                   getGBuffer(G_BUFFERS::kGB_Metallic),
+                   getGBuffer(G_BUFFERS::kGB_Roughness) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow), getGBuffer(G_BUFFERS::kGB_Specular) };
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowQuad, shadowQuadPass });
-
-  /****************************************************************************
-   * Luminance Quad pass
-   ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
-  pDesc.cBSizes = { sizeof(CBVector2x2) };
-  pDesc.inputs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  SPtr<Pass> luminancePass = make_shared<Pass>(pDesc);
-  // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_Luminance, luminancePass });
 
   /****************************************************************************
    * Skybox Quad pass
@@ -207,93 +195,80 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_IBR, ibrPass });
 
   /****************************************************************************
-   * Tone mapping Quad pass
+   * Merge Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkToneMapQuadShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_Specular),
                    getGBuffer(G_BUFFERS::kGB_Shadow),
-                   getGBuffer(G_BUFFERS::kGB_Specular),
-                   getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur),
                    getGBuffer(G_BUFFERS::kGB_Skybox),
                    getGBuffer(G_BUFFERS::kGB_IBR) };
-  pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
-  SPtr<Pass> tonePass = make_shared<Pass>(pDesc);
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
+  SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_Tone, tonePass });
+  m_passes.insert({ PASS_TYPE::kP_Merge, mergePass });
 
   /****************************************************************************
-   * Shadow Compute
+   * POST_PROCESSING
    ***************************************************************************/
-  pDesc.vSDirectory = Path("");
-  pDesc.pSDirectory = Path("");
-  pDesc.vSEntry = "";
-  pDesc.pSEntry = "";
-  pDesc.vSModel = "";
-  pDesc.pSModel = "";
-  pDesc.cSDirectory = Path("shaders/pkCShadowMapping.hlsl");
-  pDesc.cSEntry = "CSMain";
-  pDesc.cSModel = "cs_5_0";
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getDepthBuffer(D_BUFFERS::kDB_Light),
-                   getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Positions) };
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
-                    sizeof(Matrix4), sizeof(CBVector2x2) };
-  pDesc.outputs = {};
-  pDesc.pDepth = nullptr;
-  pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_Shadows) };
-  SPtr<Pass> computeShadows = make_shared<Pass>(pDesc);
-  // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_CShadows, computeShadows });
 
   /****************************************************************************
-   * Specular Compute
+   * Luminance
    ***************************************************************************/
-  pDesc.cSDirectory = Path("shaders/pkCSpecularMapping.hlsl");
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Positions) };
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4),
-                    sizeof(Matrix4), sizeof(CBVector2x2) };
-  pDesc.outputs = {};
-  pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_Specular) };
-  SPtr<Pass> computeSpecular = make_shared<Pass>(pDesc);
+  pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
+  pDesc.cBSizes = { sizeof(CBVector2x2) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  SPtr<Pass> lumPass = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_CSpecular, computeSpecular });
+  m_passes.insert({ PASS_TYPE::kP_Luminance, lumPass });
 
   /****************************************************************************
-   * Horizontal Blur Compute pass
+   * Luminance Horizontal Blur
    ***************************************************************************/
-  pDesc.cSDirectory = Path("shaders/pkCSHBlur.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
-  pDesc.uavs = { getUAVBuffer(UAV_BUFFERS::kCB_SpecHBlur) };
-  pDesc.outputs = {};
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Specular) };
-  SPtr<Pass> hBlurPass = make_shared<Pass>(pDesc);
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
+  SPtr<Pass> lumBlurHPass = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_CHBlur, hBlurPass });
+  m_passes.insert({ PASS_TYPE::kP_LumBlurH, lumBlurHPass });
+
+  /****************************************************************************
+   * Luminance Vertical Blur
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlur) };
+  SPtr<Pass> lumBlurPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_LumBlur, lumBlurPass });
+
+  /****************************************************************************
+   * Tone mapping Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkToneMap.hlsl");
+  pDesc.cBSizes = {  };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge),
+                   getGBuffer(G_BUFFERS::kGB_LumBlur) };
+  pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
+  SPtr<Pass> TonePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Tone, TonePass });
 }
 
 SPtr<Pass>
 RendererManager::getPass(const PASS_TYPE::E _type)
 {
-  if (m_passes.contains(_type)) {
-    return m_passes[_type];
-  }
-  return nullptr;
+  return m_passes.find(_type)->second;
 }
 
 SPtr<Texture>
 RendererManager::getGBuffer(const G_BUFFERS::E _type)
 {
-  if (m_gBuffers.contains(_type)) {
-    return m_gBuffers[_type];
-  }
-  return nullptr;
+  return m_gBuffers.find(_type)->second;
 }
 
 Vector<SPtr<Texture>>
@@ -327,19 +302,13 @@ RendererManager::getGBuffers(const G_BUFFERS::E _types)
 SPtr<Texture>
 RendererManager::getDepthBuffer(const D_BUFFERS::E _type)
 {
-  if (m_depthBuffers.contains(_type)) {
-    return m_depthBuffers[_type];
-  }
-  return nullptr;
+  return m_depthBuffers.find(_type)->second;
 }
 
 SPtr<Texture>
 RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
 {
-  if (m_uavBuffers.contains(_type)) {
-    return m_uavBuffers[_type];
-  }
-  return nullptr;
+  return m_uavBuffers.find(_type)->second;
 }
 
 void
@@ -439,8 +408,12 @@ RendererManager::renderModel(const SPtr<Model>& _model)
     if (mesh->getActive()) {
       SPtr<Material> material = mesh->material;
       // set the material textures to the shader
-      Vector<SPtr<Texture>> textures = { material->diffuse, material->normal, material->height,
-                                         material->metallic, material->occlusion };
+      Vector<SPtr<Texture>> textures = { material->diffuse,
+                                         material->normal,
+                                         material->height,
+                                         material->metallic,
+                                         material->occlusion,
+                                         material->roughness };
       api.pSSetShaderResourceViews(textures);
       // draw the mesh
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);

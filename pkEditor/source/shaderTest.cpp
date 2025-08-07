@@ -48,18 +48,14 @@ using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
-using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_CSpecular;
-using pkEngineSDK::PASS_TYPE::kP_CHBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_LumBlur;
+using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
@@ -150,9 +146,11 @@ ShaderTest::onInit()
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_shadows = true;
-  m_specular = true;
   m_IBR = true;
   m_IBRIntensity = 0.5f;
+  m_blurRadius = 0.01f;
+  m_blurStrength = 1.0f;
+  m_lumThreshold = 90.0f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
@@ -425,25 +423,15 @@ ShaderTest::uInterfaceUpdate()
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Render");
   // shadows option
-  im.createText("shadows  ");
-  im.sameLine();
-  im.createCheckBox("##Shadows", m_shadows);
-  // Specular option
-  im.createText("Specular ");
-  im.sameLine();
-  im.createCheckBox("##Specular", m_specular);
-  // AO
-  im.createText("AO       ");
-  im.sameLine();
-  im.createCheckBox("##AO", m_AO);
-  // Luminance
-  im.createText("Luminance");
-  im.sameLine();
-  im.createCheckBox("##Luminance", m_luminance);
+  im.createCheckBox("Shadows", m_shadows);
+  // Blur
+  im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
+  im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
+  // luminance threshold
+  im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
+
   // IBR
-  im.createText("IBR      ");
-  im.sameLine();
-  im.createCheckBox("##IBR", m_IBR);
+  im.createCheckBox("IBR", m_IBR);
   if (m_IBR) {
     im.sameLine();
     im.createDragF("##ibrIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
@@ -454,6 +442,9 @@ ShaderTest::uInterfaceUpdate()
       SPtr<Texture> texture = tm.loadTexture(path);
       rm.m_mainSkybox->copyFrom(texture);
     }
+  }
+  if (im.isItemHovered()) {
+    im.setTooltip("Skybox");
   }
   // compile shaders
   if (im.createButton("Compile Shaders")) {
@@ -489,7 +480,7 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
-  Vector2 winSize = api.getSwapChain()->getBuffer(0)->getSize();
+  Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
@@ -541,10 +532,12 @@ ShaderTest::onUpdate()
   // luminance parameters.
   CBVector2x2 lum;
   lum.vec1 = winSize;
+  lum.vec2.x = m_lumThreshold;
   // blur parameters.
   CBBlur blur;
-  blur.winSize = winSize;
-  blur.blurXOffset = 1.0f;
+  blur.WinSize = winSize;
+  blur.radius = m_blurRadius;
+  blur.strength = m_blurStrength;
   // IBR parameters.
   CBFloat IBRIntens;
   IBRIntens.value = m_IBRIntensity;
@@ -559,15 +552,12 @@ ShaderTest::onUpdate()
   // get all passes.
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = rm.getPass(kP_CHBlur);
-  // SPtr<Pass> vBlurPass = rm.getPass(kP_CVBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
-  SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
   SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
@@ -588,35 +578,21 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
   api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
 
-  // update shadow compute buffers.
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBVector2x2));
-
-  // update specular compute buffers.
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBVector2x2));
-
-  // update the luminance pass buffer.
-  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBVector2x2));
-  // update the Horizontal/Vertical blur pass buffer.
-  api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
-  //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
-
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
 
   // ibr constant buffers.
   api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
-  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(Vector4));
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
+
+  // luminance constant buffers.
+  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  // lum blur constant buffers
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  blur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 }
 
 void

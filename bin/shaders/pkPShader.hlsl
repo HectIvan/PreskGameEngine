@@ -3,6 +3,7 @@ Texture2D normalTex : register(t1);
 Texture2D heightTex : register(t2);
 Texture2D metallicTex : register(t3);
 Texture2D occlusionTex : register(t4);
+Texture2D roughnessTex : register(t5);
 
 SamplerState samLinear : register(s0);
 
@@ -24,7 +25,8 @@ struct PS_OUTPUT
   float4 diffuse : VS_Target0;
   float4 normal : SV_Target1;
   float4 metallic : SV_Target2;
-  float4 posWS : SV_Target3;
+  float4 roughness : SV_Target3;
+  float4 posWS : SV_Target4;
 };
 
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be able to remove this sv_target but i can't???
@@ -34,7 +36,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   float4 AO = occlusionTex.Sample(samLinear, input.Tex);
   float4 colorSam = diffuseTex.Sample(samLinear, input.Tex);
   float3 metallicSam = metallicTex.Sample(samLinear, input.Tex).rgb;
-  float3 normalSam = normalTex.Sample(samLinear, input.Tex) * 2.0f - 1.0f;
+  float3 normalSam = normalTex.Sample(samLinear, input.Tex).rgb * 2.0f - 1.0f;
+  float3 roughSam = roughnessTex.Sample(samLinear, input.Tex).rgb;
 
   if (colorSam.a <= 0.1f) {
     clip(-1);
@@ -44,8 +47,9 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   normalSam = normalize(mul(normalSam, TBN));
   output.normal = float4(normalSam, 1.0f);
   output.diffuse = colorSam * AO;
-  output.posWS = float4(input.PosWS, 1.0f);
   output.metallic = float4(metallicSam.rrr, 1.0f);
+  output.roughness = float4(roughSam, 1.0f);
+  output.posWS = float4(input.PosWS, 1.0f);
   
   return output;
 }

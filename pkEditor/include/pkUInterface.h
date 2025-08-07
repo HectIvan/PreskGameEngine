@@ -411,6 +411,20 @@ class UInterface : public Module<UInterface>
   isHovered();
 
   /**
+   * @brief Check if the item is hovered.
+   * @return Hovered.
+   */
+  bool
+  isItemHovered();
+
+  /**
+   * @brief Add tooltip to item.
+   * @param _text Text to display.
+   */
+  void
+  setTooltip(const char* _text);
+
+  /**
    * @brief Check if the cursor is on top of a window or item.
    * @return Hovered or not.
    */

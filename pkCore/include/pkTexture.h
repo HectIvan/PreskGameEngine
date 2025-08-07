@@ -18,6 +18,9 @@
 #include "pkPrerequisitesCore.h"
 #include "pkColor.h"
 
+namespace pkEngineSDK
+{
+
 namespace PK_BIND_FLAG
 {
   enum E
@@ -46,7 +49,7 @@ namespace PK_USAGE
   };
 }
 
-namespace TEXTURE_FORMAT
+namespace PK_TEXTURE_FORMAT
 {
   enum E
   {
@@ -174,9 +177,6 @@ namespace TEXTURE_FORMAT
     kPK_FORMAT_FORCE_UINT = 0xffffffff
   };
 }
-
-namespace pkEngineSDK
-{
 
 namespace PK_RESOURCE_MISC_FLAG {
   enum E

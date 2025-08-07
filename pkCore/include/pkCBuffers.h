@@ -94,17 +94,19 @@ struct CBAOData
   float unused;
 };
 
-struct CBBlur
-{
-  Vector2 winSize;
-  float blurXOffset;
-  float unused;
-};
-
 struct CBVector2x2
 {
   Vector2 vec1;
   Vector2 vec2;
+};
+
+struct CBBlur
+{
+  Vector2 WinSize;
+  Vector2 BlurDirection;
+  float radius;
+  float strength;
+  Vector2 _unused;
 };
 
 struct CBFloat

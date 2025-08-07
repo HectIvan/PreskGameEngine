@@ -411,6 +411,18 @@ UInterface::isHovered()
 }
 
 bool
+UInterface::isItemHovered()
+{
+  return ImGui::IsItemHovered();
+}
+
+void
+UInterface::setTooltip(const char* _text)
+{
+  ImGui::SetTooltip(_text);
+}
+
+bool
 UInterface::isHoveredWithItems()
 {
   return (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemActive());

@@ -114,6 +114,9 @@ class ShaderTest : public BaseApp
   // camera sensitivity
   float m_sensX;
   float m_sensY;
+  float m_blurRadius;
+  float m_blurStrength;
+  float m_lumThreshold;
   // camera movement speed
   float m_cameraSpeed;
 

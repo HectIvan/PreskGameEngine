@@ -26,7 +26,10 @@ TextureManager::loadTexture(const Path& _directory)
                                          false);
   }
   else {
-    texture = api.createTextureFromFile(_directory, 8, false, 28);
+    texture = api.createTextureFromFile(_directory, 
+                                        PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
+                                        false,
+                                        PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM);
   }
 
   // if the texture failed to load

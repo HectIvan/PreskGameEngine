@@ -204,6 +204,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           meshMat->setDiffuse(texture);
         }
       }
+      // hover tooltip.
+      if (im.isItemHovered()) {
+        im.setTooltip("Diffuse Texture");
+      }
       im.sameLine();
       if (im.createButtonImage(norName.c_str(), normal)) {
         // opened window to set normal texture
@@ -212,6 +216,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           SPtr<Texture> texture = tm.loadTexture(path);
           meshMat->setNormal(texture);
         }
+      }
+      // hover tooltip.
+      if (im.isItemHovered()) {
+        im.setTooltip("Normal Texture");
       }
       im.sameLine();
       if (im.createButtonImage(occName.c_str(), occlusion)) {
@@ -222,6 +230,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           meshMat->setOcclusion(texture);
         }
       }
+      // hover tooltip.
+      if (im.isItemHovered()) {
+        im.setTooltip("Ambient Occlusion Texture");
+      }
       im.sameLine();
       if (im.createButtonImage(roughName.c_str(), rough)) {
         // opened window to set rough texture
@@ -231,6 +243,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           meshMat->setRoughness(texture);
         }
       }
+      // hover tooltip.
+      if (im.isItemHovered()) {
+        im.setTooltip("Roughness Texture");
+      }
       im.sameLine();
       if (im.createButtonImage(metName.c_str(), metallic)) {
         // opened window to set metallic texture
@@ -239,6 +255,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           SPtr<Texture> texture = tm.loadTexture(path);
           meshMat->setMetallic(texture);
         }
+      }
+      // hover tooltip.
+      if (im.isItemHovered()) {
+        im.setTooltip("Metallic Texture");
       }
       im.popID();
     }

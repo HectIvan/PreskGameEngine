@@ -12,7 +12,11 @@
 
 #include "pkPrerequisitesCore.h"
 
-namespace SAM_STATE_FILTERS
+
+namespace pkEngineSDK
+{
+
+namespace PK_SAM_STATE_FILTERS
 {
   enum E
   {
@@ -20,7 +24,7 @@ namespace SAM_STATE_FILTERS
   };
 }
 
-namespace SAM_STATE_ADRESS
+namespace PK_SAM_STATE_ADRESS
 {
   enum E
   {
@@ -31,9 +35,6 @@ namespace SAM_STATE_ADRESS
     kMirrorOnce
   };
 }
-
-namespace pkEngineSDK
-{
 
 class PK_CORE_EXPORT SamplerState
 {

@@ -1584,7 +1584,7 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
 
   // how wide each line of the texture will be
   bpp = 4 * sizeof(float);
-  uint32 format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  uint32 format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
   // if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
 
   // create a default texture using the received parameters

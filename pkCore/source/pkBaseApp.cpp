@@ -17,19 +17,16 @@ using pkEngineSDK::D_BUFFERS::kDB_Light;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_CSpecular;
-using pkEngineSDK::PASS_TYPE::kP_CHBlur;
-using pkEngineSDK::PASS_TYPE::kP_HBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
-using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_CVBlur;
+using pkEngineSDK::PASS_TYPE::kP_Merge;
+using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
+using pkEngineSDK::PASS_TYPE::kP_LumBlur;
 
 namespace pkEngineSDK
 {
@@ -138,14 +135,15 @@ BaseApp::render()
   // get all passes
   SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
-  SPtr<Pass> luminancePass = renderManager.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = renderManager.getPass(kP_CHBlur);
-  SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
-  SPtr<Pass> pCShadowPass = renderManager.getPass(kP_CShadows);
-  SPtr<Pass> pCSpecPass = renderManager.getPass(kP_CSpecular);
+  SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
-  SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
+  SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
+  SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
+
+  SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   // Get all actors
   Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
@@ -161,37 +159,23 @@ BaseApp::render()
   renderManager.renderActors(actors);
   basePass->endPass();
 
-  api.clearUnorderedAccessViews(pCSpecPass->getUAVTextures(), Color(0, 0, 0, 0));
-  api.clearUnorderedAccessViews(hBlurPass->getUAVTextures(), Color(0, 0, 0, 0));
-  api.clearUnorderedAccessViews(pCShadowPass->getUAVTextures());
   api.clearRenderTargetViews(Color(1, 1, 1, 1), shadowQuad->getOutputTextures());
   // get texel size of compute passes
-  Vector2 texSize = api.getSwapChain()->getSize();
-  uint32 threadWidth = 16;
-  uint32 threadHeight = 16;
-  uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-  uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+  //        Vector2 texSize = api.getSwapChain()->getSize();
+  //        uint32 threadWidth = 16;
+  //        uint32 threadHeight = 16;
+  //        uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  //        uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
-  if (m_shadows) {
-    // pCShadowPass->beginPass();
-    // api.dispatch(x, y, 1);
-    // pCShadowPass->endPass();
-    shadowQuad->beginPass();
-    api.draw(3, 0);
-    shadowQuad->endPass();
-  }
-  // if specular is set to be rendered
-  // if (m_specular) {
-  //   pCSpecPass->beginPass();
-  //   api.dispatch(x, y, 1);
-  //   pCSpecPass->endPass();
-  // }
+  shadowQuad->beginPass();
+  api.draw(3, 0);
+  shadowQuad->endPass();
 
   // render the skybox
   skyBoxPass->beginPass();
   api.draw(3, 0);
   skyBoxPass->endPass();
-  // IBR Pass
+  // IBR Pass.
   api.clearRenderTargetViews(Color(0.0f, 0.0f, 0.0f), IBRPass->getOutputTextures());
   if (m_IBR) {
     IBRPass->beginPass();
@@ -199,13 +183,27 @@ BaseApp::render()
     IBRPass->endPass();
   }
 
-  // Quad luminance pass
-  if (m_luminance) {
-    luminancePass->beginPass();
-    api.draw(3, 0);
-    luminancePass->endPass();
-  }
-  // Quad tone map pass
+  // Quad merge pass.
+  mergePass->beginPass();
+  api.draw(3, 0);
+  mergePass->endPass();
+
+  // Quad luminosity pass.
+  lumPass->beginPass();
+  api.draw(3, 0);
+  lumPass->endPass();
+
+  // quad lum blur Horizontal pass.
+  lumBlurHPass->beginPass();
+  api.draw(3, 0);
+  lumBlurHPass->endPass();
+
+  // Quad lum blur pass.
+  lumBlurPass->beginPass();
+  api.draw(3, 0);
+  lumBlurPass->endPass();
+
+  // Quad Tone pass
   tonePass->beginPass();
   api.draw(3, 0);
   // Scene specific app render

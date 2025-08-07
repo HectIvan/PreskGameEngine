@@ -81,49 +81,58 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene)
 {
+  // modules
   ResourceManager& rm = g_ResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
   Logger& log = g_Logger().instance();
 
-  SPtr<Mesh> meshProcess = rm.searchMesh(_mesh->mName.C_Str());
+  // check if the mesh is already in storage
+  String meshName(_mesh->mName.C_Str());
+  SPtr<Mesh> meshProcess = rm.searchMesh(meshName);
   if (meshProcess) {
-    log.registerMessage("Found pre-loaded mesh of name " + String(_mesh->mName.C_Str()) + ".");
+    log.registerMessage("Found pre-loaded mesh of name " + meshName + ".");
     return meshProcess;
   }
 
+  // create the mesh
   meshProcess = make_shared<Mesh>();
-  meshProcess->setName(_mesh->mName.C_Str());
+  meshProcess->setName(meshName);
   meshProcess->vertexCount = _mesh->mNumVertices;
+  meshProcess->vertexVector.resize(_mesh->mNumVertices);
+
+  // exist checks
+  const aiVector3D* meshTexCoords = _mesh->mTextureCoords[0];
+  const bool hasTexCoords = (meshTexCoords != nullptr);
+  const bool tbExist = _mesh->HasTangentsAndBitangents();
+  const bool hasNormals = _mesh->HasNormals();
+  // default vectors for when no data is found
+  const Vector3 zero3 = Vector3::ZERO;
+  const Vector2 zero2 = Vector2::ZERO;
+
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i) {
-    SimpleVertex sv;
-    sv.pos.x = _mesh->mVertices[i].x;
-    sv.pos.y = _mesh->mVertices[i].y;
-    sv.pos.z = _mesh->mVertices[i].z;
-
-    if (_mesh->HasNormals()) {
-      sv.normal.x = _mesh->mNormals[i].x;
-      sv.normal.y = _mesh->mNormals[i].y;
-      sv.normal.z = _mesh->mNormals[i].z;
-    }
-    else { sv.normal = Vector3(0.0f); }
-
-    if (_mesh->mTextureCoords[0]) {
-      sv.Tex.x = _mesh->mTextureCoords[0][i].x;
-      sv.Tex.y = _mesh->mTextureCoords[0][i].y;
-    }
-
-    if (_mesh->HasTangentsAndBitangents()) {
-      sv.tangent.x = _mesh->mTangents[i].x;
-      sv.tangent.y = _mesh->mTangents[i].y;
-      sv.tangent.z = _mesh->mTangents[i].z;
-
-      sv.bitangent.x = _mesh->mBitangents[i].x;
-      sv.bitangent.y = _mesh->mBitangents[i].y;
-      sv.bitangent.z = _mesh->mBitangents[i].z;
-    }
-    // else { sv.Tex = Vector2(0.0f); }
-    meshProcess->vertexVector.push_back(sv);
+    // set positions
+    Vector3 pos = Vector3(_mesh->mVertices[i].x, _mesh->mVertices[i].y, _mesh->mVertices[i].z);
+    
+    // get normal directions
+    Vector3 normal = (hasNormals) ?
+                      Vector3(_mesh->mNormals[i].x, _mesh->mNormals[i].y, _mesh->mNormals[i].z)
+                      : zero3;
+    
+    // if there are texture coordinates, store them
+    Vector2 tex = (hasTexCoords) ? Vector2(meshTexCoords[i].x, meshTexCoords[i].y) : zero2;
+    
+    // check if the model has tantents and bitangents
+    Vector3 tangent = (tbExist) ? Vector3(_mesh->mTangents[i].x,
+                                          _mesh->mTangents[i].y,
+                                          _mesh->mTangents[i].z) : zero3;
+    
+    Vector3 bitangent = (tbExist) ? Vector3(_mesh->mBitangents[i].x,
+                                            _mesh->mBitangents[i].y,
+                                            _mesh->mBitangents[i].z) : zero3;
+    // create and add a new vertex
+    SimpleVertex sv = SimpleVertex(pos, normal, tex, tangent, bitangent);
+    meshProcess->vertexVector[i] = sv;
   }
 
   // process index
@@ -136,22 +145,20 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       meshProcess->indexVector.push_back(face.mIndices[j]);
     }
   }
-  for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
-    // mesh->mBones[i].
-  }
+  // for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
+  //   mesh->mBones[i].
+  // }
   if (_mesh->mMaterialIndex >= 0) {
     aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
     meshProcess->material = make_shared<Material>();
     String meshName = _mesh->mName.C_Str();
     // load default textures.
-    meshProcess->material->setDiffuse(tm.loadTexture(Path("textures/default/FlatDiff.png")));
-    meshProcess->material->setNormal(tm.loadTexture(Path("textures/default/FlatNormal.png")));
-    meshProcess->material->setOcclusion(tm.loadTexture(Path("textures/default/FlatAO.png")));
-    meshProcess->material->setHeight(tm.loadTexture(Path("textures/default/FlatHeight.png")));
-    meshProcess->material->setMetallic(tm.loadTexture(Path("textures/default/FlatMetallic.png")
-                                                      ));
-    meshProcess->material->setRoughness(tm.loadTexture(Path("textures/default/FlatRoughness.png"
-                                        )));
+    meshProcess->material->setDiffuse(tm.m_defaultDiff);
+    meshProcess->material->setNormal(tm.m_defaultNormal);
+    meshProcess->material->setOcclusion(tm.m_defaultAO);
+    meshProcess->material->setHeight(tm.m_defaultHeight);
+    meshProcess->material->setMetallic(tm.m_defaultMetallic);
+    meshProcess->material->setRoughness(tm.m_defaultRough);
 
     String matName = materialA->GetName().C_Str();
     meshProcess->material->setName(matName);
@@ -179,8 +186,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         }
       }
       else { // register that a diffuse texture was not found.
-        filePath = String(path.C_Str());
-        log.registerMessage("Failed to load diffuse texture" + filePath.getFileName() +
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load diffuse texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }
@@ -203,8 +210,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         }
       }
       else { // register that a normal texture was not found.
-        filePath = String(path.C_Str());
-        log.registerMessage("Failed to load normal texture" + filePath.getFileName() + 
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load normal texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }
@@ -227,9 +234,9 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         }
       }
       else { // register that an ambient occlussion texture was not found.
-        filePath = String(path.C_Str());
-        log.registerMessage("Failed to load ambient occlussion texture" +
-                            filePath.getFileName() + " in material " + matName + ".",
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load ambient occlussion texture" + filePath.toString() +
+                            " in material " + matName + ".",
                             LOG_MSG_TYPE::kWarning);
       }
     }
@@ -252,8 +259,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         }
       }
       else { // register that a metallic texture was not found.
-        filePath = String(path.C_Str());
-        log.registerMessage("Failed to load metallic texture" + filePath.getFileName() +
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load metallic texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }
@@ -276,8 +283,8 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
         }
       }
       else { // register that a roughness texture was not found.
-        filePath = String(path.C_Str());
-        log.registerMessage("Failed to load roughness texture" + filePath.getFileName() +
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load roughness texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }

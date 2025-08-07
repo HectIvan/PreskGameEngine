@@ -56,6 +56,7 @@ BaseApp::init(const char** _argv, int32 _count)
 
   g_SceneManager().init();
   g_RenderManager().init();
+  g_TextureManager().loadDefaultMatTextures();
 
   onInit();
 }

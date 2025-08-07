@@ -26,13 +26,19 @@ namespace pkEngineSDK
 
 struct SimpleVertex
 {
-  SimpleVertex() = default;
-  SimpleVertex(Vector3 _pos) :
-    pos(_pos)
-  {};
+  SimpleVertex(Vector3 _pos = Vector3(0.0f),
+               Vector3 _nor = Vector3(0.0f),
+               Vector2 _tex = Vector2(0.0f),
+               Vector3 _tan = Vector3(0.0f),
+               Vector3 _bitan = Vector3(0.0f)) :
+               pos(_pos),
+               normal(_nor),
+               tex(_tex),
+               tangent(_tan),
+               bitangent(_bitan) {};
   Vector3 pos;
   Vector3 normal;
-  Vector2 Tex;
+  Vector2 tex;
   Vector3 tangent;
   Vector3 bitangent;
 

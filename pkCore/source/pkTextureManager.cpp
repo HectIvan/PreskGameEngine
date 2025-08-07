@@ -4,6 +4,16 @@
 
 namespace pkEngineSDK
 {
+void
+TextureManager::loadDefaultMatTextures()
+{
+  m_defaultDiff = loadTexture(Path("textures/default/FlatDiff.png"));
+  m_defaultNormal = loadTexture(Path("textures/default/FlatNormal.png"));
+  m_defaultAO = loadTexture(Path("textures/default/FlatAO.png"));
+  m_defaultHeight = loadTexture(Path("textures/default/FlatHeight.png"));
+  m_defaultMetallic = loadTexture(Path("textures/default/FlatMetallic.png"));
+  m_defaultRough = loadTexture(Path("textures/default/FlatRoughness.png"));
+}
 
 SPtr<Texture>
 TextureManager::loadTexture(const Path& _directory)

@@ -289,5 +289,7 @@ class PK_UTILITY_EXPORT Vector2
 
  public:
   float x, y;
+
+  static const Vector2 ZERO;
 };
 }

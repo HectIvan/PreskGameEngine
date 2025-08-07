@@ -10,25 +10,25 @@ Sprite::Sprite()
   **/
   /*********************************************/
   // bsae vertex
-  SimpleVertex vertex;
+  SimpleVertex vertex = SimpleVertex();
   // first vertex
   vertex.pos = Vector3(-1.0f, -1.0f, 0.0f);
-  vertex.Tex = Vector2(1.0f, 1.0f);
+  vertex.tex = Vector2(1.0f, 1.0f);
   vertex.normal = Vector3(1.0f, 0.0f, 0.0f);
   vertexVector.push_back(vertex);
   // second vertex
   vertex.pos = Vector3(-1.0f, 1.0f, 0.0f);
-  vertex.Tex = Vector2(0.0f, 1.0f);
+  vertex.tex = Vector2(0.0f, 1.0f);
   vertex.normal = Vector3(1.0f, 0.0f, 0.0f);
   vertexVector.push_back(vertex);
   // third vertex
   vertex.pos = Vector3(1.0f, 1.0f, 0.0f);
-  vertex.Tex = Vector2(0.0f, 0.0f);
+  vertex.tex = Vector2(0.0f, 0.0f);
   vertex.normal = Vector3(1.0f, 0.0f, 0.0f);
   vertexVector.push_back(vertex);
   // fourth vertex
   vertex.pos = Vector3(1.0f, -1.0f, 0.0f);
-  vertex.Tex = Vector2(1.0f, 0.0f);
+  vertex.tex = Vector2(1.0f, 0.0f);
   vertex.normal = Vector3(1.0f, 0.0f, 0.0f);
   vertexVector.push_back(vertex);
 

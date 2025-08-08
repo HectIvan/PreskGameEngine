@@ -81,7 +81,7 @@ struct PS_OUTPUT
   float4 specular : SV_Target1;
 };
 
-float3 fresnelSchlick(float3 F0, float VoH)
+float fresnelSchlick(float F0, float VoH)
 {
   return F0 + (1.0f - F0) * pow((1.0f - VoH), 5.0f);
 }
@@ -93,9 +93,13 @@ float fresnelForLut(float VoH)
 
 float GeometrySchlickGGX(float NoV, float roughness)
 {
-  float k = (roughness * roughness) * 0.5f;
-  float denom = NoV * (1.0f - k) + k;
-  return NoV / denom;
+  // float k = (roughness * roughness) * 0.5f;
+  // float denom = NoV * (1.0f - k) + k;
+  // return NoV / denom;
+  float r = roughness + 1.0f;
+  float k = (r * r) / 8.0f;
+  float G = NoV / (NoV * (1.0f - k) + k + 1e-7f);
+  return G;
 }
 
 float GeometrySmith(float NoV, float NoL, float roughness)
@@ -113,19 +117,61 @@ float ndf_GGX(float NoH, float alpha)
   return k * k * PI;
 }
 
-float D_Beckmann(float nDotH, float alpha)
+float D_Beckmann(float NoH, float alpha)
 {
-  float cos2 = nDotH * nDotH;
+  float cos2 = NoH * NoH;
   float tan2 = (1.0f - cos2) / (cos2 + 1e-5f);
   return exp(-tan2 / alpha) / (PI * alpha * cos2 * cos2 + 1e-5f);
 }
 
-float3 cookTorrenceSpecular(float3 normal,
+// source: https://graphicscompendium.com/gamedev/15-pbr
+// min of 1 | 2(HoN)(NoV) / (VoH) | 2(HoN)(NoL) / (VoL)
+float GeometricAttenuation(float3 halfView, float3 normal, float3 view, float3 lightDir)
+{
+  float HoN = saturate(dot(halfView, normal));
+  float NoV = saturate(dot(normal, view));
+  float VoH = saturate(dot(view, normal));
+  float NoL = saturate(dot(normal, lightDir));
+  float VoL = saturate(dot(view, lightDir));
+  
+  float first = 2.0f * (HoN * NoV) / VoH;
+  float second = 2.0f * (HoN * NoL) / VoL;
+  float G = min(min(1, first), second);
+  
+  return G;
+}
+
+// source: https://graphicscompendium.com/gamedev/15-pbr
+// Dblinn = (1/PI alpha^2)(HoN^(2/alpha^2 - 2))
+float NormalDistribution(float3 halfView, float3 normal, float roughness)
+{
+  float a = roughness * roughness;
+  float a2 = a * a;
+  float HoN = saturate(dot(halfView, normal));
+  
+  float first = 1.0f / (PI * a2);
+  float expVal = (2.0f / a2) - 2.0f;
+  float exponent = pow(HoN, expVal);
+  float D = first * exponent;
+  return D;
+}
+
+// source: https://graphicscompendium.com/gamedev/15-pbr
+// F0 = (n - 1)^2 / (n + 1)^2
+// F = F0 + (1 - F0) * (1 - VoH)^5
+float Fresnel(float3 F0, float VoH) // float refraction
+{
+  // float F0 = pow((refraction - 1), 2.0f) / pow((refraction + 1), 2.0f);
+  float F = F0 + (1 - F0) * pow((1 - VoH), 5.0f);
+  return F;
+}
+
+float3 cookTorranceSpecular(float3 normal,
                             float3 viewDir,
                             float3 lightDir,
                             float rough,
                             float metallic,
-                            float3 F0)
+                            float F0)
 {
   float3 Half = normalize(viewDir + lightDir);
   float NoL = saturate(dot(normal, lightDir));
@@ -134,10 +180,13 @@ float3 cookTorrenceSpecular(float3 normal,
   float VoH = saturate(dot(viewDir, Half));
   
   float alpha = rough * rough;
-  float D = D_Beckmann(NoH, alpha);
+  // float D = D_Beckmann(NoH, alpha);
   float G = GeometrySmith(NoV, NoL, rough);
-  float3 F = fresnelSchlick(F0, VoH);
-
+  // float F = fresnelSchlick(F0, VoH);
+  float D = NormalDistribution(Half, normal, rough);
+  // float G = GeometricAttenuation(Half, normal, viewDir, lightDir); // there's an issue with this function
+  float F = Fresnel(F0, VoH);
+  
   float den = max(4.0f * NoV * NoL, 1e-5f);
   
   float3 specular = (D * G * F) / den;
@@ -184,25 +233,37 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float3 diffuse = lightColor * diff;
   
   // specular
-  float spec = 0.0;
+  // float spec = 0.0;
   lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
+  /**
+   * Works, but its not correct
+   */
+  //      float3 worldToLight = normalize(worldPos - lightPos);
+  //      float angle = dot(-lightDir, worldToLight);
+  //      if (angle < SpotCutoff)
+  //      {
+  //        output.shadow = float4(shadowColor.xxx, 1);
+  //        output.specular = float4(0, 0, 0, 1);
+  //        return output;
+  //      }
+  
   float3 viewDir = normalize(Eye.xyz - worldPos);
-  float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
+  // float3 halfwayDir = normalize(lightDir + viewDir);
+  // spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
   
-  // float3 specular = (lightColor * (spec * SpecIntensity));
+  // float3 blinn_phong = (lightColor * (spec * SpecIntensity)) * roughTex.r; // this is wrong, just a test to check pure roughness
   
-  float3 F0 = lerp(0.04f, colorTex.rgb, metallicTex.rgb);
+  float F0 = lerp(0.04f, colorTex.rgb, metallicTex.rgb);
   
-  float3 specCookTorrence = cookTorrenceSpecular(normal,
+  float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
                                                  lightDir,
                                                  roughTex.r,
                                                  metallicTex.r,
                                                  F0);
   
-  float3 specular = specCookTorrence * SpecIntensity;
+  float3 specular = (specCookTorrance) * SpecIntensity;
   
   output.shadow = float4(diffuse, alpha);
   output.specular = float4(specular, alpha);

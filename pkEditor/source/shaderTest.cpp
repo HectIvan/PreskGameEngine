@@ -118,6 +118,7 @@ ShaderTest::onInit()
 
   // create light
   m_light = activeScene->instantiate("Light");
+  m_light->setPosition(0.0f, 60.0f, 0.0f);
   m_light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = m_light->getComponent<Light>();
 

@@ -51,5 +51,5 @@ float4 PS(PS_INPUT input) : SV_Target
   float2 skyboxUV = getSkyBoxUV(view);
   float3 color = skyboxMap.Sample(samState, skyboxUV).rgb;
   
-  return float4(color * Intensity * metallicTex, 1.0f);
+  return float4(color * metallicTex * Intensity, 1.0f);
 }

@@ -158,31 +158,19 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
       // light section
       SPtr<Light> light = reinterpret_pointer_cast<Light>(_pComponent);
       // Light color
-      im.createText("Color             ");
-      im.sameLine();
-      im.colorEdit("##Color", light->m_color);
+      im.colorEdit("Color", light->m_color);
       // Light direction
-      im.createText("Direction         ");
-      im.sameLine();
       Vector4 dir4 = _pActor->m_transform * Vector4(light->m_direction, 0.0f);
       Vector3 dir = dir4.xyz().normalized();
-      im.createDrag3("##Direction", dir, 0.0f);
+      im.createDrag3("Direction", dir, 0.0f);
       // spot exponent
-      im.createText("Spot Exponent     ");
-      im.sameLine();
-      im.createDragF("##Spot Exponent", light->m_spotExponent, 0.1f, 0.0f);
+      im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f, 1.0f);
       // Spot cutoff
-      im.createText("Spot Cutoff       ");
-      im.sameLine();
-      im.createDragF("##Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
+      im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
       // shadow intensity
-      im.createText("Shadow Intensity  ");
-      im.sameLine();
-      im.createDragF("##Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
+      im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
       // Specular Intensity
-      im.createText("Specular Intensity");
-      im.sameLine();
-      im.createDragF("##Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
+      im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
     }
     break;
   }

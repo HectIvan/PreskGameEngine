@@ -38,7 +38,7 @@ class PK_CORE_EXPORT Light : public Component
  public:
   Light() {
     m_type = pkEngineSDK::LIGHT_TYPE::kDirectional;
-    m_spotCutoff = 0.90f;
+    m_spotCutoff = 0.10f;
     m_spotExponent = 32.0f;
     m_direction = Vector3(0, -1.0f, 0);
     m_position = Vector3(0.0f, 50.0f, 0.0f);

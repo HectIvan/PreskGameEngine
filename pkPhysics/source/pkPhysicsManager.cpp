@@ -261,4 +261,13 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
   Vector3 j_invTan = j_tan * -1.0f;
   _rb2.applyImpulse(j_invTan, _info.m_contactPoint2);
 }
+
+float
+PhysicsManager::getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2)
+{
+  Matrix3 skew1 = Matrix3::getSkewSymetric();
+  Matrix3 skew2 = 
+  float firstMass = _rb1.m_inverseMass * Matrix3::IDENTITY;
+  float secondMass = _rb2.m_inverseMass * Matrix3::IDENTITY;
+}
 }

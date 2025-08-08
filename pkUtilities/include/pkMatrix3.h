@@ -342,6 +342,12 @@ class PK_UTILITY_EXPORT Matrix3
   static Matrix3
   rotationZ(float& _angle);
 
+  /**
+   * @brief 
+   */
+  static Matrix3
+  getSkewSymetric(const Vector3& _vector);
+
   float matrix[3][3];
   static const Matrix3 IDENTITY;
   static const Matrix3 ZERO;

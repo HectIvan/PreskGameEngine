@@ -146,6 +146,15 @@ class PK_PHYSICS_EXPORT PhysicsManager : public Module<PhysicsManager>
    */
   void
   resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _info);
+
+  /**
+   * @brief Get the effective mass between 2 rigid bodies.
+   * @param _rb1 First rigid body.
+   * @param _rb2 Second rigid body.
+   * @return The effective mass.
+   */
+  float
+  getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2);
 };
 PhysicsManager&
 g_physicsManager()

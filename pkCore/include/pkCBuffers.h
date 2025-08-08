@@ -94,21 +94,30 @@ struct CBAOData
   float unused;
 };
 
-struct CBLuminance
+struct CBVector2x2
 {
-  float tolerance;
-  Vector3 unused;
+  Vector2 vec1;
+  Vector2 vec2;
 };
 
 struct CBBlur
 {
-  Vector2 winSize;
-  Vector2 unused;
+  Vector2 WinSize;
+  Vector2 BlurDirection;
+  float radius;
+  float strength;
+  Vector2 _unused;
 };
 
-struct CBShadowParam
+struct CBFloat
 {
-  Vector2 winSize;
-  Vector2 farNear;
+  float value;
+  Vector3 unused;
+};
+
+struct CBVector3
+{
+  Vector3 vec1;
+  float unused;
 };
 }

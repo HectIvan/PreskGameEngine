@@ -38,11 +38,16 @@ namespace G_BUFFERS
     kGB_Albedo = 0,
     kGB_Normal,
     kGB_Shadow,
-    kGB_Luminance,
+    kGB_Specular,
     kGB_Metallic,
-    kGB_HBlurredLuminance,
-    kGB_VBlurredLuminance,
+    kGB_Roughness,
+    kGB_Positions,
     kGB_Skybox,
+    kGB_IBR,
+    kGB_Merge,
+    kGB_Luminance,
+    kGB_LumBlurH,
+    kGB_LumBlur,
   };
 };
 
@@ -57,9 +62,7 @@ namespace D_BUFFERS
 namespace UAV_BUFFERS
 {
   enum E {
-    kCB_Shadows = 0,
-    kCB_Specular,
-    kCB_SpecHBlur,
+    kCB_Default = 0,
   };
 }
 
@@ -68,15 +71,14 @@ namespace PASS_TYPE
   enum E {
     kP_Base = 0,
     kP_Shadow,
-    kP_AO,
-    kP_ShadowDef,
-    kP_Luminance,
-    kP_CHBlur,
-    kP_CVBlur,
-    kP_Tone,
-    kP_CShadows, // compute shadows
-    kP_CSpecular, // comptue specular
+    kP_ShadowQuad,
     kP_SkyBox,
+    kP_IBR,
+    kP_Merge,
+    kP_Luminance,
+    kP_LumBlurH,
+    kP_LumBlur,
+    kP_Tone,
   };
 }
 
@@ -113,7 +115,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getGBuffer(const G_BUFFERS::E _type);
 
   /**
@@ -136,7 +138,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getDepthBuffer(const D_BUFFERS::E _type);
 
   /**
@@ -144,7 +146,7 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _type Type of buffer.
    * @return Pointer to the buffer.
    */
-  SPtr<Texture>&
+  SPtr<Texture>
   getUAVBuffer(const UAV_BUFFERS::E _type);
 
   /**
@@ -188,12 +190,11 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   UMap<D_BUFFERS::E, SPtr<Texture>> m_depthBuffers;
   UMap<UAV_BUFFERS::E, SPtr<Texture>> m_uavBuffers;
 
+  // skyboxes
+  SPtr<Texture> m_mainSkybox;
+
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;
-
-  // shadows
-  SPtr<Texture> m_pShadowDepth;
-  SPtr<DepthStencilView> m_pShadowDepthSV;
 };
 
 PK_CORE_EXPORT RendererManager&

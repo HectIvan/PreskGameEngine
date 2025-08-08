@@ -15,8 +15,9 @@
 
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBLuminance;
-using pkEngineSDK::CBShadowParam;
+using pkEngineSDK::CBFloat;
+using pkEngineSDK::CBVector2x2;
+using pkEngineSDK::CBVector3;
 using pkEngineSDK::CreateCBCamera;
 using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
@@ -47,17 +48,14 @@ using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
-using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_CSpecular;
-using pkEngineSDK::PASS_TYPE::kP_CHBlur;
+using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_LumBlur;
+using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
@@ -109,7 +107,7 @@ ShaderTest::onInit()
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
                                          m_window.getHeight(),
                                          3.1416f / 4.0f,
-                                         0.01f,
+                                         3.0f,
                                          5000.0f,
                                          camPos, // position
                                          Vector3::FORWARD + camPos * -1.0f, // target
@@ -128,7 +126,7 @@ ShaderTest::onInit()
   m_light->getComponent<Camera>()->init(1280,
                                         720,
                                         3.1416f / 4.0f,
-                                        0.01f,
+                                        3.0f,
                                         2000.0f,
                                         lightCom->m_position, // position
                                         lightCom->m_direction, // target
@@ -137,27 +135,22 @@ ShaderTest::onInit()
 
   SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
-  pistol->setScale(10.0f);
-  pistol->setPosition(0.0f, 5.0f, 0.0f);
-
-  // SPtr<Actor> leon = activeScene->instantiate("Leon");
-  // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
-
+  pistol->setScale(30.0f);
+  pistol->setPosition(10.0f, 15.0f, 0.0f);
+  
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-
-  // SPtr<Actor> rpd = activeScene->instantiate("RPD");
-  // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
-  // rpd->setRotation(0, 90, 0);
-  // // rpd->setScale(1.0f);
-  // rpd->setPosition(0, 0, -100);
-
+  
   SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_shadows = true;
-  m_specular = true;
+  m_IBR = true;
+  m_IBRIntensity = 0.5f;
+  m_blurRadius = 0.01f;
+  m_blurStrength = 1.0f;
+  m_lumThreshold = 90.0f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
@@ -165,6 +158,8 @@ ShaderTest::onInit()
   m_showErrors = true;
   m_showWarnings = false;
   m_showActions = false;
+
+  m_eyeIcon = g_TextureManager().loadTexture(Path("textures/white-eye-icon.jpg"));
 }
 
 void
@@ -200,6 +195,10 @@ ShaderTest::input()
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
+  // if the user wants to exit the app.
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
+    ApplicationRun(false);
+  }
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);
@@ -239,6 +238,9 @@ ShaderTest::uInterfaceUpdate()
 {
   SceneManager& sm = g_SceneManager().instance();
   UInterface& im = g_uInterface().instance();
+  RendererManager& rm = g_RenderManager().instance();
+  TextureManager& tm = g_TextureManager().instance();
+  ResourceManager& resourceMan = g_ResourceManager().instance();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -258,15 +260,15 @@ ShaderTest::uInterfaceUpdate()
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Scene");
   if (im.createButton("+")) {
-    sm.getActiveScene()->instantiate("Actor");
+    currentScene->instantiate("Actor");
   }
   if (m_selectedActor) { 
     im.sameLine();
     if (im.createButton("Delete")) {
       m_selectedActor->~Actor();
       m_selectedActor = nullptr;
-      m_sActorIndex = 0;
       currentScene->m_actors.erase(currentScene->m_actors.begin() + m_sActorIndex);
+      m_sActorIndex = 0;
     }
     im.sameLine();
     if (im.createButton("^")) {
@@ -308,12 +310,24 @@ ShaderTest::uInterfaceUpdate()
   float winHeight = 0.0f;
   // --- Transform window --- //
   if (m_selectedActor) {
+    // transform window
     winHeight = 120.0f;
     im.setNewWindowSize(Vector2(winWidth, winHeight));
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Transform");
-
+    String name = m_selectedActor->getName();
+    im.createText("Name:   ");
+    im.sameLine();
+    if (im.createInputText("##Name", &name)) {
+      m_selectedActor->setName(name);
+    }
+    // activity checkbox
+    im.sameLine();
+    im.createCheckBox("##|", m_selectedActor->isActive());
+    im.sameLine();
+    im.createImage(m_eyeIcon, Vector2(15));
+    // inspect actor transform matrix
     ActorInspector inspector(m_selectedActor);
     
     im.endWindowCreate();
@@ -325,16 +339,29 @@ ShaderTest::uInterfaceUpdate()
     im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
     im.SetNextWindowAlpha(winAlpha);
     im.startWindowCreate("Components");
-    im.createButton("Add Component(non-functional)");
+    // to do: change this to a more efficient option
+    Vector<String> options = { "model", "light", "camera" };
+    int32 val = -1;
+    if (im.beginCombo("Components", val, options)) {
+      if (val == 0) {
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString().c_str() != "") {
+          m_selectedActor->addComponent(resourceMan.loadModel(path));
+        }
+      }
+    }
+    //
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i], m_selectedActor->m_transform);
+      inspector.createComponentWindow(m_selectedActor->getComponents()[i],
+                                      m_selectedActor,
+                                      m_window,
+                                      m_searchMesh);
     }
     im.endWindowCreate();
     yOffset += winHeight;
     // --------------------------- //
   }
   // -------------------------- //
-
 
   // get framerate
   float f_fps = 1.0f / g_TimeManager().m_deltaTime;
@@ -359,7 +386,7 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate("Display");
   im.createText(fpsStr.c_str());
   im.sameLine();
-  im.plotLines("|", fpsHistory, fpsListSize, fpsOffset);
+  im.plotLines("##|", fpsHistory, fpsListSize, fpsOffset);
   // vSync
   im.createText("vSync");
   im.sameLine();
@@ -397,21 +424,34 @@ ShaderTest::uInterfaceUpdate()
   im.SetNextWindowAlpha(winAlpha);
   im.startWindowCreate("Render");
   // shadows option
-  im.createText("shadows  ");
-  im.sameLine();
-  im.createCheckBox("##Shadows", m_shadows);
-  // Specular option
-  im.createText("Specular ");
-  im.sameLine();
-  im.createCheckBox("##Specular", m_specular);
-  // AO
-  im.createText("AO       ");
-  im.sameLine();
-  im.createCheckBox("##AO", m_AO);
+  im.createCheckBox("Shadows", m_shadows);
   // Luminance
-  im.createText("Luminance");
-  im.sameLine();
-  im.createCheckBox("##Luminance", m_luminance);
+  if (im.collapsingHeader("Luminance")) {
+    // Blur
+    im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
+    im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
+    // luminance threshold
+    im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
+  }
+
+  // IBL
+  if (im.collapsingHeader("IBL")) {
+    im.createCheckBox("IBL Active", m_IBR);
+    if (m_IBR) {
+      im.sameLine();
+      im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+    }
+    if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+      Path path = m_window.openFileFromExplorer();
+      if (path.toString() != "") {
+        SPtr<Texture> texture = tm.loadTexture(path);
+        rm.m_mainSkybox->copyFrom(texture);
+      }
+    }
+  }
+  if (im.isItemHovered()) {
+    im.setTooltip("Skybox");
+  }
   // compile shaders
   if (im.createButton("Compile Shaders")) {
     g_RenderManager().compileShaders();
@@ -446,7 +486,7 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
-  Vector2 winSize = api.getSwapChain()->getBuffer(0)->getSize();
+  Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
@@ -454,20 +494,26 @@ ShaderTest::onUpdate()
   Matrix4 proj = Matrix4::IDENTITY;
   Matrix4 invView = Matrix4::IDENTITY;
   Matrix4 invProj = Matrix4::IDENTITY;
+  Matrix4 invViewProj = Matrix4::IDENTITY;
+  Matrix4 viewTransp = Matrix4::IDENTITY;
+  Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBShadowParam shadowsParam;
-  shadowsParam.farNear = Vector2(0.0f);
-  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
+  CBVector2x2 shadowsParam;
+  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
+  shadowsParam.vec2 = Vector2(0.0f);
   // to do: change this to another method
   if (camera) {
     view = camera->m_view.getTransposed();
     proj = camera->m_projection.getTransposed();
     invView = view.inverse();
     invProj = proj.inverse();
+    viewTransp = view.getTransposed();
+    projTransp = proj.getTransposed();
     CreateCBCamera::create(cBCamera, camera);
+    invViewProj = (proj * view).inverse();
 
-    shadowsParam.farNear = camera->m_farNear;
+    shadowsParam.vec2 = camera->m_farNear;
   }
   Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
 
@@ -489,30 +535,37 @@ ShaderTest::onUpdate()
     CreateCBCamera::create(cBLightCam, lightCamera);
   }
 
-  // luminance parameters
-  CBLuminance lum;
-  lum.tolerance = 0.9f;
-  // blur parameters
+  // luminance parameters.
+  CBVector2x2 lum;
+  lum.vec1 = winSize;
+  lum.vec2.x = m_lumThreshold;
+  // blur parameters.
   CBBlur blur;
-  blur.winSize = winSize;
+  blur.WinSize = winSize;
+  blur.radius = m_blurRadius;
+  blur.strength = m_blurStrength;
+  // IBR parameters.
+  CBFloat IBRIntens;
+  IBRIntens.value = m_IBRIntensity;
+  CBVector3 viewPos;
+  viewPos.vec1 = camera->m_eye.xyz();
 
-  // data type sizes
+  // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
 
-  // get all passes
+  // get all passes.
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = rm.getPass(kP_CHBlur);
-  // SPtr<Pass> vBlurPass = rm.getPass(kP_CVBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
-  SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
 
-  // update normal && base shadow pass buffers
+  // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
@@ -523,35 +576,29 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
   api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
 
-  // update shadow compute buffers
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  // update shadow-specular quad pass
+  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
 
-  // update specular compute buffers
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  // skybox constant buffers.
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
 
-  // update the luminance pass buffer
-  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
-  // update the Horizontal/Vertical blur pass buffer
-  api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
-  //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  // ibr constant buffers.
+  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
 
-  // skybox constant buffer
-  Matrix4 transform = Matrix4::IDENTITY;
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(2), &invView, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(4), &SkyBoxWinSize, sizeof(Vector4));
+  // luminance constant buffers.
+  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  // lum blur constant buffers
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  blur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 }
 
 void

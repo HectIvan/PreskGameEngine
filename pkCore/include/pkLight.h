@@ -43,7 +43,7 @@ class PK_CORE_EXPORT Light : public Component
     m_direction = Vector3(0, -1.0f, 0);
     m_position = Vector3(0.0f, 50.0f, 0.0f);
     m_color = Vector3(1.0f);
-    m_shadowIntensity = 0.65f;
+    m_shadowIntensity = 0.75f;
     m_specIntensity = 1.0f;
     m_transform = Matrix4::IDENTITY;
   }

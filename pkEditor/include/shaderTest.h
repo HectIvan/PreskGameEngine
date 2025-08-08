@@ -43,6 +43,7 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Pass;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::uint32;
 using pkEngineSDK::Vector;
@@ -114,10 +115,19 @@ class ShaderTest : public BaseApp
   // camera sensitivity
   float m_sensX;
   float m_sensY;
+  float m_blurRadius;
+  float m_blurStrength;
+  float m_lumThreshold;
   // camera movement speed
   float m_cameraSpeed;
 
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;
+
+  float m_IBRIntensity;
+
+  String m_searchMesh;
+
+  SPtr<Texture> m_eyeIcon;
 };

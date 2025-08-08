@@ -18,8 +18,8 @@
 /*********************************************/
 #include "pkInputLayout.h"
 #include "pkPassDesc.h"
-#include "pkPrerequisitesCore.h"
 #include "pkShader.h"
+#include "pkConstantBuffer.h"
 
 namespace pkEngineSDK
 {

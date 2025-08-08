@@ -63,6 +63,17 @@ class SwapChain
   }
 
   /**
+   * @brief Get the size of the swap chain according to one of its buffers.
+   * @param _index Index to search for.
+   * @return Buffer size.
+   */
+  FORCEINLINE Vector2
+  getSize(uint32 _index) const
+  {
+    return m_buffers[_index]->getSize();
+  }
+
+  /**
    * @brief Set the back buffer width.
    * @param _width Width of the buffer.
    */

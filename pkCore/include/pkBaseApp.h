@@ -93,6 +93,13 @@ class PK_CORE_EXPORT BaseApp
   virtual void
   onRender() {}
 
+  /**
+   * @brief Set if the app should keep running or not.
+   * @param _run Run state.
+   */
+  void
+  ApplicationRun(bool _run) { m_run = _run; }
+
  public:
   // system
   Window m_window;
@@ -100,11 +107,10 @@ class PK_CORE_EXPORT BaseApp
   float m_fixedTimer;
 
  protected:
+  bool m_shadows;
+  bool m_run = true;
   bool m_vSync;
 
-  bool m_shadows;
-  bool m_specular;
-  bool m_AO;
-  bool m_luminance;
+  bool m_IBR;
 };
 }

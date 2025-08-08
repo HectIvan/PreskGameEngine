@@ -29,14 +29,20 @@ Actor::setTransform(Matrix4 _transform)
 void
 Actor::setPosition(Matrix4 _translation)
 {
-  m_transform.setTranslation(_translation.getTranslation3());
+  setPosition(_translation.getTranslation3());
 }
 
 void
 Actor::setPosition(Vector3 _position)
 {
-  m_position = _position;
-  m_transform.setTranslation(_position);
+  setPosition(_position.x, _position.y, _position.z);
+}
+
+void
+Actor::setPosition(float _x, float _y, float _z)
+{
+  m_position = Vector3(_x, _y, _z);
+  generateNewTransform();
 }
 
 void
@@ -61,16 +67,11 @@ Actor::moveVerlet(Vector3 _direction, float _force)
 void
 Actor::move(float _addX, float _addY, float _addZ)
 {
-  // get the current transform matrix
-  Matrix4 currentTranslation = m_transform;
-  // add the extra position to the translation matrix
-  currentTranslation.matrix[0][3] += _addX;
-  currentTranslation.matrix[1][3] += _addY;
-  currentTranslation.matrix[2][3] += _addZ;
-  // set the current translation to the new translation
-  m_transform = currentTranslation;
+  m_position += Vector3(_addX, _addY, _addZ);
+  generateNewTransform();
 }
 
+// to do: fix this rotation function.
 void
 Actor::setRotation(Matrix4 _rotation)
 {
@@ -87,34 +88,13 @@ void
 Actor::setRotation(float _x, float _y, float _z)
 {
   m_rotation = Vector3(_x, _y, _z);
-
-  // reset to default scale
-  m_transform.matrix[0][0] /= m_scale.x;
-  m_transform.matrix[1][1] /= m_scale.y;
-  m_transform.matrix[2][2] /= m_scale.z;
-
-  _x *= Math::DEG2RAD;
-  _y *= Math::DEG2RAD;
-  _z *= Math::DEG2RAD;
-  m_transform.setRotation(Matrix4::rotation(_x, _y, _z));
-
-  // return to set scale
-  m_transform.matrix[0][0] *= m_scale.x;
-  m_transform.matrix[1][1] *= m_scale.y;
-  m_transform.matrix[2][2] *= m_scale.z;
-}
-
-void
-Actor::setPosition(float _x, float _y, float _z)
-{
-  m_transform.setTranslation(_x, _y, _z);
-  m_position = Vector3(_x, _y, _z);
+  generateNewTransform();
 }
 
 void
 Actor::setScale(Matrix4 _scale)
 {
-  m_transform.setScale(_scale);
+  setScale(_scale.getScale3());
 }
 
 void
@@ -135,12 +115,9 @@ Actor::setScale(float _x, float _y, float _z)
   if (_x == 0.0f) { _x = Math::SMALL_NUMBER; }
   if (_y == 0.0f) { _y = Math::SMALL_NUMBER; }
   if (_z == 0.0f) { _z = Math::SMALL_NUMBER; }
-
-  m_transform.matrix[0][0] /= m_scale.x;
-  m_transform.matrix[1][1] /= m_scale.y;
-  m_transform.matrix[2][2] /= m_scale.z;
-  m_transform.setScale(_x, _y, _z);
   m_scale = Vector3(_x, _y, _z);
+
+  generateNewTransform();
 }
 
 void
@@ -192,6 +169,18 @@ Actor::clear()
   if (m_parent) { m_parent->clear(); }
   m_transform = Matrix4::IDENTITY;
   m_name = "";
+}
+
+void
+Actor::generateNewTransform()
+{
+  Vector3 rot = m_rotation * Math::DEG2RAD;
+
+  Matrix4 posMat = Matrix4::translation(m_position);
+  Matrix4 rotMat = Matrix4::rotation(rot);
+  Matrix4 scaleMat = Matrix4::scale(m_scale);
+
+  m_transform = posMat * rotMat * scaleMat;
 }
 
 void

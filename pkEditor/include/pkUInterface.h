@@ -61,6 +61,14 @@ class UInterface : public Module<UInterface>
   setNextWindowPos(Vector2 _pos);
 
   /**
+   * @brief set the position of the window being created.
+   * @param _x Window position in X.
+   * @param _y Window position in Y.
+   */
+  void
+  setNextWindowPos(float _x, float _y);
+
+  /**
    * @brief Set the size of the window being created.
    * @param _size Window size.
    */
@@ -313,19 +321,19 @@ class UInterface : public Module<UInterface>
    * @brief Start the creation of a dropdown combo.
    * @param _name Name of the dropdown.
    * @param _previewVal Preview value.
-   * @return If the combo is opened.
+   * @param _options All options to use.
    */
   bool
-  beginCombo(const char* _name, const char* _previewVal);
+  beginCombo(const char* _name, int32& _previewVal, const Vector<String>& _options);
 
   /**
    * @brief Create a selectable for a dropdown combo.
    * @param _name Name of the selectable.
-   * @param _selected If the selectable is selected.
+   * @param _selected option to search for.
    * @return If it was selected.
    */
   bool
-  selectable(const char* _name, bool* _selected = nullptr);
+  selectable(const char* _name, const String _selected);
 
   /**
    * @brief End the creation of a dropdown combo.
@@ -337,10 +345,21 @@ class UInterface : public Module<UInterface>
    * @brief create a button with an image.
    * @param _name Name of the button.
    * @param _texture Texture to use.
+   * @param _size Size of the image.
    * @return If the button was pressed.
    */
   bool
-  createButtonImage(const char* _name, SPtr<Texture>& _pTexture);
+  createButtonImage(const char* _name,
+                    const SPtr<Texture>& _pTexture,
+                    const Vector2 _size = Vector2(64));
+
+  /**
+   * @brief create an image.
+   * @param _texture Texture to use.
+   * @param _size Size of the image.
+   */
+  void
+  createImage(const SPtr<Texture>& _pTexture, const Vector2 _size);
 
   /**
    * @brief Create a color editor.
@@ -379,12 +398,38 @@ class UInterface : public Module<UInterface>
             float _scaleMax = 500.0f);
 
   /**
-   * @brief Create a child window.
-   * @param _name Name of the window.
-   * @return Wether it was successful.
+   * @brief Create a collapsing header.
+   * @param _name Name of the header.
+   * @return If the header is open.
    */
   bool
-  beginChild(const char* _name);
+  collapsingHeader(const char* _name);
+
+  /**
+   * @brief Create a child window.
+   * @param _name Name of the window.
+   * @param _size Size of the window.
+   * @param _border Will it have a border.
+   * @return Wether it was opened.
+   */
+  bool
+  beginChild(const char* _name,
+             Vector2 _size = Vector2(0.0f, 0.0f),
+             const bool _border = true);
+
+  /**
+   * @brief Create a child window.
+   * @param _name Name of the window.
+   * @param _x Width of the window (if 0.0f, it will use the parent width).
+   * @param _y Height of the window (if 0.0f, it will use the parent height).
+   * @param _border Will it have a border.
+   * @return Wether it was opened.
+   */
+  bool
+  beginChild(const char* _name,
+             float _x = 0.0f,
+             float _y = 0.0f,
+             const bool _border = true);
 
   /**
    * @brief End the child window.
@@ -398,6 +443,20 @@ class UInterface : public Module<UInterface>
    */
   bool
   isHovered();
+
+  /**
+   * @brief Check if the item is hovered.
+   * @return Hovered.
+   */
+  bool
+  isItemHovered();
+
+  /**
+   * @brief Add tooltip to item.
+   * @param _text Text to display.
+   */
+  void
+  setTooltip(const char* _text);
 
   /**
    * @brief Check if the cursor is on top of a window or item.
@@ -418,6 +477,12 @@ class UInterface : public Module<UInterface>
    */
   void
   sameLine();
+
+  void
+  pushID(uint32 _id);
+
+  void
+  popID();
 
   /**
    * @brief Set window background transparency.
@@ -449,6 +514,10 @@ class UInterface : public Module<UInterface>
    */
   void
   render();
+
+ public:
+  Vector2 m_winSize;
+  Vector2 m_winPos;
 };
 
 UInterface&

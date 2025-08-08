@@ -64,6 +64,20 @@ class DX11Texture : public Texture
   setTexture2D(ID3D11Texture2D* _t2d) { m_t2d = _t2d; }
 
   /**
+   * @brief Get the render target view.
+   * @return Pointer to the target.
+   */
+  ID3D11RenderTargetView*
+  getRTV() const { return m_rTV; }
+
+  /**
+   * @brief Set the render target view.
+   * @param _rTV New render target view.
+   */
+  void
+  setRTV(ID3D11RenderTargetView* _rTV) { m_rTV = _rTV; }
+
+  /**
    * @brief Get the shader resource view.
    * @return Pointer to the resource.
    */
@@ -96,7 +110,15 @@ class DX11Texture : public Texture
    * @return The raw texture data.
    */
   void*
-  getRawData() override { return static_cast<void*>(m_sRV); }
+  getRawData() override { return reinterpret_cast<void*>(m_sRV); }
+
+  /**
+   * @brief Copy the content of the derived class from another class.
+   * @param _pTexture Other texture.
+   * @return If the conversion was successful.
+   */
+  bool
+  copyFrom(SPtr<Texture>& _pTexture) override;
 
  public:
   ID3D11Texture2D* m_t2d = nullptr;

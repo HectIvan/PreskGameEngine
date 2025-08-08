@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @ConstantBuffer pkConstantBuffer.h
-* @Hector Ivan Muñoz Ceballos
-* @date 13/12/2024
-* @Constant Buffer file for the Presk Game Engine.
-*
-* Constant Buffer class for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 13/12/2024
-* Created the file
-*/
-/************************************************************************/
+ * @file    pkConstantBuffer.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    13/12/2024
+ * @brief   Constant Buffer class for the engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 namespace pkEngineSDK

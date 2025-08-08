@@ -30,10 +30,9 @@ namespace COMPONENT_TYPE
   enum E
   {
     kModel = 0,
-    kMaterial,
     kLight,
     kCamera,
-    kRigidBody,
+    kMaterial,
     kUnknown,
   };
 }

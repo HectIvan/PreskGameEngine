@@ -9,5 +9,7 @@ Ni 1.450000
 d 1.000000
 illum 1
 map_Kd textures/drakePistol/base_albedo.png
-map_Ns textures/drakePistol/base_normal.png
-map_refl textures/drakePistol/base_roughness.png
+map_bump textures/drakePistol/base_normal.png
+map_Pm textures/drakePistol/base_metallic.png
+map_Ka textures/drakePistol/base_AO.png
+map_refl textures/base_roughness.png

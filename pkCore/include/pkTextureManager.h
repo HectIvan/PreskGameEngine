@@ -35,6 +35,12 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   virtual ~TextureManager() = default;
 
   /**
+   * @brief Load default material textures.
+   */
+  void
+  loadDefaultMatTextures();
+
+  /**
    * @brief Loads a texture from a texture name.
    * @param _directory Where to look for the file.
    * @return Pointer to the newly created texture.
@@ -44,6 +50,15 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
 
  public:
   Vector<SPtr<TextureMemory>> m_textures;
+
+  // to do: allow for the texture to be generated if not found.
+  // default textures
+  SPtr<Texture> m_defaultDiff;
+  SPtr<Texture> m_defaultNormal;
+  SPtr<Texture> m_defaultAO;
+  SPtr<Texture> m_defaultRough;
+  SPtr<Texture> m_defaultMetallic;
+  SPtr<Texture> m_defaultHeight;
 };
 PK_CORE_EXPORT TextureManager&
 g_TextureManager();

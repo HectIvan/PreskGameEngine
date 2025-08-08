@@ -265,6 +265,14 @@ class PK_CORE_EXPORT Actor
   void
   clear();
 
+ private:
+  /**
+   * @brief Create a new transform for the actor based on translation, rotation
+   *        and scale currently set.
+   */
+  void
+  generateNewTransform();
+
  public:
   Vector3 m_forward;
   Vector<SPtr<Component>> m_components;

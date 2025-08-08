@@ -76,7 +76,7 @@ class Material : public Component
    * @brief Get the name of the component.
    */
   const char*
-  getName() override { return "Material"; }
+  getName() override { return m_name.c_str(); }
 
   /**
    * @brief Get the component type of this class.
@@ -133,7 +133,7 @@ class Material : public Component
    * @param _pTexture New roughness texture.
    */
   FORCEINLINE void
-  setroughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
+  setRoughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
 
   /**
    * @brief Set the material name.
@@ -147,7 +147,7 @@ class Material : public Component
    * @return The material name.
    */
   String
-  getName() const { return m_name; }
+  getNameS() const { return m_name; }
 
  public:
   String m_name;

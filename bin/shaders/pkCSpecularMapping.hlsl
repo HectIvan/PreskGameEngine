@@ -11,6 +11,7 @@ RWTexture2D<float4> specTexture : register(u0);
 Texture2D<float4> normalMap : register(t0);
 Texture2D<float4> metallicMap : register(t1);
 Texture2D<float4> depthMap : register(t2);
+Texture2D<float4> positionsMap : register(t3);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -70,30 +71,6 @@ cbuffer ShadowParam : register(b5)
   float2 farNear; // 16
 }
 
-/*-------------------------------------------------------------------------------------------*/
-
-// get linear depth from a base depth map
-float LinearDepth(float z)
-{
-  return (farNear.x * farNear.y) / (farNear.y - z * (farNear.y - farNear.x));
-}
-
-// convert from depth to world position
-float3 WorldPosFromDepth(float2 TexCoord, float DepthSample)
-{
-  float z = DepthSample * 2.0f - 1.0f;
-
-  float4 clipSpacePosition = float4(TexCoord * 2.0f - 1.0f, z, 1.0f);
-  float4 viewSpacePosition = mul(camInvProj, clipSpacePosition);
-
-  // Perspective division
-  float3 VSP = viewSpacePosition.xyz /= viewSpacePosition.w;
-
-  float4 worldSpacePosition = mul(camInvView, float4(VSP, 1.0f));
-
-  return worldSpacePosition.xyz;
-}
-
 float fresnelSchlick(float refractionIndex, float3 lightVec, float3 normal)
 {
   float helperFunct = pow(1 - dot(lightVec, normal), 5);
@@ -143,16 +120,18 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   
   float3 normal = normalize(normalTex.xyz);
   
-  // get world position from depth map
-  float2 texCoord = (DTid.xy / winSize);
-  float3 worldPos = WorldPosFromDepth(texCoord, depthTex.r);
+  // get world position
+  float3 worldPos = positionsMap.Load(int3(DTid.xy, 0));
 
   // specular
   float spec = 0.0;
-  float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
+  // if the angle between the world to light vector and light direction is greater than the tolerance
+  float angle = dot(lightDir, LightPos - worldPos);
+  
+  float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 halfwayDir = normalize(lightDir + viewDir);
-  spec = pow(max(dot(normal, halfwayDir), SpotCutoff), SpotExponent);
+  spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
   
   //      float NoV = saturate(dot(normal, ))
   // Fresnel Schlic specular calculation
@@ -160,7 +139,6 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float FS = fresnelSchlick(0.3f, lightVecFromWorld, normal);
   // float D = ndf_GGX()
   float3 specular = (lightColor * (spec * SpecIntensity));
-  
   
   // set to opaque
   float alpha = 1.0f;

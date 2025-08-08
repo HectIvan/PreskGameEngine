@@ -354,7 +354,8 @@ ShaderTest::uInterfaceUpdate()
     for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
       inspector.createComponentWindow(m_selectedActor->getComponents()[i],
                                       m_selectedActor,
-                                      m_window);
+                                      m_window,
+                                      m_searchMesh);
     }
     im.endWindowCreate();
     yOffset += winHeight;
@@ -424,23 +425,28 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate("Render");
   // shadows option
   im.createCheckBox("Shadows", m_shadows);
-  // Blur
-  im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
-  im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
-  // luminance threshold
-  im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
-
-  // IBR
-  im.createCheckBox("IBR", m_IBR);
-  if (m_IBR) {
-    im.sameLine();
-    im.createDragF("##ibrIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+  // Luminance
+  if (im.collapsingHeader("Luminance")) {
+    // Blur
+    im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
+    im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
+    // luminance threshold
+    im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
   }
-  if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-    Path path = m_window.openFileFromExplorer();
-    if (path.toString() != "") {
-      SPtr<Texture> texture = tm.loadTexture(path);
-      rm.m_mainSkybox->copyFrom(texture);
+
+  // IBL
+  if (im.collapsingHeader("IBL")) {
+    im.createCheckBox("IBL Active", m_IBR);
+    if (m_IBR) {
+      im.sameLine();
+      im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+    }
+    if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+      Path path = m_window.openFileFromExplorer();
+      if (path.toString() != "") {
+        SPtr<Texture> texture = tm.loadTexture(path);
+        rm.m_mainSkybox->copyFrom(texture);
+      }
     }
   }
   if (im.isItemHovered()) {

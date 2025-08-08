@@ -61,6 +61,14 @@ class UInterface : public Module<UInterface>
   setNextWindowPos(Vector2 _pos);
 
   /**
+   * @brief set the position of the window being created.
+   * @param _x Window position in X.
+   * @param _y Window position in Y.
+   */
+  void
+  setNextWindowPos(float _x, float _y);
+
+  /**
    * @brief Set the size of the window being created.
    * @param _size Window size.
    */
@@ -390,12 +398,38 @@ class UInterface : public Module<UInterface>
             float _scaleMax = 500.0f);
 
   /**
-   * @brief Create a child window.
-   * @param _name Name of the window.
-   * @return Wether it was successful.
+   * @brief Create a collapsing header.
+   * @param _name Name of the header.
+   * @return If the header is open.
    */
   bool
-  beginChild(const char* _name);
+  collapsingHeader(const char* _name);
+
+  /**
+   * @brief Create a child window.
+   * @param _name Name of the window.
+   * @param _size Size of the window.
+   * @param _border Will it have a border.
+   * @return Wether it was opened.
+   */
+  bool
+  beginChild(const char* _name,
+             Vector2 _size = Vector2(0.0f, 0.0f),
+             const bool _border = true);
+
+  /**
+   * @brief Create a child window.
+   * @param _name Name of the window.
+   * @param _x Width of the window (if 0.0f, it will use the parent width).
+   * @param _y Height of the window (if 0.0f, it will use the parent height).
+   * @param _border Will it have a border.
+   * @return Wether it was opened.
+   */
+  bool
+  beginChild(const char* _name,
+             float _x = 0.0f,
+             float _y = 0.0f,
+             const bool _border = true);
 
   /**
    * @brief End the child window.
@@ -480,6 +514,10 @@ class UInterface : public Module<UInterface>
    */
   void
   render();
+
+ public:
+  Vector2 m_winSize;
+  Vector2 m_winPos;
 };
 
 UInterface&

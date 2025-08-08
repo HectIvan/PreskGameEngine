@@ -43,6 +43,7 @@ using pkEngineSDK::Light;
 using pkEngineSDK::Pass;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::uint32;
 using pkEngineSDK::Vector;
@@ -125,6 +126,8 @@ class ShaderTest : public BaseApp
   bool m_showActions;
 
   float m_IBRIntensity;
+
+  String m_searchMesh;
 
   SPtr<Texture> m_eyeIcon;
 };

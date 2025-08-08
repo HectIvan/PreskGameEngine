@@ -51,12 +51,14 @@ UInterface::setCurrentContext()
 void
 UInterface::setNewWindowSize(Vector2 _size)
 {
+  m_winSize = _size;
   ImGui::SetNextWindowSize(ImVec2(_size.x, _size.y), ImGuiCond_Always);
 }
 
 void
 UInterface::setNewWindowSize(float _x, float _y)
 {
+  m_winSize = Vector2(_x, _y);
   ImGui::SetNextWindowSize(ImVec2(_x, _y), ImGuiCond_Always);
 }
 
@@ -69,9 +71,16 @@ UInterface::uINewFrame()
 void
 UInterface::setNextWindowPos(Vector2 _pos)
 {
+  m_winPos = _pos;
   ImGui::SetNextWindowPos(ImVec2(_pos.x, _pos.y), ImGuiCond_Always);
 }
 
+void
+UInterface::setNextWindowPos(float _x, float _y)
+{
+  m_winPos = Vector2(_x, _y);
+  ImGui::SetNextWindowPos(ImVec2(_x, _y), ImGuiCond_Always);
+}
 
 Vector2
 UInterface::getDisplaySize()
@@ -393,9 +402,28 @@ UInterface::plotLines(const char* _name,
 }
 
 bool
-UInterface::beginChild(const char* _name)
+UInterface::collapsingHeader(const char* _name)
 {
-  return ImGui::BeginChild(_name);
+  return ImGui::CollapsingHeader(_name);
+}
+
+bool
+UInterface::beginChild(const char* _name, Vector2 _size, const bool _border)
+{
+  // if the size is zero (default) use the parent size.
+  if (_size == Vector2::ZERO) {
+    _size = m_winSize;
+  }
+  return ImGui::BeginChild(_name, ImVec2(_size.x, _size.y), _border);
+}
+
+bool
+UInterface::beginChild(const char* _name, float _x, float _y, const bool _border)
+{
+  // if one of the values is 0, it will be replaced by the size of the parent window.
+  if (_x == 0.0f) { _x = m_winSize.x; }
+  if (_y == 0.0f) { _y = m_winSize.y; }
+  return ImGui::BeginChild(_name, ImVec2(_x, _y), _border);
 }
 
 void

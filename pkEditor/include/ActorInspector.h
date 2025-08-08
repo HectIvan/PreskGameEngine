@@ -22,6 +22,7 @@ using pkEngineSDK::Actor;
 using pkEngineSDK::Component;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::String;
 using pkEngineSDK::Window;
 
 class ActorInspector
@@ -41,9 +42,13 @@ class ActorInspector
   /**
    * @brief Create a window for the ui based on the component of the actor.
    * @param _pComponent Component to use.
+   * @param _pActor Actor from which the component come from.
+   * @param _window Main window.
+   * @param _searchMesh Search string for a mesh in the model.
    */
   void
   createComponentWindow(SPtr<Component>& _pComponent,
                         const SPtr<Actor>& _pActor,
-                        Window& _window);
+                        Window& _window,
+                        String& _searchMesh);
 };

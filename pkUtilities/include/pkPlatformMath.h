@@ -15,14 +15,16 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesUtilities.h"
-#include "pkCollisionInfo.h"
-#include "pkSphere.h"
-#include "pkCube.h"
-#include "pkCapsule.h"
-#include "pkPlane.h"
-#include "pkOBB.h"
 #include "pkAABB.h"
+#include "pkCapsule.h"
+#include "pkCollisionInfo.h"
+#include "pkCube.h"
+#include "pkOBB.h"
+#include "pkPlane.h"
+#include "pkPrerequisitesUtilities.h"
+#include "pkSphere.h"
+#include "pkVector2.h"
+
 
 namespace pkEngineSDK 
 {
@@ -149,6 +151,16 @@ class PK_UTILITY_EXPORT PlatformMath
    */
   static float
   clamp(const float _t, const float _x, const float _y);
+
+  /**
+   * @brief clamps a Vector2 between 2 functions.
+   * @param _t Vector2 to clamp.
+   * @param _x Minimum clamping value.
+   * @param _y Maximum clamping value.
+   * @return Clamped float.
+   */
+  static Vector2
+  clamp(const Vector2 _t, const float _x, const float _y);
 
   /**
    * @brief clamps a Vector3 between 2 functions.

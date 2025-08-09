@@ -230,6 +230,14 @@ struct TextureDesc
   unsigned char* data = nullptr;
 };
 
+struct TextureAsset
+{
+  uint8* data;
+  uint32 width;
+  uint32 height;
+  uint32 channels;
+};
+
 class PK_CORE_EXPORT Texture
 {
  public:

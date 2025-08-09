@@ -24,6 +24,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
 #include "pkTexture.h"
+#include "pkUInterface.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkWindowDesc.h"
@@ -46,6 +47,7 @@ using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::uint32;
+using pkEngineSDK::UIWindow;
 using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
@@ -128,6 +130,10 @@ class ShaderTest : public BaseApp
   float m_IBRIntensity;
 
   String m_searchMesh;
+
+  UIWindow m_sceneGraphWin;
+  UIWindow m_loggerWin;
+  UIWindow m_rightWin;
 
   SPtr<Texture> m_eyeIcon;
 };

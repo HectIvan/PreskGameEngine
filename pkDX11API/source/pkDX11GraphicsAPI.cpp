@@ -1500,7 +1500,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   }
 
   // how wide each line of the texture will be
-  if (bpp == 3) { ++bpp; }
+  // if (bpp == 3) { ++bpp; }
 
   // create a default texture using the received parameters
   SPtr<Texture> temptTexture = createTexture(bpp,
@@ -1617,6 +1617,55 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   return temptTexture;
 }
 
+uint32
+getBitsFromFormat(PK_TEXTURE_FORMAT::E _format)
+{
+  // RGBA of value 32
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_UINT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_SINT) {
+    return 32 * 4;
+  }
+  // RGB of value 32
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_UINT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_SINT) {
+    return 32 * 3;
+  }
+  // RGBA of value 16
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_FLOAT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_UINT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_SINT) {
+    return 16 * 4;
+  }
+  // RG of value 16
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_FLOAT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_UINT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_SINT) {
+    return 16 * 2;
+  }
+  // RGBA of value 8
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UINT ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_SINT || 
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_UNORM ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_TYPELESS) {
+    return 8 * 4;
+  }
+  // R of value 8
+  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_TYPELESS ||
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM || 
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_SINT || 
+      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UINT) {
+    return 8;
+  }
+}
+
 SPtr<Texture>
 DX11GraphicsAPI::createTexture(uint32 _bpp,
                                uint32 _width,
@@ -1652,7 +1701,8 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
   if (_data) {
     initData = new D3D11_SUBRESOURCE_DATA();
     initData->pSysMem = _data;
-    initData->SysMemPitch = static_cast<uint32>(_width * _bpp);
+    uint32 bytesPerPixel = getBitsFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format)) / 8;
+    initData->SysMemPitch = _width * bytesPerPixel;
     initData->SysMemSlicePitch = 0;
   }
 

@@ -25,6 +25,7 @@
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
+using pkEngineSDK::Color;
 using pkEngineSDK::COMPONENT_TYPE::kCamera;
 using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
@@ -54,7 +55,7 @@ using pkEngineSDK::g_Logger;
 
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
-  Inspect(_pActor);
+  m_actor = _pActor;
 }
 /*
 void
@@ -78,33 +79,32 @@ buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window
 }*/
 
 void
-ActorInspector::Inspect(SPtr<Actor>& _pActor)
+ActorInspector::Inspect()
 {
   // get the user interface manager
   UInterface& im = g_uInterface().instance();
   // change the position
-  Vector3 newTranslation = _pActor->m_position;
+  Vector3 newTranslation = m_actor->m_position;
   im.createText("Position");
   im.sameLine();
   im.createDrag3("##Position", newTranslation);
-  _pActor->setPosition(newTranslation);
+  m_actor->setPosition(newTranslation);
   // change the rotation
-  Vector3 newRotation = _pActor->m_rotation;
+  Vector3 newRotation = m_actor->m_rotation;
   im.createText("Rotation");
   im.sameLine();
   im.createDrag3("##Rotation",newRotation, 1.0f);
-  _pActor->setRotation(newRotation);
+  m_actor->setRotation(newRotation);
   // change the scale
-  Vector3 newScale = _pActor->m_scale;
+  Vector3 newScale = m_actor->m_scale;
   im.createText("Scale   ");
   im.sameLine();
   im.createDrag3("##Scale", newScale);
-  _pActor->setScale(newScale);
+  m_actor->setScale(newScale);
 }
 
 void
 ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
-                                      const SPtr<Actor>& _pActor,
                                       Window& _window,
                                       String& _searchMesh)
 {
@@ -112,6 +112,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   UInterface& im = g_uInterface().instance();
   TextureManager& tm = g_TextureManager().instance();
   // for each type of component
+  im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   switch (_pComponent->getType()) 
   {
   case kCamera:
@@ -160,7 +161,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
       // Light color
       im.colorEdit("Color", light->m_color);
       // Light direction
-      Vector4 dir4 = _pActor->m_transform * Vector4(light->m_direction, 0.0f);
+      Vector4 dir4 = m_actor->m_transform * Vector4(light->m_direction, 0.0f);
       Vector3 dir = dir4.xyz().normalized();
       im.createDrag3("Direction", dir, 0.0f);
       // spot exponent
@@ -303,4 +304,5 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   default:
     break;
   }
+  im.popStyleColor(3);
 }

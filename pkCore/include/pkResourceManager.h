@@ -74,6 +74,9 @@ class PK_CORE_EXPORT ResourceManager : public Module<ResourceManager>
  public:
   Vector<SPtr<ModelMemory>> m_models;
   Vector<SPtr<Mesh>> m_meshes;
+
+  // assets
+  // UMap<UUID, Asset> materials
 };
 
 PK_CORE_EXPORT ResourceManager&

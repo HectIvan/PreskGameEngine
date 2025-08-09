@@ -23,7 +23,7 @@ UInterface::init()
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); static_cast<void>(io);
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | io.ConfigWindowsMoveFromTitleBarOnly;
   // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 
@@ -402,9 +402,32 @@ UInterface::plotLines(const char* _name,
 }
 
 bool
-UInterface::collapsingHeader(const char* _name)
+UInterface::collapsingHeader(const char* _name, PK_TREENODE_FLAGS::E _flags)
 {
-  return ImGui::CollapsingHeader(_name);
+  return ImGui::CollapsingHeader(_name, static_cast<ImGuiTreeNodeFlags>(_flags));
+}
+
+void
+UInterface::PushStyleColor(Color _mainColor, Color _hoverColor, Color _activeColor)
+{
+  // convert from [0, 255] range to [0, 1]
+  Vector4 mainCol = _mainColor / 255.0f;
+  Vector4 hoverCol = _hoverColor / 255.0f;
+  Vector4 activeCol = _activeColor / 255.0f;
+  // convert to ImVec4
+  ImVec4 header = ImVec4(mainCol.x, mainCol.y, mainCol.z, mainCol.w);
+  ImVec4 hover = ImVec4(hoverCol.x, hoverCol.y, hoverCol.z, hoverCol.w);
+  ImVec4 active = ImVec4(activeCol.x, activeCol.y, activeCol.z, activeCol.w);
+  // push styles
+  ImGui::PushStyleColor(ImGuiCol_Header, header);
+  ImGui::PushStyleColor(ImGuiCol_HeaderHovered, hover);
+  ImGui::PushStyleColor(ImGuiCol_HeaderActive, active);
+}
+
+void
+UInterface::popStyleColor(uint32 _count)
+{
+  ImGui::PopStyleColor(_count);
 }
 
 bool
@@ -469,15 +492,37 @@ UInterface::sameLine()
 }
 
 void
-UInterface::SetNextWindowAlpha(float _alpha)
+UInterface::setNextWindowAlpha(float _alpha)
 {
   ImGui::SetNextWindowBgAlpha(_alpha);
+}
+
+void
+UInterface::setNextWindowParams(UIWindow& _windowPrefab)
+{
+  setNewWindowSize(_windowPrefab.size);
+  setNextWindowPos(_windowPrefab.position);
+  setNextWindowAlpha(_windowPrefab.alpha);
 }
 
 void
 UInterface::endWindowCreate()
 {
   ImGui::End();
+}
+
+Vector2
+UInterface::getWindowSize()
+{
+  ImVec2 size = ImGui::GetWindowSize();
+  return Vector2(size.x, size.y);
+}
+
+Vector2
+UInterface::getWindowPos()
+{
+  ImVec2 pos = ImGui::GetWindowPos();
+  return Vector2(pos.x, pos.y);
 }
 
 void*

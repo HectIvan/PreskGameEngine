@@ -274,10 +274,19 @@ class PK_UTILITY_EXPORT Vector2
    * @brief Clamp the vector between 2 values.
    * @param _x Minimum clamp range.
    * @param _y Maximum clamp range.
-   *
    */
   void
   clamp(float _x, float _y);
+
+  /**
+   * @brief Clamp the vector between 2 values.
+   * @param _xMin Minimum clamp range for X.
+   * @param _xMax Maximum clamp range for X.
+   * @param _yMin Maximum clamp range for Y.
+   * @param _yMax Maximum clamp range for Y.
+   */
+  void
+  clampEach(float _xMin, float _xMax, float _yMin, float _yMax);
 
   /**
    * @brief Get the distance between this vector and another.

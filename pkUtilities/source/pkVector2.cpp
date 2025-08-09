@@ -53,6 +53,13 @@ Vector2::clamp(float _x, float _y)
   y = Math::clamp(y, _x, _y);
 }
 
+void
+Vector2::clampEach(float _xMin, float _xMax, float _yMin, float _yMax)
+{
+  x = Math::clamp(x, _xMin, _xMax);
+  y = Math::clamp(y, _yMin, _yMax);
+}
+
 float
 Vector2::distanceTo(const Vector2& _other)
 {

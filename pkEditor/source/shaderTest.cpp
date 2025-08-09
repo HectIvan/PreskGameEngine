@@ -2,7 +2,6 @@
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
-#include "pkUInterface.h"
 #include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
@@ -36,7 +35,6 @@ using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::int32;
-using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::LogMSG;
@@ -56,8 +54,9 @@ using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PlatformPointer;
+using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
 using pkEngineSDK::Scene;
@@ -67,6 +66,7 @@ using pkEngineSDK::String;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
+using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector4;
 // to do: create fileSystem.h in utilities
 // create class Path
@@ -161,6 +161,27 @@ ShaderTest::onInit()
   m_showActions = false;
 
   m_eyeIcon = g_TextureManager().loadTexture(Path("textures/white-eye-icon.jpg"));
+
+  /**
+   * User Interface.
+   */
+  float alpha = 0.4f;
+  // scene graph
+  Vector2 winRect = m_window.getClientWidthHeight();
+  m_sceneGraphWin.name = activeScene->m_name.c_str();
+  m_sceneGraphWin.position = Vector2(0.0f, 0.0f);
+  m_sceneGraphWin.size = Vector2(winRect.x * 0.1f, winRect.y * 0.8f);
+  m_sceneGraphWin.alpha = alpha;
+  // logger window
+  m_loggerWin.name = "Logger";
+  m_loggerWin.size = Vector2(winRect.x, winRect.y * 0.2f);
+  m_loggerWin.position = Vector2(0.0f, winRect.y * 0.8f);
+  m_loggerWin.alpha = alpha;
+  // right window
+  m_rightWin.name = "Inspector";
+  m_rightWin.size = Vector2(400.0f, 800.0f);
+  m_rightWin.position = Vector2(winRect.x - 400.0f, 0.0f);
+  m_rightWin.alpha = alpha;
 }
 
 void
@@ -248,20 +269,18 @@ ShaderTest::uInterfaceUpdate()
   im.windowNewFrame();
   im.uINewFrame();
 
-  float yOffset = 0.0f;
-  float winWidth = 450.0f;
   Vector2 winRect = m_window.getClientWidthHeight();
-
-  float winAlpha = 0.4f;
   SPtr<Scene> currentScene = sm.getActiveScene();
   
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y * 0.7f));
-  im.setNextWindowPos(Vector2(0.0f));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Scene");
+  im.setNextWindowParams(m_sceneGraphWin);
+  im.startWindowCreate(m_sceneGraphWin.name);
+  m_sceneGraphWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
+
   if (im.createButton("+")) {
     currentScene->instantiate("Actor");
+    m_sActorIndex = currentScene->getActorCount() - 1;
+    m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
   if (m_selectedActor) { 
     im.sameLine();
@@ -294,10 +313,10 @@ ShaderTest::uInterfaceUpdate()
 
   // -------------------------- //
   // Create log window
-  im.setNewWindowSize(winRect.x, winRect.y * 0.3f);
-  im.setNextWindowPos(Vector2(0.0f, winRect.y * 0.7f));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Logger.");
+  im.setNextWindowParams(m_loggerWin);
+  im.startWindowCreate(m_loggerWin.name);
+  m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
+
   im.createCheckBox("Errors", m_showErrors);
   im.sameLine();
   im.createCheckBox("Warnings", m_showWarnings);
@@ -308,59 +327,52 @@ ShaderTest::uInterfaceUpdate()
   showLogType(m_showActions, kLog);
   im.endWindowCreate();
 
-  float winHeight = 0.0f;
   // --- Transform window --- //
+  im.setNextWindowParams(m_rightWin);
+  im.startWindowCreate(m_rightWin.name);
+  m_rightWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
   if (m_selectedActor) {
-    // transform window
-    winHeight = 120.0f;
-    im.setNewWindowSize(Vector2(winWidth, winHeight));
-    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-    im.SetNextWindowAlpha(winAlpha);
-    im.startWindowCreate("Transform");
-    String name = m_selectedActor->getName();
-    im.createText("Name:   ");
-    im.sameLine();
-    if (im.createInputText("##Name", &name)) {
-      m_selectedActor->setName(name);
-    }
-    // activity checkbox
-    im.sameLine();
-    im.createCheckBox("##|", m_selectedActor->isActive());
-    im.sameLine();
-    im.createImage(m_eyeIcon, Vector2(15));
-    // inspect actor transform matrix
     ActorInspector inspector(m_selectedActor);
-    
-    im.endWindowCreate();
-    yOffset += winHeight;
-
+    // transform window
+    im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
+    if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
+      String name = m_selectedActor->getName();
+      im.createText("Name:   ");
+      im.sameLine();
+      if (im.createInputText("##Name", &name)) {
+        m_selectedActor->setName(name);
+      }
+      // activity checkbox
+      im.sameLine();
+      im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
+      im.sameLine();
+      im.createImage(m_eyeIcon, Vector2(15));
+      // inspect actor transform matrix
+      inspector.Inspect();
+    }
+    im.popStyleColor(3);
     // ---- Components window ---- //
-    winHeight = 180.0f;
-    im.setNewWindowSize(Vector2(winWidth, winHeight));
-    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-    im.SetNextWindowAlpha(winAlpha);
-    im.startWindowCreate("Components");
-    // to do: change this to a more efficient option
-    Vector<String> options = { "model", "light", "camera" };
-    int32 val = -1;
-    if (im.beginCombo("Components", val, options)) {
-      if (val == 0) {
-        Path path = m_window.openFileFromExplorer();
-        if (path.toString().c_str() != "") {
-          m_selectedActor->addComponent(resourceMan.loadModel(path));
+    im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
+    if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
+      // to do: change this to a more efficient option
+      Vector<String> options = { "model", "light", "camera" };
+      int32 val = -1;
+      if (im.beginCombo("Components", val, options)) {
+        if (val == 0) {
+          Path path = m_window.openFileFromExplorer();
+          if (path.toString().c_str() != "") {
+            m_selectedActor->addComponent(resourceMan.loadModel(path));
+          }
         }
       }
+      // create all components
+      for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
+        inspector.createComponentWindow(m_selectedActor->getComponents()[i],
+                                        m_window,
+                                        m_searchMesh);
+      }
     }
-    //
-    for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i],
-                                      m_selectedActor,
-                                      m_window,
-                                      m_searchMesh);
-    }
-    im.endWindowCreate();
-    yOffset += winHeight;
-    // --------------------------- //
+    im.popStyleColor(3);
   }
   // -------------------------- //
 
@@ -380,86 +392,74 @@ ShaderTest::uInterfaceUpdate()
   fpsOffset = (fpsOffset + 1) % fpsListSize;
 
   // --- Display window --- //
-  winHeight = 75.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Display");
-  im.createText(fpsStr.c_str());
-  im.sameLine();
-  im.plotLines("##|", fpsHistory, fpsListSize, fpsOffset);
-  // vSync
-  im.createText("vSync");
-  im.sameLine();
-  im.createCheckBox("##vSync", m_vSync);
-  im.endWindowCreate();
-  yOffset += winHeight;
+  if (im.collapsingHeader("Display", kPK_DefaultOpen)) {
+    im.createText(fpsStr.c_str());
+    im.sameLine();
+    im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
+    // vSync
+    im.createText("vSync");
+    im.sameLine();
+    im.createCheckBox("##vSync", m_vSync);
+  }
   // -------------------------- //
 
   // --- Camera window --- //
-  winHeight = 125.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Editor Camera");
-  // camera speed
-  im.createText("Speed        ");
-  im.sameLine();
-  im.createDragF("##Speed", m_cameraSpeed);
-  // X Sensitivity
-  im.createText("X Sensitivity");
-  im.sameLine();
-  im.createDragF("##XSens", m_sensX, 0.1f);
-  // Y Sensitivity
-  im.createText("Y Sensitivity");
-  im.sameLine();
-  im.createDragF("##YSens", m_sensY, 0.1f);
-  im.endWindowCreate();
-  yOffset += winHeight;
+  if (im.collapsingHeader("Editor Camera", kPK_DefaultOpen)) {
+    // camera speed
+    im.createText("Speed        ");
+    im.sameLine();
+    im.createDragF("##Speed", m_cameraSpeed);
+    // X Sensitivity
+    im.createText("X Sensitivity");
+    im.sameLine();
+    im.createDragF("##XSens", m_sensX, 0.1f);
+    // Y Sensitivity
+    im.createText("Y Sensitivity");
+    im.sameLine();
+    im.createDragF("##YSens", m_sensY, 0.1f);
+  }
   // -------------------------- //
 
   // --- Post-Process window --- //
-  winHeight = 150.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Render");
-  // shadows option
-  im.createCheckBox("Shadows", m_shadows);
-  // Luminance
-  if (im.collapsingHeader("Luminance")) {
-    // Blur
-    im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
-    im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
-    // luminance threshold
-    im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
-  }
-
-  // IBL
-  if (im.collapsingHeader("IBL")) {
-    im.createCheckBox("IBL Active", m_IBR);
-    if (m_IBR) {
-      im.sameLine();
-      im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+  im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
+  if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
+    // shadows option
+    im.createCheckBox("Shadows", m_shadows);
+    // Luminance
+    if (im.collapsingHeader("Luminance")) {
+      // Blur
+      im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
+      im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
+      // luminance threshold
+      im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
     }
-    if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-      Path path = m_window.openFileFromExplorer();
-      if (path.toString() != "") {
-        SPtr<Texture> texture = tm.loadTexture(path);
-        rm.m_mainSkybox->copyFrom(texture);
+
+    // IBL
+    if (im.collapsingHeader("IBL")) {
+      im.createCheckBox("IBL Active", m_IBR);
+      if (m_IBR) {
+        im.sameLine();
+        im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+      }
+      if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          rm.m_mainSkybox->copyFrom(texture);
+        }
       }
     }
+    if (im.isItemHovered()) {
+      im.setTooltip("Skybox");
+    }
+    // compile shaders
+    if (im.createButton("Compile Shaders")) {
+      g_RenderManager().compileShaders();
+    }
   }
-  if (im.isItemHovered()) {
-    im.setTooltip("Skybox");
-  }
-  // compile shaders
-  if (im.createButton("Compile Shaders")) {
-    g_RenderManager().compileShaders();
-  }
+  im.popStyleColor(3);
   im.endWindowCreate();
   // -------------------------- //
-
   im.render();
 }
 

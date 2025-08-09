@@ -37,6 +37,14 @@ struct PK_UTILITY_EXPORT Color final
     _color.B = b;
     _color.A = a;
   }
+  // constructor with one set color & alpha
+  Color(uint8 rgb, uint8 a)
+  {
+    _color.R = rgb;
+    _color.G = rgb;
+    _color.B = rgb;
+    _color.A = a;
+  }
   // construct color with another
   Color(const Color& other)
   {
@@ -53,6 +61,17 @@ struct PK_UTILITY_EXPORT Color final
   operator uint8() const
   {
     return _color.fullColor;
+  }
+
+  FORCEINLINE const Vector4
+  operator/(const float _val) const
+  {
+    Vector4 newColor;
+    newColor.x = static_cast<float>(_color.R) / _val;
+    newColor.y = static_cast<float>(_color.G) / _val;
+    newColor.z = static_cast<float>(_color.B) / _val;
+    newColor.w = static_cast<float>(_color.A) / _val;
+    return newColor;
   }
 
   /**

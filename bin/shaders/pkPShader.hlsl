@@ -46,8 +46,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
   normalSam = normalize(mul(normalSam, TBN));
   output.normal = float4(normalSam, 1.0f);
-  output.diffuse = colorSam * AO;
-  output.metallic = float4(metallicSam.rrr, 1.0f);
+  output.diffuse = colorSam * AO.r;
+  output.metallic = float4(metallicSam.bbb, 1.0f);
   output.roughness = float4(roughSam, 1.0f);
   output.posWS = float4(input.PosWS, 1.0f);
   

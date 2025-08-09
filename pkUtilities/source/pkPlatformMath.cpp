@@ -132,7 +132,16 @@ PlatformMath::clamp(const float _t, const float _x, const float _y)
   if (t < _x) { t = _x; }
   if (t > _y) { t = _y; }
   return t;
-} 
+}
+
+Vector2
+PlatformMath::clamp(const Vector2 _t, const float _x, const float _y)
+{
+  Vector2 vec = _t;
+  vec.x = std::ranges::clamp(_t.x, _x, _y);
+  vec.y = std::ranges::clamp(_t.y, _x, _y);
+  return vec;
+}
 
 Vector3
 PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)

@@ -26,8 +26,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 albedoShadows = albedoSample * shadowSample;
   float4 albedoSpec = albedoSample * specularSample;
   float4 IBRSpecular = IBRSample * specularSample;
-  float4 IBRDiffuse = IBRSample * albedoSample * shadowSample;
   // mix shadows, color and both specular and blured specular
+  // float4 finalColor = IBRSample * shadowSample + albedoShadows;
   float4 finalColor = albedoShadows + albedoSpec + IBRSpecular;
   
   // check for a skybox position

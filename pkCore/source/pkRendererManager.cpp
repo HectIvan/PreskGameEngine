@@ -188,7 +188,9 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
   pDesc.inputs = { m_mainSkybox, getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Positions),
-                   getGBuffer(G_BUFFERS::kGB_Metallic) };
+                   getGBuffer(G_BUFFERS::kGB_Metallic),
+                   getGBuffer(G_BUFFERS::kGB_Roughness),
+                   getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
   SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
   // insert to the passes

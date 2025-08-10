@@ -59,6 +59,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   SPtr<Texture> m_defaultRough;
   SPtr<Texture> m_defaultMetallic;
   SPtr<Texture> m_defaultHeight;
+  SPtr<Texture> m_defaultEmissive;
 };
 PK_CORE_EXPORT TextureManager&
 g_TextureManager();

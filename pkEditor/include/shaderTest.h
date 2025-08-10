@@ -123,6 +123,13 @@ class ShaderTest : public BaseApp
   // camera movement speed
   float m_cameraSpeed;
 
+  // emissive blur
+  float m_emissiveBlur;
+  float m_emissiveStrength;
+
+  // UI texture image size
+  float m_imgTextureSize;
+
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;

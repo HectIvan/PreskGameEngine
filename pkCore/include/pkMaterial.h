@@ -98,42 +98,49 @@ class Material : public Component
    * @param _pTexture New diffuse texture.
    */
   FORCEINLINE void
-  setDiffuse(const SPtr<Texture>& _pTexture) { diffuse = _pTexture; }
+  setDiffuse(const SPtr<Texture>& _pTexture) { m_diffuse = _pTexture; }
 
   /**
    * @brief Set the normal texture.
    * @param _pTexture New normal texture.
    */
   FORCEINLINE void
-  setNormal(const SPtr<Texture>& _pTexture) { normal = _pTexture; }
+  setNormal(const SPtr<Texture>& _pTexture) { m_normal = _pTexture; }
 
   /**
    * @brief Set the height texture.
    * @param _pTexture New height texture.
    */
   FORCEINLINE void
-  setHeight(const SPtr<Texture>& _pTexture) { height = _pTexture; }
+  setHeight(const SPtr<Texture>& _pTexture) { m_height = _pTexture; }
 
   /**
    * @brief Set the metallic texture.
    * @param _pTexture New metallic texture.
    */
   FORCEINLINE void
-  setMetallic(const SPtr<Texture>& _pTexture) { metallic = _pTexture; }
+  setMetallic(const SPtr<Texture>& _pTexture) { m_metallic = _pTexture; }
 
   /**
    * @brief Set the occlusion texture.
    * @param _pTexture New occlusion texture.
    */
   FORCEINLINE void
-  setOcclusion(const SPtr<Texture>& _pTexture) { occlusion = _pTexture; }
+  setOcclusion(const SPtr<Texture>& _pTexture) { m_occlusion = _pTexture; }
 
   /**
    * @brief Set the roughness texture.
    * @param _pTexture New roughness texture.
    */
   FORCEINLINE void
-  setRoughness(const SPtr<Texture>& _pTexture) { roughness = _pTexture; }
+  setRoughness(const SPtr<Texture>& _pTexture) { m_roughness = _pTexture; }
+  
+  /**
+   * @brief Set the emissive texture.
+   * @param _pTexture New emissive texture.
+   */
+  FORCEINLINE void
+  setEmissive(const SPtr<Texture>& _pTexture) { m_emissive = _pTexture; }
 
   /**
    * @brief Set the material name.
@@ -154,11 +161,12 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   MaterialProps m_properties;
-  SPtr<Texture> diffuse;
-  SPtr<Texture> normal;
-  SPtr<Texture> height;
-  SPtr<Texture> metallic;
-  SPtr<Texture> occlusion;
-  SPtr<Texture> roughness;
+  SPtr<Texture> m_diffuse;
+  SPtr<Texture> m_normal;
+  SPtr<Texture> m_height;
+  SPtr<Texture> m_metallic;
+  SPtr<Texture> m_occlusion;
+  SPtr<Texture> m_roughness;
+  SPtr<Texture> m_emissive;
 };
 }

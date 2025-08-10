@@ -5,11 +5,13 @@ namespace pkEngineSDK
 {
 void Material::init()
 {
-  diffuse = make_shared<Texture>();
-  normal = make_shared<Texture>();
-  height = make_shared<Texture>();
-  metallic = make_shared<Texture>();
-  occlusion = make_shared<Texture>();
+  m_diffuse = make_shared<Texture>();
+  m_normal = make_shared<Texture>();
+  m_height = make_shared<Texture>();
+  m_metallic = make_shared<Texture>();
+  m_roughness = make_shared<Texture>();
+  m_emissive = make_shared<Texture>();
+  m_occlusion = make_shared<Texture>();
   m_name = "";
   m_castShadow = true;
   m_receiveShadows = true;

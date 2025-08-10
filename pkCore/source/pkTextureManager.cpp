@@ -13,6 +13,7 @@ TextureManager::loadDefaultMatTextures()
   m_defaultHeight = loadTexture(Path("textures/default/FlatHeight.png"));
   m_defaultMetallic = loadTexture(Path("textures/default/FlatMetallic.png"));
   m_defaultRough = loadTexture(Path("textures/default/FlatRoughness.png"));
+  m_defaultEmissive = loadTexture(Path("textures/default/FlatEmissive.png"));
 }
 
 SPtr<Texture>

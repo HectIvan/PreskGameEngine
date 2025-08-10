@@ -61,6 +61,20 @@ void RendererManager::init()
   SPtr<Texture> posRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
+  // positions texture for the light
+  SPtr<Texture> posLightRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
+
+  // emissive texture
+  SPtr<Texture> emissiveRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_Emissive, emissiveRT });
+
+  SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveHBlur, emissiveHBlurRT });
+
+  SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveBlur, emissiveBlurRT });
+
   // IBR texture
   SPtr<Texture> ibrRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibrRT });
@@ -114,7 +128,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-  // pass description
+   // pass description
   PassDesc pDesc = PassDesc();
   pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
@@ -131,6 +145,7 @@ RendererManager::createPasses()
                     getGBuffer(G_BUFFERS::kGB_Normal),
                     getGBuffer(G_BUFFERS::kGB_Metallic),
                     getGBuffer(G_BUFFERS::kGB_Roughness),
+                    getGBuffer(G_BUFFERS::kGB_Emissive),
                     getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   // rasterizer state
@@ -147,6 +162,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkPShaderDepth.hlsl");
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
@@ -197,6 +214,28 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_IBR, ibrPass });
 
   /****************************************************************************
+   * Emissive Horizontal Blur Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Emissive) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
+  SPtr<Pass> emissiveHPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_EmissiveHBlur, emissiveHPass });
+
+  /****************************************************************************
+   * Emissive Blur Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.cBSizes = { sizeof(CBBlur) };
+  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveBlur) };
+  SPtr<Pass> emissivePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_EmissiveBlur, emissivePass });
+
+  /****************************************************************************
    * Merge Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
@@ -205,7 +244,10 @@ RendererManager::createPasses()
                    getGBuffer(G_BUFFERS::kGB_Specular),
                    getGBuffer(G_BUFFERS::kGB_Shadow),
                    getGBuffer(G_BUFFERS::kGB_Skybox),
-                   getGBuffer(G_BUFFERS::kGB_IBR) };
+                   getGBuffer(G_BUFFERS::kGB_IBR),
+                   getGBuffer(G_BUFFERS::kGB_Emissive),
+                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur),
+                   getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -410,12 +452,13 @@ RendererManager::renderModel(const SPtr<Model>& _model)
     if (mesh->getActive()) {
       SPtr<Material> material = mesh->material;
       // set the material textures to the shader
-      Vector<SPtr<Texture>> textures = { material->diffuse,
-                                         material->normal,
-                                         material->height,
-                                         material->metallic,
-                                         material->occlusion,
-                                         material->roughness };
+      Vector<SPtr<Texture>> textures = { material->m_diffuse,
+                                         material->m_normal,
+                                         material->m_height,
+                                         material->m_metallic,
+                                         material->m_occlusion,
+                                         material->m_roughness,
+                                         material->m_emissive };
       api.pSSetShaderResourceViews(textures);
       // draw the mesh
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);

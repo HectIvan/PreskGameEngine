@@ -159,6 +159,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     meshProcess->material->setHeight(tm.m_defaultHeight);
     meshProcess->material->setMetallic(tm.m_defaultMetallic);
     meshProcess->material->setRoughness(tm.m_defaultRough);
+    meshProcess->material->setEmissive(tm.m_defaultEmissive);
 
     String matName = materialA->GetName().C_Str();
     meshProcess->material->setName(matName);
@@ -285,6 +286,30 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       else { // register that a roughness texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load roughness texture" + filePath.toString() +
+                            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+      }
+    }
+
+    // get all emissive maps of the material
+    uint32 emissiveCount = materialA->GetTextureCount(aiTextureType_EMISSIVE);
+    for (uint32 i = 0; i < emissiveCount; ++i) {
+      aiString path;
+      // emissive texture loading.
+      if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
+        // load the texture.
+        Path newPath(path.C_Str());
+        SPtr<Texture> texture = tm.loadTexture(newPath);
+        // if a texture was loaded.
+        if (texture) {
+          // log registry.
+          log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
+                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+          meshProcess->material->setEmissive(texture);
+        }
+      }
+      else { // register that an emissive texture was not found.
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load emissive texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }

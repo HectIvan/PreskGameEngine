@@ -18,6 +18,8 @@ using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
@@ -139,6 +141,8 @@ BaseApp::render()
   SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
+  SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
+  SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
   SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
   SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
@@ -156,7 +160,7 @@ BaseApp::render()
   }
 
   // base pass
-  basePass->beginPass();
+  basePass->beginPass(Color(0, 0, 0, 0));
   renderManager.renderActors(actors);
   basePass->endPass();
 
@@ -184,6 +188,16 @@ BaseApp::render()
     IBRPass->endPass();
   }
 
+  // emissive Horizontal Blur pass
+  emissHBlurPass->beginPass();
+  api.draw(3, 0);
+  emissHBlurPass->endPass();
+
+  // emissive pass
+  emissBlurPass->beginPass();
+  api.draw(3, 0);
+  emissBlurPass->endPass();
+
   // Quad merge pass.
   mergePass->beginPass();
   api.draw(3, 0);
@@ -199,7 +213,7 @@ BaseApp::render()
   api.draw(3, 0);
   lumBlurHPass->endPass();
 
-  // Quad lum blur pass.
+  // Quad lum blur Vertical pass.
   lumBlurPass->beginPass();
   api.draw(3, 0);
   lumBlurPass->endPass();

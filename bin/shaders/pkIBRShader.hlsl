@@ -2,8 +2,7 @@ Texture2D skyboxMap : register(t0);
 Texture2D normalMap : register(t1);
 Texture2D posMap : register(t2);
 Texture2D metallicMap : register(t3);
-Texture2D roughnessMap : register(t4);
-Texture2D albedoMap : register(t5);
+Texture2D colorMap : register(t4);
 
 SamplerState samState : register(s0);
 
@@ -35,14 +34,23 @@ float2 getSkyBoxUV(float3 dir)
   return float2(u, v);
 }
 
+// METALLIC
+// From my understanding, metalness affects how much of the base color will seep through the reflection,
+// meaning that if the metallic value is 0, 100% of the base color will show through, while if its 1, 0%
+// of the base color shows through, meaning only reflection.
+
+// ROUGHNESS
+// On the other hand, as far as i know, roughness affects how blurry the reflection is, meaning that
+// if roughness is 0, aka, smooth as hell, the reflection will be 1:1, while if it is 1, aka, fully rough,
+// the reflection will be the blurriest possible, since the surface is scattering the light in all directions.
+
 float4 PS(PS_INPUT input) : SV_Target
 {
   // get the world normals
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 position = posMap.Sample(samState, input.TexCoord);
-  float4 roughTex = roughnessMap.Sample(samState, input.TexCoord);
-  float4 albedoTex = albedoMap.Sample(samState, input.TexCoord);
   float metallicTex = metallicMap.Sample(samState, input.TexCoord).b;
+  float3 colorTex = colorMap.Sample(samState, input.TexCoord).rgb;
   
   // normalize normals and view
   float3 N = normalize(normalTex.xyz);
@@ -54,12 +62,9 @@ float4 PS(PS_INPUT input) : SV_Target
   // sample the skybox with the new direction
   float2 skyboxUV = getSkyBoxUV(view);
   float3 IBL = skyboxMap.Sample(samState, skyboxUV).rgb;
-  return float4(IBL * metallicTex * Intensity, 1.0f);
   
   // get how much of the surounding light will be reflected.
   float3 metallicColor = IBL * metallicTex;
-  // how much of the object color will seep through the IBL
-  float3 roughColor = albedoTex.rgb * IBL * (1 - roughTex.g);
   
-  return float4((metallicColor + roughColor) * Intensity, 1.0f);
+  return float4(metallicColor * Intensity, 1.0f);
 }

@@ -13,6 +13,7 @@ Texture2D colorMap : register(t3);
 Texture2D positionsMap : register(t4);
 Texture2D metallicMap : register(t5);
 Texture2D roughnessMap : register(t6);
+Texture2D lightPosMap : register(t7);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -53,17 +54,12 @@ cbuffer LightCamera : register(b2)
   float _unusedLightCam0; // 160
 }
 
-cbuffer CamInvProj : register(b3)
+cbuffer LightViewProj : register(b3)
 {
-  float4x4 camInvProj; // 64
+  float4x4 LightViewProj; // 64
 }
 
-cbuffer CamInvView : register(b4)
-{
-  float4x4 camInvView; // 64
-}
-
-cbuffer ShadowParam : register(b5)
+cbuffer ShadowParam : register(b4)
 {
   float2 winSize; // 8
   float2 farNear; // 16
@@ -208,6 +204,11 @@ float3 cookTorranceSpecular(float3 normal,
   return specular;
 }
 
+float magnitude(float3 v)
+{
+  return sqrt((v.x * v.x) + (v.y * v.y) * (v.z * v.z));
+}
+
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
@@ -282,6 +283,27 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   
   output.shadow = float4(diffuse, alpha);
   output.specular = float4(specular, alpha);
+  
+  /**
+   * shadow mapping;
+   */
+  float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
+  float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
+  float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
+  lightUV.y = -lightUV.y;
+  
+  float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
+  
+  float lightHit = magnitude(worldPos - LightPos);
+  float worldHit = magnitude(lightWorldPos - LightPos);
+  
+  float tolerance = 1.0f;
+  
+  if (lightHit > worldHit + tolerance)
+  {
+    output.shadow = float4(shadowColor.xxx, 1.0f);
+    output.specular = float4(0.0f.xxx, 1.0f);
+  }
   
   return output;
 }

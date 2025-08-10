@@ -174,14 +174,15 @@ RendererManager::createPasses()
   pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
-                    sizeof(Matrix4), sizeof(Vector4) };
+                    sizeof(Vector4) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Light),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
                    getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_Positions),
                    getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getGBuffer(G_BUFFERS::kGB_Roughness) };
+                   getGBuffer(G_BUFFERS::kGB_Roughness),
+                   getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow), getGBuffer(G_BUFFERS::kGB_Specular) };
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes

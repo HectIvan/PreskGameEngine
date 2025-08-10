@@ -126,15 +126,15 @@ ShaderTest::onInit()
 
   // add camera component
   m_light->addComponent(make_shared<Camera>());
-  m_light->getComponent<Camera>()->init(1280,
-                                        720,
+  m_light->getComponent<Camera>()->init(1920,
+                                        1080,
                                         3.1416f / 4.0f,
                                         3.0f,
-                                        2000.0f,
+                                        5000.0f,
                                         lightCom->m_position, // position
                                         lightCom->m_direction, // target
                                         Vector3::FORWARD,
-                                        pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
+                                        pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
   SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
@@ -541,10 +541,12 @@ ShaderTest::onUpdate()
   // update shadow depth map buffers
   Matrix4 lightView = Matrix4::IDENTITY;
   Matrix4 lightProj = Matrix4::IDENTITY;
+  Matrix4 lightViewProj = Matrix4::IDENTITY;
   // to do: change this to another method
   if (light) {
     lightView = lightCamera->m_view.getTransposed();
     lightProj = lightCamera->m_projection.getTransposed();
+    lightViewProj = lightProj * lightView;
     CreateCBLight::create(cBLight, light);
     CreateCBCamera::create(cBLightCam, lightCamera);
   }
@@ -602,9 +604,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &shadowsParam, sizeof(Vector4));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);

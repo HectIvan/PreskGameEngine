@@ -287,23 +287,23 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   /**
    * shadow mapping;
    */
-  float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
-  float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
-  float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
-  lightUV.y = -lightUV.y;
-  
-  float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
-  
-  float lightHit = magnitude(worldPos - LightPos);
-  float worldHit = magnitude(lightWorldPos - LightPos);
-  
-  float tolerance = 1.0f;
-  
-  if (lightHit > worldHit + tolerance)
-  {
-    output.shadow = float4(shadowColor.xxx, 1.0f);
-    output.specular = float4(0.0f.xxx, 1.0f);
-  }
+  //        float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
+  //        float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
+  //        float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
+  //        lightUV.y = -lightUV.y;
+  //        
+  //        float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
+  //        
+  //        float lightHit = magnitude(worldPos - LightPos);
+  //        float worldHit = magnitude(lightWorldPos - LightPos);
+  //        
+  //        float tolerance = 1.0f;
+  //        
+  //        if (lightHit > worldHit + tolerance)
+  //        {
+  //          output.shadow = float4(shadowColor.xxx, 1.0f);
+  //          output.specular = float4(0.0f.xxx, 1.0f);
+  //        }
   
   return output;
 }

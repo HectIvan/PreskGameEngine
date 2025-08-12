@@ -30,16 +30,19 @@ TextureManager::loadTexture(const Path& _directory)
   SPtr<Texture> texture = nullptr;
   // create the texture
   // if it is an exr image / hdr
+  uint32 mipLevels = 1;
   if (_directory.getExtension() == "exr" || _directory.getExtension() == "hdr") {
+    mipLevels = 4;
     texture = api.createTextureFromFileF(_directory,
                                          PK_BIND_FLAG::kPK_BIND_RENDER_TARGET |
                                          PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
-                                         false);
-  }
+                                         mipLevels,
+                                         PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS);
+    }
   else {
     texture = api.createTextureFromFile(_directory, 
                                         PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
-                                        false,
+                                        mipLevels,
                                         PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM);
   }
 

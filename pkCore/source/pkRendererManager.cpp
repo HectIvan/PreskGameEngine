@@ -25,7 +25,7 @@ void RendererManager::init()
   txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
   txDesc.usage = kPK_USAGE_DEFAULT;
-  txDesc.mipLevels = false;
+  txDesc.mipLevels = 1;
   txDesc.miscFlags = 0;
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
@@ -221,6 +221,7 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Emissive) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> emissiveHPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveHBlur, emissiveHPass });
@@ -250,6 +251,7 @@ RendererManager::createPasses()
                    getGBuffer(G_BUFFERS::kGB_EmissiveBlur),
                    getGBuffer(G_BUFFERS::kGB_Metallic) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Merge, mergePass });
@@ -276,6 +278,7 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> lumBlurHPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LumBlurH, lumBlurHPass });
@@ -299,6 +302,7 @@ RendererManager::createPasses()
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge),
                    getGBuffer(G_BUFFERS::kGB_LumBlur) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> TonePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, TonePass });

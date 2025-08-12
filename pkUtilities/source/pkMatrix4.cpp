@@ -263,22 +263,18 @@ Matrix4::matrixScaling(float& _scaleX, float& _scaleY, float& _scaleZ)
 }
 
 Matrix4
+Matrix4::translation(Vector3 _position)
+{
+  return translation(_position.x, _position.y, _position.z);
+}
+
+Matrix4
 Matrix4::translation(float& _offsetX, float& _offsetY, float& _offsetZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][3] = _offsetX;
   M.matrix[1][3] = _offsetY;  
   M.matrix[2][3] = _offsetZ;
-  return M;
-} 
-
-Matrix4
-Matrix4::translation(Vector3 _position)
-{
-  Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][3] = _position.x;
-  M.matrix[1][3] = _position.y;
-  M.matrix[2][3] = _position.z;
   return M;
 }
 
@@ -431,17 +427,17 @@ Matrix4::getRotationNoScale(Vector3 _scale)
 }
 
 Matrix4
-Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
-{
-  Matrix4 M = Matrix4::IDENTITY;
-  M = rotationX(_angleX) * rotationY(_angleY) * rotationZ(_angleZ);
-  return M;
-}
-
-Matrix4
 Matrix4::rotation(Vector3& _rot)
 {
   return rotation(_rot.x, _rot.y, _rot.z);
+}
+
+Matrix4
+Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
+{
+  Matrix4 M = Matrix4::IDENTITY;
+  M = rotationZ(_angleZ) * rotationY(_angleY) * rotationX(_angleX);
+  return M;
 }
 
 Matrix4

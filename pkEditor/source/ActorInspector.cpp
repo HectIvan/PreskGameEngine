@@ -87,8 +87,10 @@ ActorInspector::Inspect()
   Vector3 newTranslation = m_actor->m_position;
   im.createText("Position");
   im.sameLine();
-  im.createDrag3("##Position", newTranslation);
-  m_actor->setPosition(newTranslation);
+  if (im.createDrag3("##Position", newTranslation)) {
+    m_actor->setPosition(newTranslation);
+    // m_actor->setPositionLocal(newTranslation);
+  }
   // change the rotation
   Vector3 newRotation = m_actor->m_rotation;
   im.createText("Rotation");
@@ -192,11 +194,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
       im.createCheckBox("Active ", _pComponent->isActive());
       // model section
       SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
-      im.createText("Meshes: ");
       Vector<SPtr<Mesh>> meshes = model->getMeshes();
+      im.sameLine();
       im.createText("Search: ");
       im.sameLine();
       im.createInputText("##Search", &_searchMesh);
+      im.createText("Meshes: ");
       for (uint32 i = 0; i < meshes.size(); ++i) {
         // get mesh
         SPtr<Mesh> mesh = meshes[i];

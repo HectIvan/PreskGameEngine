@@ -19,7 +19,8 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
-#include "pkVector3.h"
+#include "pkVector4.h"
+#include "pkMatrix4.h"
 
 namespace pkEngineSDK
 {
@@ -36,6 +37,16 @@ struct SimpleVertex
                tex(_tex),
                tangent(_tan),
                bitangent(_bitan) {};
+
+  FORCEINLINE void
+  operator*=(const Matrix4 _transform)
+  {
+    pos = (Vector4(pos, 1.0f) * _transform).xyz();
+    normal = normal * _transform;
+    tangent = tangent * _transform;
+    bitangent = bitangent * _transform;
+  }
+
   Vector3 pos;
   Vector3 normal;
   Vector2 tex;

@@ -274,8 +274,8 @@ class DX11GraphicsAPI : public GraphicsAPI
                 int32 _format,
                 int32 _usage,
                 int32 _bindFlags,
-                bool _mipLevels,
                 int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
                 int32 _miscFlags = 0,
                 unsigned char* _data = nullptr) override;
 
@@ -283,13 +283,13 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Create a texture from file.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
-   * @param _format What format will the texture be.
+   * @param _mipLevels MipMap level count.
+   * @return Pointer to the texture.
    */
   SPtr<Texture>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
-                        bool _mipLevels,
+                        int32 _mipLevels,
                         uint32 _format,
                         int32 _miscFlags = 0) override;
 
@@ -305,14 +305,16 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Create a texture from file as float.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
+   * @param _mipLevels MipMap level count.
+   * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   SPtr<Texture>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
-                         bool _mipLevels,
-                         int32 _miscFlags = 0) override;
+                         int32 _mipLevels = 1,
+                         int32 _miscFlags = 0,
+                         PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) override;
 
   /**
    * @brief Create the vertex buffer.

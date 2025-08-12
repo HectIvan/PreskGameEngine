@@ -989,7 +989,7 @@ SPtr<Texture>
 DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
   return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
-                       _desc.bindFlags, _desc.mipLevels, _desc.shaderResourceFormat,
+                       _desc.bindFlags, _desc.shaderResourceFormat, _desc.mipLevels,
                        _desc.miscFlags, _desc.data);
 }
 
@@ -1478,7 +1478,7 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
-                                       bool _mipLevels,
+                                       int32 _mipLevels,
                                        uint32 _format,
                                        int32 _miscFlags)
 {
@@ -1509,8 +1509,8 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                              _format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
-                                             _mipLevels,
                                              _format,
+                                             _mipLevels,
                                              _miscFlags,
                                              data);
 
@@ -1561,8 +1561,9 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                         uint32 _bindFlags,
-                                        bool _mipLevels,
-                                        int32 _miscFlags)
+                                        int32 _mipLevels,
+                                        int32 _miscFlags,
+                                        PK_USAGE::E _usage)
 {
   Logger& log = g_Logger().instance();
   // values
@@ -1592,10 +1593,10 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                              width,
                                              height,
                                              format,
-                                             PK_USAGE::kPK_USAGE_DEFAULT,
+                                             _usage,
                                              _bindFlags,
-                                             _mipLevels,
                                              format,
+                                             _mipLevels,
                                              _miscFlags,
                                              reinterpret_cast<unsigned char*>(data));
 
@@ -1673,20 +1674,39 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                int32 _format,
                                int32 _usage,
                                int32 _bindFlags,
-                               bool _mipLevels,
                                int32 _shaderResourceFormat,
+                               int32 _mipLevels,
                                int32 _miscFlags,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
-
   Logger& log = g_Logger().instance();
+  // verify that the device is a directX 11 device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  if (!device) {
+    const String msg = "Failed to utilize the DX device in the creation of a texture.";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    return nullptr;
+  }
+
+  // if the texture is supposed to generate mipMaps
+  // uint32 mips = 0;
+  // if ((_miscFlags & PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS) == 
+  //     PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS) {
+  //   mips = 1;
+  // }
+
+  // create the texture
+  SPtr<DX11Texture> tex = make_shared<DX11Texture>();
+  tex->setSize(Vector2(_width, _height));
+
   // texture description
   D3D11_TEXTURE2D_DESC desc;
   memset(&desc, 0, sizeof(desc));
   desc.Width = _width;
   desc.Height = _height;
-  desc.MipLevels = _mipLevels ? 0 : 1;
+  desc.MipLevels = 1;
   desc.ArraySize = 1;
   desc.Format = static_cast<DXGI_FORMAT>(_format);
   desc.SampleDesc.Count = 1;
@@ -1694,7 +1714,7 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
   desc.Usage = static_cast<D3D11_USAGE>(_usage);
   desc.BindFlags = _bindFlags;
   desc.CPUAccessFlags = 0;
-  desc.MiscFlags = _miscFlags;
+  desc.MiscFlags = static_cast<D3D11_RESOURCE_MISC_FLAG>(_miscFlags);
 
   // data of the texture
   D3D11_SUBRESOURCE_DATA* initData = nullptr;
@@ -1707,20 +1727,17 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
   }
 
   // create the texture
-  SPtr<DX11Texture> tex = make_shared<DX11Texture>();
-  tex->setSize(Vector2(_width, _height));
+  int32 hr = 0;
+  hr = device->m_pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
 
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    const String msg = "Failed to utilize the DX device in the creation of a texture.";
+  // if texture creation failed
+  if (FAILED(hr)) {
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a texture. Error message: " + errMsg;
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  // hresult
-  int32 hr = 0;
-  // create the texture
-  hr = device->m_pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
   /**
    * Create shader resource.
    */
@@ -1729,18 +1746,10 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
     memset(&sDesc, 0, sizeof(sDesc));
     sDesc.Format = static_cast<DXGI_FORMAT>(_shaderResourceFormat);
-    sDesc.Texture2D.MipLevels = desc.MipLevels;
+    sDesc.Texture2D.MipLevels = -1;
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-    // if texture creation failed
-    if (FAILED(hr)) {
-      const String errMsg = log.getMessageError(hr);
-      const String msg = "Failed to create a texture. Error message: " + errMsg;
-      log.print(msg);
-      log.registerMessage(msg, LOG_MSG_TYPE::kError);
-      return nullptr;
-    }
     // create the shader resource view
     hr = device->m_pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_sRV);
     // if failed to create shader resource view
@@ -1749,7 +1758,9 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
       const String msg = "Failed to create a shader resource view. Error message: " + errMsg;
       log.print(msg);
       log.registerMessage(msg, LOG_MSG_TYPE::kError);
+      return nullptr;
     }
+    // device->m_pImmediateContext->GenerateMips(tex->m_sRV); // this is hell on earth
   }
   /**
    * Create Depth stencil

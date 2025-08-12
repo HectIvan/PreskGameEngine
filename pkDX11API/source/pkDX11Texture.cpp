@@ -24,8 +24,8 @@ DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
 
   if (m_t2d) { m_t2d = dxTx->getTexture2D(); }
   if (m_sRV) { m_sRV = dxTx->getSRV(); };
-  if (m_uAV) { m_uAV = dxTx->getUAV(); };
-  if (m_rTV) { m_rTV = dxTx->getRTV(); };
+  if (!m_uAVs.empty()) { m_uAVs = dxTx->getUAVs(); };
+  if (!m_rTVs.empty()) { m_rTVs = dxTx->getRTVs(); };
 
   return true;
 }

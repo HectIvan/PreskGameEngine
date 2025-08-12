@@ -151,7 +151,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTarget(const SPtr<Texture> _pRTarget,
+                  const SPtr<Texture> _pDepthSV = nullptr,
+                  const uint32 _mipLevel = 0) override;
 
   /**
    * @brief Set the render targets to the device.
@@ -159,7 +161,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const uint32 _mipLevel = 0) override;
 
   // to do:change this to allow a specific ammount to be unbound.
   /**
@@ -248,6 +252,13 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
+
+  /**
+   * @brief Get bytes per pixel from the format.
+   * @param _format Format to get the bytes from.
+   */
+  uint32
+  getBytesFromFormat(const uint32 _format) override;
 
   /**
    * @brief Create a texture.
@@ -438,7 +449,8 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
-                            uint32* _initialCounts = nullptr) override;
+                            uint32* _initialCounts = nullptr,
+                            uint32 _mipLevels = 0) override;
 
   /**
    * @brief Unbind unordered views of a compute shader.

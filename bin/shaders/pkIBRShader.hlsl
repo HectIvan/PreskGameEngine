@@ -61,7 +61,7 @@ float4 PS(PS_INPUT input) : SV_Target
   
   // sample the skybox with the new direction
   float2 skyboxUV = getSkyBoxUV(view);
-  float3 IBL = skyboxMap.Sample(samState, skyboxUV).rgb;
+  float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, 0).rgb;
   
   // get how much of the surounding light will be reflected.
   float3 metallicColor = IBL * metallicTex;

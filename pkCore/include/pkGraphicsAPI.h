@@ -134,7 +134,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTarget(const SPtr<Texture> _pRTarget,
+                  const SPtr<Texture> _pDepthSV = nullptr,
+                  const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Set the render targets to the device.
@@ -142,7 +144,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Unbinds all render targets.
@@ -234,6 +238,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    */
   virtual void
   setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
+
+  /**
+   * @brief Get bytes per pixel from the format.
+   * @param _format Format to get the bytes from.
+   */
+  virtual uint32
+  getBytesFromFormat(const uint32 _format) = 0;
 
   /**
    * @brief Create a texture.
@@ -426,7 +437,8 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
-                            uint32* _initialCounts = nullptr) = 0;
+                            uint32* _initialCounts = nullptr,
+                            uint32 _mipLevels = 0) = 0;
 
   /**
    * @brief Unbind unordered views from a compute shader.

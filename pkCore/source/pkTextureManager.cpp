@@ -32,9 +32,9 @@ TextureManager::loadTexture(const Path& _directory)
   // if it is an exr image / hdr
   uint32 mipLevels = 1;
   if (_directory.getExtension() == "exr" || _directory.getExtension() == "hdr") {
-    mipLevels = 4;
+    mipLevels = 0;
     texture = api.createTextureFromFileF(_directory,
-                                         PK_BIND_FLAG::kPK_BIND_RENDER_TARGET |
+                                         PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS |
                                          PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
                                          mipLevels,
                                          PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS);

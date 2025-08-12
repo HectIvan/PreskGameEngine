@@ -217,13 +217,13 @@ PlatformMath::isNan(float _x)
 }
 
 float
-log2(float _x)
+PlatformMath::log2(float _x)
 {
   return std::log2f(_x);
 }
 
 float
-max(float _x, float _y)
+PlatformMath::max(float _x, float _y)
 {
   return std::max(_x, _y);
 }

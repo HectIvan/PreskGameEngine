@@ -29,23 +29,23 @@ class DX11Texture : public Texture
  public:
   DX11Texture() = default;
   DX11Texture(ID3D11Texture2D* _t2d,
-              ID3D11RenderTargetView* _rTV = nullptr,
+              Vector<ID3D11RenderTargetView*> _rTVs = { nullptr },
               ID3D11DepthStencilView* _dSV = nullptr,
               ID3D11ShaderResourceView* _Srv = nullptr,
-              ID3D11UnorderedAccessView* _uAV = nullptr) :
+              Vector<ID3D11UnorderedAccessView*> _uAVs = { nullptr }) :
     m_t2d(_t2d),
-    m_rTV(_rTV),
+    m_rTVs(_rTVs),
     m_dSV(_dSV),
     m_sRV(_Srv),
-    m_uAV(_uAV),
+    m_uAVs(_uAVs),
     m_owner(false)
   {}
   virtual ~DX11Texture()
   {
     safeRelease(m_sRV);
     safeRelease(m_dSV);
-    safeRelease(m_rTV);
-    safeRelease(m_uAV);
+    m_rTVs.clear();
+    m_uAVs.clear();
     if (m_owner) { safeRelease(m_t2d); }
   }
 

@@ -303,6 +303,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                          PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) = 0;
 
   /**
+   * @brief Generate mips for a texture.
+   * @param _pTexture Texture to use.
+   */
+  virtual void
+  GenerateMips(SPtr<Texture>& _pTexture) = 0;
+
+  /**
    * @brief Create a VertexBuffer.
    * @param _vertex Vertex for the buffer.
    * @param _usage What use will be given to the buffer.

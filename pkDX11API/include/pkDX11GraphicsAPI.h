@@ -317,6 +317,13 @@ class DX11GraphicsAPI : public GraphicsAPI
                          PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) override;
 
   /**
+   * @brief Generate mips for a texture.
+   * @param _pTexture Texture to use.
+   */
+  void
+  GenerateMips(SPtr<Texture>& _pTexture) override;
+
+  /**
    * @brief Create the vertex buffer.
    * @param _vertex Vector with all the vertex data needed.
    * @param _usage What use will it be given to the buffer.

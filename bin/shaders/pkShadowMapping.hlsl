@@ -275,8 +275,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
                                                  lightDir,
-                                                 roughTex.r,
-                                                 metallicTex.r,
+                                                 roughTex.g,
+                                                 metallicTex.b,
                                                  F0);
   
   float3 specular = (specCookTorrance) * SpecIntensity;

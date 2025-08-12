@@ -78,9 +78,15 @@ PlatformMath::min(const float _x, const float _y)
 }
 
 float
-PlatformMath::max(const float _x, const float _y)
+PlatformMath::maxf(const float _x, const float _y)
 {
   return static_cast<float>(std::max(_x, _y));
+}
+
+uint32
+PlatformMath::max(const uint32 _x, const uint32 _y)
+{
+  return static_cast<uint32>(std::max(_x, _y));
 }
 
 float
@@ -208,6 +214,18 @@ bool
 PlatformMath::isNan(float _x)
 {
   return isnan(_x);
+}
+
+float
+log2(float _x)
+{
+  return std::log2f(_x);
+}
+
+float
+max(float _x, float _y)
+{
+  return std::max(_x, _y);
 }
 
 /**

@@ -52,7 +52,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   // fill up all outputs with their respective values.
   output.diffuse = float4(colorSam.rgb * AO.r, 1.0f);
   output.metallic = float4(metallicSam.bbb, metallicSam.a);
-  output.roughness = roughSam;
+  output.roughness = float4(roughSam.ggg, 1.0f);
   output.emissive = emissSam;
   output.posWS = float4(input.PosWS, 1.0f);
   

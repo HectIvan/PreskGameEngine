@@ -4,22 +4,6 @@ SamplerState samState : register(s0);
 
 #define PI 3.14159265f
 
-// cbuffer CameraData : register(b0)
-// {
-//   float4 Eye; // 16
-//   float3 ForwardCam; // 28
-//   float4x4 ViewCam; // 92
-//   float4x4 ProjectionCam; // 156
-//   float _unusedCam0; // 160
-//   float4 _padding; // 172
-// };
-
-// cbuffer ViewPort : register(b1)
-// {
-//   float2 ViewPortSize;
-//   float2 _VPPadding;
-// }
-
 cbuffer ViewTransposed : register(b0)
 {
   matrix ViewTransp;

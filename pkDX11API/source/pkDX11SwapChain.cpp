@@ -32,8 +32,8 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
       g_Logger().print("Failed to utilize the DX device in the render target view creation.");
     }
     hr = device->m_pd3dDevice->CreateRenderTargetView(pBackBuffer,
-                                                    nullptr,
-                                                    &rTargetView->m_rTV);
+                                                      nullptr,
+                                                      &rTargetView->m_rTVs[0]);
     // if the creation was not successful
     if (hr != 0x00000000) {
       String errMsg = g_Logger().getMessageError(hr);

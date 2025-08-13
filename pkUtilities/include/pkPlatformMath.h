@@ -238,6 +238,29 @@ class PK_UTILITY_EXPORT PlatformMath
   static bool
   isNan(float _x);
 
+  /**
+   * @brief get the base 2 log of the number.
+   * @param _x Value to calculate the log.
+   */
+  static float
+  log2(float _x);
+
+  /**
+   * @brief Get the maximum value between 2 floats.
+   * @param _x First float to compare.
+   * @param _y Second float to compare.
+   */
+  static float
+  maxf(const float _x, const float _y);
+
+  /**
+   * @brief Get the maximum value between 2 floats.
+   * @param _x First float to compare.
+   * @param _y Second float to compare.
+   */
+  static uint32
+  max(const uint32 _x, const uint32 _y);
+
   /***************************************************************************
   * 
   * Shapes

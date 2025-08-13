@@ -13,6 +13,7 @@ Texture2D colorMap : register(t3);
 Texture2D positionsMap : register(t4);
 Texture2D metallicMap : register(t5);
 Texture2D roughnessMap : register(t6);
+Texture2D lightPosMap : register(t7);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -53,17 +54,12 @@ cbuffer LightCamera : register(b2)
   float _unusedLightCam0; // 160
 }
 
-cbuffer CamInvProj : register(b3)
+cbuffer LightViewProj : register(b3)
 {
-  float4x4 camInvProj; // 64
+  float4x4 LightViewProj; // 64
 }
 
-cbuffer CamInvView : register(b4)
-{
-  float4x4 camInvView; // 64
-}
-
-cbuffer ShadowParam : register(b5)
+cbuffer ShadowParam : register(b4)
 {
   float2 winSize; // 8
   float2 farNear; // 16
@@ -96,9 +92,14 @@ float GeometrySchlickGGX(float NoV, float roughness)
   // float k = (roughness * roughness) * 0.5f;
   // float denom = NoV * (1.0f - k) + k;
   // return NoV / denom;
-  float r = roughness + 1.0f;
-  float k = (r * r) / 8.0f;
-  float G = NoV / (NoV * (1.0f - k) + k + 1e-7f);
+  
+  // float r = roughness + 1.0f;
+  // float k = (r * r) / 8.0f;
+  // float G = NoV / (NoV * (1.0f - k) + k + 1e-7f);
+  
+  float nom = NoV;
+  float denom = NoV * (1.0 - roughness) + roughness;
+  float G = nom / denom;
   return G;
 }
 
@@ -145,15 +146,24 @@ float GeometricAttenuation(float3 halfView, float3 normal, float3 view, float3 l
 // Dblinn = (1/PI alpha^2)(HoN^(2/alpha^2 - 2))
 float NormalDistribution(float3 halfView, float3 normal, float roughness)
 {
-  float a = roughness * roughness;
-  float a2 = a * a;
-  float HoN = saturate(dot(halfView, normal));
+  // float a = roughness * roughness;
+  // float a2 = a * a;
+  // float HoN = saturate(dot(halfView, normal));
+  // 
+  // float first = 1.0f / (PI * a2);
+  // float expVal = (2.0f / a2) - 2.0f;
+  // float exponent = pow(HoN, expVal);
+  // float D = first * exponent;
+  // return D;
   
-  float first = 1.0f / (PI * a2);
-  float expVal = (2.0f / a2) - 2.0f;
-  float exponent = pow(HoN, expVal);
-  float D = first * exponent;
-  return D;
+  float a2 = roughness * roughness;
+  float NoH = max(dot(normal, halfView), 0.0f);
+  float NoH2 = NoH * NoH;
+
+  float denom = NoH2 * (a2 - 1.0f) + 1.0f;
+  denom = PI * denom * denom;
+  
+  return a2 / denom;
 }
 
 // source: https://graphicscompendium.com/gamedev/15-pbr
@@ -162,7 +172,7 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
 float Fresnel(float3 F0, float VoH) // float refraction
 {
   // float F0 = pow((refraction - 1), 2.0f) / pow((refraction + 1), 2.0f);
-  float F = F0 + (1 - F0) * pow((1 - VoH), 5.0f);
+  float F = F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
   return F;
 }
 
@@ -171,7 +181,7 @@ float3 cookTorranceSpecular(float3 normal,
                             float3 lightDir,
                             float rough,
                             float metallic,
-                            float F0)
+                            float3 F0)
 {
   float3 Half = normalize(viewDir + lightDir);
   float NoL = saturate(dot(normal, lightDir));
@@ -192,6 +202,11 @@ float3 cookTorranceSpecular(float3 normal,
   float3 specular = (D * G * F) / den;
   
   return specular;
+}
+
+float magnitude(float3 v)
+{
+  return sqrt((v.x * v.x) + (v.y * v.y) * (v.z * v.z));
 }
 
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
@@ -252,21 +267,43 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   // float3 halfwayDir = normalize(lightDir + viewDir);
   // spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
   
-  // float3 blinn_phong = (lightColor * (spec * SpecIntensity)) * roughTex.r; // this is wrong, just a test to check pure roughness
+  // float3 blinn_phong = (lightColor * (spec * SpecIntensity)); // this is wrong, just a test to check pure roughness
   
-  float F0 = lerp(0.04f, colorTex.rgb, metallicTex.rgb);
+  float3 F0 = float3(0.04f.xxx);
+  F0 = lerp(F0, colorTex.rgb, metallicTex.b);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
                                                  lightDir,
-                                                 roughTex.r,
-                                                 metallicTex.r,
+                                                 roughTex.g,
+                                                 metallicTex.b,
                                                  F0);
   
   float3 specular = (specCookTorrance) * SpecIntensity;
   
   output.shadow = float4(diffuse, alpha);
   output.specular = float4(specular, alpha);
+  
+  /**
+   * shadow mapping;
+   */
+  //        float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
+  //        float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
+  //        float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
+  //        lightUV.y = -lightUV.y;
+  //        
+  //        float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
+  //        
+  //        float lightHit = magnitude(worldPos - LightPos);
+  //        float worldHit = magnitude(lightWorldPos - LightPos);
+  //        
+  //        float tolerance = 1.0f;
+  //        
+  //        if (lightHit > worldHit + tolerance)
+  //        {
+  //          output.shadow = float4(shadowColor.xxx, 1.0f);
+  //          output.specular = float4(0.0f.xxx, 1.0f);
+  //        }
   
   return output;
 }

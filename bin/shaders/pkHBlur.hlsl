@@ -1,6 +1,9 @@
 Texture2D textureResource : register(t0);
 SamplerState samState : register(s0);
 
+#define PI 3.14159265f
+#define E 2.71828f
+
 cbuffer cBlur : register(b0)
 {
   float2 WinSize;
@@ -28,13 +31,30 @@ float gaussian(float2 offset, float sigma)
   return exp(-(magn / (2.0 * pow(sigma, 2.0f))));
 }
 
+// w(x) = exp(-(x-μ)² / (2σ²))
+float gaussian2D(float2 distance, float sigma)
+{
+  float val2 = exp(-(pow(distance.x + distance.y, 2.0f) / (2.0f * pow(sigma, 2.0f))));
+  return val2;
+}
+
+// 1 / sqrt(2 * PI * o) * e^(x^2 / (2 * o^2))
+float gaussianDistribution(float x, float o)
+{
+  float o2 = o * o;
+  float exponent = -((x * x) / (2.0f * o2));
+  float mP = (1.0f / sqrt(2.0f * PI * o2));
+  float y = mP * exp(exponent);
+  return y;
+}
+
 // Gaussian Blur
 float4 PS(PS_INPUT input) : SV_Target0
 {
   // size of a pixel in the UVs.
   float2 texelSize = 1.0f / WinSize;
   // swap between directions.
-  float2 direction = Direction * texelSize;
+  // float2 direction = Direction * texelSize;
   
   // blur color
   float4 BlurColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -43,15 +63,14 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   // for each pixel in the loop
   for (float i = -Radius; i <= Radius; ++i) {
-    for (float j = -Radius; j <= Radius; ++j)
-    {
-      // get the new uv sample
-      float gauss = gaussian(texelSize, Strength);
-      float2 uv = input.TexCoord + float2(i, j) * texelSize;
-      float4 texSample = textureResource.Sample(samState, uv);
-      BlurColor += texSample * gauss * Strength;
-      sumWeights += gauss;
-    }
+    // get the new uv sample
+    float2 direction = Direction * i;
+    // float gauss = gaussian2D(direction, Strength);
+    float gauss = gaussianDistribution(i, Strength);
+    float2 uv = input.TexCoord + direction * texelSize;
+    float4 texSample = textureResource.Sample(samState, uv);
+    BlurColor += texSample * gauss;
+    sumWeights += gauss;
   }
   BlurColor /= sumWeights;
   

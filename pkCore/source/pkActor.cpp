@@ -4,6 +4,7 @@
 **/
 /*********************************************/
 #include "pkActor.h"
+#include "pkCamera.h"
 #include "pkPlatformMath.h"
 #include "pkLight.h"
 #include "pkLogger.h"
@@ -15,9 +16,12 @@ Actor::Actor()
 {
   setActive(true);
   m_forward = Vector3::FORWARD;
+  m_right = Vector3::RIGHT;
+  m_up = Vector3::UP;
   m_scale = Vector3(1.0f);
   m_position = Vector3(0.0f);
   m_rotation = Vector3(0.0f);
+  m_transform = Matrix4::IDENTITY;
 }
 
 void
@@ -52,9 +56,42 @@ Actor::move(Vector3 _addPos)
 }
 
 void
-Actor::moveLocal(Vector3 _offset)
+Actor::moveForward(float _offset)
 {
+  move(Vector3::FORWARD * _offset);
+}
 
+void
+Actor::moveForwardLocal(float _offset)
+{
+  Vector3 newOffset = m_transform.getForwardVector() * _offset;
+  move(newOffset);
+}
+
+void
+Actor::moveRight(float _offset)
+{
+  move(Vector3::RIGHT * _offset);
+}
+
+void
+Actor::moveRightLocal(float _offset)
+{
+  Vector3 newOffset = m_transform.getRightVector() * _offset;
+  move(newOffset);
+}
+
+void
+Actor::moveUp(float _offset)
+{
+  move(Vector3::UP * _offset);
+}
+
+void
+Actor::moveUpLocal(float _offset)
+{
+  Vector3 newOffset = m_transform.getUpVector() * _offset;
+  move(newOffset);
 }
 
 void
@@ -75,7 +112,7 @@ Actor::move(float _addX, float _addY, float _addZ)
 void
 Actor::setRotation(Matrix4 _rotation)
 {
-  m_transform.setRotation(_rotation);
+  // setRotation(_rotation.getRotation());
 }
 
 void
@@ -88,6 +125,12 @@ void
 Actor::setRotation(float _x, float _y, float _z)
 {
   m_rotation = Vector3(_x, _y, _z);
+  Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
+
+  m_forward = (rotMat * Vector4(Vector3::FORWARD, 0.0f)).xyz().normalized();
+  m_right = (rotMat * Vector4(Vector3::RIGHT, 0.0f)).xyz().normalized();
+  m_up = (rotMat * Vector4(Vector3::UP, 0.0f)).xyz().normalized();
+
   generateNewTransform();
 }
 
@@ -133,6 +176,8 @@ Actor::update(float _deltaTime)
         break;
       }
       case COMPONENT_TYPE::kCamera: {
+        SPtr<Camera> camera = reinterpret_pointer_cast<Camera>(component);
+        // camera->moveForward();
         break;
       }
       case COMPONENT_TYPE::kMaterial: {
@@ -181,6 +226,33 @@ Actor::generateNewTransform()
   Matrix4 scaleMat = Matrix4::scale(m_scale);
 
   m_transform = posMat * rotMat * scaleMat;
+}
+
+void
+Actor::generateNewLocalTransform()
+{
+  Vector3 rot = m_rotation * Math::DEG2RAD;
+
+  Matrix4 posMat = Matrix4::translation(m_position);
+  Matrix4 rotMat = Matrix4::rotation(rot);
+  Matrix4 scaleMat = Matrix4::scale(m_scale);
+
+  m_transform = scaleMat * rotMat * posMat;
+}
+
+void
+Actor::setPositionLocal(Vector3 _offset)
+{
+  m_position = _offset;
+  generateNewLocalTransform();
+}
+
+void
+Actor::setPositionForwardLocal(float _offset)
+{
+  Vector3 offset = m_forward * _offset;
+  m_position += offset;
+  generateNewLocalTransform();
 }
 
 void

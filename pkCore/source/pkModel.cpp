@@ -31,7 +31,10 @@ void
 processNode(Model& _model, aiNode* _node, const aiScene* _scene);
 
 SPtr<Mesh>
-processMesh(aiMesh* _mesh, const aiScene* _scene);
+processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform);
+
+Matrix4
+aiTransformToMatrix4(aiMatrix4x4 _transform);
 
 bool
 Model::load(Path& _path)
@@ -70,7 +73,8 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
 {
   for (uint32 i = 0; i < _node->mNumMeshes; ++i) {
     aiMesh* mesh = _scene->mMeshes[_node->mMeshes[i]];
-    _model.meshes.push_back(processMesh(mesh, _scene));
+    Matrix4 transform = aiTransformToMatrix4(_node->mTransformation);
+    _model.meshes.push_back(processMesh(mesh, _scene, transform)); // , _node->mTransformation
   }
 
   for (uint32 i = 0; i < _node->mNumChildren; ++i) {
@@ -78,8 +82,19 @@ processNode(Model& _model, aiNode* _node, const aiScene* _scene)
   }
 }
 
+Matrix4
+aiTransformToMatrix4(aiMatrix4x4 _transform)
+{
+  Matrix4 M(_transform.a1, _transform.a2, _transform.a3, _transform.a4,
+            _transform.b1, _transform.b2, _transform.b3, _transform.b4,
+            _transform.c1, _transform.c2, _transform.c3, _transform.c4,
+            _transform.d1, _transform.d2, _transform.d3, _transform.d4);
+
+  return M;
+}
+
 SPtr<Mesh>
-processMesh(aiMesh* _mesh, const aiScene* _scene)
+processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
   ResourceManager& rm = g_ResourceManager().instance();
@@ -89,6 +104,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
   // check if the mesh is already in storage
   String meshName(_mesh->mName.C_Str());
   SPtr<Mesh> meshProcess = rm.searchMesh(meshName);
+  // if a mesh can be found
   if (meshProcess) {
     log.registerMessage("Found pre-loaded mesh of name " + meshName + ".");
     return meshProcess;
@@ -97,6 +113,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
   // create the mesh
   meshProcess = make_shared<Mesh>();
   meshProcess->setName(meshName);
+  meshProcess->m_transform = _transform;
   meshProcess->vertexCount = _mesh->mNumVertices;
   meshProcess->vertexVector.resize(_mesh->mNumVertices);
 
@@ -132,6 +149,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
                                             _mesh->mBitangents[i].z) : zero3;
     // create and add a new vertex
     SimpleVertex sv = SimpleVertex(pos, normal, tex, tangent, bitangent);
+    sv *= _transform;
     meshProcess->vertexVector[i] = sv;
   }
 
@@ -159,6 +177,7 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
     meshProcess->material->setHeight(tm.m_defaultHeight);
     meshProcess->material->setMetallic(tm.m_defaultMetallic);
     meshProcess->material->setRoughness(tm.m_defaultRough);
+    meshProcess->material->setEmissive(tm.m_defaultEmissive);
 
     String matName = materialA->GetName().C_Str();
     meshProcess->material->setName(matName);
@@ -285,6 +304,30 @@ processMesh(aiMesh* _mesh, const aiScene* _scene)
       else { // register that a roughness texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load roughness texture" + filePath.toString() +
+                            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+      }
+    }
+
+    // get all emissive maps of the material
+    uint32 emissiveCount = materialA->GetTextureCount(aiTextureType_EMISSIVE);
+    for (uint32 i = 0; i < emissiveCount; ++i) {
+      aiString path;
+      // emissive texture loading.
+      if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
+        // load the texture.
+        Path newPath(path.C_Str());
+        SPtr<Texture> texture = tm.loadTexture(newPath);
+        // if a texture was loaded.
+        if (texture) {
+          // log registry.
+          log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
+                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+          meshProcess->material->setEmissive(texture);
+        }
+      }
+      else { // register that an emissive texture was not found.
+        filePath = Path(path.C_Str()).getFileName();
+        log.registerMessage("Failed to load emissive texture" + filePath.toString() +
                             " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }

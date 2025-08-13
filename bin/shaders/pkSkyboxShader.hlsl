@@ -4,22 +4,6 @@ SamplerState samState : register(s0);
 
 #define PI 3.14159265f
 
-// cbuffer CameraData : register(b0)
-// {
-//   float4 Eye; // 16
-//   float3 ForwardCam; // 28
-//   float4x4 ViewCam; // 92
-//   float4x4 ProjectionCam; // 156
-//   float _unusedCam0; // 160
-//   float4 _padding; // 172
-// };
-
-// cbuffer ViewPort : register(b1)
-// {
-//   float2 ViewPortSize;
-//   float2 _VPPadding;
-// }
-
 cbuffer ViewTransposed : register(b0)
 {
   matrix ViewTransp;
@@ -44,6 +28,13 @@ float2 getSkyBoxUV(float3 dir)
   return float2(u, v);
 }
 
+float4
+sRGBToLinear(float4 color)
+{
+  // Convert sRGB to linear color space
+  return float4(pow(color.rgb, 1.0f / 2.2f), color.a);
+}
+
 float4 PS(PS_INPUT input) : SV_Target
 {
   // Reconstruct view-space direction
@@ -62,7 +53,7 @@ float4 PS(PS_INPUT input) : SV_Target
   
   float3 viewDir = normalize(viewPos.xyz);
   float2 skyboxUV = getSkyBoxUV(viewDir);
-  float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0.0f).rgb;
+  float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0).rgb;
   
-  return float4(color, 1.0f);
+  return sRGBToLinear(float4(color, 1.0f));
 }

@@ -18,6 +18,8 @@ using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::G_BUFFERS::kGB_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
@@ -108,6 +110,8 @@ BaseApp::messageLoop()
     g_TimeManager().m_deltaTime = g_TimeManager().getDeltaTime(delta);
     // fixed update timer count.
     m_fixedTimer += g_TimeManager().m_deltaTime;
+    // base app update
+    update();
     // child class app update
     onUpdate();
     // update scene
@@ -128,6 +132,117 @@ BaseApp::messageLoop()
 }
 
 void
+BaseApp::update()
+{
+  // managers
+  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& rm = g_RenderManager().instance();
+
+  Vector2 winSize = api.getSwapChain()->getSize();
+
+  // camera data
+  Matrix4 view = Matrix4::IDENTITY;
+  Matrix4 proj = Matrix4::IDENTITY;
+  Matrix4 invView = Matrix4::IDENTITY;
+  Matrix4 invProj = Matrix4::IDENTITY;
+  Matrix4 invViewProj = Matrix4::IDENTITY;
+  Matrix4 viewTransp = Matrix4::IDENTITY;
+  Matrix4 projTransp = Matrix4::IDENTITY;
+  // main camera buffer
+  CBCamera cBCamera;
+  CBVector2x2 shadowsParam;
+  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
+  shadowsParam.vec2 = Vector2(0.0f);
+  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
+
+  // light buffers
+  CBLight cBLight;
+  CBCamera cBLightCam;
+
+  // update shadow depth map buffers
+  Matrix4 lightView = Matrix4::IDENTITY;
+  Matrix4 lightProj = Matrix4::IDENTITY;
+  Matrix4 lightViewProj = Matrix4::IDENTITY;
+
+  // luminance parameters.
+  CBVector2x2 lum;
+  lum.vec1 = winSize;
+  lum.vec2.x = 90.0f;
+  // blur parameters.
+  CBBlur blur;
+  blur.WinSize = winSize;
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  blur.radius = 1.0f;
+  blur.strength = 2.0f;
+  // emissive blur parameters
+  CBBlur emissiveBlur;
+  emissiveBlur.WinSize = winSize;
+  emissiveBlur.radius = 30.0f;
+  emissiveBlur.strength = 30.0f;
+  // IBR parameters.
+  CBFloat IBRIntens;
+  IBRIntens.value = 1.0f;
+  CBVector3 viewPos;
+  viewPos.vec1 = Vector3::ZERO;
+
+  // data type sizes.
+  uint32 m4x4Size = sizeof(Matrix4);
+  uint32 cBCamSize = sizeof(CBCamera);
+  uint32 cBLightSize = sizeof(CBLight);
+
+  // get all passes.
+  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
+  SPtr<Pass> basePass = rm.getPass(kP_Base);
+  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
+  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
+  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
+
+  // update normal && base shadow pass buffers.
+  api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
+  api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
+  api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
+  api.updateConstantBuffer(basePass->getCBuffer(4), &cBCamera, cBCamSize);
+
+  api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
+  api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
+  api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
+  api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
+
+  // update shadow-specular quad pass
+  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &shadowsParam, sizeof(Vector4));
+
+  // skybox constant buffers.
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
+
+  // ibr constant buffers.
+  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
+
+  // luminance constant buffers.
+  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  // Emissive blur constant buffers;
+  emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  // lum blur constant buffers
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  blur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+}
+
+void
 BaseApp::render()
 {
   // get managers
@@ -139,6 +254,8 @@ BaseApp::render()
   SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
+  SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
+  SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
   SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
   SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
@@ -156,7 +273,7 @@ BaseApp::render()
   }
 
   // base pass
-  basePass->beginPass();
+  basePass->beginPass(Color(0, 0, 0, 0));
   renderManager.renderActors(actors);
   basePass->endPass();
 
@@ -184,6 +301,16 @@ BaseApp::render()
     IBRPass->endPass();
   }
 
+  // emissive Horizontal Blur pass
+  emissHBlurPass->beginPass();
+  api.draw(3, 0);
+  emissHBlurPass->endPass();
+
+  // emissive pass
+  emissBlurPass->beginPass();
+  api.draw(3, 0);
+  emissBlurPass->endPass();
+
   // Quad merge pass.
   mergePass->beginPass();
   api.draw(3, 0);
@@ -199,7 +326,7 @@ BaseApp::render()
   api.draw(3, 0);
   lumBlurHPass->endPass();
 
-  // Quad lum blur pass.
+  // Quad lum blur Vertical pass.
   lumBlurPass->beginPass();
   api.draw(3, 0);
   lumBlurPass->endPass();

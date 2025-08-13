@@ -35,23 +35,23 @@ struct CBTransform
 
 struct CBCamera
 {
-  Vector4 eye; // 16
-  Vector3 forward; // 12
-  Matrix4 view; // 64
-  Matrix4 projection; // 64
+  Vector4 eye = Vector4(0.0f, 0.0f, 0.0f, 1.0f); // 16
+  Vector3 forward = Vector3::FORWARD; // 12
+  Matrix4 view = Matrix4::IDENTITY; // 64
+  Matrix4 projection = Matrix4::IDENTITY; // 64
   float unused; // 4
 }; // 176 bytes
 
 struct CBLight
 {
-  Vector4 direction; // 16
-  Vector4 position; // 32
-  Vector4 color; // 48
-  float shadowIntensity; // 52
-  float spotExponent; // 56
-  float spotCutoff; // 60
-  float specIntensity; // 64
-  Matrix4 transform; // 128
+  Vector4 direction = Vector4(0.0f, -1.0f, 0.0f, 0.0f); // 16
+  Vector4 position = Vector4(0.0f, 50.0f, 0.0f, 1.0f); // 32
+  Vector4 color = Vector4(1.0f); // 48
+  float shadowIntensity = 0.75f; // 52
+  float spotExponent = 32.0f; // 56
+  float spotCutoff = 0.9f; // 60
+  float specIntensity = 1.0f; // 64
+  Matrix4 transform = Matrix4::IDENTITY; // 128
 };
 
 /* to do: find a better way of creating the buffers from the object, i feel like they'll have

@@ -289,7 +289,7 @@ class PK_UTILITY_EXPORT Vector4
     return !operator==(other);
   }
 
-  const Vector4
+  Vector4
   operator*(const Matrix4& other) const;
   
   /**
@@ -483,7 +483,7 @@ class PK_UTILITY_EXPORT Vector4
    * @brief Get vector3 from this vector.
    * @return A vector3 with the x, y and z of this vector.
    */
-  Vector3
+  const Vector3
   xyz() { return Vector3(x, y, z); }
 
   /**

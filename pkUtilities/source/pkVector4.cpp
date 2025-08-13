@@ -19,7 +19,7 @@ Vector4::Vector4(Vector3 _vec, float _w)
   w = _w;
 }
 
-const Vector4
+Vector4
 Vector4::operator*(const Matrix4& other) const
 {
   // new X value

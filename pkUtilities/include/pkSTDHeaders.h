@@ -68,6 +68,18 @@ template <class T>
 using Vector = std::vector<T>;
 
 template<typename T>
+
 using WPtr = std::weak_ptr<T>;
 
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+  #undef min
+  #undef max
+#if !defined(NOMINMAX) && defined(_MSC_VER)
+#  define NOMINMAX     //Required to stop windows.h messing up std::min
+#endif
+#if defined(__MINGW32__)
+#  include <unistd.h>
+#endif
+
+#endif
 }

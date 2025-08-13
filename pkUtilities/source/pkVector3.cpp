@@ -89,7 +89,7 @@ Vector3::normalize()
 {
   float mag = magnitude();
   mag = 1.0f / mag;
-  mag = Math::abs(mag);
+  // mag = Math::abs(mag);
   x *= mag;
   y *= mag;
   z *= mag;

@@ -73,10 +73,40 @@ class PK_CORE_EXPORT Actor
   move(Vector3 _addPos);
 
   /**
-   * @brief Move the actor relative to its local axis.
+   * @brief Move the actor on the forward vector.
    */
   void
-  moveLocal(Vector3 _offset);
+  moveForward(float _offset);
+
+  /**
+   * @brief Move the actor relative to its forward vector.
+   */
+  void
+  moveForwardLocal(float _offset);
+
+  /**
+   * @brief Move the actor on the right vector.
+   */
+  void
+  moveRight(float _offset);
+
+  /**
+   * @brief Move the actor relative to its right vector.
+   */
+  void
+  moveRightLocal(float _offset);
+
+  /**
+   * @brief Move the actor on the up vector
+   */
+  void
+  moveUp(float _offset);
+
+  /**
+   * @brief Move the actor relative to its up vector.
+   */
+  void
+  moveUpLocal(float _offset);
 
   /**
    * @brief Move the actor using the verlet integration.
@@ -168,6 +198,19 @@ class PK_CORE_EXPORT Actor
    */
   FORCEINLINE Vector3&
   getRotation() { return m_rotation; }
+
+  /**
+   * @brief Set the position relative to its local axis.
+   */
+  void
+  setPositionLocal(Vector3 _offset);
+  
+  /**
+   * @brief Set the actor position relative to its local forward.
+   * @param _offset How much will the movement be.
+   */
+  void
+  setPositionForwardLocal(float _offset);
 
   /**
    * @brief adds a component of type T.
@@ -273,13 +316,25 @@ class PK_CORE_EXPORT Actor
   void
   generateNewTransform();
 
+  /**
+   * @brief Create a new local transform for the actor based on translation, rotation
+   *        and scale currently set.
+   */
+  void
+  generateNewLocalTransform();
+
  public:
+   // transform parameters
   Vector3 m_forward;
+  Vector3 m_right;
+  Vector3 m_up;
+  Matrix4 m_transform;
+  Matrix4 m_prevTransform;
+
+  // parts
   Vector<SPtr<Component>> m_components;
   Vector<SPtr<Actor>> m_children;
   SPtr<Actor> m_parent;
-  Matrix4 m_transform;
-  Matrix4 m_prevTransform;
 
   Vector3 m_scale;
   Vector3 m_rotation;

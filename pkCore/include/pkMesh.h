@@ -33,7 +33,7 @@ class Texture;
 class Mesh
 {
  public:
-  Mesh() = default;
+   Mesh() = default;
   virtual ~Mesh() {
     clean();
   }
@@ -90,7 +90,7 @@ class Mesh
   Vector<SimpleVertex> vertexVector;
   Vector<uint32> indexVector;
 
-  Matrix4 transform;
+  Matrix4 m_transform = Matrix4::IDENTITY;
   uint32 vertexCount;
   uint32 numIndex;
 

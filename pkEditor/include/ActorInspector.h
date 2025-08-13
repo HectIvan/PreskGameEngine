@@ -47,7 +47,8 @@ class ActorInspector
   void
   createComponentWindow(SPtr<Component>& _pComponent,
                         Window& _window,
-                        String& _searchMesh);
+                        String& _searchMesh,
+                        float& _imgTexSize);
 
  public:
   SPtr<Actor> m_actor;

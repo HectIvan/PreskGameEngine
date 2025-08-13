@@ -29,23 +29,23 @@ class DX11Texture : public Texture
  public:
   DX11Texture() = default;
   DX11Texture(ID3D11Texture2D* _t2d,
-              ID3D11RenderTargetView* _rTV = nullptr,
+              Vector<ID3D11RenderTargetView*> _rTVs = { nullptr },
               ID3D11DepthStencilView* _dSV = nullptr,
               ID3D11ShaderResourceView* _Srv = nullptr,
-              ID3D11UnorderedAccessView* _uAV = nullptr) :
+              Vector<ID3D11UnorderedAccessView*> _uAVs = { nullptr }) :
     m_t2d(_t2d),
-    m_rTV(_rTV),
+    m_rTVs(_rTVs),
     m_dSV(_dSV),
     m_sRV(_Srv),
-    m_uAV(_uAV),
+    m_uAVs(_uAVs),
     m_owner(false)
   {}
   virtual ~DX11Texture()
   {
     safeRelease(m_sRV);
     safeRelease(m_dSV);
-    safeRelease(m_rTV);
-    safeRelease(m_uAV);
+    m_rTVs.clear();
+    m_uAVs.clear();
     if (m_owner) { safeRelease(m_t2d); }
   }
 
@@ -65,17 +65,33 @@ class DX11Texture : public Texture
 
   /**
    * @brief Get the render target view.
+   * @param _index Index of the RTV to get.
    * @return Pointer to the target.
    */
   ID3D11RenderTargetView*
-  getRTV() const { return m_rTV; }
+  getRTV(int32 _index = 0) const { return m_rTVs[_index]; }
+
+  /**
+   * @brief Get the render target view.
+   * @return Vect of render target views.
+   */
+  Vector<ID3D11RenderTargetView*>
+  getRTVs() const { return m_rTVs; }
 
   /**
    * @brief Set the render target view.
    * @param _rTV New render target view.
+   * @param _index Index of the RTV to set.
    */
   void
-  setRTV(ID3D11RenderTargetView* _rTV) { m_rTV = _rTV; }
+  setRTV(ID3D11RenderTargetView* _rTV, int32 _index) { m_rTVs[_index] = _rTV; }
+
+  /**
+   * @brief Set the render target views.
+   * @param _rTV New render target views.
+   */
+  void
+  setRTVs(Vector<ID3D11RenderTargetView*> _rTVs) { m_rTVs = _rTVs; }
 
   /**
    * @brief Get the shader resource view.
@@ -92,18 +108,33 @@ class DX11Texture : public Texture
   setSRV(ID3D11ShaderResourceView* _sRV) { m_sRV = _sRV; }
 
   /**
-   * @brief Get the unordered access view.
+   * @brief Get the unordered access view of an index.
    * @return Pointer to the view.
    */
   ID3D11UnorderedAccessView*
-  getUAV() const { return m_uAV; }
+  getUAV(int32 _index) const { return m_uAVs[_index]; }
+
+  /**
+   * @brief Get the unordered access views.
+   * @return Vector of UAVs.
+   */
+  Vector<ID3D11UnorderedAccessView*>
+  getUAVs() const { return m_uAVs; }
 
   /**
    * @brief Set the unordered access view.
    * @param _sRV New unordered access view.
+   * @param _index Index of the UAV to set.
    */
   void
-  setUAV(ID3D11UnorderedAccessView* _uAV) { m_uAV = _uAV; }
+  setUAV(ID3D11UnorderedAccessView* _uAV, int32 _index) { m_uAVs[_index] = _uAV; }
+
+  /**
+   * @brief Set the unordered access views.
+   * @param _sRV New unordered access views.
+   */
+  void
+  setUAVs(Vector<ID3D11UnorderedAccessView*> _uAVs) { m_uAVs = _uAVs; }
 
   /**
    * @brief Get the raw texture data.
@@ -123,13 +154,13 @@ class DX11Texture : public Texture
  public:
   ID3D11Texture2D* m_t2d = nullptr;
 
-  ID3D11RenderTargetView* m_rTV = nullptr;
+  Vector<ID3D11RenderTargetView*> m_rTVs;
 
   ID3D11DepthStencilView* m_dSV = nullptr;
 
   ID3D11ShaderResourceView* m_sRV = nullptr;
 
-  ID3D11UnorderedAccessView* m_uAV = nullptr;
+  Vector<ID3D11UnorderedAccessView*> m_uAVs;
 
   bool m_owner = true;
 };

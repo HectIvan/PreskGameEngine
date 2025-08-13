@@ -70,6 +70,12 @@ class PK_CORE_EXPORT BaseApp
   messageLoop();
 
   /**
+   * @brieg Update the base app.
+   */
+  void
+  update();
+
+  /**
    * @brief Update function for any child class of this base app
    */
   virtual void

@@ -134,7 +134,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTarget(const SPtr<Texture> _pRTarget,
+                  const SPtr<Texture> _pDepthSV = nullptr,
+                  const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Set the render targets to the device.
@@ -142,7 +144,9 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) = 0;
+  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Unbinds all render targets.
@@ -236,6 +240,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
+   * @brief Get bytes per pixel from the format.
+   * @param _format Format to get the bytes from.
+   */
+  virtual uint32
+  getBytesFromFormat(const uint32 _format) = 0;
+
+  /**
    * @brief Create a texture.
    * @param _desc Texture descrition.
    * @return Texture.
@@ -260,8 +271,8 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                 int32 _format,
                 int32 _usage,
                 int32 _bindFlags,
-                bool _mipLevels,
                 int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
                 int32 _miscflags = 0,
                 unsigned char* _data = nullptr) = 0;
 
@@ -269,14 +280,14 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @brief Create a texture from file.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _bindFlags Bind flags of the texture.
+   * @param _mipLevels MipMap level count.
    * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
-                        bool _mipLevels,
+                        int32 _mipLevels,
                         uint32 _format,
                         int32 _miscFlags = 0) = 0;
 
@@ -292,14 +303,22 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    * @brief Create a texture from file as float.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
+   * @param _mipLevels MipMap level count.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
-                         bool _mipLevels,
-                         int32 _miscFlags = 0) = 0;
+                         int32 _mipLevels = 1,
+                         int32 _miscFlags = 0,
+                         PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) = 0;
+
+  /**
+   * @brief Generate mips for a texture.
+   * @param _pTexture Texture to use.
+   */
+  virtual void
+  GenerateMips(SPtr<Texture>& _pTexture) = 0;
 
   /**
    * @brief Create a VertexBuffer.
@@ -418,7 +437,8 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual void
   cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
-                            uint32* _initialCounts = nullptr) = 0;
+                            uint32* _initialCounts = nullptr,
+                            uint32 _mipLevels = 0) = 0;
 
   /**
    * @brief Unbind unordered views from a compute shader.

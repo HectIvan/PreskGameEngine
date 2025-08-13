@@ -151,7 +151,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTarget(const SPtr<Texture> _pRTarget,
+                  const SPtr<Texture> _pDepthSV = nullptr,
+                  const uint32 _mipLevel = 0) override;
 
   /**
    * @brief Set the render targets to the device.
@@ -159,7 +161,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTargets(Vector<SPtr<Texture>> _rTargets, SPtr<Texture> _pDepthSV = nullptr) override;
+  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const uint32 _mipLevel = 0) override;
 
   // to do:change this to allow a specific ammount to be unbound.
   /**
@@ -250,6 +254,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
 
   /**
+   * @brief Get bytes per pixel from the format.
+   * @param _format Format to get the bytes from.
+   */
+  uint32
+  getBytesFromFormat(const uint32 _format) override;
+
+  /**
    * @brief Create a texture.
    * @param _desc Texture descrition.
    * @return Texture.
@@ -274,8 +285,8 @@ class DX11GraphicsAPI : public GraphicsAPI
                 int32 _format,
                 int32 _usage,
                 int32 _bindFlags,
-                bool _mipLevels,
                 int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
                 int32 _miscFlags = 0,
                 unsigned char* _data = nullptr) override;
 
@@ -283,13 +294,13 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Create a texture from file.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
-   * @param _format What format will the texture be.
+   * @param _mipLevels MipMap level count.
+   * @return Pointer to the texture.
    */
   SPtr<Texture>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
-                        bool _mipLevels,
+                        int32 _mipLevels,
                         uint32 _format,
                         int32 _miscFlags = 0) override;
 
@@ -305,14 +316,23 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Create a texture from file as float.
    * @param _directory Directory of the texture.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels If the texture has mip levels.
+   * @param _mipLevels MipMap level count.
+   * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   SPtr<Texture>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
-                         bool _mipLevels,
-                         int32 _miscFlags = 0) override;
+                         int32 _mipLevels = 1,
+                         int32 _miscFlags = 0,
+                         PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) override;
+
+  /**
+   * @brief Generate mips for a texture.
+   * @param _pTexture Texture to use.
+   */
+  void
+  GenerateMips(SPtr<Texture>& _pTexture) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -429,7 +449,8 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                             uint32 _start = 0,
-                            uint32* _initialCounts = nullptr) override;
+                            uint32* _initialCounts = nullptr,
+                            uint32 _mipLevels = 0) override;
 
   /**
    * @brief Unbind unordered views of a compute shader.

@@ -18,6 +18,8 @@
 #define STBI_ENABLE_OPENEXR
 #include "stb_image.h"
 
+#include "pkPlatformMath.h"
+
 #include "pkLogger.h"
 #include "pkDX11BlendState.h"
 #include "pkDX11ComputeShader.h"
@@ -285,7 +287,12 @@ DX11GraphicsAPI::clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv)
                      static_cast<float>(_color.getG()),
                      static_cast<float>(_color.getB()),
                      static_cast<float>(_color.getA()) };
-  device->m_pImmediateContext->ClearRenderTargetView(dxRTV->m_rTV, color);
+  for (uint32 i = 0; i < dxRTV->m_rTVs.size(); ++i) {
+    ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[i];
+    if (rtv) {
+      device->m_pImmediateContext->ClearRenderTargetView(rtv, color);
+    }
+  }
 }
 
 void
@@ -317,7 +324,12 @@ DX11GraphicsAPI::clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _colo
                      static_cast<float>(_color.getG()),
                      static_cast<float>(_color.getB()),
                      static_cast<float>(_color.getA()) };
-  device->m_pImmediateContext->ClearUnorderedAccessViewFloat(dxUAV->m_uAV, color);
+  for (uint32 i = 0; i < dxUAV->m_uAVs.size(); ++i) {
+    ID3D11UnorderedAccessView* uav = dxUAV->m_uAVs[i];
+    if (uav) {
+      device->m_pImmediateContext->ClearUnorderedAccessViewFloat(uav, color);
+    }
+  }
 }
 
 void
@@ -580,8 +592,9 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
 }
 
 void
-DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
-                                  SPtr<Texture> _pDepthSV)
+DX11GraphicsAPI::setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                                  const SPtr<Texture> _pDepthSV,
+                                  const uint32 _mipLevel)
 {
   Logger& log = g_Logger().instance();
   // reinterpret the depth stencil view to a DirectX texture
@@ -594,7 +607,10 @@ DX11GraphicsAPI::setRenderTargets(Vector<SPtr<Texture>> _rTargets,
   for (uint32 i = 0; i < RTCount; ++i) {
     SPtr<DX11Texture> dxTx = reinterpret_pointer_cast<DX11Texture>(_rTargets[i]);
     // if target is valid, store it
-    if (_rTargets[i] && dxTx->m_rTV) { rTVector.push_back(dxTx->m_rTV); }
+    ID3D11RenderTargetView* rTView = dxTx->m_rTVs[_mipLevel];
+    if (_rTargets[i] && rTView) {
+      rTVector.push_back(rTView);
+    }
     // if its not, save a null pointer
     else { rTVector.push_back(nullptr); }
   }
@@ -633,7 +649,9 @@ DX11GraphicsAPI::unbindRenderTargets()
 }
 
 void
-DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _pDepthSV)
+DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget,
+                                 const SPtr<Texture> _pDepthSV,
+                                 const uint32 _mipLevel)
 {
   Logger& log = g_Logger().instance();
   // reinterpet render target
@@ -649,7 +667,7 @@ DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget, SPtr<Texture> _p
     return;
   }
   device->m_pImmediateContext->OMSetRenderTargets(rTarget ? 1 : 0,
-                                                  rTarget ?  &rTarget->m_rTV : nullptr,
+                                                  rTarget ?  &rTarget->m_rTVs[_mipLevel] : nullptr,
                                                   pDSV ? pDSV->m_dSV : nullptr);
 }
 
@@ -989,7 +1007,7 @@ SPtr<Texture>
 DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
   return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
-                       _desc.bindFlags, _desc.mipLevels, _desc.shaderResourceFormat,
+                       _desc.bindFlags, _desc.shaderResourceFormat, _desc.mipLevels,
                        _desc.miscFlags, _desc.data);
 }
 
@@ -1423,7 +1441,8 @@ DX11GraphicsAPI::cSUnbindShaderResourceViews()
 void
 DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
                                            uint32 _start,
-                                           uint32* _initialCounts)
+                                           uint32* _initialCounts,
+                                           uint32 _mipLevel)
 {
   Logger& log = g_Logger().instance();
   // cast to a directX device
@@ -1443,7 +1462,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTexture
     // Recast to a DirectX Texture
     auto dxUAV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
     // set the resource
-    uavVector[i] = dxUAV ? dxUAV->m_uAV : nullptr;
+    uavVector[i] = dxUAV ? dxUAV->m_uAVs[_mipLevel] : nullptr;
   }
 
   device->m_pImmediateContext->CSSetUnorderedAccessViews(_start,
@@ -1478,11 +1497,13 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
-                                       bool _mipLevels,
+                                       int32 _mipLevels,
                                        uint32 _format,
                                        int32 _miscFlags)
 {
   Logger& log = g_Logger().instance();
+
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   // values
   int32 width, height, bpp;
 
@@ -1509,8 +1530,8 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                              _format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
-                                             _mipLevels,
                                              _format,
+                                             _mipLevels,
                                              _miscFlags,
                                              data);
 
@@ -1520,6 +1541,20 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
+  }
+
+  bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format));
+  auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
+  device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
+                                                 0,
+                                                 nullptr,
+                                                 data,
+                                                 width * bpp,
+                                                 0);
+
+  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  if (generateMips) {
+    GenerateMips(temptTexture);
   }
 
   // free the texture data if there's data to release
@@ -1561,10 +1596,12 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                         uint32 _bindFlags,
-                                        bool _mipLevels,
-                                        int32 _miscFlags)
+                                        int32 _mipLevels,
+                                        int32 _miscFlags,
+                                        PK_USAGE::E _usage)
 {
   Logger& log = g_Logger().instance();
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   // values
   int32 width, height, channels, bpp;
 
@@ -1592,10 +1629,10 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                              width,
                                              height,
                                              format,
-                                             PK_USAGE::kPK_USAGE_DEFAULT,
+                                             _usage,
                                              _bindFlags,
-                                             _mipLevels,
                                              format,
+                                             _mipLevels,
                                              _miscFlags,
                                              reinterpret_cast<unsigned char*>(data));
 
@@ -1605,6 +1642,19 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
+  }
+
+  auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
+  device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
+                                                 0,
+                                                 nullptr,
+                                                 data,
+                                                 width * bpp,
+                                                 0);
+
+  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  if (generateMips) {
+    GenerateMips(temptTexture);
   }
 
   // free the texture data if there's data to release
@@ -1617,36 +1667,56 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   return temptTexture;
 }
 
+void
+DX11GraphicsAPI::GenerateMips(SPtr<Texture>& _pTexture)
+{
+  Logger& log = g_Logger().instance();
+  auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
+  if (!texture) {
+    String msg = "Failed to generate mips for texture: " + _pTexture->getName().getPath();
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    return;
+  }
+
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+
+  ID3D11ShaderResourceView* srv = texture->getSRV();
+  if (srv) {
+    device->m_pImmediateContext->GenerateMips(srv);
+  }
+}
+
 uint32
-getBitsFromFormat(PK_TEXTURE_FORMAT::E _format)
+DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
 {
   // RGBA of value 32
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_TYPELESS ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_UINT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_SINT) {
-    return 32 * 4;
+    return (32 * 4) / 8;
   }
   // RGB of value 32
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_TYPELESS ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_UINT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_SINT) {
-    return 32 * 3;
+    return (32 * 3) / 8;
   }
   // RGBA of value 16
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_FLOAT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_TYPELESS ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_UINT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_SINT) {
-    return 16 * 4;
+    return (16 * 4) / 8;
   }
   // RG of value 16
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_FLOAT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_TYPELESS ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_UINT ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_SINT) {
-    return 16 * 2;
+    return (16 * 2) / 8;
   }
   // RGBA of value 8
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM ||
@@ -1655,14 +1725,14 @@ getBitsFromFormat(PK_TEXTURE_FORMAT::E _format)
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_SINT || 
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_UNORM ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_TYPELESS) {
-    return 8 * 4;
+    return (8 * 4) / 8;
   }
   // R of value 8
   if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_TYPELESS ||
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM || 
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_SINT || 
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UINT) {
-    return 8;
+    return 1;
   }
 }
 
@@ -1673,54 +1743,58 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
                                int32 _format,
                                int32 _usage,
                                int32 _bindFlags,
-                               bool _mipLevels,
                                int32 _shaderResourceFormat,
+                               int32 _mipLevels,
                                int32 _miscFlags,
                                unsigned char* _data)
 {
   PK_ASSERT(m_pDevice);
-
   Logger& log = g_Logger().instance();
+  // verify that the device is a directX 11 device
+  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+
+  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  if (generateMips) {
+    _bindFlags |= D3D11_BIND_RENDER_TARGET;
+    _bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+    if (_mipLevels == 0) {
+      _mipLevels = static_cast<uint32>(Math::log2(Math::max(_width, _height)) + 1);
+    }
+  }
+
+  // create the texture
+  SPtr<Texture> tex = make_shared<DX11Texture>();
+  auto dxTex = reinterpret_pointer_cast<DX11Texture>(tex);
+  tex->setSize(Vector2(_width, _height));
+
   // texture description
   D3D11_TEXTURE2D_DESC desc;
   memset(&desc, 0, sizeof(desc));
   desc.Width = _width;
   desc.Height = _height;
-  desc.MipLevels = _mipLevels ? 0 : 1;
+  desc.MipLevels = _mipLevels;
   desc.ArraySize = 1;
   desc.Format = static_cast<DXGI_FORMAT>(_format);
   desc.SampleDesc.Count = 1;
   desc.SampleDesc.Quality = 0;
   desc.Usage = static_cast<D3D11_USAGE>(_usage);
   desc.BindFlags = _bindFlags;
-  desc.CPUAccessFlags = 0;
-  desc.MiscFlags = _miscFlags;
-
-  // data of the texture
-  D3D11_SUBRESOURCE_DATA* initData = nullptr;
-  if (_data) {
-    initData = new D3D11_SUBRESOURCE_DATA();
-    initData->pSysMem = _data;
-    uint32 bytesPerPixel = getBitsFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format)) / 8;
-    initData->SysMemPitch = _width * bytesPerPixel;
-    initData->SysMemSlicePitch = 0;
-  }
+  desc.CPUAccessFlags = _usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+  desc.MiscFlags = generateMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
   // create the texture
-  SPtr<DX11Texture> tex = make_shared<DX11Texture>();
-  tex->setSize(Vector2(_width, _height));
+  int32 hr = 0;
+  hr = device->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
 
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    const String msg = "Failed to utilize the DX device in the creation of a texture.";
+  // if texture creation failed
+  if (FAILED(hr)) {
+    const String errMsg = log.getMessageError(hr);
+    const String msg = "Failed to create a texture. Error message: " + errMsg;
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  // hresult
-  int32 hr = 0;
-  // create the texture
-  hr = device->m_pd3dDevice->CreateTexture2D(&desc, initData, &tex->m_t2d);
   /**
    * Create shader resource.
    */
@@ -1729,26 +1803,19 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     D3D11_SHADER_RESOURCE_VIEW_DESC sDesc;
     memset(&sDesc, 0, sizeof(sDesc));
     sDesc.Format = static_cast<DXGI_FORMAT>(_shaderResourceFormat);
-    sDesc.Texture2D.MipLevels = desc.MipLevels;
+    sDesc.Texture2D.MipLevels = (_mipLevels == 0) ? -1 : desc.MipLevels;
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-    // if texture creation failed
-    if (FAILED(hr)) {
-      const String errMsg = log.getMessageError(hr);
-      const String msg = "Failed to create a texture. Error message: " + errMsg;
-      log.print(msg);
-      log.registerMessage(msg, LOG_MSG_TYPE::kError);
-      return nullptr;
-    }
     // create the shader resource view
-    hr = device->m_pd3dDevice->CreateShaderResourceView(tex->m_t2d, &sDesc, &tex->m_sRV);
+    hr = device->m_pd3dDevice->CreateShaderResourceView(dxTex->m_t2d, &sDesc, &dxTex->m_sRV);
     // if failed to create shader resource view
     if (FAILED(hr)) {
       const String errMsg = log.getMessageError(hr);
       const String msg = "Failed to create a shader resource view. Error message: " + errMsg;
       log.print(msg);
       log.registerMessage(msg, LOG_MSG_TYPE::kError);
+      return nullptr;
     }
   }
   /**
@@ -1776,8 +1843,8 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
 
-    hr = device->m_pd3dDevice->CreateDepthStencilView(tex->m_t2d, &dsvDesc, &tex->m_dSV);
-    if (!tex->m_dSV) {
+    hr = device->m_pd3dDevice->CreateDepthStencilView(dxTex->m_t2d, &dsvDesc, &dxTex->m_dSV);
+    if (!dxTex->m_dSV) {
       const String errMsg = log.getMessageError(hr);
       const String msg = "Failed to create the depth stencil. Error message: " + errMsg;
       log.print(msg);
@@ -1794,14 +1861,19 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     rtvDesc.Format = desc.Format;
     rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
+    dxTex->m_rTVs.resize(_mipLevels);
 
-    // create the render target
-    hr = device->m_pd3dDevice->CreateRenderTargetView(tex->m_t2d, &rtvDesc, &tex->m_rTV);
-    if (FAILED(hr)) {
-      const String errMsg = log.getMessageError(hr);
-      const String msg = "Failed to create a render target view. Error message: " + errMsg;
-      log.print(msg);
-      log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    for (uint32 i = 0; i < _mipLevels; ++i) {
+      rtvDesc.Texture2D.MipSlice = i;
+      hr = device->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
+                                                        &rtvDesc,
+                                                        &dxTex->m_rTVs[i]);
+      if (FAILED(hr)) {
+        const String errMsg = log.getMessageError(hr);
+        const String msg = "Failed to create a render target view. Error message: " + errMsg;
+        log.print(msg);
+        log.registerMessage(msg, LOG_MSG_TYPE::kError);
+      }
     }
   }
   /**
@@ -1811,17 +1883,22 @@ DX11GraphicsAPI::createTexture(uint32 _bpp,
     D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
     memset(&uavDesc, 0, sizeof(uavDesc));
     uavDesc.Format = desc.Format;
-    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
     uavDesc.Texture2D.MipSlice = 0;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    dxTex->m_uAVs.resize(_mipLevels);
 
-    hr = device->m_pd3dDevice->CreateUnorderedAccessView(tex->m_t2d, &uavDesc, &tex->m_uAV);
-    if (FAILED(hr)) {
-      const String errMsg = log.getMessageError(hr);
-      const String msg = "Failed to create an unordered access view. Error message: " + errMsg;
-      log.print(msg);
-      log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    for (uint32 i = 0; i < _mipLevels; ++i) {
+      uavDesc.Texture2D.MipSlice = i;
+      hr = device->m_pd3dDevice->CreateUnorderedAccessView(dxTex->m_t2d, &uavDesc, &dxTex->m_uAVs[i]);
+      if (FAILED(hr)) {
+        const String errMsg = log.getMessageError(hr);
+        const String msg = "Failed to create an unordered access view. Error message: " + errMsg;
+        log.print(msg);
+        log.registerMessage(msg, LOG_MSG_TYPE::kError);
+      }
     }
   }
+
   return tex;
 }
 

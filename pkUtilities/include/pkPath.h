@@ -17,6 +17,11 @@
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
 
+// #if PK_PLATFORM == PK_PLATFORM_WIN32
+// #include <Windows.h>
+// 
+// #endif
+
 namespace pkEngineSDK
 {
 
@@ -124,6 +129,17 @@ class PK_UTILITY_EXPORT Path
     String path = m_path.substr(0, lastSlash);
     WString str = converter.from_bytes(path);
     return str;
+
+    /**
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+    const char* pathcstr = path.c_str();
+    int32 len = MultiByteToWideChar(CP_UTF8, 0, pathcstr, -1, nullptr, 0);
+    WCHAR* wch = new WCHAR[len];
+    MultiByteToWideChar(CP_UTF8, 0, pathcstr, -1, wch, len);
+    WString str(wch);
+    return str;
+#endif
+    */
   }
 
   /**

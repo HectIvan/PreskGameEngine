@@ -47,6 +47,8 @@ using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
 using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_LumBlur;
@@ -124,15 +126,15 @@ ShaderTest::onInit()
 
   // add camera component
   m_light->addComponent(make_shared<Camera>());
-  m_light->getComponent<Camera>()->init(1280,
-                                        720,
+  m_light->getComponent<Camera>()->init(1920,
+                                        1080,
                                         3.1416f / 4.0f,
                                         3.0f,
-                                        2000.0f,
+                                        5000.0f,
                                         lightCom->m_position, // position
                                         lightCom->m_direction, // target
                                         Vector3::FORWARD,
-                                        pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
+                                        pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
   SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
@@ -148,10 +150,16 @@ ShaderTest::onInit()
 
   m_shadows = true;
   m_IBR = true;
-  m_IBRIntensity = 0.5f;
-  m_blurRadius = 0.01f;
-  m_blurStrength = 1.0f;
+  m_IBRIntensity = 1.0f;
+  // luminance blur
+  m_blurRadius = 2.0f;
+  m_blurStrength = 3.0f;
   m_lumThreshold = 90.0f;
+  // emissive blur
+  m_emissiveBlur = 30.0f;
+  m_emissiveStrength = 30.0f;
+  // testure size
+  m_imgTextureSize = 50.0f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
@@ -369,7 +377,8 @@ ShaderTest::uInterfaceUpdate()
       for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
         inspector.createComponentWindow(m_selectedActor->getComponents()[i],
                                         m_window,
-                                        m_searchMesh);
+                                        m_searchMesh,
+                                        m_imgTextureSize);
       }
     }
     im.popStyleColor(3);
@@ -425,6 +434,9 @@ ShaderTest::uInterfaceUpdate()
   if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
     // shadows option
     im.createCheckBox("Shadows", m_shadows);
+    // Emissive blur pass
+    im.createDragF("Emissive Blur", m_emissiveBlur, 1.0f, 0.001f);
+    im.createDragF("Emissive Strength", m_emissiveStrength, 0.1f, 0.001f);
     // Luminance
     if (im.collapsingHeader("Luminance")) {
       // Blur
@@ -454,8 +466,9 @@ ShaderTest::uInterfaceUpdate()
     }
     // compile shaders
     if (im.createButton("Compile Shaders")) {
-      g_RenderManager().compileShaders();
+      rm.compileShaders();
     }
+    im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
   }
   im.popStyleColor(3);
   im.endWindowCreate();
@@ -528,10 +541,12 @@ ShaderTest::onUpdate()
   // update shadow depth map buffers
   Matrix4 lightView = Matrix4::IDENTITY;
   Matrix4 lightProj = Matrix4::IDENTITY;
+  Matrix4 lightViewProj = Matrix4::IDENTITY;
   // to do: change this to another method
   if (light) {
     lightView = lightCamera->m_view.getTransposed();
     lightProj = lightCamera->m_projection.getTransposed();
+    lightViewProj = lightProj * lightView;
     CreateCBLight::create(cBLight, light);
     CreateCBCamera::create(cBLightCam, lightCamera);
   }
@@ -543,8 +558,14 @@ ShaderTest::onUpdate()
   // blur parameters.
   CBBlur blur;
   blur.WinSize = winSize;
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
   blur.radius = m_blurRadius;
   blur.strength = m_blurStrength;
+  // emissive blur parameters
+  CBBlur emissiveBlur;
+  emissiveBlur.WinSize = winSize;
+  emissiveBlur.radius = m_emissiveBlur;
+  emissiveBlur.strength = m_emissiveStrength;
   // IBR parameters.
   CBFloat IBRIntens;
   IBRIntens.value = m_IBRIntensity;
@@ -565,6 +586,8 @@ ShaderTest::onUpdate()
   SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
   SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
+  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
+  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
@@ -581,9 +604,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &shadowsParam, sizeof(Vector4));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
@@ -595,6 +617,11 @@ ShaderTest::onUpdate()
 
   // luminance constant buffers.
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  // Emissive blur constant buffers;
+  emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
   // lum blur constant buffers
   blur.BlurDirection = Vector2(1.0f, 0.0f);
   api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));

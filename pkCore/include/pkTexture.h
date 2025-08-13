@@ -224,7 +224,7 @@ struct TextureDesc
   int32 format;
   int32 usage;
   int32 bindFlags;
-  bool mipLevels;
+  int32 mipLevels = 1;
   int32 shaderResourceFormat;
   int32 miscFlags;
   unsigned char* data = nullptr;

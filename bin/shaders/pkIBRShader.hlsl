@@ -2,7 +2,8 @@ Texture2D skyboxMap : register(t0);
 Texture2D normalMap : register(t1);
 Texture2D posMap : register(t2);
 Texture2D metallicMap : register(t3);
-Texture2D colorMap : register(t4);
+Texture2D roughnessMap : register(t4);
+Texture2D colorMap : register(t5);
 
 SamplerState samState : register(s0);
 
@@ -34,6 +35,13 @@ float2 getSkyBoxUV(float3 dir)
   return float2(u, v);
 }
 
+float4
+sRGBToLinear(float4 color)
+{
+  // Convert sRGB to linear color space
+  return float4(pow(color.rgb, 1.0f / 2.2f), color.a);
+}
+
 // METALLIC
 // From my understanding, metalness affects how much of the base color will seep through the reflection,
 // meaning that if the metallic value is 0, 100% of the base color will show through, while if its 1, 0%
@@ -50,6 +58,7 @@ float4 PS(PS_INPUT input) : SV_Target
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 position = posMap.Sample(samState, input.TexCoord);
   float metallicTex = metallicMap.Sample(samState, input.TexCoord).b;
+  float roughSample = roughnessMap.Sample(samState, input.TexCoord).g;
   float3 colorTex = colorMap.Sample(samState, input.TexCoord).rgb;
   
   // normalize normals and view
@@ -61,10 +70,19 @@ float4 PS(PS_INPUT input) : SV_Target
   
   // sample the skybox with the new direction
   float2 skyboxUV = getSkyBoxUV(view);
-  float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, 0).rgb;
+  
+  // get the skybox dimensions
+  float2 dimensions = 0.0f.xx;
+  skyboxMap.GetDimensions(dimensions.x, dimensions.y);
+  // get the ammount of mip levels in the skybox.
+  float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
+  // get the target mip level based on the roughness value.
+  float targetMip = lerp(0.0, mipCount - 1.0, roughSample);
+  // sample the skybox with the target mip level.
+  float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
   // get how much of the surounding light will be reflected.
-  float3 metallicColor = IBL * metallicTex;
+  float3 metallicColor = sRGBToLinear(float4(IBL, 1.0f)).rgb * metallicTex;
   
   return float4(metallicColor * Intensity, 1.0f);
 }

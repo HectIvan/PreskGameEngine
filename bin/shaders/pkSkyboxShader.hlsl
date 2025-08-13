@@ -28,6 +28,13 @@ float2 getSkyBoxUV(float3 dir)
   return float2(u, v);
 }
 
+float4
+sRGBToLinear(float4 color)
+{
+  // Convert sRGB to linear color space
+  return float4(pow(color.rgb, 1.0f / 2.2f), color.a);
+}
+
 float4 PS(PS_INPUT input) : SV_Target
 {
   // Reconstruct view-space direction
@@ -46,7 +53,7 @@ float4 PS(PS_INPUT input) : SV_Target
   
   float3 viewDir = normalize(viewPos.xyz);
   float2 skyboxUV = getSkyBoxUV(viewDir);
-  float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0.0f).rgb;
+  float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0).rgb;
   
-  return float4(color, 1.0f);
+  return sRGBToLinear(float4(color, 1.0f));
 }

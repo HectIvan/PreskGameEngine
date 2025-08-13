@@ -204,7 +204,8 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
-  pDesc.inputs = { m_mainSkybox, getGBuffer(G_BUFFERS::kGB_Normal),
+  pDesc.inputs = { m_mainSkybox,
+                   getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Positions),
                    getGBuffer(G_BUFFERS::kGB_Metallic),
                    getGBuffer(G_BUFFERS::kGB_Roughness),

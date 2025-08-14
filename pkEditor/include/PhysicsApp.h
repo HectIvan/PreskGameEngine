@@ -82,6 +82,12 @@ class PhysicsApp : public BaseApp
   uInterfaceUpdate();
 
   /**
+   * @brief Show the log type in the UI.
+   */
+  void
+  showLogType(bool& _active, uint32 _type);
+
+  /**
    * @brief Update the physics app.
    * @param _deltatime Time between frames.
    */
@@ -110,6 +116,30 @@ class PhysicsApp : public BaseApp
   // camera sensitivity
   float m_sensX;
   float m_sensY;
+  float m_blurRadius;
+  float m_blurStrength;
+  float m_lumThreshold;
   // camera movement speed
   float m_cameraSpeed;
+
+  // emissive blur
+  float m_emissiveBlur;
+  float m_emissiveStrength;
+
+  // UI texture image size
+  float m_imgTextureSize;
+
+  bool m_showErrors;
+  bool m_showWarnings;
+  bool m_showActions;
+
+  float m_IBRIntensity;
+
+  String m_searchMesh;
+
+  UIWindow m_sceneGraphWin;
+  UIWindow m_loggerWin;
+  UIWindow m_rightWin;
+
+  SPtr<Texture> m_eyeIcon;
 };

@@ -16,18 +16,10 @@
 **/
 /*********************************************/
 #include "pkBaseManager.h"
-#include "pkCollisionInfo.h"
-#include "pkModule.h"
-#include "pkOBB.h"
-#include "pkRigidBody.h"
-#include "pkShape.h"
-#include "pkSphere.h"
 #include "pkPhysicsDefines.h"
 
 namespace pkEngineSDK
 {
-
-class Actor;
 
 class PhysicsManager : public BaseManager
 {
@@ -167,5 +159,13 @@ class PhysicsManager : public BaseManager
    */
   void
   simulateActor(SPtr<Actor>& _pActor, float _deltatime) override;
+
+  /**
+   * @brief Simulate all actors physics.
+   * @param _pActor What actors to simulate.
+   * @param _deltatime Delta time to use for the simulation.
+   */
+  void
+  simulateActors(Vector<SPtr<Actor>> _pActor, float _deltatime) override;
 };
 }

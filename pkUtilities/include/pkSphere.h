@@ -20,18 +20,25 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesUtilities.h"
-#include "pkVector3.h"
+#include "pkFigure.h"
 
 namespace pkEngineSDK
 {
 
-class PK_UTILITY_EXPORT Sphere
+class PK_UTILITY_EXPORT Sphere : public Figure
 {
  public:
   Sphere() = default;
   FORCEINLINE Sphere(Vector3& _origin, float _radius) : m_origin(_origin), m_radius(_radius) {};
   ~Sphere() = default;
+
+  /**
+   * @brief Get the support point of a shape in a direction.
+   * @param _direction Direction to take the point from.
+   * @return The final support point.
+   */
+  Vector3
+  supportPoint(Vector3& _direction) override;
 
   Vector3 m_origin;
   float m_radius;

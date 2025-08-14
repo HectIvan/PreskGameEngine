@@ -321,12 +321,15 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   {
     if (im.collapsingHeader("Rigid Body")) {
       // Component activity
-      im.createCheckBox("Active ", _pComponent->isActive());
-      // rigid body section
       SPtr<RigidBody> rb = reinterpret_pointer_cast<RigidBody>(_pComponent);
-      im.createDragF("Mass", rb->m_inverseMass, 0.1f);
-      im.createDragF("Drag", rb->m_drag, 0.01f);
+      im.createCheckBox("Active ", _pComponent->isActive());
+      im.sameLine();
+      im.createCheckBox("Simulate", rb->m_simulate);
+      // rigid body section
+      im.createDragF("Drag", rb->m_drag, 0.01f, 0.0f, 1.0f);
       im.createDragF("Gravity", rb->m_gravity, 0.01f);
+      im.createDrag3("Angular Velocity", rb->m_angularVelocity, 0.01f);
+      im.createDrag3("Linear Velocity", rb->m_linearVelocity, 0.01f);
     }
     break;
   }

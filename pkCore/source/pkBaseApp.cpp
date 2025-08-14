@@ -43,6 +43,18 @@ run(String _name, Window& _window);
 /*********************************************/
 
 void
+initPhysics()
+{
+  String physicsPlugin = "pkPhysicsd";
+  DllLoader dll;
+  dll.init(physicsPlugin);
+  auto dllSymbol = static_cast<void(*)()>(dll.getMethod("loadPlugin"));
+  if (dllSymbol) {
+    dllSymbol();
+  }
+}
+
+void
 BaseApp::init(const char** _argv, int32 _count)
 {
   Logger::startUp();
@@ -55,6 +67,7 @@ BaseApp::init(const char** _argv, int32 _count)
 
   initWin();
   initAPI(_argv, _count);
+  initPhysics();
 
   g_SceneManager().init();
   g_RenderManager().init();

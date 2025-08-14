@@ -27,8 +27,12 @@ class RigidBody : public Component
 {
  public:
   RigidBody() {
+    m_simulate = false;
+    
     m_gravity = 1.0f;
     m_drag = 0.0f;
+    m_angularVelocity = Vector3::ZERO;
+    m_linearVelocity = Vector3::ZERO;
     // physics material
     m_physMat = make_shared<PhysicsMaterial>();
   }
@@ -101,6 +105,7 @@ class RigidBody : public Component
   setFrictionCoef(const float _friction);
 
  public:
+   bool m_simulate;
   float m_gravity;
   float m_drag;
   float m_inverseMass;

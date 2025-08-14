@@ -151,6 +151,14 @@ class PK_CORE_EXPORT BaseManager : public Module<BaseManager>
    */
   virtual void
   simulateActor(SPtr<Actor>& _pActor, float _deltatime) = 0;
+
+  /**
+   * @brief Simulate all actors physics.
+   * @param _pActor What actors to simulate.
+   * @param _deltatime Delta time to use for the simulation.
+   */
+  virtual void
+  simulateActors(Vector<SPtr<Actor>> _pActor, float _deltatime) = 0;
 };
 
 PK_CORE_EXPORT BaseManager&

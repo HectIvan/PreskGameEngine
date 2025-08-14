@@ -18,10 +18,22 @@
 #include "pkLogger.h"
 #include "pkPhysicsManager.h"
 #include "pkPlatformMath.h"
+
 #include "pkCollisionInfo.h"
+#include "pkModule.h"
+#include "pkOBB.h"
+#include "pkRigidBody.h"
+#include "pkShape.h"
+#include "pkSphere.h"
 
 namespace pkEngineSDK
 {
+
+extern "C" __declspec(dllexport) void
+loadPlugin()
+{
+  BaseManager::startUp<PhysicsManager>();
+}
 
 Vector<Shape>
 PhysicsManager::sortByLeft(Vector<Shape>& _shapes)
@@ -288,13 +300,23 @@ PhysicsManager::simulateActor(SPtr<Actor>& _pActor, float _deltatime)
 {
   // get the rigid body component
   SPtr<RigidBody> rb = _pActor->getComponent<RigidBody>();
-  if (rb) {
+  if (rb && rb->m_simulate) {
     // apply gravity
     rb->m_linearVelocity += Vector3(0.0f, -rb->m_gravity, 0.0f);
     // apply drag
     rb->m_linearVelocity *= (1.0f - rb->m_drag);
     // move the actor
     _pActor->move(rb->m_linearVelocity * _deltatime);
+  }
+}
+void
+PhysicsManager::simulateActors(Vector<SPtr<Actor>> _pActor, float _deltatime)
+{
+  for (uint32 i = 0; i < _pActor.size(); ++i) {
+    SPtr<Actor> actor = _pActor[i];
+    if (actor->isActive()) {
+      simulateActor(actor, _deltatime);
+    }
   }
 }
 }

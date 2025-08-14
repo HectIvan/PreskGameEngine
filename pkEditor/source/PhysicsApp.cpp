@@ -98,7 +98,6 @@ PhysicsApp::onInit()
 {
   //start the interface
   UInterface::startUp();
-  // BaseManager::startUp<PhysicsManager>();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
@@ -369,7 +368,7 @@ PhysicsApp::uInterfaceUpdate()
     im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
     if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
       // to do: change this to a more efficient option
-      Vector<String> options = { "model", "light", "camera" };
+      Vector<String> options = { "model", "light", "camera", "Rigid Body"};
       int32 val = -1;
       if (im.beginCombo("Components", val, options)) {
         if (val == 0) {
@@ -377,6 +376,15 @@ PhysicsApp::uInterfaceUpdate()
           if (path.toString().c_str() != "") {
             m_selectedActor->addComponent(resourceMan.loadModel(path));
           }
+        }
+        if (val == 1) {
+          m_selectedActor->addComponent(make_shared<Light>());
+        }
+        if (val == 2) {
+          m_selectedActor->addComponent(make_shared<Camera>());
+        }
+        if (val == 3) {
+          m_selectedActor->addComponent(make_shared<RigidBody>());
         }
       }
       // create all components
@@ -507,17 +515,12 @@ PhysicsApp::onUpdate()
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& rm = g_RenderManager();
   SceneManager& sm = g_SceneManager();
-  // BaseManager& pm = g_BaseManager();
+  BaseManager& pm = g_BaseManager();
+  TimeManager& tm = g_TimeManager();
   SPtr<Scene> activeScene = sm.getActiveScene();
   Vector<SPtr<Actor>> actors = activeScene->getAllActors();
-  // simulate physics
-  for (uint32 i = 0; i < actors.size(); ++i) {
-    SPtr<Actor> actor = actors[i];
-    if (actor->isActive()) {
-      // pm.simulateActor(actor, tm.m_deltaTime);
-      // pm.fixedUpdate();
-    }
-  }
+  pm.simulateActors(actors, tm.m_deltaTime);
+
   Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data

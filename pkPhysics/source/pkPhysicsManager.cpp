@@ -265,9 +265,9 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
 float
 PhysicsManager::getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2)
 {
-  Matrix3 skew1 = Matrix3::getSkewSymetric();
-  Matrix3 skew2 = 
-  float firstMass = _rb1.m_inverseMass * Matrix3::IDENTITY;
-  float secondMass = _rb2.m_inverseMass * Matrix3::IDENTITY;
+  // Matrix3 skew1 = Matrix3::getSkewSymetric();
+  // Matrix3 skew2 = 
+  // float firstMass = _rb1.m_inverseMass * Matrix3::IDENTITY;
+  // float secondMass = _rb2.m_inverseMass * Matrix3::IDENTITY;
 }
 }

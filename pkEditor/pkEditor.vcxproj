@@ -176,7 +176,6 @@
     <ClCompile Include="source\pkEditorApp.cpp" />
     <ClCompile Include="source\pkImGui_win32.cpp" />
     <ClCompile Include="source\pkUInterface.cpp" />
-    <ClCompile Include="source\shaderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActorInspector.h" />

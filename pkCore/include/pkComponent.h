@@ -33,6 +33,7 @@ namespace COMPONENT_TYPE
     kLight,
     kCamera,
     kMaterial,
+    kRigidBody,
     kUnknown,
   };
 }

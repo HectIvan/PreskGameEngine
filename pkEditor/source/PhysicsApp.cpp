@@ -1,5 +1,4 @@
 #include "ActorInspector.h"
-#include "pkPhysicsManager.h"
 #include "pkLogger.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
@@ -9,15 +8,17 @@
 #include "pkRendererManager.h"
 #include "pkResourceManager.h"
 #include "pkSceneManager.h"
+#include "pkUInterface.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
-#include "PhysicsApp.h"
+#include "shaderTest.h"
 #include "pkColor.h"
 
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBLuminance;
-using pkEngineSDK::CBShadowParam;
+using pkEngineSDK::CBFloat;
+using pkEngineSDK::CBVector2x2;
+using pkEngineSDK::CBVector3;
 using pkEngineSDK::CreateCBCamera;
 using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
@@ -39,23 +40,24 @@ using pkEngineSDK::int32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
+using pkEngineSDK::LogMSG;
+using pkEngineSDK::LOG_MSG_TYPE::E;
+using pkEngineSDK::LOG_MSG_TYPE::kError;
+using pkEngineSDK::LOG_MSG_TYPE::kLog;
+using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Path;
-using pkEngineSDK::PASS_TYPE::kP_AO;
 using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_CShadows;
-using pkEngineSDK::PASS_TYPE::kP_CSpecular;
-using pkEngineSDK::PASS_TYPE::kP_CHBlur;
+using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_LumBlur;
+using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowDef;
+using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_CVBlur;
 using pkEngineSDK::PKWindowDesc;
-using pkEngineSDK::PhysicsManager;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
@@ -81,88 +83,110 @@ using pkEngineSDK::Vector4;
 // - Call from your application's message handler. Keep calling your message handler unless this function returns TRUE.
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
-                                                             UINT msg,
-                                                             WPARAM wParam,
-                                                             LPARAM lParam);
+  UINT msg,
+  WPARAM wParam,
+  LPARAM lParam);
 #endif
 
 void
-PhysicsApp::onInit()
+ShaderTest::onInit()
 {
   //start the interface
   UInterface::startUp();
-  PhysicsManager::startUp();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
   ResourceManager& resourceMan = g_ResourceManager().instance();
+  SceneManager& sceneMan = g_SceneManager().instance();
+  SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
   // create camera
   m_cameraSpeed = 20.0f;
-  m_camera = g_SceneManager().getActiveScene()->instantiate("Main Camera");
+  m_camera = activeScene->instantiate("Main Camera");
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
-                                         m_window.getHeight(),
-                                         3.1416f / 4.0f,
-                                         0.01f,
-                                         5000.0f,
-                                         camPos, // position
-                                         Vector3::FORWARD + camPos * -1.0f, // target
-                                         Vector3(0.0f, 1.0f, 0.0f)); // up vector
+    m_window.getHeight(),
+    3.1416f / 4.0f,
+    3.0f,
+    5000.0f,
+    camPos, // position
+    Vector3::FORWARD + camPos * -1.0f, // target
+    Vector3(0.0f, 1.0f, 0.0f)); // up vector
   // camera sensitivity
   m_sensX = 0.3f;
   m_sensY = 0.3f;
 
   // create light
-  m_light = g_SceneManager().getActiveScene()->instantiate("Light");
+  m_light = activeScene->instantiate("Light");
+  m_light->setPosition(0.0f, 60.0f, 0.0f);
   m_light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = m_light->getComponent<Light>();
 
   // add camera component
   m_light->addComponent(make_shared<Camera>());
   m_light->getComponent<Camera>()->init(1280,
-                                        720,
-                                        3.1416f / 4.0f,
-                                        0.01f,
-                                        2000.0f,
-                                        lightCom->m_position, // position
-                                        lightCom->m_direction, // target
-                                        Vector3::FORWARD,
-                                        pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
+    720,
+    3.1416f / 4.0f,
+    3.0f,
+    2000.0f,
+    lightCom->m_position, // position
+    lightCom->m_direction, // target
+    Vector3::FORWARD,
+    pkEngineSDK::CAMERA_PROJ::kOrthographic); // up vector);
 
-  SPtr<Actor> pistol = g_SceneManager().getActiveScene()->instantiate("Pistol");
+  SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
-  pistol->setScale(10.0f);
-  pistol->setPosition(0.0f, 5.0f, 0.0f);
-  SPtr<RigidBody> rb = make_shared<RigidBody>();
-  pistol->addComponent(rb);
+  pistol->setScale(30.0f);
+  pistol->setPosition(10.0f, 15.0f, 0.0f);
 
-  // SPtr<Actor> leon = g_SceneManager().getActiveScene()->instantiate("Leon");
-  // leon->addComponent(resourceMan.loadModel(Path("models/leon.obj")));
-
-  SPtr<Actor> sponza = g_SceneManager().getActiveScene()->instantiate("Sponza");
+  SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
 
-  // SPtr<Actor> rpd = g_SceneManager().getActiveScene()->instantiate("RPD");
-  // rpd->addComponent(resourceMan.loadModel(Path("models/rpd.obj")));
-  // rpd->setRotation(0, 90, 0);
-  // // rpd->setScale(1.0f);
-  // rpd->setPosition(0, 0, -100);
-
-  SPtr<Actor> coat = g_SceneManager().getActiveScene()->instantiate("Coat");
+  SPtr<Actor> coat = activeScene->instantiate("Coat");
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_shadows = true;
-  m_specular = true;
+  m_IBR = true;
+  m_IBRIntensity = 0.5f;
+  m_blurRadius = 0.01f;
+  m_blurStrength = 1.0f;
+  m_lumThreshold = 90.0f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
+
+  m_showErrors = true;
+  m_showWarnings = false;
+  m_showActions = false;
+
+  m_eyeIcon = g_TextureManager().loadTexture(Path("textures/white-eye-icon.jpg"));
+
+  /**
+   * User Interface.
+   */
+  float alpha = 0.4f;
+  // scene graph
+  Vector2 winRect = m_window.getClientWidthHeight();
+  m_sceneGraphWin.name = activeScene->m_name.c_str();
+  m_sceneGraphWin.position = Vector2(0.0f, 0.0f);
+  m_sceneGraphWin.size = Vector2(winRect.x * 0.1f, winRect.y * 0.8f);
+  m_sceneGraphWin.alpha = alpha;
+  // logger window
+  m_loggerWin.name = "Logger";
+  m_loggerWin.size = Vector2(winRect.x, winRect.y * 0.2f);
+  m_loggerWin.position = Vector2(0.0f, winRect.y * 0.8f);
+  m_loggerWin.alpha = alpha;
+  // right window
+  m_rightWin.name = "Inspector";
+  m_rightWin.size = Vector2(400.0f, 800.0f);
+  m_rightWin.position = Vector2(winRect.x - 400.0f, 0.0f);
+  m_rightWin.alpha = alpha;
 }
 
 void
-PhysicsApp::initWin()
+ShaderTest::initWin()
 {
   PKWindowDesc desc;
   desc.width = 1920;
@@ -171,21 +195,21 @@ PhysicsApp::initWin()
   // imgui input
 #if PK_PLATFORM == PK_PLATFORM_WIN32
   desc.funct = [](PlatformPointer _hwnd,
-                  int32 _msg,
-                  PlatformPointer _wParam,
-                  PlatformPointer _lParam) {
-    LRESULT result = ImGui_ImplWin32_WndProcHandler(reinterpret_cast<HWND>(_hwnd),
-                                                    _msg,
-                                                    reinterpret_cast<WPARAM>(_wParam),
-                                                    reinterpret_cast<LPARAM>(_lParam));
-    return reinterpret_cast<PlatformPointer>(result);
-  };
+    int32 _msg,
+    PlatformPointer _wParam,
+    PlatformPointer _lParam) {
+      LRESULT result = ImGui_ImplWin32_WndProcHandler(reinterpret_cast<HWND>(_hwnd),
+        _msg,
+        reinterpret_cast<WPARAM>(_wParam),
+        reinterpret_cast<LPARAM>(_lParam));
+      return reinterpret_cast<PlatformPointer>(result);
+    };
 #endif
   m_window.create(desc);
 }
 
 void
-PhysicsApp::input()
+ShaderTest::input()
 {
   EventQueue& eventQueue = g_eventManager().instance();
   UInterface& im = g_uInterface().instance();
@@ -194,36 +218,33 @@ PhysicsApp::input()
   float deltaTime = g_TimeManager().m_deltaTime;
   // set camera speed with deltaTime
   float speed = m_cameraSpeed * deltaTime;
+  // if the user wants to exit the app.
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
+    ApplicationRun(false);
+  }
   // move forward/backward
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
     m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
   }
   // move left/right
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(-speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
     m_camera->getComponent<Camera>()->moveRightLocal(speed);
   }
   // move up/down
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(speed);
   }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
     m_camera->getComponent<Camera>()->moveUpLocal(-speed);
   }
   // rotate camera
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && m_window.m_isFocused &&
-      !itemActive) {
+  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     // m_selectedActor = nullptr;
     posDif.x *= m_sensX;
@@ -236,38 +257,39 @@ PhysicsApp::input()
 }
 
 void
-PhysicsApp::uInterfaceUpdate()
+ShaderTest::uInterfaceUpdate()
 {
   SceneManager& sm = g_SceneManager().instance();
   UInterface& im = g_uInterface().instance();
+  RendererManager& rm = g_RenderManager().instance();
+  TextureManager& tm = g_TextureManager().instance();
+  ResourceManager& resourceMan = g_ResourceManager().instance();
 
   im.setCurrentContext();
   im.newFrameAPI();
   im.windowNewFrame();
   im.uINewFrame();
 
-  float yOffset = 0.0f;
-  float winWidth = 450.0f;
   Vector2 winRect = m_window.getClientWidthHeight();
-
-  float winAlpha = 0.4f;
   SPtr<Scene> currentScene = sm.getActiveScene();
-  
+
   // --- Scene graph window --- //
-  im.setNewWindowSize(Vector2(winRect.x * 0.1f, winRect.y));
-  im.setNextWindowPos(Vector2(0.0f));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Scene");
+  im.setNextWindowParams(m_sceneGraphWin);
+  im.startWindowCreate(m_sceneGraphWin.name);
+  m_sceneGraphWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
+
   if (im.createButton("+")) {
-    sm.getActiveScene()->instantiate("Actor");
+    currentScene->instantiate("Actor");
+    m_sActorIndex = currentScene->getActorCount() - 1;
+    m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
-  if (m_selectedActor) { 
+  if (m_selectedActor) {
     im.sameLine();
     if (im.createButton("Delete")) {
       m_selectedActor->~Actor();
       m_selectedActor = nullptr;
-      m_sActorIndex = 0;
       currentScene->m_actors.erase(currentScene->m_actors.begin() + m_sActorIndex);
+      m_sActorIndex = 0;
     }
     im.sameLine();
     if (im.createButton("^")) {
@@ -279,10 +301,10 @@ PhysicsApp::uInterfaceUpdate()
   for (uint32 i = 0; i < actorCount; ++i) {
     SPtr<Actor> currentActor = currentScene->getActor(i);
     if (im.createButton(currentActor->getName(),
-                        Color(0, 0, 0, 0),
-                        Color(50, 50, 50, 50),
-                        Color(100, 100, 100, 50),
-                        true)) {
+      Color(0, 0, 0, 0),
+      Color(50, 50, 50, 50),
+      Color(100, 100, 100, 50),
+      true)) {
       m_selectedActor = currentActor;
       m_sActorIndex = i;
     }
@@ -290,37 +312,70 @@ PhysicsApp::uInterfaceUpdate()
   im.endWindowCreate();
   // -------------------------- //
 
-  float winHeight = 0.0f;
+  // -------------------------- //
+  // Create log window
+  im.setNextWindowParams(m_loggerWin);
+  im.startWindowCreate(m_loggerWin.name);
+  m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
+
+  im.createCheckBox("Errors", m_showErrors);
+  im.sameLine();
+  im.createCheckBox("Warnings", m_showWarnings);
+  im.sameLine();
+  im.createCheckBox("Logs", m_showActions);
+  showLogType(m_showErrors, kError);
+  showLogType(m_showWarnings, kWarning);
+  showLogType(m_showActions, kLog);
+  im.endWindowCreate();
+
   // --- Transform window --- //
+  im.setNextWindowParams(m_rightWin);
+  im.startWindowCreate(m_rightWin.name);
+  m_rightWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
   if (m_selectedActor) {
-    winHeight = 120.0f;
-    im.setNewWindowSize(Vector2(winWidth, winHeight));
-    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-    im.SetNextWindowAlpha(winAlpha);
-    im.startWindowCreate("Transform");
-
     ActorInspector inspector(m_selectedActor);
-    
-    im.endWindowCreate();
-    yOffset += winHeight;
-
-    // ---- Components window ---- //
-    winHeight = 180.0f;
-    im.setNewWindowSize(Vector2(winWidth, winHeight));
-    im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-    im.SetNextWindowAlpha(winAlpha);
-    im.startWindowCreate("Components");
-    im.createButton("Add Component(non-functional)");
-    for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
-      inspector.createComponentWindow(m_selectedActor->getComponents()[i],
-                                      m_selectedActor->m_transform);
+    // transform window
+    im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
+    if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
+      String name = m_selectedActor->getName();
+      im.createText("Name:   ");
+      im.sameLine();
+      if (im.createInputText("##Name", &name)) {
+        m_selectedActor->setName(name);
+      }
+      // activity checkbox
+      im.sameLine();
+      im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
+      im.sameLine();
+      im.createImage(m_eyeIcon, Vector2(15));
+      // inspect actor transform matrix
+      inspector.Inspect();
     }
-    im.endWindowCreate();
-    yOffset += winHeight;
-    // --------------------------- //
+    im.popStyleColor(3);
+    // ---- Components window ---- //
+    im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
+    if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
+      // to do: change this to a more efficient option
+      Vector<String> options = { "model", "light", "camera" };
+      int32 val = -1;
+      if (im.beginCombo("Components", val, options)) {
+        if (val == 0) {
+          Path path = m_window.openFileFromExplorer();
+          if (path.toString().c_str() != "") {
+            m_selectedActor->addComponent(resourceMan.loadModel(path));
+          }
+        }
+      }
+      // create all components
+      for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
+        inspector.createComponentWindow(m_selectedActor->getComponents()[i],
+          m_window,
+          m_searchMesh);
+      }
+    }
+    im.popStyleColor(3);
   }
   // -------------------------- //
-
 
   // get framerate
   float f_fps = 1.0f / g_TimeManager().m_deltaTime;
@@ -338,78 +393,91 @@ PhysicsApp::uInterfaceUpdate()
   fpsOffset = (fpsOffset + 1) % fpsListSize;
 
   // --- Display window --- //
-  winHeight = 75.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Display");
-  im.createText(fpsStr.c_str());
-  im.sameLine();
-  im.plotLines("|", fpsHistory, fpsListSize, fpsOffset);
-  // vSync
-  im.createText("vSync");
-  im.sameLine();
-  im.createCheckBox("##vSync", m_vSync);
-  im.endWindowCreate();
-  yOffset += winHeight;
+  if (im.collapsingHeader("Display", kPK_DefaultOpen)) {
+    im.createText(fpsStr.c_str());
+    im.sameLine();
+    im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
+    // vSync
+    im.createText("vSync");
+    im.sameLine();
+    im.createCheckBox("##vSync", m_vSync);
+  }
   // -------------------------- //
 
   // --- Camera window --- //
-  winHeight = 125.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Editor Camera");
-  // camera speed
-  im.createText("Speed        ");
-  im.sameLine();
-  im.createDragF("##Speed", m_cameraSpeed);
-  // X Sensitivity
-  im.createText("X Sensitivity");
-  im.sameLine();
-  im.createDragF("##XSens", m_sensX, 0.1f);
-  // Y Sensitivity
-  im.createText("Y Sensitivity");
-  im.sameLine();
-  im.createDragF("##YSens", m_sensY, 0.1f);
-  im.endWindowCreate();
-  yOffset += winHeight;
+  if (im.collapsingHeader("Editor Camera", kPK_DefaultOpen)) {
+    // camera speed
+    im.createText("Speed        ");
+    im.sameLine();
+    im.createDragF("##Speed", m_cameraSpeed);
+    // X Sensitivity
+    im.createText("X Sensitivity");
+    im.sameLine();
+    im.createDragF("##XSens", m_sensX, 0.1f);
+    // Y Sensitivity
+    im.createText("Y Sensitivity");
+    im.sameLine();
+    im.createDragF("##YSens", m_sensY, 0.1f);
+  }
   // -------------------------- //
 
   // --- Post-Process window --- //
-  winHeight = 150.0f;
-  im.setNewWindowSize(Vector2(winWidth, winHeight));
-  im.setNextWindowPos(Vector2(im.getDisplaySize().x - winWidth, yOffset));
-  im.SetNextWindowAlpha(winAlpha);
-  im.startWindowCreate("Render");
-  // shadows option
-  im.createText("shadows  ");
-  im.sameLine();
-  im.createCheckBox("##Shadows", m_shadows);
-  // Specular option
-  im.createText("Specular ");
-  im.sameLine();
-  im.createCheckBox("##Specular", m_specular);
-  // AO
-  im.createText("AO       ");
-  im.sameLine();
-  im.createCheckBox("##AO", m_AO);
-  // Luminance
-  im.createText("Luminance");
-  im.sameLine();
-  im.createCheckBox("##Luminance", m_luminance);
-  // compile shaders
-  if (im.createButton("Compile Shaders")) {
-    g_RenderManager().compileShaders();
+  im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
+  if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
+    // shadows option
+    im.createCheckBox("Shadows", m_shadows);
+    // Luminance
+    if (im.collapsingHeader("Luminance")) {
+      // Blur
+      im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
+      im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
+      // luminance threshold
+      im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
+    }
+
+    // IBL
+    if (im.collapsingHeader("IBL")) {
+      im.createCheckBox("IBL Active", m_IBR);
+      if (m_IBR) {
+        im.sameLine();
+        im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+      }
+      if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString() != "") {
+          SPtr<Texture> texture = tm.loadTexture(path);
+          rm.m_mainSkybox->copyFrom(texture);
+        }
+      }
+    }
+    if (im.isItemHovered()) {
+      im.setTooltip("Skybox");
+    }
+    // compile shaders
+    if (im.createButton("Compile Shaders")) {
+      g_RenderManager().compileShaders();
+    }
   }
+  im.popStyleColor(3);
   im.endWindowCreate();
   // -------------------------- //
-
   im.render();
 }
 
 void
-PhysicsApp::onUpdate()
+ShaderTest::showLogType(bool& _active, uint32 _type)
+{
+  UInterface& im = g_uInterface().instance();
+  if (_active) {
+    Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
+    for (uint32 i = 0; i < messages.size(); ++i) {
+      im.createText(messages[i].message.c_str());
+    }
+  }
+}
+
+void
+ShaderTest::onUpdate()
 {
   // user input
   if (m_window.m_isFocused) {
@@ -420,7 +488,7 @@ PhysicsApp::onUpdate()
   GraphicsAPI& api = g_GraphicAPI().instance();
   RendererManager& rm = g_RenderManager().instance();
 
-  Vector2 winSize = api.getSwapChain()->getBuffer(0)->getSize();
+  Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
@@ -428,21 +496,29 @@ PhysicsApp::onUpdate()
   Matrix4 proj = Matrix4::IDENTITY;
   Matrix4 invView = Matrix4::IDENTITY;
   Matrix4 invProj = Matrix4::IDENTITY;
+  Matrix4 invViewProj = Matrix4::IDENTITY;
+  Matrix4 viewTransp = Matrix4::IDENTITY;
+  Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBShadowParam shadowsParam;
-  shadowsParam.farNear = Vector2(0.0f);
-  shadowsParam.winSize = winSize; // to do: win size could change, swap this to use the specific texture size.
+  CBVector2x2 shadowsParam;
+  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
+  shadowsParam.vec2 = Vector2(0.0f);
   // to do: change this to another method
   if (camera) {
     view = camera->m_view.getTransposed();
     proj = camera->m_projection.getTransposed();
     invView = view.inverse();
     invProj = proj.inverse();
+    viewTransp = view.getTransposed();
+    projTransp = proj.getTransposed();
     CreateCBCamera::create(cBCamera, camera);
+    invViewProj = (proj * view).inverse();
 
-    shadowsParam.farNear = camera->m_farNear;
+    shadowsParam.vec2 = camera->m_farNear;
   }
+  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
+
   // light data
   SPtr<Light> light = m_light->getComponent<Light>();
   SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
@@ -461,30 +537,37 @@ PhysicsApp::onUpdate()
     CreateCBCamera::create(cBLightCam, lightCamera);
   }
 
-  // luminance parameters
-  CBLuminance lum;
-  lum.tolerance = 0.9f;
-  // blur parameters
+  // luminance parameters.
+  CBVector2x2 lum;
+  lum.vec1 = winSize;
+  lum.vec2.x = m_lumThreshold;
+  // blur parameters.
   CBBlur blur;
-  blur.winSize = winSize;
+  blur.WinSize = winSize;
+  blur.radius = m_blurRadius;
+  blur.strength = m_blurStrength;
+  // IBR parameters.
+  CBFloat IBRIntens;
+  IBRIntens.value = m_IBRIntensity;
+  CBVector3 viewPos;
+  viewPos.vec1 = camera->m_eye.xyz();
 
-  // data type sizes
+  // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
 
-  // get all passes
+  // get all passes.
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> luminancePass = rm.getPass(kP_Luminance);
-  SPtr<Pass> hBlurPass = rm.getPass(kP_CHBlur);
-  // SPtr<Pass> vBlurPass = rm.getPass(kP_CVBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  SPtr<Pass> pCShadowPass = rm.getPass(kP_CShadows);
-  SPtr<Pass> pCSpecPass = rm.getPass(kP_CSpecular);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
 
-  // update normal pass buffers
+  // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
@@ -495,38 +578,33 @@ PhysicsApp::onUpdate()
   api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
   api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
 
-  // update shadow compute buffers
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(4), &invView, m4x4Size);
-  // get the shadow data needed
-  
-  api.updateConstantBuffer(pCShadowPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  // update shadow-specular quad pass
+  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &invProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(4), &invView, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(5), &shadowsParam, sizeof(Vector4));
 
-  // update specular compute buffers
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(3), &invProj, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(4), &invView, m4x4Size);
-  api.updateConstantBuffer(pCSpecPass->getCBuffer(5), &shadowsParam, sizeof(CBShadowParam));
+  // skybox constant buffers.
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
+  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
 
-  // update the luminance pass buffer
-  api.updateConstantBuffer(luminancePass->getCBuffer(0), &lum, sizeof(CBLuminance));
-  // update the Horizontal/Vertical blur pass buffer
-  api.updateConstantBuffer(hBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
-  //      api.updateConstantBuffer(vBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  // ibr constant buffers.
+  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
 
-  // skybox constant buffer
-  Matrix4 transform = Matrix4::IDENTITY;
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &transform, m4x4Size);
+  // luminance constant buffers.
+  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  // lum blur constant buffers
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  blur.BlurDirection = Vector2(0.0f, 1.0f);
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 }
 
 void
-PhysicsApp::onRender()
+ShaderTest::onRender()
 {
   // update the user interface
   uInterfaceUpdate();

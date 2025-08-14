@@ -37,9 +37,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\shaderTest.cpp">
-      <Filter>Source Files\baseApp</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkEditorApp.cpp">
       <Filter>Source Files\baseApp\Editor</Filter>
     </ClCompile>

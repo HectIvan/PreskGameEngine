@@ -37,9 +37,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkEditorApp.cpp">
-      <Filter>Source Files\baseApp\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkUInterface.cpp">
       <Filter>Source Files\interface</Filter>
     </ClCompile>
@@ -75,6 +72,9 @@
     </ClCompile>
     <ClCompile Include="source\PhysicsApp.cpp">
       <Filter>Source Files\PhysicsApp</Filter>
+    </ClCompile>
+    <ClCompile Include="source\base.cpp">
+      <Filter>include\PhysicsApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

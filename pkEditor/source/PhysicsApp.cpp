@@ -10,7 +10,6 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "PhysicsApp.h"
-#include "pkUInterface.h"
 #include "pkColor.h"
 
 using pkEngineSDK::Color;

@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\ActorInspector.cpp" />
+    <ClCompile Include="source\base.cpp" />
     <ClCompile Include="source\externals\imgui.cpp" />
     <ClCompile Include="source\externals\imgui_demo.cpp" />
     <ClCompile Include="source\externals\imgui_draw.cpp" />
@@ -173,7 +174,6 @@
     <ClCompile Include="source\externals\imgui_widgets.cpp" />
     <ClCompile Include="source\PhysicsApp.cpp" />
     <ClCompile Include="source\pkDX11ImGui.cpp" />
-    <ClCompile Include="source\pkEditorApp.cpp" />
     <ClCompile Include="source\pkImGui_win32.cpp" />
     <ClCompile Include="source\pkUInterface.cpp" />
   </ItemGroup>

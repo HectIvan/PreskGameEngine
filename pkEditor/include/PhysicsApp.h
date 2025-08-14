@@ -24,6 +24,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
 #include "pkTexture.h"
+#include "pkUInterface.h"
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkWindowDesc.h"
@@ -45,8 +46,10 @@ using pkEngineSDK::Pass;
 using pkEngineSDK::RigidBody;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::uint32;
+using pkEngineSDK::UIWindow;
 using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;

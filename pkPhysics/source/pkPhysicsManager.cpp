@@ -14,6 +14,8 @@
 * Includes
 **/
 /*********************************************/
+#include "pkActor.h"
+#include "pkLogger.h"
 #include "pkPhysicsManager.h"
 #include "pkPlatformMath.h"
 #include "pkCollisionInfo.h"
@@ -32,6 +34,12 @@ PhysicsManager::sortByLeft(Vector<Shape>& _shapes)
   //             return a.x < b.x;
   //           });
   return returnShapes;
+}
+
+void
+PhysicsManager::fixedUpdate()
+{
+  return; // to do: implement the fixed update for the physics manager
 }
 
 void
@@ -92,7 +100,9 @@ PhysicsManager::GJK(Shape& _shape1, Shape& _shape2, uint32 _attempts)
     }
     ++count;
   }
+  return false;
 }
+
 Vector3
 PhysicsManager::supportCSO(Shape& _shape1, Shape& _shape2, Vector3& _direction)
 {
@@ -107,7 +117,7 @@ bool
 PhysicsManager::updateSimplexNDirection(Shape& _simplex, Vector3& _direction)
 {
   switch (_simplex.m_vertex.size()) {
-  // get the next direction using the line
+    // get the next direction using the line
   case 2: {
     Vector3 AB = _simplex.m_vertex[1] - _simplex.m_vertex[0];
     Vector3 AO = _simplex.m_vertex[0] * -1.0f;
@@ -116,7 +126,7 @@ PhysicsManager::updateSimplexNDirection(Shape& _simplex, Vector3& _direction)
     _direction = ABPerp.normalized();
     return false;
   }
-  // get the next direction to check for by using the current triangle
+        // get the next direction to check for by using the current triangle
   case 3: {
     Vector3 AB = _simplex.m_vertex[1] - _simplex.m_vertex[0];
     Vector3 AC = _simplex.m_vertex[2] - _simplex.m_vertex[0];
@@ -124,10 +134,10 @@ PhysicsManager::updateSimplexNDirection(Shape& _simplex, Vector3& _direction)
     // get triangle normal
     return false;
   }
-  // check for the origin within all 4 sides
+        // check for the origin within all 4 sides
   case 4: {
     Vector3 array[4] = { _simplex.m_vertex[3], _simplex.m_vertex[2],
-                         _simplex.m_vertex[1], _simplex.m_vertex[0]};
+                         _simplex.m_vertex[1], _simplex.m_vertex[0] };
     Vector3 arr1[3] = { array[2], array[1], array[0] };
     Vector3 arr2[3] = { array[2], array[3], array[0] };
     Vector3 arr3[3] = { array[1], array[3], array[0] };
@@ -138,6 +148,7 @@ PhysicsManager::updateSimplexNDirection(Shape& _simplex, Vector3& _direction)
   }
   }
 }
+
 bool
 PhysicsManager::originInFrontOfPlane(Vector3 _vertex[], Vector3& _direction)
 {
@@ -269,5 +280,21 @@ PhysicsManager::getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2)
   // Matrix3 skew2 = 
   // float firstMass = _rb1.m_inverseMass * Matrix3::IDENTITY;
   // float secondMass = _rb2.m_inverseMass * Matrix3::IDENTITY;
+  return 1.0f;
+}
+
+void
+PhysicsManager::simulateActor(SPtr<Actor>& _pActor, float _deltatime)
+{
+  // get the rigid body component
+  SPtr<RigidBody> rb = _pActor->getComponent<RigidBody>();
+  if (rb) {
+    // apply gravity
+    rb->m_linearVelocity += Vector3(0.0f, -rb->m_gravity, 0.0f);
+    // apply drag
+    rb->m_linearVelocity *= (1.0f - rb->m_drag);
+    // move the actor
+    _pActor->move(rb->m_linearVelocity * _deltatime);
+  }
 }
 }

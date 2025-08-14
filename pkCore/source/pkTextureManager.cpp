@@ -62,7 +62,8 @@ TextureManager::loadTexture(const Path& _directory)
   // return the final texture
   return texture;
 }
-PK_CORE_EXPORT TextureManager&
+
+TextureManager&
 g_TextureManager()
 {
   return TextureManager::instance();

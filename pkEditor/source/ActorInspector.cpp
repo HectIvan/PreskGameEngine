@@ -22,6 +22,7 @@
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkRigidBody.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -30,6 +31,7 @@ using pkEngineSDK::COMPONENT_TYPE::kCamera;
 using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
 using pkEngineSDK::COMPONENT_TYPE::kModel;
+using pkEngineSDK::COMPONENT_TYPE::kRigidBody;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
@@ -41,6 +43,7 @@ using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
 using pkEngineSDK::Path;
 using pkEngineSDK::reinterpret_pointer_cast;
+using pkEngineSDK::RigidBody;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::TextureManager;
@@ -311,6 +314,19 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
           }
         }
       }
+    }
+    break;
+  }
+  case kRigidBody:
+  {
+    if (im.collapsingHeader("Rigid Body")) {
+      // Component activity
+      im.createCheckBox("Active ", _pComponent->isActive());
+      // rigid body section
+      SPtr<RigidBody> rb = reinterpret_pointer_cast<RigidBody>(_pComponent);
+      im.createDragF("Mass", rb->m_inverseMass, 0.1f);
+      im.createDragF("Drag", rb->m_drag, 0.01f);
+      im.createDragF("Gravity", rb->m_gravity, 0.01f);
     }
     break;
   }

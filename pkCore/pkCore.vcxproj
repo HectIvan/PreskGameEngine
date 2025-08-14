@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkBaseManager.h" />
     <ClInclude Include="include\pkActor.h" />
     <ClInclude Include="include\pkBaseApp.h" />
     <ClInclude Include="include\pkBlendState.h" />
@@ -225,6 +226,7 @@
   <ItemGroup>
     <ClCompile Include="source\pkActor.cpp" />
     <ClCompile Include="source\pkBaseApp.cpp" />
+    <ClCompile Include="source\pkBaseManager.cpp" />
     <ClCompile Include="source\pkBone.cpp" />
     <ClCompile Include="source\pkCamera.cpp" />
     <ClCompile Include="source\pkGravityComponent.cpp" />

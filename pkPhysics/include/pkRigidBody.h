@@ -23,7 +23,7 @@
 namespace pkEngineSDK
 {
 
-class PK_PHYSICS_EXPORT RigidBody : public Component
+class RigidBody : public Component
 {
  public:
   RigidBody() {
@@ -36,6 +36,9 @@ class PK_PHYSICS_EXPORT RigidBody : public Component
 
   COMPONENT_TYPE::E
   getType() override { return COMPONENT_TYPE::kRigidBody; }
+
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kRigidBody; }
 
   const char*
   getName() override { return "RigidBody"; }

@@ -11,6 +11,7 @@
 #include "pkTimeManager.h"
 #include "shaderTest.h"
 #include "pkColor.h"
+#include "pkPhysicsManager.h"
 
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
@@ -61,6 +62,7 @@ using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::ResourceManager;
+using pkEngineSDK::RigidBody;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
@@ -140,6 +142,7 @@ ShaderTest::onInit()
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(30.0f);
   pistol->setPosition(10.0f, 15.0f, 0.0f);
+  pistol->addComponent(make_shared<RigidBody>());
   
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
@@ -363,7 +366,7 @@ ShaderTest::uInterfaceUpdate()
     im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
     if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
       // to do: change this to a more efficient option
-      Vector<String> options = { "model", "light", "camera" };
+      Vector<String> options = { "model", "light", "camera", "rigidBody"};
       int32 val = -1;
       if (im.beginCombo("Components", val, options)) {
         if (val == 0) {

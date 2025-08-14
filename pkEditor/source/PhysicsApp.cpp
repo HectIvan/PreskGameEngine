@@ -11,7 +11,9 @@
 #include "pkTimeManager.h"
 #include "PhysicsApp.h"
 #include "pkColor.h"
+#include "pkPhysicsManager.h"
 
+using pkEngineSDK::BaseManager;
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBFloat;
@@ -29,6 +31,7 @@ using pkEngineSDK::g_eventManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_BaseManager;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_ResourceManager;
 using pkEngineSDK::g_SceneManager;
@@ -56,6 +59,7 @@ using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
+using pkEngineSDK::PhysicsManager;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
@@ -66,12 +70,12 @@ using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::TextureManager;
+using pkEngineSDK::TimeManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector4;
 // to do: create fileSystem.h in utilities
-// create class Path
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "externals/imgui_impl_win32.h"
@@ -94,6 +98,7 @@ PhysicsApp::onInit()
 {
   //start the interface
   UInterface::startUp();
+  // BaseManager::startUp<PhysicsManager>();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
@@ -107,13 +112,13 @@ PhysicsApp::onInit()
   m_camera->addComponent(make_shared<Camera>());
   Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   m_camera->getComponent<Camera>()->init(m_window.getWidth(),
-    m_window.getHeight(),
-    3.1416f / 4.0f,
-    3.0f,
-    5000.0f,
-    camPos, // position
-    Vector3::FORWARD + camPos * -1.0f, // target
-    Vector3(0.0f, 1.0f, 0.0f)); // up vector
+                                         m_window.getHeight(),
+                                         3.1416f / 4.0f,
+                                         3.0f,
+                                         5000.0f,
+                                         camPos, // position
+                                         Vector3::FORWARD + camPos * -1.0f, // target
+                                         Vector3(0.0f, 1.0f, 0.0f)); // up vector
   // camera sensitivity
   m_sensX = 0.3f;
   m_sensY = 0.3f;
@@ -127,19 +132,20 @@ PhysicsApp::onInit()
   // add camera component
   m_light->addComponent(make_shared<Camera>());
   m_light->getComponent<Camera>()->init(1920,
-    1080,
-    3.1416f / 4.0f,
-    3.0f,
-    5000.0f,
-    lightCom->m_position, // position
-    lightCom->m_direction, // target
-    Vector3::FORWARD,
-    pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
+                                        1080,
+                                        3.1416f / 4.0f,
+                                        3.0f,
+                                        5000.0f,
+                                        lightCom->m_position, // position
+                                        lightCom->m_direction, // target
+                                        Vector3::FORWARD,
+                                        pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
   SPtr<Actor> pistol = activeScene->instantiate("Pistol");
   pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
   pistol->setScale(30.0f);
   pistol->setPosition(10.0f, 15.0f, 0.0f);
+  pistol->addComponent(make_shared<RigidBody>());
 
   SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
@@ -496,10 +502,22 @@ PhysicsApp::onUpdate()
     input();
   }
 
-  // managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
 
+  // managers
+  GraphicsAPI& api = g_GraphicAPI();
+  RendererManager& rm = g_RenderManager();
+  SceneManager& sm = g_SceneManager();
+  // BaseManager& pm = g_BaseManager();
+  SPtr<Scene> activeScene = sm.getActiveScene();
+  Vector<SPtr<Actor>> actors = activeScene->getAllActors();
+  // simulate physics
+  for (uint32 i = 0; i < actors.size(); ++i) {
+    SPtr<Actor> actor = actors[i];
+    if (actor->isActive()) {
+      // pm.simulateActor(actor, tm.m_deltaTime);
+      // pm.fixedUpdate();
+    }
+  }
   Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data

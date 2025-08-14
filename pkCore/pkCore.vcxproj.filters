@@ -73,6 +73,12 @@
     <Filter Include="source\game">
       <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\physMan">
+      <UniqueIdentifier>{6d987116-2eb1-4727-9f92-a17d61dd231b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\physMan">
+      <UniqueIdentifier>{2cd88d81-bc43-4040-96fe-d5387aa76b94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -231,6 +237,9 @@
     <ClInclude Include="include\pkUsings.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkBaseManager.h">
+      <Filter>include\physMan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -316,6 +325,9 @@
     </ClCompile>
     <ClCompile Include="source\pkSceneManager.cpp">
       <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBaseManager.cpp">
+      <Filter>source\physMan</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

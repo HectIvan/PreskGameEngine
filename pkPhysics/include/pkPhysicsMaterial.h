@@ -21,7 +21,7 @@
 namespace pkEngineSDK
 {
 
-class PK_PHYSICS_EXPORT PhysicsMaterial
+class PhysicsMaterial
 {
  public:
   PhysicsMaterial(float _elasticity = 0.5f, float _friction = 0.5f) :

@@ -25,10 +25,9 @@ struct PS_OUTPUT
 {
   float4 diffuse : VS_Target0;
   float4 normal : SV_Target1;
-  float4 metallic : SV_Target2;
-  float4 roughness : SV_Target3;
+  float4 orm : SV_Target2; // occlusion, roughness, metallic
   float4 emissive : SV_Target4;
-  float4 posWS : SV_Target5;
+  float4 posWS : SV_Target5; // world space position
 };
 
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be able to remove this sv_target but i can't???
@@ -48,11 +47,10 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   // modify the normal vector 
   float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
   normalSam = normalize(mul(normalSam, TBN));
-  output.normal = float4(normalSam, 1.0f);
   // fill up all outputs with their respective values.
-  output.diffuse = float4(colorSam.rgb * AO.r, 1.0f);
-  output.metallic = float4(metallicSam.bbb, metallicSam.a);
-  output.roughness = float4(roughSam.ggg, 1.0f);
+  output.normal = float4(normalSam, 1.0f);
+  output.diffuse = float4(colorSam.rgb, 1.0f);
+  output.orm = float4(AO.r, roughSam.g, metallicSam.b, 1.0f);
   output.emissive = emissSam;
   output.posWS = float4(input.PosWS, 1.0f);
   

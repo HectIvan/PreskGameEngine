@@ -9,7 +9,8 @@
 namespace pkEngineSDK
 {
 
-void RendererManager::init()
+void
+RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
   TextureManager& tm = g_TextureManager().instance();
@@ -19,53 +20,43 @@ void RendererManager::init()
 
   // Texture description
   TextureDesc txDesc;
-  txDesc.bpp = 4;
   txDesc.width = winWidth;
   txDesc.height = winHeight;
   txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
   txDesc.usage = kPK_USAGE_DEFAULT;
   txDesc.mipLevels = 1;
-  txDesc.miscFlags = 0;
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
-  // render target for scene colors
+  // render target for scene colors.
   SPtr<Texture> albedoRTV = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRTV });
 
-  // create the normal render target that will store the normals of the world
+  // create the normal render target that will store the normals of the world.
   SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  // render target for the shadow result
-  SPtr<Texture> shadowRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Shadow, shadowRT });
+  // render target for the shadow specular result.
+  SPtr<Texture> shadowSpecRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_ShdwSpec, shadowSpecRT });
 
-  // render target for the shadow result
-  SPtr<Texture> specularRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Specular, specularRT });
+  // render target for the metallic result.
+  SPtr<Texture> ormRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
 
-  // render target for the metallic result
-  SPtr<Texture> metallicRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Metallic, metallicRT });
-
-  // render target for the roughness result
-  SPtr<Texture> roughnessRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_Roughness, roughnessRT });
-
-  // skybox texture
+  // skybox texture.
   SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
 
-  // positions texture
+  // positions texture.
   SPtr<Texture> posRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
-  // positions texture for the light
+  // positions texture for the light.
   SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
 
-  // emissive texture
+  // emissive texture.
   SPtr<Texture> emissiveRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Emissive, emissiveRT });
 
@@ -75,15 +66,15 @@ void RendererManager::init()
   SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveBlur, emissiveBlurRT });
 
-  // IBR texture
+  // IBR texture.
   SPtr<Texture> ibrRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibrRT });
 
-  // merge texture
+  // merge texture.
   SPtr<Texture> mergeRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Merge, mergeRT });
 
-  // luminance texture
+  // luminance texture.
   SPtr<Texture> lumRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, lumRT });
 
@@ -143,8 +134,7 @@ RendererManager::createPasses()
   pDesc.inputs = {};
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
                     getGBuffer(G_BUFFERS::kGB_Normal),
-                    getGBuffer(G_BUFFERS::kGB_Metallic),
-                    getGBuffer(G_BUFFERS::kGB_Roughness),
+                    getGBuffer(G_BUFFERS::kGB_ORM),
                     getGBuffer(G_BUFFERS::kGB_Emissive),
                     getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -180,10 +170,9 @@ RendererManager::createPasses()
                    getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Albedo),
                    getGBuffer(G_BUFFERS::kGB_Positions),
-                   getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getGBuffer(G_BUFFERS::kGB_Roughness),
+                   getGBuffer(G_BUFFERS::kGB_ORM),
                    getGBuffer(G_BUFFERS::kGB_PositionsLight) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Shadow), getGBuffer(G_BUFFERS::kGB_Specular) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowQuad, shadowQuadPass });
@@ -207,8 +196,7 @@ RendererManager::createPasses()
   pDesc.inputs = { m_mainSkybox,
                    getGBuffer(G_BUFFERS::kGB_Normal),
                    getGBuffer(G_BUFFERS::kGB_Positions),
-                   getGBuffer(G_BUFFERS::kGB_Metallic),
-                   getGBuffer(G_BUFFERS::kGB_Roughness),
+                   getGBuffer(G_BUFFERS::kGB_ORM),
                    getGBuffer(G_BUFFERS::kGB_Albedo) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
   SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
@@ -244,13 +232,11 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getGBuffer(G_BUFFERS::kGB_Specular),
-                   getGBuffer(G_BUFFERS::kGB_Shadow),
+                   getGBuffer(G_BUFFERS::kGB_ShdwSpec),
                    getGBuffer(G_BUFFERS::kGB_Skybox),
                    getGBuffer(G_BUFFERS::kGB_IBR),
                    getGBuffer(G_BUFFERS::kGB_Emissive),
-                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur),
-                   getGBuffer(G_BUFFERS::kGB_Metallic) };
+                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);

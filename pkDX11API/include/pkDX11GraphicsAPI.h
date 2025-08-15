@@ -279,16 +279,13 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _data Data of the image loaded.
    */
   SPtr<Texture>
-  createTexture(uint32 _bpp,
-                uint32 _width,
+  createTexture(uint32 _width,
                 uint32 _height,
                 int32 _format,
                 int32 _usage,
                 int32 _bindFlags,
                 int32 _shaderResourceFormat,
-                int32 _mipLevels = 1,
-                int32 _miscFlags = 0,
-                unsigned char* _data = nullptr) override;
+                int32 _mipLevels = 1) override;
 
   /**
    * @brief Create a texture from file.

@@ -1006,9 +1006,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
 SPtr<Texture>
 DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
-  return createTexture(_desc.bpp, _desc.width, _desc.height, _desc.format, _desc.usage,
-                       _desc.bindFlags, _desc.shaderResourceFormat, _desc.mipLevels,
-                       _desc.miscFlags, _desc.data);
+  return createTexture(_desc.width, _desc.height, _desc.format, _desc.usage,
+                       _desc.bindFlags, _desc.shaderResourceFormat, _desc.mipLevels);
 }
 
 SPtr<InputLayout>
@@ -1520,20 +1519,14 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     return nullptr;
   }
 
-  // how wide each line of the texture will be
-  // if (bpp == 3) { ++bpp; }
-
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(bpp,
-                                             width,
+  SPtr<Texture> temptTexture = createTexture(width,
                                              height,
                                              _format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
                                              _format,
-                                             _mipLevels,
-                                             _miscFlags,
-                                             data);
+                                             _mipLevels);
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -1543,6 +1536,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     return nullptr;
   }
 
+  // add data to the texture
   bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format));
   auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
   device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
@@ -1622,19 +1616,15 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
   // how wide each line of the texture will be
   bpp = 4 * sizeof(float);
   uint32 format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
-  // if (channels == 4) { format = TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT; }
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(bpp,
-                                             width,
+  SPtr<Texture> temptTexture = createTexture(width,
                                              height,
                                              format,
                                              _usage,
                                              _bindFlags,
                                              format,
-                                             _mipLevels,
-                                             _miscFlags,
-                                             reinterpret_cast<unsigned char*>(data));
+                                             _mipLevels);
 
   // if creating the texture failed
   if (!temptTexture) {
@@ -1644,6 +1634,7 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
     return nullptr;
   }
 
+  // add data to the texture
   auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
   device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
                                                  0,
@@ -1737,16 +1728,13 @@ DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTexture(uint32 _bpp,
-                               uint32 _width,
+DX11GraphicsAPI::createTexture(uint32 _width,
                                uint32 _height,
                                int32 _format,
                                int32 _usage,
                                int32 _bindFlags,
                                int32 _shaderResourceFormat,
-                               int32 _mipLevels,
-                               int32 _miscFlags,
-                               unsigned char* _data)
+                               int32 _mipLevels)
 {
   PK_ASSERT(m_pDevice);
   Logger& log = g_Logger().instance();

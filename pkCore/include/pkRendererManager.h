@@ -37,10 +37,8 @@ namespace G_BUFFERS
   enum E {
     kGB_Albedo = 0,
     kGB_Normal,
-    kGB_Shadow,
-    kGB_Specular,
-    kGB_Metallic,
-    kGB_Roughness,
+    kGB_ShdwSpec, // labbert shadow & torrance specular
+    kGB_ORM, // oclussion roughness metallic
     kGB_PositionsLight,
     kGB_Positions,
     kGB_Emissive,

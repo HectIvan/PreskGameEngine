@@ -11,9 +11,8 @@ Texture2D depthMap : register(t1);
 Texture2D normalMap : register(t2);
 Texture2D colorMap : register(t3);
 Texture2D positionsMap : register(t4);
-Texture2D metallicMap : register(t5);
-Texture2D roughnessMap : register(t6);
-Texture2D lightPosMap : register(t7);
+Texture2D orm : register(t5);
+Texture2D lightPosMap : register(t6);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -73,8 +72,7 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 shadow : VS_Target0;
-  float4 specular : SV_Target1;
+  float3 shdwSpec : VS_Target0;
 };
 
 float fresnelSchlick(float F0, float VoH)
@@ -224,8 +222,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 colorTex = colorMap.Sample(samState, input.TexCoord);
-  float4 metallicTex = metallicMap.Sample(samState, input.TexCoord);
-  float4 roughTex = roughnessMap.Sample(samState, input.TexCoord);
+  float metallicVal = orm.Sample(samState, input.TexCoord).b;
+  float roughVal = orm.Sample(samState, input.TexCoord).g;
   float3 worldPos = positionsMap.Sample(samState, input.TexCoord);
   
   /**
@@ -243,12 +241,10 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
-  float diff = max(dot(lightDir, normal), shadowColor);
-  diff = lerp(diff, shadowColor, 1.0f - diff);
-  float3 diffuse = lightColor * diff;
+  float lamb = max(dot(lightDir, normal), shadowColor);
+  lamb = lerp(lamb, shadowColor, 1.0f - lamb);
+  float3 lambert = lightColor * lamb;
   
-  // specular
-  // float spec = 0.0;
   lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
   /**
@@ -264,46 +260,39 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   //      }
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
-  // float3 halfwayDir = normalize(lightDir + viewDir);
-  // spec = pow(max(dot(normal, halfwayDir), 0.0f), SpotExponent);
-  
-  // float3 blinn_phong = (lightColor * (spec * SpecIntensity)); // this is wrong, just a test to check pure roughness
   
   float3 F0 = float3(0.04f.xxx);
-  F0 = lerp(F0, colorTex.rgb, metallicTex.b);
+  F0 = lerp(F0, colorTex.rgb, metallicVal);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
                                                  lightDir,
-                                                 roughTex.g,
-                                                 metallicTex.b,
+                                                 roughVal,
+                                                 metallicVal,
                                                  F0);
   
   float3 specular = (specCookTorrance) * SpecIntensity;
   
-  output.shadow = float4(diffuse, alpha);
-  output.specular = float4(specular, alpha);
+  output.shdwSpec = float3(lambert.r, specular.r, alpha);
   
   /**
    * shadow mapping;
    */
-  //        float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
-  //        float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
-  //        float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
-  //        lightUV.y = -lightUV.y;
-  //        
-  //        float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
-  //        
-  //        float lightHit = magnitude(worldPos - LightPos);
-  //        float worldHit = magnitude(lightWorldPos - LightPos);
-  //        
-  //        float tolerance = 1.0f;
-  //        
-  //        if (lightHit > worldHit + tolerance)
-  //        {
-  //          output.shadow = float4(shadowColor.xxx, 1.0f);
-  //          output.specular = float4(0.0f.xxx, 1.0f);
-  //        }
+  float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
+  float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
+  float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
+  lightUV.y = -lightUV.y;
+  
+  float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
+  
+  float lightHit = magnitude(worldPos - LightPos);
+  float worldHit = magnitude(lightWorldPos - LightPos);
+  
+  float tolerance = 1.0f;
+  
+  if (lightHit > worldHit + tolerance) {
+    output.shdwSpec = float3(shadowColor, specular.r, 1.0f);
+  }
   
   return output;
 }

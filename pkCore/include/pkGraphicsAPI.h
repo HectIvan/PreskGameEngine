@@ -265,16 +265,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   * @param _mipLevels The maximum number of mipmap levels in the texture.
   **/
   virtual SPtr<Texture>
-  createTexture(uint32 _bpp,
-                uint32 _width,
+  createTexture(uint32 _width,
                 uint32 _height,
                 int32 _format,
                 int32 _usage,
                 int32 _bindFlags,
                 int32 _shaderResourceFormat,
-                int32 _mipLevels = 1,
-                int32 _miscflags = 0,
-                unsigned char* _data = nullptr) = 0;
+                int32 _mipLevels = 1) = 0;
 
   /**
    * @brief Create a texture from file.

@@ -353,8 +353,10 @@ ShaderTest::uInterfaceUpdate()
       // activity checkbox
       im.sameLine();
       im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
-      im.sameLine();
-      im.createImage(m_eyeIcon, Vector2(15));
+      if (m_eyeIcon) {
+        im.sameLine();
+        im.createImage(m_eyeIcon, Vector2(15));
+      }
       // inspect actor transform matrix
       inspector.Inspect();
     }

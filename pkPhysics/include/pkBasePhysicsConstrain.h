@@ -1,4 +1,6 @@
 #pragma once
+#include "pkPrerequisitesCore.h"
+#include "pkRigidBody.h"
 
 namespace pkEngineSDK
 {
@@ -42,5 +44,9 @@ class BasePhysicsConstrain
    */
   float
   getError();
+
+ public:
+  SPtr<RigidBody> m_rb1;
+  SPtr<RigidBody> m_rb2;
 };
 }

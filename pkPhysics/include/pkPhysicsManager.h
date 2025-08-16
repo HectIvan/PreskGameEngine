@@ -149,7 +149,7 @@ class PhysicsManager : public BaseManager
    * @param _rb2 Second rigid body.
    * @return The effective mass.
    */
-  float
+  Matrix3
   getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2) override;
 
   /**

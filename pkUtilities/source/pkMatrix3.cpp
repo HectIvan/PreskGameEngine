@@ -126,8 +126,8 @@ Matrix3::rotationZ(float& _angle)
 Matrix3
 Matrix3::getSkewSymetric(const Vector3& _vector)
 {
-  return Matrix3(0.0f, -_vector.z, _vector.y,
-                 _vector.z, 0.0f, -_vector.x,
-                 -_vector.y, _vector.x, 0.0f);
+  return Matrix3(0.0f, -_vector.z, -_vector.y,
+                 -_vector.z, 0.0f, -_vector.x,
+                 -_vector.y, -_vector.x, 0.0f);
 }
 }

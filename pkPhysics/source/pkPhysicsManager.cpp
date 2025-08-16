@@ -218,7 +218,7 @@ PhysicsManager::getEffectiveMass(Vector3& _normalHit,
                           + _rb2.getInvInertiaWorld() *
                           (_contactPoint2.cross(_normalHit)).cross(_contactPoint2);
 
-  return _rb1.m_inverseMass + _rb2.m_inverseMass + angularEffect.dotProd(_normalHit);
+  return _rb1.getInverseMass() + _rb2.getInverseMass() + angularEffect.dotProd(_normalHit);
 }
 
 float
@@ -285,14 +285,17 @@ PhysicsManager::resolveCollision(RigidBody _rb1, RigidBody _rb2, CollisionInfo _
   _rb2.applyImpulse(j_invTan, _info.m_contactPoint2);
 }
 
-float
+Matrix3
 PhysicsManager::getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2)
 {
-  // Matrix3 skew1 = Matrix3::getSkewSymetric();
-  // Matrix3 skew2 = 
-  // float firstMass = _rb1.m_inverseMass * Matrix3::IDENTITY;
-  // float secondMass = _rb2.m_inverseMass * Matrix3::IDENTITY;
-  return 1.0f;
+  Matrix3 skew1 = Matrix3::getSkewSymetric(_rb1.getWorldPosition());
+  Matrix3 skew2 = Matrix3::getSkewSymetric(_rb2.getWorldPosition());
+  Matrix3 firstMass = Matrix3::IDENTITY * _rb1.getInverseMass();
+  Matrix3 secondMass = Matrix3::IDENTITY * _rb2.getInverseMass();
+  Matrix3 effectiveMass = firstMass + secondMass +
+                          skew1 * _rb1.getInvInertiaWorld() * skew1.getTransposed() + 
+                          skew2 * _rb2.getInvInertiaWorld() * skew2.getTransposed();
+  return effectiveMass;
 }
 
 void

@@ -13,11 +13,12 @@ RigidBody::getInvInertiaWorld()
 void
 RigidBody::applyImpulse(const Vector3& _impulse, const Vector3& _point)
 {
-  if (m_inverseMass == 0.0f) { return; }
+  float invMass = getInverseMass();
+  if (invMass == 0.0f) { return; }
 
   Vector3 r = _point - getWorldPosition();
 
-  m_linearVelocity += _impulse * m_inverseMass;
+  m_linearVelocity += _impulse * invMass;
   m_angularVelocity += getInvInertiaWorld() * r.cross(_impulse);
 }
 
@@ -56,12 +57,14 @@ RigidBody::setFrictionCoef(const float _friction)
 }
 
 void
-RigidBody::applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point) {
-  if (m_inverseMass == 0.0f) { return; }
+RigidBody::applyPositionalImpulse(const Vector3& _impulse, const Vector3& _point)
+{
+  float invMass = getInverseMass();
+  if (invMass == 0.0f) { return; }
 
   Vector3 r = _point - getWorldPosition();
 
-  m_position += _impulse * m_inverseMass;
+  m_position += _impulse * invMass;
   Vector3 pseudoVector = getInvInertiaWorld() * r.cross(_impulse);
   Quaternion deltaRot = Quaternion::axisAngle(pseudoVector, pseudoVector.magnitude());
   m_orientation = (deltaRot * m_orientation).normalized();

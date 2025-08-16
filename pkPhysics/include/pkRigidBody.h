@@ -61,6 +61,15 @@ class RigidBody : public Component
   getInvInertiaWorld();
 
   /**
+   * @brief Get the inverse mass of this rigid body.
+   */
+  float
+  getInverseMass()
+  {
+    return 1 / m_mass;
+  }
+
+  /**
    * @brief Apply impulse to the rigid body
    * @param _impulse Ammount of impulse to apply.
    * @param _point Point where the impulse will be applied.
@@ -105,10 +114,10 @@ class RigidBody : public Component
   setFrictionCoef(const float _friction);
 
  public:
-   bool m_simulate;
+  bool m_simulate;
   float m_gravity;
+  float m_mass;
   float m_drag;
-  float m_inverseMass;
   Vector3 m_linearVelocity;
   Vector3 m_angularVelocity;
   Matrix3 m_invAngularInertia;

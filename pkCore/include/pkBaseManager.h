@@ -141,7 +141,7 @@ class PK_CORE_EXPORT BaseManager : public Module<BaseManager>
    * @param _rb2 Second rigid body.
    * @return The effective mass.
    */
-  virtual float
+  virtual Matrix3
   getEffectiveMassP(RigidBody& _rb1, RigidBody& _rb2) = 0;
 
   /**

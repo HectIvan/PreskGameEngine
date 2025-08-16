@@ -27,16 +27,13 @@ BasePhysicsConstrain::preSolve(float _dt)
                           skew1 * m_rb1->getInvInertiaWorld() * skew1.getTransposed() + 
                           skew2 * m_rb2->getInvInertiaWorld() * skew2.getTransposed();
 
-  Quaternion rot1 = Quaternion();
-  Quaternion rot2 = Quaternion();
+  Quaternion rot1 = m_rb1->m_transform.getLocalRotation();
+  Quaternion rot2 = m_rb2->m_transform.getLocalRotation();
 
-  // Quaternion rot1 = m_rb1->m_transform.getLocalRotation();
-  // Quaternion rot2 = m_rb2->m_transform.getLocalRotation();
+  Vector3 lambda = effectiveMass * ((pos1 + rot1.rotate(m_r1) - pos2 - rot2.rotate(m_r2)) * -1.0f);
 
-  // Vector3 lambda1 = effectiveMass * -(pos1 + rot1 * m_r1 - pos2 - rot2 * m_r2);
-
-  // m_rb1->applyPositionalImpulse(lambda, pos1 + rot1 * m_r1);
-  // m_rb2->applyPositionalImpulse(-lambda, pos2 + rot2 * m_r2);
+  m_rb1->applyPositionalImpulse(lambda, pos1 + m_rb1->m_transform.getRotation().getMatrix3() * m_r1);
+  m_rb2->applyPositionalImpulse(lambda * -1.0f, pos2 + m_rb1->m_transform.getRotation().getMatrix3() * m_r2);
 }
 
 void

@@ -131,6 +131,11 @@ PlatformMath::atan(const float _x)
   return static_cast<float>(std::atan(_x));
 }
 
+float PlatformMath::atan2(const float _y, const float _x)
+{
+  return static_cast<float>(std::atan2(_y, _x));
+}
+
 float
 PlatformMath::clamp(const float _t, const float _x, const float _y)
 {

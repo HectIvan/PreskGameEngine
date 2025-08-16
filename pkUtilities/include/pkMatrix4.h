@@ -279,6 +279,17 @@ class PK_UTILITY_EXPORT Matrix4
     return newMat;
   }
 
+  Quaternion
+    getLocalRotation()
+  {
+    Quaternion localRotation;
+    localRotation.x = Math::atan2(matrix[2][1], matrix[2][2]);
+    localRotation.y = Math::asin(-matrix[2][0]);
+    localRotation.z = Math::atan2(matrix[1][0], matrix[0][0]);
+    localRotation.w = 1.0f; // Assuming no scaling, w can be set to 1.0f
+    return localRotation;
+  }
+
   /**
    * @brief get the forward vector from a view matrix.
    * @return the forward vector.

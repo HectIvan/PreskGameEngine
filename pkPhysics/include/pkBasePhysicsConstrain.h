@@ -15,7 +15,7 @@ class BasePhysicsConstrain
    * @brief 
    */
   void
-  init(); // with physics objects
+  init(SPtr<RigidBody> _rb1, SPtr<RigidBody> _rb2); // with rigid bodies
 
   /**
    * @brief 
@@ -48,5 +48,8 @@ class BasePhysicsConstrain
  public:
   SPtr<RigidBody> m_rb1;
   SPtr<RigidBody> m_rb2;
+
+  Vector3 m_joint1; // relative position of the first rigid body
+  Vector3 m_joint2; // relative position of the second rigid body
 };
 }

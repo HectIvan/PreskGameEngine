@@ -74,24 +74,28 @@ Quaternion::axisAngle(Vector3 _axis, float _angle)
 }
 
 Vector3
-Quaternion::rotate(const Vector3& x) const
+Quaternion::rotate(const Vector3& _vector) const
 {
   const Quaternion& p = *this;
 
-  // q = P (x,0)
-  Quaternion q;
-  q.x = p.w * x.x + p.y * x.z - p.z * x.y;
-  q.y = p.w * x.y + p.z * x.x - p.x * x.z;
-  q.z = p.w * x.z + p.x * x.y - p.y * x.x;
+  // // q = P (x,0)
+  // Quaternion q;
+  // q.x = p.w * x.x + p.y * x.z - p.z * x.y;
+  // q.y = p.w * x.y + p.z * x.x - p.x * x.z;
+  // q.z = p.w * x.z + p.x * x.y - p.y * x.x;
+  // 
+  // q.w = -p.x * x.x - p.y * x.y - p.z * x.z;
+  // 
+  // // r = q P*
+  // Vector3 r;
+  // r.x = q.w * -p.x + p.w * q.x - q.y * p.z + q.z * p.y;
+  // r.y = q.w * -p.y + p.w * q.y - q.z * p.x + q.x * p.z;
+  // r.z = q.w * -p.z + p.w * q.z - q.x * p.y + q.y * p.x;
+  
+  Vector3 r = _vector;
+  // Vector3 r = (p * Quaternion(0.0f, _vector) * p.conjugate());
 
-  q.w = -p.x * x.x - p.y * x.y - p.z * x.z;
-
-  // r = q P*
-  Vector3 r;
-  r.x = q.w * -p.x + p.w * q.x - q.y * p.z + q.z * p.y;
-  r.y = q.w * -p.y + p.w * q.y - q.z * p.x + q.x * p.z;
-  r.z = q.w * -p.z + p.w * q.z - q.x * p.y + q.y * p.x;
-
+  // return r;
   return r;
 }
 

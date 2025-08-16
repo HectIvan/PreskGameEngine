@@ -19,10 +19,11 @@
 **/
 /*********************************************/
 #include "pkMatrix3.h"
-#include "pkVector4.h"
-#include "pkVector3.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK {
+
+class Quaternion;
 
 class PK_UTILITY_EXPORT Matrix4
 {
@@ -278,6 +279,12 @@ class PK_UTILITY_EXPORT Matrix4
 
     return newMat;
   }
+
+  /**
+   * @brief Get the rotation matrix on 3 axis.
+   */
+  Quaternion
+  getLocalRotation();
 
   /**
    * @brief get the forward vector from a view matrix.

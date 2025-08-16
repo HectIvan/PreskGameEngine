@@ -5,6 +5,7 @@
 /*********************************************/
 #include "pkMath.h"
 #include "pkMatrix4.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK {
 
@@ -80,6 +81,17 @@ Matrix4::Matrix4(float m00, float m01, float m02, float m03,
   matrix[1][0] = m10; matrix[1][1] = m11;	matrix[1][2] = m12; matrix[1][3] = m13;
   matrix[2][0] = m20; matrix[2][1] = m21;	matrix[2][2] = m22; matrix[2][3] = m23;
   matrix[3][0] = m30; matrix[3][1] = m31; matrix[3][2] = m32; matrix[3][3] = m33;
+}
+
+Quaternion
+Matrix4::getLocalRotation()
+{
+  Quaternion localRotation;
+  localRotation.x = Math::atan2(matrix[2][1], matrix[2][2]);
+  localRotation.y = Math::asin(-matrix[2][0]);
+  localRotation.z = Math::atan2(matrix[1][0], matrix[0][0]);
+  localRotation.w = 1.0f; // Assuming no scaling, w can be set to 1.0f
+  return localRotation;
 }
 
 Vector3

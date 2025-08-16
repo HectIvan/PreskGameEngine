@@ -70,6 +70,15 @@ class PK_UTILITY_EXPORT Quaternion
   operator*=(const Quaternion& _quat);
 
   /**
+   * @brief Multiply the quaternion with a vector.
+   */
+  Quaternion
+  operator*(const Vector3& _vector) const
+  {
+
+  }
+
+  /**
    * @brief Rotate the quaternion respective to another quaternion.
    * @param _quat Quaternion to use for rotation.
    * @return The rotated quaternion
@@ -78,7 +87,8 @@ class PK_UTILITY_EXPORT Quaternion
   rotate(const Quaternion& _quat) const;
   
   // length utility
-  Quaternion conjugate() const;
+  Quaternion
+  conjugate() const;
   /**
    * @brief Get the magnitude Square of the Quaternion.
    * @return The sum of elements elevated by 2.
@@ -99,11 +109,6 @@ class PK_UTILITY_EXPORT Quaternion
   invert();
 
   /**
-   * @brief The magnitude of the Quaternion.
-   * @return The magnitude of this quaternion.
-   */
-
-  /**
    * @brief Normalize the Quaternion.
    */
   void
@@ -115,6 +120,15 @@ class PK_UTILITY_EXPORT Quaternion
    */
   Quaternion
   normalized();
+
+  /**
+   * @brief Get the quaternion as a Vector3.
+   */
+  Vector3
+  xyz() const
+  {
+    return Vector3(x, y, z);
+  }
 
   float w;
   float x;

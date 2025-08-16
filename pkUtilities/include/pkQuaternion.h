@@ -85,12 +85,6 @@ class PK_UTILITY_EXPORT Quaternion
    */
   Quaternion
   rotate(const Quaternion& _quat) const;
-
-  /**
-   * @brief Rotate a vector by this quaternion.
-   */
-  Quaternion
-  rotate(const Vector3& _vector) const;
   
   // length utility
   Quaternion

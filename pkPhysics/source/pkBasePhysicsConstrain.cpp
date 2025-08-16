@@ -7,9 +7,19 @@ namespace pkEngineSDK
 {
 
 void
-BasePhysicsConstrain::init()
+BasePhysicsConstrain::init(SPtr<RigidBody> _rb1, SPtr<RigidBody> _rb2)
 {
+  m_rb1 = _rb1;
+  m_rb2 = _rb2;
 
+  // compute local space of joint positions
+  m_joint1 = m_rb1->getWorldPosition() -
+             m_rb1->m_transform.getRotation().getMatrix3() *
+             m_rb1->m_transform.getLocalRotation().xyz();
+
+  m_joint2 = m_rb2->getWorldPosition() -
+             m_rb2->m_transform.getRotation().getMatrix3() *
+             m_rb2->m_transform.getLocalRotation().xyz();
 }
 
 void
@@ -30,10 +40,13 @@ BasePhysicsConstrain::preSolve(float _dt)
   Quaternion rot1 = m_rb1->m_transform.getLocalRotation();
   Quaternion rot2 = m_rb2->m_transform.getLocalRotation();
 
-  Vector3 lambda = effectiveMass * ((pos1 + rot1.rotate(m_r1) - pos2 - rot2.rotate(m_r2)) * -1.0f);
+  Vector3 lambda = effectiveMass * ((pos1 + rot1.rotate(m_joint1) -
+                                     pos2 - rot2.rotate(m_joint2)) * -1.0f);
 
-  m_rb1->applyPositionalImpulse(lambda, pos1 + m_rb1->m_transform.getRotation().getMatrix3() * m_r1);
-  m_rb2->applyPositionalImpulse(lambda * -1.0f, pos2 + m_rb1->m_transform.getRotation().getMatrix3() * m_r2);
+  m_rb1->applyPositionalImpulse(lambda,
+                                pos1 + m_rb1->m_transform.getRotation().getMatrix3() * m_joint1);
+  m_rb2->applyPositionalImpulse(lambda * -1.0f,
+                                pos2 + m_rb1->m_transform.getRotation().getMatrix3() * m_joint2);
 }
 
 void

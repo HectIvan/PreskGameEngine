@@ -19,10 +19,11 @@
 **/
 /*********************************************/
 #include "pkMatrix3.h"
-#include "pkVector4.h"
-#include "pkVector3.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK {
+
+class Quaternion;
 
 class PK_UTILITY_EXPORT Matrix4
 {
@@ -279,16 +280,11 @@ class PK_UTILITY_EXPORT Matrix4
     return newMat;
   }
 
+  /**
+   * @brief Get the rotation matrix on 3 axis.
+   */
   Quaternion
-    getLocalRotation()
-  {
-    Quaternion localRotation;
-    localRotation.x = Math::atan2(matrix[2][1], matrix[2][2]);
-    localRotation.y = Math::asin(-matrix[2][0]);
-    localRotation.z = Math::atan2(matrix[1][0], matrix[0][0]);
-    localRotation.w = 1.0f; // Assuming no scaling, w can be set to 1.0f
-    return localRotation;
-  }
+  getLocalRotation();
 
   /**
    * @brief get the forward vector from a view matrix.

@@ -25,13 +25,12 @@ namespace pkEngineSDK
 {
 
 class Device;
+struct SimpleVertex;
 
 class VertexBuffer
 {
+ public:
   VertexBuffer() = default;
   virtual ~VertexBuffer() = default;
-
-  virtual void
-  create(Device* _pDevice, Vector<SimpleVertex> _vertex) = 0;
 };
 }

@@ -1,11 +1,11 @@
 /************************************************************************/
 /**
-* @pkDX11Shader pkDX11Shader.h
+* @pkShader pkShader.h
 * @Hector Ivan Muñoz Ceballos
-* @date 11/11/2024
-* @DirectX Shader file for the Presk Game Engine.
+* @date 17/12/2024
+* @Shader file for the Presk Game Engine.
 *
-* This file contains the Shader class using DirectX11 of the engine
+* This file contains the base Shader class of the engine
 *
 * @bug No bug known.
 */
@@ -18,54 +18,72 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkPath.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
-using std::wstring;
-
-class Shader
+class PK_CORE_EXPORT Shader
 {
  public:
-  Shader() = default;
-  virtual ~Shader()
-  {
-    safeRelease(m_pSBlob);
-  }
+  Shader() {};
+  virtual ~Shader() = default;
 
   /**
-  * Compile.
-  * 
-  * Compile the shader from a file.
-  * 
-  * @param _szFileName
-  * Name of the shader.
-  * 
-  * @param _szEntryPoint
-  * What section will we compile.
-  * 
-  * @param _szShaderModel
-  * What model of the shader is compiled.
-  * 
-  * @param _ppBlobOut
-  * Blob info.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  * 
-  **/
-  int32
-  compileShaderFromFile(wstring _szFileName,
-                        LPCSTR _szEntryPoint,
-                        LPCSTR _szShaderModel,
-                        ID3DBlob** _ppBlobOut);
-  
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
+   * @brief Compile the shader.
+   */
+  virtual void
+  compile() = 0;
 
- public:
-  ID3DBlob* m_pSBlob = nullptr;
+  /**
+   * @brief Set the shader directory.
+   * @param _directory Directory of the shader.
+   */
+  virtual void
+  setShaderDirectory(const Path _directory) = 0;
+
+  /**
+   * @brief Set the entry point of the shader.
+   * @param _entry Entry point of the shader.
+   */
+  virtual void
+  setEntryPoint(const char* _entry) = 0;
+
+  /**
+   * @brief Set the model of the shader.
+   * @param _sModel Shader model.
+   */
+  virtual void
+  setShaderModel(const char* _sModel) = 0;
+
+  /**
+   * @brief Set the shader data.
+   * @param _directory Directory of the shader.
+   * @param _entry Entry point of the shader.
+   * @param _sModel Shader model.
+   */
+  virtual void
+  setData(const Path _directory, const char* _entry, const char* _sModel) = 0;
+
+  /**
+   * @brief get the current shader directory.
+   * @return the Shader directory.
+   */
+  virtual const Path&
+  getShaderDirectory() = 0;
+
+  /**
+   * @brief Get the current shader entry point.
+   * @return The entry point.
+   */
+  virtual const char*
+  getEntryPoint() = 0;
+
+  /**
+   * @brief Get the current shader model.
+   * @return The shader model.
+   */
+  virtual const char*
+  getShaderModel() = 0;
 };
 }

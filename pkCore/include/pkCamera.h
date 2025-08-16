@@ -1,19 +1,21 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkCamera pkCamera.h
-* @Hector Ivan Muñoz Ceballos
-* @date 30/09/2024
-* @Camera file for the Presk Game Engine.
-*
-* This file will contain the Camera used for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 30/09/2024
-*/
-/************************************************************************/
+ * @file    pkCamera.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    30/09/2024
+ * @brief   Camera component for the game engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
+#include "pkComponent.h"
 #include "pkMatrix4.h"
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
@@ -23,136 +25,233 @@
 namespace pkEngineSDK
 {
 
-class Camera
+namespace CAMERA_PROJ
+{
+  enum E : uint32
+  {
+    kPerspective = 0,
+    kOrthographic,
+  };
+}
+
+struct CameraDesc
+{
+  CameraDesc() = default;
+  CameraDesc(uint32 _width, uint32 _height, float _halfFOV, float _nearZ, float _farZ,
+             Vector3 _eye, Vector3 _at, Vector3 _up, CAMERA_PROJ::E _camMode) {
+    width = _width;
+    height = _height;
+    halfFOV = _halfFOV;
+    nearZ = _nearZ;
+    farZ = _farZ;
+    eye = _eye;
+    at = _at;
+    up = _up;
+    camMode = _camMode;
+  }
+  uint32 width;
+  uint32 height;
+  float halfFOV;
+  float nearZ;
+  float farZ;
+  Vector3 eye;
+  Vector3 at;
+  Vector3 up;
+  CAMERA_PROJ::E camMode;
+};
+
+class PK_CORE_EXPORT Camera : public Component
 {
  public:
   Camera() = default;
   virtual ~Camera() = default;
 
   /**
-  * Initialize the camera.
-  **/
+   * @brief Initialize the camera based on a descriptor.
+   * @param _desc Descriptor to use.
+   */
   void
-  Init(uint32 _width,
+  init(const CameraDesc& _desc);
+
+  /**
+   * @brief Initialize the camera.
+   * @param _width Width to the view.
+   * @param _height Height of the view.
+   * @param _halfFov Half of the field of view.
+   * @param _nearZ Nearest point to the camera.
+   * @param _farZ Furthest point to the camera.
+   * @param _eye Position of the camera view.
+   * @param _at Where the camera will be looking at.
+   * @param _up Up vector of the camera.
+   * @param _camMode Wether Camera perspective.
+   */
+  void
+  init(uint32 _width,
        uint32 _height,
        float _halfFOV,
        float _nearZ,
        float _farZ,
-       Vector4 _eye,
-       Vector4 _at,
-       Vector4 _up
+       Vector3 _eye,
+       Vector3 _at,
+       Vector3 _up,
+       CAMERA_PROJ::E _camMode = CAMERA_PROJ::kPerspective
   );
+
+  /**
+   * @brief Set the view matrix data
+   */
+  void
+  setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up);
   
   /**
-  * Move the camera to a new position.
-  * 
-  * @param _dist
-  * New position of the camera.
-  **/
+   * @brief Move the camera to a new position.
+   * @param _dist New position of the camera.
+   */
   void
   move(Vector3 _dist);
 
   /**
-  * Rotate the camera by rotating the At vector
-  * 
-  * @param _x
-  * New x rotation.
-  * 
-  * @param _y
-  * New y rotation.
-  * 
-  * @param _z
-  * New z rotation.
-  **/
+   * @brief Move the camera forward in the global axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveForward(float _offset);
+
+  /**
+   * @brief Move the camera forward in its local axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveForwardLocal(float _offset);
+
+  /**
+   * @brief Move the camera right in the global axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveRight(float _offset);
+
+  /**
+   * @brief Move the camera right in its local axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveRightLocal(float _offset);
+
+  /**
+   * @brief Move the camera up in the global axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveUp(float _offset);
+
+  /**
+   * @brief Move the camera up in its local axis.
+   * @param _offset Distance to move.
+   */
+  void
+  moveUpLocal(float _offset);
+
+  /**
+   * @brief Rotate the camera by rotating the At vector.
+   * @param _x New x rotation.
+   * @param _y New y rotation.
+   * @param _z New z rotation.
+   */
   void
   rotate(float _x, float _y, float _z);
 
   /**
-  * Rotate the camera by rotating the At vector
-  *
-  * @param _rotate
-  * New rotation vector.
-  **/
+   * @brief Rotate the camera by rotating the At vector.
+   * @param _rotate New rotation vector.
+   */
   void
   rotate(Vector3 _rotate);
 
   /**
-  * Gets the forward vector of the camera.
-  * 
-  * @return
-  * The forward vector as a vector4.
-  **/
-  Vector4
-  getForwardVector();
+   * @brief Get the forward vector of the camera.
+   * @return The forward vector as a vector4.
+   */
+  Vector3
+  getForward();
 
   /**
-  * Gets the right vector of the camera.
-  *
-  * @return
-  * The right vector as a vector4.
-  **/
-  Vector4
-  getRightVector();
+   * @brief Get the right vector of the camera.
+   * @return The right vector as a vector4.
+   */
+  Vector3
+  getRight();
 
   /**
-  * Gets the up vector of the camera.
-  *
-  * @return
-  * The up vector as a vector4.
-  **/
-  Vector4
-  getUpVector();
+   * @brief Get the up vector of the camera.
+   * @return The up vector as a vector4.
+   */
+  Vector3
+  getUp();
 
   /**
-  * Sets the forward vector of the camera.
-  * 
-  * @param _vec
-  * New forward vector.
-  **/
+   * @brief Set the forward vector of the camera.
+   * @param _vec New forward vector.
+   */
   void
-  setForwardVector(Vector4 _vec) { m_forward = _vec; }
+  setForward(Vector3 _vec) { m_forward = _vec; }
 
   /**
-  * Sets the right vector of the camera.
-  * 
-  * @param _vec
-  * New right vector.
-  **/
+   * @brief Set the right vector of the camera.
+   * @param _vec New right vector.
+   */
   void
-  setRightVector(Vector4 _vec) { m_right = _vec; }
+  setRight(Vector3 _vec) { m_right = _vec; }
 
   /**
-  * Sets the up vector of the camera.
-  * 
-  * @param _vec
-  * New up vector.
-  **/
+   * @brief Set the up vector of the camera.
+   * @param _vec New up vector.
+   */
   void
-  setUpVector(Vector4 _vec) { m_up = _vec; }
+  setUp(Vector3 _vec) { m_up = _vec; }
 
   /**
-  * Set all the direction vectors.
-  **/
-  void
-  updateRotation();
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  COMPONENT_TYPE::E
+  getType() override { return COMPONENT_TYPE::kCamera; }
 
+  /**
+   * @brief Get the name of the component.
+   */
+  const char*
+  getName() override { return "Camera"; }
+
+  /**
+   * @brief Get the component type of this component.
+   * @return The component type.
+   */
+  static COMPONENT_TYPE::E
+  getObjType() { return COMPONENT_TYPE::kCamera; }
+
+ public:
   // Camera view
   Matrix4 m_view;
   Matrix4 m_projection;
   uint32 m_width;
   uint32 m_height;
+  CAMERA_PROJ::E m_projType;
+  CameraDesc m_descriptor;
 
   // Camera position
   Vector4 m_eye;
   Vector4 m_at;
-  Vector4 m_up;
+  Vector3 m_up;
 
   // camera vectors
-  Vector4 m_forward;
-  Vector4 m_right;
+  Vector3 m_forward;
+  Vector3 m_right;
 
   // camera rotation and start position
-  Vector3 m_rotation = Vector3(0.0f);
+  Vector3 m_rotation;
   Vector2 m_startPos = Vector2(0.0f);
+
+  Vector2 m_farNear;
 };
 }

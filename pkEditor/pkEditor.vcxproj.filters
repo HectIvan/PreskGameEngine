@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\baseApp">
+      <UniqueIdentifier>{5a30d403-aebc-4eaf-939f-d97a3e029491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{fe17dee2-aed7-4ef6-a8ab-f7c9e7e18a54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Interface">
+      <UniqueIdentifier>{54a6d8a2-e618-4e1b-b26c-f66d08bffca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Interface\ImGui">
+      <UniqueIdentifier>{f7055187-d7a2-498f-9af3-25e14c65ddda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\interface">
+      <UniqueIdentifier>{d0f4fb97-30d9-4ddd-879d-bfa68c258a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\interface\ImGui">
+      <UniqueIdentifier>{28315225-3dc1-49ca-af04-f91699a9b30e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Editor">
+      <UniqueIdentifier>{8bb4215f-047b-47b5-b23c-13df7106fb10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PhysicsApp">
+      <UniqueIdentifier>{f170020d-da58-4dfc-af0e-6571307fe531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\PhysicsApp">
+      <UniqueIdentifier>{853d309a-7e4f-41ab-aba8-e4db64f58827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\baseApp\Editor">
+      <UniqueIdentifier>{493c38ec-bff2-4524-99d4-55dc331fee09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\shaderTest.cpp">
+      <Filter>Source Files\baseApp</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkEditorApp.cpp">
+      <Filter>Source Files\baseApp\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkUInterface.cpp">
+      <Filter>Source Files\interface</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkImGui_win32.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_demo.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_draw.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_impl_win32.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_tables.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_widgets.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\externals\imgui_impl_dx11.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11ImGui.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ActorInspector.cpp">
+      <Filter>Source Files\baseApp\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PhysicsApp.cpp">
+      <Filter>Source Files\PhysicsApp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\pkUInterface.h">
+      <Filter>include\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imconfig.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_impl_win32.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_internal.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_rectpack.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_textedit.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imstb_truetype.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\externals\imgui_impl_dx11.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActorInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhysicsApp.h">
+      <Filter>include\PhysicsApp</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

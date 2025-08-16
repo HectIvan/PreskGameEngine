@@ -66,6 +66,76 @@ TEST_CASE("Platform Math") {
 
   REQUIRE(Math::clamp(-1.0f, 0.0f, 1.0f) == 0.0f);
   REQUIRE(Math::clamp(2.0f, 0.0f, 1.0f) == 1.0f);
+
+  /**
+  * In range
+  **/
+  float inRangeTest = 2.0f;
+  float inRangeMax = 3.0f;
+  float inRangeMin = 1.0f;
+  REQUIRE(Math::isInRange(inRangeTest, inRangeMin, inRangeMax) == Approx(true));
+  inRangeMax = 4.0f;
+  inRangeMin = 3.0f;
+  REQUIRE(Math::isInRange(inRangeTest, inRangeMin, inRangeMax) == Approx(false));
+
+  /**
+  * lerp
+  **/
+  float timeDif = 0.16f;
+  // Verify time difference
+  REQUIRE(timeDif == Approx(0.16f));
+  float aS = 9.58f;
+  float bS = 2.35f;
+  // Verify varibles
+  REQUIRE(aS == Approx(9.58f));
+  REQUIRE(bS == Approx(2.35f));
+  // Do the process
+  float fS = Math::lerp(aS, bS, timeDif);
+  // Verify final result
+  REQUIRE(fS == Approx(8.4232f));
+
+  /**
+  * lerp3
+  **/
+  Vector3 a = Vector3(1.0f, 1.0f, 1.0f);
+  Vector3 b = Vector3(2.0f, 7.0f, 1.5f);
+  // Verify vector a
+  REQUIRE(a.x == Approx(1.0f));
+  REQUIRE(a.y == Approx(1.0f));
+  REQUIRE(a.z == Approx(1.0f));
+  // Verify vector b
+  REQUIRE(b.x == Approx(2.0f));
+  REQUIRE(b.y == Approx(7.0f));
+  REQUIRE(b.z == Approx(1.5f));
+  // Do the process
+  Vector3 final3 = Math::lerp3(a, b, timeDif);
+  // Verify final Vector
+  REQUIRE(final3.x == Approx(1.16f));
+  REQUIRE(final3.y == Approx(1.96f));
+  REQUIRE(final3.z == Approx(1.08f));
+
+  /**
+  * lerp4
+  **/
+  Vector4 a4 = Vector4(1.0f, 1.0f, 1.0f, 3.0f);
+  Vector4 b4 = Vector4(2.0f, 7.0f, 1.5f, 9.0f);
+  // Verify vector a
+  REQUIRE(a4.x == Approx(1.0f));
+  REQUIRE(a4.y == Approx(1.0f));
+  REQUIRE(a4.z == Approx(1.0f));
+  REQUIRE(a4.w == Approx(3.0f));
+  // Verify vector b
+  REQUIRE(b4.x == Approx(2.0f));
+  REQUIRE(b4.y == Approx(7.0f));
+  REQUIRE(b4.z == Approx(1.5f));
+  REQUIRE(b4.w == Approx(9.0f));
+  // Do the process
+  Vector4 final4 = Math::lerp4(a4, b4, timeDif);
+  // Verify final Vector
+  REQUIRE(final4.x == Approx(1.16f));
+  REQUIRE(final4.y == Approx(1.96f));
+  REQUIRE(final4.z == Approx(1.08f));
+  REQUIRE(final4.w == Approx(3.96f));
 }
 
 /**************************************************************/

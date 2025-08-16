@@ -17,11 +17,13 @@
 * Includes
 **/
 /*********************************************/
+#include "pkDevice.h"
 #include "pkDX11Prerequisites.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
-class DX11Device
+class DX11Device : public Device
 {
  public:
   DX11Device() = default;
@@ -30,41 +32,34 @@ class DX11Device
     safeRelease(m_pd3dDevice);
     safeRelease(m_pImmediateContext);
   }
+
+  /**
+   * @brief Get the raw version of the device.
+   * @return The pointer to the device.
+   */
+  void*
+  getDevice() override;
+
+  /**
+   * @brief Get the raw version of the device context.
+   * @return The pointer to the device context.
+   */
+  void*
+  getDeviceContext() override;
   
   /**
-  * Initialize device.
-  * 
-  * Initializes the DX11 device.
-  * 
-  * @param _hWnd
-  * handler to the window to use.
-  * 
-  * @param _pDriverType
-  * Type of driver we will be using for the device.
-  * 
-  * @param _pFeatureLevel
-  * Feature levels of the device.
-  * 
-  * @return
-  * What was the end result of the creation
-  **/
+   * @brief Initialize device.
+   * @param _pDriverType Type of driver we will be using for the device.
+   * @param _pFeatureLevel Feature levels of the device.
+   * @return What was the end result of the creation.
+   */
   HRESULT
-  init(HWND& _hWnd, D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
+  init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
 
   /**
-  * Clean Device.
-  * 
-  * Clears all the pointers of the device.
-  **/
-  void
-  clean();
-
-  /**
-  * Set primitive topology
-  * 
-  * @param _topology
-  * The kind of topology we will be using.
-  **/
+   * @brief Set primitive topology.
+   * @param _topology The kind of topology we will be using.
+   */
   void
   setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -72,6 +67,6 @@ class DX11Device
   ID3D11Device* m_pd3dDevice = nullptr;
   ID3D11DeviceContext* m_pImmediateContext = nullptr;
   D3D_DRIVER_TYPE* m_pDriverType;
-  D3D_FEATURE_LEVEL   m_featureLevel;
+  D3D_FEATURE_LEVEL m_featureLevel;
 };
 }

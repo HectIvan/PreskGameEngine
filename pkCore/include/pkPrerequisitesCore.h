@@ -1,3 +1,13 @@
+/*****************************************************************************/
+/**
+ * @file    pkPrerequisitesCore.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    N.A.
+ * @brief   Prerequisites for the core of the game engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -5,7 +15,12 @@
 * Includes
 **/
 /*********************************************/
+#include "pkCoreDefines.h"
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector2.h"
+#include "pkVector3.h"
+#include "pkVector4.h"
+#include "pkMatrix4.h"
 
 /*********************************************/
 /**
@@ -19,9 +34,25 @@
 namespace pkEngineSDK
 {
 
-struct Texture {
-  uint32 id;
-  String type;
+using std::reinterpret_pointer_cast;
+using std::make_shared; 
+
+struct KeyPosition
+{
+  Vector3 position;
+  float timeStamp;
+};
+
+struct KeyRotation
+{
+  Vector4 rotation;
+  float timeStamp;
+};
+
+struct KeyScale
+{
+  Vector3 scale;
+  float timeStamp;
 };
 
 template<class T>

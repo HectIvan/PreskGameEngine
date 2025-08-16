@@ -21,14 +21,19 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
+#include "pkVector3.h"
 
 namespace pkEngineSDK {
+
+class Matrix4;
+class Vector2;
 
 class PK_UTILITY_EXPORT Vector4
 {
  public:
   Vector4() = default;
   FORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
+  FORCEINLINE Vector4(Vector3 _vec, float _w);
   FORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
   ~Vector4() = default;
 
@@ -109,6 +114,20 @@ class PK_UTILITY_EXPORT Vector4
   }
 
   /**
+   * @brief Adds a Vector3 to a Vector4.
+   * @param other Vector with which the addition will be made.
+   * @return A vector with the addition done.
+   */
+  FORCEINLINE Vector4&
+  operator+=(const Vector3& other)
+  {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+  }
+
+  /**
   * add a Vector to this Vector.
   *
   * This operator adds another vector to this vector.
@@ -144,6 +163,17 @@ class PK_UTILITY_EXPORT Vector4
   operator+(const Vector4& other) const
   {
     return Vector4(x + other.x, y + other.y, z + other.z, w + other.w);
+  }
+
+  /**
+  * @brief Adds a Vector3 to a Vector4.
+  * @param other Vector with which the addition will be made.
+  * @return A vector with the addition done.
+  **/
+  FORCEINLINE const Vector4
+  operator+(const Vector3& other) const
+  {
+    return Vector4(x + other.x, y + other.y, z + other.z, w);
   }
 
   /**
@@ -233,7 +263,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if they are the same.
   **/
-  FORCEINLINE const bool
+  FORCEINLINE bool
   operator==(const Vector4& other) const
   {
     return (x != other.x ||
@@ -253,11 +283,14 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if any discrepancies were found.
   **/
-  FORCEINLINE const bool
+  FORCEINLINE bool
   operator!=(const Vector4& other) const
   {
     return !operator==(other);
   }
+
+  const Vector4
+  operator*(const Matrix4& other) const;
   
   /**
   * Calculate the cross product of this vector.
@@ -369,6 +402,12 @@ class PK_UTILITY_EXPORT Vector4
   normalize();
 
   /**
+   * @brief returns a copy of this normalized vector.
+   */
+  Vector4
+  normalized() const;
+
+  /**
   * Gets the distance between this vector and another.
   *
   * This function gets the distance between this vector and
@@ -411,7 +450,7 @@ class PK_UTILITY_EXPORT Vector4
   * A boolean determining if any value changes.
   **/
   bool
-  isDifferent(Vector4& _other) const;
+  isDifferent(const Vector4& _other) const;
 
   /**
   * Sets all parts of a vector to a single value.
@@ -425,8 +464,8 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A Vector4 with all of its parts set to a single value.
   **/
-  static
-  Vector4 vectorSplatValue(float _val);
+  static Vector4
+  vectorSplatValue(float _val);
 
   /**
   * Calculate the dot product of one vector with this one.
@@ -437,9 +476,31 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The final dot product.
   **/
-  FORCEINLINE static float
-  dotProd(const Vector4 _this, const Vector4 _other);
+  static float
+  dotProd(const Vector4& _this, const Vector4& _other);
 
+  /**
+   * @brief Get vector3 from this vector.
+   * @return A vector3 with the x, y and z of this vector.
+   */
+  Vector3
+  xyz() { return Vector3(x, y, z); }
+
+  /**
+   * @brief Get a Vector2 with x and y of this vector.
+   * @return A vector2 with the x and y of this vector
+   */
+  Vector2
+  xy();
+
+  /**
+   * @brief Get a Vector2 with y and z of this vector.
+   * @return A vector2 with the y and z of this vector
+   */
+  Vector2
+  yz();
+
+ public:
   float x, y, z, w;
 
   static const Vector4 ZERO;

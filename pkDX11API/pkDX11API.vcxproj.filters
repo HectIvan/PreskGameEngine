@@ -28,14 +28,8 @@
     <Filter Include="include\prerequisites">
       <UniqueIdentifier>{45519aa5-0a72-4626-9f73-3bce6833affb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\main">
-      <UniqueIdentifier>{47f5c2dd-c8b6-4acf-8121-6e48b031d5ef}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\pkDX11Test.cpp">
-      <Filter>source\main</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkDX11DepthStencilView.cpp">
       <Filter>source\api</Filter>
     </ClCompile>
@@ -68,6 +62,12 @@
     </ClCompile>
     <ClCompile Include="source\pkDX11GraphicsAPI.cpp">
       <Filter>source\api</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11Texture.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDX11SwapChain.cpp">
+      <Filter>source\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +108,27 @@
       <Filter>include\prerequisites</Filter>
     </ClInclude>
     <ClInclude Include="include\pkDX11GraphicsAPI.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11Texture.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11RenderTargetView.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11SwapChain.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11BlendState.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11ComputeShader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkDX11RasterizerState.h">
+      <Filter>include\api</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DDSTextureLoader.h">
       <Filter>include\api</Filter>
     </ClInclude>
   </ItemGroup>

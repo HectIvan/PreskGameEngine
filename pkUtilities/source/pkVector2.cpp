@@ -36,6 +36,14 @@ Vector2::normalize()
   y *= mag;
 }
 
+const Vector2
+Vector2::normalized() const
+{
+  float mag = magnitude();
+  mag = 1.0f / mag;
+  return Vector2(x * mag, y * mag);
+}
+
 void
 Vector2::clamp(float _x, float _y)
 {

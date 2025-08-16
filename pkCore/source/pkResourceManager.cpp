@@ -1,0 +1,67 @@
+#include "pkResourceManager.h"
+#include "pkGraphicsAPI.h"
+
+namespace pkEngineSDK
+{
+
+SPtr<Material>
+ResourceManager::newMaterial()
+{
+  // create the material component.
+  SPtr<Material> pMatComp = make_shared<Material>();
+  // return the material.
+  return pMatComp;
+}
+
+SPtr<Model>
+ResourceManager::loadModel(Path _directory)
+{
+  // search if the model has been stored before
+  for (uint32 i = 0; i < m_models.size(); ++i) {
+    if (m_models[i]->directory.toString() == _directory.toString()) {
+      return m_models[i]->model;
+    }
+  }
+
+  // create the model pointer
+  SPtr<Model> model = make_shared<Model>();
+  // load the model from the path
+  if (model->load(_directory)) {
+    // create the index and vertex buffers
+    model->m_vertexB = g_GraphicAPI().createVertexBuffer(model->vertex);
+    model->m_indexB = g_GraphicAPI().createIndexBuffer(model->index);
+    g_GraphicAPI().setIndexBuffer(model->m_indexB);
+    g_GraphicAPI().setVertexBuffer(model->m_vertexB);
+  }
+  else { // if the model could not be loaded, destroy the pointer and return null.
+    model = nullptr;
+    return nullptr;
+  }
+
+  // store the model in memory for later use if needed
+  SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();
+  newModelMem->directory = _directory;
+  newModelMem->model = model;
+  m_models.push_back(newModelMem);
+  // return the final model
+  return model;
+}
+
+SPtr<Mesh>
+ResourceManager::searchMesh(String _name)
+{
+  for (uint32 i = 0; i < m_meshes.size(); ++i)
+  {
+    if (_name == m_meshes[i]->getName()) {
+      return m_meshes[i];
+    }
+  }
+  return nullptr;
+}
+
+PK_CORE_EXPORT ResourceManager&
+g_ResourceManager()
+{
+  return ResourceManager::instance();
+}
+}

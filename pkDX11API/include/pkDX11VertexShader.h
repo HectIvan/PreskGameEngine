@@ -24,44 +24,13 @@ namespace pkEngineSDK {
 
 class DX11Device;
 
-class DX11VertexShader : public DX11Shaders
+class DX11VertexShader : public DX11Shader
 {
 public:
   DX11VertexShader() = default;
-  virtual ~DX11VertexShader()
-  {
-    safeRelease(m_pSBlob);
+  virtual ~DX11VertexShader() {
+    safeRelease(m_pShader);
   }
-  /**
-  * Compile.
-  * 
-  * Compiles the vertex shader.
-  * 
-  * @return
-  * If the compilation was successful or not.
-  **/
-  HRESULT
-  compile();
-
-  /**
-  * Create Vertex shader.
-  *
-  * Creates the Vertex shader in the device provided.
-  *
-  * param _pDevice
-  * Device where the shader will be created.
-  *
-  * @return
-  * If the creation was successful or not.
-  **/
-  HRESULT
-  create(DX11Device* _pDevice);
-
-  /**
-  * Clean the shader.
-  **/
-  void
-  clean();
 
  public:
   ID3D11VertexShader* m_pShader = nullptr;

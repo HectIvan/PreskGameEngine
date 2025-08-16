@@ -29,6 +29,7 @@
 **/
 
 namespace pkEngineSDK {
+
 using std::uint8_t;
 using std::uint16_t;
 using std::uint32_t;
@@ -64,14 +65,9 @@ using int64 = int64_t;
  * Character types
 **/
 /**************************************************************/
-#if PK_COMPILER == PK_COMPILER_MSVC
 using WCHAR = wchar_t;
-#else
-using WCHAR = unsigned short;
-#endif
 using ANSICHAR = char;
 using UNICHAR = WCHAR;
-using unchar = unsigned char;
 
 /**************************************************************/
 /**
@@ -86,4 +82,15 @@ using TYPE_OF_NULL = int32;
 **/
 /**************************************************************/
 using SIZE_T = size_t;
+
+/**************************************************************/
+/**
+ * Platform pointer
+**/
+/**************************************************************/
+#if PK_ARCH_TYPE == PK_ARCHITECTURE_X86_32
+using PlatformPointer = int32*;
+#else
+using PlatformPointer = int64*;
+#endif
 }

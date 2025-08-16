@@ -24,13 +24,14 @@
 namespace pkEngineSDK
 {
 
-class Transform
+class PK_UTILITY_EXPORT Transform
 {
  public:
   Transform() = default;
   Transform(Matrix4 _rotation,
             Matrix4 _scale,
             Matrix4 _translation);
+  explicit Transform(Matrix4 _matrix);
   explicit Transform(float _val);
   virtual ~Transform() = default;
 
@@ -87,19 +88,23 @@ class Transform
   * The desired scale matrix.
   **/
   void
-  setScale(Matrix4 _scale);
+  setScale(Vector3 _scale);
 
   /**
-  * Set translation
-  *
-  * Sets the desired transform translation.
-  *
-  * @param _translation
-  * The desired translation matrix.
-  **/
+   * Set translation
+   *
+   * Sets the desired transform translation.
+   *
+   * @param _translation
+   * The desired translation matrix.
+   */
   void
-  setTranslation(Matrix4 _translation);
+  setTranslation(Vector3 _translation);
 
+ public:
+  Vector3 position;
+  Vector3 scale;
+  Vector3 rotation;
   Matrix4 transform;
 };
 }

@@ -19,42 +19,72 @@
 * Includes
 **/
 /*********************************************/
-#include "assimp\texture.h"
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
+#include "pkMaterial.h"
 #include "pkTransform.h"
 
 namespace pkEngineSDK
 {
 
 class Device;
+class Texture;
 
 class Mesh
 {
+ public:
   Mesh() = default;
-  virtual ~Mesh() = default;
+  virtual ~Mesh() {
+    clean();
+  }
 
-  Mesh(Vector<SimpleVertex> vertex,
-       Vector<uint32> index,
-       uint32 vertexCount,
-       uint32 numIndex,
-       Vector<Texture> textures);
+  /**
+   * @brief Create a mesh.
+   * @param _vertex Vertex data.
+   * @param _index Index data.
+   * @param _vertexcount How many vertex make up the mesh.
+   * @param _numIndex How many index make up the mesh.
+   * @param _textures Textures data.
+   */
+  Mesh(Vector<SimpleVertex> _vertex,
+         Vector<uint32> _index,
+         uint32 _vertexCount,
+         uint32 _numIndex);
 
+  /**
+   * @brief Clean the mesh of any data
+   */
   void
-  Draw(Device* _pDevice);
+  clean();
 
+  /**
+   * @brief Set mesh name.
+   * @param _name Name of the mesh.
+   */
   void
-  Clean();
+  setName(String _name) { m_name = _name; }
 
-  Transform mTransform = Transform(Matrix4(0),
-                                   Matrix4(0),
-                                   Matrix4(0));
+  /**
+   * @brief Get the name of the mesh.
+   * @return Reference to the name of the mesh.
+   */
+  String&
+  getName() { return m_name; }
+
+ public:
   // stores the index and vertex info
-  Vector<SimpleVertex> m_vertexVector;
-  Vector<uint32> m_indexVector;
-  Vector<Texture> mTextures;
-  aiMaterial* mMaterial;
-  uint32 mVertexCount;
-  uint32 mNumIndex;
+  Vector<SimpleVertex> vertexVector;
+  Vector<uint32> indexVector;
+
+  Matrix4 transform;
+  uint32 vertexCount;
+  uint32 numIndex;
+
+  SPtr<Material> material;
+
+  String materialPath;
+
+ private:
+  String m_name;
 };
 }

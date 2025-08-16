@@ -8,19 +8,24 @@
 namespace pkEngineSDK
 {
 
-HRESULT
-DX11Device::init(HWND& _hWnd, D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel)
+void*
+DX11Device::getDevice()
 {
-  *m_pDriverType = D3D_DRIVER_TYPE_NULL;
-  m_featureLevel = D3D_FEATURE_LEVEL_11_0;
-  return S_OK;
+  return m_pd3dDevice;
 }
 
-void
-DX11Device::clean()
+void*
+DX11Device::getDeviceContext()
 {
-  safeRelease(m_pd3dDevice);
-  safeRelease(m_pImmediateContext);
+  return m_pImmediateContext;
+}
+
+HRESULT
+DX11Device::init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel)
+{
+  *m_pDriverType = *_pDriverType;
+  m_featureLevel = *_pFeatureLevel;
+  return S_OK;
 }
 
 void

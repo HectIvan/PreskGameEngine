@@ -23,7 +23,8 @@
 #include "pkPrerequisitesUtilities.h"
 #include "pkVector3.h"
 
-namespace pkEngineSDK {
+namespace pkEngineSDK
+{
 
 class PK_UTILITY_EXPORT Sphere
 {

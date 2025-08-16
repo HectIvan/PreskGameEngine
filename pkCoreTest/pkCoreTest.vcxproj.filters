@@ -15,5 +15,34 @@
     <ClCompile Include="source\pkCoreTest.cpp">
       <Filter>source\main</Filter>
     </ClCompile>
+    <ClCompile Include="source\PhysicsApp.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkObstacle.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Projectile.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Spring.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\PhysicsApp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Projectile.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Cannon.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Obstacle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Spring.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

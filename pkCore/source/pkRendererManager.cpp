@@ -53,8 +53,12 @@ RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // positions texture for the light.
+  // txDesc.width = winWidth * 2.0f;
+  // txDesc.height = winHeight * 2.0f;
   SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
+  // txDesc.width = winWidth;
+  // txDesc.height = winHeight;
 
   // emissive texture.
   SPtr<Texture> emissiveRT = api.createTexture(txDesc);
@@ -353,7 +357,6 @@ RendererManager::compileShaders()
   for (auto it = m_passes.begin(); it != m_passes.end(); ++it) {
     // Compile shaders
     it->second->compileShaders();
-    g_Logger().print("recompiled shaders.");
   }
 }
 

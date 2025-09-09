@@ -266,11 +266,9 @@ BaseApp::render()
   Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
   // first shadow pass
-  if (m_shadows) {
-    baseShadow->beginPass();
-    renderManager.renderActors(actors);
-    baseShadow->endPass();
-  }
+  baseShadow->beginPass();
+  renderManager.renderActors(actors);
+  baseShadow->endPass();
 
   // base pass
   basePass->beginPass(Color(0, 0, 0, 0));

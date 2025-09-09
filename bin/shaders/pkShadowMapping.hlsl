@@ -210,6 +210,7 @@ float magnitude(float3 v)
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
+  
   /**
    * light data
    */
@@ -241,7 +242,8 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
-  float lamb = max(dot(lightDir, normal), shadowColor);
+  float dotOfLight = dot(lightDir, normal);
+  float lamb = max(dotOfLight, shadowColor);
   lamb = lerp(lamb, shadowColor, 1.0f - lamb);
   float3 lambert = lightColor * lamb;
   
@@ -288,7 +290,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float lightHit = magnitude(worldPos - LightPos);
   float worldHit = magnitude(lightWorldPos - LightPos);
   
-  float tolerance = 1.0f;
+  float tolerance = 2.0f * dotOfLight;
   
   if (lightHit > worldHit + tolerance) {
     output.shdwSpec = float3(shadowColor, specular.r, 1.0f);

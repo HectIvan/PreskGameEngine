@@ -42,7 +42,9 @@ using pkEngineSDK::make_shared;
 using pkEngineSDK::ConstantBuffer;
 using pkEngineSDK::Light;
 using pkEngineSDK::Pass;
+using pkEngineSDK::Path;
 using pkEngineSDK::Scene;
+using pkEngineSDK::Shader;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
@@ -51,6 +53,13 @@ using pkEngineSDK::UIWindow;
 using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
+
+struct ShaderType
+{
+  Path path;
+  String name;
+  SPtr<Shader> shader;
+};
 
 class ShaderTest : public BaseApp
 {

@@ -113,7 +113,6 @@ class PK_CORE_EXPORT BaseApp
   float m_fixedTimer;
 
  protected:
-  bool m_shadows;
   bool m_run = true;
   bool m_vSync;
 

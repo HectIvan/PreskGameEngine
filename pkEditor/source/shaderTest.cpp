@@ -120,14 +120,14 @@ ShaderTest::onInit()
 
   // create light
   m_light = activeScene->instantiate("Light");
-  m_light->setPosition(0.0f, 60.0f, 0.0f);
+  m_light->setPosition(0.0f, 272.0f, 0.0f);
   m_light->addComponent(make_shared<Light>());
   SPtr<Light> lightCom = m_light->getComponent<Light>();
 
   // add camera component
   m_light->addComponent(make_shared<Camera>());
-  m_light->getComponent<Camera>()->init(1920,
-                                        1080,
+  m_light->getComponent<Camera>()->init(1920 * 2.0f,
+                                        1080 * 2.0f,
                                         3.1416f / 4.0f,
                                         3.0f,
                                         5000.0f,
@@ -148,8 +148,8 @@ ShaderTest::onInit()
   coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
-  m_shadows = true;
   m_IBR = true;
+  m_vSync = false;
   m_IBRIntensity = 1.0f;
   // luminance blur
   m_blurRadius = 2.0f;
@@ -261,6 +261,17 @@ ShaderTest::input()
     m_camera->getComponent<Camera>()->rotate(-posDif.y, -posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
+}
+
+bool
+findShader(const Vector<ShaderType>& _list, const Path& _path)
+{
+  for (uint32 i = 0; i < _list.size(); ++i) {
+    if (_list[i].path.toString() == _path.toString()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void
@@ -402,59 +413,39 @@ ShaderTest::uInterfaceUpdate()
   fpsHistory[fpsOffset] = f_fps;
   fpsOffset = (fpsOffset + 1) % fpsListSize;
 
-  // --- Display window --- //
-  if (im.collapsingHeader("Display", kPK_DefaultOpen)) {
-    im.createText(fpsStr.c_str());
-    im.sameLine();
-    im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
+  // --- Camera window --- //
+  if (im.collapsingHeader("Editor App", kPK_DefaultOpen)) {
     // vSync
     im.createText("vSync");
     im.sameLine();
     im.createCheckBox("##vSync", m_vSync);
-  }
-  // -------------------------- //
-
-  // --- Camera window --- //
-  if (im.collapsingHeader("Editor Camera", kPK_DefaultOpen)) {
+    im.createText(fpsStr.c_str());
+    im.sameLine();
+    im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
     // camera speed
-    im.createText("Speed        ");
+    im.createDragF("##CamSpeed", m_cameraSpeed);
     im.sameLine();
-    im.createDragF("##Speed", m_cameraSpeed);
+    im.createText("Camera Speed");
     // X Sensitivity
-    im.createText("X Sensitivity");
-    im.sameLine();
     im.createDragF("##XSens", m_sensX, 0.1f);
-    // Y Sensitivity
-    im.createText("Y Sensitivity");
     im.sameLine();
+    im.createText("X Sensitivity");
+    // Y Sensitivity
     im.createDragF("##YSens", m_sensY, 0.1f);
+    im.sameLine();
+    im.createText("Y Sensitivity");
+    im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
   }
   // -------------------------- //
 
-  // --- Post-Process window --- //
-  im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
-  if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
-    // shadows option
-    im.createCheckBox("Shadows", m_shadows);
-    // Emissive blur pass
-    im.createDragF("Emissive Blur", m_emissiveBlur, 1.0f, 0.001f);
-    im.createDragF("Emissive Strength", m_emissiveStrength, 0.1f, 0.001f);
-    // Luminance
-    if (im.collapsingHeader("Luminance")) {
-      // Blur
-      im.createDragF("Blur Radius", m_blurRadius, 0.1f, 0.001f);
-      im.createDragF("Blur Strength", m_blurStrength, 0.1f, 0.001f);
-      // luminance threshold
-      im.createDragF("Luminance Threshold", m_lumThreshold, 0.1f, 0.0f);
-    }
-
-    // IBL
-    if (im.collapsingHeader("IBL")) {
-      im.createCheckBox("IBL Active", m_IBR);
-      if (m_IBR) {
-        im.sameLine();
-        im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
-      }
+  // ------------IBL------------ //
+  if (im.collapsingHeader("IBL", kPK_DefaultOpen)) {
+    im.createCheckBox("IBL Active", m_IBR);
+    if (m_IBR) {
+      // Slider for IBL intensity.
+      im.sameLine();
+      im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+      // Button for loading an HDRI image.
       if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
@@ -463,14 +454,92 @@ ShaderTest::uInterfaceUpdate()
         }
       }
     }
-    if (im.isItemHovered()) {
-      im.setTooltip("Skybox");
-    }
+  }
+  if (im.isItemHovered()) {
+    im.setTooltip("Skybox");
+  }
+  // -------------------------- //
+  
+  // --- Post-Process window --- //
+  im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
+  if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
+    // Luminance
+    im.createText("Luminance");
+    // Blur
+    im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
+    im.sameLine();
+    im.createText("Radius");
+    im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
+    im.sameLine();
+    im.createText("Strength");
+    // luminance threshold
+    im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
+    im.sameLine();
+    im.createText("Threshold");
+
+    // Emissive blur pass
+    im.createText("Emissive");
+    im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
+    im.sameLine();
+    im.createText("Radius");
+    im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
+    im.sameLine();
+    im.createText("Strength");
+  }
+  if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
     // compile shaders
+    Vector<ShaderType> shaderPaths;
+    for (auto it = rm.m_passes.begin(); it != rm.m_passes.end(); ++it) {
+      SPtr<Shader> vShader = it->second->getVShader();
+      SPtr<Shader> pShader = it->second->getPShader();
+      SPtr<Shader> cShader = it->second->getCShader();
+      // check if a vertex shader exists.
+      if (vShader) {
+        Path dir = vShader->getShaderDirectory();
+        if (!findShader(shaderPaths, dir)) {
+          ShaderType shaderMem;
+          shaderMem.path = dir;
+          shaderMem.name = dir.getFileName();
+          shaderMem.shader = vShader;
+          shaderPaths.push_back(shaderMem);
+        }
+      }
+      // check if a pixel shader exist.
+      if (pShader) {
+        Path dir = pShader->getShaderDirectory();
+        if (!findShader(shaderPaths, dir)) {
+          ShaderType shaderMem;
+          shaderMem.path = dir;
+          shaderMem.name = dir.getFileName();
+          shaderMem.shader = pShader;
+          shaderPaths.push_back(shaderMem);
+        }
+      }
+      // check if a compute shader exists.
+      if (cShader) {
+        Path dir = cShader->getShaderDirectory();
+        if (!findShader(shaderPaths, dir)) {
+          ShaderType shaderMem;
+          shaderMem.path = dir;
+          shaderMem.name = dir.getFileName();
+          shaderMem.shader = cShader;
+          shaderPaths.push_back(shaderMem);
+        }
+      }
+    }
+    // compilation buttons for each shader.
+    for (uint32 i = 0; i < shaderPaths.size(); ++i) {
+      const char* name = shaderPaths[i].name.c_str();
+      im.createText(name);
+      // im.sameLine();
+      // if (im.createButton(name)) {
+      //   shaderPaths[i].shader->compile();
+      // }
+    }
+    // compilation button for all shaders.
     if (im.createButton("Compile Shaders")) {
       rm.compileShaders();
     }
-    im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
   }
   im.popStyleColor(3);
   im.endWindowCreate();

@@ -49,7 +49,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
   normalSam = normalize(mul(normalSam, TBN));
   // fill up all outputs with their respective values.
   output.normal = float4(normalSam, 1.0f);
-  output.diffuse = float4(colorSam.rgb, 1.0f);
+  output.diffuse = float4(colorSam.rgb * AO.r, 1.0f);
   output.orm = float4(AO.r, roughSam.g, metallicSam.b, 1.0f);
   output.emissive = emissSam;
   output.posWS = float4(input.PosWS, 1.0f);

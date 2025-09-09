@@ -67,8 +67,5 @@ float4 PS(PS_INPUT input) : SV_Target
   float targetMip = lerp(0.0, mipCount - 1.0, roughVal);
   float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
-  // get how much of the surounding light will be reflected.
-  float3 metallicColor = sRGBToLinear(float4(IBL, 1.0f)).rgb * metallicVal;
-  
-  return float4(metallicColor * Intensity, 1.0f);
+  return float4(IBL * Intensity, 1.0f);
 }

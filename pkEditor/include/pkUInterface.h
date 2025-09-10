@@ -18,7 +18,7 @@
 **/
 /*********************************************/
 #include "pkColor.h"
-#include "externals/imgui.h"
+#include "imgui.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
@@ -157,6 +157,12 @@ class UInterface : public Module<UInterface>
    */
   void
   endFrame();
+
+  /**
+   * @brief set the docking space to the current viewport.
+   */
+  void
+  createSpace();
 
   /**
    * @brief Creates a new User interface window.

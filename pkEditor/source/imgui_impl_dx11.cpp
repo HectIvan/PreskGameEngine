@@ -39,7 +39,7 @@
 
 #include "pkUInterface.h"
 #ifndef IMGUI_DISABLE
-#include "externals/imgui_impl_dx11.h"
+#include "imgui_impl_dx11.h"
 #include "pkPrerequisitesCore.h"
 
 // DirectX

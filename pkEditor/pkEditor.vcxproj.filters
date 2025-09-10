@@ -43,64 +43,64 @@
     <ClCompile Include="source\pkImGui_win32.cpp">
       <Filter>Source Files\interface\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="source\externals\imgui.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_demo.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_draw.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_impl_win32.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_tables.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_widgets.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\externals\imgui_impl_dx11.cpp">
-      <Filter>Source Files\interface\ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkDX11ImGui.cpp">
       <Filter>Source Files\interface\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="source\ActorInspector.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="source\imgui.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_demo.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_draw.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_impl_dx11.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_impl_win32.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_tables.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_widgets.cpp">
+      <Filter>Source Files\interface\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
       <Filter>include\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="include\externals\imconfig.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui_impl_win32.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui_internal.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_rectpack.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_textedit.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imstb_truetype.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\externals\imgui_impl_dx11.h">
-      <Filter>include\Interface\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="include\ActorInspector.h">
       <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imconfig.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_dx11.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_win32.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_internal.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_rectpack.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_textedit.h">
+      <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_truetype.h">
+      <Filter>include\Interface\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

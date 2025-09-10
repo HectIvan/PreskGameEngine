@@ -1,6 +1,6 @@
 #include "pkUInterface.h"
 #include "pkGraphicsAPI.h"
-#include "externals/imgui_impl_dx11.h"
+#include "imgui_impl_dx11.h"
 #include "pkPlatformMath.h"
 #include "pkTexture.h"
 

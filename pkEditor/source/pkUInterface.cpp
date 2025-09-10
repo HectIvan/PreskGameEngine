@@ -14,6 +14,9 @@
 #include "pkUInterface.h"
 #include "pkPlatformMath.h"
 
+#define IMGUI_ENABLE_VIEWPORTS
+#define IMGUI_HAS_DOCK
+
 namespace pkEngineSDK
 {
   
@@ -24,7 +27,7 @@ UInterface::init()
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); static_cast<void>(io);
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | io.ConfigWindowsMoveFromTitleBarOnly;
-  // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 
   // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to
@@ -94,6 +97,43 @@ void
 UInterface::endFrame()
 {
   ImGui::EndFrame();
+}
+
+void
+UInterface::createSpace()
+{
+  ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+
+  static bool built = false;
+  if (!built) {
+    // ImGui::dockBuilderRemoveNode(dockspace_id); // clear any previous layout
+    // ImGui::dockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_None); // add empty node
+    // ImGui::dockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+    ImGuiID main = dockspace_id;
+    ImGuiID left;
+    ImGuiID right;
+    ImGuiID bottom;
+    ImGuiID center;
+
+    // ImGui::dockBuilderSplitNode(main, ImGuiDir_Left, 0.2f, &left, &main);
+    // ImGui::dockBuilderSplitNode(main, ImGuiDir_Right, 0.2f, &right, &main);
+    // ImGui::dockBuilderSplitNode(main, ImGuiDir_Down, 0.2f, &bottom, &center);
+    // 
+    // ImGui::dockBuilderDockWindow("Scene Graph", left);
+    // ImGui::dockBuilderDockWindow("Inspector", right);
+    // ImGui::dockBuilderDockWindow("Logger", bottom);
+    // ImGui::dockBuilderDockWindow("Viewport", center);
+    // 
+    // ImGui::dockBuilderFinish(dockspace_id);
+  }
+  built = true;
+
+
+  // ImGui::DockSpaceOverViewport(ImGui::GetID("MainDockspace"), ImGui::GetMainViewport());
 }
 
 void

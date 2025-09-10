@@ -4,7 +4,7 @@
 using pkEngineSDK::g_GraphicAPI;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
-#include "externals/imgui_impl_win32.h"
+#include "imgui_impl_win32.h"
 
 namespace pkEngineSDK
 {

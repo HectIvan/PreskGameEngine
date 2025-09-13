@@ -74,6 +74,8 @@ Pass::Pass(PassDesc& _desc)
   m_outputTex = _desc.outputs;
   m_uavTex = _desc.uavs;
   m_depthTex = _desc.pDepth;
+
+  m_viewPortSize = _desc.viewportSize;
 }
 
 void
@@ -151,6 +153,7 @@ Pass::beginPass(Color _color)
   api.cSSetConstantBuffers(getCBuffers());
   // set the rasterizer state
   api.setRasterizerState(m_pRasterizerState);
+  api.setViewport(m_viewPortSize);
 }
 
 void

@@ -53,12 +53,12 @@ RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // positions texture for the light.
-  // txDesc.width = winWidth * 2.0f;
-  // txDesc.height = winHeight * 2.0f;
+  txDesc.width = winWidth * 2.0f;
+  txDesc.height = winHeight * 2.0f;
   SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
-  // txDesc.width = winWidth;
-  // txDesc.height = winHeight;
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
 
   // emissive texture.
   SPtr<Texture> emissiveRT = api.createTexture(txDesc);
@@ -123,7 +123,9 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-   // pass description
+
+  Vector2 BackBufferSize = g_GraphicAPI().getSwapChain()->getSize();
+  // pass description
   PassDesc pDesc = PassDesc();
   pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
@@ -142,6 +144,7 @@ RendererManager::createPasses()
                     getGBuffer(G_BUFFERS::kGB_Emissive),
                     getGBuffer(G_BUFFERS::kGB_Positions) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
+  pDesc.viewportSize = BackBufferSize;
   // rasterizer state
   pDesc.rSExists = true;
   pDesc.rSCullMode = RS_CULL_MODE::kPK_CULL_NONE;
@@ -159,6 +162,7 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkPShaderDepth.hlsl");
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
+  pDesc.viewportSize = BackBufferSize * 2.0f;
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
@@ -177,6 +181,7 @@ RendererManager::createPasses()
                    getGBuffer(G_BUFFERS::kGB_ORM),
                    getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
+  pDesc.viewportSize = BackBufferSize;
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowQuad, shadowQuadPass });

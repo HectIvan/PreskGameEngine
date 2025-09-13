@@ -69,11 +69,18 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Set the Client viewport.
+   * @param _size Size of the viewport.
+   */
+  virtual void
+  setViewport(Vector2 _size) = 0;
+
+  /**
+   * @brief Set the Client viewport.
    * @param _width Client width.
    * @param _height Client height.
    */
   virtual void
-  setViewport(uint32 _width, uint32 _height) = 0;
+  setViewport(float _width, float _height) = 0;
 
   /**
    * @brief Get the client viewport size.

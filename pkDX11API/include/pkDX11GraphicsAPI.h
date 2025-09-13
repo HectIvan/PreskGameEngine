@@ -86,11 +86,18 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set the Client viewport.
+   * @param _size Size of the viewport.
+   */
+  void
+  setViewport(Vector2 _size) override;
+
+  /**
+   * @brief Set the Client viewport.
    * @param _width Client width.
    * @param _height Client height.
    */
   void
-  setViewport(uint32 _width, uint32 _height);
+  setViewport(float _width, float _height) override;
 
   /**
    * @brief Get the client viewport size.

@@ -171,6 +171,8 @@ public:
   // constant buffers for the shaders.
   Vector<SPtr<ConstantBuffer>> m_cBuffers;
 
+  Vector2 m_viewPortSize;
+
   // input and output textures of the pass
   Vector<SPtr<Texture>> m_inputTex;
   Vector<SPtr<Texture>> m_outputTex;

@@ -707,14 +707,20 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
 }
 
 void
-DX11GraphicsAPI::setViewport(uint32 _width,
-                             uint32 _height)
+DX11GraphicsAPI::setViewport(Vector2 _size)
+{
+  setViewport(_size.x, _size.y);
+}
+
+void
+DX11GraphicsAPI::setViewport(float _width,
+                             float _height)
 {
   Logger& log = g_Logger().instance();
   PK_ASSERT(m_pDevice);
   D3D11_VIEWPORT vp;
-  vp.Width = static_cast<float>(_width);
-  vp.Height = static_cast<float>(_height);
+  vp.Width = _width;
+  vp.Height = _height;
   vp.MinDepth = 0.0f;
   vp.MaxDepth = 1.0f;
   vp.TopLeftX = 0;

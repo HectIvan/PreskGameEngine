@@ -78,6 +78,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   getSwapChain() override { return m_pSwapChain; }
 
   /**
+   * @brief resize the swap chain.
+   * @param _size Size to set the swap chain to.
+   */
+  void
+  resizeSwapChain(const Vector2 _size) override;
+
+  /**
    * @brief Get the device pointer.
    * @return Return te pointer to the device.
    */

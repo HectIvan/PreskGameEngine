@@ -46,7 +46,14 @@ namespace pkEngineSDK
    * @return Texture of the back buffer.
    */
   SPtr<Texture>&
-  getBuffer(uint32 _index) override;
+  getBuffer(const uint32 _index) override;
+
+  /**
+   * @brief Resize the buffers.
+   * @param _size New size of the buffers.
+   */
+  void
+  resizebuffers(const Vector2 _size) override;
 
  public:
   IDXGISwapChain* m_pSch;

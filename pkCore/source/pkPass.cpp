@@ -130,6 +130,9 @@ Pass::beginPass(Color _color)
   api.clearDepthBuffer(1.0f, m_depthTex);
   // set render targets and depth texture
   api.setRenderTargets(m_outputTex, m_depthTex);
+  // set the viewport size.
+  api.setViewport(m_viewPortSize);
+  // api.resizeSwapChain(m_viewPortSize);
   // set input layout of shader
   api.setInputLayout(getInputLayout());
   // set the shaders
@@ -153,7 +156,6 @@ Pass::beginPass(Color _color)
   api.cSSetConstantBuffers(getCBuffers());
   // set the rasterizer state
   api.setRasterizerState(m_pRasterizerState);
-  api.setViewport(m_viewPortSize);
 }
 
 void

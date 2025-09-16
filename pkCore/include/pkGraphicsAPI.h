@@ -61,6 +61,13 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   getSwapChain() = 0;
 
   /**
+   * @brief resize the swap chain.
+   * @param _size Size to set the swap chain to.
+   */
+  virtual void
+  resizeSwapChain(const Vector2 _size) = 0;
+
+  /**
    * @brief Get the api device.
    * @return The Pointer to the device
    */

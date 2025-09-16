@@ -58,6 +58,7 @@ namespace D_BUFFERS
   enum E {
     kDB_Base = 0,
     kDB_Light,
+    kDB_QuadShadow,
   };
 }
 

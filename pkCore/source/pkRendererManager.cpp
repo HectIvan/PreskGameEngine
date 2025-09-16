@@ -18,6 +18,8 @@ RendererManager::init()
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
 
+  float sizeMulShadow = 5.0f;
+
   // Texture description
   TextureDesc txDesc;
   txDesc.width = winWidth;
@@ -53,8 +55,8 @@ RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // positions texture for the light.
-  txDesc.width = winWidth * 2.0f;
-  txDesc.height = winHeight * 2.0f;
+  txDesc.width = winWidth * sizeMulShadow;
+  txDesc.height = winHeight * sizeMulShadow;
   SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
   txDesc.width = winWidth;
@@ -102,8 +104,16 @@ RendererManager::init()
   m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
 
   // light depth buffer
+  txDesc.width = winWidth * sizeMulShadow;
+  txDesc.height = winHeight * sizeMulShadow;
   SPtr<Texture> shadowDepth = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Light, shadowDepth });
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
+
+  // depth buffer quad
+  SPtr<Texture> shadowQuadDepth = api.createTexture(txDesc);
+  m_depthBuffers.insert({ D_BUFFERS::kDB_QuadShadow, shadowDepth });
 
   // ---------------------------------------------------------- //
   // UNORDERED ACCESS VIEWS
@@ -159,10 +169,11 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
+  float sizeMulShadow = 5.0f;
   pDesc.pSDirectory = Path("shaders/pkPShaderDepth.hlsl");
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
-  pDesc.viewportSize = BackBufferSize * 2.0f;
+  pDesc.viewportSize = BackBufferSize * sizeMulShadow;
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
@@ -181,6 +192,7 @@ RendererManager::createPasses()
                    getGBuffer(G_BUFFERS::kGB_ORM),
                    getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
+  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   pDesc.viewportSize = BackBufferSize;
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes

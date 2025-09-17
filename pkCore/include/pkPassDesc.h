@@ -59,8 +59,6 @@ struct PassDesc
   PK_SAM_STATE_ADRESS::E samAdress;
   PK_SAM_STATE_FILTERS::E samFilters;
 
-  Vector2 viewportSize;
-
   // rasterizer state
   bool rSExists;
   RS_CULL_MODE::E rSCullMode;

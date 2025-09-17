@@ -13,6 +13,7 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
   {
     // get buffer data
     ID3D11Texture2D* pBackBuffer = nullptr;
+    D3D11_TEXTURE2D_DESC* tDesc = new D3D11_TEXTURE2D_DESC();
     // Get the buffers in the swap chain
     int32 hr = m_pSch->GetBuffer(i, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
     // if the buffer is not correct
@@ -22,6 +23,7 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
         errMsg);
       return;
     }
+    pBackBuffer->GetDesc(tDesc);
 
     // reinterpret as a directX texture
     SPtr<DX11Texture> rTargetView = make_shared<DX11Texture>(pBackBuffer);
@@ -40,6 +42,9 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);
       return;
     }
+
+    rTargetView->setSize(Vector2(static_cast<float>(tDesc->Width),
+                                 static_cast<float>(tDesc->Height)));
 
     m_buffers.push_back(rTargetView);
     pBackBuffer->Release();

@@ -32,7 +32,7 @@ Pass::Pass() {
 Pass::Pass(PassDesc& _desc)
 {
   // call the api manager
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
   m_pSamplerState = make_shared<SamplerState>();
   // Try to create the vertex shader if there's a path.
   if (!_desc.vSDirectory.getPath().empty()) {
@@ -75,7 +75,14 @@ Pass::Pass(PassDesc& _desc)
   m_uavTex = _desc.uavs;
   m_depthTex = _desc.pDepth;
 
-  m_viewPortSize = _desc.viewportSize;
+  // get the viewport size from the needed render target or unordered access view.
+  m_viewPortSize = Vector2(0.0f);
+  if (!m_outputTex.empty()) {
+    m_viewPortSize = m_outputTex[0]->getSize();
+  }
+  else if (m_uavTex.empty()) {
+    m_viewPortSize = m_uavTex[0]->getSize();
+  }
 }
 
 void
@@ -124,7 +131,7 @@ void
 Pass::beginPass(Color _color)
 {
   // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
   // clear RTVs and Depth stencil
   api.clearRenderTargetViews(_color, m_outputTex);
   api.clearDepthBuffer(1.0f, m_depthTex);
@@ -162,7 +169,7 @@ void
 Pass::endPass()
 {
   // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
   // set all to nullptr
   api.unbindRenderTargets();
   api.setInputLayout(nullptr);

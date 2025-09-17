@@ -48,6 +48,7 @@ float gaussianDistribution(float x, float o)
   return y;
 }
 
+uniform float weight[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
 // Gaussian Blur
 float4 PS(PS_INPUT input) : SV_Target0
 {
@@ -75,6 +76,18 @@ float4 PS(PS_INPUT input) : SV_Target0
   BlurColor /= sumWeights;
   
   return saturate(BlurColor);
+  
+  // float2 tex_offset = 1.0 / WinSize; // gets size of single texel
+  // float3 result = textureResource.Sample(samState, input.TexCoord).rgb * weight[0]; // current fragment's contribution
+  // for (int i = 1; i < 5; ++i) {
+  //   float2 posX = float2(tex_offset.x * i, tex_offset.y * i) * Direction;
+  //   float2 posY = float2(tex_offset.x * i, tex_offset.y * i) * Direction;
+  //   result += textureResource.Sample(samState, input.TexCoord + posX).rgb * weight[i];
+  //   result += textureResource.Sample(samState, input.TexCoord - posY).rgb * weight[i];
+  // }
+  // float4 FragColor = float4(result, 1.0);
+  // 
+  // return FragColor * Strength;
 }
 
 // Box Blur

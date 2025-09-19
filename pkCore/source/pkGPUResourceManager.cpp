@@ -1,4 +1,4 @@
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkLogger.h"
 
@@ -6,7 +6,7 @@ namespace pkEngineSDK
 {
 
 SPtr<Material>
-ResourceManager::newMaterial()
+GPUResourceManager::newMaterial()
 {
   // create the material component.
   SPtr<Material> pMatComp = make_shared<Material>();
@@ -15,7 +15,7 @@ ResourceManager::newMaterial()
 }
 
 SPtr<Model>
-ResourceManager::loadModel(Path _directory)
+GPUResourceManager::loadModel(Path _directory)
 {
   GraphicsAPI& api = g_GraphicAPI().instance();
 
@@ -54,7 +54,7 @@ ResourceManager::loadModel(Path _directory)
 }
 
 SPtr<Mesh>
-ResourceManager::searchMesh(String _name)
+GPUResourceManager::searchMesh(String _name)
 {
   for (uint32 i = 0; i < m_meshes.size(); ++i) {
     SPtr<Mesh> mesh = m_meshes[i];
@@ -65,9 +65,9 @@ ResourceManager::searchMesh(String _name)
   return nullptr;
 }
 
-PK_CORE_EXPORT ResourceManager&
-g_ResourceManager()
+PK_CORE_EXPORT GPUResourceManager&
+g_GPUResourceManager()
 {
-  return ResourceManager::instance();
+  return GPUResourceManager::instance();
 }
 }

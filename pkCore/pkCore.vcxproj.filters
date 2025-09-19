@@ -58,20 +58,14 @@
     <Filter Include="source\graphics">
       <UniqueIdentifier>{97698cb5-919b-4d24-b37b-c212942a8975}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\debug">
-      <UniqueIdentifier>{2f4fc196-7749-4980-8965-a42c527517eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\debug">
-      <UniqueIdentifier>{f27c31e5-d2cc-4ff7-b281-9d8ed159169b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\script">
-      <UniqueIdentifier>{4bccd719-0cdb-4e48-9088-54fe53d235e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\script">
-      <UniqueIdentifier>{ad061113-2507-41f7-a44a-811483fad56a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\game">
       <UniqueIdentifier>{8f33a7ac-da31-4a04-8a80-14966e69e124}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\managers">
+      <UniqueIdentifier>{62eff678-0428-4da5-99b6-2f7e9c835f71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\managers">
+      <UniqueIdentifier>{9e1412c8-4e14-48b6-ac30-767e2c2ea502}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,9 +156,6 @@
     <ClInclude Include="include\pkSwapChain.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkSprite.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkFrustum.h">
       <Filter>include\camera</Filter>
     </ClInclude>
@@ -174,18 +165,6 @@
     <ClInclude Include="include\pkScene.h">
       <Filter>include\game</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkLogger.h">
-      <Filter>include\debug</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkRendererManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkResourceManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkTimeManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkPass.h">
       <Filter>include\base app</Filter>
     </ClInclude>
@@ -194,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="include\pkGraphicTypes.h">
       <Filter>include\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkScriptManager.h">
-      <Filter>include\script</Filter>
     </ClInclude>
     <ClInclude Include="include\pkInputLayoutDesc.h">
       <Filter>include\graphics</Filter>
@@ -213,12 +189,6 @@
     <ClInclude Include="include\pkInverseKinematics.h">
       <Filter>include\game</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkTextureManager.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkSceneManager.h">
-      <Filter>include\game</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkPassDesc.h">
       <Filter>include\base app</Filter>
     </ClInclude>
@@ -229,6 +199,36 @@
       <Filter>include\buffers</Filter>
     </ClInclude>
     <ClInclude Include="include\pkUsings.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkScriptManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSprite.h">
+      <Filter>include\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkLogger.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkSceneManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkRendererManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkGPUResourceManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTextureManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTimeManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkAssetResourceManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBaseResource.h">
       <Filter>include\base app</Filter>
     </ClInclude>
   </ItemGroup>
@@ -254,9 +254,6 @@
     <ClCompile Include="source\pkBone.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkMesh.cpp">
-      <Filter>source\api</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkDllLoader.cpp">
       <Filter>source\api</Filter>
     </ClCompile>
@@ -281,21 +278,6 @@
     <ClCompile Include="source\pkActor.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkLogger.cpp">
-      <Filter>source\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkRendererManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkResourceManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkTimeManager.cpp">
-      <Filter>source\base app</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkScriptManager.cpp">
-      <Filter>source\script</Filter>
-    </ClCompile>
     <ClCompile Include="source\pkScene.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
@@ -311,11 +293,32 @@
     <ClCompile Include="source\pkInverseKinematics.cpp">
       <Filter>source\game</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkTextureManager.cpp">
-      <Filter>source\base app</Filter>
+    <ClCompile Include="source\pkScriptManager.cpp">
+      <Filter>source\managers</Filter>
     </ClCompile>
     <ClCompile Include="source\pkSceneManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkLogger.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkRendererManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkGPUResourceManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTextureManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTimeManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMesh.cpp">
       <Filter>source\game</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkAssetResourceManager.cpp">
+      <Filter>source\managers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

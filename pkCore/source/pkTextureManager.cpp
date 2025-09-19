@@ -1,5 +1,5 @@
 #include "pkTextureManager.h"
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 #include "pkGraphicsAPI.h"
 
 namespace pkEngineSDK

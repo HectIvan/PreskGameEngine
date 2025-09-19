@@ -169,8 +169,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkAssetResourceManager.h" />
     <ClInclude Include="include\pkActor.h" />
     <ClInclude Include="include\pkBaseApp.h" />
+    <ClInclude Include="include\pkBaseResource.h" />
     <ClInclude Include="include\pkBlendState.h" />
     <ClInclude Include="include\pkBone.h" />
     <ClInclude Include="include\pkCamera.h" />
@@ -204,7 +206,7 @@
     <ClInclude Include="include\pkRasterizerState.h" />
     <ClInclude Include="include\pkRendererManager.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
-    <ClInclude Include="include\pkResourceManager.h" />
+    <ClInclude Include="include\pkGPUResourceManager.h" />
     <ClInclude Include="include\pkScene.h" />
     <ClInclude Include="include\pkScriptManager.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
@@ -224,6 +226,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkActor.cpp" />
+    <ClCompile Include="source\pkAssetResourceManager.cpp" />
     <ClCompile Include="source\pkBaseApp.cpp" />
     <ClCompile Include="source\pkBone.cpp" />
     <ClCompile Include="source\pkCamera.cpp" />
@@ -239,7 +242,7 @@
     <ClCompile Include="source\pkModel.cpp" />
     <ClCompile Include="source\pkPass.cpp" />
     <ClCompile Include="source\pkRendererManager.cpp" />
-    <ClCompile Include="source\pkResourceManager.cpp" />
+    <ClCompile Include="source\pkGPUResourceManager.cpp" />
     <ClCompile Include="source\pkScene.cpp" />
     <ClCompile Include="source\pkSceneManager.cpp" />
     <ClCompile Include="source\pkScriptManager.cpp" />

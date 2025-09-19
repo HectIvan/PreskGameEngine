@@ -5,7 +5,7 @@
 #include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
@@ -30,7 +30,7 @@ using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_ResourceManager;
+using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
@@ -60,7 +60,7 @@ using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::RendererManager;
-using pkEngineSDK::ResourceManager;
+using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
@@ -97,7 +97,7 @@ ShaderTest::onInit()
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
-  ResourceManager& resourceMan = g_ResourceManager().instance();
+  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
   SceneManager& sceneMan = g_SceneManager().instance();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
@@ -281,7 +281,7 @@ ShaderTest::uInterfaceUpdate()
   UInterface& im = g_uInterface().instance();
   RendererManager& rm = g_RenderManager().instance();
   TextureManager& tm = g_TextureManager().instance();
-  ResourceManager& resourceMan = g_ResourceManager().instance();
+  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
 
   im.setCurrentContext();
   im.newFrameAPI();

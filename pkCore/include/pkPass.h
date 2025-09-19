@@ -29,7 +29,7 @@ class Pass
 public:
   Pass();
   Pass(PassDesc& _desc);
-  virtual ~Pass() = default;
+  virtual ~Pass();
 
   /**
    * @brief Gets the input layout to the pass.

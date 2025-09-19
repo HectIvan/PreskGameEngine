@@ -47,7 +47,7 @@ BaseApp::init(const char** _argv, int32 _count)
 {
   Logger::startUp();
   RendererManager::startUp();
-  ResourceManager::startUp();
+  GPUResourceManager::startUp();
   SceneManager::startUp();
   TextureManager::startUp();
   TimeManager::startUp();
@@ -97,6 +97,9 @@ void
 BaseApp::messageLoop()
 {
   EventQueue& eventQueue = g_eventManager();
+  TimeManager& timeManager = g_TimeManager();
+  SceneManager& sceneManager = g_SceneManager();
+  SPtr<Scene> activeScene = sceneManager.getActiveScene();
   // get the starting deltaTime
   high_resolution_clock::time_point delta = high_resolution_clock::now();
 
@@ -106,10 +109,10 @@ BaseApp::messageLoop()
     // event window specific input
     eventQueue.windowInput(m_window);
     // update the delta time
-    // m_deltaTime = g_TimeManager().getDeltaTime(delta);
-    g_TimeManager().m_deltaTime = g_TimeManager().getDeltaTime(delta);
+    // m_deltaTime = timeManager.getDeltaTime(delta);
+    timeManager.m_deltaTime = timeManager.getDeltaTime(delta);
     // fixed update timer count.
-    m_fixedTimer += g_TimeManager().m_deltaTime;
+    m_fixedTimer += timeManager.m_deltaTime;
     // base app update
     update();
     // child class app update
@@ -118,25 +121,34 @@ BaseApp::messageLoop()
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();
-      g_SceneManager().getActiveScene()->update(g_TimeManager().m_deltaTime);
+      activeScene->update(timeManager.m_deltaTime);
       m_fixedTimer = 0;
     }
     else {
-      g_SceneManager().getActiveScene()->update(g_TimeManager().m_fixedDeltaTime);
+      activeScene->update(timeManager.m_fixedDeltaTime);
     }
     // event queue
     eventQueue.poll();
     // render the scene
     render();
   }
+
+  // if the program is shut dowor closes for any reason, close everything properly.
+  Logger::shutDown();
+  RendererManager::shutDown();
+  GPUResourceManager::shutDown();
+  SceneManager::shutDown();
+  TextureManager::shutDown();
+  TimeManager::shutDown();
+  EventQueue::shutDown();
 }
 
 void
 BaseApp::update()
 {
   // managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI();
+  RendererManager& rm = g_RenderManager();
 
   Vector2 winSize = api.getSwapChain()->getSize();
 

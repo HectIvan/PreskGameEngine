@@ -15,7 +15,7 @@
 #include "pkModel.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 
 #include "stb_image.h"
 
@@ -97,7 +97,7 @@ SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  ResourceManager& rm = g_ResourceManager().instance();
+  GPUResourceManager& rm = g_GPUResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
   Logger& log = g_Logger().instance();
 

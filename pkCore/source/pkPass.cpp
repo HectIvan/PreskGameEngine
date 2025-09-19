@@ -85,6 +85,24 @@ Pass::Pass(PassDesc& _desc)
   }
 }
 
+Pass::~Pass()
+{
+  m_pVShader = nullptr;
+  m_pPShader = nullptr;
+  m_pCShader = nullptr;
+  m_pInputLayout = nullptr;
+  m_pSamplerState = nullptr;
+  m_pRasterizerState = nullptr;
+  for (uint32 i = 0; i < m_cBuffers.size(); ++i) {
+    m_cBuffers[i] = nullptr;
+  }
+  m_cBuffers.clear();
+  m_inputTex.clear();
+  m_outputTex.clear();
+  m_uavTex.clear();
+  m_depthTex = nullptr;
+}
+
 void
 Pass::createVShader(const Path _directory, const char* _entry, const char* _sModel)
 {

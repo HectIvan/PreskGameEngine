@@ -21,7 +21,7 @@
 #include "pkLight.h"
 #include "pkPrerequisitesCore.h"
 #include "pkRendererManager.h"
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 #include "pkTimeManager.h"
 #include "pkWindow.h"
 

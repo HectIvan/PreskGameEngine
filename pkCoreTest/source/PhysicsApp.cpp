@@ -4,7 +4,7 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkPath.h"
-#include "pkResourceManager.h"
+#include "pkGPUResourceManager.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
@@ -16,7 +16,7 @@
 using pkEngineSDK::Logger;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
-using pkEngineSDK::g_ResourceManager;
+using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_TextureManager;
@@ -26,7 +26,7 @@ using pkEngineSDK::Math;
 using pkEngineSDK::Model;
 using pkEngineSDK::uint32;
 using pkEngineSDK::Path;
-using pkEngineSDK::ResourceManager;
+using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::Vector3;
@@ -39,7 +39,7 @@ using std::make_shared;
 void
 PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 {
-  ResourceManager& resourceMan = g_ResourceManager().instance();
+  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
   SPtr<Actor> anchor = g_SceneManager().getActiveScene()->instantiate();
   anchor->addComponent(resourceMan.loadModel(Path("sprite.fbx")));
   
@@ -61,7 +61,7 @@ PhysicsApp::initSpring(Vector3 _pos, float _length, float _stiffness)
 void
 PhysicsApp::onInit()
 {
-  ResourceManager& resourceMan = g_ResourceManager().instance();
+  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
   TextureManager& tm = g_TextureManager().instance();
 
   m_type = PHYSICS_TYPE::kEuler;

@@ -91,14 +91,15 @@ float GeometrySchlickGGX(float NoV, float roughness)
   // float denom = NoV * (1.0f - k) + k;
   // return NoV / denom;
   
-  // float r = roughness + 1.0f;
-  // float k = (r * r) / 8.0f;
-  // float G = NoV / (NoV * (1.0f - k) + k + 1e-7f);
+  float r = roughness + 1.0f;
+  float k = (r * r) / 8.0f;
+  float G =  NoV * (1.0f - k) + k;
+  return NoV / G;
   
-  float nom = NoV;
-  float denom = NoV * (1.0 - roughness) + roughness;
-  float G = nom / denom;
-  return G;
+  // float nom = NoV;
+  // float denom = NoV * (1.0 - roughness) + roughness;
+  // float G = nom / denom;
+  // return G;
 }
 
 float GeometrySmith(float NoV, float NoL, float roughness)
@@ -154,7 +155,8 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
   // float D = first * exponent;
   // return D;
   
-  float a2 = roughness * roughness;
+  float a = roughness * roughness;
+  float a2 = a * a;
   float NoH = max(dot(normal, halfView), 0.0f);
   float NoH2 = NoH * NoH;
 
@@ -181,6 +183,8 @@ float3 cookTorranceSpecular(float3 normal,
                             float metallic,
                             float3 F0)
 {
+  float3 lo = 0.0f.xxx;
+  
   float3 Half = normalize(viewDir + lightDir);
   float NoL = saturate(dot(normal, lightDir));
   float NoV = saturate(dot(normal, viewDir));
@@ -188,18 +192,36 @@ float3 cookTorranceSpecular(float3 normal,
   float VoH = saturate(dot(viewDir, Half));
   
   float alpha = rough * rough;
-  // float D = D_Beckmann(NoH, alpha);
+  float3 radiance = SpecIntensity.xxx;
+  
+  // float G = GeometrySmith(NoV, NoL, rough);
+  // float D = NormalDistribution(Half, normal, rough);
+  // float F = Fresnel(F0, VoH);
+  
+  // float den = max(4.0f * NoV * NoL, 1e-5f);
+  // 
+  // float3 specular = (NDF * G * F) / den;
+  
+  float NDF = NormalDistribution(Half, normal, rough);
   float G = GeometrySmith(NoV, NoL, rough);
-  // float F = fresnelSchlick(F0, VoH);
-  float D = NormalDistribution(Half, normal, rough);
-  // float G = GeometricAttenuation(Half, normal, viewDir, lightDir); // there's an issue with this function
-  float F = Fresnel(F0, VoH);
+  float F = Fresnel(F0, max(VoH, 0.0f));
   
-  float den = max(4.0f * NoV * NoL, 1e-5f);
+  float3 kD = float3(1.0f, 1.0f, 1.0f) - F;
+  kD *= 1.0f - metallic;
   
-  float3 specular = (D * G * F) / den;
+  float3 numerator = NDF * G * F;
+  float denominator = 4.0f * max(NoV, 0.0f) * max(NoL, 0.0f) + 1e-5f;
+  float3 specular = numerator / denominator;
   
-  return specular;
+  lo += ((kD * 1.0f / PI + specular) * radiance * NoL).xxx;
+  
+  float3 ambient = float3(0.03f.xxx) * 1.0f;
+  float3 color = ambient + lo;
+  
+  color = color / (color + float3(1.0f.xxx));
+  color = pow(color, float3((1.0f / 2.2f).xxx));
+  
+  return float4(color, 1.0);
 }
 
 float magnitude(float3 v)
@@ -238,7 +260,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   
   float3 normal = normalize(normalTex.xyz);
   
-  // diffuse
+  // diffuse light
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
@@ -261,6 +283,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   //        return output;
   //      }
   
+  // specular light
   float3 viewDir = normalize(Eye.xyz - worldPos);
   
   float3 F0 = float3(0.04f.xxx);

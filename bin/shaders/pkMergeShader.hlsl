@@ -27,8 +27,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 emissBlurSample = emissiveBlurMap.Sample(samState, input.TexCoord);
   
   
-  float4 diffuse = albedoSample * shdwSpecSample.x;
-  float4 IBRMetallic = IBRSample * shdwSpecSample.y;
+  float4 diffuse = albedoSample * shdwSpecSample.r;
+  float4 IBRMetallic = IBRSample * shdwSpecSample.g;
   
   
   diffuse += IBRMetallic;
@@ -37,8 +37,9 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   // transparency
   float alpha = albedoSample.a;
-  float4 skyboxFinal = float4(skyboxSample.rgb * (1.0f - alpha), 1.0f);
-  diffuse = diffuse * alpha + skyboxFinal;
+  // float4 skyboxFinal = float4(skyboxSample.rgb * (1.0f - alpha), 1.0f);
+  // diffuse = diffuse * alpha + skyboxFinal;
+  float4 skyboxFinal = float4(skyboxSample.rgb, 1.0f);
   
   // temporary placeholder for the issue above.
   if (alpha == 0.0f) {

@@ -65,6 +65,7 @@ float4 PS(PS_INPUT input) : SV_Target
   skyboxMap.GetDimensions(dimensions.x, dimensions.y);
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
   float targetMip = lerp(0.0, mipCount - 1.0, roughVal);
+  // targetMip = min(targetMip, 7);
   float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
   return float4(IBL * Intensity, 1.0f);

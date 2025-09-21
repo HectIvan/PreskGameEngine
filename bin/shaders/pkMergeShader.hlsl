@@ -19,7 +19,6 @@ float4 PS(PS_INPUT input) : SV_Target0
 {
   // Get texture resources.
   float4 albedoSample = albedoMap.Sample(samState, input.TexCoord);
-  albedoSample.rgb = pow(albedoSample.rgb, 2.2f);
   float2 shdwSpecSample = shdowSpecMap.Sample(samState, input.TexCoord).rg;
   float4 skyboxSample = skyboxMap.Sample(samState, input.TexCoord);
   float4 IBRSample = IBRMap.Sample(samState, input.TexCoord);
@@ -27,26 +26,29 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 emissBlurSample = emissiveBlurMap.Sample(samState, input.TexCoord);
   
   
-  float4 diffuse = albedoSample * shdwSpecSample.r;
-  float4 IBRMetallic = IBRSample * shdwSpecSample.g;
+  // float4 diffuse = albedoSample * shdwSpecSample.r;
+  // get the base color 
+  float3 color = albedoSample.rgb;
   
+  color = color / (color + float3(1.0f.xxx));
+  float3 IBL = IBRSample.rgb;
   
-  diffuse += IBRMetallic;
+  // color = IBL * shdwSpecSample.g * albedoSample.rgb;
+  
+  color = shdwSpecSample.g * IBL + albedoSample.rgb * shdwSpecSample.r;
   
   // check for a skybox position.
   
   // transparency
   float alpha = albedoSample.a;
-  // float4 skyboxFinal = float4(skyboxSample.rgb * (1.0f - alpha), 1.0f);
-  // diffuse = diffuse * alpha + skyboxFinal;
   float4 skyboxFinal = float4(skyboxSample.rgb, 1.0f);
   
   // temporary placeholder for the issue above.
   if (alpha == 0.0f) {
-    diffuse = skyboxFinal;
+    color = skyboxFinal;
   }
   
   float4 fullEmissive = emissiveSample + emissBlurSample;
   
-  return pow(diffuse + fullEmissive, 1.0f / 2.2f);
+  return pow(float4(color, 1.0f) + fullEmissive, 1.0f / 2.2f);
 }

@@ -215,13 +215,7 @@ float3 cookTorranceSpecular(float3 normal,
   
   lo += ((kD * 1.0f / PI + specular) * radiance * NoL).xxx;
   
-  float3 ambient = float3(0.03f.xxx) * 1.0f;
-  float3 color = ambient + lo;
-  
-  color = color / (color + float3(1.0f.xxx));
-  color = pow(color, float3((1.0f / 2.2f).xxx));
-  
-  return float4(color, 1.0);
+  return float4(lo, 1.0);
 }
 
 float magnitude(float3 v)
@@ -245,6 +239,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 colorTex = colorMap.Sample(samState, input.TexCoord);
+  float ambientOcclusion = orm.Sample(samState, input.TexCoord).r;
   float metallicVal = orm.Sample(samState, input.TexCoord).b;
   float roughVal = orm.Sample(samState, input.TexCoord).g;
   float3 worldPos = positionsMap.Sample(samState, input.TexCoord);
@@ -296,7 +291,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
                                                  metallicVal,
                                                  F0);
   
-  float3 specular = (specCookTorrance) * SpecIntensity;
+  float3 specular = (specCookTorrance) * SpecIntensity * ambientOcclusion;
   
   output.shdwSpec = float3(lambert.r, specular.r, alpha);
   

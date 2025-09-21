@@ -179,12 +179,12 @@ class DX11GraphicsAPI : public GraphicsAPI
                    const SPtr<Texture> _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) override;
 
-  // to do:change this to allow a specific ammount to be unbound.
   /**
    * @brief Unbinds all render targets.
+   * @param _count How many targets will be unbound.
    */
   void
-  unbindRenderTargets() override;
+  unbindRenderTargets(const SIZE_T _count = 8) override;
 
   /**
    * @brief Creates a shader of the specific graphic API.
@@ -419,9 +419,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind resources from a vertex shader.
+   * @param _count How many resources will be unbound.
    */
   void
-  vSUnbindShaderResourceViews() override;
+  vSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -433,9 +434,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind resources from a pixel shader.
+   * @param _count How many resources will be unbound.
    */
   void
-  pSUnbindShaderResourceViews() override;
+  pSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
 
   /**
    * @brief Set resources to a compute shader.
@@ -447,9 +449,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind resources of a compute shader.
+   * @param _count How many resources will be unbound.
    */
   void
-  cSUnbindShaderResourceViews() override;
+  cSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
 
   /**
    * @brief Set unordered views to a compute shader.
@@ -465,9 +468,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind unordered views of a compute shader.
+   * @param _count How many resources will be unbound.
    */
   void
-  cSUnbindUnorderedAccessViews() override;
+  cSUnbindUnorderedAccessViews(const SIZE_T _count = 8) override;
 
   /**
    * @brief Clear all render target views of a vector.

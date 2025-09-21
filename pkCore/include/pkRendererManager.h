@@ -102,6 +102,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   init();
 
   /**
+   * @brief on shut down of the module.
+   */
+  virtual void
+  onShutDown() override;
+
+  /**
    * @brief Create the passes needed for the renderer.
    */
   void

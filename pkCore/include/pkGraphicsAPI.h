@@ -164,9 +164,10 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Unbinds all render targets.
+   * @param _count How many targets will be unbound.
    */
   virtual void
-  unbindRenderTargets() = 0;
+  unbindRenderTargets(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Creates a shader of the specific graphic API.
@@ -407,9 +408,10 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Unbind resources from a vertex shader.
+   * @param _count How many resources will be unbound.
    */
   virtual void
-  vSUnbindShaderResourceViews() = 0;
+  vSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -421,9 +423,10 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Unbind resources from a pixel shader.
+   * @param _count How many resources will be unbound.
    */
   virtual void
-  pSUnbindShaderResourceViews() = 0;
+  pSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -435,9 +438,10 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Unbind resources from a compute shader.
+   * @param _count How many resources will be unbound.
    */
   virtual void
-  cSUnbindShaderResourceViews() = 0;
+  cSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Set unordered views to a compute shader.
@@ -453,9 +457,10 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 
   /**
    * @brief Unbind unordered views from a compute shader.
+   * @param _count How many resources will be unbound.
    */
   virtual void
-  cSUnbindUnorderedAccessViews() = 0;
+  cSUnbindUnorderedAccessViews(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Clear all render target views of a vector.

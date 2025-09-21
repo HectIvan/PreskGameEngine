@@ -128,6 +128,20 @@ RendererManager::init()
 }
 
 void
+RendererManager::onShutDown()
+{
+  m_gBuffers.clear();
+  m_depthBuffers.clear();
+  m_uavBuffers.clear();
+
+  for (auto& pair : m_passes) {
+    pair.second->~Pass();
+  }
+  m_passes.clear();
+  m_mainSkybox = nullptr;
+}
+
+void
 RendererManager::createPasses()
 {
   // pass description

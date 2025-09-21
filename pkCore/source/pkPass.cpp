@@ -87,19 +87,26 @@ Pass::Pass(PassDesc& _desc)
 
 Pass::~Pass()
 {
-  m_pVShader = nullptr;
-  m_pPShader = nullptr;
-  m_pCShader = nullptr;
-  m_pInputLayout = nullptr;
-  m_pSamplerState = nullptr;
-  m_pRasterizerState = nullptr;
   for (uint32 i = 0; i < m_cBuffers.size(); ++i) {
-    m_cBuffers[i] = nullptr;
+    m_cBuffers[i].reset();
   }
   m_cBuffers.clear();
+
+  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
+    m_inputTex[i].reset();
+  }
   m_inputTex.clear();
+
+  for (uint32 i = 0; i < m_outputTex.size(); ++i) {
+    m_outputTex[i].reset();
+  }
   m_outputTex.clear();
+
+  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
+    m_uavTex[i].reset();
+  }
   m_uavTex.clear();
+
   m_depthTex = nullptr;
 }
 
@@ -189,15 +196,25 @@ Pass::endPass()
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
   // set all to nullptr
-  api.unbindRenderTargets();
+  SIZE_T resourceCount = m_inputTex.size();
+  SIZE_T uavCount = m_uavTex.size();
+  SIZE_T renderTargetCount = m_outputTex.size();
+
+  if (renderTargetCount > 0) {
+    api.unbindRenderTargets(renderTargetCount);
+  }
   api.setInputLayout(nullptr);
   api.setVShader(nullptr);
   api.setPShader(nullptr);
   api.setCShader(nullptr);
-  api.vSUnbindShaderResourceViews();
-  api.pSUnbindShaderResourceViews();
-  api.cSUnbindShaderResourceViews();
-  api.cSUnbindUnorderedAccessViews();
+  if (resourceCount > 0) {
+    api.vSUnbindShaderResourceViews(resourceCount);
+    api.pSUnbindShaderResourceViews(resourceCount);
+    api.cSUnbindShaderResourceViews(resourceCount);
+  }
+  if (uavCount > 0) {
+    api.cSUnbindUnorderedAccessViews(uavCount);
+  }
   api.setSampler(nullptr);
   api.vSUnbindConstantBuffers();
   api.pSUnbindConstantBuffers();

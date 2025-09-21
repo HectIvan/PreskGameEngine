@@ -40,6 +40,12 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   void
   loadDefaultMatTextures();
 
+  // /**
+  //  * @brief on shut down of the module.
+  //  */
+  // virtual void
+  // onShutDown();
+
   /**
    * @brief Loads a texture from a texture name.
    * @param _directory Where to look for the file.

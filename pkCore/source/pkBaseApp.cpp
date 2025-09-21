@@ -134,13 +134,13 @@ BaseApp::messageLoop()
   }
 
   // if the program is shut dowor closes for any reason, close everything properly.
-  Logger::shutDown();
-  RendererManager::shutDown();
-  GPUResourceManager::shutDown();
-  SceneManager::shutDown();
-  TextureManager::shutDown();
-  TimeManager::shutDown();
-  EventQueue::shutDown();
+  // Logger::shutDown();
+  // RendererManager::shutDown();
+  // GPUResourceManager::shutDown();
+  // SceneManager::shutDown();
+  // TextureManager::shutDown();
+  // TimeManager::shutDown();
+  // EventQueue::shutDown();
 }
 
 void
@@ -258,8 +258,8 @@ void
 BaseApp::render()
 {
   // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& renderManager = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI();
+  RendererManager& renderManager = g_RenderManager();
   // get all passes
   SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
@@ -348,6 +348,6 @@ BaseApp::render()
   onRender();
   tonePass->endPass();
   // Present the final result to the screen
-  g_GraphicAPI().present(m_vSync, 0);
+  api.present(m_vSync, 0);
 }
 }

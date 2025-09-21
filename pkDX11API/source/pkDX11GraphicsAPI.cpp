@@ -646,11 +646,12 @@ DX11GraphicsAPI::setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
 }
 
 void
-DX11GraphicsAPI::unbindRenderTargets()
+DX11GraphicsAPI::unbindRenderTargets(const SIZE_T _count)
 {
   Logger& log = g_Logger();
-  static Vector<ID3D11RenderTargetView*> unbindRT = { nullptr, nullptr, nullptr, nullptr,
-                                                      nullptr, nullptr, nullptr, nullptr };
+  static Vector<ID3D11RenderTargetView*> unbindRT;
+  unbindRT.resize(_count, nullptr);
+
   // set the render targets
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -661,7 +662,7 @@ DX11GraphicsAPI::unbindRenderTargets()
   }
 
   // const uint32 size = static_cast<uint32>(unbindRT.size());
-  device->m_pImmediateContext->OMSetRenderTargets(0,
+  device->m_pImmediateContext->OMSetRenderTargets(static_cast<uint32>(_count),
                                                   unbindRT.data(),
                                                   nullptr);
 }
@@ -1342,11 +1343,12 @@ DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 }
 
 void
-DX11GraphicsAPI::pSUnbindShaderResourceViews()
+DX11GraphicsAPI::pSUnbindShaderResourceViews(const SIZE_T _count)
 {
   Logger& log = g_Logger();
-  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
-                                                          nullptr, nullptr, nullptr, nullptr };
+  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  unbindSRV.resize(_count, nullptr);
+
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -1357,10 +1359,10 @@ DX11GraphicsAPI::pSUnbindShaderResourceViews()
     return;
   }
 
-  uint32 size = static_cast<uint32>(_unbindSRV.size());
+  uint32 size = static_cast<uint32>(unbindSRV.size());
   device->m_pImmediateContext->PSSetShaderResources(0,
                                                     size,
-                                                    _unbindSRV.data());
+                                                    unbindSRV.data());
 }
 
 void
@@ -1391,11 +1393,12 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 }
 
 void
-DX11GraphicsAPI::vSUnbindShaderResourceViews()
+DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T _count)
 {
   Logger& log = g_Logger();
-  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
-                                                          nullptr, nullptr, nullptr, nullptr };
+  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  unbindSRV.resize(_count, nullptr);
+
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -1406,10 +1409,10 @@ DX11GraphicsAPI::vSUnbindShaderResourceViews()
     return;
   }
 
-  const uint32 size = static_cast<uint32>(_unbindSRV.size());
+  const uint32 size = static_cast<uint32>(unbindSRV.size());
   device->m_pImmediateContext->VSSetShaderResources(0,
                                                     size,
-                                                    _unbindSRV.data());
+                                                    unbindSRV.data());
 }
 
 void
@@ -1440,11 +1443,12 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures
 }
 
 void
-DX11GraphicsAPI::cSUnbindShaderResourceViews()
+DX11GraphicsAPI::cSUnbindShaderResourceViews(const SIZE_T _count)
 {
   Logger& log = g_Logger();
-  static Vector<ID3D11ShaderResourceView*> _unbindSRV = { nullptr, nullptr, nullptr, nullptr,
-                                                          nullptr, nullptr, nullptr, nullptr };
+  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  unbindSRV.resize(_count, nullptr);
+
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -1455,10 +1459,10 @@ DX11GraphicsAPI::cSUnbindShaderResourceViews()
     return;
   }
 
-  const uint32 size = static_cast<uint32>(_unbindSRV.size());
+  const uint32 size = static_cast<uint32>(unbindSRV.size());
   device->m_pImmediateContext->CSSetShaderResources(0,
                                                     size,
-                                                    _unbindSRV.data());
+                                                    unbindSRV.data());
 }
 
 void
@@ -1495,11 +1499,11 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTexture
 }
 
 void
-DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
+DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 {
   Logger& log = g_Logger();
-  static Vector<ID3D11UnorderedAccessView*> _unbindUAV = {nullptr, nullptr, nullptr, nullptr,
-                                                          nullptr, nullptr, nullptr, nullptr };
+  static Vector<ID3D11UnorderedAccessView*> unbindUAV;
+  unbindUAV.resize(_count, nullptr);
   // cast to a directX device
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
@@ -1510,10 +1514,10 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews()
     return;
   }
 
-  const uint32 numViews = static_cast<uint32>(_unbindUAV.size());
+  const uint32 numViews = static_cast<uint32>(unbindUAV.size());
   device->m_pImmediateContext->CSSetUnorderedAccessViews(0,
                                                          numViews,
-                                                         _unbindUAV.data(),
+                                                         unbindUAV.data(),
                                                          nullptr);
 }
 

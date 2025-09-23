@@ -282,7 +282,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float3 viewDir = normalize(Eye.xyz - worldPos);
   
   float3 F0 = float3(0.04f.xxx);
-  F0 = lerp(F0, colorTex.rgb, metallicVal);
+  F0 = lerp(F0, colorTex.rgb, metallicVal.xxx);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,

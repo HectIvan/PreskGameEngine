@@ -58,17 +58,17 @@ PS_INPUT VS(VS_INPUT input)
   
   output.Tex = input.Tex;
   
-  float3 normal = normalize(input.Normal);
-  float3 tangent = normalize(input.Tangent.xyz);
-  float3 bitangent = normalize(cross(normal, tangent) * input.Tangent.w);
+  // float3 normal = normalize(input.Normal);
+  // float3 tangent = normalize(input.Tangent.xyz);
+  // float3 bitangent = normalize(cross(normal, tangent) * input.Tangent.w);
   
   // normal fix
   float4x4 transform = worldInvTransp;
   
   output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
   output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), World).xyz);
-  // output.Bitangent = normalize(mul(float4(bitangent, 0.0f), World).xyz);
-  output.Bitangent = normalize(cross(output.Normal, output.Tangent));
+  // output.Bitangent = normalize(mul(float4(bitangent, 0.0f), World).xyz) * input.Tangent.w;
+  output.Bitangent = normalize(cross(output.Normal, output.Tangent)) * input.Tangent.w;
   
   return output;
 }

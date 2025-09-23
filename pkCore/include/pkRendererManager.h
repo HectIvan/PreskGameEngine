@@ -73,16 +73,17 @@ namespace PASS_TYPE
 {
   enum E {
     kP_Base = 0,
+    kP_EmissiveBlur,
+    kP_EmissiveHBlur,
+    kP_Exposure,
+    kP_IBR,
+    kP_Luminance,
+    kP_LumBlur,
+    kP_LumBlurH,
+    kP_Merge,
     kP_Shadow,
     kP_ShadowQuad,
     kP_SkyBox,
-    kP_IBR,
-    kP_Merge,
-    kP_EmissiveHBlur,
-    kP_EmissiveBlur,
-    kP_Luminance,
-    kP_LumBlurH,
-    kP_LumBlur,
     kP_Tone,
   };
 }

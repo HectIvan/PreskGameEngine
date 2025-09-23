@@ -50,5 +50,5 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float4 fullEmissive = emissiveSample + emissBlurSample;
   
-  return pow(float4(color, 1.0f) + fullEmissive, 1.0f / 2.2f);
+  return float4(color, 1.0f) + fullEmissive;
 }

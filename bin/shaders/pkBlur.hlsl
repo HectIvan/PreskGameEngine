@@ -24,6 +24,8 @@ struct PS_OUTPUT
   float4 blur : SV_Target0;
 };
 
+uniform float weight[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
+
 // exponent of (x2 + y2) / (2sigma^2)
 float gaussian(float2 offset, float sigma)
 {
@@ -39,36 +41,62 @@ float gaussian2D(float2 distance, float sigma)
 }
 
 // 1 / sqrt(2 * PI * o) * e^(x^2 / (2 * o^2))
-float gaussianDistribution(float x, float o)
+float gaussianDistribution(float x, float sigma)
 {
-  float o2 = o * o;
-  float exponent = -((x * x) / (2.0f * o2));
-  float mP = (1.0f / sqrt(2.0f * PI * o2));
-  float y = mP * exp(exponent);
-  return y;
+  // float o2 = o * o;
+  // float exponent = -((x * x) / (2.0f * o2));
+  // float mP = (1.0f / sqrt(2.0f * PI * o2));
+  // float y = mP * exp(exponent);
+  // return y;
+  return exp(-0.5f * (x * x) / (sigma * sigma)) / (sigma * sqrt(2 * PI));
+  // return exp(-(x * x) / (2.0 * sigma * sigma));
+
 }
 
-uniform float weight[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
 // Gaussian Blur
 float4 PS(PS_INPUT input) : SV_Target0
 {
+  // uint width;
+  // uint height;
+  // textureResource.GetDimensions(width, height);
+  // float2 textureSize = float2(width, height);
+  // 
+  // float2 tex_offset = 1.0f / textureSize; // gets size of single texel
+  // float3 result = textureResource.Sample(samState, input.TexCoord).rgb * weight[0]; // current fragment's contribution
+  // if (Direction.x != 0.0f)
+  // {
+  //   for (int i = 1; i < 5; ++i)
+  //   {
+  //     result += textureResource.Sample(samState, input.TexCoord + float2(tex_offset.x * i, 0.0)).rgb * weight[i];
+  //     result += textureResource.Sample(samState, input.TexCoord - float2(tex_offset.x * i, 0.0)).rgb * weight[i];
+  //   }
+  // }
+  // else
+  // {
+  //   for (int i = 1; i < 5; ++i)
+  //   {
+  //     result += textureResource.Sample(samState, input.TexCoord + float2(0.0, tex_offset.y * i)).rgb * weight[i];
+  //     result += textureResource.Sample(samState, input.TexCoord - float2(0.0, tex_offset.y * i)).rgb * weight[i];
+  //   }
+  // }
+  // return float4(result, 1.0);
   // size of a pixel in the UVs.
-  float2 texelSize = 1.0f / WinSize;
-  // swap between directions.
-  // float2 direction = Direction * texelSize;
+  uint width;
+  uint height;
+  textureResource.GetDimensions(width, height);
+  float2 textureSize = float2(width, height);
+  float2 texelSize = 1.0f / textureSize;
   
   // blur color
-  float4 BlurColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+  float4 BlurColor = float4(0, 0, 0, 0);
   
   float sumWeights = 0.0f;
   
   // for each pixel in the loop
-  for (float i = -Radius; i <= Radius; ++i) {
-    // get the new uv sample
-    float2 direction = Direction * i;
-    // float gauss = gaussian2D(direction, Strength);
+  for (int i = -Radius; i <= Radius; ++i) {
     float gauss = gaussianDistribution(i, Strength);
-    float2 uv = input.TexCoord + direction * texelSize;
+    float2 texelOffset = Direction / textureSize;
+    float2 uv = input.TexCoord + texelOffset * i;
     float4 texSample = textureResource.Sample(samState, uv);
     BlurColor += texSample * gauss;
     sumWeights += gauss;
@@ -76,18 +104,6 @@ float4 PS(PS_INPUT input) : SV_Target0
   BlurColor /= sumWeights;
   
   return saturate(BlurColor);
-  
-  // float2 tex_offset = 1.0 / WinSize; // gets size of single texel
-  // float3 result = textureResource.Sample(samState, input.TexCoord).rgb * weight[0]; // current fragment's contribution
-  // for (int i = 1; i < 5; ++i) {
-  //   float2 posX = float2(tex_offset.x * i, tex_offset.y * i) * Direction;
-  //   float2 posY = float2(tex_offset.x * i, tex_offset.y * i) * Direction;
-  //   result += textureResource.Sample(samState, input.TexCoord + posX).rgb * weight[i];
-  //   result += textureResource.Sample(samState, input.TexCoord - posY).rgb * weight[i];
-  // }
-  // float4 FragColor = float4(result, 1.0);
-  // 
-  // return FragColor * Strength;
 }
 
 // Box Blur

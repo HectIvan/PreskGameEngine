@@ -144,6 +144,7 @@ class ShaderTest : public BaseApp
   bool m_showActions;
 
   float m_IBRIntensity;
+  float m_exposure;
 
   String m_searchMesh;
 

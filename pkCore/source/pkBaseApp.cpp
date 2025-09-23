@@ -213,6 +213,7 @@ BaseApp::update()
   SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
   SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
+  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);

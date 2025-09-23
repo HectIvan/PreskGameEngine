@@ -12,8 +12,8 @@ namespace pkEngineSDK
 void
 RendererManager::init()
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  TextureManager& tm = g_TextureManager().instance();
+  GraphicsAPI& api = g_GraphicAPI();
+  TextureManager& tm = g_TextureManager();
 
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
@@ -235,7 +235,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Horizontal Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Emissive) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
@@ -247,7 +247,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveBlur) };
@@ -290,7 +290,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Horizontal Blur
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
@@ -302,7 +302,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Vertical Blur
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkHBlur.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlur) };
@@ -314,7 +314,7 @@ RendererManager::createPasses()
    * Tone mapping Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkToneMap.hlsl");
-  pDesc.cBSizes = {  };
+  pDesc.cBSizes = { sizeof(CBFloat) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge),
                    getGBuffer(G_BUFFERS::kGB_LumBlur) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };

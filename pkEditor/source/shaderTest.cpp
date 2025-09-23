@@ -56,6 +56,7 @@ using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
+using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
@@ -97,8 +98,8 @@ ShaderTest::onInit()
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
   // get the resource manager
-  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
-  SceneManager& sceneMan = g_SceneManager().instance();
+  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
   // create camera
@@ -152,14 +153,16 @@ ShaderTest::onInit()
   m_vSync = false;
   m_IBRIntensity = 1.0f;
   // luminance blur
-  m_blurRadius = 2.0f;
-  m_blurStrength = 3.0f;
+  m_blurRadius = 1.0f;
+  m_blurStrength = 20.0f;
   m_lumThreshold = 90.0f;
   // emissive blur
   m_emissiveBlur = 30.0f;
   m_emissiveStrength = 30.0f;
+  // exposure
+  m_exposure = 1.0f;
   // testure size
-  m_imgTextureSize = 50.0f;
+  m_imgTextureSize = 45.0f;
 
   m_sActorIndex = 0;
   m_fpsSize = 20;
@@ -218,8 +221,8 @@ ShaderTest::initWin()
 void
 ShaderTest::input()
 {
-  EventQueue& eventQueue = g_eventManager().instance();
-  UInterface& im = g_uInterface().instance();
+  EventQueue& eventQueue = g_eventManager();
+  UInterface& im = g_uInterface();
   // bool interfaceHovered = im.isHoveredWithItems();
   bool itemActive = im.isItemActive();
   float deltaTime = g_TimeManager().m_deltaTime;
@@ -277,11 +280,11 @@ findShader(const Vector<ShaderType>& _list, const Path& _path)
 void
 ShaderTest::uInterfaceUpdate()
 {
-  SceneManager& sm = g_SceneManager().instance();
-  UInterface& im = g_uInterface().instance();
-  RendererManager& rm = g_RenderManager().instance();
-  TextureManager& tm = g_TextureManager().instance();
-  GPUResourceManager& resourceMan = g_GPUResourceManager().instance();
+  SceneManager& sm = g_SceneManager();
+  UInterface& im = g_uInterface();
+  RendererManager& rm = g_RenderManager();
+  TextureManager& tm = g_TextureManager();
+  GPUResourceManager& resourceMan = g_GPUResourceManager();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -463,6 +466,7 @@ ShaderTest::uInterfaceUpdate()
   // --- Post-Process window --- //
   im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
   if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
+    im.createDragF("Exposure", m_exposure, 0.1f, 0.0f);
     // Luminance
     im.createText("Luminance");
     // Blur
@@ -485,6 +489,7 @@ ShaderTest::uInterfaceUpdate()
     im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
     im.sameLine();
     im.createText("Strength");
+    // Exposure
   }
   if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
     // compile shaders
@@ -550,7 +555,7 @@ ShaderTest::uInterfaceUpdate()
 void
 ShaderTest::showLogType(bool& _active, uint32 _type)
 {
-  UInterface& im = g_uInterface().instance();
+  UInterface& im = g_uInterface();
   if (_active) {
     Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
     for (uint32 i = 0; i < messages.size(); ++i) {
@@ -567,9 +572,11 @@ ShaderTest::onUpdate()
     input();
   }
 
+  // m_light = g_SceneManager().getActiveScene()->getActorWithComponent<Light>();
+
   // managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  RendererManager& rm = g_RenderManager().instance();
+  GraphicsAPI& api = g_GraphicAPI();
+  RendererManager& rm = g_RenderManager();
 
   Vector2 winSize = api.getSwapChain()->getSize();
 
@@ -642,6 +649,9 @@ ShaderTest::onUpdate()
   IBRIntens.value = m_IBRIntensity;
   CBVector3 viewPos;
   viewPos.vec1 = camera->m_eye.xyz();
+  // exposure parameter.
+  CBFloat exposure;
+  exposure.value = m_exposure;
 
   // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
@@ -659,6 +669,7 @@ ShaderTest::onUpdate()
   SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
   SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
+  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
@@ -698,6 +709,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
   blur.BlurDirection = Vector2(0.0f, 1.0f);
   api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+
+  api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, sizeof(CBFloat));
 }
 
 void

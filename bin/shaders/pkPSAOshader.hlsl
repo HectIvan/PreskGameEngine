@@ -1,16 +1,21 @@
 Texture2D posMap : register(t0);
 Texture2D normalMap : register(t1);
-Texture2D Random : register(t2);
 
 SamplerState samState : register(s0);
 
-float2 g_screen_size;
-float random_size;
+cbuffer ssao : register(b0)
+{
+  float sampleRadius;
+  float scale;
+  float bias;
+  float intensity;
+}
 
-float g_sample_rad;
-float g_scale;
-float g_bias;
-float g_intensity;
+cbuffer TexSize : register(b1)
+{
+  float2 screen_size;
+  float2 unused;
+}
 
 struct PS_INPUT
 {
@@ -20,80 +25,80 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 color : SV_Target0;
+  float4 ssaoOut : SV_Target0;
 };
 
-float4 getPosition(in float2 uv)
+float3 getPosition(in float2 uv)
 {
-  return posMap.Sample(samState, uv);
+  return posMap.Sample(samState, uv).rgb;
 }
 
-float3 getNormal(in float2 uv)
+float4 getNormal(in float2 uv)
 {
-  return normalize(normalMap.Sample(samState, uv));
+  float4 normal = normalMap.Sample(samState, uv);
+  normal.xyz = normal.xyz * 2.0f - 1.0f;
+  return normal;
 }
 
-float2 getRandom(float2 uv)
+float2 getRandom(in float2 uv)
 {
-    return normalize(Random.Sample(samState, g_screen_size * uv / random_size).xy);
+  float noiseX = (frac(sin(dot(uv, float2(15.8989f, 76.132f) * 1.0f)) * 46336.23745f));
+  float noiseY = (frac(sin(dot(uv, float2(11.9899f, 62.223f) * 2.0f)) * 34748.34744f));
+  float noiseZ = (frac(sin(dot(uv, float2(13.3238f, 63.122f) * 3.0f)) * 59998.47362f));
+    
+  return normalize(float3(noiseX, noiseY, noiseZ));
 }
 
-float3 randomVector(float2 uv)
+float computeAO(in float2 tcood, in float2 uv, in float3 p, in float3 cnorm)
 {
-  float z = 1.0f - 2.0f * dot(uv, uv);
-  float a = 6.28318530718f * uv.x;
-  float s = sqrt(1.0f - z * z);
-  return float3(cos(a) * s, sin(a) * s, z);
+  float3 diff = getPosition(tcood + uv).xyz - p;
+  const float d = length(diff) * scale;
+  const float v = normalize(diff);
+  return max(0.0f, dot(cnorm, v) - bias) * (1.0f / (1.0f + d)) * intensity;
 }
 
-float computeAO(in float2 tcoord, in float2 uv, in float3 p, in float3 cnorm)
+PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
 {
-  float3 diff = getPosition(tcoord + uv).xyz - p;
-  const float d = length(diff) * g_scale;
-  const float3 v = normalize(diff);
-  return max(0.0f, dot(cnorm, v) - g_bias) * (1.0f / (1.0f + d)) * g_intensity;
-}
-
-float4 PS(PS_INPUT input) : SV_Target0
-{
-  float4 normalTexture = normalMap.Sample(samState, input.TextCoord);
-
-  // check if the pixel can be drawn in (done in the normal pass)
-  if (normalTexture.w == 0.0f)
+  float2 screenUV = input.Position.xy / screen_size;
+  
+  float4 normal = getNormal(screenUV);
+  if (normal.w == 0.0f)
   {
     clip(-1);
   }
-
-  float4 pos = getPosition(input.TextCoord);
-  float3 n = normalTexture.xyz;
-  float2 rand = getRandom(input.TextCoord);
-
+  
+  float3 pos = getPosition(screenUV);
+  float3 n = normal.xyz;
+  float2 rand = getRandom(screenUV);
+  
   float ao = 0.0f;
-  float rad = g_sample_rad / -pos.x;
-
-  float2 vec[4] = {
-    float2(1,0), 
-    float2(-1, 0),
-    float2(0,1),
-    float2(0,-1)
+  float rad = sampleRadius / -pos.x;
+  
+  float2 vec[4] =
+  {
+    float2(1.0f, 0.0f),
+   float2(-1.0f, 0.0f),
+   float2(0.0f, 1.0f),
+   float2(0.0f, -1.0f)
   };
 
-  // sampling
-  int iterations = 4;
-  for (int j = 0; j < iterations; ++j)
+  int iter = 4;
+  for (int j = 0; j < iter; ++j)
   {
     float2 coord1 = reflect(vec[j], rand) * rad;
-    // for variation, rotation of 45°
-    float2 coord2 = float2(coord1.x * 0.707f - coord1.y * 0.707,
-                           coord1.x * 0.707f + coord1.y * 0.707);
-
-    ao += computeAO(input.TextCoord, coord1 * 0.25f, pos.xyz, n);
-    ao += computeAO(input.TextCoord, coord2 * 0.50f, pos.xyz, n);
-    ao += computeAO(input.TextCoord, coord1 * 0.75f, pos.xyz, n);
-    ao += computeAO(input.TextCoord, coord2        , pos.xyz, n);
+    float2 coord2 = float2(coord1.x * 0.707 - coord1.y * 0.707,
+                           coord1.x * 0.707 - coord1.y * 0.707);
+     
+    ao += computeAO(screenUV, coord1 * 0.25f, pos.xyz, n);
+    ao += computeAO(screenUV, coord2 * 0.5f, pos.xyz, n);
+    ao += computeAO(screenUV, coord2 * 0.75f, pos.xyz, n);
+    ao += computeAO(screenUV, coord2, pos.xyz, n);
   }
-
-  ao /= (iterations * 4);
   
-  return 1.0f - ao;
+  ao /= (iter * 4);
+  
+  PS_OUTPUT output = (PS_OUTPUT) 0;
+  output.ssaoOut.r = max(1.0f - ao, 0.2f);
+  
+  return output;
 }

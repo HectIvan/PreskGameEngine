@@ -155,6 +155,13 @@ public:
   Vector<SPtr<Texture>>&
   getUAVTextures() { return m_uavTex; }
 
+  /**
+   * @brief Get the viewport size.
+   * @return viewport size.
+   */
+  Vector2
+  getViewportSize() { return m_viewPortSize; }
+
  private:
   /**
    * Shader pointers

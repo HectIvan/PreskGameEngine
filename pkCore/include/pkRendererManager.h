@@ -39,6 +39,7 @@ namespace G_BUFFERS
     kGB_Normal,
     kGB_ShdwSpec, // labbert shadow & torrance specular
     kGB_ORM, // oclussion roughness metallic
+    kGB_SSAO,
     kGB_PositionsLight,
     kGB_Positions,
     kGB_Emissive,
@@ -84,6 +85,7 @@ namespace PASS_TYPE
     kP_Shadow,
     kP_ShadowQuad,
     kP_SkyBox,
+    kP_SSAO,
     kP_Tone,
   };
 }

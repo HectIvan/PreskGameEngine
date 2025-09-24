@@ -24,6 +24,7 @@ using pkEngineSDK::PASS_TYPE::kP_IBR;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
+using pkEngineSDK::PASS_TYPE::kP_SSAO;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PASS_TYPE::kP_Merge;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
@@ -266,6 +267,7 @@ BaseApp::render()
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
+  SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
   SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
   SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
@@ -299,6 +301,11 @@ BaseApp::render()
   shadowQuad->beginPass();
   api.draw(3, 0);
   shadowQuad->endPass();
+
+  // ssao pass
+  ssaoPass->beginPass();
+  api.draw(3, 0);
+  ssaoPass->endPass();
 
   // render the skybox
   skyBoxPass->beginPass();

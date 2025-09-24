@@ -17,6 +17,7 @@ using pkEngineSDK::CBBlur;
 using pkEngineSDK::CBFloat;
 using pkEngineSDK::CBVector2x2;
 using pkEngineSDK::CBVector3;
+using pkEngineSDK::CBSSAO;
 using pkEngineSDK::CreateCBCamera;
 using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
@@ -56,6 +57,7 @@ using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
+using pkEngineSDK::PASS_TYPE::kP_SSAO;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
@@ -578,6 +580,20 @@ ShaderTest::onUpdate()
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& rm = g_RenderManager();
 
+  // get all passes.
+  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
+  SPtr<Pass> basePass = rm.getPass(kP_Base);
+  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
+  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
+  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
+  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
+  SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
+
   Vector2 winSize = api.getSwapChain()->getSize();
 
   // camera data
@@ -652,24 +668,19 @@ ShaderTest::onUpdate()
   // exposure parameter.
   CBFloat exposure;
   exposure.value = m_exposure;
+  // SSAO
+  CBSSAO ssao;
+  ssao.sample_rad = 3.0f;
+  ssao.scale = 1.0f;
+  ssao.bias = 0.01f;
+  ssao.intensity = 2.0f;
+  CBVector2x2 ssaoWin;
+  ssaoWin.vec1 = ssaoPass->getViewportSize();
 
   // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
-
-  // get all passes.
-  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
-  SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
-  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
-  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
-  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
-  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
-  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
-  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
@@ -711,6 +722,9 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
 
   api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, sizeof(CBFloat));
+
+  api.updateConstantBuffer(ssaoPass->getCBuffer(0), &ssao, sizeof(CBSSAO));
+  api.updateConstantBuffer(ssaoPass->getCBuffer(1), &ssaoWin, sizeof(CBVector2x2));
 }
 
 void

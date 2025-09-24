@@ -266,18 +266,6 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   
   lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
-  /**
-   * Works, but its not correct
-   */
-  //      float3 worldToLight = normalize(worldPos - lightPos);
-  //      float angle = dot(-lightDir, worldToLight);
-  //      if (angle < SpotCutoff)
-  //      {
-  //        output.shadow = float4(shadowColor.xxx, 1);
-  //        output.specular = float4(0, 0, 0, 1);
-  //        return output;
-  //      }
-  
   // specular light
   float3 viewDir = normalize(Eye.xyz - worldPos);
   
@@ -312,6 +300,17 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   
   if (lightHit > worldHit + tolerance) {
     output.shdwSpec = float3(shadowColor, specular.r, 1.0f);
+  }
+  
+  /**
+   * Works, but its not correct
+   */
+  float3 worldToLight = normalize(worldPos - lightPos);
+  float angle = dot(-lightDir, worldToLight);
+  if (angle < SpotCutoff)
+  {
+    output.shdwSpec = float4(shadowColor, 0.0f, 0.0f, 1.0f);
+    return output;
   }
   
   return output;

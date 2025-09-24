@@ -12,6 +12,11 @@
  /*****************************************************************************/
 #pragma once
 
+/*********************************************/
+/**
+* Includes
+**/
+/*********************************************/
 #include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
@@ -39,17 +44,7 @@ public:
    * @brief Get the resource type.
    * @return The resource type.
    */
-  RESOURCE_TYPE::E
-  getType() const { return m_type; }
-
-  /**
-   * @brief Set the resource type.
-   * @param _type Type of resource.
-   */
-  void
-  setType(const RESOURCE_TYPE::E _type) { m_type = _type; }
-
- private:
-  RESOURCE_TYPE::E m_type = RESOURCE_TYPE::kUnknown;
+  virtual RESOURCE_TYPE::E
+  getType() const = 0;
 };
 }

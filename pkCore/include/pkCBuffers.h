@@ -33,6 +33,14 @@ struct CBTransform
   Matrix4 transform;
 };
 
+struct CBSSAO
+{
+  float sample_rad;
+  float scale;
+  float bias;
+  float intensity;
+};
+
 struct CBCamera
 {
   Vector4 eye = Vector4(0.0f, 0.0f, 0.0f, 1.0f); // 16

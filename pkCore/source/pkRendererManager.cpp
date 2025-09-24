@@ -46,6 +46,9 @@ RendererManager::init()
   SPtr<Texture> ormRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
 
+  SPtr<Texture> ssaoRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
+
   // skybox texture.
   SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
@@ -146,6 +149,12 @@ RendererManager::createPasses()
 {
   // pass description
   PassDesc pDesc = PassDesc();
+
+  SPtr<Texture> albedoTex = getGBuffer(G_BUFFERS::kGB_Albedo);
+  SPtr<Texture> normalTex = getGBuffer(G_BUFFERS::kGB_Normal);
+  SPtr<Texture> ormTex = getGBuffer(G_BUFFERS::kGB_ORM);
+  SPtr<Texture> posTex = getGBuffer(G_BUFFERS::kGB_Positions);
+  SPtr<Texture> ssaoTex = getGBuffer(G_BUFFERS::kGB_SSAO);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -160,11 +169,11 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
                     sizeof(CBCamera), sizeof(CBTransform) };
   pDesc.inputs = {};
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
-                    getGBuffer(G_BUFFERS::kGB_Normal),
-                    getGBuffer(G_BUFFERS::kGB_ORM),
+  pDesc.outputs = { albedoTex,
+                    normalTex,
+                    ormTex,
                     getGBuffer(G_BUFFERS::kGB_Emissive),
-                    getGBuffer(G_BUFFERS::kGB_Positions) };
+                    posTex };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
   // rasterizer state
   pDesc.rSExists = true;
@@ -195,10 +204,10 @@ RendererManager::createPasses()
                     sizeof(Vector4) };
   pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Light),
                    getDepthBuffer(D_BUFFERS::kDB_Base),
-                   getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Albedo),
-                   getGBuffer(G_BUFFERS::kGB_Positions),
-                   getGBuffer(G_BUFFERS::kGB_ORM),
+                   normalTex,
+                   albedoTex,
+                   posTex,
+                   ormTex,
                    getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
   pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -218,16 +227,30 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
+   * Screen Space Ambient Occlusion Quad pass
+   ***************************************************************************/
+  pDesc.pSDirectory = Path("shaders/pkPSAOshader.hlsl");
+  pDesc.cBSizes = { sizeof(CBSSAO), sizeof(CBVector2x2) };
+  pDesc.inputs = { posTex,
+                   normalTex};
+  pDesc.outputs = { ssaoTex };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
+  SPtr<Pass> ssaoPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_SSAO, ssaoPass });
+
+  /****************************************************************************
    * IBR Quad pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
   pDesc.inputs = { m_mainSkybox,
-                   getGBuffer(G_BUFFERS::kGB_Normal),
-                   getGBuffer(G_BUFFERS::kGB_Positions),
-                   getGBuffer(G_BUFFERS::kGB_ORM),
-                   getGBuffer(G_BUFFERS::kGB_Albedo) };
+                   normalTex,
+                   posTex,
+                   ormTex,
+                   albedoTex };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_IBR, ibrPass });
@@ -260,12 +283,13 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
   pDesc.cBSizes = {};
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Albedo),
+  pDesc.inputs = { albedoTex,
                    getGBuffer(G_BUFFERS::kGB_ShdwSpec),
                    getGBuffer(G_BUFFERS::kGB_Skybox),
                    getGBuffer(G_BUFFERS::kGB_IBR),
                    getGBuffer(G_BUFFERS::kGB_Emissive),
-                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur) };
+                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur),
+                   ssaoTex }; // to do: do a correct ambient occlusion implementation.
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);

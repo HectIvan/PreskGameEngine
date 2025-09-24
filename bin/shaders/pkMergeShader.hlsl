@@ -5,6 +5,7 @@ Texture2D skyboxMap : register(t2);
 Texture2D IBRMap : register(t3);
 Texture2D emissiveMap : register(t4);
 Texture2D emissiveBlurMap : register(t5);
+Texture2D ssaoMap : register(t6); // temporary texture to show ambient occlusion effect.
 
 // sampler
 SamplerState samState : register(s0);
@@ -24,7 +25,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 IBRSample = IBRMap.Sample(samState, input.TexCoord);
   float4 emissiveSample = emissiveMap.Sample(samState, input.TexCoord);
   float4 emissBlurSample = emissiveBlurMap.Sample(samState, input.TexCoord);
-  
+  float ssaoSample = ssaoMap.Sample(samState, input.TexCoord).r;
   
   // float4 diffuse = albedoSample * shdwSpecSample.r;
   // get the base color 
@@ -50,5 +51,5 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float4 fullEmissive = emissiveSample + emissBlurSample;
   
-  return float4(color, 1.0f) + fullEmissive;
+  return float4(color, 1.0f) * ssaoSample + fullEmissive;
 }

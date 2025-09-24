@@ -30,7 +30,11 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be a
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
   
-  output.posWS = float4(input.PosWS, 1.0f);
+  float alpha = diffuseTex.Sample(samLinear, input.Tex).a;
+  
+  if (alpha != 0.0f) {
+    output.posWS = float4(input.PosWS, 1.0f);
+  }
   
   return output;
 }

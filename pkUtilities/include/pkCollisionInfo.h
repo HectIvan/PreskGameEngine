@@ -30,7 +30,8 @@ class PK_UTILITY_EXPORT CollisionInfo
     m_penDistance(_penDist) {};
   virtual ~CollisionInfo() = default;
 
-  Vector3 m_normalHit;
-  float m_penDistance;
+ public:
+  Vector3 m_normalHit = Vector3::ZERO;
+  float m_penDistance = 0.0f;
 };
 }

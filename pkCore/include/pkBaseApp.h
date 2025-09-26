@@ -116,6 +116,7 @@ class PK_CORE_EXPORT BaseApp
   bool m_run = true;
   bool m_vSync;
 
-  bool m_IBR;
+  bool m_ssao = true;
+  bool m_IBR = true;
 };
 }

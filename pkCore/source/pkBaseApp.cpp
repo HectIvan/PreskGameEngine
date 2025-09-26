@@ -303,9 +303,12 @@ BaseApp::render()
   shadowQuad->endPass();
 
   // ssao pass
-  ssaoPass->beginPass();
-  api.draw(3, 0);
-  ssaoPass->endPass();
+  api.clearRenderTargetViews(Color(1, 1, 1, 1), ssaoPass->getOutputTextures());
+  if (m_ssao) {
+    ssaoPass->beginPass();
+    api.draw(3, 0);
+    ssaoPass->endPass();
+  }
 
   // render the skybox
   skyBoxPass->beginPass();

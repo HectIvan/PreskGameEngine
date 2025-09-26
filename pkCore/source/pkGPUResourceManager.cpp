@@ -17,7 +17,7 @@ GPUResourceManager::newMaterial()
 SPtr<Model>
 GPUResourceManager::loadModel(Path _directory)
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
 
   // Get model directory
   String dir = _directory.toString();
@@ -31,8 +31,14 @@ GPUResourceManager::loadModel(Path _directory)
 
   // create the model pointer
   SPtr<Model> model = make_shared<Model>();
+  if (_directory.getExtension() == "pkm") {
+    if (!model->loadPK(_directory)) {
+      model = nullptr;
+      return nullptr;
+    }
+  }
   // load the model from the path
-  if (model->load(_directory)) {
+  if (model->loadAssimp(_directory)) {
     // create the index and vertex buffers
     model->m_vertexB = api.createVertexBuffer(model->vertex);
     model->m_indexB = api.createIndexBuffer(model->index);

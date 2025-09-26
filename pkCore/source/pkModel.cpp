@@ -16,6 +16,7 @@
 #include "pkTexture.h"
 #include "pkTextureManager.h"
 #include "pkGPUResourceManager.h"
+#include "pkModelResource.h"
 
 #include "stb_image.h"
 
@@ -37,7 +38,31 @@ Matrix4
 aiTransformToMatrix4(aiMatrix4x4 _transform);
 
 bool
-Model::load(Path& _path)
+Model::loadPK(const Path& _path)
+{
+  Logger& log = g_Logger();
+  // to do: change where this is done. (pkAssetResourceManager)
+  ifstream file;
+  file.open(_path.getPath(), ios::in);
+
+  // if the file fails to open, return false.
+  if (!file.is_open()) {
+    String msg = "Failed to open model at directory " + _path.getPath() + ".";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    return false;
+  }
+
+  // file.read();
+
+  ModelResource res;
+  
+  file.close();
+  return true;
+}
+
+bool
+Model::loadAssimp(const Path& _path)
 {
   m_indexB = nullptr;
   m_vertexB = nullptr;

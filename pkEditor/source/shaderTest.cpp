@@ -491,7 +491,22 @@ ShaderTest::uInterfaceUpdate()
     im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
     im.sameLine();
     im.createText("Strength");
-    // Exposure
+    // ssao
+    im.createCheckBox("SSAO", m_ssao);
+    if (m_ssao) {
+      im.createDragF("SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
+      im.sameLine();
+      im.createText("Sample Radius");
+      im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
+      im.sameLine();
+      im.createText("Scale");
+      im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
+      im.sameLine();
+      im.createText("Bias");
+      im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
+      im.sameLine();
+      im.createText("Intensity");
+    }
   }
   if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
     // compile shaders
@@ -670,10 +685,10 @@ ShaderTest::onUpdate()
   exposure.value = m_exposure;
   // SSAO
   CBSSAO ssao;
-  ssao.sample_rad = 3.0f;
-  ssao.scale = 1.0f;
-  ssao.bias = 0.01f;
-  ssao.intensity = 2.0f;
+  ssao.sample_rad = m_ssaoSampleRad;
+  ssao.scale = m_ssaoScale;
+  ssao.bias = m_ssaoBias;
+  ssao.intensity = m_ssaoIntensity;
   CBVector2x2 ssaoWin;
   ssaoWin.vec1 = ssaoPass->getViewportSize();
 

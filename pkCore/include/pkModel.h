@@ -41,11 +41,17 @@ class PK_CORE_EXPORT Model : public Component
 
   /**
    * @brief Load the model from a path.
+   */
+  bool
+  loadPK(const Path& _path);
+
+  /**
+   * @brief Load the model from a path.
    * @param _path File path.
    * @return If the model was able to be loaded.
    */
   bool
-  load(Path& _path);
+  loadAssimp(const Path& _path);
 
   /**
    * @brief Get the map of bones assigned to the model.

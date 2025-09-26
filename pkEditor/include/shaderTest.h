@@ -143,6 +143,12 @@ class ShaderTest : public BaseApp
   bool m_showWarnings;
   bool m_showActions;
 
+  // ssao parameters.
+  float m_ssaoSampleRad = 3.0f;
+  float m_ssaoScale = 1.0f;
+  float m_ssaoBias = 0.01f;
+  float m_ssaoIntensity = 2.0f;
+
   float m_IBRIntensity;
   float m_exposure;
 

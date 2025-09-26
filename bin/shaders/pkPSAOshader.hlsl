@@ -28,9 +28,9 @@ struct PS_OUTPUT
   float4 ssaoOut : SV_Target0;
 };
 
-float3 getPosition(in float2 uv)
+float4 getPosition(in float2 uv)
 {
-  return posMap.Sample(samState, uv).rgb;
+  return posMap.Sample(samState, uv);
 }
 
 float4 getNormal(in float2 uv)
@@ -60,6 +60,7 @@ float computeAO(in float2 tcood, in float2 uv, in float3 p, in float3 cnorm)
 PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
 {
   float2 screenUV = input.Position.xy / screen_size;
+  PS_OUTPUT output = (PS_OUTPUT) 0;
   
   float4 normal = getNormal(screenUV);
   if (normal.w == 0.0f)
@@ -67,7 +68,14 @@ PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
     clip(-1);
   }
   
-  float3 pos = getPosition(screenUV);
+  float4 pos = getPosition(screenUV);
+  
+  if (pos.w == 0.0f)
+  {
+    output.ssaoOut = 1.0f;
+    return output;
+  }
+  
   float3 n = normal.xyz;
   float2 rand = getRandom(screenUV);
   
@@ -96,8 +104,6 @@ PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
   }
   
   ao /= (iter * 4);
-  
-  PS_OUTPUT output = (PS_OUTPUT) 0;
   output.ssaoOut.r = max(1.0f - ao, 0.2f);
   
   return output;

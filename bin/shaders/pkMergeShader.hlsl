@@ -36,7 +36,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   // color = IBL * shdwSpecSample.g * albedoSample.rgb;
   
-  color = shdwSpecSample.g * IBL + albedoSample.rgb * shdwSpecSample.r;
+  color = shdwSpecSample.g * IBL * ssaoSample + albedoSample.rgb * shdwSpecSample.r;
   
   // check for a skybox position.
   
@@ -51,5 +51,5 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float4 fullEmissive = emissiveSample + emissBlurSample;
   
-  return float4(color, 1.0f) * ssaoSample + fullEmissive;
+  return float4(color, 1.0f) + fullEmissive;
 }

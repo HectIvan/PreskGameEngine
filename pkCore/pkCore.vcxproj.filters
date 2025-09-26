@@ -231,6 +231,9 @@
     <ClInclude Include="include\pkBaseResource.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkModelResource.h">
+      <Filter>include\base app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

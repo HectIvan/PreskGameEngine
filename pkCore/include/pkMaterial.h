@@ -53,7 +53,8 @@ class Material : public Component
   /**
    * @brief Default material constructor.
    */
-  Material() = default;
+  Material();
+
   /**
    * @brief Default material destructor.
    */

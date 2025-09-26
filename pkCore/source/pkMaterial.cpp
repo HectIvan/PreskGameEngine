@@ -1,21 +1,42 @@
 #include "pkMaterial.h"
 #include "pkTexture.h"
+#include "pkTextureManager.h"
 
 namespace pkEngineSDK
 {
-void Material::init()
+Material::Material()
 {
-  m_diffuse = make_shared<Texture>();
-  m_normal = make_shared<Texture>();
-  m_height = make_shared<Texture>();
-  m_metallic = make_shared<Texture>();
-  m_roughness = make_shared<Texture>();
-  m_emissive = make_shared<Texture>();
-  m_occlusion = make_shared<Texture>();
+  TextureManager& tm = g_TextureManager();
   m_name = "";
   m_castShadow = true;
   m_receiveShadows = true;
   m_properties = MaterialProps();
+
+  setDiffuse(tm.m_defaultDiff);
+  setNormal(tm.m_defaultNormal);
+  setOcclusion(tm.m_defaultAO);
+  setHeight(tm.m_defaultHeight);
+  setMetallic(tm.m_defaultMetallic);
+  setRoughness(tm.m_defaultRough);
+  setEmissive(tm.m_defaultEmissive);
+}
+
+void
+Material::init()
+{
+  TextureManager& tm = g_TextureManager();
+  m_name = "";
+  m_castShadow = true;
+  m_receiveShadows = true;
+  m_properties = MaterialProps();
+
+  setDiffuse(tm.m_defaultDiff);
+  setNormal(tm.m_defaultNormal);
+  setOcclusion(tm.m_defaultAO);
+  setHeight(tm.m_defaultHeight);
+  setMetallic(tm.m_defaultMetallic);
+  setRoughness(tm.m_defaultRough);
+  setEmissive(tm.m_defaultEmissive);
 }
 
 void

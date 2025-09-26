@@ -31,24 +31,24 @@ GPUResourceManager::loadModel(Path _directory)
 
   // create the model pointer
   SPtr<Model> model = make_shared<Model>();
+
+  // load the model from the path depending on extension.
   if (_directory.getExtension() == "pkm") {
     if (!model->loadPK(_directory)) {
       model = nullptr;
       return nullptr;
     }
   }
-  // load the model from the path
-  if (model->loadAssimp(_directory)) {
-    // create the index and vertex buffers
-    model->m_vertexB = api.createVertexBuffer(model->vertex);
-    model->m_indexB = api.createIndexBuffer(model->index);
-    api.setIndexBuffer(model->m_indexB);
-    api.setVertexBuffer(model->m_vertexB);
-  }
-  else { // if the model could not be loaded, destroy the pointer and return null.
+  else if (!model->loadAssimp(_directory)) {
     model = nullptr;
     return nullptr;
   }
+
+  // create the index and vertex buffers
+  model->m_vertexB = api.createVertexBuffer(model->vertex);
+  model->m_indexB = api.createIndexBuffer(model->index);
+  api.setIndexBuffer(model->m_indexB);
+  api.setVertexBuffer(model->m_vertexB);
 
   // store the model in memory for later use if needed
   SPtr<ModelMemory> newModelMem = make_shared<ModelMemory>();

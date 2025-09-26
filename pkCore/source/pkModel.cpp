@@ -23,6 +23,18 @@
 namespace pkEngineSDK
 {
 
+struct ModelAssetHeader
+{
+  uint32 meshCount;
+};
+
+struct MeshAssetHeader
+{
+  uint64 vertexCount;
+  uint64 indexCount;
+  String name;
+};
+
 /*********************************************/
 /**
 * Declarations
@@ -43,7 +55,7 @@ Model::loadPK(const Path& _path)
   Logger& log = g_Logger();
   // to do: change where this is done. (pkAssetResourceManager)
   ifstream file;
-  file.open(_path.getPath(), ios::in);
+  file.open(_path.getPath(), ios::in | ios::binary);
 
   // if the file fails to open, return false.
   if (!file.is_open()) {
@@ -53,9 +65,72 @@ Model::loadPK(const Path& _path)
     return false;
   }
 
-  // file.read();
+  // get model header.
+  uint32 sizeMHeader = sizeof(ModelAssetHeader);
+  ModelAssetHeader* modelHeader = new ModelAssetHeader();
+  file.read(reinterpret_cast<char*>(modelHeader), sizeMHeader);
 
-  ModelResource res;
+  meshes.resize(modelHeader->meshCount);
+  // for each mesh in the model, get the mesh data.
+  for (uint32 i = 0; i < modelHeader->meshCount; ++i) {
+    // get mesh header.
+    uint32 sizeMeshHeader = sizeof(MeshAssetHeader);
+    MeshAssetHeader* mHeader = new MeshAssetHeader();
+    // read vertices.
+    uint64 vertexCount = 0;
+    uint64 indexCount = 0;
+    file.read(reinterpret_cast<char*>(&vertexCount), sizeof(vertexCount));
+    file.read(reinterpret_cast<char*>(&indexCount), sizeof(indexCount));
+    mHeader->vertexCount = vertexCount;
+    mHeader->indexCount = indexCount;
+    // read string.
+    // uint32 length = 0;
+    // file.read(reinterpret_cast<char*>(&length), sizeof(String));
+    // mHeader->name.resize(length);
+    // file.read(mHeader->name.data(), length);
+
+
+    // get vertex data.
+    uint32 meshVerticesSize = sizeof(SimpleVertex) * mHeader->vertexCount;
+    Vector<char> meshVertices(meshVerticesSize);
+    file.read(meshVertices.data(), meshVerticesSize);
+    Vector<SimpleVertex> vertices = Vector<SimpleVertex>(mHeader->vertexCount);
+    memcpy(vertices.data(), meshVertices.data(), meshVerticesSize);
+
+    // get index data.
+    uint32 meshIndicesSize = sizeof(uint32) * mHeader->indexCount;
+    Vector<char> meshIndices(meshIndicesSize);
+    file.read(meshIndices.data(), meshIndicesSize);
+    Vector<uint32> indices = Vector<uint32>(mHeader->indexCount);
+
+    // create the mesh
+    SPtr<Mesh> mesh = make_shared<Mesh>();
+    // set mesh data.
+    mesh->setName("mesh"); // to do: temporary placeholder for the mesh name.
+    mesh->vertexCount = mHeader->vertexCount;
+    mesh->numIndex = mHeader->indexCount;
+    // fill in mesh data.
+    mesh->vertexVector.resize(mHeader->vertexCount);
+    memcpy(mesh->vertexVector.data(), vertices.data(), meshVerticesSize);
+    mesh->indexVector.resize(mHeader->indexCount);
+    memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
+
+    // to do: why am i even doing it this way?
+    mesh->material = make_shared<Material>();
+
+    meshes[i] = mesh;
+  }
+
+  for (uint32 i = 0; i < meshes.size(); ++i) {
+    vertex.insert(vertex.end(),
+      meshes[i]->vertexVector.begin(),
+      meshes[i]->vertexVector.end());
+
+    index.insert(index.end(),
+      meshes[i]->indexVector.begin(),
+      meshes[i]->indexVector.end());
+  }
+  // ModelResource res;
   
   file.close();
   return true;
@@ -195,14 +270,6 @@ processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
     aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
     meshProcess->material = make_shared<Material>();
     String meshName = _mesh->mName.C_Str();
-    // load default textures.
-    meshProcess->material->setDiffuse(tm.m_defaultDiff);
-    meshProcess->material->setNormal(tm.m_defaultNormal);
-    meshProcess->material->setOcclusion(tm.m_defaultAO);
-    meshProcess->material->setHeight(tm.m_defaultHeight);
-    meshProcess->material->setMetallic(tm.m_defaultMetallic);
-    meshProcess->material->setRoughness(tm.m_defaultRough);
-    meshProcess->material->setEmissive(tm.m_defaultEmissive);
 
     String matName = materialA->GetName().C_Str();
     meshProcess->material->setName(matName);

@@ -79,10 +79,7 @@ Model::loadPK(const Path& _path)
     // read vertices.
     uint64 vertexCount = 0;
     uint64 indexCount = 0;
-    file.read(reinterpret_cast<char*>(&vertexCount), sizeof(vertexCount));
-    file.read(reinterpret_cast<char*>(&indexCount), sizeof(indexCount));
-    mHeader->vertexCount = vertexCount;
-    mHeader->indexCount = indexCount;
+    file.read(reinterpret_cast<char*>(mHeader), sizeMeshHeader);
     // read string.
     // uint32 length = 0;
     // file.read(reinterpret_cast<char*>(&length), sizeof(String));
@@ -102,6 +99,7 @@ Model::loadPK(const Path& _path)
     Vector<char> meshIndices(meshIndicesSize);
     file.read(meshIndices.data(), meshIndicesSize);
     Vector<uint32> indices = Vector<uint32>(mHeader->indexCount);
+    memcpy(indices.data(), meshIndices.data(), meshIndicesSize);
 
     // create the mesh
     SPtr<Mesh> mesh = make_shared<Mesh>();

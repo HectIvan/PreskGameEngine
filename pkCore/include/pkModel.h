@@ -71,14 +71,14 @@ class PK_CORE_EXPORT Model : public Component
    * @brief Set the data of the vertex to a default value
    * @param _vertex Vertex to set to default.
    */
-  void
-  setVertexBoneDataToDefault(SimpleVertex& _vertex)
-  {
-    for (int i = 0; i < MAX_BONE_WEIGHT; i++) {
-      _vertex.boneIDs[i] = -1;
-      _vertex.weights[i] = 0.0f;
-    }
-  }
+  // void
+  // setVertexBoneDataToDefault(SimpleVertex& _vertex)
+  // {
+  //   for (int i = 0; i < MAX_BONE_WEIGHT; i++) {
+  //     _vertex.boneIDs[i] = -1;
+  //     _vertex.weights[i] = 0.0f;
+  //   }
+  // }
 
   /**
    * @brief Assign bone data to a vertex.

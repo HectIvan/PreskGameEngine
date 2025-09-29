@@ -44,6 +44,7 @@ using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::TextureManager;
+using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector;
@@ -219,6 +220,15 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             SPtr<Texture> rough = meshMat->m_roughness;
             SPtr<Texture> metallic = meshMat->m_metallic;
             SPtr<Texture> emissive = meshMat->m_emissive;
+
+            im.createText("Vertex Count: ");
+            im.sameLine();
+            String vertexCount = to_string(mesh->vertexVector.size());
+            im.createText(vertexCount.c_str());
+            im.createText("Index Count: ");
+            im.sameLine();
+            String indexCount = to_string(mesh->indexVector.size());
+            im.createText(indexCount.c_str());
 
             // get the names of the texture and material
             String matName = meshMat->getNameS();

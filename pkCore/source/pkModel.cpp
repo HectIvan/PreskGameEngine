@@ -32,7 +32,7 @@ struct MeshAssetHeader
 {
   uint64 vertexCount;
   uint64 indexCount;
-  String name;
+  // String name;
 };
 
 /*********************************************/
@@ -77,14 +77,7 @@ Model::loadPK(const Path& _path)
     uint32 sizeMeshHeader = sizeof(MeshAssetHeader);
     MeshAssetHeader* mHeader = new MeshAssetHeader();
     // read vertices.
-    uint64 vertexCount = 0;
-    uint64 indexCount = 0;
     file.read(reinterpret_cast<char*>(mHeader), sizeMeshHeader);
-    // read string.
-    // uint32 length = 0;
-    // file.read(reinterpret_cast<char*>(&length), sizeof(String));
-    // mHeader->name.resize(length);
-    // file.read(mHeader->name.data(), length);
 
 
     // get vertex data.
@@ -117,6 +110,9 @@ Model::loadPK(const Path& _path)
     mesh->material = make_shared<Material>();
 
     meshes[i] = mesh;
+
+    mHeader = nullptr;
+    delete mHeader;
   }
 
   for (uint32 i = 0; i < meshes.size(); ++i) {

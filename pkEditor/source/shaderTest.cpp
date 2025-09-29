@@ -139,17 +139,17 @@ ShaderTest::onInit()
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
-  SPtr<Actor> pistol = activeScene->instantiate("Pistol");
-  pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
-  pistol->setScale(30.0f);
-  pistol->setPosition(10.0f, 15.0f, 0.0f);
-  
-  SPtr<Actor> sponza = activeScene->instantiate("Sponza");
-  sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-  
-  SPtr<Actor> coat = activeScene->instantiate("Coat");
-  coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
-  coat->setPosition(11.0f, 5.2f, 0.0f);
+  // SPtr<Actor> pistol = activeScene->instantiate("Pistol");
+  // pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
+  // pistol->setScale(30.0f);
+  // pistol->setPosition(10.0f, 15.0f, 0.0f);
+  // 
+  // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
+  // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
+  // 
+  // SPtr<Actor> coat = activeScene->instantiate("Coat");
+  // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
+  // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_IBR = true;
   m_vSync = false;

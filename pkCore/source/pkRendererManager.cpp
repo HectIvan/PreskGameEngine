@@ -419,8 +419,8 @@ void
 RendererManager::setActorsBuffers()
 {
   // get managers
-  GraphicsAPI& api = g_GraphicAPI().instance();
-  SceneManager& sm = g_SceneManager().instance();
+  GraphicsAPI& api = g_GraphicAPI();
+  SceneManager& sm = g_SceneManager();
   // for each actor in the world
   SPtr<Scene> activeScene = sm.getActiveScene();
   SIZE_T actorCount = activeScene->getAllActors().size();
@@ -439,17 +439,18 @@ RendererManager::setActorsBuffers()
 void
 RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
-  RendererManager& rManager = g_RenderManager().instance();
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  RendererManager& rManager = g_RenderManager();
+  GraphicsAPI& api = g_GraphicAPI();
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
+    SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
-    if (!_gameActors[i]->isActive()) {
+    if (!currActor->isActive()) {
       continue;
     }
     // Get the final matrix by taking into account the parent actors
-    SPtr<Actor> parent = _gameActors[i]->m_parent;
-    Matrix4 transform = _gameActors[i]->m_transform;
+    SPtr<Actor> parent = currActor->m_parent;
+    Matrix4 transform = currActor->m_transform;
     // while there's a parent
     while (parent) {
       // add the parent transform to the current transform matrix
@@ -466,13 +467,13 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
     api.updateConstantBuffer(basePass->getCBuffer(5), &transformInvTransp, sizeof(Matrix4));
 
     // render the model of the actor
-    SPtr<Model> model = _gameActors[i]->getComponent<Model>();
+    SPtr<Model> model = currActor->getComponent<Model>();
     if (model && model->isActive()) {
       renderModel(model);
     }
     // if the actor has children, do the same for them (recursive)
-    if (!_gameActors[i]->m_children.empty()) {
-      renderActors(_gameActors[i]->m_children);
+    if (!currActor->m_children.empty()) {
+      renderActors(currActor->m_children);
     }
   }
 }
@@ -481,7 +482,7 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 void
 RendererManager::renderModel(const SPtr<Model>& _model)
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
   // get a reference from the api
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);

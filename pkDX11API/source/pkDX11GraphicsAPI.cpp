@@ -1542,7 +1542,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     delete data;
     data = nullptr;
     const String msg = "Can't open " + _fileName.getDirectory() + ", unable to open file.";
-    log.print(msg);
+    // log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
@@ -1636,7 +1636,7 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
     data = nullptr;
     const String msg = "Can't open " + _fileName.getFileName() + ", unable to open file."
                         + " Reason: " + stbi_failure_reason();
-    log.print(msg);
+    // log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return nullptr;
   }
@@ -2036,7 +2036,7 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   /***************************************************************/
   D3D11_BUFFER_DESC bd;
   memset(&bd, 0, sizeof(bd));
-  bd.ByteWidth = sizeof(uint32) * (uint32)_index.size(); // size of the buffer
+  bd.ByteWidth = sizeof(uint32) * static_cast<uint32>(_index.size()); // size of the buffer
   bd.Usage = static_cast<D3D11_USAGE>(_usage); // how it is expected to be read
   bd.BindFlags = D3D11_BIND_INDEX_BUFFER; // how it will be binded to the pipeline
   bd.CPUAccessFlags = 0; // default -> CPU ha no accesss to this

@@ -16,6 +16,21 @@ TimeManager::getDeltaTime(high_resolution_clock::time_point& _delta)
   return deltaTime;
 }
 
+high_resolution_clock::time_point
+TimeManager::now()
+{
+  return high_resolution_clock::now();
+}
+
+float
+TimeManager::getElapsed(const high_resolution_clock::time_point _start,
+                        const high_resolution_clock::time_point _end)
+{
+  duration<float> time = _end - _start;
+  float elapsed = time.count();
+  return elapsed;
+}
+
 PK_CORE_EXPORT
 TimeManager& g_TimeManager()
 {

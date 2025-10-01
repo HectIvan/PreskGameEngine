@@ -30,8 +30,8 @@ struct ModelAssetHeader
 
 struct MeshAssetHeader
 {
-  uint64 vertexCount;
-  uint64 indexCount;
+  uint32 vertexCount;
+  uint32 indexCount;
   // String name;
 };
 
@@ -106,13 +106,13 @@ Model::loadPK(const Path& _path)
     mesh->indexVector.resize(mHeader->indexCount);
     memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
 
-    // to do: why am i even doing it this way?
+    // to do: make a default material
     mesh->material = make_shared<Material>();
 
     meshes[i] = mesh;
 
-    mHeader = nullptr;
     delete mHeader;
+    mHeader = nullptr;
   }
 
   for (uint32 i = 0; i < meshes.size(); ++i) {

@@ -44,6 +44,23 @@ class PK_CORE_EXPORT TimeManager : public Module<TimeManager>
   float
   getDeltaTime(high_resolution_clock::time_point& _delta);
 
+  /**
+   * @brief Get the current clock time.
+   * @return Current time
+   */
+  high_resolution_clock::time_point
+  now();
+
+  /**
+   * @brief Get the elapsed time in seconds between 2 times.
+   * @param _start Initial time.
+   * @param _end Final time.
+   * @return Time elapsed in seconds.
+   */
+  float
+  getElapsed(const high_resolution_clock::time_point _start,
+             const high_resolution_clock::time_point _end);
+
   float m_deltaTime;
   float m_fixedDeltaTime = 0.016f;
 };

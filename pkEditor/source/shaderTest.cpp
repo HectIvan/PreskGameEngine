@@ -73,6 +73,9 @@ using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector4;
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
 // to do: create fileSystem.h in utilities
 // create class Path
 
@@ -99,6 +102,8 @@ ShaderTest::onInit()
   UInterface::startUp();
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
+
+  Logger& log = g_Logger();
   // get the resource manager
   GPUResourceManager& resourceMan = g_GPUResourceManager();
   SceneManager& sceneMan = g_SceneManager();
@@ -150,6 +155,26 @@ ShaderTest::onInit()
   // SPtr<Actor> coat = activeScene->instantiate("Coat");
   // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
+
+  // log.print("Opening BistroExterior.fbx");
+  // high_resolution_clock::time_point start = high_resolution_clock::now();
+  // SPtr<Actor> bistroEX = activeScene->instantiate("Bistro Exterior");
+  // bistroEX->addComponent(resourceMan.loadModel(Path("models/BistroExterior.fbx")));
+  // high_resolution_clock::time_point end = high_resolution_clock::now();
+  // 
+  // duration<float> time = end - start;
+  // float elapsed = time.count();
+  // log.print(to_string(elapsed) + " Seconds.");
+  // 
+  // log.print("Opening BistroInterior_Wine.fbx");
+  // start = high_resolution_clock::now();
+  // SPtr<Actor> bistroIntWine = activeScene->instantiate("Bistro Interior Wine");
+  // bistroIntWine->addComponent(resourceMan.loadModel(Path("models/BistroInterior_Wine.fbx")));
+  // end = high_resolution_clock::now();
+  // 
+  // time = end - start;
+  // elapsed = time.count();
+  // log.print(to_string(elapsed) + " Seconds.");
 
   m_IBR = true;
   m_vSync = false;

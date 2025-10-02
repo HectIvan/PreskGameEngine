@@ -30,6 +30,8 @@ struct ModelAssetHeader
 
 struct MeshAssetHeader
 {
+  SIZE_T nameSize;
+  String name;
   uint32 vertexCount;
   uint32 indexCount;
   // String name;
@@ -74,10 +76,13 @@ Model::loadPK(const Path& _path)
   // for each mesh in the model, get the mesh data.
   for (uint32 i = 0; i < modelHeader->meshCount; ++i) {
     // get mesh header.
-    uint32 sizeMeshHeader = sizeof(MeshAssetHeader);
     MeshAssetHeader* mHeader = new MeshAssetHeader();
     // read vertices.
-    file.read(reinterpret_cast<char*>(mHeader), sizeMeshHeader);
+    file.read(reinterpret_cast<char*>(&mHeader->nameSize), sizeof(SIZE_T));
+    mHeader->name.resize(mHeader->nameSize);
+    file.read(reinterpret_cast<char*>(&mHeader->name[0]), mHeader->nameSize);
+    file.read(reinterpret_cast<char*>(&mHeader->vertexCount), sizeof(uint32));
+    file.read(reinterpret_cast<char*>(&mHeader->indexCount), sizeof(uint32));
 
 
     // get vertex data.
@@ -88,7 +93,7 @@ Model::loadPK(const Path& _path)
     memcpy(vertices.data(), meshVertices.data(), meshVerticesSize);
 
     // get index data.
-    uint32 meshIndicesSize = sizeof(uint32) * mHeader->indexCount;
+      uint32 meshIndicesSize = sizeof(uint32) * mHeader->indexCount;
     Vector<char> meshIndices(meshIndicesSize);
     file.read(meshIndices.data(), meshIndicesSize);
     Vector<uint32> indices = Vector<uint32>(mHeader->indexCount);
@@ -97,7 +102,7 @@ Model::loadPK(const Path& _path)
     // create the mesh
     SPtr<Mesh> mesh = make_shared<Mesh>();
     // set mesh data.
-    mesh->setName("mesh"); // to do: temporary placeholder for the mesh name.
+    mesh->setName(mHeader->name); // to do: temporary placeholder for the mesh name.
     mesh->vertexCount = mHeader->vertexCount;
     mesh->numIndex = mHeader->indexCount;
     // fill in mesh data.

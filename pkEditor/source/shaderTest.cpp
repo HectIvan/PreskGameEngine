@@ -68,11 +68,13 @@ using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
+using pkEngineSDK::TimeManager;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector4;
+using pkEngineSDK::Model;
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
@@ -104,6 +106,7 @@ ShaderTest::onInit()
   g_uInterface().initWin(m_window.getWindowHandle());
 
   Logger& log = g_Logger();
+  TimeManager& timeMan = g_TimeManager();
   // get the resource manager
   GPUResourceManager& resourceMan = g_GPUResourceManager();
   SceneManager& sceneMan = g_SceneManager();
@@ -156,25 +159,18 @@ ShaderTest::onInit()
   // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
-  // log.print("Opening BistroExterior.fbx");
-  // high_resolution_clock::time_point start = high_resolution_clock::now();
-  // SPtr<Actor> bistroEX = activeScene->instantiate("Bistro Exterior");
-  // bistroEX->addComponent(resourceMan.loadModel(Path("models/BistroExterior.fbx")));
-  // high_resolution_clock::time_point end = high_resolution_clock::now();
+  // log.print("Loading bistro interior / exterior.");
+  // timeMan.startTimer();
+  // SPtr<Actor> bistro = activeScene->instantiate("Exterior");
+  // bistro->addComponent(resourceMan.loadModel(Path("models/bistro_exterior.pkm")));
+  // bistro->setRotation(-90.0f, 0.0f, 0.0f);
   // 
-  // duration<float> time = end - start;
-  // float elapsed = time.count();
-  // log.print(to_string(elapsed) + " Seconds.");
-  // 
-  // log.print("Opening BistroInterior_Wine.fbx");
-  // start = high_resolution_clock::now();
-  // SPtr<Actor> bistroIntWine = activeScene->instantiate("Bistro Interior Wine");
-  // bistroIntWine->addComponent(resourceMan.loadModel(Path("models/BistroInterior_Wine.fbx")));
-  // end = high_resolution_clock::now();
-  // 
-  // time = end - start;
-  // elapsed = time.count();
-  // log.print(to_string(elapsed) + " Seconds.");
+  // SPtr<Actor> bistroInt = activeScene->instantiate("Interior");
+  // bistroInt->addComponent(resourceMan.loadModel(Path("models/bistro_interior_wine.pkm")));
+  // bistroInt->setRotation(-90.0f, 0.0f, 0.0f);
+  // timeMan.endTimer();
+  // float time = timeMan.getTimerElapsed();
+  // log.print(to_string(time) + " Seconds");
 
   m_IBR = true;
   m_vSync = false;

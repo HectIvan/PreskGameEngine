@@ -17,16 +17,23 @@ TimeManager::getDeltaTime(high_resolution_clock::time_point& _delta)
 }
 
 high_resolution_clock::time_point
-TimeManager::now()
+TimeManager::startTimer()
 {
-  return high_resolution_clock::now();
+  m_start = high_resolution_clock::now();
+  return m_start;
+}
+
+high_resolution_clock::time_point
+TimeManager::endTimer()
+{
+  m_end = high_resolution_clock::now();
+  return m_end;
 }
 
 float
-TimeManager::getElapsed(const high_resolution_clock::time_point _start,
-                        const high_resolution_clock::time_point _end)
+TimeManager::getTimerElapsed()
 {
-  duration<float> time = _end - _start;
+  duration<float> time = m_end - m_start;
   float elapsed = time.count();
   return elapsed;
 }

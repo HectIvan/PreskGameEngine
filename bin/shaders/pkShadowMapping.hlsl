@@ -223,6 +223,27 @@ float magnitude(float3 v)
   return sqrt((v.x * v.x) + (v.y * v.y) * (v.z * v.z));
 }
 
+float OrenNayarDiffuse(float3 N, float3 L, float3 V, float NoL, float NoV, float roughness)
+{
+  float thetaR = acos(NoV);
+  float thetaI = acos(NoL);
+  
+  float3 NVNoV = normalize(N - V * NoV);
+  float3 NLNoL = normalize(N - L * NoL);
+  
+  float cosPhiDiff = saturate(dot(NVNoV, NLNoL));
+  
+  float alpha = max(thetaI, thetaR);
+  float beta = min(thetaI, thetaR);
+  
+  float r2 = roughness * roughness;
+  
+  float A = 1.0f - 0.5f * r2 / (r2 + 0.33f);
+  float B = 0.45f * r2 / (r2 + 0.09f);
+
+  return saturate(NoL * (A + B * sin(alpha) * tan(beta)));
+}
+
 PS_OUTPUT PS(PS_INPUT input) : SV_Target0
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
@@ -253,21 +274,26 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
     alpha = 0.0f;
   }
   
+  // specular light
+  float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 normal = normalize(normalTex.xyz);
   
   // diffuse light
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
-  float dotOfLight = dot(lightDir, normal);
+  float NoL = saturate(dot(normal, lightDir));
+  float NoV = saturate(dot(normal, viewDir));
+  
+  float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, NoL, NoV, roughVal);
+  
+  float dotOfLight = orenNaya; // dot(lightDir, normal);
   float lamb = max(dotOfLight, shadowColor);
   lamb = lerp(lamb, shadowColor, 1.0f - lamb);
   float3 lambert = lightColor * lamb;
   
   lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   
-  // specular light
-  float3 viewDir = normalize(Eye.xyz - worldPos);
   
   float3 F0 = float3(0.04f.xxx);
   F0 = lerp(F0, colorTex.rgb, metallicVal.xxx);
@@ -305,13 +331,13 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   /**
    * Works, but its not correct
    */
-  float3 worldToLight = normalize(worldPos - lightPos);
-  float angle = dot(-lightDir, worldToLight);
-  if (angle < SpotCutoff)
-  {
-    output.shdwSpec = float4(shadowColor, 0.0f, 0.0f, 1.0f);
-    return output;
-  }
+  // float3 worldToLight = normalize(worldPos - lightPos);
+  // float angle = dot(-lightDir, worldToLight);
+  // if (angle < SpotCutoff)
+  // {
+  //   output.shdwSpec = float4(shadowColor, 0.0f, 0.0f, 1.0f);
+  //   return output;
+  // }
   
   return output;
 }

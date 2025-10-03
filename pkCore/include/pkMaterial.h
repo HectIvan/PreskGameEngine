@@ -53,7 +53,7 @@ class Material : public Component
   /**
    * @brief Default material constructor.
    */
-  Material();
+  Material(const String name = "newMaterial");
 
   /**
    * @brief Default material destructor.

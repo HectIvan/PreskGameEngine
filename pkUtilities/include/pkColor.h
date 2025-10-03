@@ -148,5 +148,13 @@ struct PK_UTILITY_EXPORT Color final
       uint8 A;
     };
   }_color;
+
+  static const Color WHITE;
+  static const Color BLACK;
+  static const Color RED;
+  static const Color BLUE;
+  static const Color YELLOW;
+  static const Color GREEN;
+  static const Color MAGENTA;
 };
 }

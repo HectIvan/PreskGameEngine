@@ -55,6 +55,7 @@ bool
 Model::loadPK(const Path& _path)
 {
   Logger& log = g_Logger();
+  GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
   // to do: change where this is done. (pkAssetResourceManager)
   ifstream file;
   file.open(_path.getPath(), ios::in | ios::binary);
@@ -112,7 +113,7 @@ Model::loadPK(const Path& _path)
     memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
 
     // to do: make a default material
-    mesh->material = make_shared<Material>();
+    mesh->material = GPUResourceMan.m_defaultMaterial;
 
     meshes[i] = mesh;
 
@@ -196,9 +197,9 @@ SPtr<Mesh>
 processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  GPUResourceManager& rm = g_GPUResourceManager().instance();
-  TextureManager& tm = g_TextureManager().instance();
-  Logger& log = g_Logger().instance();
+  GPUResourceManager& rm = g_GPUResourceManager();
+  TextureManager& tm = g_TextureManager();
+  Logger& log = g_Logger();
 
   // check if the mesh is already in storage
   String meshName(_mesh->mName.C_Str());
@@ -265,13 +266,13 @@ processMesh(aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
   // for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
   //   mesh->mBones[i].
   // }
+  meshProcess->material = rm.m_defaultMaterial;
   if (_mesh->mMaterialIndex >= 0) {
+    // material data
     aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
-    meshProcess->material = make_shared<Material>();
-    String meshName = _mesh->mName.C_Str();
-
     String matName = materialA->GetName().C_Str();
-    meshProcess->material->setName(matName);
+    meshProcess->material = rm.newMaterial(matName);
+    // material 
     Path filePath;
     // if no diffuse texture is found.
     uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);

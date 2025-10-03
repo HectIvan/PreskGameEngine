@@ -159,18 +159,21 @@ ShaderTest::onInit()
   // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
-  // log.print("Loading bistro interior / exterior.");
-  // timeMan.startTimer();
-  // SPtr<Actor> bistro = activeScene->instantiate("Exterior");
-  // bistro->addComponent(resourceMan.loadModel(Path("models/bistro_exterior.pkm")));
-  // bistro->setRotation(-90.0f, 0.0f, 0.0f);
-  // 
-  // SPtr<Actor> bistroInt = activeScene->instantiate("Interior");
-  // bistroInt->addComponent(resourceMan.loadModel(Path("models/bistro_interior_wine.pkm")));
-  // bistroInt->setRotation(-90.0f, 0.0f, 0.0f);
-  // timeMan.endTimer();
-  // float time = timeMan.getTimerElapsed();
-  // log.print(to_string(time) + " Seconds");
+  log.print("Loading Exterior.");
+  timeMan.startTimer();
+  SPtr<Actor> bistroInt = activeScene->instantiate("Exterior");
+  bistroInt->addComponent(resourceMan.loadModel(Path("models/bistro_exterior.pkm")));
+  timeMan.endTimer();
+  float time = timeMan.getTimerElapsed();
+  log.print(to_string(time) + " Seconds");
+
+  log.print("Loading Interior.");
+  timeMan.startTimer();
+  SPtr<Actor> bistroExt = activeScene->instantiate("Interior");
+  bistroExt->addComponent(resourceMan.loadModel(Path("models/bistro_interior_wine.pkm")));
+  timeMan.endTimer();
+  time = timeMan.getTimerElapsed();
+  log.print(to_string(time) + " Seconds");
 
   m_IBR = true;
   m_vSync = false;

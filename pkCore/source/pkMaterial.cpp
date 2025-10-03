@@ -4,10 +4,10 @@
 
 namespace pkEngineSDK
 {
-Material::Material()
+Material::Material(const String _name)
 {
   TextureManager& tm = g_TextureManager();
-  m_name = "";
+  m_name = _name;
   m_castShadow = true;
   m_receiveShadows = true;
   m_properties = MaterialProps();

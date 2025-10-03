@@ -60,6 +60,7 @@ BaseApp::init(const char** _argv, int32 _count)
   g_SceneManager().init();
   g_RenderManager().init();
   g_TextureManager().loadDefaultMatTextures();
+  g_GPUResourceManager().init();
 
   onInit();
 }
@@ -290,7 +291,7 @@ BaseApp::render()
   renderManager.renderActors(actors);
   basePass->endPass();
 
-  api.clearRenderTargetViews(Color(1, 1, 1, 1), shadowQuad->getOutputTextures());
+  api.clearRenderTargetViews(Color::WHITE, shadowQuad->getOutputTextures());
   // get texel size of compute passes
   //        Vector2 texSize = api.getSwapChain()->getSize();
   //        uint32 threadWidth = 16;
@@ -303,7 +304,7 @@ BaseApp::render()
   shadowQuad->endPass();
 
   // ssao pass
-  api.clearRenderTargetViews(Color(1, 1, 1, 1), ssaoPass->getOutputTextures());
+  api.clearRenderTargetViews(Color::WHITE, ssaoPass->getOutputTextures());
   if (m_ssao) {
     ssaoPass->beginPass();
     api.draw(3, 0);
@@ -315,7 +316,7 @@ BaseApp::render()
   api.draw(3, 0);
   skyBoxPass->endPass();
   // IBR Pass.
-  api.clearRenderTargetViews(Color(0.0f, 0.0f, 0.0f), IBRPass->getOutputTextures());
+  api.clearRenderTargetViews(Color::BLACK, IBRPass->getOutputTextures());
   if (m_IBR) {
     IBRPass->beginPass();
     api.draw(3, 0);

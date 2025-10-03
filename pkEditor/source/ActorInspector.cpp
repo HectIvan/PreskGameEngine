@@ -11,10 +11,11 @@
 **/
 /*********************************************/
 #include "pkCamera.h"
+#include "pkGPUResourceManager.h"
 #include "pkLight.h"
+#include "pkLogger.h"
 #include "pkMaterial.h"
 #include "pkModel.h"
-#include "pkLogger.h"
 #include "pkPath.h"
 #include "pkPlatformMath.h"
 #include "pkPrerequisitesCore.h"
@@ -31,6 +32,8 @@ using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
 using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
+using pkEngineSDK::GPUResourceManager;
+using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
@@ -62,8 +65,8 @@ ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 void
 buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window& _window)
 {
-  TextureManager& tm = g_TextureManager().instance();
-  UInterface& im = g_uInterface().instance();
+  TextureManager& tm = g_TextureManager();
+  UInterface& im = g_uInterface();
   // create the buttons
   if (im.createButtonImage(_name.c_str(), _pTexture)) {
     // opened window to set diffuse texture
@@ -83,7 +86,7 @@ void
 ActorInspector::Inspect()
 {
   // get the user interface manager
-  UInterface& im = g_uInterface().instance();
+  UInterface& im = g_uInterface();
   // change the position
   Vector3 newTranslation = m_actor->m_position;
   im.createText("Position");
@@ -114,8 +117,9 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 {
   Vector2 texSize = Vector2(_imgTexSize, _imgTexSize);
   // get the user interface manager
-  UInterface& im = g_uInterface().instance();
-  TextureManager& tm = g_TextureManager().instance();
+  UInterface& im = g_uInterface();
+  TextureManager& tm = g_TextureManager();
+  GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   switch (_pComponent->getType()) 
@@ -208,19 +212,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
         // if there is no search filter
         if (name.find(_searchMesh.c_str()) != String::npos) {
           if (im.collapsingHeader(name.c_str())) {
-            SPtr<Material> material = mesh->material;
-            im.pushID(i);
-            im.createCheckBox("Active ", mesh->getActive());
-            // get material
-            SPtr<Material> meshMat = mesh->material;
-            // get the textures
-            SPtr<Texture> diffuse = meshMat->m_diffuse;
-            SPtr<Texture> normal = meshMat->m_normal;
-            SPtr<Texture> occlusion = meshMat->m_occlusion;
-            SPtr<Texture> rough = meshMat->m_roughness;
-            SPtr<Texture> metallic = meshMat->m_metallic;
-            SPtr<Texture> emissive = meshMat->m_emissive;
 
+            // Mesh geometry data
             im.createText("Vertex Count: ");
             im.sameLine();
             String vertexCount = to_string(mesh->vertexVector.size());
@@ -229,95 +222,120 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             im.sameLine();
             String indexCount = to_string(mesh->indexVector.size());
             im.createText(indexCount.c_str());
+            // Mesh material data
+            SPtr<Material> material = mesh->material;
+            if (material->getName() != GPUResourceMan.m_defaultMaterial->getName()) {
+              im.pushID(i);
+              im.createCheckBox("Active ", mesh->getActive());
+              im.createText("Material Name: ");
+              im.sameLine();
+              im.createInputText("##MaterialName: ", &material->m_name);
+              // get material
+              SPtr<Material> meshMat = mesh->material;
+              String matName = meshMat->getNameS();
+              // get the textures
+              SPtr<Texture> diffuse = meshMat->m_diffuse;
+              SPtr<Texture> normal = meshMat->m_normal;
+              SPtr<Texture> occlusion = meshMat->m_occlusion;
+              SPtr<Texture> rough = meshMat->m_roughness;
+              SPtr<Texture> metallic = meshMat->m_metallic;
+              SPtr<Texture> emissive = meshMat->m_emissive;
 
-            // get the names of the texture and material
-            String matName = meshMat->getNameS();
-            String difName = diffuse->getName().toString() + matName + "diff";
-            String norName = normal->getName().toString() + matName + "norm";
-            String occName = occlusion->getName().toString() + matName + "occ";
-            String roughName = rough->getName().toString() + matName + "rough";
-            String metName = metallic->getName().toString() + matName + "metal";
-            String emissName = emissive->getName().toString() + matName + "Emiss";
+              // get the names of the texture and material
+              String difName = diffuse->getNameS() + "diff";
+              String norName = normal->getNameS() + "norm";
+              String occName = occlusion->getNameS() + "ao";
+              String roughName = rough->getNameS() + "rough";
+              String metName = metallic->getNameS() + "metal";
+              String emissName = emissive->getNameS() + "emissive";
 
-            // create the buttons
-            if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
-              // opened window to set diffuse texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setDiffuse(texture);
+              // create the buttons
+              if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
+                // opened window to set diffuse texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setDiffuse(texture);
+                }
               }
-            }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Diffuse Texture");
-            }
-            im.sameLine();
-            if (im.createButtonImage(norName.c_str(), normal, texSize)) {
-              // opened window to set normal texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setNormal(texture);
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Diffuse Texture");
               }
-            }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Normal Texture");
-            }
-            im.sameLine();
-            if (im.createButtonImage(occName.c_str(), occlusion, texSize)) {
-              // opened window to set occlusion texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setOcclusion(texture);
+              im.sameLine();
+              if (im.createButtonImage(norName.c_str(), normal, texSize)) {
+                // opened window to set normal texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setNormal(texture);
+                }
               }
-            }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Ambient Occlusion Texture");
-            }
-            im.sameLine();
-            if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
-              // opened window to set rough texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setRoughness(texture);
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Normal Texture");
               }
-            }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Roughness Texture");
-            }
-            im.sameLine();
-            if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
-              // opened window to set metallic texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setMetallic(texture);
+              im.sameLine();
+              if (im.createButtonImage(occName.c_str(), occlusion, texSize)) {
+                // opened window to set occlusion texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setOcclusion(texture);
+                }
               }
-            }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Metallic Texture");
-            }
-            im.sameLine();
-            if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
-              // opened window to set metallic texture
-              Path path(_window.openFileFromExplorer());
-              if (path.toString() != "") {
-                SPtr<Texture> texture = tm.loadTexture(path);
-                meshMat->setEmissive(texture);
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Ambient Occlusion Texture");
               }
+              im.sameLine();
+              if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
+                // opened window to set rough texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setRoughness(texture);
+                }
+              }
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Roughness Texture");
+              }
+              im.sameLine();
+              if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
+                // opened window to set metallic texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setMetallic(texture);
+                }
+              }
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Metallic Texture");
+              }
+              im.sameLine();
+              if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
+                // opened window to set metallic texture
+                Path path(_window.openFileFromExplorer());
+                if (path.toString() != "") {
+                  SPtr<Texture> texture = tm.loadTexture(path);
+                  meshMat->setEmissive(texture);
+                }
+              }
+              // hover tooltip.
+              if (im.isItemHovered()) {
+                im.setTooltip("Emissive Texture");
+              }
+              im.popID();
             }
-            // hover tooltip.
-            if (im.isItemHovered()) {
-              im.setTooltip("Emissive Texture");
+            else {
+              im.pushID(i);
+              if (im.createButton("<Create new material>")) {
+                mesh->material = GPUResourceMan.newMaterial();
+              }
+              im.popID();
             }
-            im.popID();
           }
         }
       }

@@ -313,6 +313,20 @@ class PK_CORE_EXPORT Texture
   getName() { return m_name; }
 
   /**
+   * @brief Get the texture name as a string.
+   * @return Name of the texture;
+   */
+  String
+  getNameS() { return m_name.toString(); }
+
+  /**
+   * @brief Get the texture name as a const char*.
+   * @return Name of the texture;
+   */
+  const char*
+  getNameCSTR() { return m_name.toString().c_str(); }
+
+  /**
    * @brief Get the raw texture data.
    * @return The raw texture data.
    */

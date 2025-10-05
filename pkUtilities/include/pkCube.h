@@ -29,7 +29,7 @@ class PK_UTILITY_EXPORT Cube
 {
  public:
   Cube() = default;
-  FORCEINLINE Cube(Vector3 _origin, float _size) : m_origin(_origin), m_size(_size) {};
+  PKFORCEINLINE Cube(Vector3 _origin, float _size) : m_origin(_origin), m_size(_size) {};
   ~Cube() = default;
 
   Vector3 m_origin;

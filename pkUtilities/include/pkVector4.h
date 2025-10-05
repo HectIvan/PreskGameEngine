@@ -32,9 +32,9 @@ class PK_UTILITY_EXPORT Vector4
 {
  public:
   Vector4() = default;
-  FORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
-  FORCEINLINE Vector4(Vector3 _vec, float _w);
-  FORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
+  PKFORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
+  PKFORCEINLINE Vector4(Vector3 _vec, float _w);
+  PKFORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
   ~Vector4() = default;
 
   /**
@@ -48,7 +48,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * This vector with the multiplication done.
   **/
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator*=(const Vector4& other)
   {
     x *= other.x;
@@ -69,7 +69,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * This vector with the multiplication done.
   **/
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator*=(const float other)
   {
     x *= other;
@@ -90,7 +90,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A vector with the multiplication done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator*(const Vector4& other) const
   {
     return Vector4(x * other.x, y * other.y, z * other.z, w * other.w);
@@ -107,7 +107,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A vector with the multiplication done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator*(const float& other) const
   {
     return Vector4(x * other, y * other, z * other, w * other);
@@ -118,7 +118,7 @@ class PK_UTILITY_EXPORT Vector4
    * @param other Vector with which the addition will be made.
    * @return A vector with the addition done.
    */
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator+=(const Vector3& other)
   {
     x += other.x;
@@ -138,7 +138,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * This vector with the addition done.
   **/
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator+=(const Vector4& other)
   {
     x += other.x;
@@ -159,7 +159,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A vector with the addition done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator+(const Vector4& other) const
   {
     return Vector4(x + other.x, y + other.y, z + other.z, w + other.w);
@@ -170,7 +170,7 @@ class PK_UTILITY_EXPORT Vector4
   * @param other Vector with which the addition will be made.
   * @return A vector with the addition done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator+(const Vector3& other) const
   {
     return Vector4(x + other.x, y + other.y, z + other.z, w);
@@ -187,7 +187,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * This vector with the substraction done.
   **/
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator-=(const Vector4& other)
   {
     x -= other.x;
@@ -208,7 +208,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * This vector with the substraction done.
   **/
-  FORCEINLINE Vector4&
+  PKFORCEINLINE Vector4&
   operator-=(const float& other)
   {
     x -= other;
@@ -229,7 +229,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A vector with the substraction done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator-(const Vector4& other) const
   {
     return Vector4(x - other.x, y - other.y, z - other.z, w - other.w);
@@ -246,7 +246,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A vector with the substraction done.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator-(const float& other) const
   {
     return Vector4(x - other, y - other, z - other, w - other);
@@ -263,7 +263,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if they are the same.
   **/
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   operator==(const Vector4& other) const
   {
     return (x != other.x ||
@@ -283,7 +283,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A boolean determining if any discrepancies were found.
   **/
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   operator!=(const Vector4& other) const
   {
     return !operator==(other);
@@ -304,7 +304,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The final result of the cross product as a Vector.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator^(const Vector4& other)
   {
     return vector3Cross(other);
@@ -318,7 +318,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * A Vector with all of its parts negated.
   **/
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator-() const
   {
     return Vector4(-x, -y, -z, -w);
@@ -377,7 +377,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The final result of the square operation.
   **/
-  FORCEINLINE float
+  PKFORCEINLINE float
   magnitudeSquare() const;
 
   /**
@@ -389,7 +389,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * The magnitude of the vector.
   **/
-  FORCEINLINE float
+  PKFORCEINLINE float
   magnitude() const;
 
   /**
@@ -419,7 +419,7 @@ class PK_UTILITY_EXPORT Vector4
   * @return
   * the distance between the 2 vectors
   **/
-  FORCEINLINE float
+  PKFORCEINLINE float
   distanceTo(const Vector4& _other) const;
 
   /**
@@ -434,7 +434,7 @@ class PK_UTILITY_EXPORT Vector4
   * Maximum clamp range.
   *
   **/
-  FORCEINLINE void
+  PKFORCEINLINE void
   clamp(float _x, float _y);
 
   /**

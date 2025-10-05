@@ -30,7 +30,7 @@ class PK_UTILITY_EXPORT Sphere
 {
  public:
   Sphere() = default;
-  FORCEINLINE Sphere(Vector3& _origin, float _radius) : m_origin(_origin), m_radius(_radius) {};
+  PKFORCEINLINE Sphere(Vector3& _origin, float _radius) : m_origin(_origin), m_radius(_radius) {};
   ~Sphere() = default;
 
   Vector3 m_origin;

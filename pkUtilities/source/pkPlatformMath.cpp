@@ -274,7 +274,6 @@ PlatformMath::intersectSpherePoint(Sphere& _sphere,
 bool
 PlatformMath::intersectCapsuleCapsule(Capsule& _capsule, const Capsule& _other)
 {
-  _capsule = _capsule;
   _capsule = _other;
   return false;
 }
@@ -423,10 +422,11 @@ PlatformMath::sign3(Vector3& _direction)
   return Vector3(sign(_direction.x), sign(_direction.y), sign(_direction.z));
 }
 
-Vector3 PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
+Vector3
+PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
 {
   Vector3 dir = _dir.normalized();
-  Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
+  // Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
   Vector3 dirSigns = sign3(dir);
   return _box.m_transform * (_box.m_halfSize * dirSigns);
 }

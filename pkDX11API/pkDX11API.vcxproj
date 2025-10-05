@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\DDSTextureLoader.cpp" />
     <ClCompile Include="source\pkDX11ConstantBuffer.cpp" />
     <ClCompile Include="source\pkDX11DepthStencilView.cpp" />
     <ClCompile Include="source\pkDX11Device.cpp" />

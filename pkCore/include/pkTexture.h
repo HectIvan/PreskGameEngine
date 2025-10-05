@@ -288,7 +288,7 @@ class PK_CORE_EXPORT Texture
    * @brief Get texture type.
    * @return Type as an uint32.
    */
-  const uint32&
+  uint32
   getType() const { return m_type; }
 
   /**
@@ -324,7 +324,10 @@ class PK_CORE_EXPORT Texture
    * @return Name of the texture;
    */
   const char*
-  getNameCSTR() { return m_name.toString().c_str(); }
+  getNameCSTR() {
+    const char* name = m_name.toString().c_str();
+    return name;
+  }
 
   /**
    * @brief Get the raw texture data.
@@ -342,7 +345,7 @@ class PK_CORE_EXPORT Texture
   copyFrom(SPtr<Texture>& _pTexture) { return false; };
 
  private:
-  uint32 m_id;
+  // uint32 m_id;
   TEXTURE_TYPE::E m_type;
   Path m_name;
   uint32 m_width;

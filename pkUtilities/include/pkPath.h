@@ -47,11 +47,10 @@ class PK_UTILITY_EXPORT Path
     return m_path;
   }
 
-  FORCEINLINE WString
+  WString
   getPathWStr()
   {
-    WString_Conv<Codecvt_utf8<WCHAR>> converter;
-    WString str = converter.from_bytes(m_path.c_str());
+    WString str = stringToWString(m_path);
     return str;
   }
 
@@ -125,9 +124,9 @@ class PK_UTILITY_EXPORT Path
     if (lastSlash == String::npos) {
       return L""; // no directory
     }
-    WString_Conv<Codecvt_utf8<WCHAR>> converter;
+    // WString_Conv<Codecvt_utf8<WCHAR>> converter;
     String path = m_path.substr(0, lastSlash);
-    WString str = converter.from_bytes(path);
+    WString str = stringToWString(path); // converter.from_bytes(path);
     return str;
 
     /**

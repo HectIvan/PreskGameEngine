@@ -91,20 +91,20 @@
 
 #if PK_COMPILER == PK_COMPILER_MSVC
 # if PK_COMP_VER >= 1200
-#   define FORCEINLINE __forceinline
+#   define PKFORCEINLINE __forceinline
 #   ifndef RESTRICT
 #     define RESTRICT __restrict
 #   endif
 # endif
 #elif defined(__MINGW32__)
-# if !defined(FORCEINLINE)
-#   define FORCEINLINE __inline
+# if !defined(PKFORCEINLINE)
+#   define PKFORCEINLINE __inline
 #   ifndef RESTRICT
 #     define RESTRICT
 #   endif
 # endif
 #else
-# define FORCEINLINE __inline
+# define PKFORCEINLINE __inline
 # ifndef RESTRICT
 #   define RESTRICT __restrict
 # endif

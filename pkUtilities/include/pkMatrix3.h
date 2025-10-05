@@ -32,7 +32,7 @@ class PK_UTILITY_EXPORT Matrix3
           float m10, float m11, float m12,
           float m20, float m21, float m22);
 
-  FORCEINLINE Matrix3&
+  PKFORCEINLINE Matrix3&
   operator=(const Matrix3& other)
   {
     for (int i = 0; i < 3; ++i)
@@ -45,7 +45,7 @@ class PK_UTILITY_EXPORT Matrix3
     return *this;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator+(const Matrix3& other) const
   {
     Matrix3 result;
@@ -59,7 +59,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator+(const float& other) const
   {
     Matrix3 result;
@@ -73,7 +73,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator+=(const Matrix3& other)
   {
     for (int i = 0; i < 3; ++i)
@@ -86,7 +86,7 @@ class PK_UTILITY_EXPORT Matrix3
     return *this;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator-(const float& other)
   {
     Matrix3 result;
@@ -100,7 +100,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator-(float& other)
   {
     Matrix3 result;
@@ -114,7 +114,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator-(Matrix3& other)
   {
     Matrix3 result;
@@ -128,7 +128,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator*(const float& other) const
   {
     Matrix3 result;
@@ -142,7 +142,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  Vector3
+  PKFORCEINLINE Vector3
   operator*(const Vector3& other)
   {
     float x00 = matrix[0][0] * other.x;
@@ -162,7 +162,7 @@ class PK_UTILITY_EXPORT Matrix3
                    x20 + y21 + z22);
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator*(const float& other)
   {
     Matrix3 result;
@@ -176,7 +176,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Matrix3
+  PKFORCEINLINE Matrix3
   operator*(float& other)
   {
     Matrix3 result;
@@ -190,7 +190,7 @@ class PK_UTILITY_EXPORT Matrix3
     return result;
   }
 
-  FORCEINLINE Vector4
+  PKFORCEINLINE Vector4
   operator*(const Vector4& other)
   {
     matrix[0][0] *= other.x;

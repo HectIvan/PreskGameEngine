@@ -210,7 +210,7 @@ RendererManager::createPasses()
                    ormTex,
                    getGBuffer(G_BUFFERS::kGB_PositionsLight) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
-  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
+  pDesc.pDepth = {};// getDepthBuffer(D_BUFFERS::kDB_Base);
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_ShadowQuad, shadowQuadPass });

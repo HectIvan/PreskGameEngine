@@ -200,11 +200,20 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
       // model section
       SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
       Vector<SPtr<Mesh>> meshes = model->getMeshes();
-      im.sameLine();
+      // display total model vertex count.
+      uint32 modelDataCount = static_cast<uint32>(model->vertex.size());
+      String countModel = "Vertex Count: " + to_string(modelDataCount);
+      im.createText(countModel.c_str());
+      // display total model index count.
+      modelDataCount = static_cast<uint32>(model->index.size());
+      countModel = "Index Count: " + to_string(modelDataCount);
+      im.createText(countModel.c_str());
+      
+      // search specific mesh
+      im.createText("Meshes: ");
       im.createText("Search: ");
       im.sameLine();
       im.createInputText("##Search", &_searchMesh);
-      im.createText("Meshes: ");
       for (uint32 i = 0; i < meshes.size(); ++i) {
         // get mesh
         SPtr<Mesh> mesh = meshes[i];
@@ -222,11 +231,11 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             im.sameLine();
             String indexCount = to_string(mesh->indexVector.size());
             im.createText(indexCount.c_str());
+            im.pushID(i);
+            im.createCheckBox("Active ", mesh->getActive());
             // Mesh material data
             SPtr<Material> material = mesh->material;
             if (material->getName() != GPUResourceMan.m_defaultMaterial->getName()) {
-              im.pushID(i);
-              im.createCheckBox("Active ", mesh->getActive());
               im.createText("Material Name: ");
               im.sameLine();
               im.createInputText("##MaterialName: ", &material->m_name);
@@ -327,7 +336,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Emissive Texture");
               }
-              im.popID();
             }
             else {
               im.pushID(i);
@@ -336,6 +344,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               }
               im.popID();
             }
+            im.popID();
           }
         }
       }

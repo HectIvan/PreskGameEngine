@@ -137,17 +137,18 @@ Pass::createCShader(const Path _directory, const char* _entry, const char* _sMod
 void
 Pass::compileShaders()
 {
+  GraphicsAPI& api = g_GraphicAPI();
   if (m_pVShader) {
     m_pVShader->compile();
-    g_GraphicAPI().createVShader(m_pVShader);
+    api.createVShader(m_pVShader);
   }
   if (m_pPShader) {
     m_pPShader->compile();
-    g_GraphicAPI().createPShader(m_pPShader);
+    api.createPShader(m_pPShader);
   }
   if (m_pCShader) {
     m_pCShader->compile();
-    g_GraphicAPI().createCShader(m_pCShader);
+    api.createCShader(m_pCShader);
   }
 }
 

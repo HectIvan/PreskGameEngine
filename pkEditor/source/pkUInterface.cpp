@@ -102,8 +102,8 @@ UInterface::endFrame()
 void
 UInterface::createSpace()
 {
-  ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  // ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+  // ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
 
@@ -113,11 +113,11 @@ UInterface::createSpace()
     // ImGui::dockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_None); // add empty node
     // ImGui::dockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-    ImGuiID main = dockspace_id;
-    ImGuiID left;
-    ImGuiID right;
-    ImGuiID bottom;
-    ImGuiID center;
+    // ImGuiID main = dockspace_id;
+    // ImGuiID left;
+    // ImGuiID right;
+    // ImGuiID bottom;
+    // ImGuiID center;
 
     // ImGui::dockBuilderSplitNode(main, ImGuiDir_Left, 0.2f, &left, &main);
     // ImGui::dockBuilderSplitNode(main, ImGuiDir_Right, 0.2f, &right, &main);
@@ -148,17 +148,17 @@ UInterface::createText(const char* _text)
   ImGui::Text(_text);
 }
 
-static int
-InputTextCallback(ImGuiInputTextCallbackData* data)
-{
-  if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-  {
-    auto str = static_cast<String*>(data->UserData);
-    str->resize(data->BufTextLen);
-    data->Buf = str->data();
-  }
-  return 0;
-}
+// static int32
+// InputTextCallback(ImGuiInputTextCallbackData* data)
+// {
+//   if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+//   {
+//     auto str = static_cast<String*>(data->UserData);
+//     str->resize(data->BufTextLen);
+//     data->Buf = str->data();
+//   }
+//   return 0;
+// }
 
 bool
 UInterface::createInputText(const char* _name, String* _param)

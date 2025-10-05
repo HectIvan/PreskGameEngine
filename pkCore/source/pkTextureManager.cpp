@@ -36,7 +36,6 @@ TextureManager::loadTexture(const Path& _directory)
     texture = api.createTextureFromFileF(_directory,
                                          PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS |
                                          PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
-                                         mipLevels,
                                          PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS);
     }
   else {

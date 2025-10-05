@@ -83,7 +83,7 @@ class PK_CORE_EXPORT InverseKinematics
    * @param _pActor The desired actor.
    * @param _index Position of the node
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setNode(SPtr<Actor> _pActor, uint32 _index) { m_nodes[_index] = _pActor; }
 
   /**
@@ -91,21 +91,21 @@ class PK_CORE_EXPORT InverseKinematics
    * @param _pActor The desired actor.
    * @param _index Position of the bone
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setBone(SPtr<Actor> _pActor, uint32 _index) { m_bones[_index]->actorIni = _pActor; }
 
   /**
    * @brief Get the last node of the list.
    * @return The last node.
    */
-  FORCEINLINE SPtr<Actor>
+  PKFORCEINLINE SPtr<Actor>
   getLastNode() { return m_nodes[m_nodes.size() - 1]; }
 
   /**
    * @brief Get the last bone of the list.
    * @return The last bone.
    */
-  FORCEINLINE SPtr<IKBone>
+  PKFORCEINLINE SPtr<IKBone>
   getLastBone() { return m_bones[m_bones.size() - 1]; }
 
   /**

@@ -38,7 +38,7 @@ class PK_UTILITY_EXPORT Matrix4
   // --------------------------------------------------------------//
   // Matrix4 = Matrix4
   // --------------------------------------------------------------//
-  FORCEINLINE Matrix4&
+  PKFORCEINLINE Matrix4&
   operator=(const Matrix4& other)
   {
     for (int i = 0; i < 4; ++i)
@@ -53,7 +53,7 @@ class PK_UTILITY_EXPORT Matrix4
   // --------------------------------------------------------------//
   // Matrix4 + Matrix4
   // --------------------------------------------------------------//
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator+(const Matrix4& other) const
   {
     Matrix4 result;
@@ -63,13 +63,13 @@ class PK_UTILITY_EXPORT Matrix4
       {
         result.matrix[i][j] = matrix[i][j] + other.matrix[i][j];
       }
-  	}
-  	return result;
+    }
+    return result;
   }
   // --------------------------------------------------------------//
   // Matrix4 + float
   // --------------------------------------------------------------//
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator+(const float& other) const
   {
     Matrix4 result;
@@ -86,7 +86,7 @@ class PK_UTILITY_EXPORT Matrix4
   // --------------------------------------------------------------//
   // Matrix4 += Matrix4
   // --------------------------------------------------------------//
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator+=(const Matrix4& other)
   {
     for (int i = 0; i < 4; ++i)
@@ -103,7 +103,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param other The float to use.
    * @return The subtracted matrix.
    */
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator-(const float& other)
   {
     Matrix4 result;
@@ -122,7 +122,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param other The float to use.
    * @return The subtracted matrix.
    */
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator-(float& other)
   {
     Matrix4 result;
@@ -141,7 +141,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param other The matrix to use.
    * @return The subtracted matrix.
    */
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator-(Matrix4& other)
   {
     Matrix4 result;
@@ -158,7 +158,7 @@ class PK_UTILITY_EXPORT Matrix4
   // --------------------------------------------------------------//
   // Matrix4 * float
   // --------------------------------------------------------------//
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator*(const float& other) const
   {
     Matrix4 result;
@@ -201,7 +201,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @brief Multiply the Matrix by a float.
    * @param other The float to use.
    */
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator*(const float& other)
   {
     Matrix4 result;
@@ -219,7 +219,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @brief Multiply the Matrix by a float.
    * @param other The float to use.
    */
-  FORCEINLINE Matrix4
+  PKFORCEINLINE Matrix4
   operator*(float& other)
   {
     Matrix4 result;
@@ -238,7 +238,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param other The vector to multiply
    * @return
    */
-  FORCEINLINE Vector4
+  PKFORCEINLINE Vector4
   operator*(const Vector4& other)
   {
     float x00 = matrix[0][0] * other.x;
@@ -581,7 +581,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param angle angle to rotate.
    * @return The rotation matrix at z with the rotation given to it.
    */
-  FORCEINLINE static Matrix4
+  PKFORCEINLINE static Matrix4
   rotationZ(float& _angle);
   
   /**

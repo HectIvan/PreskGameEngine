@@ -44,9 +44,10 @@ namespace pkEngineSDK
 {
 class ShaderInclude : public ID3DInclude
 {
-public:
-  HRESULT __stdcall Open(D3D_INCLUDE_TYPE, LPCSTR pFileName,
-                         LPCVOID, LPCVOID* ppData, UINT* pBytes) noexcept override {
+ public:
+  HRESULT __stdcall
+  Open(D3D_INCLUDE_TYPE, LPCSTR pFileName,
+       LPCVOID, LPCVOID* ppData, UINT* pBytes) noexcept override {
     String workingDirectory;
     workingDirectory.resize(MAX_PATH);
     GetCurrentDirectoryA(MAX_PATH, &workingDirectory[0]);
@@ -79,7 +80,7 @@ public:
   }
 };
 
-FORCEINLINE void
+PKFORCEINLINE void
 throwIfFailed(HRESULT hr) {
   if (FAILED(hr)) {
     PK_ASSERT(false && "Error in creation");
@@ -893,11 +894,14 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   // the shaders to be optimized and to run exactly the way they will run in 
   // the release configuration of this program.
   dwShaderFlags |= D3DCOMPILE_DEBUG;
+#else
+  dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION; // temporarily for Release
 #endif
   static ShaderInclude shaderInclude;
   ID3DBlob* pErrorBlob = nullptr;
   ID3DBlob* dxBlob = nullptr;
-  hr = D3DCompileFromFile(_szFileName.getPathWStr().c_str(),
+  WString widePath = _szFileName.getPathWStr(); // release issue
+  hr = D3DCompileFromFile(widePath.c_str(),
                           nullptr,
                           &shaderInclude,
                           _szEntryPoint,
@@ -906,10 +910,13 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                           0,
                           &dxBlob,
                           &pErrorBlob);
+
   if (FAILED(hr)) {
     if (pErrorBlob != nullptr) {
-      const String error = static_cast<char*>(pErrorBlob->GetBufferPointer());
-      const String msg = "Shader failed to compile. Error message:" + error;
+      const char* msg = static_cast<char*>(pErrorBlob->GetBufferPointer());
+      SIZE_T len = pErrorBlob->GetBufferSize();
+      const String error(msg, len);
+      const String fullMSG = "Shader failed to compile. Error message: " + error;
       log.print(msg);
       log.registerMessage(msg, LOG_MSG_TYPE::kError);
       pErrorBlob->Release();
@@ -1619,7 +1626,6 @@ SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
                                         uint32 _bindFlags,
                                         int32 _mipLevels,
-                                        int32 _miscFlags,
                                         PK_USAGE::E _usage)
 {
   Logger& log = g_Logger();
@@ -1753,6 +1759,7 @@ DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
       _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UINT) {
     return 1;
   }
+  return 0;
 }
 
 SPtr<Texture>
@@ -1879,7 +1886,7 @@ DX11GraphicsAPI::createTexture(uint32 _width,
     rtvDesc.Texture2D.MipSlice = 0;
     dxTex->m_rTVs.resize(_mipLevels);
 
-    for (uint32 i = 0; i < _mipLevels; ++i) {
+    for (int32 i = 0; i < _mipLevels; ++i) {
       rtvDesc.Texture2D.MipSlice = i;
       hr = device->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
                                                         &rtvDesc,
@@ -1903,7 +1910,7 @@ DX11GraphicsAPI::createTexture(uint32 _width,
     uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
     dxTex->m_uAVs.resize(_mipLevels);
 
-    for (uint32 i = 0; i < _mipLevels; ++i) {
+    for (int32 i = 0; i < _mipLevels; ++i) {
       uavDesc.Texture2D.MipSlice = i;
       hr = device->m_pd3dDevice->CreateUnorderedAccessView(dxTex->m_t2d, &uavDesc, &dxTex->m_uAVs[i]);
       if (FAILED(hr)) {

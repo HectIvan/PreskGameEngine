@@ -11,6 +11,7 @@
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
+#include <commdlg.h>
 #pragma comment(lib, "Comdlg32.lib")
 
 #define IDI_ICON1 "icon.png"
@@ -24,7 +25,7 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void
 Window::create(const PKWindowDesc& _desc)
 {
-  Logger& log = g_Logger().instance();
+  Logger& log = g_Logger();
   /************************************************************************************/
   WNDCLASSEXA wcex;
   m_hInstance = InstanceHandle();
@@ -94,7 +95,7 @@ Window::getClientWidthHeight() const
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  EventQueue& eventManager = g_eventManager().instance();
+  EventQueue& eventManager = g_eventManager();
   WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
   if (winEvent) {
     PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),
@@ -106,12 +107,13 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
   }
   PAINTSTRUCT ps;
-  HDC hdc;
   switch (message)
   {
   case WM_PAINT:
   {
-    hdc = BeginPaint(hWnd, &ps);
+    // HDC hdc;
+    // hdc = 
+    BeginPaint(hWnd, &ps);
     EndPaint(hWnd, &ps);
     break;
   }
@@ -138,8 +140,6 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   return 0;
 }
 }
-
-#endif // PK_PLATFORM_WIN32
 
 // #if PK_PLATFORM == PK_PLATFORM_OSX
 // for a future file specific to IOS
@@ -214,3 +214,4 @@ Window::openFileFromExplorer() const
   return String("");
 }
 }
+#endif

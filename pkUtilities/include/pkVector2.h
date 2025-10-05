@@ -23,9 +23,9 @@ class PK_UTILITY_EXPORT Vector2
 {
  public:
   Vector2() = default;
-  FORCEINLINE explicit Vector2(float _val) : x(_val), y(_val) {};
-  FORCEINLINE Vector2(float _x, float _y) : x(_x), y(_y) {};
-  FORCEINLINE Vector2(uint32 _x, uint32 _y) : 
+  PKFORCEINLINE explicit Vector2(float _val) : x(_val), y(_val) {};
+  PKFORCEINLINE Vector2(float _x, float _y) : x(_x), y(_y) {};
+  PKFORCEINLINE Vector2(uint32 _x, uint32 _y) : 
     x(static_cast<float>(_x)),
     y(static_cast<float>(_y))
   {};
@@ -36,7 +36,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the multiplication will be made.
    * @return This vector with the multiplication done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator*=(const Vector2& other)
   {
     x *= other.x;
@@ -49,7 +49,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Float with which the multiplication will be made.
    * @return This vector with the multiplication done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator*=(const float other)
   {
     x *= other;
@@ -62,7 +62,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the multiplication will be made.
    * @return A vector with the multiplication done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator*(const Vector2& other) const
   {
     return Vector2(x * other.x, y * other.y);
@@ -73,7 +73,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Float with which the multiplication will be made.
    * @return A vector with the multiplication done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator*(const float& other) const
   {
     return Vector2(x * other, y * other);
@@ -84,7 +84,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the division will be made.
    * @return This vector with the division done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator/=(const Vector2& other)
   {
     x /= other.x;
@@ -97,7 +97,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other float with which the division will be made.
    * @return This vector with the division done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator/=(const float& other)
   {
     x /= other;
@@ -110,7 +110,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the division will be made.
    * @return A vector with the division done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator/(const Vector2& other) const
   {
     return Vector2(x / other.x, y / other.y);
@@ -121,7 +121,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Float with which the division will be made.
    * @return A vector with the division done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator/(const float& other) const
   {
     return Vector2(x / other, y / other);
@@ -132,7 +132,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the addition will be made.
    * @return This Vector with the addition done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator+=(const Vector2& other)
   {
     x += other.x;
@@ -145,7 +145,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Float with which the addition will be made.
    * @return This Vector with the addition done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator+=(const float& other)
   {
     x += other;
@@ -158,7 +158,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the addition will be made.
    * @return A vector with the addition done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator+(const Vector2& other) const
   {
     return Vector2(x + other.x, y + other.y);
@@ -169,7 +169,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other float with which the addition will be made.
    * @return A vector with the addition done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator+(const float& other) const
   {
     return Vector2(x + other, y + other);
@@ -180,7 +180,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other vector with which the substraction will be made.
    * @return This vector with the substraction done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator-=(const Vector2& other)
   {
     x -= other.x;
@@ -193,7 +193,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other float with which the substraction will be made.
    * @return This vector with the substraction done.
    */
-  FORCEINLINE Vector2&
+  PKFORCEINLINE Vector2&
   operator-=(const float& other)
   {
     x -= other;
@@ -206,7 +206,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other vector with which the substraction will be made.
    * @return A vector with the substraction done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator-(const Vector2& other) const
   {
     return Vector2(x - other.x, y - other.y);
@@ -217,7 +217,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other float with which the substraction will be made.
    * @return A vector with the substraction done.
    */
-  FORCEINLINE const Vector2
+  PKFORCEINLINE const Vector2
   operator-(const float& other) const
   {
     return Vector2(x - other, y - other);
@@ -228,7 +228,7 @@ class PK_UTILITY_EXPORT Vector2
    * @param other Vector with which the comparison will be made.
    * @return A boolean determining if they are the same.
    */
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   operator==(const Vector2& other) const
   {
     return (x != other.x ||

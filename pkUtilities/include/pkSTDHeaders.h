@@ -19,6 +19,15 @@
 #include <vector>
 #include <fstream>
 
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#include <Windows.h>
+#endif
+
 namespace pkEngineSDK
 {
 
@@ -35,11 +44,11 @@ using std::ifstream;
 
 using std::ios;
 
-template <class T>
-using WString_Conv = std::wstring_convert<T>;
-
-template <class T>
-using Codecvt_utf8 = std::codecvt_utf8<T>;  
+// template <class T>
+// using WString_Conv = std::wstring_convert<T>;
+// 
+// template <class T>
+// using Codecvt_utf8 = std::codecvt_utf8<T>;
 
 template <class T>
 using Queue = std::queue<T>;
@@ -57,6 +66,32 @@ using String = std::string;
 
 // to do: change for linux too
 using WString = std::wstring;
+
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+
+PKFORCEINLINE WString
+stringToWString(const String& str)
+{
+  if (str.empty()) {
+    return WString();
+  }
+
+  int32_t size_needed = MultiByteToWideChar(CP_UTF8,
+                                            0,
+                                            str.c_str(),
+                                            static_cast<int32_t>(str.size()),
+                                            nullptr,
+                                            0);
+  WString wstr(size_needed, 0);
+  MultiByteToWideChar(CP_UTF8,
+                      0, str.c_str(),
+                      static_cast<int32_t>(str.size()),
+                      &wstr[0],
+                      size_needed);
+  return wstr;
+}
+
+#endif
 
 template<class _Kty, class _Ty>
 using UMap = std::unordered_map<_Kty, _Ty>;

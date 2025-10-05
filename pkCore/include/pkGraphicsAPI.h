@@ -322,7 +322,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   createTextureFromFileF(const Path& _directory,
                          uint32 _bindFlags,
                          int32 _mipLevels = 1,
-                         int32 _miscFlags = 0,
                          PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) = 0;
 
   /**

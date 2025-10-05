@@ -38,7 +38,7 @@ struct SimpleVertex
                tangent(_tan),
                bitangent(_bitan) {};
 
-  FORCEINLINE void
+  PKFORCEINLINE void
   operator*=(const Matrix4 _transform)
   {
     pos = (Vector4(pos, 1.0f) * _transform).xyz();

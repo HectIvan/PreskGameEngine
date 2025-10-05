@@ -25,7 +25,7 @@ class PK_UTILITY_EXPORT CollisionInfo
 {
  public:
   CollisionInfo() = default;
-  FORCEINLINE CollisionInfo(Vector3 _normalHit, float _penDist) :
+  PKFORCEINLINE CollisionInfo(Vector3 _normalHit, float _penDist) :
     m_normalHit(_normalHit),
     m_penDistance(_penDist) {};
   virtual ~CollisionInfo() = default;

@@ -26,8 +26,8 @@ class PK_UTILITY_EXPORT Vector3
 {
  public:
   Vector3() = default;
-  FORCEINLINE explicit Vector3(float _val) : x(_val), y(_val), z(_val) {};
-  FORCEINLINE Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
+  PKFORCEINLINE explicit Vector3(float _val) : x(_val), y(_val), z(_val) {};
+  PKFORCEINLINE Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
   ~Vector3() = default;
 
   /**
@@ -35,7 +35,7 @@ class PK_UTILITY_EXPORT Vector3
   * @param other Vector with which the multiplication will be made.
   * @return This vector with the multiplication done.
   **/
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator*=(const Vector3& other)
   {
     x *= other.x;
@@ -49,7 +49,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the multiplication will be made.
    * @return This vector with the multiplication done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator*=(const float other)
   {
     x *= other;
@@ -63,7 +63,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the multiplication will be made.
    * @return A vector with the multiplication done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator*(const Vector3& other) const
   {
     return Vector3(x * other.x, y * other.y, z * other.z);
@@ -74,7 +74,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the multiplication will be made.
    * @return A vector with the multiplication done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator*(const float& other) const
   {
     return Vector3(x * other, y * other, z * other);
@@ -85,7 +85,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the division will be made.
    * @return This vector with the division done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator/=(const Vector3& other)
   {
     x /= other.x;
@@ -99,7 +99,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the division will be made.
    * @return This vector with the division done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator/=(const float& other)
   {
     x /= other;
@@ -113,7 +113,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the division will be made.
    * @return A vector with the division done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator/(const Vector3& other) const
   {
     return Vector3(x / other.x, y / other.y, z / other.z);
@@ -124,7 +124,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the division will be made.
    * @return A vector with the division done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator/(const float& other) const
   {
     return Vector3(x / other, y / other, z / other);
@@ -135,7 +135,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the addition will be made.
    * @return This vector with the addition done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator+=(const Vector3& other)
   {
     x += other.x;
@@ -149,7 +149,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the addition will be made.
    * @return This vector with the addition done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator+=(const float& other)
   {
     x += other;
@@ -163,7 +163,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the addition will be made.
    * @return A vector with the addition done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator+(const Vector3& other) const
   {
     return Vector3(x + other.x, y + other.y, z + other.z);
@@ -174,7 +174,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the addition will be made.
    * @return A vector with the addition done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator+(const float& other) const
   {
     return Vector3(x + other, y + other, z + other);
@@ -186,7 +186,7 @@ class PK_UTILITY_EXPORT Vector3
    * @return
    * This vector with the substraction done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator-=(const Vector3& other)
   {
     x -= other.x;
@@ -201,7 +201,7 @@ class PK_UTILITY_EXPORT Vector3
    * @return
    * This vector with the substraction done.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   operator-=(const float& other)
   {
     x -= other;
@@ -215,7 +215,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the substraction will be made.
    * @return A vector with the substraction done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator-(const Vector3& other) const
   {
     return Vector3(x - other.x, y - other.y, z - other.z);
@@ -226,7 +226,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other float with which the substraction will be made.
    * @return A vector with the substraction done.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator-(const float& other) const
   {
     return Vector3(x - other, y - other, z - other);
@@ -237,7 +237,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Vector with which the comparison will be made.
    * @return A boolean determining if they are the same.
    */
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   operator==(const Vector3& other) const
   {
     return (x != other.x ||
@@ -253,7 +253,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param other Other Vector3.
    * @return The cross poduct.
    */
-  FORCEINLINE const Vector3
+  PKFORCEINLINE const Vector3
   operator^(const Vector3& other) const;
 
   /**
@@ -277,7 +277,7 @@ class PK_UTILITY_EXPORT Vector3
    * @brief This function calculates the square result of this vectors values.
    * @return The final result of the square operation.
    */
-  FORCEINLINE float
+  PKFORCEINLINE float
   magnitudeSquare() const;
 
   /**
@@ -285,7 +285,7 @@ class PK_UTILITY_EXPORT Vector3
    * the square root of the vector multiplied by itself.
    * @return The magnitude of the vector.
    */
-  FORCEINLINE float
+  PKFORCEINLINE float
   magnitude() const;
 
   /**
@@ -313,7 +313,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _other the vector to be targeted for distance measuring
    * @return the distance between the 2 vectors
    */
-  FORCEINLINE float
+  PKFORCEINLINE float
   distanceTo(const Vector3& _other);
 
   /**
@@ -321,7 +321,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _x Minimum clamp range.
    * @param _y Maximum clamp range.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   clamp(float _x, float _y);
 
   /**
@@ -339,7 +339,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _other The other vector3.
    * @return The final dot product.
    */
-  FORCEINLINE static float
+  PKFORCEINLINE static float
   dotProd(const Vector3 _this, const Vector3 _other);
 
   /**
@@ -347,21 +347,21 @@ class PK_UTILITY_EXPORT Vector3
    * @param _other The other vector4.
    * @return The final dot product.
    */
-  FORCEINLINE static float
+  PKFORCEINLINE static float
   dotProd(const Vector3 _this, const Vector4 _other);
 
   /**
    * @brief Check if the vector is a zero vector.
    * @return Wether the vector is 0 or not.
    */
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   isZero();
 
   /**
    * @brief Check if the vector has a non number.
    * @return wether the vector has or does not have a nan.
    */
-  FORCEINLINE bool
+  PKFORCEINLINE bool
   hasNan();
 
   /**

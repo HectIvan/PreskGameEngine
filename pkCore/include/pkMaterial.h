@@ -98,49 +98,49 @@ class Material : public Component
    * @brief Set the diffuse texture.
    * @param _pTexture New diffuse texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setDiffuse(const SPtr<Texture>& _pTexture) { m_diffuse = _pTexture; }
 
   /**
    * @brief Set the normal texture.
    * @param _pTexture New normal texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setNormal(const SPtr<Texture>& _pTexture) { m_normal = _pTexture; }
 
   /**
    * @brief Set the height texture.
    * @param _pTexture New height texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setHeight(const SPtr<Texture>& _pTexture) { m_height = _pTexture; }
 
   /**
    * @brief Set the metallic texture.
    * @param _pTexture New metallic texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setMetallic(const SPtr<Texture>& _pTexture) { m_metallic = _pTexture; }
 
   /**
    * @brief Set the occlusion texture.
    * @param _pTexture New occlusion texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setOcclusion(const SPtr<Texture>& _pTexture) { m_occlusion = _pTexture; }
 
   /**
    * @brief Set the roughness texture.
    * @param _pTexture New roughness texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setRoughness(const SPtr<Texture>& _pTexture) { m_roughness = _pTexture; }
   
   /**
    * @brief Set the emissive texture.
    * @param _pTexture New emissive texture.
    */
-  FORCEINLINE void
+  PKFORCEINLINE void
   setEmissive(const SPtr<Texture>& _pTexture) { m_emissive = _pTexture; }
 
   /**

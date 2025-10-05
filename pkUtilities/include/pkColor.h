@@ -63,7 +63,7 @@ struct PK_UTILITY_EXPORT Color final
     return _color.fullColor;
   }
 
-  FORCEINLINE const Vector4
+  PKFORCEINLINE const Vector4
   operator/(const float _val) const
   {
     Vector4 newColor;

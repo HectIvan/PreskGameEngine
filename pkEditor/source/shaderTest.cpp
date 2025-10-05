@@ -105,8 +105,8 @@ ShaderTest::onInit()
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
 
-  Logger& log = g_Logger();
-  TimeManager& timeMan = g_TimeManager();
+  // Logger& log = g_Logger();
+  // TimeManager& timeMan = g_TimeManager();
   // get the resource manager
   GPUResourceManager& resourceMan = g_GPUResourceManager();
   SceneManager& sceneMan = g_SceneManager();
@@ -159,21 +159,21 @@ ShaderTest::onInit()
   // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
-  log.print("Loading Exterior.");
-  timeMan.startTimer();
-  SPtr<Actor> bistroInt = activeScene->instantiate("Exterior");
-  bistroInt->addComponent(resourceMan.loadModel(Path("models/bistro_exterior.pkm")));
-  timeMan.endTimer();
-  float time = timeMan.getTimerElapsed();
-  log.print(to_string(time) + " Seconds");
-
-  log.print("Loading Interior.");
-  timeMan.startTimer();
-  SPtr<Actor> bistroExt = activeScene->instantiate("Interior");
-  bistroExt->addComponent(resourceMan.loadModel(Path("models/bistro_interior_wine.pkm")));
-  timeMan.endTimer();
-  time = timeMan.getTimerElapsed();
-  log.print(to_string(time) + " Seconds");
+  // log.print("Loading Exterior.");
+  // timeMan.startTimer();
+  // SPtr<Actor> bistroInt = activeScene->instantiate("Exterior");
+  // bistroInt->addComponent(resourceMan.loadModel(Path("models/bistro_exterior.pkm")));
+  // timeMan.endTimer();
+  // float time = timeMan.getTimerElapsed();
+  // log.print(to_string(time) + " Seconds");
+  // 
+  // log.print("Loading Interior.");
+  // timeMan.startTimer();
+  // SPtr<Actor> bistroExt = activeScene->instantiate("Interior");
+  // bistroExt->addComponent(resourceMan.loadModel(Path("models/bistro_interior_wine.pkm")));
+  // timeMan.endTimer();
+  // time = timeMan.getTimerElapsed();
+  // log.print(to_string(time) + " Seconds");
 
   m_IBR = true;
   m_vSync = false;

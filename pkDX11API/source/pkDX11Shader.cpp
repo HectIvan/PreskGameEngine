@@ -14,7 +14,7 @@ namespace pkEngineSDK
 void
 DX11Shader::compile()
 {
-  GraphicsAPI& api = g_GraphicAPI().instance();
+  GraphicsAPI& api = g_GraphicAPI();
   m_pSBlob = reinterpret_cast<ID3DBlob*>(api.compileShaderFromFile(m_shaderDirectory,
                                                                    m_sEntryPoint,
                                                                    m_sModel));

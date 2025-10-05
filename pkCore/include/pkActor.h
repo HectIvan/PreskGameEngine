@@ -189,14 +189,14 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor scale.
    * @return The actor scale.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   getScale() { return m_scale; }
 
   /**
    * @brief Get the actor rotation.
    * @return The actor rotation.
    */
-  FORCEINLINE Vector3&
+  PKFORCEINLINE Vector3&
   getRotation() { return m_rotation; }
 
   /**

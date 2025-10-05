@@ -51,7 +51,7 @@ class PK_CORE_EXPORT Scene
    * @brief Get the last inserted actor of the scene.
    * @return The last actor.
    */
-  FORCEINLINE SPtr<Actor>
+  PKFORCEINLINE SPtr<Actor>
   getLastActor() { return m_actors[m_actors.size() - 1]; }
 
   /**

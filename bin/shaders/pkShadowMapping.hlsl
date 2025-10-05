@@ -287,7 +287,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   
   float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, NoL, NoV, roughVal);
   
-  float dotOfLight = orenNaya; // dot(lightDir, normal);
+  float dotOfLight = orenNaya; // dot(lightDir, normal); // 
   float lamb = max(dotOfLight, shadowColor);
   lamb = lerp(lamb, shadowColor, 1.0f - lamb);
   float3 lambert = lightColor * lamb;

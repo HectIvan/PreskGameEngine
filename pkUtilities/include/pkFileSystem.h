@@ -27,13 +27,13 @@ using std::filesystem::is_regular_file;
 namespace pkEngineSDK
 {
 
-  namespace FileSystem
-  {
-    static bool
-    fileExists(const Path& _path)
-    {
-      path fsPath(_path.toString());
-      return exists(fsPath) && is_regular_file(fsPath);
-    }
-  }
+namespace FileSystem
+{
+  // static bool
+  // fileExists(const Path& _path)
+  // {
+  //   path fsPath(_path.toString());
+  //   return exists(fsPath) && is_regular_file(fsPath);
+  // }
+}
 }

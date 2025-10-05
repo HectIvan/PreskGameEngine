@@ -17,8 +17,8 @@ EventQueue::poll()
     keys[i].pressed = GetAsyncKeyState(i) & 0x8000;
 
     if (keys[i].pressed) {
-      uint32 j = 0;
-      j -= 1;
+      // uint32 j = 0;
+      // j -= 1;
     }
   }
   // update cursor position

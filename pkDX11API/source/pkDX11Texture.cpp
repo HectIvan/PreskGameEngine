@@ -17,8 +17,7 @@ DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return false;
   }
-  // copy the values
-  setType(dxTx->getType());
+  // copy the values.
   setSize(dxTx->getSize());
   setName(dxTx->getName());
 

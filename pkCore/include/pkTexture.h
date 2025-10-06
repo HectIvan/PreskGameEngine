@@ -285,20 +285,6 @@ class PK_CORE_EXPORT Texture
   getSize() { return Vector2(m_width, m_height); }
 
   /**
-   * @brief Get texture type.
-   * @return Type as an uint32.
-   */
-  uint32
-  getType() const { return m_type; }
-
-  /**
-   * @brief Set texture type.
-   * @param _type What type of texture it will be
-   */
-  void
-  setType(uint32 _type) { m_type = static_cast<TEXTURE_TYPE::E>(_type); }
-
-  /**
    * @brief Set the texture name.
    * @param _name Name of the texture
    */
@@ -345,8 +331,6 @@ class PK_CORE_EXPORT Texture
   copyFrom(SPtr<Texture>& _pTexture) { return false; };
 
  private:
-  // uint32 m_id;
-  TEXTURE_TYPE::E m_type;
   Path m_name;
   uint32 m_width;
   uint32 m_height;

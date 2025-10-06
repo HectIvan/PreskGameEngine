@@ -87,19 +87,10 @@ float fresnelForLut(float VoH)
 
 float GeometrySchlickGGX(float NoV, float roughness)
 {
-  // float k = (roughness * roughness) * 0.5f;
-  // float denom = NoV * (1.0f - k) + k;
-  // return NoV / denom;
-  
   float r = roughness + 1.0f;
   float k = (r * r) / 8.0f;
   float G =  NoV * (1.0f - k) + k;
   return NoV / G;
-  
-  // float nom = NoV;
-  // float denom = NoV * (1.0 - roughness) + roughness;
-  // float G = nom / denom;
-  // return G;
 }
 
 float GeometrySmith(float NoV, float NoL, float roughness)
@@ -145,16 +136,6 @@ float GeometricAttenuation(float3 halfView, float3 normal, float3 view, float3 l
 // Dblinn = (1/PI alpha^2)(HoN^(2/alpha^2 - 2))
 float NormalDistribution(float3 halfView, float3 normal, float roughness)
 {
-  // float a = roughness * roughness;
-  // float a2 = a * a;
-  // float HoN = saturate(dot(halfView, normal));
-  // 
-  // float first = 1.0f / (PI * a2);
-  // float expVal = (2.0f / a2) - 2.0f;
-  // float exponent = pow(HoN, expVal);
-  // float D = first * exponent;
-  // return D;
-  
   float a = roughness * roughness;
   float a2 = a * a;
   float NoH = max(dot(normal, halfView), 0.0f);
@@ -171,7 +152,6 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
 // F = F0 + (1 - F0) * (1 - VoH)^5
 float Fresnel(float3 F0, float VoH) // float refraction
 {
-  // float F0 = pow((refraction - 1), 2.0f) / pow((refraction + 1), 2.0f);
   float F = F0.x + (1.0f - F0.x) * pow((1 - VoH), 5.0f);
   return F;
 }
@@ -193,14 +173,6 @@ float3 cookTorranceSpecular(float3 normal,
   
   float alpha = rough * rough;
   float3 radiance = SpecIntensity.xxx;
-  
-  // float G = GeometrySmith(NoV, NoL, rough);
-  // float D = NormalDistribution(Half, normal, rough);
-  // float F = Fresnel(F0, VoH);
-  
-  // float den = max(4.0f * NoV * NoL, 1e-5f);
-  // 
-  // float3 specular = (NDF * G * F) / den;
   
   float NDF = NormalDistribution(Half, normal, rough);
   float G = GeometrySmith(NoV, NoL, rough);

@@ -46,14 +46,14 @@ float2 getRandom(in float2 uv)
   float noiseY = (frac(sin(dot(uv, float2(11.9899f, 62.223f) * 2.0f)) * 34748.34744f));
   float noiseZ = (frac(sin(dot(uv, float2(13.3238f, 63.122f) * 3.0f)) * 59998.47362f));
     
-  return normalize(float3(noiseX, noiseY, noiseZ));
+  return normalize(float3(noiseX, noiseY, noiseZ)).xy;
 }
 
 float computeAO(in float2 tcood, in float2 uv, in float3 p, in float3 cnorm)
 {
   float3 diff = getPosition(tcood + uv).xyz - p;
   const float d = length(diff) * scale;
-  const float v = normalize(diff);
+  const float v = normalize(diff).x;
   return max(0.0f, dot(cnorm, v) - bias) * (1.0f / (1.0f + d)) * intensity;
 }
 

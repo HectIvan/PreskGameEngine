@@ -108,7 +108,7 @@ ShaderTest::onInit()
   // Logger& log = g_Logger();
   // TimeManager& timeMan = g_TimeManager();
   // get the resource manager
-  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  // GPUResourceManager& resourceMan = g_GPUResourceManager();
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 

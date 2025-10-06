@@ -172,7 +172,7 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
 float Fresnel(float3 F0, float VoH) // float refraction
 {
   // float F0 = pow((refraction - 1), 2.0f) / pow((refraction + 1), 2.0f);
-  float F = F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
+  float F = F0.x + (1.0f - F0.x) * pow((1 - VoH), 5.0f);
   return F;
 }
 
@@ -215,7 +215,7 @@ float3 cookTorranceSpecular(float3 normal,
   
   lo += ((kD * 1.0f / PI + specular) * radiance * NoL).xxx;
   
-  return float4(lo, 1.0);
+  return lo;
 }
 
 float magnitude(float3 v)
@@ -244,7 +244,7 @@ float OrenNayarDiffuse(float3 N, float3 L, float3 V, float NoL, float NoV, float
   return saturate(NoL * (A + B * sin(alpha) * tan(beta)));
 }
 
-PS_OUTPUT PS(PS_INPUT input) : SV_Target0
+PS_OUTPUT PS(PS_INPUT input) : SV_Target
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
   
@@ -263,7 +263,7 @@ PS_OUTPUT PS(PS_INPUT input) : SV_Target0
   float ambientOcclusion = orm.Sample(samState, input.TexCoord).r;
   float metallicVal = orm.Sample(samState, input.TexCoord).b;
   float roughVal = orm.Sample(samState, input.TexCoord).g;
-  float3 worldPos = positionsMap.Sample(samState, input.TexCoord);
+  float3 worldPos = positionsMap.Sample(samState, input.TexCoord).xyz;
   
   /**
    * alpha values

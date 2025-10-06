@@ -18,13 +18,13 @@
 #define STBI_ENABLE_OPENEXR
 #include "stb_image.h"
 
-#include "pkPlatformMath.h"
 
 #include "pkLogger.h"
 #include "pkDX11BlendState.h"
 #include "pkDX11ComputeShader.h"
 #include "pkDX11GraphicsAPI.h"
 #include "pkDX11IndexBuffer.h"
+#include "pkDX11InputLayout.h"
 #include "pkDX11PixelShader.h"
 #include "pkDX11Prerequisites.h"
 #include "pkDX11RasterizerState.h"
@@ -33,9 +33,10 @@
 #include "pkDX11SwapChain.h"
 #include "pkDX11VertexBuffer.h"
 #include "pkDX11VertexShader.h"
+#include "pkFileSystem.h"
+#include "pkPlatformMath.h"
 #include "pkVertexBuffer.h"
 
-#include "pkDX11InputLayout.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <d3dcompiler.h>
@@ -66,6 +67,9 @@ class ShaderInclude : public ID3DInclude
     size_t size = file.tellg();
     file.seekg(0, ios::beg);
 
+    if (size == 0) {
+      return E_FAIL;
+    }
     char* buffer = new char[size];
     file.read(buffer, size);
 
@@ -897,10 +901,24 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
 #else
   dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION; // temporarily for Release
 #endif
+  
+  if (!FileSystem::fileExists(_szFileName)) {
+    const String err = "Shader file not found: " + _szFileName.toString();
+    log.print(err);
+    log.registerMessage(err, LOG_MSG_TYPE::kError);
+    return nullptr;
+  }
+
   static ShaderInclude shaderInclude;
   ID3DBlob* pErrorBlob = nullptr;
   ID3DBlob* dxBlob = nullptr;
-  WString widePath = _szFileName.getPathWStr(); // release issue
+  WString widePath = FileSystem::getAbsolutePathWStr(_szFileName);// _szFileName.getPathWStr(); // release issue
+
+  // wprintf(L"Compiling shader: %s\n", widePath.c_str());
+
+  // to do: a single shaders can be compiled several times, as each pass has their own independent shader
+  // and some may be shared. creating a shader manager might help mitigate this issue, perhaps by using a
+  // UMap and using the shader directory, entry point and model as a key to access the shader itself whenever it's needed.
   hr = D3DCompileFromFile(widePath.c_str(),
                           nullptr,
                           &shaderInclude,
@@ -911,19 +929,26 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                           &dxBlob,
                           &pErrorBlob);
 
-  if (FAILED(hr)) {
-    if (pErrorBlob != nullptr) {
-      const char* msg = static_cast<char*>(pErrorBlob->GetBufferPointer());
-      SIZE_T len = pErrorBlob->GetBufferSize();
-      const String error(msg, len);
-      const String fullMSG = "Shader failed to compile. Error message: " + error;
-      log.print(msg);
-      log.registerMessage(msg, LOG_MSG_TYPE::kError);
-      pErrorBlob->Release();
+  // if there's an error.
+  if (pErrorBlob) {
+    const char* msg = reinterpret_cast<char*>(pErrorBlob->GetBufferPointer());
+    SIZE_T len = pErrorBlob->GetBufferSize();
+    String error(msg, len);
+    String fullMSG = "Shader failed to compile. Error message: " + error;
+    // if the compilation outright failed
+    if (FAILED(hr)) {
+      log.print(fullMSG);
+      log.registerMessage(fullMSG, LOG_MSG_TYPE::kError);
+      return nullptr;
     }
-    safeRelease(pErrorBlob);
-    return nullptr;
+    // if it didnt fail but there's a message, it must be a warning
+    fullMSG = _szFileName.toString() + " - Warning: " + error;
+    log.print(fullMSG);
+    log.registerMessage(fullMSG, LOG_MSG_TYPE::kWarning);
+    pErrorBlob->Release();
   }
+  safeRelease(pErrorBlob);
+
   return reinterpret_cast<void**>(dxBlob);
 }
 

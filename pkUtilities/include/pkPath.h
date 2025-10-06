@@ -47,6 +47,10 @@ class PK_UTILITY_EXPORT Path
     return m_path;
   }
 
+  /**
+   * @brief Get a wide string from the path.
+   * @return WString of the path.
+   */
   WString
   getPathWStr()
   {

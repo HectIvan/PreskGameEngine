@@ -89,8 +89,8 @@ void
 Projectile::obstacleBounce(Vector3 _obstaclePos, float _obstacleRadius)
 {
   // to prevent warnings.
-  _obstaclePos = _obstaclePos;
-  _obstacleRadius = _obstacleRadius;
+  _obstaclePos = Vector3();
+  _obstacleRadius = 1.0f;
   // Final position.
   // Difference = |((R1 + R2) - (P1 - P2).magnitude)|
   // P1 += normal * Difference

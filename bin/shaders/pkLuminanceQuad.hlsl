@@ -24,7 +24,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 color = inputTexture.Sample(samState, uv).rgb;
   
-  float luminance = pow(dot(color, float3(0.2126f, 0.7152f, 0.0722f)), threshold.x);
+  float luminance = pow(abs(dot(color, float3(0.2126f, 0.7152f, 0.0722f))), threshold.x);
   
   return float4(luminance.xxx, 1.0f);
 }

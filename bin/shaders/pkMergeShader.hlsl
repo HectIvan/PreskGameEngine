@@ -46,10 +46,10 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   // temporary placeholder for the issue above.
   if (alpha == 0.0f) {
-    color = skyboxFinal;
+    color = skyboxFinal.rgb;
   }
   
-  float4 fullEmissive = pow(emissiveSample + emissBlurSample, 1.0f / 2.2f);
+  float4 fullEmissive = pow(abs(emissiveSample + emissBlurSample), 1.0f / 2.2f);
   
   return float4(color, 1.0f) + fullEmissive;
 }

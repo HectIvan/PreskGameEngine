@@ -32,7 +32,7 @@ float4
 sRGBToLinear(float4 color)
 {
   // Convert sRGB to linear color space
-  return float4(pow(color.rgb, 1.0f / 2.2f), color.a);
+  return float4(pow(abs(color.rgb), 1.0f / 2.2f), color.a);
 }
 
 float4 PS(PS_INPUT input) : SV_Target

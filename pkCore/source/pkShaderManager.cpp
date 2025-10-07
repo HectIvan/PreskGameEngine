@@ -28,7 +28,11 @@ ShaderManager::insertShader(const ShaderKey& _key, SPtr<Shader> _pShader)
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
-  return m_shaders.find(_key)->second;
+  bool hasShader = m_shaders.contains(_key);
+  if (hasShader) {
+    return m_shaders.find(_key)->second;
+  }
+  return nullptr;
 }
 
 PK_CORE_EXPORT ShaderManager&

@@ -18,7 +18,7 @@ RendererManager::init()
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
 
-  float sizeMulShadow = 6.0f;
+  float sizeMulShadow = 3.0f;
 
   // Texture description
   TextureDesc txDesc;
@@ -150,11 +150,21 @@ RendererManager::createPasses()
   // pass description
   PassDesc pDesc = PassDesc();
 
+  // Textures
   SPtr<Texture> albedoTex = getGBuffer(G_BUFFERS::kGB_Albedo);
   SPtr<Texture> normalTex = getGBuffer(G_BUFFERS::kGB_Normal);
   SPtr<Texture> ormTex = getGBuffer(G_BUFFERS::kGB_ORM);
   SPtr<Texture> posTex = getGBuffer(G_BUFFERS::kGB_Positions);
+  SPtr<Texture> lightPosTex = getGBuffer(G_BUFFERS::kGB_PositionsLight);
   SPtr<Texture> ssaoTex = getGBuffer(G_BUFFERS::kGB_SSAO);
+  SPtr<Texture> emissTex = getGBuffer(G_BUFFERS::kGB_Emissive);
+  SPtr<Texture> emissHBlurTex = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
+  SPtr<Texture> emissBlurTex = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
+  SPtr<Texture> shadowSpecTex = getGBuffer(G_BUFFERS::kGB_ShdwSpec);
+
+  // Depth textures
+  SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
+  SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -172,9 +182,9 @@ RendererManager::createPasses()
   pDesc.outputs = { albedoTex,
                     normalTex,
                     ormTex,
-                    getGBuffer(G_BUFFERS::kGB_Emissive),
+                    emissTex,
                     posTex };
-  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Base);
+  pDesc.pDepth = DepthBuffer;
   // rasterizer state
   pDesc.rSExists = true;
   pDesc.rSCullMode = RS_CULL_MODE::kPK_CULL_NONE;
@@ -190,8 +200,8 @@ RendererManager::createPasses()
    * Shadow Pass
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkPShaderDepth.hlsl");
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_PositionsLight) };
-  pDesc.pDepth = getDepthBuffer(D_BUFFERS::kDB_Light);
+  pDesc.outputs = { lightPosTex };
+  pDesc.pDepth = LightDepthBuffer;
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_Shadow, shadowPass });
 
@@ -202,14 +212,14 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
                     sizeof(Vector4) };
-  pDesc.inputs = { getDepthBuffer(D_BUFFERS::kDB_Light),
-                   getDepthBuffer(D_BUFFERS::kDB_Base),
+  pDesc.inputs = { LightDepthBuffer,
+                   DepthBuffer,
                    normalTex,
                    albedoTex,
                    posTex,
                    ormTex,
-                   getGBuffer(G_BUFFERS::kGB_PositionsLight) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_ShdwSpec) };
+                   lightPosTex };
+  pDesc.outputs = { shadowSpecTex };
   pDesc.pDepth = {};// getDepthBuffer(D_BUFFERS::kDB_Base);
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -260,8 +270,8 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Emissive) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
+  pDesc.inputs = { emissTex };
+  pDesc.outputs = { emissHBlurTex };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> emissiveHPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -272,8 +282,8 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
   pDesc.cBSizes = { sizeof(CBBlur) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_EmissiveHBlur) };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_EmissiveBlur) };
+  pDesc.inputs = { emissHBlurTex };
+  pDesc.outputs = { emissBlurTex };
   SPtr<Pass> emissivePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveBlur, emissivePass });
@@ -284,11 +294,11 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { albedoTex,
-                   getGBuffer(G_BUFFERS::kGB_ShdwSpec),
+                   shadowSpecTex,
                    getGBuffer(G_BUFFERS::kGB_Skybox),
                    getGBuffer(G_BUFFERS::kGB_IBR),
-                   getGBuffer(G_BUFFERS::kGB_Emissive),
-                   getGBuffer(G_BUFFERS::kGB_EmissiveBlur),
+                   emissTex,
+                   emissBlurTex,
                    ssaoTex }; // to do: do a correct ambient occlusion implementation.
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;

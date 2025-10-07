@@ -24,24 +24,43 @@ namespace pkEngineSDK
 {
 
 // to do: temporary shader key, change for a UUID
-class ShaderKey
+struct ShaderKey
 {
- public:
-  ShaderKey() = default;
-  ShaderKey(const ShaderKey&) = default;
-  ShaderKey(const Path _path, const char* _entryP, const char* _shaderModel) :
+  ShaderKey(const String _path, const char* _entryP, const char* _shaderModel) :
     shaderPath(_path),
     _szEntryPoint(_entryP),
     _szShaderModel(_shaderModel)
   {};
   ~ShaderKey() = default;
-  
 
-  Path shaderPath;
+  bool
+  operator==(const ShaderKey& _other) const {
+    return (shaderPath == _other.shaderPath &&
+            _szEntryPoint == _other._szEntryPoint && 
+            _szShaderModel == _other._szShaderModel);
+  }
+
+  String shaderPath;
   const char* _szEntryPoint;
   const char* _szShaderModel;
 };
+}
 
+namespace std {
+template<>
+struct hash<pkEngineSDK::ShaderKey>
+{
+  SIZE_T
+    operator()(const pkEngineSDK::ShaderKey& _key) const {
+    return hash<pkEngineSDK::String>()(_key.shaderPath) ^
+           hash<const char*>()(_key._szEntryPoint) ^
+           hash<const char*>()(_key._szShaderModel);
+  }
+};
+}
+
+namespace pkEngineSDK
+{
 class ShaderManager : public Module<ShaderManager>
 {
  public:

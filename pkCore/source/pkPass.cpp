@@ -21,6 +21,7 @@
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkShaderManager.h"
+#include "pkLogger.h"
 
 namespace pkEngineSDK
 {
@@ -117,11 +118,13 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
   ShaderManager& shaderMan = g_ShaderManager();
 
   // check if the shader already exists
-  ShaderKey key(_directory, _entry, _sModel);
+  ShaderKey key(_directory.toString(), _entry, _sModel);
   SPtr<Shader> checkShader = shaderMan.getShader(key);
 
   // if the shader exists, get the shader and return.
   if (checkShader) {
+    String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
+    g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
     m_pVShader = checkShader;
     return;
   }
@@ -136,17 +139,45 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
 void
 Pass::createPShader(const Path _directory, const char* _entry, const char* _sModel)
 {
+  ShaderManager& shaderMan = g_ShaderManager();
+  ShaderKey key(_directory.toString(), _entry, _sModel);
+  SPtr<Shader> checkShader = shaderMan.getShader(key);
+
+  // if the shader exists, get the shader and return.
+  if (checkShader) {
+    String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
+    g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
+    m_pPShader = checkShader;
+    return;
+  }
+
   m_pPShader->setData(_directory, _entry, _sModel);
   m_pPShader->compile();
   g_GraphicAPI().createPShader(m_pPShader);
+
+  shaderMan.insertShader(key, m_pPShader);
 }
 
 void
 Pass::createCShader(const Path _directory, const char* _entry, const char* _sModel)
 {
+  ShaderManager& shaderMan = g_ShaderManager();
+  ShaderKey key(_directory.toString(), _entry, _sModel);
+  SPtr<Shader> checkShader = shaderMan.getShader(key);
+
+  // if the shader exists, get the shader and return.
+  if (checkShader) {
+    String msg = "Found previously compiled Compute shader: " + key.shaderPath;
+    g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
+    m_pCShader = checkShader;
+    return;
+  }
+
   m_pCShader->setData(_directory, _entry, _sModel);
   m_pCShader->compile();
   g_GraphicAPI().createCShader(m_pCShader);
+
+  shaderMan.insertShader(key, m_pCShader);
 }
 
 void

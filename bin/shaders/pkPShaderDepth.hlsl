@@ -21,20 +21,7 @@ struct PS_INPUT
   float3 PosWS : TEXCOORD4;
 };
 
-struct PS_OUTPUT
+float4 PS(PS_INPUT input) : SV_Target0
 {
-  float4 posWS : SV_Target;
-};
-
-PS_OUTPUT PS(PS_INPUT input)
-{
-  PS_OUTPUT output = (PS_OUTPUT) 0;
-  
-  float alpha = diffuseTex.Sample(samLinear, input.Tex).a;
-  
-  if (alpha != 0.0f) {
-    output.posWS = float4(input.PosWS, 1.0f);
-  }
-  
-  return output;
+  return float4(input.PosWS, 0.0f);
 }

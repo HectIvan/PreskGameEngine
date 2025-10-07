@@ -23,14 +23,14 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 diffuse : VS_Target0;
+  float4 diffuse : SV_Target0;
   float4 normal : SV_Target1;
   float4 orm : SV_Target2; // occlusion, roughness, metallic
   float4 emissive : SV_Target4;
   float4 posWS : SV_Target5; // world space position
 };
 
-PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be able to remove this sv_target but i can't???
+PS_OUTPUT PS(PS_INPUT input)
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
   // texture sampling

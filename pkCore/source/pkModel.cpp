@@ -440,22 +440,22 @@ aIMatrixToMatrix(aiMatrix4x4 _node)
                  _node.d1, _node.d2, _node.d3, _node.d4);
 }
 
-void
-Model::setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight)
-{
-  /**
-  * This is done to prevent warnings for the moment, at least until
-  * bones are implemented correctly.
-  **/
-  /**************************/
-  SimpleVertex vertexT = _vertex;
-  vertexT.pos = Vector3(0.0f);
-  _boneId = 0;
-  _weight = 0;
-  /**************************/
-  // for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
-  // }
-}
+// void
+// Model::setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight)
+// {
+//   /**
+//   * This is done to prevent warnings for the moment, at least until
+//   * bones are implemented correctly.
+//   **/
+//   /**************************/
+//   SimpleVertex vertexT = _vertex;
+//   vertexT.pos = Vector3(0.0f);
+//   _boneId = 0;
+//   _weight = 0;
+//   /**************************/
+//   // for (uint32 i = 0; i < MAX_BONE_WEIGHT; ++i) {
+//   // }
+// }
 
 void
 extractBoneWeightForVertices(Model& _model,
@@ -484,11 +484,11 @@ extractBoneWeightForVertices(Model& _model,
     auto weights = _mesh->mBones[i]->mWeights;
     uint32 numWeight = _mesh->mBones[i]->mNumWeights;
 
-    for (uint32 j = 0; j < numWeight; ++j) {
-      uint32 vertexID = weights[i].mVertexId;
-      float weight = weights[i].mWeight;
-      _model.setVertexBoneData(_model.vertex[vertexID], boneID, weight);
-    }
+    // for (uint32 j = 0; j < numWeight; ++j) {
+    //   uint32 vertexID = weights[i].mVertexId;
+    //   float weight = weights[i].mWeight;
+    //   _model.setVertexBoneData(_model.vertex[vertexID], boneID, weight);
+    // }
   }
 }
 

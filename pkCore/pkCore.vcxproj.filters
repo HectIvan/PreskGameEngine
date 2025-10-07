@@ -234,6 +234,9 @@
     <ClInclude Include="include\pkModelResource.h">
       <Filter>include\base app</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkShaderManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -321,6 +324,9 @@
       <Filter>source\game</Filter>
     </ClCompile>
     <ClCompile Include="source\pkAssetResourceManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkShaderManager.cpp">
       <Filter>source\managers</Filter>
     </ClCompile>
   </ItemGroup>

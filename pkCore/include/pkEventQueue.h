@@ -62,5 +62,5 @@ class PK_CORE_EXPORT EventQueue : public Module<EventQueue>
 };
 
 PK_CORE_EXPORT EventQueue&
-g_eventManager();
+g_EventManager();
 }

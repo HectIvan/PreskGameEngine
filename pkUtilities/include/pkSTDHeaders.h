@@ -44,6 +44,8 @@ using std::ifstream;
 
 using std::ios;
 
+using std::hash;
+
 // template <class T>
 // using WString_Conv = std::wstring_convert<T>;
 // 

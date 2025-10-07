@@ -72,7 +72,7 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float3 shdwSpec : VS_Target0;
+  float3 shdwSpec : SV_Target;
 };
 
 float fresnelSchlick(float F0, float VoH)
@@ -216,7 +216,7 @@ float OrenNayarDiffuse(float3 N, float3 L, float3 V, float NoL, float NoV, float
   return saturate(NoL * (A + B * sin(alpha) * tan(beta)));
 }
 
-PS_OUTPUT PS(PS_INPUT input) : SV_Target
+PS_OUTPUT PS(PS_INPUT input)
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
   

@@ -108,13 +108,6 @@ Actor::move(float _addX, float _addY, float _addZ)
   generateNewTransform();
 }
 
-// to do: fix this rotation function.
-void
-Actor::setRotation(Matrix4 _rotation)
-{
-  // setRotation(_rotation.getRotation());
-}
-
 void
 Actor::setRotation(Vector3 _rotation)
 {

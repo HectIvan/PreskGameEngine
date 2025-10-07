@@ -11,6 +11,7 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
+#include "pkShaderManager.h"
 
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Light;
@@ -53,6 +54,7 @@ BaseApp::init(const char** _argv, int32 _count)
   TextureManager::startUp();
   TimeManager::startUp();
   EventQueue::startUp();
+  ShaderManager::startUp();
 
   initWin();
   initAPI(_argv, _count);
@@ -98,7 +100,7 @@ run(String _name, Window& _window)
 void
 BaseApp::messageLoop()
 {
-  EventQueue& eventQueue = g_eventManager();
+  EventQueue& eventQueue = g_EventManager();
   TimeManager& timeManager = g_TimeManager();
   SceneManager& sceneManager = g_SceneManager();
   SPtr<Scene> activeScene = sceneManager.getActiveScene();

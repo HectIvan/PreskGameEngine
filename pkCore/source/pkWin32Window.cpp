@@ -95,7 +95,7 @@ Window::getClientWidthHeight() const
 LRESULT
 CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  EventQueue& eventManager = g_eventManager();
+  EventQueue& eventManager = g_EventManager();
   WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
   if (winEvent) {
     PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),

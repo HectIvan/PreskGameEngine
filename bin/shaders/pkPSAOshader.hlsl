@@ -25,7 +25,7 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 ssaoOut : SV_Target0;
+  float4 ssaoOut : SV_Target;
 };
 
 float4 getPosition(in float2 uv)
@@ -57,7 +57,7 @@ float computeAO(in float2 tcood, in float2 uv, in float3 p, in float3 cnorm)
   return max(0.0f, dot(cnorm, v) - bias) * (1.0f / (1.0f + d)) * intensity;
 }
 
-PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
+PS_OUTPUT PS(PS_INPUT input)
 {
   float2 screenUV = input.Position.xy / screen_size;
   PS_OUTPUT output = (PS_OUTPUT) 0;
@@ -85,12 +85,13 @@ PS_OUTPUT PS(PS_INPUT input) : SV_TARGET
   float2 vec[4] =
   {
     float2(1.0f, 0.0f),
-   float2(-1.0f, 0.0f),
-   float2(0.0f, 1.0f),
-   float2(0.0f, -1.0f)
+    float2(-1.0f, 0.0f),
+    float2(0.0f, 1.0f),
+    float2(0.0f, -1.0f)
   };
 
-  int iter = 4;
+  static const int iter = 4;
+  [unroll(iter)]
   for (int j = 0; j < iter; ++j)
   {
     float2 coord1 = reflect(vec[j], rand) * rad;

@@ -49,7 +49,7 @@ EventQueue::windowInput(Window& _window)
 }
 
 PK_CORE_EXPORT EventQueue&
-g_eventManager()
+g_EventManager()
 {
   { return EventQueue::instance(); }
 }

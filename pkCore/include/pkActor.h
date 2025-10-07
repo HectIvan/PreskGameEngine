@@ -134,13 +134,6 @@ class PK_CORE_EXPORT Actor
 
   /**
    * @brief Set the rotation of the Actor.
-   * @param _rotation Rotation Matrix.
-   */
-  void
-  setRotation(Matrix4 _rotation);
-
-  /**
-   * @brief Set the rotation of the Actor.
    * @param _rotation Rotation Vector.
    */
   void

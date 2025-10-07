@@ -303,7 +303,7 @@ class PK_CORE_EXPORT Texture
    * @return Name of the texture;
    */
   String
-  getNameS() { return m_name.toString(); }
+  getNameString() { return m_name.toString(); }
 
   /**
    * @brief Get the texture name as a const char*.
@@ -328,7 +328,7 @@ class PK_CORE_EXPORT Texture
    * @return If the conversion was successful.
    */
   virtual bool
-  copyFrom(SPtr<Texture>& _pTexture) { return false; };
+  copyFrom(SPtr<Texture>& _pTexture) = 0;
 
  private:
   Path m_name;

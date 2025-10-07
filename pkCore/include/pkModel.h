@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkModel pkModel.h
-* @Hector Ivan Muñoz Ceballos
-* @date 20/11/2024
-* @Model file for the Presk Game Engine.
-*
-* This file will contain the Model class used for the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 21/11/2024
-* added a way to get the model current component type.
-*/
-/************************************************************************/
+ * @file    pkModel.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    20/11/2024
+ * @brief   Model file for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -86,8 +81,8 @@ class PK_CORE_EXPORT Model : public Component
    * @param _boneID What bone id it will have.
    * @param _weight How much influence will the bone have.
    */
-  void
-  setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
+  // void
+  // setVertexBoneData(SimpleVertex& _vertex, int _boneId, float _weight);
 
   /**
    * @brief Get the component type of this component.

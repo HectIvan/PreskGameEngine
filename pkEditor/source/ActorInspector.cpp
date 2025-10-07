@@ -251,12 +251,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               SPtr<Texture> emissive = meshMat->m_emissive;
 
               // get the names of the texture and material
-              String difName = diffuse->getNameS() + "diff";
-              String norName = normal->getNameS() + "norm";
-              String occName = occlusion->getNameS() + "ao";
-              String roughName = rough->getNameS() + "rough";
-              String metName = metallic->getNameS() + "metal";
-              String emissName = emissive->getNameS() + "emissive";
+              String difName = diffuse->getNameString() + "diff";
+              String norName = normal->getNameString() + "norm";
+              String occName = occlusion->getNameString() + "ao";
+              String roughName = rough->getNameString() + "rough";
+              String metName = metallic->getNameString() + "metal";
+              String emissName = emissive->getNameString() + "emissive";
 
               // create the buttons
               if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {

@@ -23,10 +23,10 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 posWS : SV_Target0;
+  float4 posWS : SV_Target;
 };
 
-PS_OUTPUT PS(PS_INPUT input) : SV_Target0 // from my understanding i should be able to remove this sv_target but i can't???
+PS_OUTPUT PS(PS_INPUT input)
 {
   PS_OUTPUT output = (PS_OUTPUT) 0;
   

@@ -26,7 +26,7 @@ using pkEngineSDK::EventQueue;
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
-using pkEngineSDK::g_eventManager;
+using pkEngineSDK::g_EventManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_Logger;
@@ -247,7 +247,7 @@ ShaderTest::initWin()
 void
 ShaderTest::input()
 {
-  EventQueue& eventQueue = g_eventManager();
+  EventQueue& eventQueue = g_EventManager();
   UInterface& im = g_uInterface();
   // bool interfaceHovered = im.isHoveredWithItems();
   bool itemActive = im.isItemActive();

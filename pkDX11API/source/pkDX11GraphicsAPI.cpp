@@ -888,7 +888,6 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                                        const char* _szShaderModel)
 {
   Logger& log = g_Logger();
-
   int32 hr = S_OK;
 
   DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -928,6 +927,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                           0,
                           &dxBlob,
                           &pErrorBlob);
+  // to do: change this function to another as this one crashes easily.
 
   // if there's an error.
   if (pErrorBlob) {

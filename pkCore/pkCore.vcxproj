@@ -210,6 +210,7 @@
     <ClInclude Include="include\pkGPUResourceManager.h" />
     <ClInclude Include="include\pkScene.h" />
     <ClInclude Include="include\pkScriptManager.h" />
+    <ClInclude Include="include\pkShaderManager.h" />
     <ClInclude Include="include\pkSimpleVertex.h" />
     <ClInclude Include="include\pkSprite.h" />
     <ClInclude Include="include\pkSwapChain.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="source\pkSceneManager.cpp" />
     <ClCompile Include="source\pkScriptManager.cpp" />
     <ClCompile Include="source\pkShader.cpp" />
+    <ClCompile Include="source\pkShaderManager.cpp" />
     <ClCompile Include="source\pkSprite.cpp" />
     <ClCompile Include="source\pkTexture.cpp" />
     <ClCompile Include="source\pkTextureManager.cpp" />

@@ -14,12 +14,13 @@
 * Includes
 **/
 /*********************************************/
+#include <iostream>
+
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
-
-#include <iostream>
+#include "pkShaderManager.h"
 
 namespace pkEngineSDK
 {
@@ -113,9 +114,23 @@ Pass::~Pass()
 void
 Pass::createVShader(const Path _directory, const char* _entry, const char* _sModel)
 {
+  ShaderManager& shaderMan = g_ShaderManager();
+
+  // check if the shader already exists
+  ShaderKey key(_directory, _entry, _sModel);
+  SPtr<Shader> checkShader = shaderMan.getShader(key);
+
+  // if the shader exists, get the shader and return.
+  if (checkShader) {
+    m_pVShader = checkShader;
+    return;
+  }
+  // if it doesnt exist, continue with the compilation and store the shader.
   m_pVShader->setData(_directory, _entry, _sModel);
   m_pVShader->compile();
   g_GraphicAPI().createVShader(m_pVShader);
+
+  shaderMan.insertShader(key, m_pVShader);
 }
 
 void

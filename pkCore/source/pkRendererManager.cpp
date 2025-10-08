@@ -18,7 +18,7 @@ RendererManager::init()
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
 
-  float sizeMulShadow = 3.0f;
+  float sizeMulShadow = 6.0f;
 
   // Texture description
   TextureDesc txDesc;
@@ -75,9 +75,9 @@ RendererManager::init()
   SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveBlur, emissiveBlurRT });
 
-  // IBR texture.
-  SPtr<Texture> ibrRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_IBR, ibrRT });
+  // IBL texture.
+  SPtr<Texture> iblRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_IBL, iblRT });
 
   // merge texture.
   SPtr<Texture> mergeRT = api.createTexture(txDesc);
@@ -252,18 +252,18 @@ RendererManager::createPasses()
   /****************************************************************************
    * IBR Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkIBRShader.hlsl");
+  pDesc.pSDirectory = Path("shaders/pkIBLShader.hlsl");
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
   pDesc.inputs = { m_mainSkybox,
                    normalTex,
                    posTex,
                    ormTex,
                    albedoTex };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBR) };
+  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBL) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
-  SPtr<Pass> ibrPass = make_shared<Pass>(pDesc);
+  SPtr<Pass> iblPass = make_shared<Pass>(pDesc);
   // insert to the passes
-  m_passes.insert({ PASS_TYPE::kP_IBR, ibrPass });
+  m_passes.insert({ PASS_TYPE::kP_IBL, iblPass });
 
   /****************************************************************************
    * Emissive Horizontal Blur Quad pass
@@ -296,7 +296,7 @@ RendererManager::createPasses()
   pDesc.inputs = { albedoTex,
                    shadowSpecTex,
                    getGBuffer(G_BUFFERS::kGB_Skybox),
-                   getGBuffer(G_BUFFERS::kGB_IBR),
+                   getGBuffer(G_BUFFERS::kGB_IBL),
                    emissTex,
                    emissBlurTex,
                    ssaoTex }; // to do: do a correct ambient occlusion implementation.

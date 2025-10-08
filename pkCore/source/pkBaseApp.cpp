@@ -21,7 +21,7 @@ using pkEngineSDK::G_BUFFERS::kGB_ShdwSpec;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
-using pkEngineSDK::PASS_TYPE::kP_IBR;
+using pkEngineSDK::PASS_TYPE::kP_IBL;
 using pkEngineSDK::PASS_TYPE::kP_Shadow;
 using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
@@ -210,7 +210,7 @@ BaseApp::update()
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBL);
   SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
   SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
@@ -271,7 +271,7 @@ BaseApp::render()
   SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
-  SPtr<Pass> IBRPass = renderManager.getPass(kP_IBR);
+  SPtr<Pass> IBRPass = renderManager.getPass(kP_IBL);
   SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
   SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
@@ -289,11 +289,10 @@ BaseApp::render()
   baseShadow->endPass();
 
   // base pass
-  basePass->beginPass(Color(0, 0, 0, 0));
+  basePass->beginPass(Color::BLACK);
   renderManager.renderActors(actors);
   basePass->endPass();
 
-  api.clearRenderTargetViews(Color::WHITE, shadowQuad->getOutputTextures());
   // get texel size of compute passes
   //        Vector2 texSize = api.getSwapChain()->getSize();
   //        uint32 threadWidth = 16;
@@ -301,6 +300,7 @@ BaseApp::render()
   //        uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   //        uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
+  api.clearRenderTargetViews(Color::WHITE, shadowQuad->getOutputTextures());
   shadowQuad->beginPass();
   api.draw(3, 0);
   shadowQuad->endPass();

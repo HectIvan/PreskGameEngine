@@ -50,7 +50,7 @@ using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
-using pkEngineSDK::PASS_TYPE::kP_IBR;
+using pkEngineSDK::PASS_TYPE::kP_IBL;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_LumBlur;
 using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
@@ -108,7 +108,7 @@ ShaderTest::onInit()
   // Logger& log = g_Logger();
   // TimeManager& timeMan = g_TimeManager();
   // get the resource manager
-  // GPUResourceManager& resourceMan = g_GPUResourceManager();
+  GPUResourceManager& resourceMan = g_GPUResourceManager();
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
@@ -155,8 +155,8 @@ ShaderTest::onInit()
   // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
-  // SPtr<Actor> coat = activeScene->instantiate("Coat");
-  // coat->addComponent(resourceMan.loadModel(Path("models/export3dcoat.obj")));
+  SPtr<Actor> coat = activeScene->instantiate("Coat");
+  coat->addComponent(resourceMan.loadModel(Path("models/pk3DCoat.pkm")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   // log.print("Loading Exterior.");
@@ -183,7 +183,7 @@ ShaderTest::onInit()
   m_blurStrength = 20.0f;
   m_lumThreshold = 90.0f;
   // emissive blur
-  m_emissiveBlur = 30.0f;
+  m_emissiveBlur = 5.0f;
   m_emissiveStrength = 30.0f;
   // exposure
   m_exposure = 1.0f;
@@ -623,7 +623,7 @@ ShaderTest::onUpdate()
   SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> IBRPass = rm.getPass(kP_IBR);
+  SPtr<Pass> IBRPass = rm.getPass(kP_IBL);
   SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
   SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);

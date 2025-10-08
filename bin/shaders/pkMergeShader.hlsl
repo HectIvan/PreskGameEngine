@@ -35,8 +35,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   float3 IBL = IBRSample.rgb;
   
   // color = IBL * shdwSpecSample.g * albedoSample.rgb;
-  
-  color = shdwSpecSample.g * IBL * ssaoSample + albedoSample.rgb * shdwSpecSample.r;
+  //  * ssaoSample
+  color = (shdwSpecSample.g * IBL) + (albedoSample.rgb * shdwSpecSample.r);
   
   // check for a skybox position.
   

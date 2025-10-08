@@ -26,8 +26,8 @@ struct PS_OUTPUT
   float4 diffuse : SV_Target0;
   float4 normal : SV_Target1;
   float4 orm : SV_Target2; // occlusion, roughness, metallic
-  float4 emissive : SV_Target4;
-  float4 posWS : SV_Target5; // world space position
+  float4 emissive : SV_Target3;
+  float4 posWS : SV_Target4; // world space position
 };
 
 PS_OUTPUT PS(PS_INPUT input)

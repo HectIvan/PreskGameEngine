@@ -38,7 +38,7 @@ struct PK_UTILITY_EXPORT Color final
     _color.A = a;
   }
   // constructor with one set color & alpha
-  Color(uint8 rgb, uint8 a)
+  explicit Color(uint8 rgb, uint8 a)
   {
     _color.R = rgb;
     _color.G = rgb;
@@ -51,9 +51,9 @@ struct PK_UTILITY_EXPORT Color final
     _color.fullColor = other._color.fullColor;
   }
   // construct color from one single value
-  Color(uint8 other)
+  Color(uint32 other)
   {
-    _color.fullColor = other;
+    _color.fullColor = static_cast<uint32>(other);
   }
 
   virtual ~Color() = default;
@@ -72,6 +72,15 @@ struct PK_UTILITY_EXPORT Color final
     newColor.z = static_cast<float>(_color.B) / _val;
     newColor.w = static_cast<float>(_color.A) / _val;
     return newColor;
+  }
+
+  PKFORCEINLINE const Color&
+  operator=(const Color& _other) {
+    _color.R = _other._color.R;
+    _color.G = _other._color.G;
+    _color.B = _other._color.B;
+    _color.A = _other._color.A;
+    return *this;
   }
 
   /**
@@ -139,7 +148,7 @@ struct PK_UTILITY_EXPORT Color final
 
   union
   {
-    uint8 fullColor;
+    uint32 fullColor;
     struct
     {
       uint8 R;

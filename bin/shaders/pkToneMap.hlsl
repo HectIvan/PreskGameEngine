@@ -30,7 +30,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   // exposure tone mapping
   float3 mapped = float3(1.0f.xxx) - exp(-finalColor.rgb * exposure);
   // gamma correction 
-  mapped = pow(abs(mapped), float3(1.0f.xxx / gamma));
+  mapped = pow(abs(mapped), float3((1.0f / gamma).xxx));
   
   finalColor = float4(mapped, 1.0f);
 

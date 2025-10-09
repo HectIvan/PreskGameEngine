@@ -164,12 +164,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   getUAVBuffer(const UAV_BUFFERS::E _type);
 
   /**
-   * @brief Compile the shaders of all passes.
-   */
-  void
-  compileShaders();
-
-  /**
    * @brief Set the buffers of each actor.
    */
   void

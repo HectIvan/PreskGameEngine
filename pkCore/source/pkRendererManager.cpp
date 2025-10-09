@@ -410,15 +410,6 @@ RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
   return m_uavBuffers.find(_type)->second;
 }
 
-void
-RendererManager::compileShaders()
-{
-  for (auto it = m_passes.begin(); it != m_passes.end(); ++it) {
-    // Compile shaders
-    it->second->compileShaders();
-  }
-}
-
 template<class T> void
 RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuffer)
 {

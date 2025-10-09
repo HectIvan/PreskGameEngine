@@ -271,7 +271,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Diffuse Texture");
               }
-              im.sameLine();
+              // im.sameLine();
               if (im.createButtonImage(norName.c_str(), normal, texSize)) {
                 // opened window to set normal texture
                 Path path(_window.openFileFromExplorer());
@@ -284,7 +284,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Normal Texture");
               }
-              im.sameLine();
+              // im.sameLine();
               if (im.createButtonImage(occName.c_str(), occlusion, texSize)) {
                 // opened window to set occlusion texture
                 Path path(_window.openFileFromExplorer());
@@ -297,7 +297,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Ambient Occlusion Texture");
               }
-              im.sameLine();
+              // im.sameLine();
               if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
                 // opened window to set rough texture
                 Path path(_window.openFileFromExplorer());
@@ -310,7 +310,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Roughness Texture");
               }
-              im.sameLine();
+              // im.sameLine();
               if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
                 // opened window to set metallic texture
                 Path path(_window.openFileFromExplorer());
@@ -323,7 +323,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Metallic Texture");
               }
-              im.sameLine();
+              // im.sameLine();
               if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
                 // opened window to set metallic texture
                 Path path(_window.openFileFromExplorer());

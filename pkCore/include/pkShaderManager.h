@@ -61,7 +61,7 @@ struct hash<pkEngineSDK::ShaderKey>
 
 namespace pkEngineSDK
 {
-class ShaderManager : public Module<ShaderManager>
+class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
 {
  public:
   ShaderManager() = default;
@@ -83,6 +83,23 @@ class ShaderManager : public Module<ShaderManager>
   SPtr<Shader>
   getShader(const ShaderKey& _key);
 
+  /**
+   * @brief Get all shaders from the manager.
+   * @return All shaders.
+   */
+  Vector<SPtr<Shader>>
+  getShaders();
+
+  /**
+   * @brief Get the names from all compiled shaders.
+   * @param _getEntry If the function should get the entry point of the shader.
+   * @param _getModel If the function should get the model of the shader.
+   * @return The name of the shader with or without the entry point and/or model.
+   */
+  Vector<String> 
+  getShaderNames(const bool _getEntry = false, const bool _getModel = false);
+
+ private:
   UMap<ShaderKey, SPtr<Shader>> m_shaders;
 };
 

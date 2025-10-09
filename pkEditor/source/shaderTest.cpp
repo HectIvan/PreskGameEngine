@@ -7,6 +7,7 @@
 #include "pkRendererManager.h"
 #include "pkGPUResourceManager.h"
 #include "pkSceneManager.h"
+#include "pkShaderManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "shaderTest.h"
@@ -33,6 +34,7 @@ using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_SceneManager;
+using pkEngineSDK::g_ShaderManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::int32;
@@ -66,6 +68,7 @@ using pkEngineSDK::RendererManager;
 using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
+using pkEngineSDK::ShaderManager;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::TimeManager;
@@ -216,7 +219,7 @@ ShaderTest::onInit()
   m_loggerWin.alpha = alpha;
   // right window
   m_rightWin.name = "Inspector";
-  m_rightWin.size = Vector2(400.0f, 800.0f);
+  m_rightWin.size = Vector2(400.0f, winRect.y * 0.8f);
   m_rightWin.position = Vector2(winRect.x - 400.0f, 0.0f);
   m_rightWin.alpha = alpha;
 }
@@ -307,6 +310,7 @@ void
 ShaderTest::uInterfaceUpdate()
 {
   SceneManager& sm = g_SceneManager();
+  ShaderManager& shaderMan = g_ShaderManager();
   UInterface& im = g_uInterface();
   RendererManager& rm = g_RenderManager();
   TextureManager& tm = g_TextureManager();
@@ -410,7 +414,7 @@ ShaderTest::uInterfaceUpdate()
       if (im.beginCombo("Components", val, options)) {
         if (val == 0) {
           Path path = m_window.openFileFromExplorer();
-          if (path.toString().c_str() != "") {
+          if (path.toString() != "") {
             m_selectedActor->addComponent(resourceMan.loadModel(path));
           }
         }
@@ -533,58 +537,18 @@ ShaderTest::uInterfaceUpdate()
     }
   }
   if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
-    // compile shaders
-    Vector<ShaderType> shaderPaths;
-    for (auto it = rm.m_passes.begin(); it != rm.m_passes.end(); ++it) {
-      SPtr<Shader> vShader = it->second->getVShader();
-      SPtr<Shader> pShader = it->second->getPShader();
-      SPtr<Shader> cShader = it->second->getCShader();
-      // check if a vertex shader exists.
-      if (vShader) {
-        Path dir = vShader->getShaderDirectory();
-        if (!findShader(shaderPaths, dir)) {
-          ShaderType shaderMem;
-          shaderMem.path = dir;
-          shaderMem.name = dir.getFileName();
-          shaderMem.shader = vShader;
-          shaderPaths.push_back(shaderMem);
-        }
+    // display all compiled shaders.
+    Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
+    for (uint32 i = 0; i < shaders.size(); ++i) {
+      SPtr<Shader> shader = shaders[i];
+      String shaderName = shader->getShaderDirectory().getFileName();
+      im.createText(shaderName.c_str());
+      im.sameLine();
+      im.pushID(i);
+      if (im.createButton("Cmp")) {
+        shader->compile();
       }
-      // check if a pixel shader exist.
-      if (pShader) {
-        Path dir = pShader->getShaderDirectory();
-        if (!findShader(shaderPaths, dir)) {
-          ShaderType shaderMem;
-          shaderMem.path = dir;
-          shaderMem.name = dir.getFileName();
-          shaderMem.shader = pShader;
-          shaderPaths.push_back(shaderMem);
-        }
-      }
-      // check if a compute shader exists.
-      if (cShader) {
-        Path dir = cShader->getShaderDirectory();
-        if (!findShader(shaderPaths, dir)) {
-          ShaderType shaderMem;
-          shaderMem.path = dir;
-          shaderMem.name = dir.getFileName();
-          shaderMem.shader = cShader;
-          shaderPaths.push_back(shaderMem);
-        }
-      }
-    }
-    // compilation buttons for each shader.
-    for (uint32 i = 0; i < shaderPaths.size(); ++i) {
-      const char* name = shaderPaths[i].name.c_str();
-      im.createText(name);
-      // im.sameLine();
-      // if (im.createButton(name)) {
-      //   shaderPaths[i].shader->compile();
-      // }
-    }
-    // compilation button for all shaders.
-    if (im.createButton("Compile Shaders")) {
-      rm.compileShaders();
+      im.popID();
     }
   }
   im.popStyleColor(3);

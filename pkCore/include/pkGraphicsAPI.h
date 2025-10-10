@@ -300,8 +300,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         int32 _mipLevels,
-                        uint32 _format,
-                        int32 _miscFlags = 0) = 0;
+                        uint32 _format) = 0;
 
   /**
    * @brief Create a texture from a DDS file.

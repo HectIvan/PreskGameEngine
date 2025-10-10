@@ -464,7 +464,7 @@ extractBoneWeightForVertices(Model& _model,
                              aiMesh* _mesh)
 {
   for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
-    int boneID = -1;
+    // uint32 boneID = -1;
     String boneName = _mesh->mBones[i]->mName.C_Str();
     if (_model.boneMap.find(boneName) == _model.boneMap.end()) {
       Bone newBone;
@@ -474,15 +474,15 @@ extractBoneWeightForVertices(Model& _model,
                           aIMatrixToMatrix(_mesh->mBones[i]->mOffsetMatrix));
       newBone.setLocalTransform(transform);
       _model.boneMap[boneName] = newBone;
-      boneID = _model.boneCounter;
+      // boneID = _model.boneCounter;
       ++_model.boneCounter;
     }
-    else
-    {
-      boneID = _model.boneMap[boneName].getBoneID();
-    }
-    auto weights = _mesh->mBones[i]->mWeights;
-    uint32 numWeight = _mesh->mBones[i]->mNumWeights;
+    // else
+    // {
+    //   // boneID = _model.boneMap[boneName].getBoneID();
+    // }
+    // auto weights = _mesh->mBones[i]->mWeights;
+    // uint32 numWeight = _mesh->mBones[i]->mNumWeights;
 
     // for (uint32 j = 0; j < numWeight; ++j) {
     //   uint32 vertexID = weights[i].mVertexId;

@@ -312,8 +312,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
                         int32 _mipLevels,
-                        uint32 _format,
-                        int32 _miscFlags = 0) override;
+                        uint32 _format) override;
 
   /**
    * @brief Create a texture from a DDS file.

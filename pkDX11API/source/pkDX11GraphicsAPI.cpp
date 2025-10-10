@@ -39,7 +39,7 @@
 
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
-#include <d3dcompiler.h>
+#include <D3Dcompiler.h>
 
 namespace pkEngineSDK
 {
@@ -1557,8 +1557,7 @@ SPtr<Texture>
 DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _bindFlags,
                                        int32 _mipLevels,
-                                       uint32 _format,
-                                       int32 _miscFlags)
+                                       uint32 _format)
 {
   Logger& log = g_Logger();
 

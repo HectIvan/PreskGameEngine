@@ -36,7 +36,7 @@ namespace FileSystem
  * @param _path Path to check for.
  * @return If the path exists or not.
  */
-  PKFORCEINLINE static bool
+PKFORCEINLINE static bool
 fileExists(const Path& _path)
 {
   path fsPath(_path.toString());

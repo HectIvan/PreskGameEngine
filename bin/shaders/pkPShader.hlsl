@@ -11,6 +11,14 @@ SamplerState samLinear : register(s0);
 #define M_PI 3.14159f
 #define DELTA 1.0f
 
+cbuffer MaterialProps : register(b3)
+{
+  float3 colorMultiplier; // base color multiplier
+  float roughnessFactor; // roughness factor
+  float3 emissiveMultiplier; // emissive Multiplier
+  float metallicFactor; // metallic factor
+};
+
 struct PS_INPUT
 {
   float4 PosSS : SV_POSITION;
@@ -49,9 +57,9 @@ PS_OUTPUT PS(PS_INPUT input)
   normalSam = normalize(mul(normalSam, TBN));
   // fill up all outputs with their respective values.
   output.normal = float4(normalSam, 1.0f);
-  output.diffuse = float4(colorSam.rgb, 1.0f);
-  output.orm = float4(AO.r, roughSam.g, metallicSam.b, 1.0f);
-  output.emissive = emissSam;
+  output.diffuse = float4(colorSam.rgb * colorMultiplier, 1.0f);
+  output.orm = float4(AO.r, roughSam.g * roughnessFactor, metallicSam.b * metallicFactor, 1.0f);
+  output.emissive = emissSam * float4(emissiveMultiplier, 1.0f);
   output.posWS = float4(input.PosWS, 1.0f);
   
   return output;

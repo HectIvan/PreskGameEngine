@@ -422,7 +422,7 @@ bool
 UInterface::colorEdit(const char* _name, Vector3& _color)
 {
   float color[3] = { _color.x, _color.y, _color.z };
-  bool result = ImGui::ColorEdit3(_name, color);
+  bool result = ImGui::ColorEdit3(_name, color, ImGuiColorEditFlags_NoInputs);
   _color.x = color[0];
   _color.y = color[1];
   _color.z = color[2];

@@ -27,22 +27,27 @@ namespace pkEngineSDK
 
 struct MaterialProps
 {
-  union {
-    struct {
-      uint32 m_hasDiffuse : 1;
-      uint32 m_hasSpecular : 1;
-      uint32 m_hasNormal : 1;
-      uint32 m_opaque : 1;
-      uint32 m_hasAlphaTest : 1;
-      uint32 m_alphaBlend : 1;
-      uint32 m_doubleSided : 1;
-      uint32 m_wireFrame : 1;
-      uint32 m_castShadow : 1;
-      uint32 m_receiveShadow : 1;
-      uint32 unused : 22;
-    } flags;
-    uint32 value = 0;
-  } properties;
+  // union {
+  //   struct {
+  //     uint32 m_hasDiffuse : 1;
+  //     uint32 m_hasSpecular : 1;
+  //     uint32 m_hasNormal : 1;
+  //     uint32 m_opaque : 1;
+  //     uint32 m_hasAlphaTest : 1;
+  //     uint32 m_alphaBlend : 1;
+  //     uint32 m_doubleSided : 1;
+  //     uint32 m_wireFrame : 1;
+  //     uint32 m_castShadow : 1;
+  //     uint32 m_receiveShadow : 1;
+  //     uint32 unused : 22;
+  //   } flags;
+  //   uint32 value = 0;
+  // } properties;
+
+  Vector3 ColorMultiply = Vector3(1.0f);
+  float roughnessMultiply = 0.24f;
+  Vector3 EmissiveMultiply = Vector3(1.0f);
+  float metallicMultiply = 0.0f;
 };
 
 // check the bit in question in hex

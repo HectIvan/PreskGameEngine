@@ -176,8 +176,10 @@ RendererManager::createPasses()
   pDesc.pSModel = "ps_5_0";
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
-  pDesc.cBSizes = { sizeof(CBView), sizeof(CBProjection), sizeof(CBTransform), sizeof(CBLight),
-                    sizeof(CBCamera), sizeof(CBTransform) };
+  pDesc.cBSizes = { sizeof(CBMatrix),
+                    sizeof(CBMatrix),
+                    sizeof(CBMatrix),
+                    sizeof(CBMaterialProps) };
   pDesc.inputs = {};
   pDesc.outputs = { albedoTex,
                     normalTex,
@@ -442,6 +444,8 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
+  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  SPtr<Pass> shadowPass = rManager.getPass(PASS_TYPE::kP_Shadow);
   // for each actor
   for (uint32 i = 0; i < _gameActors.size(); ++i) {
     SPtr<Actor> currActor = _gameActors[i];
@@ -460,12 +464,8 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work 
-    SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-    SPtr<Pass> shadowPass = rManager.getPass(PASS_TYPE::kP_Shadow);
     api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
     api.updateConstantBuffer(shadowPass->getCBuffer(2), &transform, sizeof(Matrix4));
-    Matrix4 transformInvTransp = transform.inverse().getTransposed();
-    api.updateConstantBuffer(basePass->getCBuffer(5), &transformInvTransp, sizeof(Matrix4));
 
     // render the model of the actor
     SPtr<Model> model = currActor->getComponent<Model>();
@@ -483,8 +483,11 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 void
 RendererManager::renderModel(const SPtr<Model>& _model)
 {
+  // get a reference from managers and passes.
+  RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
-  // get a reference from the api
+  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  SPtr<Pass> shadowPass = rManager.getPass(PASS_TYPE::kP_Shadow);
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
@@ -506,6 +509,8 @@ RendererManager::renderModel(const SPtr<Model>& _model)
                                          material->m_roughness,
                                          material->m_emissive };
       api.pSSetShaderResourceViews(textures);
+      api.updateConstantBuffer(basePass->getCBuffer(3),
+                               &material->m_properties, sizeof(CBMaterialProps));
       // draw the mesh
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }

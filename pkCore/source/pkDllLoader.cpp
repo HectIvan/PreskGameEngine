@@ -28,7 +28,7 @@ DllLoader::load()
 void*
 DllLoader::getMethod(const String& _methodName)
 {
-  return static_cast<void*>(GetProcAddress(handler, _methodName.c_str()));
+  return reinterpret_cast<void*>(GetProcAddress(handler, _methodName.c_str()));
 }
 }
 

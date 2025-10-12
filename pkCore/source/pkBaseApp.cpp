@@ -91,7 +91,7 @@ run(String _name, Window& _window)
 {
   DllLoader dll;
   dll.init(_name);
-  auto dllSymbol = static_cast<void(*)(Window)>(dll.getMethod("loadPlugin"));
+  auto dllSymbol = reinterpret_cast<void(*)(Window)>(dll.getMethod("loadPlugin"));
   if (dllSymbol) {
     dllSymbol(_window);
   }

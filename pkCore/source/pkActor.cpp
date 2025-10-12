@@ -157,7 +157,7 @@ Actor::setScale(float _x, float _y, float _z)
 }
 
 void
-Actor::update(float _deltaTime)
+Actor::update(float)
 {
   for (uint32 i = 0; i < m_components.size(); ++i) {
     SPtr<Component> component = m_components[i];

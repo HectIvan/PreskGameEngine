@@ -37,7 +37,8 @@ struct LogMSG
 {
   LogMSG(String _message, LOG_MSG_TYPE::E _type) :
     message(_message),
-    type(_type) {}
+    type(_type)
+  {}
   String message;
   LOG_MSG_TYPE::E type;
 };

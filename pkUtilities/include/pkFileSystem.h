@@ -36,7 +36,7 @@ namespace FileSystem
  * @param _path Path to check for.
  * @return If the path exists or not.
  */
-static bool
+  PKFORCEINLINE static bool
 fileExists(const Path& _path)
 {
   path fsPath(_path.toString());
@@ -48,7 +48,7 @@ fileExists(const Path& _path)
  * @param _path Path to use.
  * @return Absolute path.
  */
-static path
+PKFORCEINLINE static path
 getAbsolutePath(const Path& _path)
 {
   path fsPath(_path.toString());
@@ -60,7 +60,7 @@ getAbsolutePath(const Path& _path)
  * @param _path Path to use.
  * @return Absolute path.
  */
-static WString
+PKFORCEINLINE static WString
 getAbsolutePathWStr(const Path& _path)
 {
   path fsPath(_path.toString());

@@ -18,6 +18,11 @@
 namespace pkEngineSDK
 {
 
+struct CBMatrix
+{
+  Matrix4 matrix;
+};
+
 struct CBView
 {
   Matrix4 view;
@@ -127,5 +132,13 @@ struct CBVector3
 {
   Vector3 vec1;
   float unused;
+};
+
+struct CBMaterialProps
+{
+  Vector3 ColorMultiply = Vector3(1.0f);
+  float roughnessMultiply = 1.0f;
+  Vector3 EmissiveMultiply = Vector3(1.0f);
+  float metallicMultiply = 1.0f;
 };
 }

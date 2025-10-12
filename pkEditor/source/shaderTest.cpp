@@ -688,13 +688,9 @@ ShaderTest::onUpdate()
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
-  api.updateConstantBuffer(basePass->getCBuffer(3), &cBLight, cBLightSize);
-  api.updateConstantBuffer(basePass->getCBuffer(4), &cBCamera, cBCamSize);
 
   api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
   api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
-  api.updateConstantBuffer(baseShadow->getCBuffer(3), &cBLight, cBLightSize);
-  api.updateConstantBuffer(baseShadow->getCBuffer(4), &cBLightCam, cBCamSize);
 
   // update shadow-specular quad pass
   api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);

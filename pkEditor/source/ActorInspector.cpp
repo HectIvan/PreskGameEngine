@@ -38,6 +38,7 @@ using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
+using pkEngineSDK::MaterialProps;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
@@ -241,6 +242,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               im.createInputText("##MaterialName: ", &material->m_name);
               // get material
               SPtr<Material> meshMat = mesh->material;
+              MaterialProps& matProps = meshMat->m_properties;
               String matName = meshMat->getNameS();
               // get the textures
               SPtr<Texture> diffuse = meshMat->m_diffuse;
@@ -271,6 +273,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Diffuse Texture");
               }
+              im.sameLine();
+              im.colorEdit("Color Multiply", matProps.ColorMultiply);
               // im.sameLine();
               if (im.createButtonImage(norName.c_str(), normal, texSize)) {
                 // opened window to set normal texture
@@ -310,6 +314,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Roughness Texture");
               }
+              im.sameLine();
+              im.createDragF("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
               // im.sameLine();
               if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
                 // opened window to set metallic texture
@@ -323,6 +329,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Metallic Texture");
               }
+              im.sameLine();
+              im.createDragF("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
               // im.sameLine();
               if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
                 // opened window to set metallic texture
@@ -336,6 +344,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               if (im.isItemHovered()) {
                 im.setTooltip("Emissive Texture");
               }
+              im.sameLine();
+              im.colorEdit("Emissive Color", matProps.EmissiveMultiply);
             }
             else {
               im.pushID(i);

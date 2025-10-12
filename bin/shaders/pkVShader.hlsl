@@ -17,11 +17,6 @@ cbuffer cbWorld : register(b2)
     matrix World;
 };
 
-cbuffer cbWorldInverseTransposed : register(b5)
-{
-  matrix worldInvTransp;
-}
-
 struct VS_INPUT
 {
   float3 Position : POSITION;
@@ -63,7 +58,7 @@ PS_INPUT VS(VS_INPUT input)
   // float3 bitangent = normalize(cross(normal, tangent) * input.Tangent.w);
   
   // normal fix
-  float4x4 transform = worldInvTransp;
+  // float4x4 transform = worldInvTransp;
   
   output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
   output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), World).xyz);

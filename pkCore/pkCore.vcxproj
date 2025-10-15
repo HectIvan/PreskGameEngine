@@ -216,6 +216,7 @@
     <ClInclude Include="include\pkSwapChain.h" />
     <ClInclude Include="include\pkTexture.h" />
     <ClInclude Include="include\pkTextureManager.h" />
+    <ClInclude Include="include\pkTextureResource.h" />
     <ClInclude Include="include\pkTimeManager.h" />
     <ClInclude Include="include\pkUsings.h" />
     <ClInclude Include="include\pkVertexBuffer.h" />

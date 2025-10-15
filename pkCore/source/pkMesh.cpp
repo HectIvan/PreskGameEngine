@@ -1,5 +1,5 @@
 #include "pkMesh.h"
-#include "pkDevice.h"
+#include "pkDevice.h" // removing this breaks with a linker error, i don't know why
 
 namespace pkEngineSDK
 {

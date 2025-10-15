@@ -27,13 +27,10 @@
 namespace pkEngineSDK
 {
 
-class Device;
-class Texture;
-
 class Mesh
 {
  public:
-   Mesh() = default;
+  Mesh() = default;
   virtual ~Mesh() {
     clean();
   }

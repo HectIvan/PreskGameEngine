@@ -34,6 +34,13 @@ namespace RESOURCE_TYPE
   };
 }
 
+struct BaseHeader
+{
+  uint32 id;
+  String name;
+  RESOURCE_TYPE::E type;
+};
+
 class PK_CORE_EXPORT BaseResource
 {
 public:

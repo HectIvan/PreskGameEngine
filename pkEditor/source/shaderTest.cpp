@@ -182,9 +182,9 @@ ShaderTest::onInit()
   m_vSync = false;
   m_IBRIntensity = 1.0f;
   // luminance blur
-  m_blurRadius = 1.0f;
+  m_blurRadius = 0.001f;
   m_blurStrength = 20.0f;
-  m_lumThreshold = 90.0f;
+  m_lumThreshold = 6.0f;
   // emissive blur
   m_emissiveBlur = 5.0f;
   m_emissiveStrength = 30.0f;

@@ -67,6 +67,9 @@
     <Filter Include="source\managers">
       <UniqueIdentifier>{9e1412c8-4e14-48b6-ac30-767e2c2ea502}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\resources">
+      <UniqueIdentifier>{64eebc39-ffc4-486f-bac2-304f40d9621e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -228,14 +231,17 @@
     <ClInclude Include="include\pkAssetResourceManager.h">
       <Filter>include\managers</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkBaseResource.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkModelResource.h">
-      <Filter>include\base app</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkShaderManager.h">
       <Filter>include\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkModelResource.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkBaseResource.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkTextureResource.h">
+      <Filter>include\resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

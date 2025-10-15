@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkModelResource.h
+ * @file    pkTextureResource.h
  * @author  Héctor Iván Muñoz Ceballos
- * @date    04/02/2025
- * @brief   Resource for engine models.
+ * @date    15/10/2025
+ * @brief   Texture resource for engine models.
  *
  * @bug    No known bugs.
  */
@@ -16,40 +16,27 @@
 **/
 /*********************************************/
 #include "pkBaseResource.h"
-#include "pkSimpleVertex.h"
 
 namespace pkEngineSDK
 {
 
-struct ModelAssetHeader
-{
-  uint32 meshCount;
-};
-
-struct MeshAssetHeader
-{
-  SIZE_T nameSize;
-  String name;
-  uint32 vertexCount;
-  uint32 indexCount;
-  // String name;
-};
-
-class PK_CORE_EXPORT ModelResource : public BaseResource
+class TextureResource : public BaseResource
 {
  public:
-  ModelResource() = default;
-  virtual ~ModelResource() = default;
+  TextureResource() = default;
+  virtual ~TextureResource() = default;
 
   /**
    * @brief Get the resource type.
    * @return The resource type.
    */
   RESOURCE_TYPE::E
-  getType() const override { return RESOURCE_TYPE::kModel; }
+  getType() const { return RESOURCE_TYPE::kTexture; }
 
  public:
-  Vector<SimpleVertex> vertex;
-  Vector<uint32> index;
+  uint32 m_width;
+  uint32 m_height;
+  uint32 m_format;
+  Vector<uint8> m_data;
 };
 }

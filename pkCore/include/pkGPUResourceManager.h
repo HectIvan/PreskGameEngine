@@ -16,7 +16,6 @@
 **/
 /*********************************************/
 #include "pkMaterial.h"
-#include "pkModel.h"
 #include "pkMesh.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
@@ -25,6 +24,8 @@
 
 namespace pkEngineSDK
 {
+
+class Model;
 
 /**
  * Memory structures used to store already loaded data and call it when needed.
@@ -70,12 +71,28 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
   loadModel(Path _directory);
 
   /**
+   * @brief Loads a model from a .pkm file.
+   * @param _path File path.
+   * @return Pointer to the model if loaded; nullptr if failed.
+   */
+  SPtr<Model>
+  loadPKModel(Path _path);
+
+  /**
+   * @brief Loads a model from a file using Assimp.
+   * @param _path File path.
+   * @return Pointer to the model if loaded; nullptr if failed.
+   */
+  SPtr<Model>
+  loadAssimpModel(Path _path);
+
+  /**
    * @brief search for a specific mesh
    * @param _name Name of the mesh.
    * @return Pointer to the mesh if found;
    */
   SPtr<Mesh>
-  searchMesh(String _name);
+  searchMesh(const String _name);
 
  public:
   Vector<SPtr<ModelMemory>> m_models;

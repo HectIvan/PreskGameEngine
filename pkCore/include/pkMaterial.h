@@ -45,9 +45,9 @@ struct MaterialProps
   // } properties;
 
   Vector3 ColorMultiply = Vector3(1.0f);
-  float roughnessMultiply = 0.24f;
+  float roughnessMultiply = 1.0f;
   Vector3 EmissiveMultiply = Vector3(1.0f);
-  float metallicMultiply = 0.0f;
+  float metallicMultiply = 1.0f;
 };
 
 // check the bit in question in hex

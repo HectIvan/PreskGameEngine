@@ -18,7 +18,7 @@ RendererManager::init()
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
 
-  float sizeMulShadow = 6.0f;
+  float sizeMulShadow = 10.0f;
 
   // Texture description
   TextureDesc txDesc;

@@ -297,7 +297,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float tolerance = 2.0f * dotOfLight;
   
   if (lightHit > worldHit + tolerance) {
-    // output.shdwSpec = float3(shadowColor, specular.r, 1.0f);
+    output.shdwSpec = float3(shadowColor, specular.r, 1.0f);
   }
   
   /**

@@ -18,7 +18,6 @@
 #include "pkBone.h"
 #include "pkComponent.h"
 #include "pkIndexBuffer.h"
-#include "pkMaterial.h"
 #include "pkMesh.h"
 #include "pkPath.h"
 #include "pkVertexBuffer.h"
@@ -26,28 +25,13 @@
 namespace pkEngineSDK
 {
 
-class PK_CORE_EXPORT Model : public Component
+class Model : public Component
 {
  public:
-  Model() = default;
+  Model();
   virtual ~Model() {
     clean();
   }
-
-  /**
-   * @brief Load the model from a path.
-   */
-  bool
-  loadPK(const Path& _path);
-
-  /**
-   * @brief Load the model from a path.
-   * @param _path File path.
-   * @return If the model was able to be loaded.
-   */
-  bool
-  loadAssimp(const Path& _path);
-
   /**
    * @brief Get the map of bones assigned to the model.
    * @return The bone map.
@@ -138,6 +122,12 @@ class PK_CORE_EXPORT Model : public Component
   SPtr<IndexBuffer>
   getIndexBuffer() { return m_indexB; }
 
+  /**
+   * @brief Set the vertex and index data to the model.
+   */
+  void
+  setVerticesIndices();
+
  public:
   // vertex and index data
   Vector<SimpleVertex> vertex;
@@ -153,9 +143,9 @@ class PK_CORE_EXPORT Model : public Component
   SPtr<VertexBuffer> m_vertexB;
   SPtr<IndexBuffer> m_indexB;
 
- private:
   // location data
   Path path;
+ private:
   // name
   String m_name;
 };

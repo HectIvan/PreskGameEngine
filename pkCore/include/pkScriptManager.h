@@ -17,13 +17,12 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkModule.h"
-#include "sol/sol.hpp"
 
 namespace pkEngineSDK
 {
 
-using ScriptState = sol::state;
-using sol::lib;
+// using ScriptState = sol::state;
+// using sol::lib;
 
 class PK_CORE_EXPORT ScriptManager : public Module<ScriptManager>
 {
@@ -32,7 +31,7 @@ class PK_CORE_EXPORT ScriptManager : public Module<ScriptManager>
   virtual ~ScriptManager() = default;
 
  public:
-  ScriptState m_state;
+  // ScriptState m_state;
 };
 
 PK_CORE_EXPORT ScriptManager&

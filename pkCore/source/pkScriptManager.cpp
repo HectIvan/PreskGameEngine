@@ -15,15 +15,19 @@
 **/
 /*********************************************/
 #include "pkScriptManager.h"
+#include "sol/sol.hpp"
+
 
 namespace pkEngineSDK
 {
+using ScriptState = sol::state;
+using sol::lib;
 
 ScriptManager::ScriptManager()
 {
-  m_state.open_libraries(
-    lib::base
-  );
+  // m_state.open_libraries(
+  //   lib::base
+  // );
 }
 
 PK_CORE_EXPORT ScriptManager&

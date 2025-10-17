@@ -49,7 +49,7 @@ float4 PS(PS_INPUT input) : SV_Target0
     color = skyboxFinal.rgb;
   }
   
-  float4 fullEmissive = emissiveSample;
+  float4 fullEmissive = emissiveSample + emissBlurSample;
   
   return float4(color, 1.0f) + fullEmissive;
 }

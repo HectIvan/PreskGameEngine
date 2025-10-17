@@ -420,7 +420,8 @@ ShaderTest::uInterfaceUpdate()
         }
       }
       // create all components
-      for (uint32 i = 0; i < m_selectedActor->getComponents().size(); ++i) {
+      uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
+      for (uint32 i = 0; i < componentCount; ++i) {
         inspector.createComponentWindow(m_selectedActor->getComponents()[i],
                                         m_window,
                                         m_searchMesh,
@@ -438,9 +439,9 @@ ShaderTest::uInterfaceUpdate()
   String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
 
   // FPS parameters
-  static const int fpsListSize = 100;
+  static const uint32 fpsListSize = 100;
   static float fpsHistory[fpsListSize] = {};
-  static int fpsOffset = 0;
+  static uint32 fpsOffset = 0;
 
   // Record the current FPS
   fpsHistory[fpsOffset] = f_fps;

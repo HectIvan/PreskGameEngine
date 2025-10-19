@@ -1,11 +1,12 @@
 // Resources
 Texture2D albedoMap : register(t0);
-Texture2D shdowSpecMap : register(t1);
-Texture2D skyboxMap : register(t2);
-Texture2D IBLMap : register(t3);
-Texture2D emissiveMap : register(t4);
-Texture2D emissiveBlurMap : register(t5);
-Texture2D ssaoMap : register(t6); // temporary texture to show ambient occlusion effect.
+Texture2D diffuseBRDFmap : register(t1);
+Texture2D specularBRDFmap : register(t2);
+Texture2D skyboxMap : register(t3);
+Texture2D IBLMap : register(t4);
+Texture2D emissiveMap : register(t5);
+Texture2D emissiveBlurMap : register(t6);
+Texture2D ssaoMap : register(t7); // temporary texture to show ambient occlusion effect.
 
 // sampler
 SamplerState samState : register(s0);
@@ -20,7 +21,8 @@ float4 PS(PS_INPUT input) : SV_Target0
 {
   // Get texture resources.
   float4 albedoSample = albedoMap.Sample(samState, input.TexCoord);
-  float2 shdwSpecSample = shdowSpecMap.Sample(samState, input.TexCoord).rg;
+  float3 diffBRDFSample = diffuseBRDFmap.Sample(samState, input.TexCoord).rgb;
+  float3 specBRDFSample = specularBRDFmap.Sample(samState, input.TexCoord).rgb;
   float4 skyboxSample = skyboxMap.Sample(samState, input.TexCoord);
   float4 IBLSample = IBLMap.Sample(samState, input.TexCoord);
   float4 emissiveSample = emissiveMap.Sample(samState, input.TexCoord);
@@ -31,12 +33,13 @@ float4 PS(PS_INPUT input) : SV_Target0
   // get the base color 
   float3 color = albedoSample.rgb;
   
-  color = color / (color + float3(1.0f.xxx));
+  // color = color / (color + float3(1.0f.xxx));
   float3 IBL = IBLSample.rgb;
   
   // color = IBL * shdwSpecSample.g * albedoSample.rgb;
   //  * ssaoSample
-  color = (shdwSpecSample.g * IBL) + (albedoSample.rgb * shdwSpecSample.r);
+  
+  color = (albedoSample.rgb * diffBRDFSample) + (specBRDFSample * IBL);
   
   // check for a skybox position.
   

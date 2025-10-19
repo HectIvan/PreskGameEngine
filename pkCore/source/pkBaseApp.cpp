@@ -13,11 +13,6 @@
 #include "pkWindowDesc.h"
 #include "pkShaderManager.h"
 
-using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Light;
-using pkEngineSDK::G_BUFFERS::kGB_Albedo;
-using pkEngineSDK::G_BUFFERS::kGB_Normal;
-using pkEngineSDK::G_BUFFERS::kGB_ShdwSpec;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;

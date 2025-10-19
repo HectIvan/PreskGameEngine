@@ -72,7 +72,8 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float3 shdwSpec : SV_Target;
+  float4 diffuseBRDF : SV_Target0;
+  float4 specularBRDF : SV_Target1;
 };
 
 float fresnelSchlick(float F0, float VoH)
@@ -150,9 +151,9 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
 // source: https://graphicscompendium.com/gamedev/15-pbr
 // F0 = (n - 1)^2 / (n + 1)^2
 // F = F0 + (1 - F0) * (1 - VoH)^5
-float Fresnel(float3 F0, float VoH) // float refraction
+float3 Fresnel(float3 F0, float VoH) // float refraction
 {
-  float F = F0.x + (1.0f - F0.x) * pow((1 - VoH), 5.0f);
+  float3 F = F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
   return F;
 }
 
@@ -176,16 +177,13 @@ float3 cookTorranceSpecular(float3 normal,
   
   float NDF = NormalDistribution(Half, normal, rough);
   float G = GeometrySmith(NoV, NoL, rough);
-  float F = Fresnel(F0, max(VoH, 0.0f));
-  
-  float3 kD = float3(1.0f, 1.0f, 1.0f) - F;
-  kD *= 1.0f - metallic;
+  float3 F = Fresnel(F0, max(VoH, 0.0f));
   
   float3 numerator = NDF * G * F;
   float denominator = 4.0f * max(NoV, 0.0f) * max(NoL, 0.0f) + 1e-5f;
   float3 specular = numerator / denominator;
   
-  lo += ((kD * 1.0f / PI + specular) * radiance * NoL).xxx;
+  lo += (specular * radiance * NoL);
   
   return lo;
 }
@@ -195,8 +193,11 @@ float magnitude(float3 v)
   return sqrt((v.x * v.x) + (v.y * v.y) * (v.z * v.z));
 }
 
-float OrenNayarDiffuse(float3 N, float3 L, float3 V, float NoL, float NoV, float roughness)
+float OrenNayarDiffuse(float3 N, float3 L, float3 V, float roughness)
 {
+  float NoL = saturate(dot(N, L));
+  float NoV = saturate(dot(N, V));
+  
   float thetaR = acos(NoV);
   float thetaI = acos(NoL);
   
@@ -231,7 +232,7 @@ PS_OUTPUT PS(PS_INPUT input)
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
-  float4 colorTex = colorMap.Sample(samState, input.TexCoord);
+  float3 colorTex = colorMap.Sample(samState, input.TexCoord).rgb;
   float ambientOcclusion = orm.Sample(samState, input.TexCoord).r;
   float metallicVal = orm.Sample(samState, input.TexCoord).b;
   float roughVal = orm.Sample(samState, input.TexCoord).g;
@@ -246,29 +247,28 @@ PS_OUTPUT PS(PS_INPUT input)
     alpha = 0.0f;
   }
   
-  // specular light
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 normal = normalize(normalTex.xyz);
   
-  // diffuse light
+  // Diffuse BRDF
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  
-  float NoL = saturate(dot(normal, lightDir));
-  float NoV = saturate(dot(normal, viewDir));
-  
-  float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, NoL, NoV, roughVal);
+  float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughVal);
   
   float dotOfLight = orenNaya; // dot(lightDir, normal); // 
   float lamb = max(dotOfLight, shadowColor);
-  lamb = lerp(lamb, shadowColor, 1.0f - lamb);
-  float3 lambert = lightColor * lamb;
+  float3 diffuseBRDF = lerp(lamb, shadowColor, 1.0f - lamb);
   
-  lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  
-  
-  float3 F0 = float3(0.04f.xxx);
-  F0 = lerp(F0, colorTex.rgb, metallicVal.xxx);
+  // Compute F0
+  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), colorTex, metallicVal.xxx);
+
+  // fresnel value
+  float3 Half = normalize(viewDir + lightDir);
+  float VoH = saturate(dot(viewDir, Half));
+  float3 F = Fresnel(F0, VoH);
+
+  // Diffuse energy weight
+  float3 kD = (1.0f - F) * (1.0f - metallicVal);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
@@ -279,7 +279,8 @@ PS_OUTPUT PS(PS_INPUT input)
   
   float3 specular = (specCookTorrance) * SpecIntensity * ambientOcclusion;
   
-  output.shdwSpec = float3(lambert.r, specular.r, alpha);
+  output.diffuseBRDF = float4(diffuseBRDF * kD, alpha);
+  output.specularBRDF = float4(specular, alpha);
   
   /**
    * shadow mapping;
@@ -297,7 +298,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float tolerance = 2.0f * dotOfLight;
   
   if (lightHit > worldHit + tolerance) {
-    output.shdwSpec = float3(shadowColor, specular.r, 1.0f);
+    // output.diffuseBRDF = float4(diffuseBRDF * kD * shadowColor.xxx, alpha);
   }
   
   /**

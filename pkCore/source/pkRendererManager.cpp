@@ -38,9 +38,13 @@ RendererManager::init()
   SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
-  // render target for the shadow specular result.
-  SPtr<Texture> shadowSpecRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_ShdwSpec, shadowSpecRT });
+  // render target for the diffuseBRDF result.
+  SPtr<Texture> diffuseBRDF = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_DiffuseBRDF, diffuseBRDF });
+
+  // render target for the specularBRDF result.
+  SPtr<Texture> specularBRDF = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_SpecularBRDF, specularBRDF });
 
   // render target for the metallic result.
   SPtr<Texture> ormRT = api.createTexture(txDesc);
@@ -160,7 +164,11 @@ RendererManager::createPasses()
   SPtr<Texture> emissTex = getGBuffer(G_BUFFERS::kGB_Emissive);
   SPtr<Texture> emissHBlurTex = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
   SPtr<Texture> emissBlurTex = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
-  SPtr<Texture> shadowSpecTex = getGBuffer(G_BUFFERS::kGB_ShdwSpec);
+  SPtr<Texture> diffBRDFTex = getGBuffer(G_BUFFERS::kGB_DiffuseBRDF);
+  SPtr<Texture> specBRDFTex = getGBuffer(G_BUFFERS::kGB_SpecularBRDF);
+  SPtr<Texture> skyboxTex = getGBuffer(G_BUFFERS::kGB_Skybox);
+  SPtr<Texture> iblTex = getGBuffer(G_BUFFERS::kGB_IBL);
+  SPtr<Texture> mergeTex = getGBuffer(G_BUFFERS::kGB_Merge);
 
   // Depth textures
   SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -221,7 +229,7 @@ RendererManager::createPasses()
                    posTex,
                    ormTex,
                    lightPosTex };
-  pDesc.outputs = { shadowSpecTex };
+  pDesc.outputs = { diffBRDFTex, specBRDFTex };
   pDesc.pDepth = {};// getDepthBuffer(D_BUFFERS::kDB_Base);
   SPtr<Pass> shadowQuadPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -233,7 +241,7 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Skybox) };
+  pDesc.outputs = { skyboxTex };
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
@@ -261,7 +269,7 @@ RendererManager::createPasses()
                    posTex,
                    ormTex,
                    albedoTex };
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_IBL) };
+  pDesc.outputs = { iblTex };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> iblPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -296,13 +304,14 @@ RendererManager::createPasses()
   pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
   pDesc.cBSizes = {};
   pDesc.inputs = { albedoTex,
-                   shadowSpecTex,
-                   getGBuffer(G_BUFFERS::kGB_Skybox),
-                   getGBuffer(G_BUFFERS::kGB_IBL),
+                   diffBRDFTex,
+                   specBRDFTex,
+                   skyboxTex,
+                   iblTex,
                    emissTex,
                    emissBlurTex,
                    ssaoTex }; // to do: do a correct ambient occlusion implementation.
-  pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
+  pDesc.outputs = { mergeTex };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -317,7 +326,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
   pDesc.cBSizes = { sizeof(CBVector2x2) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge) };
+  pDesc.inputs = { mergeTex };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   SPtr<Pass> lumPass = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -351,7 +360,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.pSDirectory = Path("shaders/pkToneMap.hlsl");
   pDesc.cBSizes = { sizeof(CBFloat) };
-  pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Merge),
+  pDesc.inputs = { mergeTex,
                    getGBuffer(G_BUFFERS::kGB_LumBlur) };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;

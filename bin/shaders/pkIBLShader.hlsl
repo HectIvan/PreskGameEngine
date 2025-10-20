@@ -44,14 +44,15 @@ sRGBToLinear(float4 color)
 float4 PS(PS_INPUT input) : SV_Target
 {
   // get the world normals
-  float4 normalTex = normalMap.Sample(samState, input.TexCoord);
+  float4 normal = normalMap.Sample(samState, input.TexCoord);
   float4 position = posMap.Sample(samState, input.TexCoord);
-  float metallicVal = ormMap.Sample(samState, input.TexCoord).b;
-  float roughVal = ormMap.Sample(samState, input.TexCoord).g;
-  float3 colorTex = colorMap.Sample(samState, input.TexCoord).rgb;
+  float ao = ormMap.Sample(samState, input.TexCoord).r;
+  float roughness = ormMap.Sample(samState, input.TexCoord).g;
+  float metallic = ormMap.Sample(samState, input.TexCoord).b;
+  float3 color = colorMap.Sample(samState, input.TexCoord).rgb;
   
   // normalize normals and view
-  float3 N = normalize(normalTex.xyz);
+  float3 N = normalize(normal.xyz);
   float3 V = normalize(position.xyz - ViewPosition);
   
   // reflect the view direction on the normal to get the view reflected
@@ -64,9 +65,12 @@ float4 PS(PS_INPUT input) : SV_Target
   float2 dimensions = 0.0f.xx;
   skyboxMap.GetDimensions(dimensions.x, dimensions.y);
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
-  float targetMip = lerp(0.0, mipCount - 1.0, roughVal);
-  // targetMip = min(targetMip, 7);
+  float targetMip = lerp(0.0, mipCount - 1.0, roughness);
+  // specular IBL
   float3 IBL = skyboxMap.SampleLevel(samState, skyboxUV, targetMip).rgb;
+  
+  // diffuse IBL
+  // float3 irradiance = skyboxMap.SampleLevel(samState, getSkyBoxUV(N), mipCount - 1).rgb;
   
   return float4(IBL * Intensity, 1.0f);
 }

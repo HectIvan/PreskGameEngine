@@ -13,6 +13,7 @@ Texture2D colorMap : register(t3);
 Texture2D positionsMap : register(t4);
 Texture2D orm : register(t5);
 Texture2D lightPosMap : register(t6);
+Texture2D brdfLUT : register(t7);
 // sampler state
 SamplerState samState : register(s0);
 
@@ -44,21 +45,12 @@ cbuffer Camera : register(b1)
   float _unusedCam0; // 160
 }
 
-cbuffer LightCamera : register(b2)
-{
-  float4 EyeLight; // 16
-  float3 ForwardLight; // 28
-  float4x4 ViewLight; // 92
-  float4x4 ProjectionLight; // 156
-  float _unusedLightCam0; // 160
-}
-
-cbuffer LightViewProj : register(b3)
+cbuffer LightViewProj : register(b2)
 {
   float4x4 LightViewProj; // 64
 }
 
-cbuffer ShadowParam : register(b4)
+cbuffer ShadowParam : register(b3)
 {
   float2 winSize; // 8
   float2 farNear; // 16
@@ -75,11 +67,6 @@ struct PS_OUTPUT
   float4 diffuseBRDF : SV_Target0;
   float4 specularBRDF : SV_Target1;
 };
-
-float fresnelSchlick(float F0, float VoH)
-{
-  return F0 + (1.0f - F0) * pow((1.0f - VoH), 5.0f);
-}
 
 float fresnelForLut(float VoH)
 {
@@ -100,37 +87,6 @@ float GeometrySmith(float NoV, float NoL, float roughness)
   float ggx1 = GeometrySchlickGGX(NoL, roughness);
   
   return ggx1 * ggx2;
-}
-
-float ndf_GGX(float NoH, float alpha)
-{
-  float a = NoH * alpha;
-  float k = alpha / (1.0f - NoH * NoH + a * a);
-  return k * k * PI;
-}
-
-float D_Beckmann(float NoH, float alpha)
-{
-  float cos2 = NoH * NoH;
-  float tan2 = (1.0f - cos2) / (cos2 + 1e-5f);
-  return exp(-tan2 / alpha) / (PI * alpha * cos2 * cos2 + 1e-5f);
-}
-
-// source: https://graphicscompendium.com/gamedev/15-pbr
-// min of 1 | 2(HoN)(NoV) / (VoH) | 2(HoN)(NoL) / (VoL)
-float GeometricAttenuation(float3 halfView, float3 normal, float3 view, float3 lightDir)
-{
-  float HoN = saturate(dot(halfView, normal));
-  float NoV = saturate(dot(normal, view));
-  float VoH = saturate(dot(view, normal));
-  float NoL = saturate(dot(normal, lightDir));
-  float VoL = saturate(dot(view, lightDir));
-  
-  float first = 2.0f * (HoN * NoV) / VoH;
-  float second = 2.0f * (HoN * NoL) / VoL;
-  float G = min(min(1, first), second);
-  
-  return G;
 }
 
 // source: https://graphicscompendium.com/gamedev/15-pbr
@@ -233,9 +189,9 @@ PS_OUTPUT PS(PS_INPUT input)
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float3 colorTex = colorMap.Sample(samState, input.TexCoord).rgb;
-  float ambientOcclusion = orm.Sample(samState, input.TexCoord).r;
-  float metallicVal = orm.Sample(samState, input.TexCoord).b;
-  float roughVal = orm.Sample(samState, input.TexCoord).g;
+  float ao = orm.Sample(samState, input.TexCoord).r;
+  float metallic = orm.Sample(samState, input.TexCoord).b;
+  float roughness = orm.Sample(samState, input.TexCoord).g;
   float3 worldPos = positionsMap.Sample(samState, input.TexCoord).xyz;
   
   /**
@@ -249,18 +205,20 @@ PS_OUTPUT PS(PS_INPUT input)
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 normal = normalize(normalTex.xyz);
+  // float NoV = saturate(dot(normal, viewDir));
+  // float2 brdfSample = brdfLUT.Sample(samState, float2(NoV, roughness)).rg;
   
   // Diffuse BRDF
   float shadowColor = 1.0f - ShadowIntensity;
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughVal);
+  float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughness);
   
   float dotOfLight = orenNaya; // dot(lightDir, normal); // 
   float lamb = max(dotOfLight, shadowColor);
   float3 diffuseBRDF = lerp(lamb, shadowColor, 1.0f - lamb);
   
   // Compute F0
-  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), colorTex, metallicVal.xxx);
+  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), colorTex, metallic.xxx);
 
   // fresnel value
   float3 Half = normalize(viewDir + lightDir);
@@ -268,16 +226,16 @@ PS_OUTPUT PS(PS_INPUT input)
   float3 F = Fresnel(F0, VoH);
 
   // Diffuse energy weight
-  float3 kD = (1.0f - F) * (1.0f - metallicVal);
+  float3 kD = (1.0f - F) * (1.0f - metallic);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
                                                  lightDir,
-                                                 roughVal,
-                                                 metallicVal,
+                                                 roughness,
+                                                 metallic,
                                                  F0);
   
-  float3 specular = (specCookTorrance) * SpecIntensity * ambientOcclusion;
+  float3 specular = (specCookTorrance) * SpecIntensity * ao;
   
   output.diffuseBRDF = float4(diffuseBRDF * kD, alpha);
   output.specularBRDF = float4(specular, alpha);

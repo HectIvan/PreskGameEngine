@@ -220,8 +220,7 @@ RendererManager::createPasses()
    ***************************************************************************/
   pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
   pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(CBCamera), sizeof(Matrix4), 
-                    sizeof(Vector4) };
+  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4) };
   pDesc.inputs = { LightDepthBuffer,
                    DepthBuffer,
                    normalTex,

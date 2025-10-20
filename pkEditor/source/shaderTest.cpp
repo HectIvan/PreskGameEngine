@@ -696,9 +696,8 @@ ShaderTest::onUpdate()
   // update shadow-specular quad pass
   api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(2), &cBLightCam, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(3), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(4), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(quadShadows->getCBuffer(2), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(quadShadows->getCBuffer(3), &shadowsParam, sizeof(Vector4));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);

@@ -28,7 +28,7 @@ namespace pkEngineSDK
 
 class Device;
 
-class IndexBuffer
+class PK_CORE_EXPORT IndexBuffer
 {
  public:
   IndexBuffer() = default;

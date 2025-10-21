@@ -20,21 +20,23 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
-#include "pkTransform.h"
+#include "pkMatrix4.h"
 
 struct aiNodeAnim;
 
 namespace pkEngineSDK
 {
 
-class Matrix4;
-
-class Bone
+class PK_CORE_EXPORT Bone
 {
  public:
   Bone() = default;
+  Bone(const Bone& _bone);
   Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel);
   virtual ~Bone() = default;
+
+  Bone&
+  operator=(const Bone& _bone);
 
   /**
    * @brief Update the bone.
@@ -75,21 +77,21 @@ class Bone
    * @param _transform The new transform matrix.
    */
   void
-  setLocalTransform(const Transform& _transform) { m_transform = _transform; }
+  setLocalTransform(const Matrix4& _transform) { m_transform = _transform; }
 
   /**
    * @brief Get the local transform of the object.
    * @return The transform matrix.
    */
-  Transform
-  getLocalTransform() { return m_transform; }
+  Matrix4
+  getLocalTransform() const { return m_transform; }
 
   /**
    * @brief Get the name of the bone.
    * @return The name of the bone.
    */
   String
-  getBoneName() { return m_name; }
+  getBoneName() const { return m_name; }
 
   /**
    * @brief Set the name of the bone.
@@ -103,7 +105,7 @@ class Bone
     * @return The ID of the bone.
     */
   int32
-  getBoneID() { return m_ID; }
+  getBoneID() const { return m_ID; }
 
   /**
    * @brief Set the ID of the bone.
@@ -144,6 +146,6 @@ class Bone
  private:
   int32 m_ID;
   String m_name;
-  Transform m_transform;
+  Matrix4 m_transform;
 };
 }

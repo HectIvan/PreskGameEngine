@@ -22,12 +22,11 @@
 #include "pkPrerequisitesCore.h"
 #include "pkSimpleVertex.h"
 #include "pkMaterial.h"
-#include "pkTransform.h"
 
 namespace pkEngineSDK
 {
 
-class Mesh
+class PK_CORE_EXPORT Mesh
 {
  public:
   Mesh() = default;

@@ -243,6 +243,9 @@
     <ClInclude Include="include\pkTextureResource.h">
       <Filter>include\resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkModelCodec.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -333,6 +336,9 @@
       <Filter>source\managers</Filter>
     </ClCompile>
     <ClCompile Include="source\pkShaderManager.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkModelCodec.cpp">
       <Filter>source\managers</Filter>
     </ClCompile>
   </ItemGroup>

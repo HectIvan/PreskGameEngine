@@ -27,7 +27,7 @@ namespace pkEngineSDK
 class Device;
 struct SimpleVertex;
 
-class VertexBuffer
+class PK_CORE_EXPORT VertexBuffer
 {
  public:
   VertexBuffer() = default;

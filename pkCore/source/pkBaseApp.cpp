@@ -12,6 +12,7 @@
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
 #include "pkShaderManager.h"
+#include "pkModelCodec.h"
 
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
@@ -53,6 +54,7 @@ BaseApp::init(const char** _argv, int32 _count)
 
   initWin();
   initAPI(_argv, _count);
+  run("pkModelCodecd", m_window);
 
   g_SceneManager().init();
   g_RenderManager().init();

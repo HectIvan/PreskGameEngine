@@ -25,7 +25,7 @@
 namespace pkEngineSDK
 {
 
-class Model : public Component
+class PK_CORE_EXPORT Model : public Component
 {
  public:
   Model();

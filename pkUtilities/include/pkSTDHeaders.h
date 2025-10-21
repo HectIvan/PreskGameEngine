@@ -36,6 +36,8 @@ using Function = std::function<T>;
 
 using std::make_unique;
 
+using std::move;
+
 using std::rand;
 
 using std::to_string;

@@ -54,7 +54,12 @@ BaseApp::init(const char** _argv, int32 _count)
 
   initWin();
   initAPI(_argv, _count);
+
+#if PK_DEBUG_MODE
   run("pkModelCodecd", m_window);
+#else
+  run("pkModelCodec", m_window);
+#endif
 
   g_SceneManager().init();
   g_RenderManager().init();

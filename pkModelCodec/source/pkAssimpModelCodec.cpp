@@ -20,12 +20,28 @@
 #include <assimp/scene.h>
 
 #include "pkAssimpModelCodec.h"
-#include "pkLogger.h"
-#include "pkTextureManager.h"
 #include "pkGPUResourceManager.h"
+#include "pkGraphicsAPI.h" // to do: remove later
+#include "pkLogger.h"
+#include "pkFileSystem.h"
+#include "pkModelResource.h"
+#include "pkTexture.h"
+#include "pkTextureManager.h"
+#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
+
+extern "C" __declspec(dllexport) void
+loadPlugin(const Window& _window)
+{
+  AssimpModelCodec::startUp<AssimpModelCodec>(_window);
+}
+
+AssimpModelCodec::AssimpModelCodec(const Window& _window)
+{
+  // PK_UNUSED(_window);
+}
 
 /**
  * @brief Processes an aiNode and its children recursively.
@@ -57,9 +73,10 @@ aiTransformToMatrix4(aiMatrix4x4 _transform);
 SPtr<Model>
 AssimpModelCodec::loadModel(const Path _path)
 {
+  GraphicsAPI& api = g_GraphicAPI();
   SPtr<Model> model = make_shared<Model>();
 
-  String modelPath = _path.toString();
+  String modelPath = FileSystem::getAbsolutePath(_path).string();
   model->path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(),
@@ -68,12 +85,18 @@ AssimpModelCodec::loadModel(const Path _path)
     aiProcess_FlipUVs);
   if (!scene) {
     g_Logger().registerMessage("Failed to load model at directory " + modelPath + ".",
-      LOG_MSG_TYPE::kWarning);
+                               LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
   model->setName(scene->mName.C_Str());
   processNode(*model, scene->mRootNode, scene);
   model->setVerticesIndices();
+
+  model->m_vertexB = api.createVertexBuffer(model->vertex);
+  model->m_indexB = api.createIndexBuffer(model->index);
+  api.setIndexBuffer(model->m_indexB);
+  api.setVertexBuffer(model->m_vertexB);
+
   return model;
 }
 

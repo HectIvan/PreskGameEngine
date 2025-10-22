@@ -1,17 +1,18 @@
 #include "ActorInspector.h"
-#include "pkLogger.h"
+#include "pkColor.h"
+#include "pkGPUResourceManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
+#include "pkLogger.h"
+#include "pkModelCodec.h"
 #include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
-#include "pkGPUResourceManager.h"
 #include "pkSceneManager.h"
 #include "pkShaderManager.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "shaderTest.h"
-#include "pkColor.h"
 
 using pkEngineSDK::Color;
 using pkEngineSDK::CBBlur;
@@ -29,14 +30,15 @@ using pkEngineSDK::G_BUFFERS::kGB_Albedo;
 using pkEngineSDK::G_BUFFERS::kGB_Normal;
 using pkEngineSDK::g_EventManager;
 using pkEngineSDK::g_GraphicAPI;
-using pkEngineSDK::g_uInterface;
-using pkEngineSDK::g_Logger;
-using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_GPUResourceManager;
+using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_ModelCodec;
+using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_ShaderManager;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::g_uInterface;
 using pkEngineSDK::int32;
 using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
@@ -48,6 +50,7 @@ using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Material;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
+using pkEngineSDK::ModelCodec;
 using pkEngineSDK::Path;
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
@@ -111,7 +114,7 @@ ShaderTest::onInit()
   // Logger& log = g_Logger();
   // TimeManager& timeMan = g_TimeManager();
   // get the resource manager
-  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  ModelCodec& modelCod = g_ModelCodec();
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
@@ -159,7 +162,7 @@ ShaderTest::onInit()
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
   SPtr<Actor> coat = activeScene->instantiate("Coat");
-  coat->addComponent(resourceMan.loadModel(Path("models/pk3DCoat.pkm")));
+  coat->addComponent(modelCod.loadModel(Path("models/pk3DCoat.pkm")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   // log.print("Loading Exterior.");
@@ -314,7 +317,7 @@ ShaderTest::uInterfaceUpdate()
   UInterface& im = g_uInterface();
   RendererManager& rm = g_RenderManager();
   TextureManager& tm = g_TextureManager();
-  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  ModelCodec& modelCod = g_ModelCodec();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -415,7 +418,7 @@ ShaderTest::uInterfaceUpdate()
         if (val == 0) {
           Path path = m_window.openFileFromExplorer();
           if (path.toString() != "") {
-            m_selectedActor->addComponent(resourceMan.loadModel(path));
+            m_selectedActor->addComponent(modelCod.loadModel(path));
           }
         }
       }

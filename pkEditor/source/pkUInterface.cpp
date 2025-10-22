@@ -105,7 +105,7 @@ UInterface::createSpace()
   // ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
   // ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+  // ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
 
   static bool built = false;
   if (!built) {

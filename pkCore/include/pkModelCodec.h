@@ -33,7 +33,16 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
   //  */
   // void
   // loadPKM() { return; }
-  
+
+  /**
+   * @brief Save a model as a pkm to a given path.
+   * @param _pModel Pointer to the model to save.
+   * @param _path Path to save the model to.
+   * @return True if the model was saved successfully, false otherwise.
+   */
+  bool
+  savePKModel(const SPtr<Model>& _pModel, const Path _path);
+
   /**
    * @brief Load a model from a given path.
    * @param _path Path to load the model from.

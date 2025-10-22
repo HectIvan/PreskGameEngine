@@ -19,12 +19,16 @@
 
 namespace pkEngineSDK
 {
+
+class Window;
+
 class AssimpModelCodec : public ModelCodec
 {
  public:
   AssimpModelCodec() = default;
+  AssimpModelCodec(const Window& _window);
   virtual ~AssimpModelCodec() = default;
-  
+
   /**
    * @brief Load a model from a given path.
    * @param _path Path to load the model from.

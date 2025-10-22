@@ -64,27 +64,12 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
   newMaterial(String _name = "newMaterial");
 
   /**
-   * @brief Loads a model from a file.
-   * @param _directory File path.
-   */
-  SPtr<Model>
-  loadModel(Path _directory);
-
-  /**
    * @brief Loads a model from a .pkm file.
    * @param _path File path.
    * @return Pointer to the model if loaded; nullptr if failed.
    */
   SPtr<Model>
   loadPKModel(Path _path);
-
-  /**
-   * @brief Loads a model from a file using Assimp.
-   * @param _path File path.
-   * @return Pointer to the model if loaded; nullptr if failed.
-   */
-  SPtr<Model>
-  loadAssimpModel(Path _path);
 
   /**
    * @brief search for a specific mesh

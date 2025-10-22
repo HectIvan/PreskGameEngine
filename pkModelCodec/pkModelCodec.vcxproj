@@ -100,8 +100,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/ASSIMP/lib/$(PlatformTarget)/$(Configuration); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mtd.lib;pkUtilitiesd.lib;pkCored.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\;$(DEVLIBS)\ASSIMP\lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;assimp-vc143-mtd.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,8 +118,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/ASSIMP/lib/$(PlatformTarget)/$(Configuration); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;pkUtilities.lib;pkCore.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\;$(DEVLIBS)\ASSIMP\lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;assimp-vc143-mt.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,8 +134,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/ASSIMP/lib/$(PlatformTarget)/$(Configuration); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mtd.lib;pkUtilitiesd.lib;pkCored.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\;$(DEVLIBS)\ASSIMP\lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilitiesd.lib;pkCored.lib;assimp-vc143-mtd.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,8 +152,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib/$(PlatformTarget)/;$(DEVLIBS)/ASSIMP/lib/$(PlatformTarget)/$(Configuration); </AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;pkUtilities.lib;pkCore.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\;$(DEVLIBS)\ASSIMP\lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkUtilities.lib;pkCore.lib;assimp-vc143-mt.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -14,10 +14,18 @@
 * Includes
 **/
 /*********************************************/
+#include "pkModel.h"
 #include "pkModelCodec.h"
+#include "pkPath.h"
 
 namespace pkEngineSDK
 {
+
+bool
+ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
+{
+  return true;
+}
 
 PK_CORE_EXPORT ModelCodec&
 g_ModelCodec()

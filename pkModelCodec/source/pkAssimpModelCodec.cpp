@@ -92,10 +92,14 @@ AssimpModelCodec::loadModel(const Path _path)
   processNode(*model, scene->mRootNode, scene);
   model->setVerticesIndices();
 
+  // create model resource.
+
   model->m_vertexB = api.createVertexBuffer(model->vertex);
   model->m_indexB = api.createIndexBuffer(model->index);
   api.setIndexBuffer(model->m_indexB);
   api.setVertexBuffer(model->m_vertexB);
+
+  savePKModel(model, _path.getFileNameWithoutExtension());
 
   return model;
 }

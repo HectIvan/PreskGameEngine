@@ -7,6 +7,7 @@
 /*********************************************/
 #include <cassert>
 #include <codecvt>
+#include <fstream>
 #include <functional>
 #include <map>
 #include <memory>
@@ -17,7 +18,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <fstream>
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
@@ -36,23 +36,25 @@ using Function = std::function<T>;
 
 using std::make_unique;
 
+using std::make_shared;
+
+using std::reinterpret_pointer_cast;
+
 using std::move;
 
 using std::rand;
 
 using std::to_string;
 
+using std::fstream;
+
+using std::hash;
+
 using std::ifstream;
 
 using std::ios;
 
-using std::hash;
-
-// template <class T>
-// using WString_Conv = std::wstring_convert<T>;
-// 
-// template <class T>
-// using Codecvt_utf8 = std::codecvt_utf8<T>;
+using std::ofstream;
 
 template <class T>
 using Queue = std::queue<T>;

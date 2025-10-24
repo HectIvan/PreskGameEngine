@@ -88,6 +88,7 @@ BaseApp::initAPI(const char** _argv, int32 _count)
 #endif
 }
 
+// to do: make a plugin manager to handle this.
 void
 run(String _name, Window& _window)
 {

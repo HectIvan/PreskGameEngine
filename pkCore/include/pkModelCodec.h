@@ -28,11 +28,11 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
   ModelCodec() = default;
   virtual ~ModelCodec() = default;
 
-  // /**
-  //  * @brief Load .pkm file.
-  //  */
-  // void
-  // loadPKM() { return; }
+  /**
+   * @brief Load .pkm file.
+   */
+  void
+  loadPKM();
 
   /**
    * @brief Save a model as a pkm to a given path.

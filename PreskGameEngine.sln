@@ -40,6 +40,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkPhysics", "pkPhysics\pkPhysics.vcxproj", "{74EBF1CC-E408-40B3-8CCA-82281CA6388B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkModelCodec", "pkModelCodec\pkModelCodec.vcxproj", "{D1FCDF88-7A39-4212-BFE2-62812399242F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2AE61FDC-8017-4C13-BF4D-416B68AAD3C0} = {2AE61FDC-8017-4C13-BF4D-416B68AAD3C0}
+		{7AC8224F-1F51-4711-BE1B-B59FDDCAC0ED} = {7AC8224F-1F51-4711-BE1B-B59FDDCAC0ED}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

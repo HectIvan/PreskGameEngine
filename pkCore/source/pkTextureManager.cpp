@@ -4,6 +4,13 @@
 
 namespace pkEngineSDK
 {
+
+void
+TextureManager::init()
+{
+  loadDefaultMatTextures();
+}
+
 void
 TextureManager::loadDefaultMatTextures()
 {

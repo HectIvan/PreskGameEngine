@@ -33,14 +33,9 @@ namespace pkEngineSDK
 {
 
 extern "C" __declspec(dllexport) void
-loadPlugin(const Window& _window)
+loadPlugin()
 {
-  AssimpModelCodec::startUp<AssimpModelCodec>(_window);
-}
-
-AssimpModelCodec::AssimpModelCodec(const Window& _window)
-{
-  // PK_UNUSED(_window);
+  AssimpModelCodec::startUp<AssimpModelCodec>();
 }
 
 /**
@@ -74,6 +69,7 @@ SPtr<Model>
 AssimpModelCodec::loadModel(const Path _path)
 {
   GraphicsAPI& api = g_GraphicAPI();
+  Logger& log = g_Logger();
   SPtr<Model> model = make_shared<Model>();
 
   String modelPath = FileSystem::getAbsolutePath(_path).string();
@@ -84,24 +80,80 @@ AssimpModelCodec::loadModel(const Path _path)
     aiProcess_RemoveRedundantMaterials |
     aiProcess_FlipUVs);
   if (!scene) {
-    g_Logger().registerMessage("Failed to load model at directory " + modelPath + ".",
-                               LOG_MSG_TYPE::kWarning);
+    String msg = "Assimp failed to load model at directory " + modelPath + ".";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
+
   model->setName(scene->mName.C_Str());
   processNode(*model, scene->mRootNode, scene);
   model->setVerticesIndices();
-
-  // create model resource.
 
   model->m_vertexB = api.createVertexBuffer(model->vertex);
   model->m_indexB = api.createIndexBuffer(model->index);
   api.setIndexBuffer(model->m_indexB);
   api.setVertexBuffer(model->m_vertexB);
 
-  savePKModel(model, _path.getFileNameWithoutExtension());
+  // if the model cannot be parsed into a .pkm file, log an error.
+  if (!savePKModel(model, _path.getFileNameWithoutExtension())) {
+    String msg = "Failed to save resource for " + _path.getFileNameWithoutExtension() + ".";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+  }
 
   return model;
+}
+
+Bone
+AssimpModelCodec::aiboneToBone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
+{
+  Bone newBone;
+  newBone.setBoneName(_name);
+  newBone.setBoneID(_ID);
+  newBone.setLocalTransform(Matrix4(1.0f));
+
+  // get all the positions
+  newBone.numPositions = _channel->mNumPositionKeys;
+  for (uint32 i = 0; i < newBone.numPositions; ++i) {
+    Vector3 position = Vector3(_channel->mPositionKeys[i].mValue.x,
+                               _channel->mPositionKeys[i].mValue.y,
+                               _channel->mPositionKeys[i].mValue.z);
+    float timeStamp = static_cast<float>(_channel->mPositionKeys[i].mTime);
+    KeyPosition data;
+    data.position = position;
+    data.timeStamp = timeStamp;
+    newBone.positions.push_back(data);
+  }
+
+  // get all the rotations
+  newBone.numRotations = _channel->mNumRotationKeys;
+  for (uint32 i = 0; i < newBone.numRotations; ++i) {
+    Vector4 rotation = Vector4(_channel->mRotationKeys[i].mValue.x,
+      _channel->mRotationKeys[i].mValue.y,
+      _channel->mRotationKeys[i].mValue.z,
+      _channel->mRotationKeys[i].mValue.w);
+    float timeStamp = static_cast<float>(_channel->mRotationKeys[i].mTime);
+    KeyRotation data;
+    data.rotation = rotation;
+    data.timeStamp = timeStamp;
+    newBone.rotations.push_back(data);
+  }
+
+  // get all the scales
+  newBone.numScales = _channel->mNumScalingKeys;
+  for (uint32 i = 0; i < newBone.numScales; ++i) {
+    Vector3 scale = Vector3(_channel->mScalingKeys[i].mValue.x,
+      _channel->mScalingKeys[i].mValue.y,
+      _channel->mScalingKeys[i].mValue.z);
+    float timeStamp = static_cast<float>(_channel->mRotationKeys[i].mTime);
+    KeyScale data;
+    data.scale = scale;
+    data.timeStamp = timeStamp;
+    newBone.scales.push_back(data);
+  }
+
+  return newBone;
 }
 
 void

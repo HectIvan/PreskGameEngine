@@ -1,6 +1,7 @@
 #include "pkBaseApp.h"
 #include "pkLogger.h"
-#include "pkDllLoader.h"
+// #include "pkDllLoader.h"
+#include "pkDllManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkLight.h"
 #include "pkModel.h"
@@ -32,38 +33,33 @@ namespace pkEngineSDK
 {
 
 void
-run(String _name, Window& _window);
-
-/*********************************************/
-/**
-* Definitions.
-**/
-/*********************************************/
-
-void
 BaseApp::init(const char** _argv, int32 _count)
 {
+  DLLManager::startUp();
+  EventQueue::startUp();
+  GPUResourceManager::startUp();
   Logger::startUp();
   RendererManager::startUp();
-  GPUResourceManager::startUp();
   SceneManager::startUp();
+  ShaderManager::startUp();
   TextureManager::startUp();
   TimeManager::startUp();
-  EventQueue::startUp();
-  ShaderManager::startUp();
+
+  DLLManager& dllManager = g_DLLManager();
 
   initWin();
   initAPI(_argv, _count);
 
 #if PK_DEBUG_MODE
-  run("pkModelCodecd", m_window);
+  dllManager.runDll("pkModelCodecd");
 #else
-  run("pkModelCodec", m_window);
+  dllManager.runDll("pkModelCodec");
 #endif
 
+  g_GraphicAPI().init(m_window);
   g_SceneManager().init();
   g_RenderManager().init();
-  g_TextureManager().loadDefaultMatTextures();
+  g_TextureManager().init();
   g_GPUResourceManager().init();
 
   onInit();
@@ -72,6 +68,7 @@ BaseApp::init(const char** _argv, int32 _count)
 void
 BaseApp::initAPI(const char** _argv, int32 _count)
 {
+  DLLManager& dllManager = g_DLLManager();
   String abstraction = "DX11APId";
   if (_count > 1) {
     abstraction = _argv[1]; // _argv[0] is always the executable path
@@ -79,25 +76,13 @@ BaseApp::initAPI(const char** _argv, int32 _count)
 
 #if PK_DEBUG_MODE
   if (abstraction == "DX11APId") {
-    run("pkDX11APId", m_window);
+    dllManager.runDll("pkDX11APId");
   }
 #else
   if (abstraction == "DX11API") {
-    run("pkDX11API", m_window);
+    dllManager.runDll("pkDX11API");
   }
 #endif
-}
-
-// to do: make a plugin manager to handle this.
-void
-run(String _name, Window& _window)
-{
-  DllLoader dll;
-  dll.init(_name);
-  auto dllSymbol = reinterpret_cast<void(*)(Window)>(dll.getMethod("loadPlugin"));
-  if (dllSymbol) {
-    dllSymbol(_window);
-  }
 }
 
 void

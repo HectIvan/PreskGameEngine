@@ -51,7 +51,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   * @param _wHnd Handler to the window to be used.
   **/
   virtual void
-  initApi(const Window& _window) = 0;
+  init(const Window& _window) = 0;
 
   /**
    * @brief Get the API Swap chain

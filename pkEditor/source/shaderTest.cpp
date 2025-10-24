@@ -154,7 +154,7 @@ ShaderTest::onInit()
                                         pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
   // SPtr<Actor> pistol = activeScene->instantiate("Pistol");
-  // pistol->addComponent(resourceMan.loadModel(Path("models/drakefire_pistol_low.obj")));
+  // pistol->addComponent(modelCod.loadModel(Path("models/drakefire_pistol_low.obj")));
   // pistol->setScale(30.0f);
   // pistol->setPosition(10.0f, 15.0f, 0.0f);
   // 
@@ -162,7 +162,7 @@ ShaderTest::onInit()
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
   SPtr<Actor> coat = activeScene->instantiate("Coat");
-  coat->addComponent(modelCod.loadModel(Path("models/pk3DCoat.pkm")));
+  coat->addComponent(modelCod.loadModel(Path("models/export3dcoat.obj")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   // log.print("Loading Exterior.");

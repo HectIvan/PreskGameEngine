@@ -246,6 +246,9 @@
     <ClInclude Include="include\pkModelCodec.h">
       <Filter>include\managers</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDllManager.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -339,6 +342,9 @@
       <Filter>source\managers</Filter>
     </ClCompile>
     <ClCompile Include="source\pkModelCodec.cpp">
+      <Filter>source\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkDllManager.cpp">
       <Filter>source\managers</Filter>
     </ClCompile>
   </ItemGroup>

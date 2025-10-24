@@ -41,14 +41,13 @@ class DX11GraphicsAPI : public GraphicsAPI
 {
  public:
   DX11GraphicsAPI() = default;
-  DX11GraphicsAPI(const Window& _window);
   virtual ~DX11GraphicsAPI() = default;
 
   /**
    * @brief Initialize the api.
    */
   void
-  initApi(const Window& _window) override;
+  init(const Window& _window) override;
 
   /**
    * @brief Create the device and swap chain.

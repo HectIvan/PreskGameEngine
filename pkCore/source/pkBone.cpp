@@ -1,5 +1,3 @@
-#include <assimp/anim.h>
-
 #include "pkBone.h"
 #include "pkMath.h"
 
@@ -34,53 +32,6 @@ Bone::operator=(const Bone& _bone)
   setLocalTransform(_bone.getLocalTransform());
 
   return *this;
-}
-
-Bone::Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
-{
-  setBoneName(_name);
-  setBoneID(_ID);
-  setLocalTransform(Matrix4(1.0f));
-
-  // get all the positions
-  numPositions = _channel->mNumPositionKeys;
-  for (uint32 i = 0; i < numPositions; ++i) {
-    Vector3 position = Vector3(_channel->mPositionKeys[i].mValue.x,
-                               _channel->mPositionKeys[i].mValue.y,
-                               _channel->mPositionKeys[i].mValue.z);
-    float timeStamp = static_cast<float>(_channel->mPositionKeys[i].mTime);
-    KeyPosition data;
-    data.position = position;
-    data.timeStamp = timeStamp;
-    positions.push_back(data);
-  }
-
-  // get all the rotations
-  numRotations = _channel->mNumRotationKeys;
-  for (uint32 i = 0; i < numRotations; ++i) {
-    Vector4 rotation = Vector4(_channel->mRotationKeys[i].mValue.x,
-                               _channel->mRotationKeys[i].mValue.y,
-                               _channel->mRotationKeys[i].mValue.z,
-                               _channel->mRotationKeys[i].mValue.w);
-    float timeStamp = static_cast<float>(_channel->mRotationKeys[i].mTime);
-    KeyRotation data;
-    data.rotation = rotation;
-    data.timeStamp = timeStamp;
-    rotations.push_back(data);
-  }
-
-  // get all the scales
-  numScales = _channel->mNumScalingKeys;
-  for (uint32 i = 0; i < numScales; ++i) {
-    Vector3 scale = Vector3(_channel->mScalingKeys[i].mValue.x,
-                            _channel->mScalingKeys[i].mValue.y,
-                            _channel->mScalingKeys[i].mValue.z);
-    float timeStamp = static_cast<float>(_channel->mRotationKeys[i].mTime);
-    KeyScale data;
-    data.scale = scale;
-    data.timeStamp = timeStamp;
-    scales.push_back(data);
-  }
 }
 
 void

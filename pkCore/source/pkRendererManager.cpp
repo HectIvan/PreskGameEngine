@@ -427,27 +427,6 @@ RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuf
 }
 
 void
-RendererManager::setActorsBuffers()
-{
-  // get managers
-  GraphicsAPI& api = g_GraphicAPI();
-  SceneManager& sm = g_SceneManager();
-  // for each actor in the world
-  SPtr<Scene> activeScene = sm.getActiveScene();
-  SIZE_T actorCount = activeScene->getAllActors().size();
-  for (uint32 i = 0; i < actorCount; ++i) {
-    // Cast to a gameObject, if it fails, do none of the following process
-    SPtr<Actor> actor = activeScene->getActor(i);
-    // if the actor has a model 
-    SPtr<Model> model = actor->getComponent<Model>();
-    if (model) {
-      api.setVertexBuffer(model->m_vertexB);
-      api.setIndexBuffer(model->m_indexB);
-    }
-  }
-}
-
-void
 RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
   RendererManager& rManager = g_RenderManager();

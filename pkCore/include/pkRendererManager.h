@@ -165,12 +165,6 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   getUAVBuffer(const UAV_BUFFERS::E _type);
 
   /**
-   * @brief Set the buffers of each actor.
-   */
-  void
-  setActorsBuffers();
-
-  /**
    * @brief Render a list of actors.
    * @param _gameActors The actors to render.
    */

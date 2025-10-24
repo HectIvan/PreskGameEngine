@@ -35,6 +35,12 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   virtual ~TextureManager() = default;
 
   /**
+   * @brief initialize the texture manager by loading default textures.
+   */
+  void
+  init();
+
+  /**
    * @brief Load default material textures.
    */
   void

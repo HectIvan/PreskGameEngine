@@ -92,18 +92,13 @@ throwIfFailed(HRESULT hr) {
 }
 
 extern "C" __declspec(dllexport) void
-loadPlugin(const Window& _window)
+loadPlugin()
 {
-  GraphicsAPI::startUp<DX11GraphicsAPI>(_window);
-}
-
-DX11GraphicsAPI::DX11GraphicsAPI(const Window& _window)
-{
-  initApi(_window);
+  GraphicsAPI::startUp<DX11GraphicsAPI>();
 }
 
 void
-DX11GraphicsAPI::initApi(const Window& _window)
+DX11GraphicsAPI::init(const Window& _window)
 {
   uint32 createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -1574,7 +1569,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
     data = nullptr;
     const String msg = "Can't open " + _fileName.getDirectory() + ", unable to open file.";
     // log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
@@ -1667,7 +1662,7 @@ DX11GraphicsAPI::createTextureFromFileF(const Path& _fileName,
     const String msg = "Can't open " + _fileName.getFileName() + ", unable to open file."
                         + " Reason: " + stbi_failure_reason();
     // log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kError);
+    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 

@@ -22,8 +22,6 @@
 #include "pkPrerequisitesCore.h"
 #include "pkMatrix4.h"
 
-struct aiNodeAnim;
-
 namespace pkEngineSDK
 {
 
@@ -32,7 +30,6 @@ class PK_CORE_EXPORT Bone
  public:
   Bone() = default;
   Bone(const Bone& _bone);
-  Bone(const String& _name, int32 _ID, const aiNodeAnim* _channel);
   virtual ~Bone() = default;
 
   Bone&

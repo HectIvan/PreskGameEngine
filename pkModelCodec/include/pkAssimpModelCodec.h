@@ -26,7 +26,6 @@ class AssimpModelCodec : public ModelCodec
 {
  public:
   AssimpModelCodec() = default;
-  AssimpModelCodec(const Window& _window);
   virtual ~AssimpModelCodec() = default;
 
   /**
@@ -36,5 +35,15 @@ class AssimpModelCodec : public ModelCodec
    */
   SPtr<Model>
   loadModel(const Path _path) override;
+
+  /**
+   * @brief Convert an aiBone to a Bone.
+   * @param _name Name of the bone.
+   * @param _ID ID of the bone.
+   * @param _channel aiNodeAnim channel of the bone.
+   * @return The converted Bone.
+   */
+  Bone
+  aiboneToBone(const String& _name, int32 _ID, const aiNodeAnim* _channel);
 };
 }

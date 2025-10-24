@@ -27,7 +27,7 @@ bool
 ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
-  String filePath = _path.getFileName() + ".pkm";
+  String filePath = "resources/" + _path.getFileName() + ".pkm";
   ofstream file(filePath, ios::out | ios::binary);
   // char error[256];
   // strerror_s(error, sizeof(error), errno); // last error of io.

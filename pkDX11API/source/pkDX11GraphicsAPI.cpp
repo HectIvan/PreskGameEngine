@@ -36,6 +36,7 @@
 #include "pkFileSystem.h"
 #include "pkPlatformMath.h"
 #include "pkVertexBuffer.h"
+#include "pkTextureCodec.h"
 
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
@@ -1555,18 +1556,20 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
                                        uint32 _format)
 {
   Logger& log = g_Logger();
+  TextureCodec& texCodec = g_TextureCodec();
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   // values
-  int32 width, height, bpp;
+  // int32 width, height, bpp;
 
   // load the image data into a storage variable
-  unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
-
+  TextureResource* texRes = new TextureResource();
+  texRes = texCodec.loadTextureFromFile(_fileName);
+  // unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
   // check if the texture was found
-  if (!data) {
-    delete data;
-    data = nullptr;
+  if (!texRes->m_data) {
+    delete texRes;
+    texRes = nullptr;
     const String msg = "Can't open " + _fileName.getDirectory() + ", unable to open file.";
     // log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
@@ -1574,8 +1577,8 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   }
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(width,
-                                             height,
+  SPtr<Texture> temptTexture = createTexture(texRes->m_width,
+                                             texRes->m_height,
                                              _format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
@@ -1591,13 +1594,13 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   }
 
   // add data to the texture
-  bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format));
+  texRes->m_bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(_format));
   auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
-  device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
+  device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(), // something says null here and i dont know what.
                                                  0,
                                                  nullptr,
-                                                 data,
-                                                 width * bpp,
+                                                 texRes->m_data,
+                                                 texRes->m_width * texRes->m_bpp,
                                                  0);
 
   bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
@@ -1606,7 +1609,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   }
 
   // free the texture data if there's data to release
-  if (data) { stbi_image_free(data); }
+  // if (data) { stbi_image_free(data); }
 
   // set the path
   temptTexture->setName(_fileName);

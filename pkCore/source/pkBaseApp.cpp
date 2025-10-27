@@ -14,6 +14,7 @@
 #include "pkWindowDesc.h"
 #include "pkShaderManager.h"
 #include "pkModelCodec.h"
+#include "pkTextureCodec.h"
 
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
@@ -52,8 +53,10 @@ BaseApp::init(const char** _argv, int32 _count)
 
 #if PK_DEBUG_MODE
   dllManager.runDll("pkModelCodecd");
+  dllManager.runDll("pkStbiImageCodecd");
 #else
   dllManager.runDll("pkModelCodec");
+  dllManager.runDll("pkStbiImageCodec");
 #endif
 
   g_GraphicAPI().init(m_window);

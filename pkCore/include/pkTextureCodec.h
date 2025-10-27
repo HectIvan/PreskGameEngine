@@ -12,25 +12,31 @@
 
 /*********************************************/
 /**
-* Includes
-**/
+ * Includes
+ */
 /*********************************************/
-#include "pkTextureCodec.h"
+#include "pkModule.h"
+#include "pkTextureResource.h"
+#include "pkPath.h"
+#include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
 
-class StbiTextureCodec : public TextureCodec
+class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
 {
  public:
-  StbiTextureCodec() = default;
-  virtual ~StbiTextureCodec() = default;
+  TextureCodec() = default;
+  virtual ~TextureCodec() = default;
   /**
    * @brief Loads a texture from a file using STBI.
    * @param _path Where to look for the file.
    * @return texture resource.
    */
-  TextureResource*
-  loadTextureFromFile(const Path _path) override;
-}; 
+  virtual TextureResource*
+  loadTextureFromFile(const Path _path) = 0;
+};
+
+PK_CORE_EXPORT TextureCodec&
+g_TextureCodec();
 }

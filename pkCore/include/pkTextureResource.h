@@ -20,7 +20,16 @@
 namespace pkEngineSDK
 {
 
-class TextureResource : public BaseResource
+struct TextureAssetHeader
+{
+  int32 width;
+  int32 height;
+  int32 bpp;
+  uint32 format;
+  uint32 dataSize;
+};
+
+class PK_CORE_EXPORT TextureResource : public BaseResource
 {
  public:
   TextureResource() = default;
@@ -31,12 +40,13 @@ class TextureResource : public BaseResource
    * @return The resource type.
    */
   RESOURCE_TYPE::E
-  getType() const { return RESOURCE_TYPE::kTexture; }
+  getType() const override { return RESOURCE_TYPE::kTexture; }
 
  public:
-  uint32 m_width;
-  uint32 m_height;
+  int32 m_width;
+  int32 m_height;
+  int32 m_bpp;
   uint32 m_format;
-  Vector<uint8> m_data;
+  unsigned char* m_data;
 };
 }

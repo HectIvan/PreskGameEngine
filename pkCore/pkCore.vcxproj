@@ -217,6 +217,7 @@
     <ClInclude Include="include\pkSprite.h" />
     <ClInclude Include="include\pkSwapChain.h" />
     <ClInclude Include="include\pkTexture.h" />
+    <ClInclude Include="include\pkTextureCodec.h" />
     <ClInclude Include="include\pkTextureManager.h" />
     <ClInclude Include="include\pkTextureResource.h" />
     <ClInclude Include="include\pkTimeManager.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="source\pkShaderManager.cpp" />
     <ClCompile Include="source\pkSprite.cpp" />
     <ClCompile Include="source\pkTexture.cpp" />
+    <ClCompile Include="source\pkTextureCodec.cpp" />
     <ClCompile Include="source\pkTextureManager.cpp" />
     <ClCompile Include="source\pkTimeManager.cpp" />
     <ClCompile Include="source\pkWin32Event.cpp" />

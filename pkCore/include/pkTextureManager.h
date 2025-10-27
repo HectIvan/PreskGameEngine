@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /**
- * @file    pkTextureManager.cpp
+ * @file    pkTextureManager.h
  * @author  Héctor  Iván Muñoz Ceballos
  * @date    19/11/2024
  * @brief   Manager used for creating and storing textures.

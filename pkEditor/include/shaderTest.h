@@ -139,6 +139,8 @@ class ShaderTest : public BaseApp
   // UI texture image size
   float m_imgTextureSize;
 
+  // low window log/resources search.
+  bool m_inLogger;
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;
@@ -151,6 +153,7 @@ class ShaderTest : public BaseApp
 
   float m_IBRIntensity;
   float m_exposure;
+
 
   String m_searchMesh;
 

@@ -50,7 +50,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   SPtr<BaseResource>
   unloadResource();
 
-private:
+ private:
   UMap<ASSET_ID::E, SPtr<BaseResource>> m_loadedResources;
   UMap<ASSET_ID::E, SPtr<BaseResource>> m_allResources;
 };

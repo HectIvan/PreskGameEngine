@@ -1563,8 +1563,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   // int32 width, height, bpp;
 
   // load the image data into a storage variable
-  TextureResource* texRes = new TextureResource();
-  texRes = texCodec.loadTextureFromFile(_fileName);
+  TextureResource* texRes = texCodec.loadTextureFromFile(_fileName);
   // unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
   // check if the texture was found
   if (!texRes->m_data) {

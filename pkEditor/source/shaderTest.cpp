@@ -199,6 +199,7 @@ ShaderTest::onInit()
   m_sActorIndex = 0;
   m_fpsSize = 20;
 
+  m_inLogger = false;
   m_showErrors = true;
   m_showWarnings = false;
   m_showActions = false;
@@ -372,14 +373,35 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate(m_loggerWin.name);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
-  im.createCheckBox("Errors", m_showErrors);
+  // -------------------------- //
+  im.beginChild("Tab", im.getWindowSize().x * 0.1f, im.getWindowSize().y, true);
+  if (im.createButton("Logger")) {
+    m_inLogger = true;
+  }
+  if (im.createButton("Resources")) {
+    m_inLogger = false;
+  }
+  im.endChild();
+  // -------------------------- //
   im.sameLine();
-  im.createCheckBox("Warnings", m_showWarnings);
-  im.sameLine();
-  im.createCheckBox("Logs", m_showActions);
-  showLogType(m_showErrors, kError);
-  showLogType(m_showWarnings, kWarning);
-  showLogType(m_showActions, kLog);
+  // -------------------------- //
+  im.beginChild("LoggerMessages", im.getWindowSize().x * 0.9f, im.getWindowSize().y, true);
+  if (m_inLogger) {
+    im.createCheckBox("Errors", m_showErrors);
+    im.sameLine();
+    im.createCheckBox("Warnings", m_showWarnings);
+    im.sameLine();
+    im.createCheckBox("Logs", m_showActions);
+    showLogType(m_showErrors, kError);
+    showLogType(m_showWarnings, kWarning);
+    showLogType(m_showActions, kLog);
+  }
+  else {
+
+  }
+  im.endChild();
+  // -------------------------- //
+
   im.endWindowCreate();
 
   // --- Transform window --- //

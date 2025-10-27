@@ -18,10 +18,10 @@
 #define STBI_ENABLE_OPENEXR
 #include "stb_image.h"
 
+#include "pkFileSystem.h"
 #include "pkLogger.h"
 #include "pkStbiTextureCodec.h"
 #include "pkTexture.h"
-
 
 namespace pkEngineSDK
 {
@@ -48,7 +48,6 @@ StbiTextureCodec::loadTextureFromFile(const Path _path)
     String msg = "Failed to generate resource for texture " + texturePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    // return nullptr;
   }
 
   // load data using stbi image.

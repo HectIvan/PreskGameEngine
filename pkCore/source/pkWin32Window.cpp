@@ -204,7 +204,7 @@ Window::openFileFromExplorer() const
   ofn.nMaxFile = sizeof(szFile);
   ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.TXT\0";
   ofn.nFilterIndex = 1;
-  ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+  ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
   // Display the Open dialog box
   if (GetOpenFileNameA(&ofn) == TRUE)

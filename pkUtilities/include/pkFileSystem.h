@@ -24,6 +24,7 @@ using std::filesystem::path;
 using std::filesystem::exists;
 using std::filesystem::is_regular_file;
 using std::filesystem::absolute;
+using std::filesystem::current_path;
 
 namespace pkEngineSDK
 {
@@ -65,6 +66,12 @@ getAbsolutePathWStr(const Path& _path)
 {
   path fsPath(_path.toString());
   return absolute(fsPath).wstring();
+}
+
+PKFORCEINLINE static path
+currentPath()
+{
+  return current_path();
 }
 }
 }

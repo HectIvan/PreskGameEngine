@@ -302,9 +302,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture from file.
-   * @param _directory Directory of the texture.
+   * @param _directory Directory of the resource.
    * @param _bindFlags What kind of binding will it have.
    * @param _mipLevels MipMap level count.
+   * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   SPtr<Texture>

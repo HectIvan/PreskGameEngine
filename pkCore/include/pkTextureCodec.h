@@ -28,13 +28,14 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
  public:
   TextureCodec() = default;
   virtual ~TextureCodec() = default;
+
   /**
-   * @brief Loads a texture from a file using STBI.
+   * @brief Create a texture resource from a file using STBI.
    * @param _path Where to look for the file.
    * @return texture resource.
    */
   virtual TextureResource*
-  loadTextureFromFile(const Path _path) = 0;
+  createResourceFromFile(const Path _path) = 0;
 };
 
 PK_CORE_EXPORT TextureCodec&

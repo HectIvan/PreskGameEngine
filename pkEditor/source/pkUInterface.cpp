@@ -133,7 +133,31 @@ UInterface::createSpace()
   built = true;
 
 
-  // ImGui::DockSpaceOverViewport(ImGui::GetID("MainDockspace"), ImGui::GetMainViewport());
+  ImGui::DockSpaceOverViewport(ImGui::GetID("MainDockspace"), ImGui::GetMainViewport());
+}
+
+bool
+UInterface::beginTabBar(const char* _name)
+{
+  return ImGui::BeginTabBar(_name);
+}
+
+void
+UInterface::endTabBar()
+{
+  ImGui::EndTabBar();
+}
+
+bool
+UInterface::beginTabItem(const char* _name)
+{
+  return ImGui::BeginTabItem(_name);
+}
+
+void
+UInterface::endTabItem()
+{
+  ImGui::EndTabItem();
 }
 
 void

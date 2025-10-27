@@ -140,7 +140,6 @@ class ShaderTest : public BaseApp
   float m_imgTextureSize;
 
   // low window log/resources search.
-  bool m_inLogger;
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;

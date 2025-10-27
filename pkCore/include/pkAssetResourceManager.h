@@ -18,6 +18,9 @@
 namespace pkEngineSDK
 {
 
+class Path;
+class TextureResource;
+
 // to do: placeholder for the id.
 namespace ASSET_ID
 {
@@ -49,6 +52,20 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    */
   SPtr<BaseResource>
   unloadResource();
+
+  /**
+   *
+   */
+  // ModelResource*
+  // loadModelResource(const Path _path);
+
+  /**
+   * @brief load a pkt Texture resource from a given path.
+   * @param _path Path to load the texture from.
+   * @return Pointer to the resource.
+   */
+  TextureResource*
+  loadTextureResource(const Path _path);
 
  private:
   UMap<ASSET_ID::E, SPtr<BaseResource>> m_loadedResources;

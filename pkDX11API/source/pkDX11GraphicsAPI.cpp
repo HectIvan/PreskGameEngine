@@ -19,6 +19,7 @@
 #include "stb_image.h"
 
 
+#include "pkAssetResourceManager.h"
 #include "pkLogger.h"
 #include "pkDX11BlendState.h"
 #include "pkDX11ComputeShader.h"
@@ -37,6 +38,7 @@
 #include "pkPlatformMath.h"
 #include "pkVertexBuffer.h"
 #include "pkTextureCodec.h"
+#include "pkTextureResource.h"
 
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
@@ -1550,26 +1552,26 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
+DX11GraphicsAPI::createTextureFromFile(const Path& _directory,
                                        uint32 _bindFlags,
                                        int32 _mipLevels,
                                        uint32 _format)
 {
   Logger& log = g_Logger();
-  TextureCodec& texCodec = g_TextureCodec();
+  AssetResourceManager& assetResMgr = g_AssetResourceManager();
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   // values
   // int32 width, height, bpp;
 
   // load the image data into a storage variable
-  TextureResource* texRes = texCodec.loadTextureFromFile(_fileName);
+  TextureResource* texRes = assetResMgr.loadTextureResource(_directory); // texCodec.loadTextureFromFile(_fileName);
   // unsigned char* data = stbi_load(_fileName.toString().c_str(), &width, &height, &bpp, 4);
   // check if the texture was found
-  if (!texRes->m_data) {
+  if (!texRes) {
     delete texRes;
     texRes = nullptr;
-    const String msg = "Can't open " + _fileName.getDirectory() + ", unable to open file.";
+    const String msg = "Can't open " + _directory.getDirectory() + ", unable to open file.";
     // log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
@@ -1611,7 +1613,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _fileName,
   // if (data) { stbi_image_free(data); }
 
   // set the path
-  temptTexture->setName(_fileName);
+  temptTexture->setName(_directory.getFileName());
 
   // return the texture
   return temptTexture;

@@ -25,12 +25,13 @@ class StbiTextureCodec : public TextureCodec
  public:
   StbiTextureCodec() = default;
   virtual ~StbiTextureCodec() = default;
+
   /**
-   * @brief Loads a texture from a file using STBI.
+   * @brief Create a texture resource from a file using STBI.
    * @param _path Where to look for the file.
    * @return texture resource.
    */
   TextureResource*
-  loadTextureFromFile(const Path _path) override;
+    createResourceFromFile(const Path _path) override;
 }; 
 }

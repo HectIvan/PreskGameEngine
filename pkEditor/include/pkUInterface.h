@@ -165,6 +165,32 @@ class UInterface : public Module<UInterface>
   createSpace();
 
   /**
+   * @brief Begin a tab bar in the UI.
+   * @param _name Name of the tab bar.
+   * @return Wether the tab bar was created or not.
+   */
+  bool
+  beginTabBar(const char* _name);
+
+  void
+  endTabBar();
+
+  /**
+   * @brief Begin a UI tab.
+   * @param _name Name of the tab.
+   * @param _open Wether the tab is open or not.
+   * @return Wether the tab is open or not.
+   */
+  bool
+  beginTabItem(const char* _name);
+
+  /**
+   * @brief end the UI tab.
+   */
+  void
+  endTabItem();
+
+  /**
    * @brief Creates a new User interface window.
    * @param _name Name of the window.
    */

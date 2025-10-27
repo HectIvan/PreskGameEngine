@@ -33,7 +33,7 @@ loadPlugin()
 }
 
 TextureResource*
-StbiTextureCodec::loadTextureFromFile(const Path _path)
+StbiTextureCodec::createResourceFromFile(const Path _path)
 {
   Logger& log = g_Logger();
   bool canCreateResource = true;
@@ -74,15 +74,22 @@ StbiTextureCodec::loadTextureFromFile(const Path _path)
 
   // write the data into the pkt file.
   if (canCreateResource) {
-    TextureAssetHeader texHeader;
-    texHeader.width = textureRes->m_width;
-    texHeader.height = textureRes->m_height;
-    texHeader.bpp = textureRes->m_bpp;
-    texHeader.format = textureRes->m_format;
-    texHeader.dataSize = dataSize;
-    file.write(reinterpret_cast<const char*>(&texHeader), sizeof(TextureAssetHeader));
-    file.write(reinterpret_cast<const char*>(&data), dataSize);
+    TextureAssetHeader* texHeader = new TextureAssetHeader();
+    texHeader->width = textureRes->m_width;
+    texHeader->height = textureRes->m_height;
+    texHeader->bpp = textureRes->m_bpp;
+    texHeader->format = textureRes->m_format;
+    texHeader->dataSize = dataSize;
+    file.write(reinterpret_cast<const char*>(&texHeader->width), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader->height), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader->bpp), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader->format), sizeof(uint32));
+    file.write(reinterpret_cast<const char*>(&texHeader->dataSize), sizeof(uint32));
+    file.write(reinterpret_cast<char*>(&data[0]), dataSize);
     file.close();
+
+    delete texHeader;
+    texHeader = nullptr;
   }
 
   if (data) { stbi_image_free(data); }

@@ -199,7 +199,6 @@ ShaderTest::onInit()
   m_sActorIndex = 0;
   m_fpsSize = 20;
 
-  m_inLogger = false;
   m_showErrors = true;
   m_showWarnings = false;
   m_showActions = false;
@@ -327,7 +326,7 @@ ShaderTest::uInterfaceUpdate()
 
   Vector2 winRect = m_window.getClientWidthHeight();
   SPtr<Scene> currentScene = sm.getActiveScene();
-  
+
   // --- Scene graph window --- //
   im.setNextWindowParams(m_sceneGraphWin);
   im.startWindowCreate(m_sceneGraphWin.name);
@@ -338,7 +337,7 @@ ShaderTest::uInterfaceUpdate()
     m_sActorIndex = currentScene->getActorCount() - 1;
     m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
-  if (m_selectedActor) { 
+  if (m_selectedActor) {
     im.sameLine();
     if (im.createButton("Delete")) {
       m_selectedActor->~Actor();
@@ -356,10 +355,10 @@ ShaderTest::uInterfaceUpdate()
   for (uint32 i = 0; i < actorCount; ++i) {
     SPtr<Actor> currentActor = currentScene->getActor(i);
     if (im.createButton(currentActor->getName(),
-                        Color(0, 0, 0, 0),
-                        Color(50, 50, 50, 50),
-                        Color(100, 100, 100, 50),
-                        true)) {
+      Color(0, 0, 0, 0),
+      Color(50, 50, 50, 50),
+      Color(100, 100, 100, 50),
+      true)) {
       m_selectedActor = currentActor;
       m_sActorIndex = i;
     }
@@ -374,32 +373,34 @@ ShaderTest::uInterfaceUpdate()
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
   // -------------------------- //
-  im.beginChild("Tab", im.getWindowSize().x * 0.1f, im.getWindowSize().y, true);
-  if (im.createButton("Logger")) {
-    m_inLogger = true;
-  }
-  if (im.createButton("Resources")) {
-    m_inLogger = false;
-  }
-  im.endChild();
-  // -------------------------- //
   im.sameLine();
   // -------------------------- //
-  im.beginChild("LoggerMessages", im.getWindowSize().x * 0.9f, im.getWindowSize().y, true);
-  if (m_inLogger) {
-    im.createCheckBox("Errors", m_showErrors);
-    im.sameLine();
-    im.createCheckBox("Warnings", m_showWarnings);
-    im.sameLine();
-    im.createCheckBox("Logs", m_showActions);
-    showLogType(m_showErrors, kError);
-    showLogType(m_showWarnings, kWarning);
-    showLogType(m_showActions, kLog);
-  }
-  else {
+  // logger window.
+  if (im.beginTabBar("Logger/resources")) {
+    if (im.beginTabItem("Logger")) {
+      im.createCheckBox("Errors", m_showErrors);
+      im.sameLine();
+      im.createCheckBox("Warnings", m_showWarnings);
+      im.sameLine();
+      im.createCheckBox("Logs", m_showActions);
+      showLogType(m_showErrors, kError);
+      showLogType(m_showWarnings, kWarning);
+      showLogType(m_showActions, kLog);
+      im.endTabItem();
+    }
+    // resources window.
+    if (im.beginTabItem("Resources")) {
+      if (im.createButton("Model Resource")) {
 
+      }
+      im.sameLine();
+      if (im.createButton("Texture Resource")) {
+
+      }
+      im.endTabItem();
+    }
+    im.endTabBar();
   }
-  im.endChild();
   // -------------------------- //
 
   im.endWindowCreate();

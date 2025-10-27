@@ -29,12 +29,12 @@ class AssimpModelCodec : public ModelCodec
   virtual ~AssimpModelCodec() = default;
 
   /**
-   * @brief Load a model from a given path.
-   * @param _path Path to load the model from.
-   * @return Pointer to the loaded model.
+   * @brief Create a model resource from a given path using Assimp.
+   * @param _path Path of the model.
+   * @return Pointer to the model resource.
    */
-  SPtr<Model>
-  loadModel(const Path _path) override;
+  ModelResource*
+  createResourceFromFile(const Path _path) override;
 
   /**
    * @brief Convert an aiBone to a Bone.

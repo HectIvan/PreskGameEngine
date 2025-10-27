@@ -20,6 +20,7 @@ namespace pkEngineSDK
 
 class Path;
 class TextureResource;
+class ModelResource;
 
 // to do: placeholder for the id.
 namespace ASSET_ID
@@ -54,14 +55,16 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   unloadResource();
 
   /**
-   *
+   * @brief load a pkt Model resource from a given path.
+   * @param _path Path to load the resource from.
+   * @return Pointer to the resource.
    */
-  // ModelResource*
-  // loadModelResource(const Path _path);
+  ModelResource*
+  loadModelResource(const Path _path);
 
   /**
    * @brief load a pkt Texture resource from a given path.
-   * @param _path Path to load the texture from.
+   * @param _path Path to load the resource from.
    * @return Pointer to the resource.
    */
   TextureResource*

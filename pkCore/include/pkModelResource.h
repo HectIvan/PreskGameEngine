@@ -16,7 +16,7 @@
 **/
 /*********************************************/
 #include "pkBaseResource.h"
-#include "pkSimpleVertex.h"
+#include "pkMesh.h"
 
 namespace pkEngineSDK
 {
@@ -32,7 +32,6 @@ struct MeshAssetHeader
   String name;
   uint32 vertexCount;
   uint32 indexCount;
-  // String name;
 };
 
 class PK_CORE_EXPORT ModelResource : public BaseResource
@@ -49,7 +48,8 @@ class PK_CORE_EXPORT ModelResource : public BaseResource
   getType() const override { return RESOURCE_TYPE::kModel; }
 
  public:
-  Vector<SimpleVertex> vertex;
-  Vector<uint32> index;
+  Vector<SimpleVertex> m_vertex;
+  Vector<uint32> m_index;
+  Vector<SPtr<Mesh>> m_meshes;
 };
 }

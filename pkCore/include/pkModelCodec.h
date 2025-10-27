@@ -22,6 +22,8 @@
 namespace pkEngineSDK
 {
 
+class ModelResource;
+
 class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
 {
  public:
@@ -29,27 +31,21 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
   virtual ~ModelCodec() = default;
 
   /**
-   * @brief Load .pkm file.
-   */
-  void
-  loadPKM();
-
-  /**
    * @brief Save a model as a pkm to a given path.
    * @param _pModel Pointer to the model to save.
    * @param _path Path to save the model to.
-   * @return True if the model was saved successfully, false otherwise.
+   * @return Model resource.
    */
-  bool
+  ModelResource*
   savePKModel(const SPtr<Model>& _pModel, const Path _path);
 
   /**
-   * @brief Load a model from a given path.
-   * @param _path Path to load the model from.
-   * @return Pointer to the loaded model.
+   * @brief Create a model resource from a given path.
+   * @param _path Path of the model.
+   * @return Pointer to the model resource.
    */
-  virtual SPtr<Model>
-  loadModel(const Path _path) = 0;
+  virtual ModelResource*
+  createResourceFromFile(const Path _path) = 0;
 };
 
 PK_CORE_EXPORT ModelCodec&

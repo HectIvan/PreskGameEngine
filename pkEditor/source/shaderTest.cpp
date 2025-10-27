@@ -10,82 +10,31 @@
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkShaderManager.h"
+#include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "shaderTest.h"
 
-using pkEngineSDK::Color;
-using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBFloat;
-using pkEngineSDK::CBVector2x2;
-using pkEngineSDK::CBVector3;
-using pkEngineSDK::CBSSAO;
-using pkEngineSDK::CreateCBCamera;
-using pkEngineSDK::CreateCBLight;
-using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Light;
-using pkEngineSDK::EventQueue;
 using pkEngineSDK::GraphicsAPI;
-using pkEngineSDK::G_BUFFERS::kGB_Albedo;
-using pkEngineSDK::G_BUFFERS::kGB_Normal;
-using pkEngineSDK::g_EventManager;
 using pkEngineSDK::g_GraphicAPI;
-using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_ModelCodec;
-using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_ShaderManager;
 using pkEngineSDK::g_TextureManager;
-using pkEngineSDK::g_TimeManager;
-using pkEngineSDK::g_uInterface;
-using pkEngineSDK::int32;
-using pkEngineSDK::Light;
+using pkEngineSDK::g_TextureCodec;
 using pkEngineSDK::Logger;
 using pkEngineSDK::LogMSG;
 using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
 using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
-using pkEngineSDK::Material;
 using pkEngineSDK::Math;
-using pkEngineSDK::Matrix4;
 using pkEngineSDK::ModelCodec;
-using pkEngineSDK::Path;
-using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
-using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
-using pkEngineSDK::PASS_TYPE::kP_IBL;
-using pkEngineSDK::PASS_TYPE::kP_Luminance;
-using pkEngineSDK::PASS_TYPE::kP_LumBlur;
-using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
-using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
-using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PASS_TYPE::kP_SSAO;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PlatformPointer;
-using pkEngineSDK::PKWindowDesc;
-using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
-using pkEngineSDK::RendererManager;
-using pkEngineSDK::GPUResourceManager;
-using pkEngineSDK::Scene;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::ShaderManager;
-using pkEngineSDK::SPtr;
-using pkEngineSDK::String;
-using pkEngineSDK::TimeManager;
 using pkEngineSDK::TextureManager;
-using pkEngineSDK::to_string;
-using pkEngineSDK::uint32;
-using pkEngineSDK::UInterface;
-using pkEngineSDK::Vector4;
-using pkEngineSDK::Model;
-
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
-// to do: create fileSystem.h in utilities
-// create class Path
+using pkEngineSDK::TextureCodec;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "imgui_impl_win32.h"
@@ -161,8 +110,8 @@ ShaderTest::onInit()
   // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
-  SPtr<Actor> coat = activeScene->instantiate("Coat");
-  coat->addComponent(modelCod.loadModel(Path("models/export3dcoat.obj")));
+  // SPtr<Actor> coat = activeScene->instantiate("Coat");
+  // coat->addComponent(modelCod.loadModel(Path("resources/export3dcoat.pkm")));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   // log.print("Loading Exterior.");
@@ -312,12 +261,14 @@ findShader(const Vector<ShaderType>& _list, const Path& _path)
 void
 ShaderTest::uInterfaceUpdate()
 {
+  ModelCodec& modelCod = g_ModelCodec();
+  RendererManager& rm = g_RenderManager();
+  GPUResourceManager& gpuResMan = g_GPUResourceManager();
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
-  UInterface& im = g_uInterface();
-  RendererManager& rm = g_RenderManager();
+  TextureCodec& texCod = g_TextureCodec();
   TextureManager& tm = g_TextureManager();
-  ModelCodec& modelCod = g_ModelCodec();
+  UInterface& im = g_uInterface();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -391,11 +342,17 @@ ShaderTest::uInterfaceUpdate()
     // resources window.
     if (im.beginTabItem("Resources")) {
       if (im.createButton("Model Resource")) {
-
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString() != "") {
+          modelCod.createResourceFromFile(path);
+        }
       }
       im.sameLine();
       if (im.createButton("Texture Resource")) {
-
+        Path path = m_window.openFileFromExplorer();
+        if (path.toString() != "") {
+          texCod.createResourceFromFile(path);
+        }
       }
       im.endTabItem();
     }
@@ -444,7 +401,7 @@ ShaderTest::uInterfaceUpdate()
           if (val == 0) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
-              m_selectedActor->addComponent(modelCod.loadModel(path));
+              m_selectedActor->addComponent(gpuResMan.loadPKModel(path));
             }
           }
         }
@@ -452,9 +409,9 @@ ShaderTest::uInterfaceUpdate()
         uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
         for (uint32 i = 0; i < componentCount; ++i) {
           inspector.createComponentWindow(m_selectedActor->getComponents()[i],
-            m_window,
-            m_searchMesh,
-            m_imgTextureSize);
+                                          m_window,
+                                          m_searchMesh,
+                                          m_imgTextureSize);
         }
       }
       im.popStyleColor(3);

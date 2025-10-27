@@ -21,7 +21,6 @@
 
 #include "pkAssimpModelCodec.h"
 #include "pkGPUResourceManager.h"
-#include "pkGraphicsAPI.h" // to do: remove later
 #include "pkLogger.h"
 #include "pkFileSystem.h"
 #include "pkModelResource.h"
@@ -65,10 +64,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
 Matrix4
 aiTransformToMatrix4(aiMatrix4x4 _transform);
 
-SPtr<Model>
-AssimpModelCodec::loadModel(const Path _path)
+ModelResource*
+AssimpModelCodec::createResourceFromFile(const Path _path)
 {
-  GraphicsAPI& api = g_GraphicAPI();
   Logger& log = g_Logger();
   SPtr<Model> model = make_shared<Model>();
 
@@ -76,9 +74,9 @@ AssimpModelCodec::loadModel(const Path _path)
   model->path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(),
-    aiProcessPreset_TargetRealtime_MaxQuality |
-    aiProcess_RemoveRedundantMaterials |
-    aiProcess_FlipUVs);
+                                           aiProcessPreset_TargetRealtime_MaxQuality |
+                                           aiProcess_RemoveRedundantMaterials |
+                                           aiProcess_FlipUVs);
   if (!scene) {
     String msg = "Assimp failed to load model at directory " + modelPath + ".";
     log.print(msg);
@@ -90,19 +88,15 @@ AssimpModelCodec::loadModel(const Path _path)
   processNode(*model, scene->mRootNode, scene);
   model->setVerticesIndices();
 
-  model->m_vertexB = api.createVertexBuffer(model->vertex);
-  model->m_indexB = api.createIndexBuffer(model->index);
-  api.setIndexBuffer(model->m_indexB);
-  api.setVertexBuffer(model->m_vertexB);
-
   // if the model cannot be parsed into a .pkm file, log an error.
-  if (!savePKModel(model, _path.getFileNameWithoutExtension())) {
+  ModelResource* modelRes = savePKModel(model, _path.getFileNameWithoutExtension());
+  if (!modelRes) {
     String msg = "Failed to save resource for " + _path.getFileNameWithoutExtension() + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
   }
 
-  return model;
+  return modelRes;
 }
 
 Bone

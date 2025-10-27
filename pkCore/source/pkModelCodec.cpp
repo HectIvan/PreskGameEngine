@@ -23,10 +23,13 @@
 namespace pkEngineSDK
 {
 
-bool
+ModelResource*
 ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
+
+  ModelResource* modelRes = new ModelResource();
+
   String filePath = "resources/" + _path.getFileName() + ".pkm";
   ofstream file(filePath, ios::out | ios::binary);
   // char error[256];
@@ -35,14 +38,20 @@ ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
     String msg = "Failed to save model at path " + filePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    return false;
+    delete modelRes;
+    modelRes = nullptr;
+    return nullptr;
   }
+
+  modelRes->m_meshes = _pModel->meshes;
+  modelRes->m_index = _pModel->index;
+  modelRes->m_vertex = _pModel->vertex;
 
   // get and write model header.
   ModelAssetHeader* mHeader = new ModelAssetHeader();
   uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
   mHeader->meshCount = meshCount;
-  file.write(reinterpret_cast<const char*>(&mHeader), sizeof(ModelAssetHeader));
+  file.write(reinterpret_cast<const char*>(&mHeader->meshCount), sizeof(uint32));
   // for each mesh in the model.
   for (uint32 i = 0; i < meshCount; ++i) {
     // aquire needed objects
@@ -69,9 +78,9 @@ ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
     file.write(reinterpret_cast<const char*>(mesh->indexVector.data()),
                sizeof(uint32) * indicesCount);
   }
-
   file.close();
-  return true;
+
+  return modelRes;
 }
 
 PK_CORE_EXPORT ModelCodec&

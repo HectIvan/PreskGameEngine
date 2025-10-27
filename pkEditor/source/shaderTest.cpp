@@ -409,176 +409,188 @@ ShaderTest::uInterfaceUpdate()
   im.setNextWindowParams(m_rightWin);
   im.startWindowCreate(m_rightWin.name);
   m_rightWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
-  if (m_selectedActor) {
-    ActorInspector inspector(m_selectedActor);
-    // transform window
-    im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
-    if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
-      String name = m_selectedActor->getName();
-      im.createText("Name:   ");
-      im.sameLine();
-      if (im.createInputText("##Name", &name)) {
-        m_selectedActor->setName(name);
-      }
-      // activity checkbox
-      im.sameLine();
-      im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
-      if (m_eyeIcon) {
+  if (im.beginTabBar("InspectorTab")) {
+    // -------------------------- //
+    // actor tab
+    if (m_selectedActor && im.beginTabItem("Actor")) {
+      ActorInspector inspector(m_selectedActor);
+      // transform window
+      im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
+      if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
+        String name = m_selectedActor->getName();
+        im.createText("Name:   ");
         im.sameLine();
-        im.createImage(m_eyeIcon, Vector2(15));
+        if (im.createInputText("##Name", &name)) {
+          m_selectedActor->setName(name);
+        }
+        // activity checkbox
+        im.sameLine();
+        im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
+        if (m_eyeIcon) {
+          im.sameLine();
+          im.createImage(m_eyeIcon, Vector2(15));
+        }
+        // inspect actor transform matrix
+        inspector.Inspect();
       }
-      // inspect actor transform matrix
-      inspector.Inspect();
+      im.popStyleColor(3);
+      // ---- Components window ---- //
+      im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
+      if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
+        // to do: change this to a more efficient option
+        Vector<String> options = { "model", "light", "camera" };
+        int32 val = -1;
+        if (im.beginCombo("Components", val, options)) {
+          if (val == 0) {
+            Path path = m_window.openFileFromExplorer();
+            if (path.toString() != "") {
+              m_selectedActor->addComponent(modelCod.loadModel(path));
+            }
+          }
+        }
+        // create all components
+        uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
+        for (uint32 i = 0; i < componentCount; ++i) {
+          inspector.createComponentWindow(m_selectedActor->getComponents()[i],
+            m_window,
+            m_searchMesh,
+            m_imgTextureSize);
+        }
+      }
+      im.popStyleColor(3);
+      im.endTabItem();
     }
-    im.popStyleColor(3);
-    // ---- Components window ---- //
-    im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
-    if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
-      // to do: change this to a more efficient option
-      Vector<String> options = { "model", "light", "camera" };
-      int32 val = -1;
-      if (im.beginCombo("Components", val, options)) {
-        if (val == 0) {
-          Path path = m_window.openFileFromExplorer();
-          if (path.toString() != "") {
-            m_selectedActor->addComponent(modelCod.loadModel(path));
+    // -------------------------- //
+    // app tab.
+    if (im.beginTabItem("App")) {
+      // get framerate
+      float f_fps = 1.0f / g_TimeManager().m_deltaTime;
+      uint32 fps = static_cast<uint32>(f_fps);
+      String fpsStr = "FPS: " + to_string(fps);
+      String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
+
+      // FPS parameters
+      static const uint32 fpsListSize = 100;
+      static float fpsHistory[fpsListSize] = {};
+      static uint32 fpsOffset = 0;
+
+      // Record the current FPS
+      fpsHistory[fpsOffset] = f_fps;
+      fpsOffset = (fpsOffset + 1) % fpsListSize;
+      // --- Camera window --- //
+      if (im.collapsingHeader("Editor App", kPK_DefaultOpen)) {
+        // vSync
+        im.createText("vSync");
+        im.sameLine();
+        im.createCheckBox("##vSync", m_vSync);
+        im.createText(fpsStr.c_str());
+        im.sameLine();
+        im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
+        // camera speed
+        im.createDragF("##CamSpeed", m_cameraSpeed);
+        im.sameLine();
+        im.createText("Camera Speed");
+        // X Sensitivity
+        im.createDragF("##XSens", m_sensX, 0.1f);
+        im.sameLine();
+        im.createText("X Sensitivity");
+        // Y Sensitivity
+        im.createDragF("##YSens", m_sensY, 0.1f);
+        im.sameLine();
+        im.createText("Y Sensitivity");
+        im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
+      }
+      im.endTabItem();
+    }
+    // -------------------------- //
+    // Graphics tab.
+    if (im.beginTabItem("Graphics")) {
+      // ------------IBL------------ //
+      if (im.collapsingHeader("IBL", kPK_DefaultOpen)) {
+        im.createCheckBox("IBL Active", m_IBR);
+        if (m_IBR) {
+          // Slider for IBL intensity.
+          im.sameLine();
+          im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
+          // Button for loading an HDRI image.
+          if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+            Path path = m_window.openFileFromExplorer();
+            if (path.toString() != "") {
+              SPtr<Texture> texture = tm.loadTexture(path);
+              rm.m_mainSkybox->copyFrom(texture);
+            }
           }
         }
       }
-      // create all components
-      uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
-      for (uint32 i = 0; i < componentCount; ++i) {
-        inspector.createComponentWindow(m_selectedActor->getComponents()[i],
-                                        m_window,
-                                        m_searchMesh,
-                                        m_imgTextureSize);
+      if (im.isItemHovered()) {
+        im.setTooltip("Skybox");
       }
-    }
-    im.popStyleColor(3);
-  }
-  // -------------------------- //
+      // -------------------------- //
 
-  // get framerate
-  float f_fps = 1.0f / g_TimeManager().m_deltaTime;
-  uint32 fps = static_cast<uint32>(f_fps);
-  String fpsStr = "FPS: " + to_string(fps);
-  String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
+      // --- Post-Process window --- //
+      im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
+      if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
+        im.createDragF("Exposure", m_exposure, 0.1f, 0.0f);
+        // Luminance
+        im.createText("Luminance");
+        // Blur
+        im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
+        im.sameLine();
+        im.createText("Radius");
+        im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
+        im.sameLine();
+        im.createText("Strength");
+        // luminance threshold
+        im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
+        im.sameLine();
+        im.createText("Threshold");
 
-  // FPS parameters
-  static const uint32 fpsListSize = 100;
-  static float fpsHistory[fpsListSize] = {};
-  static uint32 fpsOffset = 0;
-
-  // Record the current FPS
-  fpsHistory[fpsOffset] = f_fps;
-  fpsOffset = (fpsOffset + 1) % fpsListSize;
-
-  // --- Camera window --- //
-  if (im.collapsingHeader("Editor App", kPK_DefaultOpen)) {
-    // vSync
-    im.createText("vSync");
-    im.sameLine();
-    im.createCheckBox("##vSync", m_vSync);
-    im.createText(fpsStr.c_str());
-    im.sameLine();
-    im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
-    // camera speed
-    im.createDragF("##CamSpeed", m_cameraSpeed);
-    im.sameLine();
-    im.createText("Camera Speed");
-    // X Sensitivity
-    im.createDragF("##XSens", m_sensX, 0.1f);
-    im.sameLine();
-    im.createText("X Sensitivity");
-    // Y Sensitivity
-    im.createDragF("##YSens", m_sensY, 0.1f);
-    im.sameLine();
-    im.createText("Y Sensitivity");
-    im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
-  }
-  // -------------------------- //
-
-  // ------------IBL------------ //
-  if (im.collapsingHeader("IBL", kPK_DefaultOpen)) {
-    im.createCheckBox("IBL Active", m_IBR);
-    if (m_IBR) {
-      // Slider for IBL intensity.
-      im.sameLine();
-      im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
-      // Button for loading an HDRI image.
-      if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-        Path path = m_window.openFileFromExplorer();
-        if (path.toString() != "") {
-          SPtr<Texture> texture = tm.loadTexture(path);
-          rm.m_mainSkybox->copyFrom(texture);
+        // Emissive blur pass
+        im.createText("Emissive");
+        im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
+        im.sameLine();
+        im.createText("Radius");
+        im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
+        im.sameLine();
+        im.createText("Strength");
+        // ssao
+        im.createCheckBox("SSAO", m_ssao);
+        if (m_ssao) {
+          im.createDragF("SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
+          im.sameLine();
+          im.createText("Sample Radius");
+          im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
+          im.sameLine();
+          im.createText("Scale");
+          im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
+          im.sameLine();
+          im.createText("Bias");
+          im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
+          im.sameLine();
+          im.createText("Intensity");
         }
       }
-    }
-  }
-  if (im.isItemHovered()) {
-    im.setTooltip("Skybox");
-  }
-  // -------------------------- //
-  
-  // --- Post-Process window --- //
-  im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
-  if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
-    im.createDragF("Exposure", m_exposure, 0.1f, 0.0f);
-    // Luminance
-    im.createText("Luminance");
-    // Blur
-    im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
-    im.sameLine();
-    im.createText("Radius");
-    im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
-    im.sameLine();
-    im.createText("Strength");
-    // luminance threshold
-    im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
-    im.sameLine();
-    im.createText("Threshold");
-
-    // Emissive blur pass
-    im.createText("Emissive");
-    im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
-    im.sameLine();
-    im.createText("Radius");
-    im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
-    im.sameLine();
-    im.createText("Strength");
-    // ssao
-    im.createCheckBox("SSAO", m_ssao);
-    if (m_ssao) {
-      im.createDragF("SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
-      im.sameLine();
-      im.createText("Sample Radius");
-      im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
-      im.sameLine();
-      im.createText("Scale");
-      im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
-      im.sameLine();
-      im.createText("Bias");
-      im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
-      im.sameLine();
-      im.createText("Intensity");
-    }
-  }
-  if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
-    // display all compiled shaders.
-    Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
-    for (uint32 i = 0; i < shaders.size(); ++i) {
-      SPtr<Shader> shader = shaders[i];
-      String shaderName = shader->getShaderDirectory().getFileName();
-      im.createText(shaderName.c_str());
-      im.sameLine();
-      im.pushID(i);
-      if (im.createButton("Cmp")) {
-        shader->compile();
+      if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
+        // display all compiled shaders.
+        Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
+        for (uint32 i = 0; i < shaders.size(); ++i) {
+          SPtr<Shader> shader = shaders[i];
+          String shaderName = shader->getShaderDirectory().getFileName();
+          im.createText(shaderName.c_str());
+          im.sameLine();
+          im.pushID(i);
+          if (im.createButton("Cmp")) {
+            shader->compile();
+          }
+          im.popID();
+        }
       }
-      im.popID();
+      im.popStyleColor(3);
+      im.endTabItem();
     }
+    // -------------------------- //
+    im.endTabBar();
   }
-  im.popStyleColor(3);
   im.endWindowCreate();
   // -------------------------- //
   im.render();

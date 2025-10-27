@@ -178,7 +178,6 @@ class UInterface : public Module<UInterface>
   /**
    * @brief Begin a UI tab.
    * @param _name Name of the tab.
-   * @param _open Wether the tab is open or not.
    * @return Wether the tab is open or not.
    */
   bool

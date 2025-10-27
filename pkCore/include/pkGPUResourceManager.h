@@ -69,7 +69,7 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
    * @return Pointer to the model if loaded; nullptr if failed.
    */
   SPtr<Model>
-  loadPKModel(Path _path);
+  loadPKModel(const Path _path);
 
   /**
    * @brief search for a specific mesh
@@ -78,6 +78,22 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
    */
   SPtr<Mesh>
   searchMesh(const String _name);
+
+  /**
+   * @brief search for a specific model.
+   * @param _directory Directory of the model.
+   * @return Pointer to the model if found.
+   */
+  SPtr<Model>
+  searchModel(const Path _directory);
+
+  /**
+   * @brief Insert a model into the memory.
+   * @param _model Model to insert.
+   * @param _directory Directory of the model.
+   */
+  void
+  insertModelMemory(const SPtr<Model> _pModel, const Path _directory);
 
  public:
   Vector<SPtr<ModelMemory>> m_models;

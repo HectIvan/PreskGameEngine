@@ -32,7 +32,7 @@ loadPlugin()
   TextureCodec::startUp<StbiTextureCodec>();
 }
 
-TextureResource*
+SPtr<TextureResource>
 StbiTextureCodec::createResourceFromFile(const Path _path)
 {
   Logger& log = g_Logger();
@@ -50,46 +50,63 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
   }
 
-  // load data using stbi image.
+  // load data using stbi.
   int32 width, height, bpp;
-  unsigned char* data = stbi_load(_path.toString().c_str(), &width, &height, &bpp, 4);
+  String extension = _path.getExtension();
+  unsigned char* data;
+  PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+
+  // load float data for exr and hdr files.
+  if (extension == "exr" || extension == "hdr") {
+    float* dataF = stbi_loadf(_path.toString().c_str(), &width, &height, &bpp, 4);
+    data = reinterpret_cast<unsigned char*>(dataF);
+    bpp = 4 * sizeof(float);
+    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  }
+  // load normal data for other file types.
+  else {
+    data = stbi_load(_path.toString().c_str(), &width, &height, &bpp, 4);
+  }
 
   // if stbi failed to load the texture data, return a warning and a nullptr.
   if (!data) {
-    String msg = "STBI failed to load texture at directory " + texturePath + ".";
+    String msg = "STBI failed to load texture " + texturePath + "."
+                 + " Reason:" + stbi_failure_reason();
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
-  SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * 4; // to do: remove magic numbers.
+  // force 4 bytes per pixel.
+  if (bpp < 4) {
+    bpp = 4;
+  }
+
+  SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * bpp;
   // create texture resource.
-  TextureResource* textureRes = new TextureResource();
+  SPtr<TextureResource> textureRes = make_shared<TextureResource>();
   textureRes->m_width = width;
   textureRes->m_height = height;
   textureRes->m_bpp = bpp;
-  textureRes->m_format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM; // to do: make this dynamic.
+  textureRes->m_format = static_cast<uint32>(format);
   textureRes->m_data = new unsigned char[dataSize];
   memcpy(textureRes->m_data, data, dataSize);
 
   // write the data into the pkt file.
   if (canCreateResource) {
-    TextureAssetHeader* texHeader = new TextureAssetHeader();
-    texHeader->width = textureRes->m_width;
-    texHeader->height = textureRes->m_height;
-    texHeader->bpp = textureRes->m_bpp;
-    texHeader->format = textureRes->m_format;
-    texHeader->dataSize = dataSize;
-    file.write(reinterpret_cast<const char*>(&texHeader->width), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader->height), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader->bpp), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader->format), sizeof(uint32));
-    file.write(reinterpret_cast<const char*>(&texHeader->dataSize), sizeof(uint32));
+    TextureAssetHeader texHeader;
+    texHeader.width = textureRes->m_width;
+    texHeader.height = textureRes->m_height;
+    texHeader.bpp = textureRes->m_bpp;
+    texHeader.format = textureRes->m_format;
+    texHeader.dataSize = dataSize;
+    file.write(reinterpret_cast<const char*>(&texHeader.width), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader.height), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader.bpp), sizeof(int32));
+    file.write(reinterpret_cast<const char*>(&texHeader.format), sizeof(uint32));
+    file.write(reinterpret_cast<const char*>(&texHeader.dataSize), sizeof(uint32));
     file.write(reinterpret_cast<char*>(&data[0]), dataSize);
     file.close();
-
-    delete texHeader;
-    texHeader = nullptr;
   }
 
   if (data) { stbi_image_free(data); }

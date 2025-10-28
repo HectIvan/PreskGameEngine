@@ -45,19 +45,15 @@ TextureManager::loadTexture(const Path& _directory)
   // create the texture
   // if it is an exr image / hdr
   uint32 mipLevels = 1;
-  if (_directory.getExtension() == "exr" || _directory.getExtension() == "hdr") {
-    mipLevels = 0;
-    texture = api.createTextureFromFileF(_directory,
-                                         PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS |
-                                         PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
-                                         mipLevels);// PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS);
-  }
-  else {
-    texture = api.createTextureFromFile(_directory, 
-                                        PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE,
-                                        mipLevels,
-                                        PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM);
-  }
+  uint32 bindFlags = PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
+  mipLevels = 0; // to do: separate mips generation function between skybox and textures.
+  // if (_directory.getExtension() == "exr" || _directory.getExtension() == "hdr") {
+  //   bindFlags = PK_BIND_FLAG::kPK_BIND_UNORDERED_ACCESS |
+  //               PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
+  //   // PK_RESOURCE_MISC_FLAG::kPK_RESOURCE_MISC_GENERATE_MIPS);
+  // }
+
+  texture = api.createTextureFromFile(_directory, bindFlags, mipLevels);
 
   // if the texture failed to load
   if (!texture) {

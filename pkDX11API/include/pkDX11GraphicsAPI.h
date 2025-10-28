@@ -305,14 +305,12 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _directory Directory of the resource.
    * @param _bindFlags What kind of binding will it have.
    * @param _mipLevels MipMap level count.
-   * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   SPtr<Texture>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
-                        int32 _mipLevels,
-                        uint32 _format) override;
+                        int32 _mipLevels) override;
 
   /**
    * @brief Create a texture from a DDS file.
@@ -321,20 +319,6 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<Texture>
   createDDSTextureFromFile(const Path& _directory) override;
-
-  /**
-   * @brief Create a texture from file as float.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels MipMap level count.
-   * @param _format Format of the texture.
-   * @return Pointer to the texture.
-   */
-  SPtr<Texture>
-  createTextureFromFileF(const Path& _directory,
-                         uint32 _bindFlags,
-                         int32 _mipLevels = 1,
-                         PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) override;
 
   /**
    * @brief Generate mips for a texture.

@@ -65,7 +65,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @param _path Path to load the resource from.
    * @return Pointer to the resource.
    */
-  ModelResource*
+  SPtr<ModelResource>
   loadModelResource(const Path _path);
 
   /**
@@ -73,7 +73,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @param _path Path to load the resource from.
    * @return Pointer to the resource.
    */
-  TextureResource*
+  SPtr<TextureResource>
   loadTextureResource(const Path _path);
 
   /**

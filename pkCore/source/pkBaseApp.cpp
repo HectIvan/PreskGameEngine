@@ -56,6 +56,7 @@ BaseApp::init(const char** _argv, int32 _count)
   onInit();
 }
 
+// to do: class command line parser module to register arguments.
 void
 BaseApp::initAPI(const char** _argv, int32 _count)
 {

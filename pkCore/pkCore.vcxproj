@@ -229,7 +229,6 @@
     <ClInclude Include="include\pkWindowDesc.h" />
     <ClInclude Include="include\pkSamplerState.h" />
     <ClInclude Include="include\pkSceneManager.h" />
-    <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkActor.cpp" />

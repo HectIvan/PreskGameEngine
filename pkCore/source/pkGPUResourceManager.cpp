@@ -38,10 +38,17 @@ GPUResourceManager::loadPKModel(const Path _path)
 
   GraphicsAPI& api = g_GraphicAPI();
   AssetResourceManager& assetResMgr = g_AssetResourceManager();
+  Logger& log = g_Logger();
 
   model = make_shared<Model>();
-  ModelResource* modelRes = assetResMgr.loadModelResource(_path);
+  SPtr<ModelResource> modelRes = assetResMgr.loadModelResource(_path);
 
+  if (!modelRes) {
+    String msg = "Failed to load model at path " + _path.toString() + ".";
+    log.print(msg);
+    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    return nullptr;
+  }
   model->index = modelRes->m_index;
   model->vertex = modelRes->m_vertex;
   model->meshes = modelRes->m_meshes;

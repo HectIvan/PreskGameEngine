@@ -299,8 +299,7 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
   virtual SPtr<Texture>
   createTextureFromFile(const Path& _directory,
                         uint32 _bindFlags,
-                        int32 _mipLevels,
-                        uint32 _format) = 0;
+                        int32 _mipLevels) = 0;
 
   /**
    * @brief Create a texture from a DDS file.
@@ -309,19 +308,6 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
    */
   virtual SPtr<Texture>
   createDDSTextureFromFile(const Path& _directory) = 0;
-
-  /**
-   * @brief Create a texture from file as float.
-   * @param _directory Directory of the texture.
-   * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels MipMap level count.
-   * @return Pointer to the texture.
-   */
-  virtual SPtr<Texture>
-  createTextureFromFileF(const Path& _directory,
-                         uint32 _bindFlags,
-                         int32 _mipLevels = 1,
-                         PK_USAGE::E _usage = PK_USAGE::kPK_USAGE_DEFAULT) = 0;
 
   /**
    * @brief Generate mips for a texture.

@@ -5,6 +5,7 @@
 #include "pkSamplerState.h"
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
+#include "pkTextureCodec.h"
 
 namespace pkEngineSDK
 {
@@ -97,7 +98,7 @@ RendererManager::init()
   SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  m_mainSkybox = tm.loadTexture(Path("textures/skybox/Skybox_papermill.hdr"));
+  m_mainSkybox = tm.loadTexture(Path("resources/Skybox_papermill.pkt"));
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS

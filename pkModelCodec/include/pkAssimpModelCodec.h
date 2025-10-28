@@ -33,7 +33,7 @@ class AssimpModelCodec : public ModelCodec
    * @param _path Path of the model.
    * @return Pointer to the model resource.
    */
-  ModelResource*
+  SPtr<ModelResource>
   createResourceFromFile(const Path _path) override;
 
   /**

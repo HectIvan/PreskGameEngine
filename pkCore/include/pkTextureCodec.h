@@ -34,7 +34,7 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
    * @param _path Where to look for the file.
    * @return texture resource.
    */
-  virtual TextureResource*
+  virtual SPtr<TextureResource>
   createResourceFromFile(const Path _path) = 0;
 };
 

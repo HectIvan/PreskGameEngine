@@ -31,7 +31,7 @@ class StbiTextureCodec : public TextureCodec
    * @param _path Where to look for the file.
    * @return texture resource.
    */
-  TextureResource*
-    createResourceFromFile(const Path _path) override;
+  SPtr<TextureResource>
+  createResourceFromFile(const Path _path) override;
 }; 
 }

@@ -23,12 +23,12 @@
 namespace pkEngineSDK
 {
 
-ModelResource*
+SPtr<ModelResource>
 ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
 
-  ModelResource* modelRes = new ModelResource();
+  SPtr<ModelResource> modelRes = make_shared<ModelResource>();
 
   String filePath = "resources/" + _path.getFileName() + ".pkm";
   ofstream file(filePath, ios::out | ios::binary);
@@ -38,8 +38,6 @@ ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
     String msg = "Failed to save model at path " + filePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    delete modelRes;
-    modelRes = nullptr;
     return nullptr;
   }
 
@@ -48,28 +46,28 @@ ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
   modelRes->m_vertex = _pModel->vertex;
 
   // get and write model header.
-  ModelAssetHeader* mHeader = new ModelAssetHeader();
+  ModelAssetHeader mHeader;
   uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
-  mHeader->meshCount = meshCount;
-  file.write(reinterpret_cast<const char*>(&mHeader->meshCount), sizeof(uint32));
+  mHeader.meshCount = meshCount;
+  file.write(reinterpret_cast<const char*>(&mHeader.meshCount), sizeof(uint32));
   // for each mesh in the model.
   for (uint32 i = 0; i < meshCount; ++i) {
     // aquire needed objects
     SPtr<Mesh> mesh = _pModel->meshes[i];
-    MeshAssetHeader* meshHeader = new MeshAssetHeader();
+    MeshAssetHeader meshHeader;
     uint32 indicesCount = static_cast<uint32>(mesh->indexVector.size());
     uint32 verticesCount = static_cast<uint32>(mesh->vertexVector.size());
     String name = mesh->getName();
     SIZE_T nameSize = name.length();
-    meshHeader->indexCount = indicesCount;
-    meshHeader->vertexCount = verticesCount;
-    meshHeader->nameSize = nameSize;
-    meshHeader->name = name;
+    meshHeader.indexCount = indicesCount;
+    meshHeader.vertexCount = verticesCount;
+    meshHeader.nameSize = nameSize;
+    meshHeader.name = name;
     // write the mesh header.
-    file.write(reinterpret_cast<const char*>(&meshHeader->nameSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(meshHeader->name.c_str()), nameSize);
-    file.write(reinterpret_cast<const char*>(&meshHeader->vertexCount), sizeof(uint32));
-    file.write(reinterpret_cast<const char*>(&meshHeader->indexCount), sizeof(uint32));
+    file.write(reinterpret_cast<const char*>(&meshHeader.nameSize), sizeof(SIZE_T));
+    file.write(reinterpret_cast<const char*>(meshHeader.name.c_str()), nameSize);
+    file.write(reinterpret_cast<const char*>(&meshHeader.vertexCount), sizeof(uint32));
+    file.write(reinterpret_cast<const char*>(&meshHeader.indexCount), sizeof(uint32));
 
     // write all vertices of the mesh.
     file.write(reinterpret_cast<const char*>(mesh->vertexVector.data()),

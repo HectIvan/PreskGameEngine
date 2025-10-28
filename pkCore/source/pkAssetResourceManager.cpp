@@ -39,7 +39,7 @@ AssetResourceManager::unloadResource()
   return SPtr<BaseResource>();
 }
 
-ModelResource*
+SPtr<ModelResource>
 AssetResourceManager::loadModelResource(const Path _path)
 {
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
@@ -55,46 +55,46 @@ AssetResourceManager::loadModelResource(const Path _path)
     return nullptr;
   }
 
-  ModelResource* modelResource = new ModelResource();
+  SPtr<ModelResource> modelResource = make_shared<ModelResource>();
 
   // read the model header.
-  ModelAssetHeader* modelHeader = new ModelAssetHeader();
-  file.read(reinterpret_cast<char*>(&modelHeader->meshCount), sizeof(uint32));
-  modelResource->m_meshes.resize(modelHeader->meshCount);
+  ModelAssetHeader modelHeader;
+  file.read(reinterpret_cast<char*>(&modelHeader.meshCount), sizeof(uint32));
+  modelResource->m_meshes.resize(modelHeader.meshCount);
 
   // read through each mesh in the model.
-  for (uint32 i = 0; i < modelHeader->meshCount; ++i) {
-    MeshAssetHeader* meshHeader = new MeshAssetHeader();
-    file.read(reinterpret_cast<char*>(&meshHeader->nameSize), sizeof(SIZE_T));
-    meshHeader->name.resize(meshHeader->nameSize);
-    file.read(reinterpret_cast<char*>(&meshHeader->name[0]), meshHeader->nameSize);
-    file.read(reinterpret_cast<char*>(&meshHeader->vertexCount), sizeof(uint32));
-    file.read(reinterpret_cast<char*>(&meshHeader->indexCount), sizeof(uint32));
+  for (uint32 i = 0; i < modelHeader.meshCount; ++i) {
+    MeshAssetHeader meshHeader;
+    file.read(reinterpret_cast<char*>(&meshHeader.nameSize), sizeof(SIZE_T));
+    meshHeader.name.resize(meshHeader.nameSize);
+    file.read(reinterpret_cast<char*>(&meshHeader.name[0]), meshHeader.nameSize);
+    file.read(reinterpret_cast<char*>(&meshHeader.vertexCount), sizeof(uint32));
+    file.read(reinterpret_cast<char*>(&meshHeader.indexCount), sizeof(uint32));
 
     // get vertices data
-    uint32 meshVerticesSize = sizeof(SimpleVertex) * meshHeader->vertexCount;
+    uint32 meshVerticesSize = sizeof(SimpleVertex) * meshHeader.vertexCount;
     Vector<char> meshVertices(meshVerticesSize);
     file.read(meshVertices.data(), meshVerticesSize);
-    Vector<SimpleVertex> vertices = Vector<SimpleVertex>(meshHeader->vertexCount);
+    Vector<SimpleVertex> vertices = Vector<SimpleVertex>(meshHeader.vertexCount);
     memcpy(vertices.data(), meshVertices.data(), meshVerticesSize);
 
     // get indices data.
-    uint32 meshIndicesSize = sizeof(uint32) * meshHeader->indexCount;
+    uint32 meshIndicesSize = sizeof(uint32) * meshHeader.indexCount;
     Vector<char> meshIndices(meshIndicesSize);
     file.read(meshIndices.data(), meshIndicesSize);
-    Vector<uint32> indices = Vector<uint32>(meshHeader->indexCount);
+    Vector<uint32> indices = Vector<uint32>(meshHeader.indexCount);
     memcpy(indices.data(), meshIndices.data(), meshIndicesSize);
 
     // create the mesh
     SPtr<Mesh> mesh = make_shared<Mesh>();
     // set mesh data.
-    mesh->setName(meshHeader->name); // to do: temporary placeholder for the mesh name.
-    mesh->vertexCount = meshHeader->vertexCount;
-    mesh->numIndex = meshHeader->indexCount;
+    mesh->setName(meshHeader.name); // to do: temporary placeholder for the mesh name.
+    mesh->vertexCount = meshHeader.vertexCount;
+    mesh->numIndex = meshHeader.indexCount;
     // fill in mesh data.
-    mesh->vertexVector.resize(meshHeader->vertexCount);
+    mesh->vertexVector.resize(meshHeader.vertexCount);
     memcpy(mesh->vertexVector.data(), vertices.data(), meshVerticesSize);
-    mesh->indexVector.resize(meshHeader->indexCount);
+    mesh->indexVector.resize(meshHeader.indexCount);
     memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
 
     // to do: make a default material
@@ -102,13 +102,10 @@ AssetResourceManager::loadModelResource(const Path _path)
     modelResource->m_meshes[i] = mesh;
   }
 
-  delete modelHeader;
-  modelHeader = nullptr;
-
   return modelResource;
 }
 
-TextureResource*
+SPtr<TextureResource>
 AssetResourceManager::loadTextureResource(const Path _path)
 {
   Logger& log = g_Logger();
@@ -123,25 +120,22 @@ AssetResourceManager::loadTextureResource(const Path _path)
     return nullptr;
   }
 
-  TextureResource* texResource = new TextureResource();
+  SPtr<TextureResource> texResource = make_shared<TextureResource>();
 
-  TextureAssetHeader* texHeader = new TextureAssetHeader();
-  file.read(reinterpret_cast<char*>(&texHeader->width), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader->height), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader->bpp), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader->format), sizeof(uint32));
-  file.read(reinterpret_cast<char*>(&texHeader->dataSize), sizeof(uint32));
+  TextureAssetHeader texHeader;
+  file.read(reinterpret_cast<char*>(&texHeader.width), sizeof(int32));
+  file.read(reinterpret_cast<char*>(&texHeader.height), sizeof(int32));
+  file.read(reinterpret_cast<char*>(&texHeader.bpp), sizeof(int32));
+  file.read(reinterpret_cast<char*>(&texHeader.format), sizeof(uint32));
+  file.read(reinterpret_cast<char*>(&texHeader.dataSize), sizeof(uint32));
 
-  texResource->m_width = texHeader->width;
-  texResource->m_height = texHeader->height;
-  texResource->m_bpp = texHeader->bpp;
-  texResource->m_format = texHeader->format;
+  texResource->m_width = texHeader.width;
+  texResource->m_height = texHeader.height;
+  texResource->m_bpp = texHeader.bpp;
+  texResource->m_format = texHeader.format;
 
-  texResource->m_data = new unsigned char[texHeader->dataSize];
-  file.read(reinterpret_cast<char*>(&texResource->m_data[0]), texHeader->dataSize);
-
-  delete texHeader;
-  texHeader = nullptr;
+  texResource->m_data = new unsigned char[texHeader.dataSize];
+  file.read(reinterpret_cast<char*>(&texResource->m_data[0]), texHeader.dataSize);
 
   return texResource;
 }

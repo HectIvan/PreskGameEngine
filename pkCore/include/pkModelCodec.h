@@ -36,7 +36,7 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
    * @param _path Path to save the model to.
    * @return Model resource.
    */
-  ModelResource*
+  SPtr<ModelResource>
   savePKModel(const SPtr<Model>& _pModel, const Path _path);
 
   /**
@@ -44,7 +44,7 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
    * @param _path Path of the model.
    * @return Pointer to the model resource.
    */
-  virtual ModelResource*
+  virtual SPtr<ModelResource>
   createResourceFromFile(const Path _path) = 0;
 };
 

@@ -114,9 +114,6 @@
     <ClInclude Include="include\pkVertexBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
-    <ClInclude Include="include\stb_image.h">
-      <Filter>include\api</Filter>
-    </ClInclude>
     <ClInclude Include="include\pkLight.h">
       <Filter>include\graphics</Filter>
     </ClInclude>

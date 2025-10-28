@@ -64,7 +64,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
 Matrix4
 aiTransformToMatrix4(aiMatrix4x4 _transform);
 
-ModelResource*
+SPtr<ModelResource>
 AssimpModelCodec::createResourceFromFile(const Path _path)
 {
   Logger& log = g_Logger();
@@ -89,7 +89,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
   model->setVerticesIndices();
 
   // if the model cannot be parsed into a .pkm file, log an error.
-  ModelResource* modelRes = savePKModel(model, _path.getFileNameWithoutExtension());
+  SPtr<ModelResource> modelRes = savePKModel(model, _path.getFileNameWithoutExtension());
   if (!modelRes) {
     String msg = "Failed to save resource for " + _path.getFileNameWithoutExtension() + ".";
     log.print(msg);

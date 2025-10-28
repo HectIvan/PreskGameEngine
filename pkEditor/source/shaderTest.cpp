@@ -65,6 +65,7 @@ ShaderTest::onInit()
   // get the resource manager
   ModelCodec& modelCod = g_ModelCodec();
   SceneManager& sceneMan = g_SceneManager();
+  GPUResourceManager& resourceMan = g_GPUResourceManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
 
   // create camera
@@ -110,9 +111,9 @@ ShaderTest::onInit()
   // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
-  // SPtr<Actor> coat = activeScene->instantiate("Coat");
-  // coat->addComponent(modelCod.loadModel(Path("resources/export3dcoat.pkm")));
-  // coat->setPosition(11.0f, 5.2f, 0.0f);
+  SPtr<Actor> coat = activeScene->instantiate("Coat");
+  coat->addComponent(resourceMan.loadPKModel(Path("resources/export3dcoat.pkm")));
+  coat->setPosition(11.0f, 5.2f, 0.0f);
 
   // log.print("Loading Exterior.");
   // timeMan.startTimer();
@@ -152,7 +153,7 @@ ShaderTest::onInit()
   m_showWarnings = false;
   m_showActions = false;
 
-  m_eyeIcon = g_TextureManager().loadTexture(Path("textures/white-eye-icon.jpg"));
+  m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
 
   /**
    * User Interface.

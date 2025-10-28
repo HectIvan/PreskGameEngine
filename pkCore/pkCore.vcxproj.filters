@@ -261,6 +261,12 @@
     <ClInclude Include="include\pkPassDesc.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkMaterialResource.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkMaterialCodec.h">
+      <Filter>include\codecs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -361,6 +367,9 @@
     </ClCompile>
     <ClCompile Include="source\pkGravityComponent.cpp">
       <Filter>source\components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMaterialCodec.cpp">
+      <Filter>source\codecs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

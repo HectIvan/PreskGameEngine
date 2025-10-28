@@ -10,10 +10,15 @@
  * @changes Created the file.
  */
  /*****************************************************************************/
+#pragma once
+
+/*********************************************/
+/**
+ * Includes
+ */
+ /*********************************************/
 #include "pkModule.h"
 #include "pkBaseResource.h"
-
-#pragma once
 
 namespace pkEngineSDK
 {
@@ -21,6 +26,7 @@ namespace pkEngineSDK
 class Path;
 class TextureResource;
 class ModelResource;
+class MaterialResource;
 
 // to do: placeholder for the id.
 namespace ASSET_ID
@@ -69,6 +75,14 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    */
   TextureResource*
   loadTextureResource(const Path _path);
+
+  /**
+   * @brief Load a pkmat Material resource from a given path.
+   * @param _path Path to load the resource from.
+   * @return Pointer to the resource.
+   */
+  MaterialResource*
+  loadMaterialResource(const Path _path);
 
  private:
   UMap<ASSET_ID::E, SPtr<BaseResource>> m_loadedResources;

@@ -25,6 +25,7 @@ using std::filesystem::exists;
 using std::filesystem::is_regular_file;
 using std::filesystem::absolute;
 using std::filesystem::current_path;
+using std::filesystem::directory_iterator;
 
 namespace pkEngineSDK
 {
@@ -66,6 +67,25 @@ getAbsolutePathWStr(const Path& _path)
 {
   path fsPath(_path.toString());
   return absolute(fsPath).wstring();
+}
+
+/**
+ * @brief Get all files from a folder.
+ * @param _path Folder path where to look for.
+ * @return Vector of paths
+ */
+PKFORCEINLINE static Vector<Path>
+getFilesFromFolder(const Path _path)
+{
+  path absPath = getAbsolutePath(_path);
+  Vector<Path> paths;
+  for (const auto& entry : directory_iterator(absPath.string())) {
+    path entryPath = entry.path();
+    if (is_regular_file(entryPath)) {
+      paths.push_back(entryPath.string());
+    }
+  }
+  return paths;
 }
 
 PKFORCEINLINE static path

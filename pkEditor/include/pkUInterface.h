@@ -172,8 +172,61 @@ class UInterface : public Module<UInterface>
   bool
   beginTabBar(const char* _name);
 
+  /**
+   * @brief End a tab bar in the UI.
+   */
   void
   endTabBar();
+
+  /**
+   * @brief Begin the drag and drop process.
+   * @return If the drag and drop has been initiated.
+   */
+  bool
+  beginDragDropSource();
+
+  /**
+   * @brief Set what data will be dragged.
+   * @param _name Name of the payload.
+   * @param _data Payload Data.
+   * @param _dataSize Data Size.
+   */
+  void
+  setDragDropPayload(const char* _name, const void* _data, const SIZE_T _dataSize);
+
+  /**
+   * @brief End the drag and drop process.
+   */
+  void
+  endDragDropSource();
+
+  /**
+   * @brief Begin the drag drop target.
+   */
+  void
+  beginDragDropTarget();
+
+  /**
+   * @brief Accept a drag drop payload.
+   * @param _type Payload type.
+   */
+  bool
+  acceptDragDropPayload(const char* _type);
+
+  /**
+   * @brief End the drag drop process.
+   */
+  void
+  endDragDropTarget();
+
+  /**
+   * @brief Create a selectable widget.
+   * @param _name Name of the widget.
+   * @param _size Size of the widget.
+   * @return If clicked this frame.
+   */
+  bool
+  selectable(const char* _name, const Vector2 _size = Vector2(0.0f));
 
   /**
    * @brief Begin a UI tab.

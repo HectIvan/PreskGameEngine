@@ -18,13 +18,14 @@
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkTextureResource.h"
+#include "pkFileSystem.h"
 
 namespace pkEngineSDK
 {
 void
-AssetResourceManager::init()
+AssetResourceManager::init(const String _resourcesPath)
 {
-  // To do: implement the asset resource manager.
+  m_resourcesFolder = Path(_resourcesPath);
 }
 
 SPtr<BaseResource>
@@ -140,7 +141,7 @@ AssetResourceManager::loadTextureResource(const Path _path)
   return texResource;
 }
 
-MaterialResource*
+SPtr<MaterialResource>
 AssetResourceManager::loadMaterialResource(const Path _path)
 {
   Logger& log = g_Logger();
@@ -153,51 +154,78 @@ AssetResourceManager::loadMaterialResource(const Path _path)
     return nullptr;
   }
 
-  MaterialResource* matResource = new MaterialResource();
-  MaterialAssetHeader* matHeader = new MaterialAssetHeader();
+  SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
+  MaterialAssetHeader matHeader;
 
   // read diffuse data
-  file.read(reinterpret_cast<char*>(&matHeader->diffusePathSize), sizeof(SIZE_T));
-  matResource->m_diffusePath.resize(matHeader->diffusePathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.diffusePathSize), sizeof(SIZE_T));
+  matResource->m_diffusePath.resize(matHeader.diffusePathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_diffusePath[0]),
-                                    matHeader->diffusePathSize);
+                                    matHeader.diffusePathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_diffuseColor), sizeof(Color));
 
   // read normal data
-  file.read(reinterpret_cast<char*>(&matHeader->normalPathSize), sizeof(SIZE_T));
-  matResource->m_normalPath.resize(matHeader->normalPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_normalPath[0]), matHeader->normalPathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.normalPathSize), sizeof(SIZE_T));
+  matResource->m_normalPath.resize(matHeader.normalPathSize);
+  file.read(reinterpret_cast<char*>(&matResource->m_normalPath[0]), matHeader.normalPathSize);
 
   // read ao data
-  file.read(reinterpret_cast<char*>(&matHeader->aoPathSize), sizeof(SIZE_T));
-  matResource->m_aoPath.resize(matHeader->aoPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_aoPath[0]), matHeader->aoPathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.aoPathSize), sizeof(SIZE_T));
+  matResource->m_aoPath.resize(matHeader.aoPathSize);
+  file.read(reinterpret_cast<char*>(&matResource->m_aoPath[0]), matHeader.aoPathSize);
 
   // read roughness data
-  file.read(reinterpret_cast<char*>(&matHeader->roughnessPathSize), sizeof(SIZE_T));
-  matResource->m_roughnessPath.resize(matHeader->roughnessPathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.roughnessPathSize), sizeof(SIZE_T));
+  matResource->m_roughnessPath.resize(matHeader.roughnessPathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_roughnessPath[0]),
-                                    matHeader->roughnessPathSize);
+                                    matHeader.roughnessPathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_roughValue), sizeof(float));
 
   // read metallic data
-  file.read(reinterpret_cast<char*>(&matHeader->metallicPathSize), sizeof(SIZE_T));
-  matResource->m_metallicPath.resize(matHeader->metallicPathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.metallicPathSize), sizeof(SIZE_T));
+  matResource->m_metallicPath.resize(matHeader.metallicPathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_metallicPath[0]),
-                                    matHeader->metallicPathSize);
+                                    matHeader.metallicPathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_metallicValue), sizeof(float));
 
   // read emissive data
-  file.read(reinterpret_cast<char*>(&matHeader->emissivePathSize), sizeof(SIZE_T));
-  matResource->m_emissivePath.resize(matHeader->emissivePathSize);
+  file.read(reinterpret_cast<char*>(&matHeader.emissivePathSize), sizeof(SIZE_T));
+  matResource->m_emissivePath.resize(matHeader.emissivePathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_emissivePath[0]),
-                                    matHeader->emissivePathSize);
+                                    matHeader.emissivePathSize);
   file.read(reinterpret_cast<char*>(&matResource->m_emissiveColor), sizeof(Color));
 
-  delete matHeader;
-  matHeader = nullptr;
-
   return matResource;
+}
+
+void
+AssetResourceManager::loadAssetsFromResourcesFolder()
+{
+  m_allResources.clear();
+  Vector<Path> paths = FileSystem::getFilesFromFolder(m_resourcesFolder);
+  uint32 pathCount = static_cast<uint32>(paths.size());
+
+  // iterate through all found resources.
+  for (uint32 i = 0; i < pathCount; ++i) {
+    Path path = paths[i];
+    // check if the file is a PK resource.
+    if (isPKResource(path)) {
+      // SPtr<BaseResource> resource = make_shared<BaseResource>();
+      // resource->m_resourcePath = path;
+      // resource->m_name = path.getFileName();
+      m_allResources.insert({ i, path });
+    }
+  }
+}
+
+bool
+AssetResourceManager::isPKResource(const Path _path)
+{
+  String extension = _path.getExtension();
+  if (extension == "pkm" || extension == "pkt" || extension == "pkmat") {
+    return true;
+  }
+  return false;
 }
 
 PK_CORE_EXPORT AssetResourceManager&

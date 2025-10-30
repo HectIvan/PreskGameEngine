@@ -149,6 +149,48 @@ UInterface::endTabBar()
 }
 
 bool
+UInterface::beginDragDropSource()
+{
+  return ImGui::BeginDragDropSource();
+}
+
+void
+UInterface::setDragDropPayload(const char* _name, const void* _data, const SIZE_T _dataSize)
+{
+  ImGui::SetDragDropPayload(_name, _data, _dataSize);
+}
+
+void
+UInterface::endDragDropSource()
+{
+  ImGui::EndDragDropSource();
+}
+
+void
+UInterface::beginDragDropTarget()
+{
+  ImGui::BeginDragDropTarget();
+}
+
+bool
+UInterface::acceptDragDropPayload(const char* _type)
+{
+  return ImGui::AcceptDragDropPayload(_type);
+}
+
+void
+UInterface::endDragDropTarget()
+{
+  ImGui::EndDragDropTarget();
+}
+
+bool
+UInterface::selectable(const char* _name, const Vector2 _size)
+{
+  return ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
+}
+
+bool
 UInterface::beginTabItem(const char* _name)
 {
   return ImGui::BeginTabItem(_name);

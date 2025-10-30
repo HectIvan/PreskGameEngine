@@ -1,4 +1,5 @@
 #include "ActorInspector.h"
+#include "pkAssetResourceManager.h"
 #include "pkColor.h"
 #include "pkGPUResourceManager.h"
 #include "pkGraphicsAPI.h"
@@ -16,6 +17,8 @@
 #include "shaderTest.h"
 
 using pkEngineSDK::GraphicsAPI;
+using pkEngineSDK::AssetResourceManager;
+using pkEngineSDK::g_AssetResourceManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_ModelCodec;
@@ -242,6 +245,7 @@ findShader(const Vector<ShaderType>& _list, const Path& _path)
 void
 ShaderTest::uInterfaceUpdate()
 {
+  AssetResourceManager& assetManager = g_AssetResourceManager();
   ModelCodec& modelCod = g_ModelCodec();
   RendererManager& rm = g_RenderManager();
   GPUResourceManager& gpuResMan = g_GPUResourceManager();
@@ -326,6 +330,7 @@ ShaderTest::uInterfaceUpdate()
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           modelCod.createResourceFromFile(path);
+          assetManager.loadAssetsFromResourcesFolder();
         }
       }
       im.sameLine();
@@ -333,11 +338,25 @@ ShaderTest::uInterfaceUpdate()
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           texCod.createResourceFromFile(path);
+          assetManager.loadAssetsFromResourcesFolder();
         }
       }
       im.endTabItem();
+      for (auto& asset : assetManager.getAllResources()) {
+        String assetName = asset.second.getFileName();
+        if (im.selectable(assetName.c_str(), Vector2(100.0f))) {
+          if (im.beginDragDropSource()) {
+
+          }
+          // do something with the asset (maybe load it when clicked)
+        }
+        if (im.isItemHovered()) {
+          im.setTooltip(assetName.c_str());
+        }
+        im.sameLine();
+      }
     }
-    im.endTabBar();
+      im.endTabBar();
   }
   // -------------------------- //
 

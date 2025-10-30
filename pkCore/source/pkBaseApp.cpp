@@ -35,6 +35,10 @@ BaseApp::init(const char** _argv, int32 _count)
   TimeManager::startUp();
 
   DLLManager& dllManager = g_DLLManager();
+  AssetResourceManager& assetResource = g_AssetResourceManager();
+
+  assetResource.init("resources");
+  assetResource.loadAssetsFromResourcesFolder();
 
   initWin();
   initAPI(_argv, _count);

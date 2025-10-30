@@ -18,6 +18,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkPath.h"
 
 namespace pkEngineSDK
 {
@@ -43,7 +44,7 @@ struct BaseHeader
 
 class PK_CORE_EXPORT BaseResource
 {
-public:
+ public:
   BaseResource() = default;
   virtual ~BaseResource() = default;
 
@@ -53,5 +54,9 @@ public:
    */
   virtual RESOURCE_TYPE::E
   getType() const = 0;
+
+ public:
+  Path m_resourcePath;
+  String m_name;
 };
 }

@@ -190,9 +190,11 @@
     <ClInclude Include="include\pkSphere.h" />
     <ClInclude Include="include\pkSTDHeaders.h" />
     <ClInclude Include="include\pkTransform.h" />
+    <ClInclude Include="include\pkUUID.h" />
     <ClInclude Include="include\pkVector2.h" />
     <ClInclude Include="include\pkVector3.h" />
     <ClInclude Include="include\pkVector4.h" />
+    <ClInclude Include="include\uuid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkCapsule.cpp" />
@@ -207,6 +209,7 @@
     <ClCompile Include="source\pkQuaternion.cpp" />
     <ClCompile Include="source\pkSphere.cpp" />
     <ClCompile Include="source\pkTransform.cpp" />
+    <ClCompile Include="source\pkUUID.cpp" />
     <ClCompile Include="source\pkVector2.cpp" />
     <ClCompile Include="source\pkVector3.cpp" />
     <ClCompile Include="source\pkVector4.cpp" />

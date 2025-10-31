@@ -36,6 +36,12 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
   virtual ~TextureResource() = default;
 
   /**
+   * @brief Load the texture resource.
+   */
+  void
+  load() override;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */

@@ -41,6 +41,12 @@ class PK_CORE_EXPORT ModelResource : public BaseResource
   virtual ~ModelResource() = default;
 
   /**
+   * @brief Load the model resource.
+   */
+  void
+  load() override;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */

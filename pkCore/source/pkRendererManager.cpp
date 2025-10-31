@@ -15,6 +15,7 @@ RendererManager::init()
 {
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
+  TextureCodec& texCodec = g_TextureCodec();
 
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();

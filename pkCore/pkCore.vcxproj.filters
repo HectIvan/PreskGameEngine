@@ -82,6 +82,9 @@
     <Filter Include="source\components">
       <UniqueIdentifier>{f627251f-3799-43fa-b803-08db6bee61b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\resources">
+      <UniqueIdentifier>{d4478e0c-0048-4d0c-a213-a2c7acdb8f6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkPrerequisitesCore.h">
@@ -367,6 +370,16 @@
     </ClCompile>
     <ClCompile Include="source\pkMaterialCodec.cpp">
       <Filter>source\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBaseResource.cpp">
+      <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="include\pkModelResource.cpp" />
+    <ClCompile Include="source\pkModelResource.cpp">
+      <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkTextureResource.cpp">
+      <Filter>source\resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

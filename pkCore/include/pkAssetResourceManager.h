@@ -61,22 +61,6 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   unloadResource();
 
   /**
-   * @brief load a pkt Model resource from a given path.
-   * @param _path Path to load the resource from.
-   * @return Pointer to the resource.
-   */
-  SPtr<ModelResource>
-  loadModelResource(const Path _path);
-
-  /**
-   * @brief load a pkt Texture resource from a given path.
-   * @param _path Path to load the resource from.
-   * @return Pointer to the resource.
-   */
-  SPtr<TextureResource>
-  loadTextureResource(const Path _path);
-
-  /**
    * @brief Load a pkmat Material resource from a given path.
    * @param _path Path to load the resource from.
    * @return Pointer to the resource.
@@ -98,14 +82,49 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   bool
   isPKResource(const Path _path);
 
-  UMap<uint32, Path>
+  /**
+   * @brief Get all resources in the manager.
+   * @return The map with all resources
+   */
+  UMap<String, SPtr<BaseResource>>
   getAllResources() {
     return m_allResources;
   }
 
+  /**
+   * @brief Insert a resource into the resources map (not the loaded resources).
+   * @param _UUID resource ID.
+   * @param _pResource Asset Resource to insert.
+   */
+  void
+  insertNewResource(SPtr<BaseResource> _pResource)
+  {
+    m_allResources.insert({_pResource->m_id, _pResource});
+  }
+
+  /**
+   * @brief Insert a resource into the loaded resources map.
+   * @param _UUID resource ID.
+   * @param _pResource Loaded Asset Resource to insert.
+   */
+  void
+  insertLoadedResource(SPtr<BaseResource> _pResource)
+  {
+    m_loadedResources.insert({ _pResource->m_id, _pResource});
+  }
+
+  /**
+   * @brief Get all resources in the manager.
+   * @return The map with all loaded resources
+   */
+  UMap<String, SPtr<BaseResource>>
+  getAllLoadedResources() {
+    return m_loadedResources;
+  }
+
  private:
-  UMap<uint32, Path> m_loadedResources; // SPtr<BaseResource>
-  UMap<uint32, Path> m_allResources;    // SPtr<BaseResource>
+  UMap<String, SPtr<BaseResource>> m_loadedResources;
+  UMap<String, SPtr<BaseResource>> m_allResources;   
   Path m_resourcesFolder;
 };
 

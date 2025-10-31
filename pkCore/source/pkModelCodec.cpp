@@ -14,23 +14,24 @@
 * Includes
 **/
 /*********************************************/
+#include "pkAssetResourceManager.h"
+#include "pkLogger.h"
 #include "pkModel.h"
 #include "pkModelCodec.h"
-#include "pkPath.h"
-#include "pkLogger.h"
 #include "pkModelResource.h"
+#include "pkPath.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
 
-SPtr<ModelResource>
-ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
+SPtr<BaseResource>
+ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
 
-  SPtr<ModelResource> modelRes = make_shared<ModelResource>();
-
-  String filePath = "resources/" + _path.getFileName() + ".pkm";
+  String fileName = _path.getFileNameWithoutExtension();
+  String filePath = "resources/" + fileName + ".pkm";
   ofstream file(filePath, ios::out | ios::binary);
   // char error[256];
   // strerror_s(error, sizeof(error), errno); // last error of io.
@@ -41,9 +42,16 @@ ModelCodec::savePKModel(const SPtr<Model>& _pModel, const Path _path)
     return nullptr;
   }
 
+  /**
+   * Create the model resource.
+   */
+  SPtr<ModelResource> modelRes = make_shared<ModelResource>();
   modelRes->m_meshes = _pModel->meshes;
   modelRes->m_index = _pModel->index;
   modelRes->m_vertex = _pModel->vertex;
+
+  // generate the base resource header.
+  modelRes->writeBaseHeader(file, _path);
 
   // get and write model header.
   ModelAssetHeader mHeader;

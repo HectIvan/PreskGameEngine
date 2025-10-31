@@ -37,9 +37,12 @@ namespace RESOURCE_TYPE
 
 struct BaseHeader
 {
-  uint32 id;
+  String ID;
+  SIZE_T IDSize;
   String name;
-  RESOURCE_TYPE::E type;
+  SIZE_T nameSize;
+  String path;
+  SIZE_T pathSize;
 };
 
 class PK_CORE_EXPORT BaseResource
@@ -49,6 +52,34 @@ class PK_CORE_EXPORT BaseResource
   virtual ~BaseResource() = default;
 
   /**
+   * @brief Soft load the resource (used by the asset manager to know what resource is what).
+   */
+  void
+  softLoad(const Path& _path);
+
+  /**
+   * @brief load the base resource header from a read stream.
+   * @param _file File ifstream.
+   * @return The base resource header.
+   */
+  BaseHeader
+  loadBaseHeader(ifstream& _file);
+
+  /**
+   * @brief Write the base resource header in a write stream.
+   * @param _file File ofstream.
+   * @param _path file path.
+   */
+  void
+  writeBaseHeader(ofstream& _file, const Path& _path);
+
+  /**
+   * @brief Load the resource.
+   */
+  virtual void
+  load() = 0;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */
@@ -56,7 +87,9 @@ class PK_CORE_EXPORT BaseResource
   getType() const = 0;
 
  public:
-  Path m_resourcePath;
+  String m_id;
   String m_name;
+  Path m_originalPath;
+  Path m_resourcePath;
 };
 }

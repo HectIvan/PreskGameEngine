@@ -20,8 +20,6 @@
 namespace pkEngineSDK
 {
 
-class Window;
-
 class AssimpModelCodec : public ModelCodec
 {
  public:
@@ -33,7 +31,7 @@ class AssimpModelCodec : public ModelCodec
    * @param _path Path of the model.
    * @return Pointer to the model resource.
    */
-  SPtr<ModelResource>
+  SPtr<BaseResource>
   createResourceFromFile(const Path _path) override;
 
   /**

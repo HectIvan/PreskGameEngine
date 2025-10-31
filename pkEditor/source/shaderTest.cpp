@@ -329,7 +329,7 @@ ShaderTest::uInterfaceUpdate()
       if (im.createButton("Model Resource")) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
-          modelCod.createResourceFromFile(path);
+          assetManager.insertNewResource(modelCod.createResourceFromFile(path));
           assetManager.loadAssetsFromResourcesFolder();
         }
       }
@@ -343,10 +343,9 @@ ShaderTest::uInterfaceUpdate()
       }
       im.endTabItem();
       for (auto& asset : assetManager.getAllResources()) {
-        String assetName = asset.second.getFileName();
+        String assetName = asset.second->m_name;
         if (im.selectable(assetName.c_str(), Vector2(100.0f))) {
           if (im.beginDragDropSource()) {
-
           }
           // do something with the asset (maybe load it when clicked)
         }

@@ -41,7 +41,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
 
   String texturePath = "resources/" + _path.getFileNameWithoutExtension() + ".pkt";
 
-  fstream file(texturePath, ios::out | ios::binary);
+  ofstream file(texturePath, ios::out | ios::binary);
 
   // if the file cannot be open/created, return a warning and a nullptr.
   if (!file.is_open()) {
@@ -96,15 +96,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   // write the data into the pkt file.
   if (canCreateResource) {
     // generate the base resource header.
-    BaseHeader baseHeader = g_AssetResourceManager().createResourceHeader(_path);
-
-    // write the base resource header.
-    file.write(reinterpret_cast<const char*>(&baseHeader.IDSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(baseHeader.ID.c_str()), baseHeader.IDSize);
-    file.write(reinterpret_cast<const char*>(&baseHeader.nameSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(baseHeader.name.c_str()), baseHeader.nameSize);
-    file.write(reinterpret_cast<const char*>(&baseHeader.pathSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(baseHeader.path.c_str()), baseHeader.pathSize);
+    textureRes->writeBaseHeader(file, _path);
 
     TextureAssetHeader texHeader;
     texHeader.width = textureRes->m_width;

@@ -6,6 +6,10 @@ namespace pkEngineSDK
 void
 TextureResource::load()
 {
+  if (m_isLoaded) {
+    return;
+  }
+
   Logger& log = g_Logger();
 
   String path = m_resourcePath.toString();
@@ -36,6 +40,10 @@ TextureResource::load()
 
   m_data = new unsigned char[texHeader.dataSize];
   file.read(reinterpret_cast<char*>(&m_data[0]), texHeader.dataSize);
+
+  file.close();
+
+  m_isLoaded = true;
 
   return;
 }

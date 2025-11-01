@@ -22,12 +22,6 @@
 namespace pkEngineSDK
 {
 
-struct TextureMemory
-{
-  Path name;
-  SPtr<Texture> texture;
-};
-
 class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
 {
  public:
@@ -53,15 +47,32 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   // onShutDown();
 
   /**
-   * @brief Loads a texture from a texture name.
-   * @param _directory Where to look for the file.
+   * @brief Load texture from a texture name.
+   * @param _ID ID of the texture to load.
    * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
-  loadTexture(const Path& _directory);
+  loadTexture(const String& _ID);
+
+  /**
+   * @brief Get a saved texture via its ID.
+   * @param _ID ID to look for.
+   * @return Pointer to the saved texture.
+   */
+  SPtr<Texture>
+  getTexture(const String& _ID);
+  
+  /**
+   * @brief Store a loaded texture into the memory for later use.
+   * @param _ID ID of the texture.
+   * @param _pTexture Texture to store.
+   */
+  void
+  insertLoadedTexture(const String& _ID, const SPtr<Texture>& _pTexture);
 
  public:
-  Vector<SPtr<TextureMemory>> m_textures;
+  // save textures with the resource id
+  UMap<String, SPtr<Texture>> m_textures;
 
   // to do: allow for the texture to be generated if not found.
   // default textures
@@ -72,6 +83,14 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   SPtr<Texture> m_defaultMetallic;
   SPtr<Texture> m_defaultHeight;
   SPtr<Texture> m_defaultEmissive;
+
+  String m_diffID;
+  String m_normalID;
+  String m_AOID;
+  String m_roughID;
+  String m_metallicID;
+  String m_heightID;
+  String m_emissiveID;
 };
 PK_CORE_EXPORT TextureManager&
 g_TextureManager();

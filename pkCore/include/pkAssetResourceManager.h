@@ -42,6 +42,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
  public:
   AssetResourceManager() = default;
   virtual ~AssetResourceManager() = default;
+  
   /**
    * @brief Initialize the asset resource manager.
    */
@@ -121,6 +122,14 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   getAllLoadedResources() {
     return m_loadedResources;
   }
+
+  /**
+   * @brief Get a resource via its ID.
+   * @param _ID ID to look for.
+   * @return Pointer to the resource.
+   */
+  SPtr<BaseResource>
+  getResource(const String&_ID);
 
  private:
   UMap<String, SPtr<BaseResource>> m_loadedResources;

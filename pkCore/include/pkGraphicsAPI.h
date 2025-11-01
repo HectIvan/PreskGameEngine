@@ -39,6 +39,8 @@ class ConstantBuffer;
 class Device;
 class IndexBuffer;
 class VertexBuffer;
+class BaseResource;
+class TextureResource;
 
 class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
 {
@@ -289,17 +291,16 @@ class PK_CORE_EXPORT GraphicsAPI : public Module<GraphicsAPI>
                 int32 _mipLevels = 1) = 0;
 
   /**
-   * @brief Create a texture from file.
-   * @param _directory Directory of the resource.
+   * @brief Create a texture from a pk resource.
+   * @param _pResource pointer to the resource.
    * @param _bindFlags What kind of binding will it have.
    * @param _mipLevels MipMap level count.
-   * @param _format Format of the texture.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
-  createTextureFromFile(const Path& _directory,
-                        uint32 _bindFlags,
-                        int32 _mipLevels) = 0;
+  createTextureFromResource(const SPtr<BaseResource>& _pResource,
+                            uint32 _bindFlags,
+                            int32 _mipLevels) = 0;
 
   /**
    * @brief Create a texture from a DDS file.

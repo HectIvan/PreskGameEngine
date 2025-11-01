@@ -37,6 +37,9 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   MaterialResource() = default;
   virtual ~MaterialResource() = default;
 
+  void
+  load() override { return; }
+
   /**
    * @brief Get the resource type.
    * @return The resource type.

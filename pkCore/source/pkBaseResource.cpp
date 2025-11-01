@@ -23,6 +23,7 @@ BaseResource::softLoad(const Path& _path)
   }
 
   loadBaseHeader(file);
+  m_resourcePath = _path;
 
   file.close();
 }
@@ -47,7 +48,6 @@ BaseResource::loadBaseHeader(ifstream& _file)
   m_id = baseHeader.ID;
   m_name = baseHeader.name;
   m_originalPath = baseHeader.path;
-  m_resourcePath = FileSystem::getAbsolutePath(baseHeader.path).string();
 
   return baseHeader;
 }

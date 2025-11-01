@@ -29,9 +29,10 @@ GPUResourceManager::newMaterial(String _name)
 }
 
 SPtr<Model>
-GPUResourceManager::loadPKModel(const Path _path)
+GPUResourceManager::loadPKModel(const String& _ID)
 {
-  SPtr<Model> model = searchModel(_path);
+  // check if the model has already been stored.
+  SPtr<Model> model = getModelMemory(_ID);
   if (model) {
     return model;
   }
@@ -40,15 +41,22 @@ GPUResourceManager::loadPKModel(const Path _path)
   AssetResourceManager& assetResMgr = g_AssetResourceManager();
   Logger& log = g_Logger();
 
-  model = make_shared<Model>();
-  SPtr<ModelResource> modelRes = assetResMgr.loadModelResource(_path);
+  // get the model resource.
+  auto resource = assetResMgr.getResource(_ID);
+  auto modelRes = reinterpret_pointer_cast<ModelResource>(resource);
+  modelRes->load();
+  assetResMgr.insertLoadedResource(modelRes);
 
+  // check if the resource is a valid model resource.
   if (!modelRes) {
-    String msg = "Failed to load model at path " + _path.toString() + ".";
+    String msg = "Failed to load model resource of ID: " + resource->m_id + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
+
+  // save the model data.
+  model = make_shared<Model>();
   model->index = modelRes->m_index;
   model->vertex = modelRes->m_vertex;
   model->meshes = modelRes->m_meshes;
@@ -60,7 +68,7 @@ GPUResourceManager::loadPKModel(const Path _path)
   api.setIndexBuffer(model->m_indexB);
   api.setVertexBuffer(model->m_vertexB);
 
-  insertModelMemory(model, _path);
+  insertModelMemory(modelRes->m_id, model);
 
   return model;
 }
@@ -77,28 +85,21 @@ GPUResourceManager::searchMesh(const String _name)
   return nullptr;
 }
 
-SPtr<Model>
-GPUResourceManager::searchModel(const Path _directory)
+void
+GPUResourceManager::insertModelMemory(const String& _ID, const SPtr<Model>& _pModel)
 {
-  uint32 modelCount = static_cast<uint32>(m_models.size());
-  // search through the loaded models.
-  for (uint32 i = 0; i < modelCount; ++i) {
-    SPtr<ModelMemory> modelMem = m_models[i];
-    // if a model with the same directory is found, return it.
-    if (modelMem->directory.toString() == _directory.toString()) {
-      return modelMem->model;
+  m_models.insert({ _ID, _pModel });
+}
+
+SPtr<Model>
+GPUResourceManager::getModelMemory(const String& _ID)
+{
+  for (auto& model : m_models) {
+    if (_ID == model.first) {
+      return model.second;
     }
   }
   return nullptr;
-}
-
-void
-GPUResourceManager::insertModelMemory(const SPtr<Model> _pModel, const Path _directory)
-{
-  SPtr<ModelMemory> modelMem = make_shared<ModelMemory>();
-  modelMem->directory = _directory;
-  modelMem->model = _pModel;
-  m_models.push_back(modelMem);
 }
 
 PK_CORE_EXPORT GPUResourceManager&

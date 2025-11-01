@@ -1548,32 +1548,30 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTextureFromFile(const Path& _directory,
-                                       uint32 _bindFlags,
-                                       int32 _mipLevels)
+DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
+                                           uint32 _bindFlags,
+                                           int32 _mipLevels)
 {
   Logger& log = g_Logger();
   AssetResourceManager& assetResMgr = g_AssetResourceManager();
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
+  auto resource = reinterpret_pointer_cast<TextureResource>(_pResource);
 
-  // load the image data into a storage variable
-  SPtr<TextureResource> texRes = assetResMgr.loadTextureResource(_directory);
-  // check if the texture was found
-  if (!texRes) {
-    const String msg = "Can't open " + _directory.getDirectory() + ", unable to open file.";
-    // log.print(msg);
+  if (!resource) {
+    const String msg = "Failed to utilize resource " + _pResource->m_name + ".";
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    return nullptr;
   }
 
+  resource->load();
+
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(texRes->m_width,
-                                             texRes->m_height,
-                                             texRes->m_format,
+  SPtr<Texture> temptTexture = createTexture(resource->m_width,
+                                             resource->m_height,
+                                             resource->m_format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
-                                             texRes->m_format,
+                                             resource->m_format,
                                              _mipLevels);
 
   // if creating the texture failed
@@ -1585,13 +1583,13 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _directory,
   }
 
   // add data to the texture
-  texRes->m_bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(texRes->m_format));
+  resource->m_bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(resource->m_format));
   auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
   device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(), // something says null here and i dont know what.
                                                  0,
                                                  nullptr,
-                                                 texRes->m_data,
-                                                 texRes->m_width * texRes->m_bpp,
+                                                 resource->m_data,
+                                                 resource->m_width * resource->m_bpp,
                                                  0);
 
   bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
@@ -1600,7 +1598,7 @@ DX11GraphicsAPI::createTextureFromFile(const Path& _directory,
   }
 
   // set the path
-  temptTexture->setName(_directory.getFileName());
+  temptTexture->setName(resource->m_name);
 
   // return the texture
   return temptTexture;

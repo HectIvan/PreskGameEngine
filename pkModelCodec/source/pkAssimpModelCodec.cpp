@@ -19,12 +19,14 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include "pkAssetResourceManager.h"
 #include "pkAssimpModelCodec.h"
 #include "pkGPUResourceManager.h"
 #include "pkLogger.h"
 #include "pkFileSystem.h"
 #include "pkModelResource.h"
 #include "pkTexture.h"
+#include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkWindow.h"
 
@@ -174,8 +176,10 @@ SPtr<Mesh>
 processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   GPUResourceManager& rm = g_GPUResourceManager();
   TextureManager& tm = g_TextureManager();
+  TextureCodec& texCodec = g_TextureCodec();
   Logger& log = g_Logger();
 
   // check if the mesh is already in storage
@@ -263,12 +267,15 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
           log.registerMessage("Loaded diffuse texture " + newPath.getFileName() +
-            " in material " + matName + ".");
+                              " in material " + matName + ".");
           meshProcess->material->setDiffuse(texture);
         }
       }
@@ -287,7 +294,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -311,7 +321,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -336,7 +349,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -360,7 +376,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -384,7 +403,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<Texture> texture = tm.loadTexture(newPath);
+        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        assetMan.insertNewResource(resource);
+        resource->load();
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.

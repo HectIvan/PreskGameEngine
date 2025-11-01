@@ -1,3 +1,4 @@
+#include "pkAssetResourceManager.h"
 #include "pkCamera.h"
 #include "pkGraphicsAPI.h"
 #include "pkLogger.h"
@@ -13,6 +14,7 @@ namespace pkEngineSDK
 void
 RendererManager::init()
 {
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
   TextureCodec& texCodec = g_TextureCodec();
@@ -99,7 +101,11 @@ RendererManager::init()
   SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  m_mainSkybox = tm.loadTexture(Path("resources/Skybox_papermill.pkt"));
+  texCodec.createResourceFromFile(Path("textures/skybox/Skybox_papermill.hdr"));
+  SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
+  assetMan.insertNewResource(resSky);
+  m_mainSkybox = tm.loadTexture(resSky->m_id);
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS

@@ -119,7 +119,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   Vector2 texSize = Vector2(_imgTexSize, _imgTexSize);
   // get the user interface manager
   UInterface& im = g_uInterface();
-  TextureManager& tm = g_TextureManager();
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
@@ -265,8 +264,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set diffuse texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setDiffuse(texture);
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setDiffuse(texture);
                 }
               }
               // hover tooltip.
@@ -280,8 +279,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set normal texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setNormal(texture);
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setNormal(texture);
                 }
               }
               // hover tooltip.
@@ -293,8 +292,9 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set occlusion texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setOcclusion(texture);
+
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setOcclusion(texture);
                 }
               }
               // hover tooltip.
@@ -306,8 +306,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set rough texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setRoughness(texture);
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setRoughness(texture);
                 }
               }
               // hover tooltip.
@@ -321,8 +321,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set metallic texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setMetallic(texture);
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setMetallic(texture);
                 }
               }
               // hover tooltip.
@@ -336,8 +336,8 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                 // opened window to set metallic texture
                 Path path(_window.openFileFromExplorer());
                 if (path.toString() != "") {
-                  SPtr<Texture> texture = tm.loadTexture(path);
-                  meshMat->setEmissive(texture);
+                  // SPtr<Texture> texture = tm.loadTexture(path);
+                  // meshMat->setEmissive(texture);
                 }
               }
               // hover tooltip.

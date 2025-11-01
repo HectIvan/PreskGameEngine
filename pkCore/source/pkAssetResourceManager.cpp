@@ -135,6 +135,17 @@ AssetResourceManager::isPKResource(const Path _path)
   return false;
 }
 
+SPtr<BaseResource>
+AssetResourceManager::getResource(const String& _ID)
+{
+  for (auto& resource : m_allResources) {
+    if (_ID == resource.first) {
+      return resource.second;
+    }
+  }
+  return nullptr;
+}
+
 PK_CORE_EXPORT AssetResourceManager&
 g_AssetResourceManager()
 {

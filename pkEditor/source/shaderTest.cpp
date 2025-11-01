@@ -6,6 +6,7 @@
 #include "pkGraphicTypes.h"
 #include "pkLogger.h"
 #include "pkModelCodec.h"
+#include "pkModelResource.h"
 #include "pkPlatformMath.h"
 #include "pkPath.h"
 #include "pkRendererManager.h"
@@ -16,8 +17,9 @@
 #include "pkTimeManager.h"
 #include "shaderTest.h"
 
-using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::AssetResourceManager;
+using pkEngineSDK::BaseResource;
+using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_AssetResourceManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
@@ -34,10 +36,12 @@ using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Math;
 using pkEngineSDK::ModelCodec;
+using pkEngineSDK::ModelResource;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::ShaderManager;
-using pkEngineSDK::TextureManager;
 using pkEngineSDK::TextureCodec;
+using pkEngineSDK::TextureManager;
+using pkEngineSDK::TextureResource;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "imgui_impl_win32.h"
@@ -63,9 +67,11 @@ ShaderTest::onInit()
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
 
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   SceneManager& sceneMan = g_SceneManager();
   GPUResourceManager& resourceMan = g_GPUResourceManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
+  ModelCodec& modelCodec = g_ModelCodec();
 
   // create camera
   m_cameraSpeed = 20.0f;
@@ -111,7 +117,9 @@ ShaderTest::onInit()
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
   SPtr<Actor> coat = activeScene->instantiate("Coat");
-  coat->addComponent(resourceMan.loadPKModel(Path("resources/export3dcoat.pkm")));
+  SPtr<BaseResource> resource = modelCodec.createResourceFromFile(Path("models/export3dcoat.obj"));
+  assetMan.insertNewResource(resource);
+  coat->addComponent(resourceMan.loadPKModel(resource->m_id));
   coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_IBR = true;
@@ -136,7 +144,7 @@ ShaderTest::onInit()
   m_showWarnings = false;
   m_showActions = false;
 
-  m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
+  // m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
 
   /**
    * User Interface.
@@ -246,14 +254,12 @@ void
 ShaderTest::uInterfaceUpdate()
 {
   AssetResourceManager& assetManager = g_AssetResourceManager();
-  ModelCodec& modelCod = g_ModelCodec();
   RendererManager& rm = g_RenderManager();
   GPUResourceManager& gpuResMan = g_GPUResourceManager();
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
-  TextureCodec& texCod = g_TextureCodec();
-  TextureManager& tm = g_TextureManager();
   UInterface& im = g_uInterface();
+  ModelCodec& modelCodec = g_ModelCodec();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -329,16 +335,18 @@ ShaderTest::uInterfaceUpdate()
       if (im.createButton("Model Resource")) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
-          assetManager.insertNewResource(modelCod.createResourceFromFile(path));
-          assetManager.loadAssetsFromResourcesFolder();
+          SPtr<ModelResource> resource = make_shared<ModelResource>();
+          resource->softLoad(path);
+          assetManager.insertNewResource(resource);
         }
       }
       im.sameLine();
       if (im.createButton("Texture Resource")) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
-          texCod.createResourceFromFile(path);
-          assetManager.loadAssetsFromResourcesFolder();
+          SPtr<TextureResource> resource = make_shared<TextureResource>();
+          resource->softLoad(path);
+          assetManager.insertNewResource(resource);
         }
       }
       im.endTabItem();
@@ -400,7 +408,9 @@ ShaderTest::uInterfaceUpdate()
           if (val == 0) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
-              m_selectedActor->addComponent(gpuResMan.loadPKModel(path));
+              SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
+              assetManager.insertNewResource(resource);
+              m_selectedActor->addComponent(gpuResMan.loadPKModel(resource->m_id));
             }
           }
         }
@@ -472,8 +482,8 @@ ShaderTest::uInterfaceUpdate()
           if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
-              SPtr<Texture> texture = tm.loadTexture(path);
-              rm.m_mainSkybox->copyFrom(texture);
+              // SPtr<Texture> texture = tm.loadTexture(path);
+              // rm.m_mainSkybox->copyFrom(texture);
             }
           }
         }

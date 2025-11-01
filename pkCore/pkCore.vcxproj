@@ -231,7 +231,6 @@
     <ClInclude Include="include\pkSceneManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\pkModelResource.cpp" />
     <ClCompile Include="source\pkActor.cpp" />
     <ClCompile Include="source\pkAssetResourceManager.cpp" />
     <ClCompile Include="source\pkBaseApp.cpp" />

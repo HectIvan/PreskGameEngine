@@ -8,6 +8,11 @@ namespace pkEngineSDK
 void
 ModelResource::load()
 {
+
+  if (m_isLoaded) {
+    return;
+  }
+
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
   Logger& log = g_Logger();
 
@@ -69,6 +74,10 @@ ModelResource::load()
     mesh->material = GPUResourceMan.m_defaultMaterial;
     m_meshes[i] = mesh;
   }
+
+  file.close();
+
+  m_isLoaded = true;
 
   return;
 }

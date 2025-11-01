@@ -374,7 +374,6 @@
     <ClCompile Include="source\pkBaseResource.cpp">
       <Filter>source\resources</Filter>
     </ClCompile>
-    <ClCompile Include="include\pkModelResource.cpp" />
     <ClCompile Include="source\pkModelResource.cpp">
       <Filter>source\resources</Filter>
     </ClCompile>

@@ -65,11 +65,11 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
 
   /**
    * @brief Loads a model from a .pkm file.
-   * @param _path File path.
+   * @param _ID Resource ID.
    * @return Pointer to the model if loaded; nullptr if failed.
    */
   SPtr<Model>
-  loadPKModel(const Path _path);
+  loadPKModel(const String& _ID);
 
   /**
    * @brief search for a specific mesh
@@ -80,23 +80,23 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
   searchMesh(const String _name);
 
   /**
-   * @brief search for a specific model.
-   * @param _directory Directory of the model.
-   * @return Pointer to the model if found.
-   */
-  SPtr<Model>
-  searchModel(const Path _directory);
-
-  /**
    * @brief Insert a model into the memory.
-   * @param _model Model to insert.
-   * @param _directory Directory of the model.
+   * @param _ID ID of the model to store.
+   * @param _pModel Model to store.
    */
   void
-  insertModelMemory(const SPtr<Model> _pModel, const Path _directory);
+  insertModelMemory(const String& _ID, const SPtr<Model>& _pModel);
+
+  /**
+   * @brief Get a model from memory.
+   * @param _ID ID of the model to look for.
+   * @return Pointer to the model. null if its not stored.
+   */
+  SPtr<Model>
+  getModelMemory(const String& _ID);
 
  public:
-  Vector<SPtr<ModelMemory>> m_models;
+  UMap<String, SPtr<Model>> m_models;
   Vector<SPtr<Mesh>> m_meshes;
 
   // unique string for the default material

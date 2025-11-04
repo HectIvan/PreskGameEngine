@@ -12,24 +12,23 @@ void
 TextureManager::init()
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
-  TextureCodec& texCodec = g_TextureCodec();
 
-  SPtr<BaseResource> diffResource = texCodec.createResourceFromFile(Path("textures/default/FlatDiff.png"));
+  SPtr<BaseResource> diffResource = make_shared<TextureResource>();
   diffResource->softLoad(Path("resources/FlatDiff.pkt"));
   assetMan.insertNewResource(diffResource);
-  SPtr<BaseResource> normalResource = texCodec.createResourceFromFile(Path("textures/default/FlatNormal.png"));
+  SPtr<BaseResource> normalResource = make_shared<TextureResource>();
   normalResource->softLoad(Path("resources/FlatNormal.pkt"));
   assetMan.insertNewResource(normalResource);
-  SPtr<BaseResource> aoResource = texCodec.createResourceFromFile(Path("textures/default/FlatAO.png"));
+  SPtr<BaseResource> aoResource = make_shared<TextureResource>();
   aoResource->softLoad(Path("resources/FlatAO.pkt"));
   assetMan.insertNewResource(aoResource);
-  SPtr<BaseResource> roughResource = texCodec.createResourceFromFile(Path("textures/default/FlatRoughness.png"));
+  SPtr<BaseResource> roughResource = make_shared<TextureResource>();
   roughResource->softLoad(Path("resources/FlatRoughness.pkt"));
   assetMan.insertNewResource(roughResource);
-  SPtr<BaseResource> metallicResource = texCodec.createResourceFromFile(Path("textures/default/FlatMetallic.png"));
+  SPtr<BaseResource> metallicResource = make_shared<TextureResource>();
   metallicResource->softLoad(Path("resources/FlatMetallic.pkt"));
   assetMan.insertNewResource(metallicResource);
-  SPtr<BaseResource> emissiveResource = texCodec.createResourceFromFile(Path("textures/default/FlatEmissive.png"));
+  SPtr<BaseResource> emissiveResource = make_shared<TextureResource>();
   emissiveResource->softLoad(Path("resources/FlatEmissive.pkt"));
   assetMan.insertNewResource(emissiveResource);
 
@@ -78,7 +77,9 @@ TextureManager::loadTexture(const String& _ID)
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
-  resource->load();
+  if (!resource->m_isLoaded) {
+    resource->load();
+  }
 
   texture = api.createTextureFromResource(resource, bindFlags, mipLevels);
 
@@ -87,8 +88,9 @@ TextureManager::loadTexture(const String& _ID)
     texture = nullptr;
     return nullptr;
   }
+  texture->setID(resource->m_id);
 
-  insertLoadedTexture(resource->m_id, texture);
+  insertLoadedTexture(resource->m_id, resource->m_resourcePath, texture);
 
   // return the final texture
   return texture;
@@ -98,18 +100,29 @@ SPtr<Texture>
 TextureManager::getTexture(const String& _ID)
 {
   // search if the texture has been stored before
-  for (auto& texture : m_textures) {
-    if (_ID == texture.first) {
-      return texture.second;
-    }
+  auto it = m_textures.find(_ID);
+  if (it != m_textures.end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
+SPtr<Texture>
+TextureManager::getTextureFromPath(const String& _path)
+{
+  // search if the texture has been stored before
+  auto it = m_texturesPath.find(_path);
+  if (it != m_texturesPath.end()) {
+    return it->second;
   }
   return nullptr;
 }
 
 void
-TextureManager::insertLoadedTexture(const String& _ID, const SPtr<Texture>& _pTexture)
+TextureManager::insertLoadedTexture(const String& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
 {
   m_textures.insert({ _ID, _pTexture });
+  m_texturesPath.insert({ _path.toString(), _pTexture });
 }
 
 PK_CORE_EXPORT TextureManager&

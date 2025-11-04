@@ -199,6 +199,7 @@
     <ClInclude Include="include\pkLight.h" />
     <ClInclude Include="include\pkMaterial.h" />
     <ClInclude Include="include\pkMaterialCodec.h" />
+    <ClInclude Include="include\pkMaterialManager.h" />
     <ClInclude Include="include\pkMaterialResource.h" />
     <ClInclude Include="include\pkMesh.h" />
     <ClInclude Include="include\pkModel.h" />
@@ -247,6 +248,8 @@
     <ClCompile Include="source\pkLinuxWindow.cpp" />
     <ClCompile Include="source\pkMaterial.cpp" />
     <ClCompile Include="source\pkMaterialCodec.cpp" />
+    <ClCompile Include="source\pkMaterialManager.cpp" />
+    <ClCompile Include="source\pkMaterialResource.cpp" />
     <ClCompile Include="source\pkMesh.cpp" />
     <ClCompile Include="source\pkModel.cpp" />
     <ClCompile Include="source\pkModelCodec.cpp" />

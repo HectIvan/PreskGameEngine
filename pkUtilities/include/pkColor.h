@@ -83,6 +83,16 @@ struct PK_UTILITY_EXPORT Color final
     return *this;
   }
 
+  PKFORCEINLINE const Color
+  operator=(const Vector3& _other) {
+    Color newColor;
+    newColor.setR(_other.x);
+    newColor.setG(_other.y);
+    newColor.setB(_other.z);
+    newColor.setA(1.0f);
+    return newColor;
+  }
+
   /**
    * @brief Get the red value of the color.
    * @return The red value as an uint8.
@@ -145,6 +155,13 @@ struct PK_UTILITY_EXPORT Color final
    */
   Vector4
   colorTo01();
+
+  /**
+   * @brief Get the RGB value of the color into a vector.
+   * @return Vector with the RGB values
+   */
+  Vector3
+  rgb() { return Vector3(_color.R, _color.G, _color.B); }
 
   union
   {

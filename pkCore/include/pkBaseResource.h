@@ -97,7 +97,7 @@ class PK_CORE_EXPORT BaseResource
   String m_id;
   String m_name;
   bool m_isLoaded;
-  Path m_originalPath;
-  Path m_resourcePath;
+  String m_originalPath;
+  String m_resourcePath;
 };
 }

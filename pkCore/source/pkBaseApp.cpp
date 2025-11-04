@@ -16,6 +16,8 @@
 #include "pkModelCodec.h"
 #include "pkTextureCodec.h"
 #include "pkAssetResourceManager.h"
+#include "pkMaterialCodec.h"
+#include "pkMaterialManager.h"
 
 namespace pkEngineSDK
 {
@@ -28,6 +30,8 @@ BaseApp::init(const char** _argv, int32 _count)
   EventQueue::startUp();
   GPUResourceManager::startUp();
   Logger::startUp();
+  MaterialCodec::startUp();
+  MaterialManager::startUp();
   RendererManager::startUp();
   SceneManager::startUp();
   ShaderManager::startUp();

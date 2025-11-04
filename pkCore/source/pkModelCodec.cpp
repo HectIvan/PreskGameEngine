@@ -16,6 +16,7 @@
 /*********************************************/
 #include "pkAssetResourceManager.h"
 #include "pkLogger.h"
+#include "pkMaterialCodec.h"
 #include "pkModel.h"
 #include "pkModelCodec.h"
 #include "pkModelResource.h"
@@ -29,6 +30,7 @@ SPtr<BaseResource>
 ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
+  MaterialCodec& matCodec = g_MaterialCodec();
 
   String fileName = _path.getFileNameWithoutExtension();
   String filePath = "resources/" + fileName + ".pkm";
@@ -48,11 +50,11 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   SPtr<ModelResource> modelRes = make_shared<ModelResource>();
 
   modelRes->m_id = UUID::generateRandomUUID();
-  modelRes->m_originalPath = _path;
+  modelRes->m_originalPath = _path.toString();
   modelRes->m_resourcePath = filePath;
   modelRes->m_name = fileName;
 
-  modelRes->writeBaseHeader(file, modelRes->m_id, fileName, _path.toString());
+  modelRes->writeBaseHeader(file, modelRes->m_id, fileName, modelRes->m_resourcePath);
 
   modelRes->m_meshes = _pModel->meshes;
   modelRes->m_index = _pModel->index;
@@ -90,6 +92,12 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     // write all indices of the mesh.
     file.write(reinterpret_cast<const char*>(mesh->indexVector.data()),
                sizeof(uint32) * indicesCount);
+
+    SPtr<MaterialResource> matResource = matCodec.createResource(mesh->material);
+
+    SIZE_T matIDSize = matResource->m_id.length();
+    file.write(reinterpret_cast<const char*>(&matIDSize), sizeof(SIZE_T));
+    file.write(reinterpret_cast<const char*>(matResource->m_id.c_str()), matIDSize);
   }
   file.close();
 

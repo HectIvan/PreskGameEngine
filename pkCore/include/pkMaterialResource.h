@@ -23,12 +23,12 @@ namespace pkEngineSDK
 
 struct MaterialAssetHeader
 {
-  SIZE_T diffusePathSize;
-  SIZE_T normalPathSize;
-  SIZE_T aoPathSize;
-  SIZE_T roughnessPathSize;
-  SIZE_T metallicPathSize;
-  SIZE_T emissivePathSize;
+  SIZE_T diffuseIDSize;
+  SIZE_T normalIDSize;
+  SIZE_T aoIDSize;
+  SIZE_T roughnessIDSize;
+  SIZE_T metallicIDSize;
+  SIZE_T emissiveIDSize;
 };
 
 class PK_CORE_EXPORT MaterialResource : public BaseResource
@@ -37,8 +37,11 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   MaterialResource() = default;
   virtual ~MaterialResource() = default;
 
+  /**
+   * @brief Load the material resource.
+   */
   void
-  load() override { return; }
+  load() override;
 
   /**
    * @brief Get the resource type.
@@ -46,16 +49,17 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
    */
   RESOURCE_TYPE::E
   getType() const override { return RESOURCE_TYPE::kMaterial; }
+
  public:
-   String m_diffusePath;
+   String m_diffuseID;
    Color m_diffuseColor;
-   String m_normalPath;
-   String m_aoPath;
-   String m_roughnessPath;
+   String m_normalID;
+   String m_aoID;
+   String m_roughnessID;
    float m_roughValue;
-   String m_metallicPath;
+   String m_metallicID;
    float m_metallicValue;
-   String m_emissivePath;
+   String m_emissiveID;
    Color m_emissiveColor;
 };
 }

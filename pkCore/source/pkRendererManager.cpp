@@ -17,7 +17,6 @@ RendererManager::init()
   AssetResourceManager& assetMan = g_AssetResourceManager();
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
-  TextureCodec& texCodec = g_TextureCodec();
 
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
@@ -101,7 +100,7 @@ RendererManager::init()
   SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  texCodec.createResourceFromFile(Path("textures/skybox/Skybox_papermill.hdr"));
+  // texCodec.createResourceFromFile(Path("textures/skybox/Skybox_papermill.hdr"));
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   assetMan.insertNewResource(resSky);

@@ -24,6 +24,7 @@
 #include "pkGPUResourceManager.h"
 #include "pkLogger.h"
 #include "pkFileSystem.h"
+#include "pkMaterialResource.h"
 #include "pkModelResource.h"
 #include "pkTexture.h"
 #include "pkTextureCodec.h"
@@ -91,6 +92,25 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
   model->setVerticesIndices();
 
   return createResourceFromModel(model, _path);
+}
+
+SPtr<Texture>
+getTextureFromPath(const Path& _path)
+{
+  TextureCodec& textureCodec = g_TextureCodec();
+  TextureManager& tm = g_TextureManager();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+
+  // if a texture with this path has already been loaded.
+  SPtr<Texture> texture = tm.getTextureFromPath(_path.toString());
+  if (texture) {
+    return texture;
+  }
+
+  SPtr<BaseResource> resource = textureCodec.createResourceFromFile(_path);
+  assetMan.insertNewResource(resource);
+  texture = tm.loadTexture(resource->m_id);
+  return texture;
 }
 
 Bone
@@ -173,10 +193,7 @@ SPtr<Mesh>
 processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  AssetResourceManager& assetMan = g_AssetResourceManager();
   GPUResourceManager& rm = g_GPUResourceManager();
-  TextureManager& tm = g_TextureManager();
-  TextureCodec& textureCodec = g_TextureCodec();
   Logger& log = g_Logger();
 
   // check if the mesh is already in storage
@@ -243,6 +260,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   // for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
   //   mesh->mBones[i].
   // }
+
+  /**
+   * Material loading
+   */
   meshProcess->material = rm.m_defaultMaterial;
   if (_mesh->mMaterialIndex >= 0) {
     // material data
@@ -251,7 +272,10 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     meshProcess->material = rm.newMaterial(matName);
     // material 
     Path filePath;
-    // if no diffuse texture is found.
+    
+    /**
+     * Diffuse load.
+     */
     uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     if (diffCount < 1) {
       log.registerMessage("Could not find diffuse texture of material " + matName + ".",
@@ -264,9 +288,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -282,7 +304,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       }
     }
 
-    // get all normal maps of the material.
+    /**
+     * Normal load.
+     */
     uint32 normCount = materialA->GetTextureCount(aiTextureType_HEIGHT);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
@@ -290,9 +314,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -308,7 +330,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       }
     }
 
-    // get all ambient occlusion maps of the material.
+    /**
+     * AO load.
+     */
     uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT);
     for (uint32 i = 0; i < aoCount; ++i) {
       aiString path;
@@ -316,9 +340,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -335,7 +357,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       }
     }
 
-    // get all metallic maps of the material
+    /**
+     * Metallic load.
+     */
     uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
     for (uint32 i = 0; i < metallicCount; ++i) {
       aiString path;
@@ -343,9 +367,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -361,7 +383,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       }
     }
 
-    // get all roughness maps of the material
+    /**
+     * Roughness load.
+     */
     uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_REFLECTION);
     for (uint32 i = 0; i < roughnessCount; ++i) {
       aiString path;
@@ -369,9 +393,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -387,7 +409,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       }
     }
 
-    // get all emissive maps of the material
+    /**
+     * Emissive load.
+     */
     uint32 emissiveCount = materialA->GetTextureCount(aiTextureType_EMISSIVE);
     for (uint32 i = 0; i < emissiveCount; ++i) {
       aiString path;
@@ -395,9 +419,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
-        assetMan.insertNewResource(resource);
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id); 
+        SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.

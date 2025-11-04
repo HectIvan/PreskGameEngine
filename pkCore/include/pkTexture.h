@@ -330,8 +330,23 @@ class PK_CORE_EXPORT Texture
   virtual bool
   copyFrom(SPtr<Texture>& _pTexture) = 0;
 
+  /**
+   * @brief Set the texture ID.
+   * @param _ID ID for the texture.
+   */
+  void
+  setID(const String& _ID) { m_id = _ID; }
+
+  /**
+   * @brief Get the texture ID.
+   * @return The texture ID.
+   */
+  String
+  getID() { return m_id; }
+
  private:
   Path m_name;
+  String m_id;
   uint32 m_width;
   uint32 m_height;
 };

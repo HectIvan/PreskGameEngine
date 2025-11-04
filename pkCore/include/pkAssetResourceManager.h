@@ -64,14 +64,6 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   unloadResource();
 
   /**
-   * @brief Load a pkmat Material resource from a given path.
-   * @param _path Path to load the resource from.
-   * @return Pointer to the resource.
-   */
-  SPtr<MaterialResource>
-  loadMaterialResource(const Path _path);
-
-  /**
    * @brief Get assets from the set resources folder.
    */
   void

@@ -90,7 +90,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
 
-  textureRes->m_originalPath = _path;
+  textureRes->m_originalPath = _path.toString();
   textureRes->m_resourcePath = resourcePath;
   textureRes->m_name = fileName;
   textureRes->m_id = UUID::generateRandomUUID();

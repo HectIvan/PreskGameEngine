@@ -67,11 +67,8 @@ ShaderTest::onInit()
   g_uInterface().init();
   g_uInterface().initWin(m_window.getWindowHandle());
 
-  AssetResourceManager& assetMan = g_AssetResourceManager();
   SceneManager& sceneMan = g_SceneManager();
-  GPUResourceManager& resourceMan = g_GPUResourceManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
-  ModelCodec& modelCodec = g_ModelCodec();
 
   // create camera
   m_cameraSpeed = 20.0f;
@@ -253,13 +250,13 @@ void
 ShaderTest::uInterfaceUpdate()
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
+  GPUResourceManager& gpuResourceMan = g_GPUResourceManager();
+  ModelCodec& modelCodec = g_ModelCodec();
   RendererManager& rm = g_RenderManager();
-  GPUResourceManager& gpuResMan = g_GPUResourceManager();
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
-  UInterface& im = g_uInterface();
-  ModelCodec& modelCodec = g_ModelCodec();
   TextureCodec& textureCodec = g_TextureCodec();
+  UInterface& im = g_uInterface();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -349,7 +346,8 @@ ShaderTest::uInterfaceUpdate()
       }
       im.endTabItem();
       for (auto& asset : assetMan.getAllResources()) {
-        String assetName = asset.second->m_resourcePath.getFileName();
+        const Path assetPath = asset.second->m_resourcePath;
+        const String assetName = assetPath.getFileName();
         if (im.selectable(assetName.c_str(), Vector2(100.0f))) {
           if (im.beginDragDropSource()) {
           }
@@ -403,9 +401,14 @@ ShaderTest::uInterfaceUpdate()
         Vector<String> options = { "model", "light", "camera" };
         int32 val = -1;
         if (im.beginCombo("Components", val, options)) {
+          // if a model component is to be added.
           if (val == 0) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
+              SPtr<BaseResource> resource = make_shared<ModelResource>();
+              resource->softLoad(path);
+              m_selectedActor->addComponent(gpuResourceMan.loadPKModel(resource->m_id));
+              
               // const String ID = assetManager.createModelResource(path);
               // m_selectedActor->addComponent(assetManager.loadResource(path));
             }

@@ -1553,7 +1553,6 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
                                            int32 _mipLevels)
 {
   Logger& log = g_Logger();
-  AssetResourceManager& assetResMgr = g_AssetResourceManager();
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   auto resource = reinterpret_pointer_cast<TextureResource>(_pResource);

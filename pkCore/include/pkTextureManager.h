@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /**
  * @file    pkTextureManager.h
- * @author  Héctor  Iván Muñoz Ceballos
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    19/11/2024
  * @brief   Manager used for creating and storing textures.
  *
@@ -47,7 +47,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   // onShutDown();
 
   /**
-   * @brief Load texture from a texture name.
+   * @brief Load texture from a texture id.
    * @param _ID ID of the texture to load.
    * @return Pointer to the newly created texture.
    */
@@ -61,18 +61,29 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    */
   SPtr<Texture>
   getTexture(const String& _ID);
+
+  /**
+   * @brief Get a saved texture via its resource path.
+   * @param _path Path of the texture resource.
+   * @return Pointer to the saved texture.
+   */
+  SPtr<Texture>
+  getTextureFromPath(const String& _path);
   
   /**
    * @brief Store a loaded texture into the memory for later use.
    * @param _ID ID of the texture.
+   * @param _path Path of the texture resource.
    * @param _pTexture Texture to store.
    */
   void
-  insertLoadedTexture(const String& _ID, const SPtr<Texture>& _pTexture);
+  insertLoadedTexture(const String& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
 
  public:
-  // save textures with the resource id
+  // save textures with the texture id
   UMap<String, SPtr<Texture>> m_textures;
+  // save textures with the texture path
+  UMap<String, SPtr<Texture>> m_texturesPath;
 
   // to do: allow for the texture to be generated if not found.
   // default textures

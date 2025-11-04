@@ -1,6 +1,9 @@
-#include "pkModelResource.h"
+#include "pkAssetResourceManager.h"
 #include "pkGPUResourceManager.h"
 #include "pkLogger.h"
+#include "pkMaterialManager.h"
+#include "pkModelResource.h"
+#include "pkTextureManager.h"
 
 namespace pkEngineSDK
 {
@@ -8,20 +11,18 @@ namespace pkEngineSDK
 void
 ModelResource::load()
 {
-
   if (m_isLoaded) {
     return;
   }
 
-  GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
+  MaterialManager& materialMan = g_MaterialManager();
   Logger& log = g_Logger();
 
-  String path = m_resourcePath.toString();
-  ifstream file(path, ios::in | ios::binary);
+  ifstream file(m_resourcePath, ios::in | ios::binary);
 
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
-    String msg = "Failed to open a model resource at directory " + path + ".";
+    String msg = "Failed to open a model resource at directory " + m_resourcePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return;
@@ -70,8 +71,13 @@ ModelResource::load()
     mesh->indexVector.resize(meshHeader.indexCount);
     memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
 
+    SIZE_T matIDSize;
+    String matID;
+    file.read(reinterpret_cast<char*>(&matIDSize), sizeof(SIZE_T));
+    file.read(reinterpret_cast<char*>(&matID[0]), matIDSize);
+
     // to do: make a default material
-    mesh->material = GPUResourceMan.m_defaultMaterial;
+    mesh->material = materialMan.loadMaterial(matID);
     m_meshes[i] = mesh;
   }
 

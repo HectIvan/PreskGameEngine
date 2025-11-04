@@ -49,63 +49,6 @@ AssetResourceManager::unloadResource()
   return SPtr<BaseResource>();
 }
 
-SPtr<MaterialResource>
-AssetResourceManager::loadMaterialResource(const Path _path)
-{
-  Logger& log = g_Logger();
-  ifstream file(_path.toString(), ios::in | ios::binary);
-  // if the direcory cannot be opened, return a warning and a nullptr.
-  if (!file.is_open()) {
-    String msg = "Failed to open material resource at directory " + _path.toString() + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    return nullptr;
-  }
-
-  SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
-  MaterialAssetHeader matHeader;
-
-  // read diffuse data
-  file.read(reinterpret_cast<char*>(&matHeader.diffusePathSize), sizeof(SIZE_T));
-  matResource->m_diffusePath.resize(matHeader.diffusePathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_diffusePath[0]),
-                                    matHeader.diffusePathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_diffuseColor), sizeof(Color));
-
-  // read normal data
-  file.read(reinterpret_cast<char*>(&matHeader.normalPathSize), sizeof(SIZE_T));
-  matResource->m_normalPath.resize(matHeader.normalPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_normalPath[0]), matHeader.normalPathSize);
-
-  // read ao data
-  file.read(reinterpret_cast<char*>(&matHeader.aoPathSize), sizeof(SIZE_T));
-  matResource->m_aoPath.resize(matHeader.aoPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_aoPath[0]), matHeader.aoPathSize);
-
-  // read roughness data
-  file.read(reinterpret_cast<char*>(&matHeader.roughnessPathSize), sizeof(SIZE_T));
-  matResource->m_roughnessPath.resize(matHeader.roughnessPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_roughnessPath[0]),
-                                    matHeader.roughnessPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_roughValue), sizeof(float));
-
-  // read metallic data
-  file.read(reinterpret_cast<char*>(&matHeader.metallicPathSize), sizeof(SIZE_T));
-  matResource->m_metallicPath.resize(matHeader.metallicPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_metallicPath[0]),
-                                    matHeader.metallicPathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_metallicValue), sizeof(float));
-
-  // read emissive data
-  file.read(reinterpret_cast<char*>(&matHeader.emissivePathSize), sizeof(SIZE_T));
-  matResource->m_emissivePath.resize(matHeader.emissivePathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_emissivePath[0]),
-                                    matHeader.emissivePathSize);
-  file.read(reinterpret_cast<char*>(&matResource->m_emissiveColor), sizeof(Color));
-
-  return matResource;
-}
-
 void
 AssetResourceManager::loadAssetsFromResourcesFolder ()
 {
@@ -115,16 +58,17 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
 
   // iterate through all found resources.
   for (uint32 i = 0; i < pathCount; ++i) {
-    Path path = paths[i];
+    const Path path = paths[i];
     // check if the file is a PK resource.
     if (isPKResource(path)) {
       // soft load the resource and save it in the asset manager.
-      if (path.getDirectory() == "pkm") {
+      const String extension = path.getExtension();
+      if (extension == "pkm") {
         SPtr<ModelResource> modelRes = make_shared<ModelResource>();
         modelRes->softLoad(path);
         insertNewResource(modelRes);
       }
-      if (path.getDirectory() == "pkt") {
+      if (extension == "pkt") {
         SPtr<TextureResource> textureRes = make_shared<TextureResource>();
         textureRes->softLoad(path);
         insertNewResource(textureRes);
@@ -146,10 +90,9 @@ AssetResourceManager::isPKResource(const Path _path)
 SPtr<BaseResource>
 AssetResourceManager::getResource(const String& _ID)
 {
-  for (auto& resource : m_allResources) {
-    if (_ID == resource.first) {
-      return resource.second;
-    }
+  auto it = m_allResources.find(_ID);
+  if (it != m_allResources.end()) {
+    return it->second;
   }
   return nullptr;
 }

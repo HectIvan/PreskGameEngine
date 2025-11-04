@@ -116,11 +116,10 @@ ShaderTest::onInit()
   // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
   // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
   // 
-  SPtr<Actor> coat = activeScene->instantiate("Coat");
-  SPtr<BaseResource> resource = modelCodec.createResourceFromFile(Path("models/export3dcoat.obj"));
-  assetMan.insertNewResource(resource);
-  coat->addComponent(resourceMan.loadPKModel(resource->m_id));
-  coat->setPosition(11.0f, 5.2f, 0.0f);
+  // SPtr<Actor> coat = activeScene->instantiate("Coat");
+  // SPtr<BaseResource> res = assetMan.loadResource(Path("resources/export3dcoat.pkm"));
+  // coat->addComponent(resourceMan.loadPKModel(res->m_id));
+  // coat->setPosition(11.0f, 5.2f, 0.0f);
 
   m_IBR = true;
   m_vSync = false;
@@ -253,13 +252,14 @@ findShader(const Vector<ShaderType>& _list, const Path& _path)
 void
 ShaderTest::uInterfaceUpdate()
 {
-  AssetResourceManager& assetManager = g_AssetResourceManager();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   RendererManager& rm = g_RenderManager();
   GPUResourceManager& gpuResMan = g_GPUResourceManager();
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
   UInterface& im = g_uInterface();
   ModelCodec& modelCodec = g_ModelCodec();
+  TextureCodec& textureCodec = g_TextureCodec();
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -335,23 +335,21 @@ ShaderTest::uInterfaceUpdate()
       if (im.createButton("Model Resource")) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
-          SPtr<ModelResource> resource = make_shared<ModelResource>();
-          resource->softLoad(path);
-          assetManager.insertNewResource(resource);
+          SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
+          assetMan.insertNewResource(resource);
         }
       }
       im.sameLine();
       if (im.createButton("Texture Resource")) {
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
-          SPtr<TextureResource> resource = make_shared<TextureResource>();
-          resource->softLoad(path);
-          assetManager.insertNewResource(resource);
+          SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
+          assetMan.insertNewResource(resource);
         }
       }
       im.endTabItem();
-      for (auto& asset : assetManager.getAllResources()) {
-        String assetName = asset.second->m_name;
+      for (auto& asset : assetMan.getAllResources()) {
+        String assetName = asset.second->m_resourcePath.getFileName();
         if (im.selectable(assetName.c_str(), Vector2(100.0f))) {
           if (im.beginDragDropSource()) {
           }
@@ -408,9 +406,8 @@ ShaderTest::uInterfaceUpdate()
           if (val == 0) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
-              SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
-              assetManager.insertNewResource(resource);
-              m_selectedActor->addComponent(gpuResMan.loadPKModel(resource->m_id));
+              // const String ID = assetManager.createModelResource(path);
+              // m_selectedActor->addComponent(assetManager.loadResource(path));
             }
           }
         }

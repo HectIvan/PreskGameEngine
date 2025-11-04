@@ -19,6 +19,7 @@
 #include "stb_image.h"
 
 #include "pkAssetResourceManager.h"
+#include "pkUUID.h"
 #include "pkFileSystem.h"
 #include "pkLogger.h"
 #include "pkStbiTextureCodec.h"
@@ -39,14 +40,15 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   Logger& log = g_Logger();
   bool canCreateResource = true;
 
-  String texturePath = "resources/" + _path.getFileNameWithoutExtension() + ".pkt";
+  String fileName = _path.getFileNameWithoutExtension();
+  String resourcePath = "resources/" + fileName + ".pkt";
 
-  ofstream file(texturePath, ios::out | ios::binary);
+  ofstream file(resourcePath, ios::out | ios::binary);
 
   // if the file cannot be open/created, return a warning and a nullptr.
   if (!file.is_open()) {
     canCreateResource = false;
-    String msg = "Failed to generate resource for texture " + texturePath + ".";
+    String msg = "Failed to generate resource for texture " + resourcePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
   }
@@ -71,7 +73,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
 
   // if stbi failed to load the texture data, return a warning and a nullptr.
   if (!data) {
-    String msg = "STBI failed to load texture " + texturePath + "."
+    String msg = "STBI failed to load texture " + resourcePath + "."
                  + " Reason:" + stbi_failure_reason();
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
@@ -84,8 +86,15 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   }
 
   SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * bpp;
+
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
+
+  textureRes->m_originalPath = _path;
+  textureRes->m_resourcePath = resourcePath;
+  textureRes->m_name = fileName;
+  textureRes->m_id = UUID::generateRandomUUID();
+
   textureRes->m_width = width;
   textureRes->m_height = height;
   textureRes->m_bpp = bpp;
@@ -96,7 +105,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   // write the data into the pkt file.
   if (canCreateResource) {
     // generate the base resource header.
-    textureRes->writeBaseHeader(file, _path);
+    textureRes->writeBaseHeader(file, textureRes->m_id, fileName, resourcePath);
 
     TextureAssetHeader texHeader;
     texHeader.width = textureRes->m_width;

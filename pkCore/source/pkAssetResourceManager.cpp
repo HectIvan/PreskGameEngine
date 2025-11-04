@@ -14,9 +14,11 @@
 #include "pkGPUResourceManager.h"
 #include "pkLogger.h"
 #include "pkMaterialResource.h"
+#include "pkModelCodec.h"
 #include "pkModelResource.h"
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
+#include "pkTextureCodec.h"
 #include "pkTextureResource.h"
 #include "pkFileSystem.h"
 #include "pkUUID.h"
@@ -30,9 +32,15 @@ AssetResourceManager::init(const String _resourcesPath)
 }
 
 SPtr<BaseResource>
-AssetResourceManager::loadResource()
+AssetResourceManager::loadResource(const String& _ID)
 {
-  return SPtr<BaseResource>();
+  // check if the file is stored in the map
+  SPtr<BaseResource> resource = getResource(_ID);
+  if (!resource) {
+    return nullptr;
+  }
+  resource->load();
+  return resource;
 }
 
 SPtr<BaseResource>

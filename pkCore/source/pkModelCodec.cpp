@@ -46,12 +46,19 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
    * Create the model resource.
    */
   SPtr<ModelResource> modelRes = make_shared<ModelResource>();
+
+  modelRes->m_id = UUID::generateRandomUUID();
+  modelRes->m_originalPath = _path;
+  modelRes->m_resourcePath = filePath;
+  modelRes->m_name = fileName;
+
+  modelRes->writeBaseHeader(file, modelRes->m_id, fileName, _path.toString());
+
   modelRes->m_meshes = _pModel->meshes;
   modelRes->m_index = _pModel->index;
   modelRes->m_vertex = _pModel->vertex;
 
   // generate the base resource header.
-  modelRes->writeBaseHeader(file, _path);
 
   // get and write model header.
   ModelAssetHeader mHeader;

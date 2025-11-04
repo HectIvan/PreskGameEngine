@@ -90,10 +90,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
   processNode(*model, scene->mRootNode, scene);
   model->setVerticesIndices();
 
-  // if the model cannot be parsed into a .pkm file, log an error.
-  SPtr<BaseResource> modelRes = createResourceFromModel(model, _path);
-
-  return modelRes;
+  return createResourceFromModel(model, _path);
 }
 
 Bone
@@ -179,7 +176,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   AssetResourceManager& assetMan = g_AssetResourceManager();
   GPUResourceManager& rm = g_GPUResourceManager();
   TextureManager& tm = g_TextureManager();
-  TextureCodec& texCodec = g_TextureCodec();
+  TextureCodec& textureCodec = g_TextureCodec();
   Logger& log = g_Logger();
 
   // check if the mesh is already in storage
@@ -267,9 +264,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
         SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
@@ -294,15 +290,14 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
         SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
           log.registerMessage("Loaded normal texture " + newPath.getFileName() +
-            " in material " + matName + ".");
+                              " in material " + matName + ".");
           meshProcess->material->setNormal(texture);
         }
       }
@@ -321,9 +316,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
         SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
@@ -336,7 +330,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       else { // register that an ambient occlussion texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load ambient occlussion texture" + filePath.toString() +
-          " in material " + matName + ".",
+                            " in material " + matName + ".",
           LOG_MSG_TYPE::kWarning);
       }
     }
@@ -349,15 +343,14 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
         SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
           log.registerMessage("Loaded metallic texture " + newPath.getFileName() +
-            " in material " + matName + ".");
+                              " in material " + matName + ".");
           meshProcess->material->setMetallic(texture);
         }
       }
@@ -376,15 +369,14 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
         SPtr<Texture> texture = tm.loadTexture(resource->m_id);
         // if a texture was loaded.
         if (texture) {
           // log registry.
           log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
-            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
           meshProcess->material->setRoughness(texture);
         }
       }
@@ -403,22 +395,21 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
-        SPtr<BaseResource> resource = texCodec.createResourceFromFile(newPath);
+        SPtr<BaseResource> resource = textureCodec.createResourceFromFile(newPath);
         assetMan.insertNewResource(resource);
-        resource->load();
-        SPtr<Texture> texture = tm.loadTexture(resource->m_id);
+        SPtr<Texture> texture = tm.loadTexture(resource->m_id); 
         // if a texture was loaded.
         if (texture) {
           // log registry.
           log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
-            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
           meshProcess->material->setEmissive(texture);
         }
       }
       else { // register that an emissive texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load emissive texture" + filePath.toString() +
-          " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }
     // materialA->GetTexture(aiTextureType_DIFFUSE);

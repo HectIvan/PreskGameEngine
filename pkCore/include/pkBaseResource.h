@@ -53,8 +53,10 @@ class PK_CORE_EXPORT BaseResource
 
   /**
    * @brief Soft load the resource (used by the asset manager to know what resource is what).
+   * @param _path Path to soft load.
+   * @return Resource ID.
    */
-  void
+  String
   softLoad(const Path& _path);
 
   /**
@@ -68,10 +70,15 @@ class PK_CORE_EXPORT BaseResource
   /**
    * @brief Write the base resource header in a write stream.
    * @param _file File ofstream.
-   * @param _path file path.
+   * @param _ID Resource ID.
+   * @param _fileName Name of the file.
+   * @param _resourcePath resource path.
    */
   void
-  writeBaseHeader(ofstream& _file, const Path& _path);
+  writeBaseHeader(ofstream& _file,
+                  const String& _ID,
+                  const String& _fileName,
+                  const String& _resourcePath);
 
   /**
    * @brief Load the resource.

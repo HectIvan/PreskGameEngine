@@ -6,7 +6,7 @@
 namespace pkEngineSDK
 {
 
-void
+String
 BaseResource::softLoad(const Path& _path)
 {
   Logger& log = g_Logger();
@@ -19,13 +19,14 @@ BaseResource::softLoad(const Path& _path)
     String msg = "Failed to load header resource at path: " + path + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
-    return;
+    return "";
   }
 
   loadBaseHeader(file);
-  m_resourcePath = _path;
 
   file.close();
+
+  return m_id;
 }
 
 BaseHeader
@@ -47,20 +48,24 @@ BaseResource::loadBaseHeader(ifstream& _file)
 
   m_id = baseHeader.ID;
   m_name = baseHeader.name;
-  m_originalPath = baseHeader.path;
+  m_resourcePath = baseHeader.path;
 
   return baseHeader;
 }
+
 void
-BaseResource::writeBaseHeader(ofstream& _file, const Path& _path)
+BaseResource::writeBaseHeader(ofstream& _file,
+                              const String& _ID,
+                              const String& _fileName,
+                              const String& _resourcePath)
 {
   BaseHeader header;
-  header.ID = UUID::generateRandomUUID();
-  header.IDSize = header.ID.length();
-  header.name = _path.getFileName();
-  header.nameSize = header.name.length();
-  header.path = _path.toString();
-  header.pathSize = header.path.length();
+  header.ID = _ID;
+  header.IDSize = _ID.length();
+  header.name = _fileName;
+  header.nameSize = _fileName.length();
+  header.path = _resourcePath;
+  header.pathSize = _resourcePath.length();
 
   _file.write(reinterpret_cast<const char*>(&header.IDSize), sizeof(SIZE_T));
   _file.write(reinterpret_cast<const char*>(header.ID.c_str()), header.IDSize);

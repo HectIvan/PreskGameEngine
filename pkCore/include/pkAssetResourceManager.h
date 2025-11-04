@@ -51,9 +51,11 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
 
   /**
    * @brief Load a resource from a file.
+   * @param _ID Resource ID.
+   * @return Pointer to the loaded resource.
    */
   SPtr<BaseResource>
-  loadResource();
+  loadResource(const String& _ID);
 
   /**
    * @brief Save a resource to a file.
@@ -133,7 +135,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
 
  private:
   UMap<String, SPtr<BaseResource>> m_loadedResources;
-  UMap<String, SPtr<BaseResource>> m_allResources;   
+  UMap<String, SPtr<BaseResource>> m_allResources;
   Path m_resourcesFolder;
 };
 

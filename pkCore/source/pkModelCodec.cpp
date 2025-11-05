@@ -30,6 +30,7 @@ SPtr<BaseResource>
 ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path)
 {
   Logger& log = g_Logger();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   MaterialCodec& matCodec = g_MaterialCodec();
 
   String fileName = _path.getFileNameWithoutExtension();
@@ -49,10 +50,10 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
    */
   SPtr<ModelResource> modelRes = make_shared<ModelResource>();
 
-  modelRes->m_id = UUID::generateRandomUUID();
   modelRes->m_originalPath = _path.toString();
   modelRes->m_resourcePath = filePath;
   modelRes->m_name = fileName;
+  modelRes->m_id = UUID::generateRandomUUIDFromString(fileName + " Model");
 
   modelRes->writeBaseHeader(file, modelRes->m_id, fileName, modelRes->m_resourcePath);
 
@@ -93,7 +94,11 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     file.write(reinterpret_cast<const char*>(mesh->indexVector.data()),
                sizeof(uint32) * indicesCount);
 
+    // create the material resource
     SPtr<MaterialResource> matResource = matCodec.createResource(mesh->material);
+    assetMan.insertNewResource(matResource);
+
+    // to do: find a better way to do this
 
     SIZE_T matIDSize = matResource->m_id.length();
     file.write(reinterpret_cast<const char*>(&matIDSize), sizeof(SIZE_T));

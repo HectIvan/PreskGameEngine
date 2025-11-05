@@ -69,6 +69,8 @@ MaterialManager::loadMaterial(const String& _ID)
   const String metalId = matResource->m_metallicID;
   const String emissId = matResource->m_emissiveID;
 
+  material->setName(resource->m_name);
+
   material->m_diffuse = textureMan.loadTexture(diffId);
   material->m_normal = textureMan.loadTexture(normId);
   material->m_occlusion = textureMan.loadTexture(aoId);
@@ -80,6 +82,8 @@ MaterialManager::loadMaterial(const String& _ID)
   material->m_properties.roughnessMultiply = matResource->m_roughValue;
   material->m_properties.metallicMultiply = matResource->m_metallicValue;
   material->m_properties.EmissiveMultiply = matResource->m_emissiveColor.rgb();
+
+  insertLoadedMaterial(_ID, material);
 
   return material;
 }

@@ -47,13 +47,6 @@ MaterialResource::load()
   SIZE_T nameLength = 0;
   SIZE_T resourceLength = 0;
 
-  file.read(reinterpret_cast<char*>(idLength), sizeof(SIZE_T));
-  file.read(reinterpret_cast<char*>(&m_id[0]), idLength);
-  file.read(reinterpret_cast<char*>(nameLength), sizeof(SIZE_T));
-  file.read(reinterpret_cast<char*>(&m_name[0]), nameLength);
-  file.read(reinterpret_cast<char*>(resourceLength), sizeof(SIZE_T));
-  file.read(reinterpret_cast<char*>(&m_resourcePath[0]), resourceLength);
-
   // read diffuse data
   file.read(reinterpret_cast<char*>(&matHeader.diffuseIDSize), sizeof(SIZE_T));
   m_diffuseID.resize(matHeader.diffuseIDSize);

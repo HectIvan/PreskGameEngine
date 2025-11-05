@@ -203,14 +203,14 @@ class UInterface : public Module<UInterface>
   /**
    * @brief Begin the drag drop target.
    */
-  void
+  bool
   beginDragDropTarget();
 
   /**
    * @brief Accept a drag drop payload.
    * @param _type Payload type.
    */
-  bool
+  void*
   acceptDragDropPayload(const char* _type);
 
   /**

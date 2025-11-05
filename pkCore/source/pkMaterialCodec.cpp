@@ -43,12 +43,15 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 
   SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
 
-  matResource->m_id = UUID::generateRandomUUID();
+  matResource->m_id = UUID::generateRandomUUIDFromString(materialName + " Material");
   matResource->m_name = materialName;
   matResource->m_resourcePath = filePath;
 
   matResource->m_diffuseID = _pMaterial->m_diffuse->getID();
-  matResource->m_diffuseColor = _pMaterial->m_properties.ColorMultiply;
+  Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
+  matResource->m_diffuseColor = Color(static_cast<uint8>(diffColor.x),
+                                      static_cast<uint8>(diffColor.y),
+                                      static_cast<uint8>(diffColor.z));
   matResource->m_normalID = _pMaterial->m_normal->getID();
   matResource->m_aoID = _pMaterial->m_occlusion->getID();
   matResource->m_roughnessID = _pMaterial->m_roughness->getID();
@@ -56,18 +59,12 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   matResource->m_metallicID = _pMaterial->m_metallic->getID();
   matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
   matResource->m_emissiveID = _pMaterial->m_emissive->getID();
-  matResource->m_emissiveColor = _pMaterial->m_properties.EmissiveMultiply;
+  Vector3 emissColor = _pMaterial->m_properties.EmissiveMultiply;
+  matResource->m_emissiveColor = Color(static_cast<uint8>(emissColor.x),
+                                       static_cast<uint8>(emissColor.y),
+                                       static_cast<uint8>(emissColor.z));
 
-  // base header write
-  SIZE_T idLength = matResource->m_id.length();
-  SIZE_T nameLength = materialName.length();
-  SIZE_T resourceLength = filePath.length();
-  file.write(reinterpret_cast<const char*>(&idLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_id.c_str()), idLength);
-  file.write(reinterpret_cast<const char*>(&nameLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(materialName.c_str()), nameLength);
-  file.write(reinterpret_cast<const char*>(&resourceLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(filePath.c_str()), resourceLength);
+  matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
 
   // diffuse write
   SIZE_T diffLength = matResource->m_diffuseID.length();
@@ -99,6 +96,8 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   file.write(reinterpret_cast<const char*>(&matResource->m_emissiveColor), sizeof(Color));
 
   file.close();
+
+  matResource->m_isLoaded = true;
 
   return matResource;
 }

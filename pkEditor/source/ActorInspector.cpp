@@ -119,6 +119,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   Vector2 texSize = Vector2(_imgTexSize, _imgTexSize);
   // get the user interface manager
   UInterface& im = g_uInterface();
+  TextureManager& tm = g_TextureManager();
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
@@ -268,6 +269,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // meshMat->setDiffuse(texture);
                 }
               }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setDiffuse(texture);
+                }
+                im.endDragDropTarget();
+              }
               // hover tooltip.
               if (im.isItemHovered()) {
                 im.setTooltip("Diffuse Texture");
@@ -283,6 +292,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // meshMat->setNormal(texture);
                 }
               }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setNormal(texture);
+                }
+                im.endDragDropTarget();
+              }
               // hover tooltip.
               if (im.isItemHovered()) {
                 im.setTooltip("Normal Texture");
@@ -297,6 +314,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // meshMat->setOcclusion(texture);
                 }
               }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setOcclusion(texture);
+                }
+                im.endDragDropTarget();
+              }
               // hover tooltip.
               if (im.isItemHovered()) {
                 im.setTooltip("Ambient Occlusion Texture");
@@ -309,6 +334,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // SPtr<Texture> texture = tm.loadTexture(path);
                   // meshMat->setRoughness(texture);
                 }
+              }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setRoughness(texture);
+                }
+                im.endDragDropTarget();
               }
               // hover tooltip.
               if (im.isItemHovered()) {
@@ -325,6 +358,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // meshMat->setMetallic(texture);
                 }
               }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setMetallic(texture);
+                }
+                im.endDragDropTarget();
+              }
               // hover tooltip.
               if (im.isItemHovered()) {
                 im.setTooltip("Metallic Texture");
@@ -339,6 +380,14 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   // SPtr<Texture> texture = tm.loadTexture(path);
                   // meshMat->setEmissive(texture);
                 }
+              }
+              if (im.beginDragDropTarget()) {
+                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Texture> texture = tm.loadTexture(id);
+                  meshMat->setEmissive(texture);
+                }
+                im.endDragDropTarget();
               }
               // hover tooltip.
               if (im.isItemHovered()) {

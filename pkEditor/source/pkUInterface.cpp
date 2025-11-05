@@ -166,16 +166,20 @@ UInterface::endDragDropSource()
   ImGui::EndDragDropSource();
 }
 
-void
+bool
 UInterface::beginDragDropTarget()
 {
-  ImGui::BeginDragDropTarget();
+  return ImGui::BeginDragDropTarget();
 }
 
-bool
+void*
 UInterface::acceptDragDropPayload(const char* _type)
 {
-  return ImGui::AcceptDragDropPayload(_type);
+  const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(_type);
+  if (payload) {
+    return payload->Data;
+  }
+  return nullptr;
 }
 
 void

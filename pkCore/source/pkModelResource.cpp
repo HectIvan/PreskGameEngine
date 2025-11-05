@@ -74,6 +74,7 @@ ModelResource::load()
     SIZE_T matIDSize;
     String matID;
     file.read(reinterpret_cast<char*>(&matIDSize), sizeof(SIZE_T));
+    matID.resize(matIDSize);
     file.read(reinterpret_cast<char*>(&matID[0]), matIDSize);
 
     // to do: make a default material

@@ -63,16 +63,18 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
     if (isPKResource(path)) {
       // soft load the resource and save it in the asset manager.
       const String extension = path.getExtension();
+      SPtr<BaseResource> resource;
       if (extension == "pkm") {
-        SPtr<ModelResource> modelRes = make_shared<ModelResource>();
-        modelRes->softLoad(path);
-        insertNewResource(modelRes);
+        resource = make_shared<ModelResource>();
       }
       if (extension == "pkt") {
-        SPtr<TextureResource> textureRes = make_shared<TextureResource>();
-        textureRes->softLoad(path);
-        insertNewResource(textureRes);
+        resource = make_shared<TextureResource>();
       }
+      if (extension == "pkmat") {
+        resource = make_shared<MaterialResource>();
+      }
+      resource->softLoad(path);
+      insertNewResource(resource);
     }
   }
 }

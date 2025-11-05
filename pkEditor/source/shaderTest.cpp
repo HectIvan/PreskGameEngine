@@ -256,6 +256,7 @@ ShaderTest::uInterfaceUpdate()
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
   TextureCodec& textureCodec = g_TextureCodec();
+  TextureManager& tm = g_TextureManager();
   UInterface& im = g_uInterface();
 
   im.setCurrentContext();
@@ -348,10 +349,15 @@ ShaderTest::uInterfaceUpdate()
       for (auto& asset : assetMan.getAllResources()) {
         const Path assetPath = asset.second->m_resourcePath;
         const String assetName = assetPath.getFileName();
-        if (im.selectable(assetName.c_str(), Vector2(100.0f))) {
-          if (im.beginDragDropSource()) {
-          }
-          // do something with the asset (maybe load it when clicked)
+        if (im.createButton(assetName.c_str())) {
+          
+        }
+        if (im.beginDragDropSource()) {
+          const String dragText = "Dragging " + assetName;
+          im.createText(dragText.c_str());
+          const char* data = asset.first.c_str();
+          im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+          im.endDragDropSource();
         }
         if (im.isItemHovered()) {
           im.setTooltip(assetName.c_str());
@@ -485,6 +491,14 @@ ShaderTest::uInterfaceUpdate()
               // SPtr<Texture> texture = tm.loadTexture(path);
               // rm.m_mainSkybox->copyFrom(texture);
             }
+          }
+          if (im.beginDragDropTarget()) {
+            const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+            if (id) {
+              SPtr<Texture> texture = tm.loadTexture(id);
+              rm.m_mainSkybox->copyFrom(texture);
+            }
+            im.endDragDropTarget();
           }
         }
       }

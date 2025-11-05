@@ -277,6 +277,16 @@ ShaderTest::uInterfaceUpdate()
     m_sActorIndex = currentScene->getActorCount() - 1;
     m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
+  if (im.beginDragDropTarget()) {
+    const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+    if (id) {
+      SPtr<Model> model = gpuResourceMan.loadPKModel(id);
+      SPtr<Actor> newActor = currentScene->instantiate(model->getName());
+      newActor->addComponent(model);
+      m_selectedActor = newActor;
+    }
+    im.endDragDropTarget();
+  }
   if (m_selectedActor) {
     im.sameLine();
     if (im.createButton("Delete")) {

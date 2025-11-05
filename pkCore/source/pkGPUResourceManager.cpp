@@ -57,6 +57,7 @@ GPUResourceManager::loadPKModel(const String& _ID)
 
   // save the model data.
   model = make_shared<Model>();
+  model->setName(modelRes->m_name.c_str());
   model->index = modelRes->m_index;
   model->vertex = modelRes->m_vertex;
   model->meshes = modelRes->m_meshes;

@@ -274,6 +274,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   getBytesFromFormat(const uint32 _format) override;
 
   /**
+   * @brief Create a new empty texture.
+   * @return Pointer to the texture.
+   */
+  virtual SPtr<Texture>
+  createEmptyTexture() override;
+
+  /**
    * @brief Create a texture.
    * @param _desc Texture descrition.
    * @return Texture.

@@ -1700,6 +1700,12 @@ DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
 }
 
 SPtr<Texture>
+DX11GraphicsAPI::createEmptyTexture()
+{
+  return make_shared<DX11Texture>();
+}
+
+SPtr<Texture>
 DX11GraphicsAPI::createTexture(uint32 _width,
                                uint32 _height,
                                int32 _format,

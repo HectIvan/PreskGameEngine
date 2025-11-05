@@ -104,7 +104,9 @@ RendererManager::init()
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   assetMan.insertNewResource(resSky);
-  m_mainSkybox = tm.loadTexture(resSky->m_id);
+  SPtr<Texture> skyboxResource = tm.loadTexture(resSky->m_id);
+  m_mainSkybox = api.createEmptyTexture();
+  m_mainSkybox->copyFrom(skyboxResource);
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS

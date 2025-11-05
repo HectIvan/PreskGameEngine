@@ -21,10 +21,10 @@ DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
   setSize(dxTx->getSize());
   setName(dxTx->getName());
 
-  if (m_t2d) { m_t2d = dxTx->getTexture2D(); }
-  if (m_sRV) { m_sRV = dxTx->getSRV(); };
-  if (!m_uAVs.empty()) { m_uAVs = dxTx->getUAVs(); };
-  if (!m_rTVs.empty()) { m_rTVs = dxTx->getRTVs(); };
+  if (dxTx->m_t2d) { m_t2d = dxTx->getTexture2D(); }
+  if (dxTx->m_sRV) { m_sRV = dxTx->getSRV(); };
+  if (!dxTx->m_uAVs.empty()) { m_uAVs = dxTx->getUAVs(); };
+  if (!dxTx->m_rTVs.empty()) { m_rTVs = dxTx->getRTVs(); };
 
   return true;
 }

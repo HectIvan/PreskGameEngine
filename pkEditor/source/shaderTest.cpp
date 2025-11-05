@@ -420,6 +420,14 @@ ShaderTest::uInterfaceUpdate()
             }
           }
         }
+        if (im.beginDragDropTarget()) {
+          const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+          if (id) {
+            SPtr<Model> model = gpuResourceMan.loadPKModel(id);
+            m_selectedActor->addComponent(model);
+          }
+          im.endDragDropTarget();
+        }
         // create all components
         uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
         for (uint32 i = 0; i < componentCount; ++i) {

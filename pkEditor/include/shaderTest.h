@@ -186,6 +186,7 @@ class ShaderTest : public BaseApp
 
 
   String m_searchMesh;
+  String m_searchResource;
 
   UIWindow m_sceneGraphWin;
   UIWindow m_loggerWin;

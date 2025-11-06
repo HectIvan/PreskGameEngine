@@ -256,7 +256,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float tolerance = 2.0f * dotOfLight;
   
   if (lightHit > worldHit + tolerance) {
-    // output.diffuseBRDF = float4(diffuseBRDF * kD * shadowColor.xxx, alpha);
+    output.diffuseBRDF = float4(diffuseBRDF * kD * shadowColor.xxx, alpha);
   }
   
   /**

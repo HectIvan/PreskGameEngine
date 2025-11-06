@@ -59,16 +59,18 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   unsigned char* data;
   PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
+  const String fullPath = FileSystem::getAbsolutePath(_path).string();
+
   // load float data for exr and hdr files.
   if (extension == "exr" || extension == "hdr") {
-    float* dataF = stbi_loadf(_path.toString().c_str(), &width, &height, &bpp, 4);
+    float* dataF = stbi_loadf(fullPath.c_str(), &width, &height, &bpp, 4);
     data = reinterpret_cast<unsigned char*>(dataF);
     bpp = 4 * sizeof(float);
     format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
   }
   // load normal data for other file types.
   else {
-    data = stbi_load(_path.toString().c_str(), &width, &height, &bpp, 4);
+    data = stbi_load(fullPath.c_str(), &width, &height, &bpp, 4);
   }
 
   // if stbi failed to load the texture data, return a warning and a nullptr.

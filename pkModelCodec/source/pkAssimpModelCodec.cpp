@@ -108,6 +108,9 @@ getTextureFromPath(const Path& _path)
   }
 
   SPtr<BaseResource> resource = textureCodec.createResourceFromFile(_path);
+  if (!resource) {
+    return nullptr;
+  }
   assetMan.insertNewResource(resource);
   texture = tm.loadTexture(resource->m_id);
   return texture;

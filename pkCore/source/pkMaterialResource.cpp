@@ -43,10 +43,6 @@ MaterialResource::load()
   loadBaseHeader(file);
   MaterialAssetHeader matHeader;
 
-  SIZE_T idLength = 0;
-  SIZE_T nameLength = 0;
-  SIZE_T resourceLength = 0;
-
   // read diffuse data
   file.read(reinterpret_cast<char*>(&matHeader.diffuseIDSize), sizeof(SIZE_T));
   m_diffuseID.resize(matHeader.diffuseIDSize);

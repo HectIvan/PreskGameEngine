@@ -73,6 +73,17 @@ using String = std::string;
 // to do: change for linux too
 using WString = std::wstring;
 
+PKFORCEINLINE String
+stringToLower(const String& _string)
+{
+  String newString = _string;
+  for (uint32 i = 0; i < newString.length(); ++i) {
+    newString[i] = tolower(newString[i]);
+  }
+  
+  return newString;
+}
+
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 
 PKFORCEINLINE WString

@@ -8,6 +8,8 @@ Texture2D emissiveMap : register(t5);
 Texture2D emissiveBlurMap : register(t6);
 Texture2D ssaoMap : register(t7); // temporary texture to show ambient occlusion effect.
 
+#define PI 3.151592
+
 // sampler
 SamplerState samState : register(s0);
 
@@ -36,10 +38,12 @@ float4 PS(PS_INPUT input) : SV_Target0
   // color = color / (color + float3(1.0f.xxx));
   float3 IBL = IBLSample.rgb;
   
+  float3 diffuseIBL = IBL * (color / PI);
+  
   // color = IBL * shdwSpecSample.g * albedoSample.rgb;
   //  * ssaoSample
   
-  color = (albedoSample.rgb * diffBRDFSample) + (specBRDFSample * IBL);
+  color = (albedoSample.rgb * diffBRDFSample) + (specBRDFSample * IBL) + diffuseIBL;
   
   // check for a skybox position.
   

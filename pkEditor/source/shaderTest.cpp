@@ -34,6 +34,7 @@ using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
 using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
+using pkEngineSDK::stringToLower;
 using pkEngineSDK::Math;
 using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelResource;
@@ -355,24 +356,30 @@ ShaderTest::uInterfaceUpdate()
           assetMan.insertNewResource(resource);
         }
       }
+      im.sameLine();
+      im.createInputText("##Search", &m_searchResource);
       im.endTabItem();
       for (auto& asset : assetMan.getAllResources()) {
         const Path assetPath = asset.second->m_resourcePath;
         const String assetName = assetPath.getFileName();
-        if (im.createButton(assetName.c_str())) {
-          
+        const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
+        const String assetNameLower = stringToLower(assetName);
+        if (assetNameLower.find(searchResLower.c_str()) != String::npos) {
+          if (im.createButton(assetName.c_str())) {
+
+          }
+          if (im.beginDragDropSource()) {
+            const String dragText = "Dragging " + assetName;
+            im.createText(dragText.c_str());
+            const char* data = asset.first.c_str();
+            im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+            im.endDragDropSource();
+          }
+          if (im.isItemHovered()) {
+            im.setTooltip(assetName.c_str());
+          }
+          im.sameLine();
         }
-        if (im.beginDragDropSource()) {
-          const String dragText = "Dragging " + assetName;
-          im.createText(dragText.c_str());
-          const char* data = asset.first.c_str();
-          im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
-          im.endDragDropSource();
-        }
-        if (im.isItemHovered()) {
-          im.setTooltip(assetName.c_str());
-        }
-        im.sameLine();
       }
     }
       im.endTabBar();

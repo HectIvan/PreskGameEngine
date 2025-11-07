@@ -349,7 +349,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
           // log registry.
           log.registerMessage("Loaded ambient occlussion texture " + newPath.getFileName() +
             " in material " + matName + ".");
-          meshProcess->material->setOcclusion(texture);
+          meshProcess->material->setOclussion(texture);
         }
       }
       else { // register that an ambient occlussion texture was not found.

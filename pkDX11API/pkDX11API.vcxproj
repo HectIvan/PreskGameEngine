@@ -29,6 +29,7 @@
     <ClCompile Include="source\pkDX11PixelShader.cpp" />
     <ClCompile Include="source\pkDX11SamplerState.cpp" />
     <ClCompile Include="source\pkDX11Shader.cpp" />
+    <ClCompile Include="source\pkDX11ShaderCodec.cpp" />
     <ClCompile Include="source\pkDX11SwapChain.cpp" />
     <ClCompile Include="source\pkDX11Texture.cpp" />
     <ClCompile Include="source\pkDX11VertexBuffer.cpp" />
@@ -51,6 +52,7 @@
     <ClInclude Include="include\pkDX11RenderTargetView.h" />
     <ClInclude Include="include\pkDX11SamplerState.h" />
     <ClInclude Include="include\pkDX11Shader.h" />
+    <ClInclude Include="include\pkDX11ShaderCodec.h" />
     <ClInclude Include="include\pkDX11SwapChain.h" />
     <ClInclude Include="include\pkDX11Texture.h" />
     <ClInclude Include="include\pkDX11VertexBuffer.h" />

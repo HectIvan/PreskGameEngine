@@ -1,23 +1,23 @@
+#include "pkAssetResourceManager.h"
 #include "pkBaseApp.h"
-#include "pkLogger.h"
-// #include "pkDllLoader.h"
 #include "pkDllManager.h"
 #include "pkGraphicsAPI.h"
+#include "pkLogger.h"
 #include "pkLight.h"
-#include "pkModel.h"
+#include "pkMaterialCodec.h"
+#include "pkMaterialManager.h"
 #include "pkMath.h"
+#include "pkModel.h"
+#include "pkModelCodec.h"
 #include "pkPrerequisitesCore.h"
 #include "pkSceneManager.h"
+#include "pkShaderCodec.h"
+#include "pkShaderManager.h"
 #include "pkSprite.h"
+#include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
-#include "pkShaderManager.h"
-#include "pkModelCodec.h"
-#include "pkTextureCodec.h"
-#include "pkAssetResourceManager.h"
-#include "pkMaterialCodec.h"
-#include "pkMaterialManager.h"
 
 namespace pkEngineSDK
 {
@@ -77,10 +77,12 @@ BaseApp::initAPI(const char** _argv, int32 _count)
 #if PK_DEBUG_MODE
   if (abstraction == "DX11APId") {
     dllManager.runDll("pkDX11APId");
+    ShaderCodec::startUp();
   }
 #else
   if (abstraction == "DX11API") {
     dllManager.runDll("pkDX11API");
+    ShaderCodec::startUp();
   }
 #endif
 }

@@ -49,7 +49,7 @@ GPUResourceManager::loadPKModel(const String& _ID)
 
   // check if the resource is a valid model resource.
   if (!modelRes) {
-    String msg = "Failed to load model resource of ID: " + resource->m_id + ".";
+    const String msg = "Failed to load model resource of ID: " + resource->m_id + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;

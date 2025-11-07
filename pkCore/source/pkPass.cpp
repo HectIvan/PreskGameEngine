@@ -118,18 +118,19 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
   ShaderManager& shaderMan = g_ShaderManager();
 
   // check if the shader already exists
-  ShaderKey key(_directory.toString(), _entry, _sModel);
+  const ShaderKey key(_directory.toString(), _entry, _sModel);
   SPtr<Shader> checkShader = shaderMan.getShader(key);
 
   // if the shader exists, get the shader and return.
   if (checkShader) {
-    String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
+    const String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
     g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
     m_pVShader = checkShader;
     return;
   }
   // if it doesnt exist, continue with the compilation and store the shader.
   m_pVShader->setData(_directory, _entry, _sModel);
+  g_Logger().print(_directory.toString());
   m_pVShader->compile();
   g_GraphicAPI().createVShader(m_pVShader);
 
@@ -140,12 +141,12 @@ void
 Pass::createPShader(const Path _directory, const char* _entry, const char* _sModel)
 {
   ShaderManager& shaderMan = g_ShaderManager();
-  ShaderKey key(_directory.toString(), _entry, _sModel);
+  const ShaderKey key(_directory.toString(), _entry, _sModel);
   SPtr<Shader> checkShader = shaderMan.getShader(key);
 
   // if the shader exists, get the shader and return.
   if (checkShader) {
-    String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
+    const String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
     g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
     m_pPShader = checkShader;
     return;
@@ -162,12 +163,12 @@ void
 Pass::createCShader(const Path _directory, const char* _entry, const char* _sModel)
 {
   ShaderManager& shaderMan = g_ShaderManager();
-  ShaderKey key(_directory.toString(), _entry, _sModel);
+  const ShaderKey key(_directory.toString(), _entry, _sModel);
   SPtr<Shader> checkShader = shaderMan.getShader(key);
 
   // if the shader exists, get the shader and return.
   if (checkShader) {
-    String msg = "Found previously compiled Compute shader: " + key.shaderPath;
+    const String msg = "Found previously compiled Compute shader: " + key.shaderPath;
     g_Logger().registerMessage(msg, LOG_MSG_TYPE::kLog);
     m_pCShader = checkShader;
     return;

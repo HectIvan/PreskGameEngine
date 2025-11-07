@@ -102,11 +102,13 @@ RendererManager::init()
 
   // texCodec.createResourceFromFile(Path("textures/skybox/Skybox_papermill.hdr"));
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
-  resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
-  assetMan.insertNewResource(resSky);
-  SPtr<Texture> skyboxResource = tm.loadTexture(resSky->m_id);
+  const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
-  m_mainSkybox->copyFrom(skyboxResource);
+  if (success) {
+    assetMan.insertNewResource(resSky);
+    SPtr<Texture> skyboxResource = tm.loadTexture(resSky->m_id);
+    m_mainSkybox->copyFrom(skyboxResource);
+  }
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS

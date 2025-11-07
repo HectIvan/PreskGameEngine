@@ -9,11 +9,14 @@ namespace pkEngineSDK
 bool
 DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
 {
-  Logger& log = g_Logger().instance();
+  if (!_pTexture) {
+    return false;
+  }
+  Logger& log = g_Logger();
   // comvert to DirectX Texture.
   const auto dxTx = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!dxTx) {
-    const String msg = "Failed to copy texture: '" + _pTexture->getName().toString() + "'.";
+    const String msg = "Failed to copy texture: '" + _pTexture->getNameString() + "'.";
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return false;
   }

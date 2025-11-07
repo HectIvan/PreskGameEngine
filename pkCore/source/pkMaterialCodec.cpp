@@ -28,6 +28,9 @@ namespace pkEngineSDK
 SPtr<MaterialResource>
 MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 {
+  if (!_pMaterial) {
+    return nullptr;
+  }
   Logger& log = g_Logger();
 
   const String materialName = _pMaterial->getNameS();
@@ -47,22 +50,35 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   matResource->m_name = materialName;
   matResource->m_resourcePath = filePath;
 
-  matResource->m_diffuseID = _pMaterial->m_diffuse->getID();
-  Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
-  matResource->m_diffuseColor = Color(static_cast<uint8>(diffColor.x),
-                                      static_cast<uint8>(diffColor.y),
-                                      static_cast<uint8>(diffColor.z));
-  matResource->m_normalID = _pMaterial->m_normal->getID();
-  matResource->m_aoID = _pMaterial->m_occlusion->getID();
-  matResource->m_roughnessID = _pMaterial->m_roughness->getID();
-  matResource->m_roughValue = _pMaterial->m_properties.roughnessMultiply;
-  matResource->m_metallicID = _pMaterial->m_metallic->getID();
-  matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
-  matResource->m_emissiveID = _pMaterial->m_emissive->getID();
-  Vector3 emissColor = _pMaterial->m_properties.EmissiveMultiply;
-  matResource->m_emissiveColor = Color(static_cast<uint8>(emissColor.x),
-                                       static_cast<uint8>(emissColor.y),
-                                       static_cast<uint8>(emissColor.z));
+  // check for each texture and see if they are valid to use.
+  if (_pMaterial->m_diffuse) {
+    matResource->m_diffuseID = _pMaterial->m_diffuse->getID();
+    Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
+    matResource->m_diffuseColor = Color(static_cast<uint8>(diffColor.x),
+                                        static_cast<uint8>(diffColor.y),
+                                        static_cast<uint8>(diffColor.z));
+  }
+  if (_pMaterial->m_normal) {
+    matResource->m_normalID = _pMaterial->m_normal->getID();
+  }
+  if (_pMaterial->m_occlusion) {
+    matResource->m_aoID = _pMaterial->m_occlusion->getID();
+  }
+  if (_pMaterial->m_roughness) {
+    matResource->m_roughnessID = _pMaterial->m_roughness->getID();
+    matResource->m_roughValue = _pMaterial->m_properties.roughnessMultiply;
+  }
+  if (_pMaterial->m_metallic) {
+    matResource->m_metallicID = _pMaterial->m_metallic->getID();
+    matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
+  }
+  if (_pMaterial->m_emissive) {
+    matResource->m_emissiveID = _pMaterial->m_emissive->getID();
+    Vector3 emissColor = _pMaterial->m_properties.EmissiveMultiply;
+    matResource->m_emissiveColor = Color(static_cast<uint8>(emissColor.x),
+                                         static_cast<uint8>(emissColor.y),
+                                         static_cast<uint8>(emissColor.z));
+  }
 
   matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
 

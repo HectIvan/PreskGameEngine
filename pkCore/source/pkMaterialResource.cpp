@@ -16,9 +16,26 @@
  /*********************************************/
 #include "pkMaterialResource.h"
 #include "pkLogger.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
+
+MaterialResource::MaterialResource()
+{
+  const String noID = UUID::PK_DEFAULT_UUID;
+
+  m_diffuseID = noID;
+  m_diffuseColor = Color::WHITE;
+  m_normalID = noID;
+  m_aoID = noID;
+  m_roughnessID = noID;
+  m_roughValue = 1.0f;
+  m_metallicID = noID;
+  m_metallicValue = 1.0f;
+  m_emissiveID = noID;
+  m_emissiveColor = Color::WHITE;
+}
 
 void
 MaterialResource::load()
@@ -31,7 +48,7 @@ MaterialResource::load()
   ifstream file(m_resourcePath, ios::in | ios::binary);
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
-    String msg = "Failed to open material resource at directory " + m_resourcePath + ".";
+    const String msg = "Failed to open material resource at directory " + m_resourcePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return;

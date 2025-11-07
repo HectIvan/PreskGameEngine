@@ -31,5 +31,6 @@ class PK_UTILITY_EXPORT UUID
 
  public:
   static const String PK_NAME_GEN_SEED;
+  static const String PK_DEFAULT_UUID;
 };
 }

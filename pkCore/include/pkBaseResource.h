@@ -54,9 +54,9 @@ class PK_CORE_EXPORT BaseResource
   /**
    * @brief Soft load the resource (used by the asset manager to know what resource is what).
    * @param _path Path to soft load.
-   * @return Resource ID.
+   * @return If the soft load was successful.
    */
-  String
+  bool
   softLoad(const Path& _path);
 
   /**

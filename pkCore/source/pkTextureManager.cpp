@@ -4,6 +4,7 @@
 #include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkLogger.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
@@ -13,31 +14,32 @@ TextureManager::init()
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
 
-  SPtr<BaseResource> diffResource = make_shared<TextureResource>();
-  diffResource->softLoad(Path("resources/FlatDiff.pkt"));
-  assetMan.insertNewResource(diffResource);
-  SPtr<BaseResource> normalResource = make_shared<TextureResource>();
-  normalResource->softLoad(Path("resources/FlatNormal.pkt"));
-  assetMan.insertNewResource(normalResource);
-  SPtr<BaseResource> aoResource = make_shared<TextureResource>();
-  aoResource->softLoad(Path("resources/FlatAO.pkt"));
-  assetMan.insertNewResource(aoResource);
-  SPtr<BaseResource> roughResource = make_shared<TextureResource>();
-  roughResource->softLoad(Path("resources/FlatRoughness.pkt"));
-  assetMan.insertNewResource(roughResource);
-  SPtr<BaseResource> metallicResource = make_shared<TextureResource>();
-  metallicResource->softLoad(Path("resources/FlatMetallic.pkt"));
-  assetMan.insertNewResource(metallicResource);
-  SPtr<BaseResource> emissiveResource = make_shared<TextureResource>();
-  emissiveResource->softLoad(Path("resources/FlatEmissive.pkt"));
-  assetMan.insertNewResource(emissiveResource);
+  const Vector<String> paths = { "resources/FlatDiff.pkt",
+                                 "resources/FlatNormal.pkt",
+                                 "resources/FlatAO.pkt",
+                                 "resources/FlatRoughness.pkt",
+                                 "resources/FlatMetallic.pkt",
+                                 "resources/FlatEmissive.pkt" };
 
-  m_diffID = diffResource->m_id;
-  m_normalID = normalResource->m_id;
-  m_AOID = aoResource->m_id;
-  m_roughID = roughResource->m_id;
-  m_metallicID = metallicResource->m_id;
-  m_emissiveID = emissiveResource->m_id;
+  Vector<String> ids;
+  ids.resize(paths.size(), UUID::PK_DEFAULT_UUID);
+
+  for (uint32 i = 0; i < paths.size(); ++i) {
+    SPtr<BaseResource> resource = make_shared<TextureResource>();
+    bool status = resource->softLoad(Path(paths[i]));
+
+    if (status) {
+      assetMan.insertNewResource(resource);
+      ids[i] = resource->m_id;
+    }
+  }
+
+  m_diffID = ids[0];
+  m_normalID = ids[1];
+  m_AOID = ids[2];
+  m_roughID = ids[3];
+  m_metallicID = ids[4];
+  m_emissiveID = ids[5];
 
   loadDefaultMatTextures();
 }
@@ -51,6 +53,13 @@ TextureManager::loadDefaultMatTextures()
   m_defaultMetallic = loadTexture(m_metallicID);
   m_defaultRough = loadTexture(m_roughID);
   m_defaultEmissive = loadTexture(m_emissiveID);
+}
+
+SPtr<Texture>
+TextureManager::createEmptyTexture()
+{
+  GraphicsAPI& api = g_GraphicAPI();
+  return api.createEmptyTexture();
 }
 
 SPtr<Texture>

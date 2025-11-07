@@ -33,13 +33,13 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   AssetResourceManager& assetMan = g_AssetResourceManager();
   MaterialCodec& matCodec = g_MaterialCodec();
 
-  String fileName = _path.getFileNameWithoutExtension();
-  String filePath = "resources/" + fileName + ".pkm";
+  const String fileName = _path.getFileNameWithoutExtension();
+  const String filePath = "resources/" + fileName + ".pkm";
   ofstream file(filePath, ios::out | ios::binary);
   // char error[256];
   // strerror_s(error, sizeof(error), errno); // last error of io.
   if (!file.is_open()) {
-    String msg = "Failed to save model at path " + filePath + ".";
+    const String msg = "Failed to save model at path " + filePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;

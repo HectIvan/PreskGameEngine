@@ -6,17 +6,20 @@
 namespace pkEngineSDK
 {
 
-String
+bool
 BaseResource::softLoad(const Path& _path)
 {
+  if (!FileSystem::fileExists(_path)) {
+    return false;
+  }
   Logger& log = g_Logger();
 
-  String path = _path.toString();
+  const String path = _path.toString();
   ifstream file(path, ios::in | ios::binary);
 
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
-    String msg = "Failed to load header resource at path: " + path + ".";
+    const String msg = "Failed to load header resource at path: " + path + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return "";
@@ -26,7 +29,7 @@ BaseResource::softLoad(const Path& _path)
 
   file.close();
 
-  return m_id;
+  return true;
 }
 
 BaseHeader

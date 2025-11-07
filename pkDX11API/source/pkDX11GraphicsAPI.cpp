@@ -599,8 +599,8 @@ DX11GraphicsAPI::resizeSwapChain(const Vector2 _size)
   auto swapChain = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
 
   if (!device || !swapChain) {
-    String msg = "Failed to utilize the DX device or swap chain in \n"
-                 "the resizing of the swap chain.";
+    const String msg = "Failed to utilize the DX device or swap chain in \n"
+                       "the resizing of the swap chain.";
     g_Logger().print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
@@ -892,7 +892,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   // the release configuration of this program.
   dwShaderFlags |= D3DCOMPILE_DEBUG;
 #else
-  dwShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION; // temporarily for Release
+  dwShaderFlags |= D3DCOMPILE_ENABLE_STRICTNESS; // temporarily for Release (D3DCOMPILE_SKIP_OPTIMIZATION)
 #endif
   
   if (!FileSystem::fileExists(_szFileName)) {
@@ -912,6 +912,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   // to do: a single shaders can be compiled several times, as each pass has their own independent shader
   // and some may be shared. creating a shader manager might help mitigate this issue, perhaps by using a
   // UMap and using the shader directory, entry point and model as a key to access the shader itself whenever it's needed.
+
   hr = D3DCompileFromFile(widePath.c_str(),
                           nullptr,
                           &shaderInclude,
@@ -1635,7 +1636,8 @@ DX11GraphicsAPI::GenerateMips(SPtr<Texture>& _pTexture)
   Logger& log = g_Logger();
   auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!texture) {
-    String msg = "Failed to generate mips for texture: " + _pTexture->getName().getPath();
+    const String msg = "Failed to generate mips for texture: " +
+                       _pTexture->getName().getPath();
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
     return;
@@ -1751,7 +1753,7 @@ DX11GraphicsAPI::createTexture(uint32 _width,
 
   // create the texture
   int32 hr = 0;
-  hr = device->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
+  int32 hr = device->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
 
   // if texture creation failed
   if (FAILED(hr)) {

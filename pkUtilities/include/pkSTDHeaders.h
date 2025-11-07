@@ -56,19 +56,21 @@ using std::ios;
 
 using std::ofstream;
 
+using Exception = std::exception;
+
 template <class T>
 using Queue = std::queue<T>;
 
 template<class T>
 using SPtr = std::shared_ptr<T>;
 
-template<class T>
-using UPtr = std::unique_ptr<T>;
-
 template <class T>
 using Stack = std::stack<T>;
 
 using String = std::string;
+
+template<class T>
+using UPtr = std::unique_ptr<T>;
 
 // to do: change for linux too
 using WString = std::wstring;

@@ -247,154 +247,282 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               // get the textures
               SPtr<Texture> diffuse = meshMat->m_diffuse;
               SPtr<Texture> normal = meshMat->m_normal;
-              SPtr<Texture> occlusion = meshMat->m_occlusion;
+              SPtr<Texture> oclussion = meshMat->m_occlusion;
               SPtr<Texture> rough = meshMat->m_roughness;
               SPtr<Texture> metallic = meshMat->m_metallic;
               SPtr<Texture> emissive = meshMat->m_emissive;
 
-              // get the names of the texture and material
-              String difName = diffuse->getNameString() + "diff";
-              String norName = normal->getNameString() + "norm";
-              String occName = occlusion->getNameString() + "ao";
-              String roughName = rough->getNameString() + "rough";
-              String metName = metallic->getNameString() + "metal";
-              String emissName = emissive->getNameString() + "emissive";
+              /***************************************************************/
+              /*------------------------diffuse button-----------------------*/
+              /***************************************************************/
+              if (diffuse) {
+                String difName = diffuse->getNameString() + "diff";
+                if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
+                  // opened window to set diffuse texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setDiffuse(texture);
+                  }
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setDiffuse(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Diffuse Texture");
+                }
+                im.sameLine();
+                im.colorEdit("Color Multiply", matProps.ColorMultiply);
+              }
+              else {
+                if (im.createButton("##DiffuseButton")) {
 
-              // create the buttons
-              if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
-                // opened window to set diffuse texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setDiffuse(texture);
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setDiffuse(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Diffuse texture is null.");
                 }
               }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setDiffuse(texture);
-                }
-                im.endDragDropTarget();
-              }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Diffuse Texture");
-              }
-              im.sameLine();
-              im.colorEdit("Color Multiply", matProps.ColorMultiply);
-              // im.sameLine();
-              if (im.createButtonImage(norName.c_str(), normal, texSize)) {
-                // opened window to set normal texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setNormal(texture);
-                }
-              }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setNormal(texture);
-                }
-                im.endDragDropTarget();
-              }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Normal Texture");
-              }
-              // im.sameLine();
-              if (im.createButtonImage(occName.c_str(), occlusion, texSize)) {
-                // opened window to set occlusion texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
+              
+              /***************************************************************/
+              /*------------------------Normal button------------------------*/
+              /***************************************************************/
 
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setOcclusion(texture);
+              if (normal) {
+                String norName = normal->getNameString() + "norm";
+                if (im.createButtonImage(norName.c_str(), normal, texSize)) {
+                  // opened window to set normal texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setNormal(texture);
+                  }
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setNormal(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Normal Texture");
                 }
               }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setOcclusion(texture);
+              else {
+                if (im.createButton("##NormalButton")) {
+
                 }
-                im.endDragDropTarget();
-              }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Ambient Occlusion Texture");
-              }
-              // im.sameLine();
-              if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
-                // opened window to set rough texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setRoughness(texture);
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setNormal(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Normal texture is null.");
                 }
               }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setRoughness(texture);
+              
+              /***************************************************************/
+              /*----------------------oclussion button-----------------------*/
+              /***************************************************************/
+
+              if (oclussion) {
+                String occName = oclussion->getNameString() + "ao";
+                if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {
+                  // opened window to set occlusion texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setOcclusion(texture);
+                  }
                 }
-                im.endDragDropTarget();
-              }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Roughness Texture");
-              }
-              im.sameLine();
-              im.createDragF("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
-              // im.sameLine();
-              if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
-                // opened window to set metallic texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setMetallic(texture);
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setOcclusion(texture);
+                  }
+                  im.endDragDropTarget();
                 }
-              }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setMetallic(texture);
-                }
-                im.endDragDropTarget();
-              }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Metallic Texture");
-              }
-              im.sameLine();
-              im.createDragF("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
-              // im.sameLine();
-              if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
-                // opened window to set metallic texture
-                Path path(_window.openFileFromExplorer());
-                if (path.toString() != "") {
-                  // SPtr<Texture> texture = tm.loadTexture(path);
-                  // meshMat->setEmissive(texture);
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Ambient Occlusion Texture");
                 }
               }
-              if (im.beginDragDropTarget()) {
-                const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                if (id) {
-                  SPtr<Texture> texture = tm.loadTexture(id);
-                  meshMat->setEmissive(texture);
+              else {
+                if (im.createButton("##OclussionButton")) {
+
                 }
-                im.endDragDropTarget();
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setOcclusion(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Oclussion texture is null.");
+                }
               }
-              // hover tooltip.
-              if (im.isItemHovered()) {
-                im.setTooltip("Emissive Texture");
+              
+              /***************************************************************/
+              /*-----------------------roughness button----------------------*/
+              /***************************************************************/
+
+              if (rough) {
+                String roughName = rough->getNameString() + "rough";
+                if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
+                  // opened window to set rough texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setRoughness(texture);
+                  }
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setRoughness(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Roughness Texture");
+                }
+                im.sameLine();
+                im.createDragF("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
               }
-              im.sameLine();
-              im.colorEdit("Emissive Color", matProps.EmissiveMultiply);
+              else {
+                if (im.createButton("##RoughnessButton")) {
+
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setRoughness(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Roughness texture is null.");
+                }
+              }
+              
+              /***************************************************************/
+              /*-----------------------metallic button-----------------------*/
+              /***************************************************************/
+
+              if (metallic) {
+                String metName = metallic->getNameString() + "metal";
+                if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
+                  // opened window to set metallic texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setMetallic(texture);
+                  }
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setMetallic(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Metallic Texture");
+                }
+                im.sameLine();
+                im.createDragF("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
+              }
+              else {
+                if (im.createButton("##MetallicButton")) {
+
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setMetallic(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Metallic texture is null.");
+                }
+              }
+              
+              /***************************************************************/
+              /*-----------------------emissive button-----------------------*/
+              /***************************************************************/
+
+              if (emissive) {
+                String emissName = emissive->getNameString() + "emissive";
+                if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
+                  // opened window to set metallic texture
+                  Path path(_window.openFileFromExplorer());
+                  if (path.toString() != "") {
+                    // SPtr<Texture> texture = tm.loadTexture(path);
+                    // meshMat->setEmissive(texture);
+                  }
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setEmissive(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                // hover tooltip.
+                if (im.isItemHovered()) {
+                  im.setTooltip("Emissive Texture");
+                }
+                im.sameLine();
+                im.colorEdit("Emissive Color", matProps.EmissiveMultiply);
+              }
+              else {
+                if (im.createButton("##EmissiveButton")) {
+
+                }
+                if (im.beginDragDropTarget()) {
+                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  if (id) {
+                    SPtr<Texture> texture = tm.loadTexture(id);
+                    meshMat->setEmissive(texture);
+                  }
+                  im.endDragDropTarget();
+                }
+                if (im.isItemHovered()) {
+                  im.setTooltip("Warning!!! Emissive texture is null.");
+                }
+              }
             }
             else {
               im.pushID(i);

@@ -73,7 +73,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
   Logger& log = g_Logger();
   SPtr<Model> model = make_shared<Model>();
 
-  String modelPath = FileSystem::getAbsolutePath(_path).string();
+  const String modelPath = FileSystem::getAbsolutePath(_path).string();
   model->path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(),
@@ -81,7 +81,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
                                            aiProcess_RemoveRedundantMaterials |
                                            aiProcess_FlipUVs);
   if (!scene) {
-    String msg = "Assimp failed to load model at directory " + modelPath + ".";
+    const String msg = "Assimp failed to load model at directory " + modelPath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;

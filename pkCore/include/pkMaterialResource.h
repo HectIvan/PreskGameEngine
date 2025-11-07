@@ -34,7 +34,7 @@ struct MaterialAssetHeader
 class PK_CORE_EXPORT MaterialResource : public BaseResource
 {
  public:
-  MaterialResource() = default;
+  MaterialResource();
   virtual ~MaterialResource() = default;
 
   /**

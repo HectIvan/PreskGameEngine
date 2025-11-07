@@ -40,6 +40,13 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   void
   loadDefaultMatTextures();
 
+  /**
+   * @brief Create an empty texture.
+   * @return Pointer to the empty texture.
+   */
+  SPtr<Texture>
+  createEmptyTexture();
+
   // /**
   //  * @brief on shut down of the module.
   //  */

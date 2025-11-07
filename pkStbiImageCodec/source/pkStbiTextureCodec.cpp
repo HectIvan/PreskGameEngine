@@ -40,25 +40,29 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   Logger& log = g_Logger();
   bool canCreateResource = true;
 
-  String fileName = _path.getFileNameWithoutExtension();
-  String resourcePath = "resources/" + fileName + ".pkt";
+  const String fileName = _path.getFileNameWithoutExtension();
+  const String resourcePath = "resources/" + fileName + ".pkt";
+
+  if (!FileSystem::fileExists(_path)) {
+    return nullptr;
+  }
 
   ofstream file(resourcePath, ios::out | ios::binary);
 
   // if the file cannot be open/created, return a warning and a nullptr.
   if (!file.is_open()) {
     canCreateResource = false;
-    String msg = "Failed to generate resource for texture " + resourcePath + ".";
+    const String msg = "Failed to generate resource for texture " + resourcePath + ".";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
   }
 
   // load data using stbi.
   int32 width, height, bpp;
-  String extension = _path.getExtension();
   unsigned char* data;
   PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
+  const String extension = _path.getExtension();
   const String fullPath = FileSystem::getAbsolutePath(_path).string();
 
   // load float data for exr and hdr files.
@@ -75,8 +79,8 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
 
   // if stbi failed to load the texture data, return a warning and a nullptr.
   if (!data) {
-    String msg = "STBI failed to load texture " + resourcePath + "."
-                 + " Reason:" + stbi_failure_reason();
+    const String msg = "STBI failed to load texture " + resourcePath + "."
+                       + " Reason:" + stbi_failure_reason();
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
     return nullptr;
@@ -87,7 +91,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     bpp = 4;
   }
 
-  SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * bpp;
+  const SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * bpp;
 
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();

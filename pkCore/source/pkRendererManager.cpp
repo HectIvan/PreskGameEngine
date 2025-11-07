@@ -503,7 +503,7 @@ RendererManager::renderModel(const SPtr<Model>& _model)
                                          material->m_normal,
                                          material->m_height,
                                          material->m_metallic,
-                                         material->m_occlusion,
+                                         material->m_oclussion,
                                          material->m_roughness,
                                          material->m_emissive };
       api.pSSetShaderResourceViews(textures);

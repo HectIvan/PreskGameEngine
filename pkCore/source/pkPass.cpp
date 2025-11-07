@@ -130,7 +130,6 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
   }
   // if it doesnt exist, continue with the compilation and store the shader.
   m_pVShader->setData(_directory, _entry, _sModel);
-  g_Logger().print(_directory.toString());
   m_pVShader->compile();
   g_GraphicAPI().createVShader(m_pVShader);
 

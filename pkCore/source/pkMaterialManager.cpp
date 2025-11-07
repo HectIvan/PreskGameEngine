@@ -73,7 +73,7 @@ MaterialManager::loadMaterial(const String& _ID)
 
   material->m_diffuse = textureMan.loadTexture(diffId);
   material->m_normal = textureMan.loadTexture(normId);
-  material->m_occlusion = textureMan.loadTexture(aoId);
+  material->m_oclussion = textureMan.loadTexture(aoId);
   material->m_roughness = textureMan.loadTexture(roughId);
   material->m_metallic = textureMan.loadTexture(metalId);
   material->m_emissive = textureMan.loadTexture(emissId);

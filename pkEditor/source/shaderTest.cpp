@@ -525,7 +525,6 @@ ShaderTest::uInterfaceUpdate()
             }
             im.endDragDropTarget();
           }
-          
         }
       }
       if (im.isItemHovered()) {

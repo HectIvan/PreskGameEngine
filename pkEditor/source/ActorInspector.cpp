@@ -247,7 +247,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               // get the textures
               SPtr<Texture> diffuse = meshMat->m_diffuse;
               SPtr<Texture> normal = meshMat->m_normal;
-              SPtr<Texture> oclussion = meshMat->m_occlusion;
+              SPtr<Texture> oclussion = meshMat->m_oclussion;
               SPtr<Texture> rough = meshMat->m_roughness;
               SPtr<Texture> metallic = meshMat->m_metallic;
               SPtr<Texture> emissive = meshMat->m_emissive;
@@ -256,14 +256,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /*------------------------diffuse button-----------------------*/
               /***************************************************************/
               if (diffuse) {
-                String difName = diffuse->getNameString() + "diff";
+                const String difName = diffuse->getNameString() + "diff";
                 if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
                   // opened window to set diffuse texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setDiffuse(texture);
                   }
+                }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + difName;
+                  im.createText(dragText.c_str());
+                  const String textureID = diffuse->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
@@ -302,14 +310,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /***************************************************************/
 
               if (normal) {
-                String norName = normal->getNameString() + "norm";
+                const String norName = normal->getNameString() + "norm";
                 if (im.createButtonImage(norName.c_str(), normal, texSize)) {
                   // opened window to set normal texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setNormal(texture);
                   }
+                }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + norName;
+                  im.createText(dragText.c_str());
+                  const String textureID = normal->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
@@ -346,21 +362,29 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /***************************************************************/
 
               if (oclussion) {
-                String occName = oclussion->getNameString() + "ao";
+                const String occName = oclussion->getNameString() + "ao";
                 if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {
                   // opened window to set occlusion texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
 
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setOcclusion(texture);
                   }
                 }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + occName;
+                  im.createText(dragText.c_str());
+                  const String textureID = oclussion->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
+                }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setOcclusion(texture);
+                    meshMat->setOclussion(texture);
                   }
                   im.endDragDropTarget();
                 }
@@ -377,7 +401,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setOcclusion(texture);
+                    meshMat->setOclussion(texture);
                   }
                   im.endDragDropTarget();
                 }
@@ -391,14 +415,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /***************************************************************/
 
               if (rough) {
-                String roughName = rough->getNameString() + "rough";
+                const String roughName = rough->getNameString() + "rough";
                 if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
                   // opened window to set rough texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setRoughness(texture);
                   }
+                }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + roughName;
+                  im.createText(dragText.c_str());
+                  const String textureID = rough->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
@@ -437,14 +469,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /***************************************************************/
 
               if (metallic) {
-                String metName = metallic->getNameString() + "metal";
+                const String metName = metallic->getNameString() + "metal";
                 if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
                   // opened window to set metallic texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setMetallic(texture);
                   }
+                }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + metName;
+                  im.createText(dragText.c_str());
+                  const String textureID = metallic->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
@@ -483,14 +523,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               /***************************************************************/
 
               if (emissive) {
-                String emissName = emissive->getNameString() + "emissive";
+                const String emissName = emissive->getNameString() + "emissive";
                 if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
                   // opened window to set metallic texture
-                  Path path(_window.openFileFromExplorer());
+                  const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
                     // meshMat->setEmissive(texture);
                   }
+                }
+                if (im.beginDragDropSource()) {
+                  const String dragText = "Dragging " + emissName;
+                  im.createText(dragText.c_str());
+                  const String textureID = emissive->getID();
+                  const char* data = textureID.c_str();
+                  im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+                  im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));

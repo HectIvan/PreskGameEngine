@@ -1566,7 +1566,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
   resource->load();
 
   // create a default texture using the received parameters
-  SPtr<Texture> temptTexture = createTexture(resource->m_width,
+  SPtr<Texture> tempTexture = createTexture(resource->m_width,
                                              resource->m_height,
                                              resource->m_format,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
@@ -1575,7 +1575,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
                                              _mipLevels);
 
   // if creating the texture failed
-  if (!temptTexture) {
+  if (!tempTexture) {
     const String msg = "Failed to create a texture.";
     log.print(msg);
     log.registerMessage(msg, LOG_MSG_TYPE::kError);
@@ -1584,7 +1584,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
 
   // add data to the texture
   resource->m_bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(resource->m_format));
-  auto dxTex = reinterpret_pointer_cast<DX11Texture>(temptTexture);
+  auto dxTex = reinterpret_pointer_cast<DX11Texture>(tempTexture);
   device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(), // something says null here and i dont know what.
                                                  0,
                                                  nullptr,
@@ -1594,14 +1594,15 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
 
   bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
   if (generateMips) {
-    GenerateMips(temptTexture);
+    GenerateMips(tempTexture);
   }
 
   // set the path
-  temptTexture->setName(resource->m_name);
+  tempTexture->setName(resource->m_name);
+  tempTexture->setID(resource->m_id);
 
   // return the texture
-  return temptTexture;
+  return tempTexture;
 }
 
 SPtr<Texture>
@@ -1752,7 +1753,6 @@ DX11GraphicsAPI::createTexture(uint32 _width,
   desc.MiscFlags = generateMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
   // create the texture
-  int32 hr = 0;
   int32 hr = device->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
 
   // if texture creation failed

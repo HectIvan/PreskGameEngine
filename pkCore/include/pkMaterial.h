@@ -137,7 +137,7 @@ class Material : public Component
    * @param _pTexture New occlusion texture.
    */
   PKFORCEINLINE void
-  setOcclusion(const SPtr<Texture>& _pTexture) { m_occlusion = _pTexture; }
+  setOclussion(const SPtr<Texture>& _pTexture) { m_oclussion = _pTexture; }
 
   /**
    * @brief Set the roughness texture.
@@ -176,7 +176,7 @@ class Material : public Component
   SPtr<Texture> m_normal;
   SPtr<Texture> m_height;
   SPtr<Texture> m_metallic;
-  SPtr<Texture> m_occlusion;
+  SPtr<Texture> m_oclussion;
   SPtr<Texture> m_roughness;
   SPtr<Texture> m_emissive;
 };

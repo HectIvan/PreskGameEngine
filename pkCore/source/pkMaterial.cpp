@@ -14,7 +14,7 @@ Material::Material(const String _name)
 
   setDiffuse(tm.m_defaultDiff);
   setNormal(tm.m_defaultNormal);
-  setOcclusion(tm.m_defaultAO);
+  setOclussion(tm.m_defaultAO);
   setHeight(tm.m_defaultHeight);
   setMetallic(tm.m_defaultMetallic);
   setRoughness(tm.m_defaultRough);
@@ -32,7 +32,7 @@ Material::init()
 
   setDiffuse(tm.m_defaultDiff);
   setNormal(tm.m_defaultNormal);
-  setOcclusion(tm.m_defaultAO);
+  setOclussion(tm.m_defaultAO);
   setHeight(tm.m_defaultHeight);
   setMetallic(tm.m_defaultMetallic);
   setRoughness(tm.m_defaultRough);

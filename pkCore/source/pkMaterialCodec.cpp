@@ -61,8 +61,8 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   if (_pMaterial->m_normal) {
     matResource->m_normalID = _pMaterial->m_normal->getID();
   }
-  if (_pMaterial->m_occlusion) {
-    matResource->m_aoID = _pMaterial->m_occlusion->getID();
+  if (_pMaterial->m_oclussion) {
+    matResource->m_aoID = _pMaterial->m_oclussion->getID();
   }
   if (_pMaterial->m_roughness) {
     matResource->m_roughnessID = _pMaterial->m_roughness->getID();

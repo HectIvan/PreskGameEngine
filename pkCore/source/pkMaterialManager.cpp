@@ -62,7 +62,7 @@ MaterialManager::loadMaterial(const String& _ID)
 
   material = make_shared<Material>();
 
-  const String diffId = matResource->m_diffuseID;
+  const String diffId = matResource->m_albedoID;
   const String normId = matResource->m_normalID;
   const String aoId = matResource->m_aoID;
   const String roughId = matResource->m_roughnessID;
@@ -71,14 +71,14 @@ MaterialManager::loadMaterial(const String& _ID)
 
   material->setName(resource->m_name);
 
-  material->m_diffuse = textureMan.loadTexture(diffId);
+  material->m_albedo = textureMan.loadTexture(diffId);
   material->m_normal = textureMan.loadTexture(normId);
   material->m_oclussion = textureMan.loadTexture(aoId);
   material->m_roughness = textureMan.loadTexture(roughId);
   material->m_metallic = textureMan.loadTexture(metalId);
   material->m_emissive = textureMan.loadTexture(emissId);
 
-  material->m_properties.ColorMultiply = matResource->m_diffuseColor.rgb();
+  material->m_properties.ColorMultiply = matResource->m_albedoColor.rgb();
   material->m_properties.roughnessMultiply = matResource->m_roughValue;
   material->m_properties.metallicMultiply = matResource->m_metallicValue;
   material->m_properties.EmissiveMultiply = matResource->m_emissiveColor.rgb();

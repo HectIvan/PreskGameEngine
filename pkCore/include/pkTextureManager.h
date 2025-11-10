@@ -94,7 +94,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
 
   // to do: allow for the texture to be generated if not found.
   // default textures
-  SPtr<Texture> m_defaultDiff;
+  SPtr<Texture> m_defaultAlb;
   SPtr<Texture> m_defaultNormal;
   SPtr<Texture> m_defaultAO;
   SPtr<Texture> m_defaultRough;
@@ -102,7 +102,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   SPtr<Texture> m_defaultHeight;
   SPtr<Texture> m_defaultEmissive;
 
-  String m_diffID;
+  String m_albID;
   String m_normalID;
   String m_AOID;
   String m_roughID;

@@ -277,17 +277,17 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     Path filePath;
     
     /**
-     * Diffuse load.
+     * Albedo load.
      */
     const uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     if (diffCount < 1) {
-      log.registerMessage("Could not find diffuse texture of material " + matName + ".",
+      log.registerMessage("Could not find albedo texture of material " + matName + ".",
         LOG_MSG_TYPE::kWarning);
     }
-    // if there are diffuse textures.
+    // if there are albedo textures.
     for (uint32 i = 0; i < diffCount; ++i) {
       aiString path;
-      // diffuse texture loading.
+      // albedo texture loading.
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
         Path newPath(path.C_Str());
@@ -295,14 +295,14 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         // if a texture was loaded.
         if (texture) {
           // log registry.
-          log.registerMessage("Loaded diffuse texture " + newPath.getFileName() +
+          log.registerMessage("Loaded albedo texture " + newPath.getFileName() +
                               " in material " + matName + ".");
-          meshProcess->material->setDiffuse(texture);
+          meshProcess->material->setAlbedo(texture);
         }
       }
-      else { // register that a diffuse texture was not found.
+      else { // register that a albedo texture was not found.
         filePath = Path(path.C_Str()).getFileName();
-        log.registerMessage("Failed to load diffuse texture" + filePath.toString() +
+        log.registerMessage("Failed to load albedo texture" + filePath.toString() +
           " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
       }
     }

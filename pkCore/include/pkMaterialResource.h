@@ -23,7 +23,7 @@ namespace pkEngineSDK
 
 struct MaterialAssetHeader
 {
-  SIZE_T diffuseIDSize;
+  SIZE_T albedoIDSize;
   SIZE_T normalIDSize;
   SIZE_T aoIDSize;
   SIZE_T roughnessIDSize;
@@ -51,8 +51,8 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   getType() const override { return RESOURCE_TYPE::kMaterial; }
 
  public:
-   String m_diffuseID;
-   Color m_diffuseColor;
+   String m_albedoID;
+   Color m_albedoColor;
    String m_normalID;
    String m_aoID;
    String m_roughnessID;

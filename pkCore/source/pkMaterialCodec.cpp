@@ -51,10 +51,10 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   matResource->m_resourcePath = filePath;
 
   // check for each texture and see if they are valid to use.
-  if (_pMaterial->m_diffuse) {
-    matResource->m_diffuseID = _pMaterial->m_diffuse->getID();
+  if (_pMaterial->m_albedo) {
+    matResource->m_albedoID = _pMaterial->m_albedo->getID();
     Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
-    matResource->m_diffuseColor = Color(static_cast<uint8>(diffColor.x),
+    matResource->m_albedoColor = Color(static_cast<uint8>(diffColor.x),
                                         static_cast<uint8>(diffColor.y),
                                         static_cast<uint8>(diffColor.z));
   }
@@ -82,11 +82,11 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 
   matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
 
-  // diffuse write
-  SIZE_T diffLength = matResource->m_diffuseID.length();
+  // albedo write
+  SIZE_T diffLength = matResource->m_albedoID.length();
   file.write(reinterpret_cast<const char*>(&diffLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_diffuseID.c_str()), diffLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_diffuseColor), sizeof(Color));
+  file.write(reinterpret_cast<const char*>(matResource->m_albedoID.c_str()), diffLength);
+  file.write(reinterpret_cast<const char*>(&matResource->m_albedoColor), sizeof(Color));
   // normal write
   SIZE_T normalLength = matResource->m_normalID.length();
   file.write(reinterpret_cast<const char*>(&normalLength), sizeof(SIZE_T));

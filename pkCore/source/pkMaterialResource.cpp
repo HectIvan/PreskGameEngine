@@ -25,8 +25,8 @@ MaterialResource::MaterialResource()
 {
   const String noID = UUID::PK_DEFAULT_UUID;
   m_isLoaded = false;
-  m_diffuseID = noID;
-  m_diffuseColor = Color::WHITE;
+  m_albedoID = noID;
+  m_albedoColor = Color::WHITE;
   m_normalID = noID;
   m_aoID = noID;
   m_roughnessID = noID;
@@ -60,11 +60,11 @@ MaterialResource::load()
   loadBaseHeader(file);
   MaterialAssetHeader matHeader;
 
-  // read diffuse data
-  file.read(reinterpret_cast<char*>(&matHeader.diffuseIDSize), sizeof(SIZE_T));
-  m_diffuseID.resize(matHeader.diffuseIDSize);
-  file.read(reinterpret_cast<char*>(&m_diffuseID[0]), matHeader.diffuseIDSize);
-  file.read(reinterpret_cast<char*>(&m_diffuseColor), sizeof(Color));
+  // read albedo data
+  file.read(reinterpret_cast<char*>(&matHeader.albedoIDSize), sizeof(SIZE_T));
+  m_albedoID.resize(matHeader.albedoIDSize);
+  file.read(reinterpret_cast<char*>(&m_albedoID[0]), matHeader.albedoIDSize);
+  file.read(reinterpret_cast<char*>(&m_albedoColor), sizeof(Color));
 
   // read normal data
   file.read(reinterpret_cast<char*>(&matHeader.normalIDSize), sizeof(SIZE_T));

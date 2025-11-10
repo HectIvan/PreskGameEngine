@@ -29,7 +29,7 @@ struct MaterialProps
 {
   // union {
   //   struct {
-  //     uint32 m_hasDiffuse : 1;
+  //     uint32 m_hasAlbedo : 1;
   //     uint32 m_hasSpecular : 1;
   //     uint32 m_hasNormal : 1;
   //     uint32 m_opaque : 1;
@@ -51,7 +51,7 @@ struct MaterialProps
 };
 
 // check the bit in question in hex
-// bool hasDiffuse(uint32 _props) {
+// bool hasAlbedo(uint32 _props) {
 //   return (_props & 0x1) != 0;
 // }
 
@@ -105,11 +105,11 @@ class Material : public Component
   setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
 
   /**
-   * @brief Set the diffuse texture.
-   * @param _pTexture New diffuse texture.
+   * @brief Set the albedo texture.
+   * @param _pTexture New albedo texture.
    */
   PKFORCEINLINE void
-  setDiffuse(const SPtr<Texture>& _pTexture) { m_diffuse = _pTexture; }
+  setAlbedo(const SPtr<Texture>& _pTexture) { m_albedo = _pTexture; }
 
   /**
    * @brief Set the normal texture.
@@ -172,7 +172,7 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   MaterialProps m_properties;
-  SPtr<Texture> m_diffuse;
+  SPtr<Texture> m_albedo;
   SPtr<Texture> m_normal;
   SPtr<Texture> m_height;
   SPtr<Texture> m_metallic;

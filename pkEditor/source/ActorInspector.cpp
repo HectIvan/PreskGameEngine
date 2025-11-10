@@ -72,16 +72,16 @@ buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window
   UInterface& im = g_uInterface();
   // create the buttons
   if (im.createButtonImage(_name.c_str(), _pTexture)) {
-    // opened window to set diffuse texture
+    // opened window to set albedo texture
     Path path(_window.openFileFromExplorer());
     if (path.toString() != "") {
       SPtr<Texture> texture = tm.loadTexture(path);
-      meshMat->setDiffuse(texture);
+      meshMat->setAlbedo(texture);
     }
   }
   // hover tooltip.
   if (im.isItemHovered()) {
-    im.setTooltip("Diffuse Texture");
+    im.setTooltip("Albedo Texture");
   }
 }*/
 
@@ -252,7 +252,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               MaterialProps& matProps = meshMat->m_properties;
               String matName = meshMat->getNameS();
               // get the textures
-              SPtr<Texture> diffuse = meshMat->m_diffuse;
+              SPtr<Texture> albedo = meshMat->m_albedo;
               SPtr<Texture> normal = meshMat->m_normal;
               SPtr<Texture> oclussion = meshMat->m_oclussion;
               SPtr<Texture> rough = meshMat->m_roughness;
@@ -260,22 +260,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               SPtr<Texture> emissive = meshMat->m_emissive;
 
               /***************************************************************/
-              /*------------------------diffuse button-----------------------*/
+              /*------------------------albedo button-----------------------*/
               /***************************************************************/
-              if (diffuse) {
-                const String difName = diffuse->getNameString() + "diff";
-                if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
-                  // opened window to set diffuse texture
+              if (albedo) {
+                const String albName = albedo->getNameString() + "diff";
+                if (im.createButtonImage(albName.c_str(), albedo, texSize)) {
+                  // opened window to set albedo texture
                   const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setDiffuse(texture);
+                    // meshMat->setAlbedo(texture);
                   }
                 }
                 if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + difName;
+                  const String dragText = "Dragging " + albName;
                   im.createText(dragText.c_str());
-                  const String textureID = diffuse->getID();
+                  const String textureID = albedo->getID();
                   const char* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
@@ -284,31 +284,31 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setDiffuse(texture);
+                    meshMat->setAlbedo(texture);
                   }
                   im.endDragDropTarget();
                 }
                 // hover tooltip.
                 if (im.isItemHovered()) {
-                  im.setTooltip("Diffuse Texture");
+                  im.setTooltip("Albedo Texture");
                 }
                 im.sameLine();
                 im.colorEdit("Color Multiply", matProps.ColorMultiply);
               }
               else {
-                if (im.createButton("##DiffuseButton")) {
+                if (im.createButton("##AlbedoButton")) {
 
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setDiffuse(texture);
+                    meshMat->setAlbedo(texture);
                   }
                   im.endDragDropTarget();
                 }
                 if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Diffuse texture is null.");
+                  im.setTooltip("Warning!!! Albedo texture is null.");
                 }
               }
               

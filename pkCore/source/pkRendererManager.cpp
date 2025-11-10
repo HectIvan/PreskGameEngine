@@ -499,7 +499,7 @@ RendererManager::renderModel(const SPtr<Model>& _model)
     if (mesh->getActive()) {
       SPtr<Material> material = mesh->material;
       // set the material textures to the shader
-      Vector<SPtr<Texture>> textures = { material->m_diffuse,
+      Vector<SPtr<Texture>> textures = { material->m_albedo,
                                          material->m_normal,
                                          material->m_height,
                                          material->m_metallic,

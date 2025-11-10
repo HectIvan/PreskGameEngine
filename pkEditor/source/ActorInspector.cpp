@@ -23,6 +23,7 @@
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkModelCodec.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -34,6 +35,8 @@ using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::g_GPUResourceManager;
+using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
@@ -43,6 +46,7 @@ using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
+using pkEngineSDK::ModelCodec;
 using pkEngineSDK::Path;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
@@ -55,8 +59,6 @@ using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
-
-using pkEngineSDK::g_Logger;
 
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
@@ -121,6 +123,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   UInterface& im = g_uInterface();
   TextureManager& tm = g_TextureManager();
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
+  ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   switch (_pComponent->getType()) 
@@ -198,8 +201,13 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
     if (im.collapsingHeader("Model")) {
       // Component activity
       im.createCheckBox("Active ", _pComponent->isActive());
-      // model section
+      im.sameLine();
       SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
+      if (im.createButton("Save")) {
+        Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
+        modelCod.createResourceFromModel(model, resourcePath);
+      }
+      // model section
       Vector<SPtr<Mesh>> meshes = model->getMeshes();
       // display total model vertex count.
       uint32 modelDataCount = static_cast<uint32>(model->vertex.size());
@@ -222,7 +230,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
         // if there is no search filter
         if (name.find(_searchMesh.c_str()) != String::npos) {
           if (im.collapsingHeader(name.c_str())) {
-
             // Mesh geometry data
             im.createText("Vertex Count: ");
             im.sameLine();

@@ -24,7 +24,7 @@ namespace pkEngineSDK
 MaterialResource::MaterialResource()
 {
   const String noID = UUID::PK_DEFAULT_UUID;
-
+  m_isLoaded = false;
   m_diffuseID = noID;
   m_diffuseColor = Color::WHITE;
   m_normalID = noID;

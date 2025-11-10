@@ -270,8 +270,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   meshProcess->material = rm.m_defaultMaterial;
   if (_mesh->mMaterialIndex >= 0) {
     // material data
-    aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
-    String matName = materialA->GetName().C_Str();
+    const aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
+    const String matName = materialA->GetName().C_Str();
     meshProcess->material = rm.newMaterial(matName);
     // material 
     Path filePath;
@@ -279,7 +279,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * Diffuse load.
      */
-    uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
+    const uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     if (diffCount < 1) {
       log.registerMessage("Could not find diffuse texture of material " + matName + ".",
         LOG_MSG_TYPE::kWarning);
@@ -310,7 +310,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * Normal load.
      */
-    uint32 normCount = materialA->GetTextureCount(aiTextureType_HEIGHT);
+    const uint32 normCount = materialA->GetTextureCount(aiTextureType_HEIGHT);
     for (uint32 i = 0; i < normCount; ++i) {
       aiString path;
       // normal texture loading.
@@ -336,7 +336,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * AO load.
      */
-    uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT);
+    const uint32 aoCount = materialA->GetTextureCount(aiTextureType_AMBIENT);
     for (uint32 i = 0; i < aoCount; ++i) {
       aiString path;
       // ambient occlusion texture loading.
@@ -363,7 +363,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * Metallic load.
      */
-    uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
+    const uint32 metallicCount = materialA->GetTextureCount(aiTextureType_METALNESS);
     for (uint32 i = 0; i < metallicCount; ++i) {
       aiString path;
       // metallic texture loading.
@@ -389,7 +389,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * Roughness load.
      */
-    uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_REFLECTION);
+    const uint32 roughnessCount = materialA->GetTextureCount(aiTextureType_REFLECTION);
     for (uint32 i = 0; i < roughnessCount; ++i) {
       aiString path;
       // roughness texture loading.
@@ -415,7 +415,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     /**
      * Emissive load.
      */
-    uint32 emissiveCount = materialA->GetTextureCount(aiTextureType_EMISSIVE);
+    const uint32 emissiveCount = materialA->GetTextureCount(aiTextureType_EMISSIVE);
     for (uint32 i = 0; i < emissiveCount; ++i) {
       aiString path;
       // emissive texture loading.

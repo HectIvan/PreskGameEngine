@@ -438,10 +438,24 @@ class UInterface : public Module<UInterface>
    */
   bool
   createButton(String _name,
-               Color _normal = Color(0,0,0,0),
-               Color _hover = Color(0,0,0,0),
-               Color _active = Color(0,0,0,0),
+               Color _normal = Color::BLACK,
+               Color _hover = Color::BLACK,
+               Color _active = Color::BLACK,
                bool _newcolor = false);
+
+  /**
+   * @brief Get the position of the last created item.
+   * @return Position of the item.
+   */
+  Vector2
+  getItemPosition();
+
+  /**
+   * @brief Get the size of the last created item.
+   * @return Size of the item.
+   */
+  Vector2
+  getItemSize();
 
   /**
    * @brief Start the creation of a dropdown combo.

@@ -9,6 +9,7 @@
 #include <codecvt>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <optional>
@@ -56,7 +57,13 @@ using std::ios;
 
 using std::ofstream;
 
+using std::cout;
+
+using std::endl;
+
 using Exception = std::exception;
+
+using Runtime_error = std::runtime_error;
 
 template <class T>
 using Queue = std::queue<T>;

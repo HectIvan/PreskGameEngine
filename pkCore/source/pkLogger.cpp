@@ -14,18 +14,23 @@
 * Includes
 **/
 /*********************************************/
-#include <iostream>
-
+#include "pkPrerequisitesCore.h"
 #include "pkLogger.h"
-
-using std::cout;
-using std::endl;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
 
 namespace pkEngineSDK
 {
+
+void
+Logger::init(const bool _printLog, const bool _printWarning, const bool _printError)
+{
+  m_printLog = _printLog;
+  m_printWarnings = _printWarning;
+  m_printErrors = _printError;
+}
+
 String
 Logger::getMessageError(int32 _hr)
 {
@@ -119,10 +124,49 @@ Logger::toString(const Vector3 _vec)
 }
 
 void
-Logger::registerMessage(String _msg, LOG_MSG_TYPE::E _type)
+Logger::throwError(const String _errorMSG)
 {
-  LogMSG message(_msg, _type);
+  throw Runtime_error(_errorMSG);
+}
+
+void
+Logger::registerMessage(const String& _msg,
+                        const ANSICHAR* _file,
+                        const uint32 _line,
+                        const LOG_MSG_TYPE::E _type)
+{
+  // register the message.
+  LogMSG message(_msg, _file, _line, _type);
   m_messages.emplace_back(message);
+
+  // check if the message should be print in the console.
+  if (m_printLog && _type == LOG_MSG_TYPE::kLog) {
+    printMessage(message);
+  }
+  if (m_printWarnings && _type == LOG_MSG_TYPE::kWarning) {
+    printMessage(message);
+  }
+  if (m_printErrors && _type == LOG_MSG_TYPE::kError) {
+    printMessage(message);
+  }
+}
+
+void
+Logger::printMessage(const LogMSG& _msg)
+{
+  String message = getStringFromLog(_msg);
+  print(message);
+}
+
+String
+Logger::getStringFromLog(const LogMSG& _msg)
+{
+  return String("[" + String(_msg.file) +
+                " : " +
+                to_string(_msg.line) +
+                "]" +
+                " " +
+                _msg.message);
 }
 
 Vector<LogMSG>
@@ -142,7 +186,7 @@ Logger::printMessageLogOfType(const LOG_MSG_TYPE::E _type)
 {
   Vector<LogMSG> messages = getMessageLogOfType(_type);
   for (uint32 i = 0; i < messages.size(); ++i) {
-    print(messages[i].message);
+    printMessage(messages[i]);
   }
 }
 

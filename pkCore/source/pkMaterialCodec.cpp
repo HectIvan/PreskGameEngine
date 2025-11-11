@@ -39,8 +39,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 
   if (!file.is_open()) {
     const String msg = "Failed to create material resource " + materialName + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 

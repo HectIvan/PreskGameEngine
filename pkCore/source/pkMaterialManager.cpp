@@ -44,8 +44,7 @@ MaterialManager::loadMaterial(const String& _ID)
   SPtr<BaseResource> resource = assetMan.getResource(_ID);
   if (!resource) {
     const String msg = "Resource not found. ID: " + _ID + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
   if (!resource->m_isLoaded) {
@@ -55,8 +54,7 @@ MaterialManager::loadMaterial(const String& _ID)
   SPtr<MaterialResource> matResource = reinterpret_pointer_cast<MaterialResource>(resource);
   if (!matResource) {
     const String msg = "Resource is not  amaterial resource: " + _ID + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 

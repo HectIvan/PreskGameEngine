@@ -17,8 +17,7 @@ TextureResource::load()
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
     const String msg = "Failed to load a texture resource at directory " + m_resourcePath + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return;
   }
 

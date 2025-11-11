@@ -323,6 +323,9 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate(m_loggerWin.name);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
+  Vector2 logWinPos = im.getItemPosition();
+  Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
+
   // -------------------------- //
   im.sameLine();
   // -------------------------- //
@@ -378,7 +381,11 @@ ShaderTest::uInterfaceUpdate()
           if (im.isItemHovered()) {
             im.setTooltip(assetName.c_str());
           }
-          im.sameLine();
+          Vector2 itemPos = im.getItemPosition();
+          Vector2 itemSize = im.getItemSize();
+          if (itemPos.x + itemSize.x < logWinSize.x) {
+            im.sameLine();
+          }
         }
       }
     }
@@ -605,10 +612,12 @@ void
 ShaderTest::showLogType(bool& _active, uint32 _type)
 {
   UInterface& im = g_uInterface();
+  Logger& log = g_Logger();
   if (_active) {
     Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
     for (uint32 i = 0; i < messages.size(); ++i) {
-      im.createText(messages[i].message.c_str());
+      const String msg = log.getStringFromLog(messages[i]);
+      im.createText(msg.c_str());
     }
   }
 }

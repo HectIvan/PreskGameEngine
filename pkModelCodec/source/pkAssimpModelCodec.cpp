@@ -82,8 +82,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
                                            aiProcess_FlipUVs);
   if (!scene) {
     const String msg = "Assimp failed to load model at directory " + modelPath + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
@@ -204,7 +203,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   SPtr<Mesh> meshProcess = rm.searchMesh(meshName);
   // if a mesh can be found
   if (meshProcess) {
-    log.registerMessage("Found pre-loaded mesh of name " + meshName + ".");
+    log.registerMessage("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__);
     return meshProcess;
   }
 
@@ -282,7 +281,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     const uint32 diffCount = materialA->GetTextureCount(aiTextureType_DIFFUSE);
     if (diffCount < 1) {
       log.registerMessage("Could not find albedo texture of material " + matName + ".",
-        LOG_MSG_TYPE::kWarning);
+                          __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     }
     // if there are albedo textures.
     for (uint32 i = 0; i < diffCount; ++i) {
@@ -296,14 +295,19 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded albedo texture " + newPath.getFileName() +
-                              " in material " + matName + ".");
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__);
           meshProcess->material->setAlbedo(texture);
         }
       }
       else { // register that a albedo texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load albedo texture" + filePath.toString() +
-          " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".",
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
 
@@ -322,14 +326,19 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded normal texture " + newPath.getFileName() +
-                              " in material " + matName + ".");
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__);
           meshProcess->material->setNormal(texture);
         }
       }
       else { // register that a normal texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load normal texture" + filePath.toString() +
-          " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".",
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
 
@@ -348,7 +357,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded ambient occlussion texture " + newPath.getFileName() +
-            " in material " + matName + ".");
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__);
           meshProcess->material->setOclussion(texture);
         }
       }
@@ -356,7 +367,9 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load ambient occlussion texture" + filePath.toString() +
                             " in material " + matName + ".",
-          LOG_MSG_TYPE::kWarning);
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
 
@@ -375,14 +388,19 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded metallic texture " + newPath.getFileName() +
-                              " in material " + matName + ".");
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__);
           meshProcess->material->setMetallic(texture);
         }
       }
       else { // register that a metallic texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load metallic texture" + filePath.toString() +
-          " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".",
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
 
@@ -401,14 +419,20 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
-                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__,
+                              LOG_MSG_TYPE::kWarning);
           meshProcess->material->setRoughness(texture);
         }
       }
       else { // register that a roughness texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load roughness texture" + filePath.toString() +
-          " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".",
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
 
@@ -427,21 +451,29 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
         if (texture) {
           // log registry.
           log.registerMessage("Loaded roughness texture " + newPath.getFileName() +
-                              " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                              " in material " + matName + ".",
+                              __FILE__,
+                              __LINE__,
+                              LOG_MSG_TYPE::kWarning);
           meshProcess->material->setEmissive(texture);
         }
       }
       else { // register that an emissive texture was not found.
         filePath = Path(path.C_Str()).getFileName();
         log.registerMessage("Failed to load emissive texture" + filePath.toString() +
-                            " in material " + matName + ".", LOG_MSG_TYPE::kWarning);
+                            " in material " + matName + ".",
+                            __FILE__,
+                            __LINE__,
+                            LOG_MSG_TYPE::kWarning);
       }
     }
     // materialA->GetTexture(aiTextureType_DIFFUSE);
     // materialA->Get(AI_MATKEY_COLOR_DIFFUSE, )
     // loadMaterialTextures(meshProcess, _scene->mMaterials[_mesh->mMaterialIndex], _scene);
   }
-  log.registerMessage("Loaded mesh of name " + String(_mesh->mName.C_Str()) + ".");
+  log.registerMessage("Loaded mesh of name " + String(_mesh->mName.C_Str()) + ".",
+                      __FILE__,
+                      __LINE__);
   return meshProcess;
 }
 

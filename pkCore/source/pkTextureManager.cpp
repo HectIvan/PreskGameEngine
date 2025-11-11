@@ -82,8 +82,7 @@ TextureManager::loadTexture(const String& _ID)
   SPtr<BaseResource> resource = g_AssetResourceManager().getResource(_ID);
   if (!resource) {
     const String msg = "Failed to find a resource with the ID: " + _ID + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
   if (!resource->m_isLoaded) {

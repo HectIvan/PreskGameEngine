@@ -53,8 +53,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   if (!file.is_open()) {
     canCreateResource = false;
     const String msg = "Failed to generate resource for texture " + resourcePath + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
   }
 
   // load data using stbi.
@@ -81,8 +80,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   if (!data) {
     const String msg = "STBI failed to load texture " + resourcePath + "."
                        + " Reason:" + stbi_failure_reason();
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 

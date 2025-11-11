@@ -255,8 +255,8 @@ Actor::addComponent(SPtr<Component> _pComponent)
   if (_pComponent) {
     m_components.push_back(_pComponent);
     // log registry.
-    String message = "Inserted Actor component: " + String(_pComponent->getName());
-    g_Logger().registerMessage(message);
+    String msg = "Inserted Actor component: " + String(_pComponent->getName());
+    g_Logger().registerMessage(msg, __FILE__, __LINE__);
   }
 }
 }

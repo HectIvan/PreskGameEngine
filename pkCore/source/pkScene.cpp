@@ -82,7 +82,7 @@ Scene::instantiate(String _name,
   else { insertActor(actor, m_actors); }
   // log registry.
   String message = "Instantiated actor of name: " + _name;
-  g_Logger().registerMessage(message);
+  g_Logger().registerMessage(message, __FILE__, __LINE__);
   // return the actor created.
   return actor;
   

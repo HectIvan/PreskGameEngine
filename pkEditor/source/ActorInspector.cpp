@@ -23,6 +23,7 @@
 #include "pkUInterface.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkModelCodec.h"
 
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -34,6 +35,8 @@ using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::g_GPUResourceManager;
+using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
@@ -43,6 +46,7 @@ using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
 using pkEngineSDK::Mesh;
 using pkEngineSDK::Model;
+using pkEngineSDK::ModelCodec;
 using pkEngineSDK::Path;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
@@ -56,8 +60,6 @@ using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
 
-using pkEngineSDK::g_Logger;
-
 ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
   m_actor = _pActor;
@@ -70,16 +72,16 @@ buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window
   UInterface& im = g_uInterface();
   // create the buttons
   if (im.createButtonImage(_name.c_str(), _pTexture)) {
-    // opened window to set diffuse texture
+    // opened window to set albedo texture
     Path path(_window.openFileFromExplorer());
     if (path.toString() != "") {
       SPtr<Texture> texture = tm.loadTexture(path);
-      meshMat->setDiffuse(texture);
+      meshMat->setAlbedo(texture);
     }
   }
   // hover tooltip.
   if (im.isItemHovered()) {
-    im.setTooltip("Diffuse Texture");
+    im.setTooltip("Albedo Texture");
   }
 }*/
 
@@ -121,6 +123,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   UInterface& im = g_uInterface();
   TextureManager& tm = g_TextureManager();
   GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
+  ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   switch (_pComponent->getType()) 
@@ -198,8 +201,13 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
     if (im.collapsingHeader("Model")) {
       // Component activity
       im.createCheckBox("Active ", _pComponent->isActive());
-      // model section
+      im.sameLine();
       SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
+      if (im.createButton("Save")) {
+        Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
+        modelCod.createResourceFromModel(model, resourcePath);
+      }
+      // model section
       Vector<SPtr<Mesh>> meshes = model->getMeshes();
       // display total model vertex count.
       uint32 modelDataCount = static_cast<uint32>(model->vertex.size());
@@ -222,7 +230,6 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
         // if there is no search filter
         if (name.find(_searchMesh.c_str()) != String::npos) {
           if (im.collapsingHeader(name.c_str())) {
-
             // Mesh geometry data
             im.createText("Vertex Count: ");
             im.sameLine();
@@ -245,7 +252,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               MaterialProps& matProps = meshMat->m_properties;
               String matName = meshMat->getNameS();
               // get the textures
-              SPtr<Texture> diffuse = meshMat->m_diffuse;
+              SPtr<Texture> albedo = meshMat->m_albedo;
               SPtr<Texture> normal = meshMat->m_normal;
               SPtr<Texture> oclussion = meshMat->m_oclussion;
               SPtr<Texture> rough = meshMat->m_roughness;
@@ -253,22 +260,22 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
               SPtr<Texture> emissive = meshMat->m_emissive;
 
               /***************************************************************/
-              /*------------------------diffuse button-----------------------*/
+              /*------------------------albedo button-----------------------*/
               /***************************************************************/
-              if (diffuse) {
-                const String difName = diffuse->getNameString() + "diff";
-                if (im.createButtonImage(difName.c_str(), diffuse, texSize)) {
-                  // opened window to set diffuse texture
+              if (albedo) {
+                const String albName = albedo->getNameString() + "diff";
+                if (im.createButtonImage(albName.c_str(), albedo, texSize)) {
+                  // opened window to set albedo texture
                   const Path path(_window.openFileFromExplorer());
                   if (path.toString() != "") {
                     // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setDiffuse(texture);
+                    // meshMat->setAlbedo(texture);
                   }
                 }
                 if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + difName;
+                  const String dragText = "Dragging " + albName;
                   im.createText(dragText.c_str());
-                  const String textureID = diffuse->getID();
+                  const String textureID = albedo->getID();
                   const char* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
@@ -277,31 +284,31 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setDiffuse(texture);
+                    meshMat->setAlbedo(texture);
                   }
                   im.endDragDropTarget();
                 }
                 // hover tooltip.
                 if (im.isItemHovered()) {
-                  im.setTooltip("Diffuse Texture");
+                  im.setTooltip("Albedo Texture");
                 }
                 im.sameLine();
                 im.colorEdit("Color Multiply", matProps.ColorMultiply);
               }
               else {
-                if (im.createButton("##DiffuseButton")) {
+                if (im.createButton("##AlbedoButton")) {
 
                 }
                 if (im.beginDragDropTarget()) {
                   const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
-                    meshMat->setDiffuse(texture);
+                    meshMat->setAlbedo(texture);
                   }
                   im.endDragDropTarget();
                 }
                 if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Diffuse texture is null.");
+                  im.setTooltip("Warning!!! Albedo texture is null.");
                 }
               }
               

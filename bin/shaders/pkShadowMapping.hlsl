@@ -226,6 +226,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float3 F = Fresnel(F0, VoH);
 
   // Diffuse energy weight
+  float3 kS = F;
   float3 kD = (1.0f - F) * (1.0f - metallic);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
@@ -238,7 +239,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float3 specular = (specCookTorrance) * SpecIntensity * ao;
   
   output.diffuseBRDF = float4(diffuseBRDF * kD, alpha);
-  output.specularBRDF = float4(specular, alpha);
+  output.specularBRDF = float4(specular * kS, alpha);
   
   /**
    * shadow mapping;

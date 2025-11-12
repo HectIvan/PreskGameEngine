@@ -34,7 +34,7 @@ TextureManager::init()
     }
   }
 
-  m_diffID = ids[0];
+  m_albID = ids[0];
   m_normalID = ids[1];
   m_AOID = ids[2];
   m_roughID = ids[3];
@@ -47,7 +47,7 @@ TextureManager::init()
 void
 TextureManager::loadDefaultMatTextures()
 {
-  m_defaultDiff = loadTexture(m_diffID);
+  m_defaultAlb = loadTexture(m_albID);
   m_defaultNormal = loadTexture(m_normalID);
   m_defaultAO = loadTexture(m_AOID);
   m_defaultMetallic = loadTexture(m_metallicID);
@@ -82,8 +82,7 @@ TextureManager::loadTexture(const String& _ID)
   SPtr<BaseResource> resource = g_AssetResourceManager().getResource(_ID);
   if (!resource) {
     const String msg = "Failed to find a resource with the ID: " + _ID + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
   if (!resource->m_isLoaded) {

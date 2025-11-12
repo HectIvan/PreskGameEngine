@@ -40,8 +40,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   // strerror_s(error, sizeof(error), errno); // last error of io.
   if (!file.is_open()) {
     const String msg = "Failed to save model at path " + filePath + ".";
-    log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 

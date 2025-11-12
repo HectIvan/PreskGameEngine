@@ -20,7 +20,7 @@ SceneManager::init()
   clear();
   createScene("Base scene");
   setActive(0);
-  g_Logger().registerMessage("Initialized Scene Manager.");
+  g_Logger().registerMessage("Initialized Scene Manager.", __FILE__, __LINE__);
 }
 
 void
@@ -30,7 +30,7 @@ SceneManager::createScene(String _name)
   scene->m_name = _name;
   scene->setActive(false);
   m_scenes.push_back(scene);
-  g_Logger().registerMessage("Created scene '" + _name + "'.");
+  g_Logger().registerMessage("Created scene '" + _name + "'.", __FILE__, __LINE__);
 }
 
 void
@@ -40,12 +40,13 @@ SceneManager::deleteScene(uint32 _index)
   // check if the index is inside the range of existing scenes.
   if (_index >= m_scenes.size() - 1 && !(_index < 0)) {
     SPtr<Scene> scene = m_scenes[_index];
-    log.registerMessage("Deleted Scene " + scene->m_name + ".");
+    log.registerMessage("Deleted Scene " + scene->m_name + ".", __FILE__, __LINE__);
     scene->clear();
     m_scenes.erase(m_scenes.begin() + _index);
   }
   else {
-    log.registerMessage("Trying to delete an out of range scene.", LOG_MSG_TYPE::kWarning);
+    const String msg = "Trying to delete an out of range scene.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
   }
 }
 
@@ -56,7 +57,7 @@ SceneManager::setActive(uint32 _index)
   if (_index > m_scenes.size() - 1 && !(_index < 0)) {
     String errMsg = "setActive call out of bounds. index accesed: " + to_string(_index);
     errMsg += ". Current scene count: " + to_string(static_cast<uint32>(m_scenes.size()));
-    g_Logger().registerMessage(errMsg, LOG_MSG_TYPE::kWarning);
+    g_Logger().registerMessage(errMsg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return;
   }
 

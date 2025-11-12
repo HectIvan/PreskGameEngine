@@ -29,7 +29,6 @@ BaseApp::init(const char** _argv, int32 _count)
   DLLManager::startUp();
   EventQueue::startUp();
   GPUResourceManager::startUp();
-  Logger::startUp();
   MaterialCodec::startUp();
   MaterialManager::startUp();
   RendererManager::startUp();

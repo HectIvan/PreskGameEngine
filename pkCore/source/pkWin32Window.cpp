@@ -43,7 +43,8 @@ Window::create(const PKWindowDesc& _desc)
   wcex.lpszMenuName = nullptr;
   wcex.lpszClassName = "WindowClass";
   if (!RegisterClassEx(&wcex)) {
-    log.registerMessage("Failed to register a window class.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to register a window class.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return;
   }
   /************************************************************************************/
@@ -73,13 +74,14 @@ Window::create(const PKWindowDesc& _desc)
    * Check if creation failed. 
    */
   if (!m_windowH) {
-    log.registerMessage("Failed to create the window.", LOG_MSG_TYPE::kError);
+    const String msg = "Failed to create the window.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return;
   }
   auto* eventFunct = new WinFunctEvent(_desc.funct);
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(eventFunct));
   ShowWindow(m_windowH, 1);
-  log.registerMessage("Created Window.");
+  log.registerMessage("Created Window.", __FILE__, __LINE__);
 }
 
 Vector2
@@ -170,8 +172,8 @@ Window::setWidth(uint32 _width)
   m_width = _width;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
-  String message = "Set window width to: " + to_string(_width);
-  g_Logger().registerMessage(message);
+  String msg = "Set window width to: " + to_string(_width);
+  g_Logger().registerMessage(msg, __FILE__, __LINE__);
 }
 
 void
@@ -180,8 +182,8 @@ Window::setHeight(uint32 _height)
   m_height = _height;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
-  String message = "Set window height to: " + to_string(_height);
-  g_Logger().registerMessage(message);
+  String msg = "Set window height to: " + to_string(_height);
+  g_Logger().registerMessage(msg, __FILE__, __LINE__);
 }
 
 Vector2

@@ -29,17 +29,28 @@ namespace LOG_MSG_TYPE
     kNone = 0, // smth idk
     kWarning, // warning log registry.
     kError, // error log registry.
+    kFatal, // fatal error log registry.
     kLog, // normal log registry.
   };
 }
 
 struct LogMSG
 {
-  LogMSG(String _message, LOG_MSG_TYPE::E _type) :
+  LogMSG(const String& _message,
+         const ANSICHAR* _file,
+         const uint32& _line,
+         const String& _time,
+         LOG_MSG_TYPE::E _type) :
     message(_message),
+    file(_file),
+    line(_line),
+    time(_time),
     type(_type)
   {}
   String message;
+  const ANSICHAR* file;
+  uint32 line;
+  String time;
   LOG_MSG_TYPE::E type;
 };
 
@@ -48,6 +59,15 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
  public:
   Logger() = default;
   virtual ~Logger() = default;
+
+  /**
+   * @brief Initialize the Logger.
+   * @param _toPrint If the logger will print the register when a new entry is done.
+   */
+  void
+  init(const bool _printLog = false,
+       const bool _printWarning = true,
+       const bool _printError = true);
 
   /**
    * @brief Get the error message from a HRESULT.
@@ -108,12 +128,37 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   toString(const Vector3 _vec);
 
   /**
+   * @brief Throw a handled crash.
+   * @param _errorMSG Message to send the catch.
+   */
+  void
+  throwError(const String _errorMSG);
+
+  /**
    * @brief Register a log message into the logger.
    * @param _msg Message.
+   * @param _file File where the message is registered.
    * @param _type Message type.
    */
   void
-  registerMessage(const String _msg, const LOG_MSG_TYPE::E _type = LOG_MSG_TYPE::kLog);
+  registerMessage(const String& _msg,
+                  const ANSICHAR* _file,
+                  const uint32 _line,
+                  const LOG_MSG_TYPE::E _type = LOG_MSG_TYPE::kLog);
+
+  /**
+   * @brief Print a log into the console.
+   * @param _msg Message to print.
+   */
+  void
+  printMessage(const LogMSG& _msg);
+
+  /**
+   * @brief Get the full message from a log as a string.
+   * @param _msg Message to interpret.
+   */
+  String
+  getStringFromLog(const LogMSG& _msg);
 
   /**
    * @brief Get the message logs.
@@ -138,8 +183,17 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   void
   printMessageLogOfType(const LOG_MSG_TYPE::E _type);
 
- public:
+  /**
+   * @brief Create log files for the messages registered.
+   */
+  void
+  createLogFiles();
+
+ private:
   Vector<LogMSG> m_messages;
+  bool m_printLog = false;
+  bool m_printWarnings = false;
+  bool m_printErrors = false;
 };
 PK_CORE_EXPORT Logger&
 g_Logger();

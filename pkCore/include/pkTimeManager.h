@@ -30,6 +30,7 @@ namespace pkEngineSDK
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
+using std::chrono::system_clock;
 
 class PK_CORE_EXPORT TimeManager : public Module<TimeManager>
 {
@@ -66,6 +67,13 @@ class PK_CORE_EXPORT TimeManager : public Module<TimeManager>
    */
   float
   getTimerElapsed();
+
+  /**
+   * @brief Get the current time as a string.
+   * @return Current time string.
+   */
+  String
+  getCurrentTime();
 
   float m_deltaTime;
   float m_fixedDeltaTime = 0.016f;

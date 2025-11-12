@@ -379,10 +379,10 @@ UInterface::createCheckBox(const char* _name, bool& _param)
 
 bool
 UInterface::createButton(String _name,
-  Color _normal,
-  Color _hover,
-  Color _active,
-  bool _newcolor)
+                         Color _normal,
+                         Color _hover,
+                         Color _active,
+                         bool _newcolor)
 {
   if (_name.empty()) {
     _name = "--Default--";
@@ -405,6 +405,21 @@ UInterface::createButton(String _name,
     return result;
   }
   return ImGui::Button(_name.c_str());
+}
+
+Vector2
+UInterface::getItemPosition()
+{
+  ImVec2 topLeft = ImGui::GetItemRectMin();
+  return Vector2(topLeft.x, topLeft.y);
+}
+
+Vector2 UInterface::getItemSize()
+{
+  ImVec2 topLeft = ImGui::GetItemRectMin();
+  ImVec2 bottomRight = ImGui::GetItemRectMax();
+
+  return Vector2(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 }
 
 bool

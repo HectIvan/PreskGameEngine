@@ -12,7 +12,7 @@ Material::Material(const String _name)
   m_receiveShadows = true;
   m_properties = MaterialProps();
 
-  setDiffuse(tm.m_defaultDiff);
+  setAlbedo(tm.m_defaultAlb);
   setNormal(tm.m_defaultNormal);
   setOclussion(tm.m_defaultAO);
   setHeight(tm.m_defaultHeight);
@@ -30,7 +30,7 @@ Material::init()
   m_receiveShadows = true;
   m_properties = MaterialProps();
 
-  setDiffuse(tm.m_defaultDiff);
+  setAlbedo(tm.m_defaultAlb);
   setNormal(tm.m_defaultNormal);
   setOclussion(tm.m_defaultAO);
   setHeight(tm.m_defaultHeight);

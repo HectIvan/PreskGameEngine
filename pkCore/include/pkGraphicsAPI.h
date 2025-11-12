@@ -53,35 +53,35 @@ public:
   * @param _wHnd Handler to the window to be used.
   **/
   virtual void
-    init(const Window& _window) = 0;
+  init(const Window& _window) = 0;
 
   /**
    * @brief Get the API Swap chain
    * @return Swap chain.
    */
   virtual SPtr<SwapChain>
-    getSwapChain() = 0;
+  getSwapChain() = 0;
 
   /**
    * @brief resize the swap chain.
    * @param _size Size to set the swap chain to.
    */
   virtual void
-    resizeSwapChain(const Vector2 _size) = 0;
+  resizeSwapChain(const Vector2 _size) = 0;
 
   /**
    * @brief Get the api device.
    * @return The Pointer to the device
    */
   virtual SPtr<Device>
-    getDevice() = 0;
+  getDevice() = 0;
 
   /**
    * @brief Set the Client viewport.
    * @param _size Size of the viewport.
    */
   virtual void
-    setViewport(Vector2 _size) = 0;
+  setViewport(Vector2 _size) = 0;
 
   /**
    * @brief Set the Client viewport.
@@ -89,28 +89,28 @@ public:
    * @param _height Client height.
    */
   virtual void
-    setViewport(float _width, float _height) = 0;
+  setViewport(float _width, float _height) = 0;
 
   /**
    * @brief Get the client viewport size.
    * @param _vpPos What viewport to get.
    */
   virtual Vector2
-    getViewportSize(uint32 _vpPos) = 0;
+  getViewportSize(uint32 _vpPos) = 0;
 
   /**
    * @brief Create the blend state.
    * @return Blend state pointer
    */
   virtual SPtr<BlendState>
-    createBlendState() = 0;
+  createBlendState() = 0;
 
   /**
    * @brief Set the blend state.
    * @param _pBlendState Blend state to set.
    */
   virtual void
-    setBlendState(const SPtr<BlendState> _pBlendState) = 0;
+  setBlendState(const SPtr<BlendState> _pBlendState) = 0;
 
   /**
    * @brief Create the Rasterizer state.
@@ -118,14 +118,14 @@ public:
    * @return Rasterizer state pointer.
    */
   virtual SPtr<RasterizerState>
-    createRasterizerState(const RASTERIZER_DESC& _desc) = 0;
+  createRasterizerState(const RASTERIZER_DESC& _desc) = 0;
 
   /**
    * @brief Set the rasterizer state.
    * @param _pRasterizerState Rasterizer state to set.
    */
   virtual void
-    setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) = 0;
+  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) = 0;
 
   /**
    * @brief Create the sampler state.
@@ -134,15 +134,15 @@ public:
    * @return Pointer to the new sampler state.
    */
   virtual SPtr<SamplerState>
-    createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
+  createSamplerState(const uint32 _mode, const uint32 _filter) = 0;
 
   /**
   * Set the sampler state.
   **/
   virtual void
-    setSampler(const SPtr<SamplerState> _pSamLinear,
-      uint32 _startSlot = 0,
-      uint32 _numSamplers = 1) = 0;
+  setSampler(const SPtr<SamplerState> _pSamLinear,
+             uint32 _startSlot = 0,
+             uint32 _numSamplers = 1) = 0;
 
   /**
    * @brief Set the render target to the device.
@@ -150,9 +150,9 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-    setRenderTarget(const SPtr<Texture> _pRTarget,
-      const SPtr<Texture> _pDepthSV = nullptr,
-      const uint32 _mipLevel = 0) = 0;
+  setRenderTarget(const SPtr<Texture> _pRTarget,
+                  const SPtr<Texture> _pDepthSV = nullptr,
+                  const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Set the render targets to the device.
@@ -160,65 +160,65 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-    setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-      const SPtr<Texture> _pDepthSV = nullptr,
-      const uint32 _mipLevel = 0) = 0;
+  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const uint32 _mipLevel = 0) = 0;
 
   /**
    * @brief Unbinds all render targets.
    * @param _count How many targets will be unbound.
    */
   virtual void
-    unbindRenderTargets(const SIZE_T _count = 8) = 0;
+  unbindRenderTargets(const SIZE_T _count = 8) = 0;
 
   /**
    * @brief Creates a shader of the specific graphic API.
    * @return API Specific shader.
    */
   virtual SPtr<Shader>
-    internalCreateShader() = 0;
+  internalCreateShader() = 0;
 
   /**
    * @brief Create a vertex shader.
    * @returtn Vertex Shader.
    */
   virtual SPtr<Shader>
-    createVShader(SPtr<Shader> _pShader) = 0;
+  createVShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Create a pixel shader.
    * @return Pixel Shader.
    */
   virtual SPtr<Shader>
-    createPShader(SPtr<Shader> _pShader) = 0;
+  createPShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Create a compute shader.
    * @return Compute shader.
    */
   virtual SPtr<Shader>
-    createCShader(SPtr<Shader> _pShader) = 0;
+  createCShader(SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-    setVShader(const SPtr<Shader> _pShader) = 0;
+  setVShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-    setPShader(const SPtr<Shader> _pShader) = 0;
+  setPShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Set a compute shader.
    * @param _pShader Compute shader.
    */
   virtual void
-    setCShader(const SPtr<Shader> _pShader) = 0;
+  setCShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -228,9 +228,9 @@ public:
    * @return Data blob.
    */
   virtual void**
-    compileShaderFromFile(Path _szFileName,
-      const char* _szEntryPoint,
-      const char* _szShaderModel) = 0;
+  compileShaderFromFile(Path _szFileName,
+                        const char* _szEntryPoint,
+                        const char* _szShaderModel) = 0;
 
   /**
    * @brief Create the input layout based on the shader.
@@ -238,7 +238,7 @@ public:
    * @return Input layout pointer
    */
   virtual SPtr<InputLayout>
-    createInputLayoutFromVShader(const SPtr<Shader> _pShader) = 0;
+  createInputLayoutFromVShader(const SPtr<Shader> _pShader) = 0;
 
   /**
    * @brief Create the Input Layout.
@@ -247,14 +247,14 @@ public:
    * @return Pointer to the new input layout
    */
   virtual SPtr<InputLayout>
-    createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
+  createInputLayout(const Vector<InputDesc>& _vDesc, const SPtr<Shader> _pVShader) = 0;
 
   /**
    * @brief Set input layout.
    * @param _pInputLayout What input layout to use.
    */
   virtual void
-    setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
+  setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
 
   /**
    * @brief Get bytes per pixel from the format.

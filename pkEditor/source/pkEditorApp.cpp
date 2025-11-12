@@ -18,12 +18,16 @@ main(int argc, const char** argv)
   }
   catch (const Exception& e) { // 
     log.print(e.what());
+    log.createLogFiles();
     return 1;
   }
   catch (...) { // non handled exceptions
     log.print("Unhandled exception");
+    log.createLogFiles();
+    return 2;
   }
-
   app.messageLoop();
+  log.createLogFiles();
+
   return 0;
 }

@@ -16,6 +16,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkLogger.h"
+#include "pkTimeManager.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -136,7 +137,8 @@ Logger::registerMessage(const String& _msg,
                         const LOG_MSG_TYPE::E _type)
 {
   // register the message.
-  LogMSG message(_msg, _file, _line, _type);
+  String time = g_TimeManager().getCurrentTime();
+  LogMSG message(_msg, _file, _line, time, _type);
   m_messages.emplace_back(message);
 
   // check if the message should be print in the console.
@@ -161,7 +163,10 @@ Logger::printMessage(const LogMSG& _msg)
 String
 Logger::getStringFromLog(const LogMSG& _msg)
 {
-  return String("[" + String(_msg.file) +
+  return String("[" + 
+                _msg.time +
+                "] " +
+                "[" + String(_msg.file) +
                 " : " +
                 to_string(_msg.line) +
                 "]" +
@@ -188,6 +193,35 @@ Logger::printMessageLogOfType(const LOG_MSG_TYPE::E _type)
   for (uint32 i = 0; i < messages.size(); ++i) {
     printMessage(messages[i]);
   }
+}
+
+void
+Logger::createLogFiles()
+{
+  Vector<LogMSG> logs = getMessageLog();
+
+  // create log file
+  ofstream logFile("log/Log.txt", ios::out);
+  for (uint32 i = 0; i < logs.size(); ++i) {
+
+    String message = "";
+    if (logs[i].type == LOG_MSG_TYPE::kLog) {
+      message += "[LOG] ";
+    }
+    if (logs[i].type == LOG_MSG_TYPE::kError) {
+      message += "[ERROR] ";
+    }
+    if (logs[i].type == LOG_MSG_TYPE::kWarning) {
+      message += "[WARNING] ";
+    }
+    if (logs[i].type == LOG_MSG_TYPE::kFatal) {
+      message += "[FATAL] ";
+    }
+
+    message += getStringFromLog(logs[i]);
+    logFile << message << endl;
+  }
+  logFile.close();
 }
 
 PK_CORE_EXPORT Logger&

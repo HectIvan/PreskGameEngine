@@ -39,15 +39,18 @@ struct LogMSG
   LogMSG(const String& _message,
          const ANSICHAR* _file,
          const uint32& _line,
+         const String& _time,
          LOG_MSG_TYPE::E _type) :
     message(_message),
     file(_file),
     line(_line),
+    time(_time),
     type(_type)
   {}
   String message;
   const ANSICHAR* file;
   uint32 line;
+  String time;
   LOG_MSG_TYPE::E type;
 };
 
@@ -179,6 +182,12 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    */
   void
   printMessageLogOfType(const LOG_MSG_TYPE::E _type);
+
+  /**
+   * @brief Create log files for the messages registered.
+   */
+  void
+  createLogFiles();
 
  private:
   Vector<LogMSG> m_messages;

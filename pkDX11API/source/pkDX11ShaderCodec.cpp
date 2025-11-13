@@ -27,7 +27,7 @@ namespace pkEngineSDK
 {
 
 SPtr<BaseResource>
-DX11ShaderCodec::createResourceFromShader(const SPtr<Shader> _pShader)
+DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 {
   Logger& log = g_Logger();
   
@@ -35,24 +35,25 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader> _pShader)
   if (!_pShader) {
     const String msg = "Shader is null!";
     log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
   auto shader = reinterpret_pointer_cast<DX11Shader>(_pShader);
 
   // check if the DirectX shader is valid.
+  Path shaderDir = _pShader->getShaderDirectory();
   if (!shader) {
     const String msg = "Failed to reinterpret a shader " +
-                       _pShader->getShaderDirectory().toString() + " into a DirectX shader.";
+                       shaderDir.toString() +
+                       " into a DirectX shader.";
     log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
   // attempt to create the shader resource.
-  Path shaderDirectory = _pShader->getShaderDirectory();
-  const String shaderName = shaderDirectory.getFileName();
+  const String shaderName = shaderDir.getFileName();
   const String resourceDir = "resources/" + shaderName + ".pks";
   ofstream file(resourceDir, ios::out | ios::binary);
 
@@ -60,7 +61,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader> _pShader)
   if (!file.is_open()) {
     const String msg = "Failed to generate the shader resource: " + resourceDir + ".";
     log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
@@ -69,7 +70,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader> _pShader)
   resource->m_id = UUID::generateRandomUUIDFromString(shaderName + " Shader");
   resource->m_name = shaderName;
   resource->m_isLoaded = true;
-  resource->m_originalPath = shaderDirectory.toString();
+  resource->m_originalPath = shaderDir.toString();
   resource->m_resourcePath = resourceDir;
 
   resource->writeBaseHeader(file, resource->m_id, shaderName, resourceDir);
@@ -84,5 +85,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader> _pShader)
   file.write(reinterpret_cast<const char*>(shader->m_pSBlob->GetBufferPointer()), fileSize);
 
   file.close();
+
+  return resource;
 }
 }

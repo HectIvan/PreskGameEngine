@@ -33,15 +33,18 @@ ShaderResource::load()
   if (!file.is_open()) {
     const String msg = "Failed to open resource at path: " + m_resourcePath + ".";
     log.print(msg);
-    log.registerMessage(msg, LOG_MSG_TYPE::kWarning);
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return;
   }
-
+  // load the base resource header.
+  loadBaseHeader(file);
+  // load the shader blob.
   SIZE_T blobSize = 0;
   file.read(reinterpret_cast<char*>(&blobSize), sizeof(SIZE_T));
   m_data.resize(blobSize);
   file.read(reinterpret_cast<char*>(m_data.data()), blobSize);
-
   file.close();
+
+  m_isLoaded = true;
 }
 }

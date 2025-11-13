@@ -323,7 +323,6 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate(m_loggerWin.name);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
-  Vector2 logWinPos = im.getItemPosition();
   Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
 
   // -------------------------- //

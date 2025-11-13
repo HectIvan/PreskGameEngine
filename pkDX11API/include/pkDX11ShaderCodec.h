@@ -33,6 +33,6 @@ class DX11ShaderCodec : public ShaderCodec
    * @param _pShader Pointer to the shader.
    */
   SPtr<BaseResource>
-  createResourceFromShader(const SPtr<Shader> _pShader) override;
+  createResourceFromShader(const SPtr<Shader>& _pShader) override;
 };
 }

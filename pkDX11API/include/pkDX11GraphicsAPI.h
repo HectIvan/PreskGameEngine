@@ -35,8 +35,6 @@ namespace pkEngineSDK
 
 class Window;
 
-using pkEngineSDK::GraphicsAPI;
-
 class DX11GraphicsAPI : public GraphicsAPI
 {
  public:

@@ -263,6 +263,7 @@
     <ClCompile Include="source\pkSceneManager.cpp" />
     <ClCompile Include="source\pkScriptManager.cpp" />
     <ClCompile Include="source\pkShader.cpp" />
+    <ClCompile Include="source\pkShaderCodec.cpp" />
     <ClCompile Include="source\pkShaderManager.cpp" />
     <ClCompile Include="source\pkShaderResource.cpp" />
     <ClCompile Include="source\pkSprite.cpp" />

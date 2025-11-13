@@ -76,12 +76,10 @@ BaseApp::initAPI(const char** _argv, int32 _count)
 #if PK_DEBUG_MODE
   if (abstraction == "DX11APId") {
     dllManager.runDll("pkDX11APId");
-    ShaderCodec::startUp();
   }
 #else
   if (abstraction == "DX11API") {
     dllManager.runDll("pkDX11API");
-    ShaderCodec::startUp();
   }
 #endif
 }

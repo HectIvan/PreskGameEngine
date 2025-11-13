@@ -10,36 +10,20 @@
  * @changes Created the file.
  */
  /*****************************************************************************/
-#pragma once
 
 /*********************************************/
 /**
  * Includes
  */
  /*********************************************/
-#include "pkModule.h"
-#include "pkPrerequisitesCore.h"
+#include "pkShaderCodec.h"
 
 namespace pkEngineSDK
 {
 
-class BaseResource;
-class Shader;
-
-class PK_CORE_EXPORT ShaderCodec : public Module<ShaderCodec>
-{
- public:
-  ShaderCodec() = default;
-  virtual ~ShaderCodec() = default;
-
-  /**
-   * @brief Create a shader resource from a pointer to a shader.
-   * @param _pShader Pointer to the shader.
-   */
-  virtual SPtr<BaseResource>
-  createResourceFromShader(const SPtr<Shader>& _pShader) = 0;
-};
-
 PK_CORE_EXPORT ShaderCodec&
-g_ShaderCodec();
+g_ShaderCodec()
+{
+  return ShaderCodec::instance();
+}
 }

@@ -59,6 +59,16 @@ struct hash<pkEngineSDK::ShaderKey>
 };
 }
 
+namespace PK_SHADER_TYPE
+{
+  enum E
+  {
+    kVertex,
+    kPixel,
+    kCompute
+  };
+}
+
 namespace pkEngineSDK
 {
 class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
@@ -66,6 +76,20 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
  public:
   ShaderManager() = default;
   ~ShaderManager() = default;
+
+  /**
+   * @brief Create the shader resources.
+   */
+  void
+  createShaderResources();
+
+  /**
+   * @brief Initialize the shader resource by type.
+   * @param _type Type of shader to create.
+   * @return Shader pointer.
+   */
+  SPtr<Shader>
+  initShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E _type);
 
   /**
    * @brief Insert a shader into the map.

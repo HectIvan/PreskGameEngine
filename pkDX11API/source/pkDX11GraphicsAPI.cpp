@@ -32,9 +32,10 @@
 #include "pkDX11VertexShader.h"
 #include "pkFileSystem.h"
 #include "pkPlatformMath.h"
-#include "pkVertexBuffer.h"
 #include "pkTextureCodec.h"
 #include "pkTextureResource.h"
+#include "pkVertexBuffer.h"
+#include "pkDX11ShaderCodec.h"
 
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
@@ -94,6 +95,7 @@ extern "C" __declspec(dllexport) void
 loadPlugin()
 {
   GraphicsAPI::startUp<DX11GraphicsAPI>();
+  ShaderCodec::startUp<DX11ShaderCodec>();
 }
 
 void

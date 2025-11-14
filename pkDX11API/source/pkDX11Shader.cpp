@@ -35,7 +35,18 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
 
   // load the shader data.
   resource->load();
-  m_pSBlob = reinterpret_cast<ID3DBlob*>(resource->m_data.data());
+  const SIZE_T blobSize = resource->m_data.size();
+  // warning: this may cause the same issue we had with D3DCompileFromFile.
+  const uint32 hr = D3DCreateBlob(blobSize, &m_pSBlob);
+
+  // if the blob failed to be created.
+  if (FAILED(hr)) {
+    const String msg = "Failed to create sBlob of size " + to_string(blobSize) + ".";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    return;
+  }
+  memcpy(m_pSBlob->GetBufferPointer(), resource->m_data.data(), resource->m_data.size());
+  // m_pSBlob = reinterpret_cast<ID3DBlob*>(resource->m_data.data());
 
   // check if the data transfer was succesful.
   if (!m_pSBlob) {

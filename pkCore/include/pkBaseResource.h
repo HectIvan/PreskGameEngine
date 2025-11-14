@@ -52,6 +52,12 @@ class PK_CORE_EXPORT BaseResource
   virtual ~BaseResource() = default;
 
   /**
+   * @brief Load the resource.
+   */
+  virtual void
+  load() = 0;
+
+  /**
    * @brief Soft load the resource (used by the asset manager to know what resource is what).
    * @param _path Path to soft load.
    * @return If the soft load was successful.
@@ -79,12 +85,6 @@ class PK_CORE_EXPORT BaseResource
                   const String& _ID,
                   const String& _fileName,
                   const String& _resourcePath);
-
-  /**
-   * @brief Load the resource.
-   */
-  virtual void
-  load() = 0;
 
   /**
    * @brief Get the resource type.

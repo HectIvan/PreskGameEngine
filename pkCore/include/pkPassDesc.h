@@ -44,17 +44,9 @@ namespace pkEngineSDK
 
 struct PassDesc
 {
-  Path vSDirectory;
-  Path pSDirectory;
-  Path cSDirectory;
-
-  const char* vSEntry;
-  const char* pSEntry;
-  const char* cSEntry;
-
-  const char* vSModel;
-  const char* pSModel;
-  const char* cSModel;
+  String vSDirectory;
+  String pSDirectory;
+  String cSDirectory;
 
   PK_SAM_STATE_ADRESS::E samAdress;
   PK_SAM_STATE_FILTERS::E samFilters;

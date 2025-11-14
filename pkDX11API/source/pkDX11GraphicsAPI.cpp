@@ -145,7 +145,6 @@ DX11GraphicsAPI::init(const Window& _window)
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
     const String msg = "Failed to utilize the DX device in the API Initialization";
-    log.print(msg);
     log.registerMessage(msg, __FILE__, __LINE__);
     log.throwError(msg);
     return;
@@ -369,7 +368,6 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
   Logger& log = g_Logger();
   // convert from shader to dx vertex shader
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
-  // SPtr<DX11VertexShader> dxVShader = make_shared<DX11VertexShader>();
   // create the vertex shader
   uint32 hr;
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);

@@ -34,7 +34,6 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   // check if the shader is not null.
   if (!_pShader) {
     const String msg = "Shader is null!";
-    log.print(msg);
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
@@ -47,20 +46,18 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
     const String msg = "Failed to reinterpret a shader " +
                        shaderDir.toString() +
                        " into a DirectX shader.";
-    log.print(msg);
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
 
   // attempt to create the shader resource.
-  const String shaderName = shaderDir.getFileName();
+  const String shaderName = shaderDir.getFileNameWithoutExtension();
   const String resourceDir = "resources/" + shaderName + ".pks";
   ofstream file(resourceDir, ios::out | ios::binary);
 
   // check if the resource creation failed.
   if (!file.is_open()) {
     const String msg = "Failed to generate the shader resource: " + resourceDir + ".";
-    log.print(msg);
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }

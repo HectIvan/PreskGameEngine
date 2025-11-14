@@ -100,7 +100,6 @@ RendererManager::init()
   SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  // texCodec.createResourceFromFile(Path("textures/skybox/Skybox_papermill.hdr"));
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
@@ -187,12 +186,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-  pDesc.vSDirectory = Path("shaders/pkVShader.hlsl");
-  pDesc.pSDirectory = Path("shaders/pkPShader.hlsl");
-  pDesc.vSEntry = "VS";
-  pDesc.pSEntry = "PS";
-  pDesc.vSModel = "vs_5_0";
-  pDesc.pSModel = "ps_5_0";
+  pDesc.vSDirectory = "resources/pkVShader.pks";
+  pDesc.pSDirectory = "resources/pkPShader.pks";
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
   pDesc.cBSizes = { sizeof(CBMatrix),
@@ -220,7 +215,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkPShaderDepth.hlsl");
+  pDesc.pSDirectory = "resources/pkPShaderDepth.pks";
   pDesc.outputs = { lightPosTex };
   pDesc.pDepth = LightDepthBuffer;
   SPtr<Pass> shadowPass = make_shared<Pass>(pDesc);
@@ -229,8 +224,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Specular Quad Pass
    ***************************************************************************/
-  pDesc.vSDirectory = Path("shaders/pkQuadShader.hlsl");
-  pDesc.pSDirectory = Path("shaders/pkShadowMapping.hlsl");
+  pDesc.vSDirectory = "resources/pkQuadShader.pks";
+  pDesc.pSDirectory = "resources/pkShadowMapping.pks";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4) };
   pDesc.inputs = { LightDepthBuffer,
                    DepthBuffer,
@@ -248,7 +243,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkSkyboxShader.hlsl");
+  pDesc.pSDirectory = "resources/pkSkyboxShader.pks";
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxTex };
@@ -259,7 +254,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Screen Space Ambient Occlusion Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkPSAOshader.hlsl");
+  pDesc.pSDirectory = "resources/pkPSAOshader.pks";
   pDesc.cBSizes = { sizeof(CBSSAO), sizeof(CBVector2x2) };
   pDesc.inputs = { posTex,
                    normalTex};
@@ -272,7 +267,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * IBR Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkIBLShader.hlsl");
+  pDesc.pSDirectory = "resources/pkIBLShader.pks";
   pDesc.cBSizes = { sizeof(Vector4), sizeof(Vector4) };
   pDesc.inputs = { m_mainSkybox,
                    normalTex,
@@ -288,7 +283,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Horizontal Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
+  pDesc.pSDirectory = "resources/pkBlur.pks";
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissTex };
   pDesc.outputs = { emissHBlurTex };
@@ -300,7 +295,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
+  pDesc.pSDirectory = "resources/pkBlur.pks";
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissHBlurTex };
   pDesc.outputs = { emissBlurTex };
@@ -311,7 +306,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Merge Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkMergeShader.hlsl");
+  pDesc.pSDirectory = "resources/pkMergeShader.pks";
   pDesc.cBSizes = {};
   pDesc.inputs = { albedoTex,
                    diffBRDFTex,
@@ -334,7 +329,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkLuminanceQuad.hlsl");
+  pDesc.pSDirectory = "resources/pkLuminanceQuad.pks";
   pDesc.cBSizes = { sizeof(CBVector2x2) };
   pDesc.inputs = { mergeTex };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
@@ -345,7 +340,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Horizontal Blur
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
+  pDesc.pSDirectory = "resources/pkBlur.pks";
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
@@ -357,7 +352,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Vertical Blur
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkBlur.hlsl");
+  pDesc.pSDirectory = "resources/pkBlur.pks";
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlur) };
@@ -368,7 +363,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = Path("shaders/pkToneMap.hlsl");
+  pDesc.pSDirectory = "resources/pkToneMap.pks";
   pDesc.cBSizes = { sizeof(CBFloat) };
   pDesc.inputs = { mergeTex,
                    getGBuffer(G_BUFFERS::kGB_LumBlur) };

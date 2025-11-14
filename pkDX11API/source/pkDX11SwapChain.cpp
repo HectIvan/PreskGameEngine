@@ -72,7 +72,6 @@ DX11SwapChain::resizebuffers(const Vector2 _size)
     const String msgErr = log.getMessageError(hr);
     const String msg = "Failed to resize the swap chain buffers. Error: " + msgErr;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    log.print(msg);
     return;
   }
 

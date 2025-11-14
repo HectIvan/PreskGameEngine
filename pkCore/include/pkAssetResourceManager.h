@@ -125,6 +125,14 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   SPtr<BaseResource>
   getResource(const String&_ID);
 
+  /**
+   * @brief Get a resource via the resource directory.
+   * @param _directory resource Directory.
+   * @return Pointer to the resource.
+   */
+  SPtr<BaseResource>
+  getResourceBydirectory(const String& _directory);
+
  private:
   UMap<String, SPtr<BaseResource>> m_loadedResources;
   UMap<String, SPtr<BaseResource>> m_allResources;

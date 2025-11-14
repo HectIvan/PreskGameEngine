@@ -40,8 +40,6 @@ BaseApp::init(const char** _argv, int32 _count)
   DLLManager& dllManager = g_DLLManager();
   AssetResourceManager& assetResource = g_AssetResourceManager();
 
-  assetResource.init("resources");
-  assetResource.loadAssetsFromResourcesFolder();
 
   initWin();
   initAPI(_argv, _count);
@@ -55,6 +53,9 @@ BaseApp::init(const char** _argv, int32 _count)
 #endif
 
   g_GraphicAPI().init(m_window);
+  // g_ShaderManager().createShaderResources();
+  assetResource.init("resources");
+  assetResource.loadAssetsFromResourcesFolder();
   g_SceneManager().init();
   g_RenderManager().init();
   g_TextureManager().init();

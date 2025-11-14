@@ -16,6 +16,7 @@
 /*********************************************/
 #include <iostream>
 
+#include "pkAssetResourceManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
 #include "pkRendererManager.h"
@@ -36,25 +37,31 @@ Pass::Pass(PassDesc& _desc)
 {
   // call the api manager
   GraphicsAPI& api = g_GraphicAPI();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
   m_pSamplerState = make_shared<SamplerState>();
   // Try to create the vertex shader if there's a path.
-  if (!_desc.vSDirectory.getPath().empty()) {
+  if (!_desc.vSDirectory.empty()) {
+    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.vSDirectory);
     m_pVShader = api.internalCreateShader();
-    createVShader(_desc.vSDirectory, _desc.vSEntry, _desc.vSModel);
-    // create all pointers
+    m_pVShader->compileFromResource(res);
+    api.createVShader(m_pVShader);
+    // create the input layout for the shader
     m_pInputLayout = make_shared<InputLayout>();
-    // create input and sampler state
     m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
   };
   // Try to create the pixel shader if there's a path.
-  if (!_desc.pSDirectory.getPath().empty()) {
+  if (!_desc.pSDirectory.empty()) {
+    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.pSDirectory);
     m_pPShader = api.internalCreateShader();
-    createPShader(_desc.pSDirectory, _desc.pSEntry, _desc.pSModel);
+    m_pPShader->compileFromResource(res);
+    api.createPShader(m_pPShader);
   }
   // Try to create the compute shader if there's a path.
-  if (!_desc.cSDirectory.getPath().empty()) {
+  if (!_desc.cSDirectory.empty()) {
+    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.cSDirectory);
     m_pCShader = api.internalCreateShader();
-    createCShader(_desc.cSDirectory, _desc.cSEntry, _desc.cSModel);
+    m_pCShader->compileFromResource(res);
+    api.createCShader(m_pCShader);
   }
   // create the sampler state
   m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);

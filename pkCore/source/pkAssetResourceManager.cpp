@@ -18,6 +18,7 @@
 #include "pkModelResource.h"
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
+#include "pkShaderResource.h"
 #include "pkTextureCodec.h"
 #include "pkTextureResource.h"
 #include "pkFileSystem.h"
@@ -73,6 +74,9 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
       if (extension == "pkmat") {
         resource = make_shared<MaterialResource>();
       }
+      if (extension == "pks") {
+        resource = make_shared<ShaderResource>();
+      }
       resource->softLoad(path);
       insertNewResource(resource);
     }
@@ -83,7 +87,7 @@ bool
 AssetResourceManager::isPKResource(const Path _path)
 {
   String extension = _path.getExtension();
-  if (extension == "pkm" || extension == "pkt" || extension == "pkmat") {
+  if (extension == "pkm" || extension == "pkt" || extension == "pkmat" || extension == "pks") {
     return true;
   }
   return false;
@@ -95,6 +99,17 @@ AssetResourceManager::getResource(const String& _ID)
   auto it = m_allResources.find(_ID);
   if (it != m_allResources.end()) {
     return it->second;
+  }
+  return nullptr;
+}
+
+SPtr<BaseResource>
+AssetResourceManager::getResourceBydirectory(const String& _directory)
+{
+  for (auto resource : m_allResources) {
+    if (resource.second->m_resourcePath == _directory) {
+      return resource.second;
+    }
   }
   return nullptr;
 }

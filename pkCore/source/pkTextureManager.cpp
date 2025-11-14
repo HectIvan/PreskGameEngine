@@ -16,10 +16,10 @@ TextureManager::init()
 
   const Vector<String> paths = { "resources/FlatDiff.pkt",
                                  "resources/FlatNormal.pkt",
-                                 "resources/FlatAO.pkt",
-                                 "resources/FlatRoughness.pkt",
-                                 "resources/FlatMetallic.pkt",
-                                 "resources/FlatEmissive.pkt" };
+                                 "resources/FlatWhite.pkt",
+                                 "resources/FlatWhite.pkt",
+                                 "resources/FlatWhite.pkt",
+                                 "resources/FlatBlack.pkt" };
 
   Vector<String> ids;
   ids.resize(paths.size(), UUID::PK_DEFAULT_UUID);

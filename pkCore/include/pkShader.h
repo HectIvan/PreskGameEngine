@@ -23,6 +23,8 @@
 namespace pkEngineSDK
 {
 
+class BaseResource;
+
 class PK_CORE_EXPORT Shader
 {
  public:
@@ -30,10 +32,16 @@ class PK_CORE_EXPORT Shader
   virtual ~Shader() = default;
 
   /**
-   * @brief Compile the shader.
+   * @brief Compile the shader from a file.
    */
   virtual void
-  compile() = 0;
+  compileFromFile() = 0;
+
+  /**
+   * @brief Compile the shader blob from a shader resource.
+   */
+  virtual void
+  compileFromResource(const SPtr<BaseResource>& _pBaseResource) = 0;
 
   /**
    * @brief Set the shader directory.

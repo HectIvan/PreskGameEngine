@@ -34,10 +34,16 @@ class DX11Shader : public Shader
   }
 
   /**
-   * @brief Compile the shader.
+   * @brief Compile the shader from a file.
    */
   void
-  compile() override;
+  compileFromFile() override;
+
+  /**
+   * @brief Compile the shader blob from a shader resource.
+   */
+  void
+  compileFromResource(const SPtr<BaseResource>& _pBaseResource) override;
 
   /**
    * @brief Set the shader directory.

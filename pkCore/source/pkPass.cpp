@@ -131,7 +131,7 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
   }
   // if it doesnt exist, continue with the compilation and store the shader.
   m_pVShader->setData(_directory, _entry, _sModel);
-  m_pVShader->compile();
+  m_pVShader->compileFromFile();
   g_GraphicAPI().createVShader(m_pVShader);
   g_ShaderCodec().createResourceFromShader(m_pVShader);
 
@@ -154,7 +154,7 @@ Pass::createPShader(const Path _directory, const char* _entry, const char* _sMod
   }
 
   m_pPShader->setData(_directory, _entry, _sModel);
-  m_pPShader->compile();
+  m_pPShader->compileFromFile();
   g_GraphicAPI().createPShader(m_pPShader);
   g_ShaderCodec().createResourceFromShader(m_pPShader);
 
@@ -177,7 +177,7 @@ Pass::createCShader(const Path _directory, const char* _entry, const char* _sMod
   }
 
   m_pCShader->setData(_directory, _entry, _sModel);
-  m_pCShader->compile();
+  m_pCShader->compileFromFile();
   g_GraphicAPI().createCShader(m_pCShader);
   g_ShaderCodec().createResourceFromShader(m_pCShader);
 
@@ -189,15 +189,15 @@ Pass::compileShaders()
 {
   GraphicsAPI& api = g_GraphicAPI();
   if (m_pVShader) {
-    m_pVShader->compile();
+    m_pVShader->compileFromFile();
     api.createVShader(m_pVShader);
   }
   if (m_pPShader) {
-    m_pPShader->compile();
+    m_pPShader->compileFromFile();
     api.createPShader(m_pPShader);
   }
   if (m_pCShader) {
-    m_pCShader->compile();
+    m_pCShader->compileFromFile();
     api.createCShader(m_pCShader);
   }
 }

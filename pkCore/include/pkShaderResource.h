@@ -38,6 +38,6 @@ class PK_CORE_EXPORT ShaderResource : public BaseResource
   getType() const override { return RESOURCE_TYPE::kShader; }
 
  public:
-  Vector<char> m_data;
+  Vector<ANSICHAR> m_data;
 };
 }

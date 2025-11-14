@@ -86,6 +86,13 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   file.close();
 
+  // register the creation.
+  const String msg = "Created shader resource " +
+                     resourceDir +
+                     " of size " +
+                     to_string(fileSize);
+  log.registerMessage(msg, __FILE__, __LINE__);
+
   return resource;
 }
 }

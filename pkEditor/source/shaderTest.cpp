@@ -591,7 +591,7 @@ ShaderTest::uInterfaceUpdate()
           im.sameLine();
           im.pushID(i);
           if (im.createButton("Cmp")) {
-            shader->compile();
+            shader->compileFromFile();
           }
           im.popID();
         }

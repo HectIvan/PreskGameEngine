@@ -53,5 +53,11 @@ struct KeyScale
 };
 
 template<typename T>
-void safeRelease(T* x) { if (x) { x->Release(); x = nullptr; } }
+void
+safeRelease(T* x) {
+  if (x) {
+    x->Release();
+    x = nullptr;
+  }
+}
 }

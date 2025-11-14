@@ -62,7 +62,7 @@ ShaderManager::initShaderResource(const ShaderKey& _shaderData, const PK_SHADER_
   shader->setData(Path(_shaderData.shaderPath),
                   _shaderData._szEntryPoint,
                   _shaderData._szShaderModel);
-  shader->compile();
+  shader->compileFromFile();
   // create the shader based on its type.
   if (PK_SHADER_TYPE::kVertex == _type) {
     api.createVShader(shader);

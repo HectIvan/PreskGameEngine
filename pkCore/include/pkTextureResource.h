@@ -48,6 +48,13 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
   RESOURCE_TYPE::E
   getType() const override { return RESOURCE_TYPE::kTexture; }
 
+  /**
+   * @brief Get the resource type as a string.
+   * @return The resource type string.
+   */
+  String
+  getTypeString() const override { return "Texture"; }
+
  public:
   int32 m_width;
   int32 m_height;

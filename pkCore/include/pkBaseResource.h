@@ -93,10 +93,17 @@ class PK_CORE_EXPORT BaseResource
   virtual RESOURCE_TYPE::E
   getType() const = 0;
 
+  /**
+   * @brief Get the resource type as a string.
+   * @return The resource type in string.
+   */
+  virtual String
+  getTypeString() const = 0;
+
  public:
   String m_id;
   String m_name;
-  bool m_isLoaded;
+  bool m_isLoaded = false;
   String m_originalPath;
   String m_resourcePath;
 };

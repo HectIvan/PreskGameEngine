@@ -43,6 +43,9 @@ GPUResourceManager::loadPKModel(const String& _ID)
 
   // get the model resource.
   auto resource = assetResMgr.getResource(_ID);
+  if (resource->getType() != RESOURCE_TYPE::kModel) {
+    return nullptr;
+  }
   auto modelRes = reinterpret_pointer_cast<ModelResource>(resource);
   modelRes->load();
   assetResMgr.insertLoadedResource(modelRes);

@@ -34,12 +34,13 @@ using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
 using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
-using pkEngineSDK::stringToLower;
 using pkEngineSDK::Math;
 using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelResource;
+using pkEngineSDK::RESOURCE_TYPE::kShader;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::ShaderManager;
+using pkEngineSDK::stringToLower;
 using pkEngineSDK::TextureCodec;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::TextureResource;
@@ -282,9 +283,11 @@ ShaderTest::uInterfaceUpdate()
     const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
       SPtr<Model> model = gpuResourceMan.loadPKModel(id);
-      SPtr<Actor> newActor = currentScene->instantiate(model->getName());
-      newActor->addComponent(model);
-      m_selectedActor = newActor;
+      if (model) {
+        SPtr<Actor> newActor = currentScene->instantiate(model->getName());
+        newActor->addComponent(model);
+        m_selectedActor = newActor;
+      }
     }
     im.endDragDropTarget();
   }
@@ -347,7 +350,9 @@ ShaderTest::uInterfaceUpdate()
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
-          assetMan.insertNewResource(resource);
+          if (resource) {
+            assetMan.insertNewResource(resource);
+          }
         }
       }
       im.sameLine();
@@ -355,7 +360,9 @@ ShaderTest::uInterfaceUpdate()
         Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
-          assetMan.insertNewResource(resource);
+          if (resource) {
+            assetMan.insertNewResource(resource);
+          }
         }
       }
       im.sameLine();
@@ -366,7 +373,8 @@ ShaderTest::uInterfaceUpdate()
         const String assetName = assetPath.getFileName();
         const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
         const String assetNameLower = stringToLower(assetName);
-        if (assetNameLower.find(searchResLower.c_str()) != String::npos) {
+        if (asset.second->getType() != kShader && 
+            assetNameLower.find(searchResLower.c_str()) != String::npos) {
           if (im.createButton(assetName.c_str())) {
 
           }
@@ -378,7 +386,10 @@ ShaderTest::uInterfaceUpdate()
             im.endDragDropSource();
           }
           if (im.isItemHovered()) {
-            im.setTooltip(assetName.c_str());
+            const String tooltip = "Name: " + assetName + "\n" +
+                                   "Asset ID: " + asset.first + "\n" + 
+                                   "Asset type: " + asset.second->getTypeString();
+            im.setTooltip(tooltip.c_str());
           }
           Vector2 itemPos = im.getItemPosition();
           Vector2 itemSize = im.getItemSize();
@@ -591,7 +602,7 @@ ShaderTest::uInterfaceUpdate()
           im.sameLine();
           im.pushID(i);
           if (im.createButton("Cmp")) {
-            shader->compileFromFile();
+            //shader->compileFromFile();
           }
           im.popID();
         }

@@ -37,6 +37,13 @@ class PK_CORE_EXPORT ShaderResource : public BaseResource
   RESOURCE_TYPE::E
   getType() const override { return RESOURCE_TYPE::kShader; }
 
+  /**
+   * @brief Get the resource type as a string.
+   * @return The resource type string.
+   */
+  String
+  getTypeString() const override { return "Shader"; }
+
  public:
   Vector<ANSICHAR> m_data;
 };

@@ -53,9 +53,8 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   if (_pMaterial->m_albedo) {
     matResource->m_albedoID = _pMaterial->m_albedo->getID();
     Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
-    matResource->m_albedoColor = Color(static_cast<uint8>(diffColor.x),
-                                        static_cast<uint8>(diffColor.y),
-                                        static_cast<uint8>(diffColor.z));
+    diffColor *= 255.0f;
+    matResource->m_albedoColor = Color(diffColor);
   }
   if (_pMaterial->m_normal) {
     matResource->m_normalID = _pMaterial->m_normal->getID();
@@ -74,9 +73,8 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   if (_pMaterial->m_emissive) {
     matResource->m_emissiveID = _pMaterial->m_emissive->getID();
     Vector3 emissColor = _pMaterial->m_properties.EmissiveMultiply;
-    matResource->m_emissiveColor = Color(static_cast<uint8>(emissColor.x),
-                                         static_cast<uint8>(emissColor.y),
-                                         static_cast<uint8>(emissColor.z));
+    emissColor *= 255.0f;
+    matResource->m_emissiveColor = Color(emissColor);
   }
 
   matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
@@ -103,7 +101,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   SIZE_T metalLength = matResource->m_metallicID.length();
   file.write(reinterpret_cast<const char*>(&metalLength), sizeof(SIZE_T));
   file.write(reinterpret_cast<const char*>(matResource->m_metallicID.c_str()), metalLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_roughValue), sizeof(float));
+  file.write(reinterpret_cast<const char*>(&matResource->m_metallicValue), sizeof(float));
   // emissive write
   SIZE_T emissLength = matResource->m_emissiveID.length();
   file.write(reinterpret_cast<const char*>(&emissLength), sizeof(SIZE_T));

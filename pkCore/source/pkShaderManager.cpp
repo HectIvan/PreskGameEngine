@@ -90,9 +90,9 @@ ShaderManager::insertShader(const ShaderKey& _key, SPtr<Shader> _pShader)
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
-  bool hasShader = m_shaders.contains(_key);
-  if (hasShader) {
-    return m_shaders.find(_key)->second;
+  SPtr<Shader> shader = m_shaders.find(_key)->second;
+  if (shader) {
+    return shader;
   }
   return nullptr;
 }

@@ -45,6 +45,14 @@ struct PK_UTILITY_EXPORT Color final
     _color.B = rgb;
     _color.A = a;
   }
+  // constructor with a vector3 & alpha.
+  explicit Color(const Vector3 _rgb, const uint8 _a = 255)
+  {
+    _color.R = _rgb.x;
+    _color.G = _rgb.y;
+    _color.B = _rgb.z;
+    _color.A = _a;
+  }
   // construct color with another
   Color(const Color& other)
   {

@@ -79,6 +79,9 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
       }
       resource->softLoad(path);
       insertNewResource(resource);
+      // register the action in the log.
+      const String msg = "Stored resource " + resource->m_resourcePath + ".";
+      g_Logger().registerMessage(msg, __FILE__, __LINE__);
     }
   }
 }

@@ -91,7 +91,9 @@ MaterialResource::load()
   file.read(reinterpret_cast<char*>(&matHeader.emissiveIDSize), sizeof(SIZE_T));
   m_emissiveID.resize(matHeader.emissiveIDSize);
   file.read(reinterpret_cast<char*>(&m_emissiveID[0]), matHeader.emissiveIDSize);
-  file.read(reinterpret_cast<char*>(&m_emissiveColor), sizeof(Color));
+  Color emissColor;
+  file.read(reinterpret_cast<char*>(&emissColor), sizeof(Color));
+  m_emissiveColor = Color(emissColor.rgb(), emissColor.getA());
 
   file.close();
 }

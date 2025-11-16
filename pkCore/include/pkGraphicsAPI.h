@@ -35,6 +35,7 @@
 namespace pkEngineSDK
 {
 
+class PKBlob;
 class ConstantBuffer;
 class Device;
 class IndexBuffer;
@@ -227,7 +228,7 @@ public:
    * @param _szShaderModel What kind of model is the shader.
    * @return Data blob.
    */
-  virtual void**
+  virtual PKBlob*
   compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
                         const char* _szShaderModel) = 0;

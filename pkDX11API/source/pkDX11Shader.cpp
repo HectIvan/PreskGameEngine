@@ -8,18 +8,13 @@
 #include "pkShaderResource.h"
 #include "pkLogger.h"
 
-#include <d3dcompiler.h>
-
 namespace pkEngineSDK
 {
 
 void
 DX11Shader::compileFromFile()
 {
-  GraphicsAPI& api = g_GraphicAPI();
-  m_pSBlob = reinterpret_cast<ID3DBlob*>(api.compileShaderFromFile(m_shaderDirectory,
-                                                                   m_sEntryPoint,
-                                                                   m_sModel));
+  m_pSBlob = g_GraphicAPI().compileShaderFromFile(m_shaderDirectory, m_sEntryPoint, m_sModel);
 }
 
 void
@@ -35,22 +30,31 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
 
   // load the shader data.
   resource->load();
+  // check if there is data in the shader
+  if (resource->m_data.empty()) {
+    const String msg = "Data from resource " + _pResource->m_name + " is empty.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    return;
+  }
+
+  // copy the new data into the blob
   const SIZE_T blobSize = resource->m_data.size();
-  // warning: this may cause the same issue we had with D3DCompileFromFile.
-  const uint32 hr = D3DCreateBlob(blobSize, &m_pSBlob);
+  m_pSBlob = new PKBlob(resource->m_data);
+
+  const String blobSizeString = to_string(blobSize);
 
   // if the blob failed to be created.
-  if (FAILED(hr)) {
-    const String msg = "Failed to create sBlob of size " + to_string(blobSize) + ".";
+  if (!m_pSBlob) {
+    const String msg = "Failed to create sBlob of size " + blobSizeString + ".";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return;
   }
-  memcpy(m_pSBlob->GetBufferPointer(), resource->m_data.data(), resource->m_data.size());
-  // m_pSBlob = reinterpret_cast<ID3DBlob*>(resource->m_data.data());
 
   // check if the data transfer was succesful.
   if (!m_pSBlob) {
-    const String msg = "Failed to create a shader blob from the shader resource " +
+    const String msg = "Failed to create a shader blob of size " +
+                       blobSizeString +
+                       " from the shader resource " +
                        resource->m_resourcePath +
                        ".";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);

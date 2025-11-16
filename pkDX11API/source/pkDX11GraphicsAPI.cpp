@@ -16,7 +16,7 @@
 /*********************************************/
 
 #include "pkAssetResourceManager.h"
-#include "pkLogger.h"
+#include "pkBlob.h"
 #include "pkDX11BlendState.h"
 #include "pkDX11ComputeShader.h"
 #include "pkDX11GraphicsAPI.h"
@@ -31,6 +31,7 @@
 #include "pkDX11VertexBuffer.h"
 #include "pkDX11VertexShader.h"
 #include "pkFileSystem.h"
+#include "pkLogger.h"
 #include "pkPlatformMath.h"
 #include "pkTextureCodec.h"
 #include "pkTextureResource.h"
@@ -376,8 +377,8 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  hr = device->m_pd3dDevice->CreateVertexShader(dxVShader->m_pSBlob->GetBufferPointer(),
-                                                dxVShader->m_pSBlob->GetBufferSize(),
+  hr = device->m_pd3dDevice->CreateVertexShader(dxVShader->m_pSBlob->getBufferPointer(),
+                                                dxVShader->m_pSBlob->getBufferSize(),
                                                 nullptr,
                                                 &dxVShader->m_pShader);
   // check if the creation was successful
@@ -385,7 +386,7 @@ DX11GraphicsAPI::createVShader(SPtr<Shader> _pShader)
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a DX Vertex Shader. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    dxVShader->m_pSBlob->Release();
+    safeRelease(dxVShader->m_pSBlob);
     return nullptr;
   }
   log.registerMessage("Created a DirectX Vertex Shader.", __FILE__, __LINE__);
@@ -408,8 +409,8 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  hr = device->m_pd3dDevice->CreatePixelShader(dxPShader->m_pSBlob->GetBufferPointer(),
-                                               dxPShader->m_pSBlob->GetBufferSize(),
+  hr = device->m_pd3dDevice->CreatePixelShader(dxPShader->m_pSBlob->getBufferPointer(),
+                                               dxPShader->m_pSBlob->getBufferSize(),
                                                nullptr,
                                                &dxPShader->m_pShader);
   // check if the creation was successful
@@ -417,7 +418,7 @@ DX11GraphicsAPI::createPShader(SPtr<Shader> _pShader)
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a DX Pixel Shader. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    dxPShader->m_pSBlob->Release();
+    safeRelease(dxPShader->m_pSBlob);
     return nullptr;
   }
   log.registerMessage("Created a DirectX Pixel Shader.", __FILE__, __LINE__);
@@ -440,8 +441,8 @@ DX11GraphicsAPI::createCShader(SPtr<Shader> _pShader)
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return nullptr;
   }
-  hr = device->m_pd3dDevice->CreateComputeShader(dxCShader->m_pSBlob->GetBufferPointer(),
-                                                 dxCShader->m_pSBlob->GetBufferSize(),
+  hr = device->m_pd3dDevice->CreateComputeShader(dxCShader->m_pSBlob->getBufferPointer(),
+                                                 dxCShader->m_pSBlob->getBufferSize(),
                                                  nullptr,
                                                  &dxCShader->m_pShader);
   // check if the creation was successful
@@ -449,7 +450,7 @@ DX11GraphicsAPI::createCShader(SPtr<Shader> _pShader)
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a DX Compute Shader. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    dxCShader->m_pSBlob->Release();
+    safeRelease(dxCShader->m_pSBlob);
     return nullptr;
   }
   log.registerMessage("Created a DirectX Compute Shader.", __FILE__, __LINE__);
@@ -859,7 +860,7 @@ DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState> _pRasterizerStat
   device->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
 }
 
-void**
+PKBlob*
 DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                                        const char* _szEntryPoint,
                                        const char* _szShaderModel)
@@ -888,12 +889,6 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   ID3DBlob* pErrorBlob = nullptr;
   ID3DBlob* dxBlob = nullptr;
   WString widePath = FileSystem::getAbsolutePathWStr(_szFileName);// _szFileName.getPathWStr(); // release issue
-
-  // wprintf(L"Compiling shader: %s\n", widePath.c_str());
-
-  // to do: a single shaders can be compiled several times, as each pass has their own independent shader
-  // and some may be shared. creating a shader manager might help mitigate this issue, perhaps by using a
-  // UMap and using the shader directory, entry point and model as a key to access the shader itself whenever it's needed.
 
   hr = D3DCompileFromFile(widePath.c_str(),
                           nullptr,
@@ -924,7 +919,9 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   }
   safeRelease(pErrorBlob);
 
-  return reinterpret_cast<void**>(dxBlob);
+  PKBlob* blob = new PKBlob(dxBlob->GetBufferPointer(), dxBlob->GetBufferSize());
+
+  return blob;
 }
 
 SPtr<InputLayout>
@@ -940,8 +937,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
 
   ID3D11ShaderReflection* pVShaderReflection = nullptr;
-  throwIfFailed(D3DReflect(dxVShader->m_pSBlob->GetBufferPointer(),
-                           dxVShader->m_pSBlob->GetBufferSize(),
+  throwIfFailed(D3DReflect(dxVShader->m_pSBlob->getBufferPointer(),
+                           dxVShader->m_pSBlob->getBufferSize(),
                            __uuidof(ID3D11ShaderReflection),
                            reinterpret_cast<void**>(&pVShaderReflection)));
 
@@ -1022,8 +1019,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader> _pShader)
   }
   device->m_pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
                                           static_cast<uint32>(inputLayoutDesc.size()),
-                                          dxVShader->m_pSBlob->GetBufferPointer(),
-                                          dxVShader->m_pSBlob->GetBufferSize(),
+                                          dxVShader->m_pSBlob->getBufferPointer(),
+                                          dxVShader->m_pSBlob->getBufferSize(),
                                           &pLayout->m_pVertexLayout);
   if (!pLayout) {
     const String msg = "Failed to create the input layout.";
@@ -1100,8 +1097,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
   }
   hr = device->m_pd3dDevice->CreateInputLayout(dxLayout.data(),
                                                static_cast<uint32>(dxLayout.size()),
-                                               dxVShader->m_pSBlob->GetBufferPointer(),
-                                               dxVShader->m_pSBlob->GetBufferSize(),
+                                               dxVShader->m_pSBlob->getBufferPointer(),
+                                               dxVShader->m_pSBlob->getBufferSize(),
                                                &pInputL->m_pVertexLayout);
   // failed to create the input layout
   if (hr != 0x00000000) {

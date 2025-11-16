@@ -2,7 +2,7 @@
 /**
  * @file    pkShaderManager.h
  * @author  Héctor Iván Muñoz Ceballos
- * @date    10/06/2026
+ * @date    10/06/2025
  * @brief   Shader Manager for the Engine.
  *
  * @bug    No known bugs.

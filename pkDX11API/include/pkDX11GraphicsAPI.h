@@ -237,7 +237,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _szShaderModel What kind of model is the shader.
    * @return Data blob.
    */
-  void **
+  PKBlob*
   compileShaderFromFile(Path _szFileName,
                         const char* _szEntryPoint,
                         const char* _szShaderModel) override;

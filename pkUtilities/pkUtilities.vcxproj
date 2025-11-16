@@ -170,6 +170,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\pkAABB.h" />
+    <ClInclude Include="include\pkBlob.h" />
     <ClInclude Include="include\pkCapsule.h" />
     <ClInclude Include="include\pkCollisionInfo.h" />
     <ClInclude Include="include\pkColor.h" />
@@ -197,6 +198,7 @@
     <ClInclude Include="include\uuid.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkBlob.cpp" />
     <ClCompile Include="source\pkCapsule.cpp" />
     <ClCompile Include="source\pkColor.cpp" />
     <ClCompile Include="source\pkCube.cpp" />

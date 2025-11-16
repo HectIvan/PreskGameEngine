@@ -123,6 +123,9 @@
     <ClInclude Include="include\pkUUID.h">
       <Filter>include\prerequisites</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkBlob.h">
+      <Filter>include\system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPlatformMath.cpp">
@@ -172,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="source\pkUUID.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkBlob.cpp">
+      <Filter>source\system</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

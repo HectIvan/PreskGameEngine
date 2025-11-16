@@ -72,14 +72,16 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   resource->writeBaseHeader(file, resource->m_id, shaderName, resourceDir);
 
-  resource->m_data = Vector<char>(static_cast<const char*>(shader->m_pSBlob->GetBufferPointer()),
-                                  static_cast<const char*>(shader->m_pSBlob->GetBufferPointer()) +
-                                  shader->m_pSBlob->GetBufferSize() );
+  const void* pointer = shader->m_pSBlob->getBufferPointer();
+  const SIZE_T pointerSize = shader->m_pSBlob->getBufferSize();
 
-  const SIZE_T fileSize = shader->m_pSBlob->GetBufferSize();
-  file.write(reinterpret_cast<const char*>(&fileSize), sizeof(SIZE_T));
+  resource->m_data = Vector<ANSICHAR>(static_cast<const ANSICHAR*>(pointer),
+                                      static_cast<const ANSICHAR*>(pointer) +
+                                      pointerSize );
+
+  file.write(reinterpret_cast<const ANSICHAR*>(&pointerSize), sizeof(SIZE_T));
   // write the shader blob data into the resource.
-  file.write(reinterpret_cast<const char*>(shader->m_pSBlob->GetBufferPointer()), fileSize);
+  file.write(reinterpret_cast<const ANSICHAR*>(pointer), pointerSize);
 
   file.close();
 
@@ -87,7 +89,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   const String msg = "Created shader resource " +
                      resourceDir +
                      " of size " +
-                     to_string(fileSize);
+                     to_string(pointerSize);
   log.registerMessage(msg, __FILE__, __LINE__);
 
   return resource;

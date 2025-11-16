@@ -19,6 +19,7 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 #include "pkShader.h"
+#include "pkBlob.h"
 
 namespace pkEngineSDK
 {
@@ -100,7 +101,7 @@ class DX11Shader : public Shader
   getBlob() { return m_pSBlob; }
 
  public:
-  ID3DBlob* m_pSBlob = nullptr;
+  PKBlob* m_pSBlob = nullptr;
 
  protected:
   /**

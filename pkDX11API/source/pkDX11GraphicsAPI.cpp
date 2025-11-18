@@ -1505,18 +1505,22 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 
 SPtr<Texture>
 DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                                           uint32 _bindFlags,
-                                           int32 _mipLevels)
+                                           uint32 _bindFlags)
 {
   Logger& log = g_Logger();
+
+  if (_pResource->getType() != RESOURCE_TYPE::kTexture) {
+    const String msg = "Failed to create texture from resource: " +
+                       _pResource->m_name +
+                       ". Resource is not a texture resource.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    return nullptr;
+  }
 
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   auto resource = reinterpret_pointer_cast<TextureResource>(_pResource);
 
-  if (!resource) {
-    const String msg = "Failed to utilize resource " + _pResource->m_name + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
-  }
+  uint32 mipLevels = resource->m_mipMapCount;
 
   resource->load();
 
@@ -1527,7 +1531,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
                                              PK_USAGE::kPK_USAGE_DEFAULT,
                                              _bindFlags,
                                              resource->m_format,
-                                             _mipLevels);
+                                             mipLevels);
 
   // if creating the texture failed
   if (!tempTexture) {
@@ -1546,7 +1550,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
                                                  resource->m_width * resource->m_bpp,
                                                  0);
 
-  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  bool generateMips = (mipLevels == 0 || mipLevels > 1);
   if (generateMips) {
     GenerateMips(tempTexture);
   }

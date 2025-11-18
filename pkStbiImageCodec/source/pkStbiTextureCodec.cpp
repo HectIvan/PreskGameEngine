@@ -65,11 +65,13 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   const String fullPath = FileSystem::getAbsolutePath(_path).string();
 
   // load float data for exr and hdr files.
+  uint32 mipcount = 1;
   if (extension == "exr" || extension == "hdr") {
     float* dataF = stbi_loadf(fullPath.c_str(), &width, &height, &bpp, 4);
     data = reinterpret_cast<unsigned char*>(dataF);
     bpp = 4 * sizeof(float);
     format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+    mipcount = 0;
   }
   // load normal data for other file types.
   else {
@@ -103,6 +105,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   textureRes->m_height = height;
   textureRes->m_bpp = bpp;
   textureRes->m_format = static_cast<uint32>(format);
+  textureRes->m_mipMapCount = mipcount;
   textureRes->m_data = new unsigned char[dataSize];
   memcpy(textureRes->m_data, data, dataSize);
 
@@ -117,11 +120,13 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     texHeader.bpp = textureRes->m_bpp;
     texHeader.format = textureRes->m_format;
     texHeader.dataSize = dataSize;
+    texHeader.mipMapCount = textureRes->m_mipMapCount;
     file.write(reinterpret_cast<const char*>(&texHeader.width), sizeof(int32));
     file.write(reinterpret_cast<const char*>(&texHeader.height), sizeof(int32));
     file.write(reinterpret_cast<const char*>(&texHeader.bpp), sizeof(int32));
     file.write(reinterpret_cast<const char*>(&texHeader.format), sizeof(uint32));
     file.write(reinterpret_cast<const char*>(&texHeader.dataSize), sizeof(uint32));
+    file.write(reinterpret_cast<const char*>(&texHeader.mipMapCount), sizeof(uint32));
     file.write(reinterpret_cast<char*>(&data[0]), dataSize);
     file.close();
   }

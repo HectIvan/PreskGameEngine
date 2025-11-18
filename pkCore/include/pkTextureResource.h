@@ -27,6 +27,7 @@ struct TextureAssetHeader
   int32 bpp;
   uint32 format;
   uint32 dataSize;
+  uint32 mipMapCount;
 };
 
 class PK_CORE_EXPORT TextureResource : public BaseResource
@@ -60,6 +61,7 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
   int32 m_height;
   int32 m_bpp;
   uint32 m_format;
+  uint32 m_mipMapCount;
   unsigned char* m_data;
 };
 }

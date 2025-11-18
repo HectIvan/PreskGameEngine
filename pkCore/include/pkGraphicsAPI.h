@@ -302,13 +302,11 @@ public:
    * @brief Create a texture from a pk resource.
    * @param _pResource pointer to the resource.
    * @param _bindFlags What kind of binding will it have.
-   * @param _mipLevels MipMap level count.
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
   createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                            uint32 _bindFlags,
-                            int32 _mipLevels) = 0;
+                            uint32 _bindFlags) = 0;
 
   /**
    * @brief Create a texture from a DDS file.

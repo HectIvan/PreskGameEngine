@@ -491,8 +491,8 @@ RendererManager::renderModel(const SPtr<Model>& _model)
     // get the material
     SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
-    if (mesh->getActive()) {
-      SPtr<Material> material = mesh->material;
+    SPtr<Material> material = mesh->material;
+    if (mesh->getActive() &&  material) {
       // set the material textures to the shader
       Vector<SPtr<Texture>> textures = { material->m_albedo,
                                          material->m_normal,

@@ -85,11 +85,10 @@ TextureManager::loadTexture(const String& _ID)
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
-  if (!resource->m_isLoaded) {
-    resource->load();
-  }
+  
+  resource->load();
 
-  texture = api.createTextureFromResource(resource, bindFlags, mipLevels);
+  texture = api.createTextureFromResource(resource, bindFlags);
 
   // if the texture failed to load
   if (!texture) {

@@ -314,8 +314,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<Texture>
   createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                            uint32 _bindFlags,
-                            int32 _mipLevels) override;
+                            uint32 _bindFlags) override;
 
   /**
    * @brief Create a texture from a DDS file.

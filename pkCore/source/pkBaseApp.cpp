@@ -53,7 +53,7 @@ BaseApp::init(const char** _argv, int32 _count)
 #endif
 
   g_GraphicAPI().init(m_window);
-  // g_ShaderManager().createShaderResources();
+  g_ShaderManager().createShaderResources();
   assetResource.init("resources");
   assetResource.loadAssetsFromResourcesFolder();
   g_SceneManager().init();

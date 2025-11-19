@@ -230,8 +230,8 @@ public:
    */
   virtual PKBlob*
   compileShaderFromFile(Path _szFileName,
-                        const char* _szEntryPoint,
-                        const char* _szShaderModel) = 0;
+                        const ANSICHAR* _szEntryPoint,
+                        const ANSICHAR* _szShaderModel) = 0;
 
   /**
    * @brief Create the input layout based on the shader.

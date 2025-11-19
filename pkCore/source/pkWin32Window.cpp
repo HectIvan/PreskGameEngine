@@ -196,7 +196,7 @@ String
 Window::openFileFromExplorer() const
 {
   OPENFILENAME ofn;       // common dialog box structure
-  char szFile[MAX_PATH] = { 0 }; // buffer for file name
+  ANSICHAR szFile[MAX_PATH] = { 0 }; // buffer for file name
 
   // Initialize OPENFILENAME
   ZeroMemory(&ofn, sizeof(ofn));

@@ -220,7 +220,7 @@ class PK_CORE_EXPORT Camera : public Component
   /**
    * @brief Get the name of the component.
    */
-  const char*
+  const ANSICHAR*
   getName() override { return "Camera"; }
 
   /**

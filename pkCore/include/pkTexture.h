@@ -306,12 +306,12 @@ class PK_CORE_EXPORT Texture
   getNameString() { return m_name.toString(); }
 
   /**
-   * @brief Get the texture name as a const char*.
+   * @brief Get the texture name as a const ANSICHAR*.
    * @return Name of the texture;
    */
-  // const char*
+  // const ANSICHAR*
   // getNameCSTR() {
-  //   const char* name = m_name.toString().c_str();
+  //   const ANSICHAR* name = m_name.toString().c_str();
   //   return name;
   // }
 

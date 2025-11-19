@@ -18,6 +18,7 @@
 #include "shaderTest.h"
 
 using pkEngineSDK::AssetResourceManager;
+using pkEngineSDK::ANSICHAR;
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_AssetResourceManager;
@@ -280,7 +281,7 @@ ShaderTest::uInterfaceUpdate()
     m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
   if (im.beginDragDropTarget()) {
-    const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+    const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
       SPtr<Model> model = gpuResourceMan.loadPKModel(id);
       if (model) {
@@ -381,7 +382,7 @@ ShaderTest::uInterfaceUpdate()
           if (im.beginDragDropSource()) {
             const String dragText = "Dragging " + assetName;
             im.createText(dragText.c_str());
-            const char* data = asset.first.c_str();
+            const ANSICHAR* data = asset.first.c_str();
             im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
             im.endDragDropSource();
           }
@@ -455,7 +456,7 @@ ShaderTest::uInterfaceUpdate()
           }
         }
         if (im.beginDragDropTarget()) {
-          const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+          const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
           if (id) {
             SPtr<Model> model = gpuResourceMan.loadPKModel(id);
             m_selectedActor->addComponent(model);
@@ -535,7 +536,7 @@ ShaderTest::uInterfaceUpdate()
             }
           }
           if (im.beginDragDropTarget()) {
-            const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+            const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
             if (id) {
               SPtr<Texture> texture = tm.loadTexture(id);
               rm.m_mainSkybox->copyFrom(texture);

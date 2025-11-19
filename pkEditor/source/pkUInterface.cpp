@@ -137,7 +137,7 @@ UInterface::createSpace()
 }
 
 bool
-UInterface::beginTabBar(const char* _name)
+UInterface::beginTabBar(const ANSICHAR* _name)
 {
   return ImGui::BeginTabBar(_name);
 }
@@ -155,7 +155,7 @@ UInterface::beginDragDropSource()
 }
 
 void
-UInterface::setDragDropPayload(const char* _name, const void* _data, const SIZE_T _dataSize)
+UInterface::setDragDropPayload(const ANSICHAR* _name, const void* _data, const SIZE_T _dataSize)
 {
   ImGui::SetDragDropPayload(_name, _data, _dataSize);
 }
@@ -173,7 +173,7 @@ UInterface::beginDragDropTarget()
 }
 
 void*
-UInterface::acceptDragDropPayload(const char* _type)
+UInterface::acceptDragDropPayload(const ANSICHAR* _type)
 {
   const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(_type);
   if (payload) {
@@ -189,13 +189,13 @@ UInterface::endDragDropTarget()
 }
 
 bool
-UInterface::selectable(const char* _name, const Vector2 _size)
+UInterface::selectable(const ANSICHAR* _name, const Vector2 _size)
 {
   return ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
 }
 
 bool
-UInterface::beginTabItem(const char* _name)
+UInterface::beginTabItem(const ANSICHAR* _name)
 {
   return ImGui::BeginTabItem(_name);
 }
@@ -207,13 +207,13 @@ UInterface::endTabItem()
 }
 
 void
-UInterface::startWindowCreate(const char* _name)
+UInterface::startWindowCreate(const ANSICHAR* _name)
 {
   ImGui::Begin(_name, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 }
 
 void
-UInterface::createText(const char* _text)
+UInterface::createText(const ANSICHAR* _text)
 {
   ImGui::Text(_text);
 }
@@ -231,24 +231,24 @@ UInterface::createText(const char* _text)
 // }
 
 bool
-UInterface::createInputText(const char* _name, String* _param)
+UInterface::createInputText(const ANSICHAR* _name, String* _param)
 {
   return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
 }
 
 bool
-UInterface::createInputF(const char* _name, float& _param, float _step, float _largeStep)
+UInterface::createInputF(const ANSICHAR* _name, float& _param, float _step, float _largeStep)
 {
   return ImGui::InputFloat(_name, &_param, _step, _largeStep);
 }
 
 bool
-UInterface::createInputFClamp(const char* _name,
-  float& _param,
-  float _min,
-  float _max,
-  float _step,
-  float _largeStep)
+UInterface::createInputFClamp(const ANSICHAR* _name,
+                              float& _param,
+                              float _min,
+                              float _max,
+                              float _step,
+                              float _largeStep)
 {
   bool change = createInputF(_name, _param, _step, _largeStep);
   _param = Math::clamp(_param, _min, _max);
@@ -256,7 +256,7 @@ UInterface::createInputFClamp(const char* _name,
 }
 
 bool
-UInterface::createInputVector2(const char* _name, Vector2& _param)
+UInterface::createInputVector2(const ANSICHAR* _name, Vector2& _param)
 {
   float v[2] = { _param.x, _param.y };
   bool change = ImGui::InputFloat2(_name, v);
@@ -265,7 +265,10 @@ UInterface::createInputVector2(const char* _name, Vector2& _param)
   return change;
 }
 
-bool UInterface::createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max)
+bool UInterface::createInputVector2Clamp(const ANSICHAR* _name,
+                                         Vector2& _param,
+                                         float _min,
+                                         float _max)
 {
   bool change = createInputVector2(_name, _param);
   _param.clamp(_min, _max);
@@ -273,7 +276,7 @@ bool UInterface::createInputVector2Clamp(const char* _name, Vector2& _param, flo
 }
 
 bool
-UInterface::createInputVector3(const char* _name, Vector3& _param)
+UInterface::createInputVector3(const ANSICHAR* _name, Vector3& _param)
 {
   float v[3] = { _param.x, _param.y, _param.z };
   bool change = ImGui::InputFloat3(_name, v);
@@ -284,7 +287,7 @@ UInterface::createInputVector3(const char* _name, Vector3& _param)
 }
 
 Vector3
-UInterface::createInputVector3Ret(const char* _name, Vector3 _param)
+UInterface::createInputVector3Ret(const ANSICHAR* _name, Vector3 _param)
 {
   float v[3] = { _param.x, _param.y, _param.z };
   ImGui::InputFloat3(_name, v);
@@ -295,7 +298,10 @@ UInterface::createInputVector3Ret(const char* _name, Vector3 _param)
 }
 
 bool
-UInterface::createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max)
+UInterface::createInputVector3Clamp(const ANSICHAR* _name,
+                                    Vector3& _param,
+                                    float _min,
+                                    float _max)
 {
   bool change = createInputVector3(_name, _param);
   _param.clamp(_min, _max);
@@ -303,7 +309,7 @@ UInterface::createInputVector3Clamp(const char* _name, Vector3& _param, float _m
 }
 
 bool
-UInterface::createInputVector4(const char* _name, Vector4& _param)
+UInterface::createInputVector4(const ANSICHAR* _name, Vector4& _param)
 {
   float v[4] = { _param.x, _param.y, _param.z, _param.w };
   bool change = ImGui::InputFloat4(_name, v);
@@ -315,7 +321,10 @@ UInterface::createInputVector4(const char* _name, Vector4& _param)
 }
 
 bool
-UInterface::createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max)
+UInterface::createInputVector4Clamp(const ANSICHAR* _name,
+                                    Vector4& _param,
+                                    float _min,
+                                    float _max)
 {
   bool change = createInputVector4(_name, _param);
   _param.clamp(_min, _max);
@@ -323,16 +332,19 @@ UInterface::createInputVector4Clamp(const char* _name, Vector4& _param, float _m
 }
 
 void
-UInterface::createSliderF(const char* _name, float& _param, const float _min, const float _max)
+UInterface::createSliderF(const ANSICHAR* _name,
+                          float& _param,
+                          const float _min,
+                          const float _max)
 {
   ImGui::SliderFloat(_name, &_param, _min, _max);
 }
 
 void
-UInterface::createSliderVector2(const char* _name,
-  Vector2& _param,
-  const float _min,
-  const float _max)
+UInterface::createSliderVector2(const ANSICHAR* _name,
+                                Vector2& _param,
+                                const float _min,
+                                const float _max)
 {
   float vector[2] = { _param.x, _param.y };
   ImGui::SliderFloat2(_name, vector, _min, _max);
@@ -341,10 +353,10 @@ UInterface::createSliderVector2(const char* _name,
 }
 
 Vector3
-UInterface::createSliderVector3(const char* _name,
-  Vector3 _param,
-  const float _min,
-  const float _max)
+UInterface::createSliderVector3(const ANSICHAR* _name,
+                                Vector3 _param,
+                                const float _min,
+                                const float _max)
 {
   float vector[3] = { _param.x, _param.y, _param.z };
   ImGui::SliderFloat3(_name, vector, _min, _max);
@@ -355,13 +367,21 @@ UInterface::createSliderVector3(const char* _name,
 }
 
 bool
-UInterface::createDragF(const char* _name, float& _value, float _speed, float _min, float _max)
+UInterface::createDragF(const ANSICHAR* _name,
+                        float& _value,
+                        float _speed,
+                        float _min,
+                        float _max)
 {
   return ImGui::DragFloat(_name, &_value, _speed, _min, _max);
 }
 
 bool
-UInterface::createDrag3(const char* _name, Vector3& _value, float _speed, float _min, float _max)
+UInterface::createDrag3(const ANSICHAR* _name,
+                        Vector3& _value,
+                        float _speed,
+                        float _min,
+                        float _max)
 {
   float value[3] = { _value.x, _value.y, _value.z };
   bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
@@ -372,7 +392,7 @@ UInterface::createDrag3(const char* _name, Vector3& _value, float _speed, float 
 }
 
 void
-UInterface::createCheckBox(const char* _name, bool& _param)
+UInterface::createCheckBox(const ANSICHAR* _name, bool& _param)
 {
   ImGui::Checkbox(_name, &_param);
 }
@@ -423,12 +443,12 @@ Vector2 UInterface::getItemSize()
 }
 
 bool
-UInterface::beginCombo(const char* _name,
+UInterface::beginCombo(const ANSICHAR* _name,
                        int32& _previewVal,
                        const Vector<String>& _options)
 {
-  // make a string of const chars*
-  Vector<const char*> cstrs;
+  // make a string of const ANSICHAR*
+  Vector<const ANSICHAR*> cstrs;
   for (const auto& option : _options) {
     cstrs.push_back(option.c_str());
   }
@@ -440,7 +460,7 @@ UInterface::beginCombo(const char* _name,
 }
 
 bool
-UInterface::selectable(const char* _name, const String _selected)
+UInterface::selectable(const ANSICHAR* _name, const String _selected)
 {
   return ImGui::Selectable(_name, _selected == _name);
 }
@@ -466,7 +486,7 @@ UInterface::popID()
 
 
 bool
-UInterface::createButtonImage(const char* _name,
+UInterface::createButtonImage(const ANSICHAR* _name,
                               const SPtr<Texture>& _pTexture,
                               const Vector2 _size)
 {
@@ -489,7 +509,7 @@ UInterface::createImage(const SPtr<Texture>& _pTexture, const Vector2 _size)
 }
 
 bool
-UInterface::colorEdit(const char* _name, Color& _color)
+UInterface::colorEdit(const ANSICHAR* _name, Color& _color)
 {
   float color[4] = { static_cast<float>(_color.getR()),
                      static_cast<float>(_color.getB()),
@@ -504,7 +524,7 @@ UInterface::colorEdit(const char* _name, Color& _color)
 }
 
 bool
-UInterface::colorEdit(const char* _name, Vector3& _color)
+UInterface::colorEdit(const ANSICHAR* _name, Vector3& _color)
 {
   float color[3] = { _color.x, _color.y, _color.z };
   bool result = ImGui::ColorEdit3(_name, color, ImGuiColorEditFlags_NoInputs);
@@ -515,11 +535,11 @@ UInterface::colorEdit(const char* _name, Vector3& _color)
 }
 
 void
-UInterface::plotLines(const char* _name,
+UInterface::plotLines(const ANSICHAR* _name,
                       float _values[],
                       uint32 _size,
                       int32 _valuesOffset,
-                      const char* _overlayText,
+                      const ANSICHAR* _overlayText,
                       float _scaleMin,
                       float _scaleMax)
 {
@@ -527,7 +547,7 @@ UInterface::plotLines(const char* _name,
 }
 
 bool
-UInterface::collapsingHeader(const char* _name, PK_TREENODE_FLAGS::E _flags)
+UInterface::collapsingHeader(const ANSICHAR* _name, PK_TREENODE_FLAGS::E _flags)
 {
   return ImGui::CollapsingHeader(_name, static_cast<ImGuiTreeNodeFlags>(_flags));
 }
@@ -556,7 +576,7 @@ UInterface::popStyleColor(uint32 _count)
 }
 
 bool
-UInterface::beginChild(const char* _name, Vector2 _size, const bool _border)
+UInterface::beginChild(const ANSICHAR* _name, Vector2 _size, const bool _border)
 {
   // if the size is zero (default) use the parent size.
   if (_size == Vector2::ZERO) {
@@ -566,7 +586,7 @@ UInterface::beginChild(const char* _name, Vector2 _size, const bool _border)
 }
 
 bool
-UInterface::beginChild(const char* _name, float _x, float _y, const bool _border)
+UInterface::beginChild(const ANSICHAR* _name, float _x, float _y, const bool _border)
 {
   // if one of the values is 0, it will be replaced by the size of the parent window.
   if (_x == 0.0f) { _x = m_winSize.x; }
@@ -593,7 +613,7 @@ UInterface::isItemHovered()
 }
 
 void
-UInterface::setTooltip(const char* _text)
+UInterface::setTooltip(const ANSICHAR* _text)
 {
   ImGui::SetTooltip(_text);
 }

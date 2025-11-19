@@ -3,6 +3,9 @@
 
 namespace pkEngineSDK
 {
+
+using pkEngineSDK::ANSICHAR;
+
 void
 TextureResource::load()
 {
@@ -25,12 +28,12 @@ TextureResource::load()
   loadBaseHeader(file);
 
   TextureAssetHeader texHeader;
-  file.read(reinterpret_cast<char*>(&texHeader.width), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader.height), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader.bpp), sizeof(int32));
-  file.read(reinterpret_cast<char*>(&texHeader.format), sizeof(uint32));
-  file.read(reinterpret_cast<char*>(&texHeader.dataSize), sizeof(uint32));
-  file.read(reinterpret_cast<char*>(&texHeader.mipMapCount), sizeof(uint32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.width), sizeof(int32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.height), sizeof(int32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.bpp), sizeof(int32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.format), sizeof(uint32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.dataSize), sizeof(uint32));
+  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.mipMapCount), sizeof(uint32));
 
   m_width = texHeader.width;
   m_height = texHeader.height;
@@ -39,7 +42,7 @@ TextureResource::load()
   m_mipMapCount = texHeader.mipMapCount;
 
   m_data = new unsigned char[texHeader.dataSize];
-  file.read(reinterpret_cast<char*>(&m_data[0]), texHeader.dataSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_data[0]), texHeader.dataSize);
 
   file.close();
 

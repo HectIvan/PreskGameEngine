@@ -23,7 +23,7 @@ namespace pkEngineSDK
 {
 
 void
-BaseApp::init(const char** _argv, int32 _count)
+BaseApp::init(const ANSICHAR** _argv, int32 _count)
 {
   AssetResourceManager::startUp();
   DLLManager::startUp();
@@ -66,7 +66,7 @@ BaseApp::init(const char** _argv, int32 _count)
 
 // to do: class command line parser module to register arguments.
 void
-BaseApp::initAPI(const char** _argv, int32 _count)
+BaseApp::initAPI(const ANSICHAR** _argv, int32 _count)
 {
   DLLManager& dllManager = g_DLLManager();
   String abstraction = "DX11APId";

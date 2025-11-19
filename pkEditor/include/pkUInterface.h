@@ -55,7 +55,7 @@ namespace PK_TREENODE_FLAGS
 struct UIWindow {
   Vector2 size;
   Vector2 position;
-  const char* name;
+  const ANSICHAR* name;
   float alpha;
 
   void
@@ -170,7 +170,7 @@ class UInterface : public Module<UInterface>
    * @return Wether the tab bar was created or not.
    */
   bool
-  beginTabBar(const char* _name);
+  beginTabBar(const ANSICHAR* _name);
 
   /**
    * @brief End a tab bar in the UI.
@@ -192,7 +192,7 @@ class UInterface : public Module<UInterface>
    * @param _dataSize Data Size.
    */
   void
-  setDragDropPayload(const char* _name, const void* _data, const SIZE_T _dataSize);
+  setDragDropPayload(const ANSICHAR* _name, const void* _data, const SIZE_T _dataSize);
 
   /**
    * @brief End the drag and drop process.
@@ -211,7 +211,7 @@ class UInterface : public Module<UInterface>
    * @param _type Payload type.
    */
   void*
-  acceptDragDropPayload(const char* _type);
+  acceptDragDropPayload(const ANSICHAR* _type);
 
   /**
    * @brief End the drag drop process.
@@ -226,7 +226,7 @@ class UInterface : public Module<UInterface>
    * @return If clicked this frame.
    */
   bool
-  selectable(const char* _name, const Vector2 _size = Vector2(0.0f));
+  selectable(const ANSICHAR* _name, const Vector2 _size = Vector2(0.0f));
 
   /**
    * @brief Begin a UI tab.
@@ -234,7 +234,7 @@ class UInterface : public Module<UInterface>
    * @return Wether the tab is open or not.
    */
   bool
-  beginTabItem(const char* _name);
+  beginTabItem(const ANSICHAR* _name);
 
   /**
    * @brief end the UI tab.
@@ -247,14 +247,14 @@ class UInterface : public Module<UInterface>
    * @param _name Name of the window.
    */
   void
-  startWindowCreate(const char* _name);
+  startWindowCreate(const ANSICHAR* _name);
 
   /**
    * @brief Create a text in the User interface window.
    * @param _text What text to display.
    */
   void
-  createText(const char* _text);
+  createText(const ANSICHAR* _text);
 
   /**
    * @brief Create an input text.
@@ -263,7 +263,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputText(const char* _name, String* _param);
+  createInputText(const ANSICHAR* _name, String* _param);
 
   /**
    * @brief Create an input float.
@@ -274,7 +274,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputF(const char* _name,
+  createInputF(const ANSICHAR* _name,
                float& _param,
                float _step = 5.0f,
                float _largeStep = 10.0f);
@@ -290,7 +290,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputFClamp(const char* _name,
+  createInputFClamp(const ANSICHAR* _name,
                     float& _param,
                     float _min,
                     float _max,
@@ -304,7 +304,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector2(const char* _name, Vector2& _param);
+  createInputVector2(const ANSICHAR* _name, Vector2& _param);
 
   /**
    * @brief Create an input Vector2 with clamp.
@@ -315,7 +315,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector2Clamp(const char* _name, Vector2& _param, float _min, float _max);
+  createInputVector2Clamp(const ANSICHAR* _name, Vector2& _param, float _min, float _max);
 
   /**
    * @brief Create an input Vector3.
@@ -324,7 +324,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector3(const char* _name, Vector3& _param);
+  createInputVector3(const ANSICHAR* _name, Vector3& _param);
 
   /**
    * @brief Create an input Vector3 that returns the new value.
@@ -333,7 +333,7 @@ class UInterface : public Module<UInterface>
    * @return New value.
    */
   Vector3
-  createInputVector3Ret(const char* _name, Vector3 _param);
+  createInputVector3Ret(const ANSICHAR* _name, Vector3 _param);
 
   /**
    * @brief Create an input Vector3 with clamp.
@@ -344,7 +344,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector3Clamp(const char* _name, Vector3& _param, float _min, float _max);
+  createInputVector3Clamp(const ANSICHAR* _name, Vector3& _param, float _min, float _max);
 
   /**
    * @brief Create an input Vector4.
@@ -353,7 +353,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector4(const char* _name, Vector4& _param);
+  createInputVector4(const ANSICHAR* _name, Vector4& _param);
 
   /**
    * @brief Create an input Vector4 with clamp.
@@ -364,7 +364,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change or not.
    */
   bool
-  createInputVector4Clamp(const char* _name, Vector4& _param, float _min, float _max);
+  createInputVector4Clamp(const ANSICHAR* _name, Vector4& _param, float _min, float _max);
 
   /**
    * @brief Create a float slider.
@@ -374,7 +374,7 @@ class UInterface : public Module<UInterface>
    * @param _max Maximum value the parameter can have.
    */
   void
-  createSliderF(const char* _name, float& _param, const float _min, const float _max);
+  createSliderF(const ANSICHAR* _name, float& _param, const float _min, const float _max);
 
   /**
    * @brief Create a Vector2 slider.
@@ -384,7 +384,7 @@ class UInterface : public Module<UInterface>
    * @param _max Maximum value the parameter can have.
    */
   void
-  createSliderVector2(const char* _name, Vector2& _param, const float _min, const float _max);
+  createSliderVector2(const ANSICHAR* _name, Vector2& _param, const float _min, const float _max);
 
   /**
    * @brief Create a Vector3 slider.
@@ -394,7 +394,7 @@ class UInterface : public Module<UInterface>
    * @param _max Maximum value the parameter can have.
    */
   Vector3
-  createSliderVector3(const char* _name, Vector3 _param, const float _min, const float _max);
+  createSliderVector3(const ANSICHAR* _name, Vector3 _param, const float _min, const float _max);
 
   /**
    * @brief Create a drag input.
@@ -406,7 +406,10 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDragF(const char* _name, float& _value, float _speed = 1.0f, float _min = -99999.9f,
+  createDragF(const ANSICHAR* _name,
+              float& _value,
+              float _speed = 1.0f,
+              float _min = -99999.9f,
               float _max = 99999.9f);
 
   /**
@@ -419,7 +422,10 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDrag3(const char* _name, Vector3& _value, float _speed = 1.0f, float _min = -99999.9f,
+  createDrag3(const ANSICHAR* _name,
+              Vector3& _value,
+              float _speed = 1.0f,
+              float _min = -99999.9f,
               float _max = 99999.9f);
 
   /**
@@ -428,7 +434,7 @@ class UInterface : public Module<UInterface>
    * @param _param What parameter to change.
    */
   void
-  createCheckBox(const char* _name, bool& _param);
+  createCheckBox(const ANSICHAR* _name, bool& _param);
 
   /**
    * @brief Create a Button.
@@ -464,7 +470,7 @@ class UInterface : public Module<UInterface>
    * @param _options All options to use.
    */
   bool
-  beginCombo(const char* _name, int32& _previewVal, const Vector<String>& _options);
+  beginCombo(const ANSICHAR* _name, int32& _previewVal, const Vector<String>& _options);
 
   /**
    * @brief Create a selectable for a dropdown combo.
@@ -473,7 +479,7 @@ class UInterface : public Module<UInterface>
    * @return If it was selected.
    */
   bool
-  selectable(const char* _name, const String _selected);
+  selectable(const ANSICHAR* _name, const String _selected);
 
   /**
    * @brief End the creation of a dropdown combo.
@@ -489,7 +495,7 @@ class UInterface : public Module<UInterface>
    * @return If the button was pressed.
    */
   bool
-  createButtonImage(const char* _name,
+  createButtonImage(const ANSICHAR* _name,
                     const SPtr<Texture>& _pTexture,
                     const Vector2 _size = Vector2(64));
 
@@ -508,7 +514,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change.
    */
   bool
-  colorEdit(const char* _name, Color& _color);
+  colorEdit(const ANSICHAR* _name, Color& _color);
 
   /**
    * @brief Create a color editor.
@@ -517,7 +523,7 @@ class UInterface : public Module<UInterface>
    * @return Wether there was a change.
    */
   bool
-  colorEdit(const char* _name, Vector3& _color);
+  colorEdit(const ANSICHAR* _name, Vector3& _color);
 
   /**
    * @brief Create a plot line.
@@ -529,11 +535,11 @@ class UInterface : public Module<UInterface>
    * @param _scaleMax Maximum Y size.
    */
   void
-  plotLines(const char* _name,
+  plotLines(const ANSICHAR* _name,
             float _values[],
             uint32 _size,
             int32 _valuesOffset,
-            const char* _overlayText = nullptr,
+            const ANSICHAR* _overlayText = nullptr,
             float _scaleMin = 0.0f,
             float _scaleMax = 500.0f);
 
@@ -544,7 +550,7 @@ class UInterface : public Module<UInterface>
    * @return If the header is open.
    */
   bool
-  collapsingHeader(const char* _name,
+  collapsingHeader(const ANSICHAR* _name,
                    PK_TREENODE_FLAGS::E _flags = PK_TREENODE_FLAGS::kPK_None);
 
   /**
@@ -571,7 +577,7 @@ class UInterface : public Module<UInterface>
    * @return Wether it was opened.
    */
   bool
-  beginChild(const char* _name,
+  beginChild(const ANSICHAR* _name,
              Vector2 _size = Vector2(0.0f, 0.0f),
              const bool _border = true);
 
@@ -584,7 +590,7 @@ class UInterface : public Module<UInterface>
    * @return Wether it was opened.
    */
   bool
-  beginChild(const char* _name,
+  beginChild(const ANSICHAR* _name,
              float _x = 0.0f,
              float _y = 0.0f,
              const bool _border = true);
@@ -614,7 +620,7 @@ class UInterface : public Module<UInterface>
    * @param _text Text to display.
    */
   void
-  setTooltip(const char* _text);
+  setTooltip(const ANSICHAR* _text);
 
   /**
    * @brief Check if the cursor is on top of a window or item.

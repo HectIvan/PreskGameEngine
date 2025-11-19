@@ -25,6 +25,7 @@
 #include "pkVector4.h"
 #include "pkModelCodec.h"
 
+using pkEngineSDK::ANSICHAR;
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
 using pkEngineSDK::Color;
@@ -276,12 +277,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + albName;
                   im.createText(dragText.c_str());
                   const String textureID = albedo->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setAlbedo(texture);
@@ -300,7 +301,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setAlbedo(texture);
@@ -330,12 +331,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + norName;
                   im.createText(dragText.c_str());
                   const String textureID = normal->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setNormal(texture);
@@ -352,7 +353,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setNormal(texture);
@@ -383,12 +384,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + occName;
                   im.createText(dragText.c_str());
                   const String textureID = oclussion->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setOclussion(texture);
@@ -405,7 +406,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setOclussion(texture);
@@ -435,12 +436,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + roughName;
                   im.createText(dragText.c_str());
                   const String textureID = rough->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setRoughness(texture);
@@ -459,7 +460,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setRoughness(texture);
@@ -489,12 +490,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + metName;
                   im.createText(dragText.c_str());
                   const String textureID = metallic->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setMetallic(texture);
@@ -513,7 +514,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setMetallic(texture);
@@ -543,12 +544,12 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                   const String dragText = "Dragging " + emissName;
                   im.createText(dragText.c_str());
                   const String textureID = emissive->getID();
-                  const char* data = textureID.c_str();
+                  const ANSICHAR* data = textureID.c_str();
                   im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
                   im.endDragDropSource();
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setEmissive(texture);
@@ -567,7 +568,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
 
                 }
                 if (im.beginDragDropTarget()) {
-                  const char* id = reinterpret_cast<const char*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                  const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
                   if (id) {
                     SPtr<Texture> texture = tm.loadTexture(id);
                     meshMat->setEmissive(texture);

@@ -60,39 +60,39 @@ MaterialResource::load()
   MaterialAssetHeader matHeader;
 
   // read albedo data
-  file.read(reinterpret_cast<char*>(&matHeader.albedoIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.albedoIDSize), sizeof(SIZE_T));
   m_albedoID.resize(matHeader.albedoIDSize);
-  file.read(reinterpret_cast<char*>(&m_albedoID[0]), matHeader.albedoIDSize);
-  file.read(reinterpret_cast<char*>(&m_albedoColor), sizeof(Color));
+  file.read(reinterpret_cast<ANSICHAR*>(&m_albedoID[0]), matHeader.albedoIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_albedoColor), sizeof(Color));
 
   // read normal data
-  file.read(reinterpret_cast<char*>(&matHeader.normalIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.normalIDSize), sizeof(SIZE_T));
   m_normalID.resize(matHeader.normalIDSize);
-  file.read(reinterpret_cast<char*>(&m_normalID[0]), matHeader.normalIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_normalID[0]), matHeader.normalIDSize);
 
   // read ao data
-  file.read(reinterpret_cast<char*>(&matHeader.aoIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.aoIDSize), sizeof(SIZE_T));
   m_aoID.resize(matHeader.aoIDSize);
-  file.read(reinterpret_cast<char*>(&m_aoID[0]), matHeader.aoIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_aoID[0]), matHeader.aoIDSize);
 
   // read roughness data
-  file.read(reinterpret_cast<char*>(&matHeader.roughnessIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.roughnessIDSize), sizeof(SIZE_T));
   m_roughnessID.resize(matHeader.roughnessIDSize);
-  file.read(reinterpret_cast<char*>(&m_roughnessID[0]), matHeader.roughnessIDSize);
-  file.read(reinterpret_cast<char*>(&m_roughValue), sizeof(float));
+  file.read(reinterpret_cast<ANSICHAR*>(&m_roughnessID[0]), matHeader.roughnessIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_roughValue), sizeof(float));
 
   // read metallic data
-  file.read(reinterpret_cast<char*>(&matHeader.metallicIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.metallicIDSize), sizeof(SIZE_T));
   m_metallicID.resize(matHeader.metallicIDSize);
-  file.read(reinterpret_cast<char*>(&m_metallicID[0]), matHeader.metallicIDSize);
-  file.read(reinterpret_cast<char*>(&m_metallicValue), sizeof(float));
+  file.read(reinterpret_cast<ANSICHAR*>(&m_metallicID[0]), matHeader.metallicIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_metallicValue), sizeof(float));
 
   // read emissive data
-  file.read(reinterpret_cast<char*>(&matHeader.emissiveIDSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&matHeader.emissiveIDSize), sizeof(SIZE_T));
   m_emissiveID.resize(matHeader.emissiveIDSize);
-  file.read(reinterpret_cast<char*>(&m_emissiveID[0]), matHeader.emissiveIDSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_emissiveID[0]), matHeader.emissiveIDSize);
   Color emissColor;
-  file.read(reinterpret_cast<char*>(&emissColor), sizeof(Color));
+  file.read(reinterpret_cast<ANSICHAR*>(&emissColor), sizeof(Color));
   m_emissiveColor = Color(emissColor.rgb(), emissColor.getA());
 
   file.close();

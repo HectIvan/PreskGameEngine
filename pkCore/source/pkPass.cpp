@@ -121,7 +121,7 @@ Pass::~Pass()
 }
 
 void
-Pass::createVShader(const Path _directory, const char* _entry, const char* _sModel)
+Pass::createVShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
 {
   ShaderManager& shaderMan = g_ShaderManager();
 
@@ -146,7 +146,7 @@ Pass::createVShader(const Path _directory, const char* _entry, const char* _sMod
 }
 
 void
-Pass::createPShader(const Path _directory, const char* _entry, const char* _sModel)
+Pass::createPShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
 {
   ShaderManager& shaderMan = g_ShaderManager();
   const ShaderKey key(_directory.toString(), _entry, _sModel);
@@ -169,7 +169,7 @@ Pass::createPShader(const Path _directory, const char* _entry, const char* _sMod
 }
 
 void
-Pass::createCShader(const Path _directory, const char* _entry, const char* _sModel)
+Pass::createCShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
 {
   ShaderManager& shaderMan = g_ShaderManager();
   const ShaderKey key(_directory.toString(), _entry, _sModel);

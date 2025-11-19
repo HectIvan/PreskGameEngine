@@ -26,7 +26,7 @@ namespace pkEngineSDK
 // to do: temporary shader key, change for a UUID
 struct ShaderKey
 {
-  ShaderKey(const String _path, const char* _entryP, const char* _shaderModel) :
+  ShaderKey(const String _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :
     shaderPath(_path),
     _szEntryPoint(_entryP),
     _szShaderModel(_shaderModel)
@@ -41,8 +41,8 @@ struct ShaderKey
   }
 
   String shaderPath;
-  const char* _szEntryPoint;
-  const char* _szShaderModel;
+  const ANSICHAR* _szEntryPoint;
+  const ANSICHAR* _szShaderModel;
 };
 }
 
@@ -53,8 +53,8 @@ struct hash<pkEngineSDK::ShaderKey>
   SIZE_T
     operator()(const pkEngineSDK::ShaderKey& _key) const {
     return hash<pkEngineSDK::String>()(_key.shaderPath) ^
-           hash<const char*>()(_key._szEntryPoint) ^
-           hash<const char*>()(_key._szShaderModel);
+           hash<const pkEngineSDK::ANSICHAR*>()(_key._szEntryPoint) ^
+           hash<const pkEngineSDK::ANSICHAR*>()(_key._szShaderModel);
   }
 };
 }

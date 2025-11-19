@@ -71,7 +71,7 @@ class PK_CORE_EXPORT Shader
    * @param _sModel Shader model.
    */
   virtual void
-  setData(const Path _directory, const char* _entry, const char* _sModel) = 0;
+  setData(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel) = 0;
 
   /**
    * @brief get the current shader directory.
@@ -84,14 +84,14 @@ class PK_CORE_EXPORT Shader
    * @brief Get the current shader entry point.
    * @return The entry point.
    */
-  virtual const char*
+  virtual const ANSICHAR*
   getEntryPoint() = 0;
 
   /**
    * @brief Get the current shader model.
    * @return The shader model.
    */
-  virtual const char*
+  virtual const ANSICHAR*
   getShaderModel() = 0;
 };
 }

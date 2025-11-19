@@ -256,7 +256,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor name as a const char*.
    * @return Name as a const char*
    */
-  const char*
+  const ANSICHAR*
   getNameCSTR() { return m_name.c_str(); }
 
   /**

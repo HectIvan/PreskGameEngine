@@ -59,7 +59,7 @@ public:
    * @param _sModel Shader model.
    */
   void
-  createVShader(const Path _directory, const char* _entry, const char* _sModel);
+  createVShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
 
   /**
    * @brief Create the pixel shader.
@@ -68,7 +68,7 @@ public:
    * @param _sModel Shader model.
    */
   void
-  createPShader(const Path _directory, const char* _entry, const char* _sModel);
+  createPShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
 
   /**
    * @brief Create the compute shader.
@@ -77,7 +77,7 @@ public:
    * @param _sModel Shader model.
    */
   void
-  createCShader(const Path _directory, const char* _entry, const char* _sModel);
+  createCShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
 
   /**
    * @brief Compile both pixel and vertex shaders;

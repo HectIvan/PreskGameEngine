@@ -239,8 +239,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   PKBlob*
   compileShaderFromFile(Path _szFileName,
-                        const char* _szEntryPoint,
-                        const char* _szShaderModel) override;
+                        const ANSICHAR* _szEntryPoint,
+                        const ANSICHAR* _szShaderModel) override;
 
   /**
    * @brief Create the input layout based on the shader.

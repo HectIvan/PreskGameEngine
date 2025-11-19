@@ -54,7 +54,7 @@ class PK_CORE_EXPORT BaseApp
    * @brief Initialize the app.
    */
   void
-  init(const char** _argv, int32 _count);
+  init(const ANSICHAR** _argv, int32 _count);
 
   /**
    * @brief On initializing the app.
@@ -74,7 +74,7 @@ class PK_CORE_EXPORT BaseApp
    * @param _count Ammount of parameters.
    */
   void
-  initAPI(const char** _argv, int32 _count);
+  initAPI(const ANSICHAR** _argv, int32 _count);
 
   /**
    * @brief Event message loop.

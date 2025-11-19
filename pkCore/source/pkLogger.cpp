@@ -36,7 +36,7 @@ String
 Logger::getMessageError(int32 _hr)
 {
   // error log
-  char* errorMsg = nullptr;
+  ANSICHAR* errorMsg = nullptr;
 
   // convert from int32 to HRESULT
   HRESULT hr = static_cast<HRESULT>(_hr);

@@ -80,12 +80,12 @@ class PK_CORE_EXPORT Model : public Component
    * @param _name Name of the model.
    */
   void
-  setName(const char* _name) { m_name = String(_name); }
+  setName(const ANSICHAR* _name) { m_name = String(_name); }
 
   /**
    * @brief Get the name of the component.
    */
-  const char*
+  const ANSICHAR*
   getName() override { return m_name.c_str(); }
 
   /**

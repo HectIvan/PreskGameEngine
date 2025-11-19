@@ -66,7 +66,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   ModelAssetHeader mHeader;
   uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
   mHeader.meshCount = meshCount;
-  file.write(reinterpret_cast<const char*>(&mHeader.meshCount), sizeof(uint32));
+  file.write(reinterpret_cast<const ANSICHAR*>(&mHeader.meshCount), sizeof(uint32));
   // for each mesh in the model.
   for (uint32 i = 0; i < meshCount; ++i) {
     // aquire needed objects
@@ -81,16 +81,16 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     meshHeader.nameSize = nameSize;
     meshHeader.name = name;
     // write the mesh header.
-    file.write(reinterpret_cast<const char*>(&meshHeader.nameSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(meshHeader.name.c_str()), nameSize);
-    file.write(reinterpret_cast<const char*>(&meshHeader.vertexCount), sizeof(uint32));
-    file.write(reinterpret_cast<const char*>(&meshHeader.indexCount), sizeof(uint32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.nameSize), sizeof(SIZE_T));
+    file.write(reinterpret_cast<const ANSICHAR*>(meshHeader.name.c_str()), nameSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
 
     // write all vertices of the mesh.
-    file.write(reinterpret_cast<const char*>(mesh->vertexVector.data()),
+    file.write(reinterpret_cast<const ANSICHAR*>(mesh->vertexVector.data()),
                sizeof(SimpleVertex) * verticesCount);
     // write all indices of the mesh.
-    file.write(reinterpret_cast<const char*>(mesh->indexVector.data()),
+    file.write(reinterpret_cast<const ANSICHAR*>(mesh->indexVector.data()),
                sizeof(uint32) * indicesCount);
 
     // create the material resource
@@ -100,8 +100,8 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     // to do: find a better way to do this
 
     SIZE_T matIDSize = matResource->m_id.length();
-    file.write(reinterpret_cast<const char*>(&matIDSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const char*>(matResource->m_id.c_str()), matIDSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(&matIDSize), sizeof(SIZE_T));
+    file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_id.c_str()), matIDSize);
   }
   file.close();
 

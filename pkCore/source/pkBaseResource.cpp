@@ -38,15 +38,15 @@ BaseResource::loadBaseHeader(ifstream& _file)
   BaseHeader baseHeader;
 
   // write the base resource header.
-  _file.read(reinterpret_cast<char*>(&baseHeader.IDSize), sizeof(SIZE_T));
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.IDSize), sizeof(SIZE_T));
   baseHeader.ID.resize(baseHeader.IDSize);
-  _file.read(reinterpret_cast<char*>(&baseHeader.ID[0]), baseHeader.IDSize);
-  _file.read(reinterpret_cast<char*>(&baseHeader.nameSize), sizeof(SIZE_T));
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.ID[0]), baseHeader.IDSize);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.nameSize), sizeof(SIZE_T));
   baseHeader.name.resize(baseHeader.nameSize);
-  _file.read(reinterpret_cast<char*>(&baseHeader.name[0]), baseHeader.nameSize);
-  _file.read(reinterpret_cast<char*>(&baseHeader.pathSize), sizeof(SIZE_T));
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.name[0]), baseHeader.nameSize);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.pathSize), sizeof(SIZE_T));
   baseHeader.path.resize(baseHeader.pathSize);
-  _file.read(reinterpret_cast<char*>(&baseHeader.path[0]), baseHeader.pathSize);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.path[0]), baseHeader.pathSize);
 
   m_id = baseHeader.ID;
   m_name = baseHeader.name;
@@ -69,11 +69,11 @@ BaseResource::writeBaseHeader(ofstream& _file,
   header.path = _resourcePath;
   header.pathSize = _resourcePath.length();
 
-  _file.write(reinterpret_cast<const char*>(&header.IDSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const char*>(header.ID.c_str()), header.IDSize);
-  _file.write(reinterpret_cast<const char*>(&header.nameSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const char*>(header.name.c_str()), header.nameSize);
-  _file.write(reinterpret_cast<const char*>(&header.pathSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const char*>(header.path.c_str()), header.pathSize);
+  _file.write(reinterpret_cast<const ANSICHAR*>(&header.IDSize), sizeof(SIZE_T));
+  _file.write(reinterpret_cast<const ANSICHAR*>(header.ID.c_str()), header.IDSize);
+  _file.write(reinterpret_cast<const ANSICHAR*>(&header.nameSize), sizeof(SIZE_T));
+  _file.write(reinterpret_cast<const ANSICHAR*>(header.name.c_str()), header.nameSize);
+  _file.write(reinterpret_cast<const ANSICHAR*>(&header.pathSize), sizeof(SIZE_T));
+  _file.write(reinterpret_cast<const ANSICHAR*>(header.path.c_str()), header.pathSize);
 }
 }

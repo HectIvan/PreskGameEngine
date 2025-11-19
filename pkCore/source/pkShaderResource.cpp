@@ -43,9 +43,9 @@ ShaderResource::load()
   loadBaseHeader(file);
   // load the shader blob.
   SIZE_T blobSize = 0;
-  file.read(reinterpret_cast<char*>(&blobSize), sizeof(SIZE_T));
+  file.read(reinterpret_cast<ANSICHAR*>(&blobSize), sizeof(SIZE_T));
   m_data.resize(blobSize);
-  file.read(reinterpret_cast<char*>(m_data.data()), blobSize);
+  file.read(reinterpret_cast<ANSICHAR*>(m_data.data()), blobSize);
   file.close();
 
   // register the action.

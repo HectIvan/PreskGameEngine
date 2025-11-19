@@ -53,7 +53,7 @@ class PK_CORE_EXPORT Component
   /**
    * @brief Get the name of the component.
    */
-  virtual const char*
+  virtual const ANSICHAR*
   getName() = 0;
 
   /**

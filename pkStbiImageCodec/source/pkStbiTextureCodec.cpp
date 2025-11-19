@@ -18,6 +18,7 @@
 #define STBI_ENABLE_OPENEXR
 #include "stb_image.h"
 
+
 #include "pkAssetResourceManager.h"
 #include "pkUUID.h"
 #include "pkFileSystem.h"
@@ -58,7 +59,8 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
 
   // load data using stbi.
   int32 width, height, bpp;
-  unsigned char* data;
+
+  UASINCHAR* data;
   PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
   const String extension = _path.getExtension();
@@ -68,7 +70,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   uint32 mipcount = 1;
   if (extension == "exr" || extension == "hdr") {
     float* dataF = stbi_loadf(fullPath.c_str(), &width, &height, &bpp, 4);
-    data = reinterpret_cast<unsigned char*>(dataF);
+    data = reinterpret_cast<UASINCHAR*>(dataF);
     bpp = 4 * sizeof(float);
     format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
     mipcount = 0;
@@ -121,13 +123,13 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     texHeader.format = textureRes->m_format;
     texHeader.dataSize = dataSize;
     texHeader.mipMapCount = textureRes->m_mipMapCount;
-    file.write(reinterpret_cast<const char*>(&texHeader.width), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader.height), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader.bpp), sizeof(int32));
-    file.write(reinterpret_cast<const char*>(&texHeader.format), sizeof(uint32));
-    file.write(reinterpret_cast<const char*>(&texHeader.dataSize), sizeof(uint32));
-    file.write(reinterpret_cast<const char*>(&texHeader.mipMapCount), sizeof(uint32));
-    file.write(reinterpret_cast<char*>(&data[0]), dataSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.width), sizeof(int32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.height), sizeof(int32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.bpp), sizeof(int32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.format), sizeof(uint32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.dataSize), sizeof(uint32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.mipMapCount), sizeof(uint32));
+    file.write(reinterpret_cast<ANSICHAR*>(&data[0]), dataSize);
     file.close();
   }
 

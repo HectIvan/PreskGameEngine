@@ -81,32 +81,35 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 
   // albedo write
   SIZE_T diffLength = matResource->m_albedoID.length();
-  file.write(reinterpret_cast<const char*>(&diffLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_albedoID.c_str()), diffLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_albedoColor), sizeof(Color));
+  file.write(reinterpret_cast<const ANSICHAR*>(&diffLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_albedoID.c_str()), diffLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoColor), sizeof(Color));
   // normal write
   SIZE_T normalLength = matResource->m_normalID.length();
-  file.write(reinterpret_cast<const char*>(&normalLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_normalID.c_str()), normalLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&normalLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_normalID.c_str()), normalLength);
   // AO write
   SIZE_T aoLength = matResource->m_aoID.length();
-  file.write(reinterpret_cast<const char*>(&aoLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_aoID.c_str()), aoLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&aoLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_aoID.c_str()), aoLength);
   // roughness write
   SIZE_T roughLength = matResource->m_roughnessID.length();
-  file.write(reinterpret_cast<const char*>(&roughLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_roughnessID.c_str()), roughLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_roughValue), sizeof(float));
+  file.write(reinterpret_cast<const ANSICHAR*>(&roughLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_roughnessID.c_str()),
+             roughLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_roughValue), sizeof(float));
   // metallic write
   SIZE_T metalLength = matResource->m_metallicID.length();
-  file.write(reinterpret_cast<const char*>(&metalLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_metallicID.c_str()), metalLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_metallicValue), sizeof(float));
+  file.write(reinterpret_cast<const ANSICHAR*>(&metalLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_metallicID.c_str()),
+             metalLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_metallicValue), sizeof(float));
   // emissive write
   SIZE_T emissLength = matResource->m_emissiveID.length();
-  file.write(reinterpret_cast<const char*>(&emissLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const char*>(matResource->m_emissiveID.c_str()), emissLength);
-  file.write(reinterpret_cast<const char*>(&matResource->m_emissiveColor), sizeof(Color));
+  file.write(reinterpret_cast<const ANSICHAR*>(&emissLength), sizeof(SIZE_T));
+  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_emissiveID.c_str()),
+             emissLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveColor), sizeof(Color));
 
   file.close();
 

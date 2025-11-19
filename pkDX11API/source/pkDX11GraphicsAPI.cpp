@@ -71,7 +71,7 @@ class ShaderInclude : public ID3DInclude
     if (size == 0) {
       return E_FAIL;
     }
-    char* buffer = new char[size];
+    ANSICHAR* buffer = new ANSICHAR[size];
     file.read(buffer, size);
 
     *ppData = buffer;
@@ -80,7 +80,7 @@ class ShaderInclude : public ID3DInclude
   }
 
   HRESULT __stdcall Close(LPCVOID pData) noexcept override {
-    delete[] static_cast<const char*>(pData);
+    delete[] static_cast<const ANSICHAR*>(pData);
     return S_OK;
   }
 };
@@ -862,8 +862,8 @@ DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState> _pRasterizerStat
 
 PKBlob*
 DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
-                                       const char* _szEntryPoint,
-                                       const char* _szShaderModel)
+                                       const ANSICHAR* _szEntryPoint,
+                                       const ANSICHAR* _szShaderModel)
 {
   Logger& log = g_Logger();
   int32 hr = S_OK;
@@ -903,7 +903,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
 
   // if there's an error.
   if (pErrorBlob) {
-    const char* msg = reinterpret_cast<char*>(pErrorBlob->GetBufferPointer());
+    const ANSICHAR* msg = reinterpret_cast<ANSICHAR*>(pErrorBlob->GetBufferPointer());
     SIZE_T len = pErrorBlob->GetBufferSize();
     String error(msg, len);
     String fullMSG = "Shader failed to compile. Error message: " + error;

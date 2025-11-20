@@ -244,7 +244,9 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             im.createCheckBox("Active ", mesh->getActive());
             // Mesh material data
             SPtr<Material> material = mesh->material;
-            if (material->getName() != GPUResourceMan.m_defaultMaterial->getName()) {
+            const String matName = material->getNameS();
+            const String defaultMatName = GPUResourceMan.m_defaultMaterial->getName();
+            if (material && matName != defaultMatName) {
               im.createText("Material Name: ");
               im.sameLine();
               im.createInputText("##MaterialName: ", &material->m_name);

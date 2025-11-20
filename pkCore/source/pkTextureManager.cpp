@@ -73,10 +73,7 @@ TextureManager::loadTexture(const String& _ID)
     return texture;
   }
   // create the texture
-  // if it is an exr image / hdr
-  uint32 mipLevels = 0;
   uint32 bindFlags = PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
-  // mipLevels = 0; // to do: separate mips generation function between skybox and textures.
 
   // check if the resource is saved in the resource manager. otherwise, resource doesnt exist.
   SPtr<BaseResource> resource = g_AssetResourceManager().getResource(_ID);

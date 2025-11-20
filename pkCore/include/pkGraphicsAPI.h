@@ -265,6 +265,14 @@ public:
   getBytesFromFormat(const uint32 _format) = 0;
 
   /**
+   * @brief Get the format of a texture from the bytes per pixel.
+   * @param _bpp Bytes per pixel of the texture.
+   * @return
+   */
+  virtual uint32
+  getFormatFromBytes(const uint32 _bpp) = 0;
+
+  /**
    * @brief Create a new empty texture.
    * @return Pointer to the texture.
    */

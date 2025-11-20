@@ -1546,7 +1546,7 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
   device->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(), // something says null here and i dont know what.
                                                  0,
                                                  nullptr,
-                                                 resource->m_data,
+                                                 resource->m_data.data(),
                                                  resource->m_width * resource->m_bpp,
                                                  0);
 
@@ -1656,6 +1656,23 @@ DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
     return 1;
   }
   return 0;
+}
+
+uint32
+DX11GraphicsAPI::getFormatFromBytes(const uint32 _bpp)
+{
+  if (_bpp == 4) {
+    return PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  }
+  if (_bpp == 3) {
+    return PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
+  }
+  if (_bpp == 2) {
+    return PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_FLOAT;
+  }
+  if (_bpp == 1) {
+    return PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM;
+  }
 }
 
 SPtr<Texture>

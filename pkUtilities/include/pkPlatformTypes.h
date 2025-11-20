@@ -68,7 +68,7 @@ using int64 = int64_t;
 using WCHAR = wchar_t;
 using ANSICHAR = char;
 using UNICHAR = WCHAR;
-using UASINCHAR = unsigned char;
+using UANSICHAR = unsigned char;
 
 /**************************************************************/
 /**

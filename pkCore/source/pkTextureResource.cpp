@@ -32,7 +32,6 @@ TextureResource::load()
   file.read(reinterpret_cast<ANSICHAR*>(&texHeader.height), sizeof(int32));
   file.read(reinterpret_cast<ANSICHAR*>(&texHeader.bpp), sizeof(int32));
   file.read(reinterpret_cast<ANSICHAR*>(&texHeader.format), sizeof(uint32));
-  file.read(reinterpret_cast<ANSICHAR*>(&texHeader.dataSize), sizeof(uint32));
   file.read(reinterpret_cast<ANSICHAR*>(&texHeader.mipMapCount), sizeof(uint32));
 
   m_width = texHeader.width;
@@ -40,9 +39,10 @@ TextureResource::load()
   m_bpp = texHeader.bpp;
   m_format = texHeader.format;
   m_mipMapCount = texHeader.mipMapCount;
+  uint32 dataSize = m_width * m_height * m_bpp;
+  m_data.resize(static_cast<SIZE_T>(dataSize));
 
-  m_data = new unsigned char[texHeader.dataSize];
-  file.read(reinterpret_cast<ANSICHAR*>(&m_data[0]), texHeader.dataSize);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_data[0]), dataSize);
 
   file.close();
 

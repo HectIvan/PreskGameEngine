@@ -272,6 +272,14 @@ class DX11GraphicsAPI : public GraphicsAPI
   getBytesFromFormat(const uint32 _format) override;
 
   /**
+   * @brief Get the format of a texture from the bytes per pixel.
+   * @param _bpp Bytes per pixel of the texture.
+   * @return
+   */
+  uint32
+  getFormatFromBytes(const uint32 _bpp) override;
+
+  /**
    * @brief Create a new empty texture.
    * @return Pointer to the texture.
    */

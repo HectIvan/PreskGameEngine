@@ -60,7 +60,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   // load data using stbi.
   int32 width, height, bpp;
 
-  UASINCHAR* data;
+  UANSICHAR* data;
   PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
   const String extension = _path.getExtension();
@@ -70,7 +70,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   uint32 mipcount = 1;
   if (extension == "exr" || extension == "hdr") {
     float* dataF = stbi_loadf(fullPath.c_str(), &width, &height, &bpp, 4);
-    data = reinterpret_cast<UASINCHAR*>(dataF);
+    data = reinterpret_cast<UANSICHAR*>(dataF);
     bpp = 4 * sizeof(float);
     format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
     mipcount = 0;
@@ -108,8 +108,8 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   textureRes->m_bpp = bpp;
   textureRes->m_format = static_cast<uint32>(format);
   textureRes->m_mipMapCount = mipcount;
-  textureRes->m_data = new unsigned char[dataSize];
-  memcpy(textureRes->m_data, data, dataSize);
+  textureRes->m_data.resize(dataSize);//  = new unsigned char[dataSize];
+  memcpy(textureRes->m_data.data(), data, dataSize);
 
   // write the data into the pkt file.
   if (canCreateResource) {
@@ -121,13 +121,11 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     texHeader.height = textureRes->m_height;
     texHeader.bpp = textureRes->m_bpp;
     texHeader.format = textureRes->m_format;
-    texHeader.dataSize = dataSize;
     texHeader.mipMapCount = textureRes->m_mipMapCount;
     file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.width), sizeof(int32));
     file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.height), sizeof(int32));
     file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.bpp), sizeof(int32));
     file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.format), sizeof(uint32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.dataSize), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.mipMapCount), sizeof(uint32));
     file.write(reinterpret_cast<ANSICHAR*>(&data[0]), dataSize);
     file.close();

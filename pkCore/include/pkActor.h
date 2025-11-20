@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkFrustum pkFrustum.h
-* @Hector Ivan Muñoz Ceballos
-* @date 22/01/2025
-* @Frustum file for the Presk Game Engine.
-*
-* This file will contain the Frustum class used for the engine
-*
-* @bug No current function.
-*
-* @HectIvan 22/01/2024
-* File Creation.
-*/
-/************************************************************************/
+ * @file    pkActor.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    22/01/2024
+ * @brief   Actor for the scene in the engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

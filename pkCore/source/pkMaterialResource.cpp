@@ -26,7 +26,7 @@ MaterialResource::MaterialResource()
   const String noID = UUID::PK_DEFAULT_UUID;
   m_isLoaded = false;
   m_albedoID = noID;
-  m_albedoColor = Color::WHITE;
+  m_albedoColor = Vector3(1.0f);
   m_normalID = noID;
   m_aoID = noID;
   m_roughnessID = noID;
@@ -34,7 +34,7 @@ MaterialResource::MaterialResource()
   m_metallicID = noID;
   m_metallicValue = 1.0f;
   m_emissiveID = noID;
-  m_emissiveColor = Color::WHITE;
+  m_emissiveColor = Vector3(1.0f);
 }
 
 void
@@ -63,7 +63,7 @@ MaterialResource::load()
   file.read(reinterpret_cast<ANSICHAR*>(&matHeader.albedoIDSize), sizeof(SIZE_T));
   m_albedoID.resize(matHeader.albedoIDSize);
   file.read(reinterpret_cast<ANSICHAR*>(&m_albedoID[0]), matHeader.albedoIDSize);
-  file.read(reinterpret_cast<ANSICHAR*>(&m_albedoColor), sizeof(Color));
+  file.read(reinterpret_cast<ANSICHAR*>(&m_albedoColor), sizeof(Vector3));
 
   // read normal data
   file.read(reinterpret_cast<ANSICHAR*>(&matHeader.normalIDSize), sizeof(SIZE_T));
@@ -91,9 +91,7 @@ MaterialResource::load()
   file.read(reinterpret_cast<ANSICHAR*>(&matHeader.emissiveIDSize), sizeof(SIZE_T));
   m_emissiveID.resize(matHeader.emissiveIDSize);
   file.read(reinterpret_cast<ANSICHAR*>(&m_emissiveID[0]), matHeader.emissiveIDSize);
-  Color emissColor;
-  file.read(reinterpret_cast<ANSICHAR*>(&emissColor), sizeof(Color));
-  m_emissiveColor = Color(emissColor.rgb(), emissColor.getA());
+  file.read(reinterpret_cast<ANSICHAR*>(&m_emissiveColor), sizeof(Vector3));
 
   file.close();
 }

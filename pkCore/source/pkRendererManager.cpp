@@ -503,7 +503,8 @@ RendererManager::renderModel(const SPtr<Model>& _model)
                                          material->m_emissive };
       api.pSSetShaderResourceViews(textures);
       api.updateConstantBuffer(basePass->getCBuffer(3),
-                               &material->m_properties, sizeof(CBMaterialProps));
+                               &material->m_properties,
+                               sizeof(CBMaterialProps));
       // draw the mesh
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }

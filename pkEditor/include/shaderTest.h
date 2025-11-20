@@ -181,7 +181,7 @@ class ShaderTest : public BaseApp
   float m_ssaoBias = 0.01f;
   float m_ssaoIntensity = 2.0f;
 
-  float m_IBRIntensity;
+  float m_IBLIntensity;
   float m_exposure;
 
 

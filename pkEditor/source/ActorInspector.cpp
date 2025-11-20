@@ -51,6 +51,7 @@ using pkEngineSDK::ModelCodec;
 using pkEngineSDK::Path;
 using pkEngineSDK::reinterpret_pointer_cast;
 using pkEngineSDK::String;
+using pkEngineSDK::stringToLower;
 using pkEngineSDK::Texture;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::to_string;
@@ -228,8 +229,10 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
         // get mesh
         SPtr<Mesh> mesh = meshes[i];
         String name = mesh->getName();
+        const String searchMeshLower = stringToLower(_searchMesh);
+        const String meshNameLower = stringToLower(name);
         // if there is no search filter
-        if (name.find(_searchMesh.c_str()) != String::npos) {
+        if (meshNameLower.find(searchMeshLower.c_str()) != String::npos) {
           if (im.collapsingHeader(name.c_str())) {
             // Mesh geometry data
             im.createText("Vertex Count: ");

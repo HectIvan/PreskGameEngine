@@ -121,9 +121,9 @@ ShaderTest::onInit()
   // coat->addComponent(resourceMan.loadPKModel(res->m_id));
   // coat->setPosition(11.0f, 5.2f, 0.0f);
 
-  m_IBR = true;
+  m_IBL = true;
   m_vSync = false;
-  m_IBRIntensity = 1.0f;
+  m_IBLIntensity = 1.0f;
   // luminance blur
   m_blurRadius = 0.001f;
   m_blurStrength = 20.0f;
@@ -493,28 +493,35 @@ ShaderTest::uInterfaceUpdate()
       fpsHistory[fpsOffset] = f_fps;
       fpsOffset = (fpsOffset + 1) % fpsListSize;
       // --- Camera window --- //
-      if (im.collapsingHeader("Editor App", kPK_DefaultOpen)) {
-        // vSync
-        im.createText("vSync");
-        im.sameLine();
-        im.createCheckBox("##vSync", m_vSync);
-        im.createText(fpsStr.c_str());
-        im.sameLine();
-        im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
-        // camera speed
-        im.createDragF("##CamSpeed", m_cameraSpeed);
-        im.sameLine();
+      im.createText("vSync");
+      im.sameLine();
+      im.createCheckBox("##vSync", m_vSync);
+      // fps graph
+      im.createText(fpsStr.c_str());
+      im.sameLine();
+      im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
+      // editor app settings
+      if (im.beginTable("Editor App")) {
+        im.tableJumpRow();
+
+        im.tableJumpRow();
         im.createText("Camera Speed");
-        // X Sensitivity
-        im.createDragF("##XSens", m_sensX, 0.1f);
-        im.sameLine();
+        im.tableNextColumn();
+        im.createDragF("##CamSpeed", m_cameraSpeed);
+        im.tableJumpRow();
         im.createText("X Sensitivity");
-        // Y Sensitivity
-        im.createDragF("##YSens", m_sensY, 0.1f);
-        im.sameLine();
+        im.tableNextColumn();
+        im.createDragF("##XSens", m_sensX, 0.1f);
+        im.tableJumpRow();
         im.createText("Y Sensitivity");
-        im.createDragF("Texture UI Image Size", m_imgTextureSize, 1.0f, 1.0f);
+        im.tableNextColumn();
+        im.createDragF("##YSens", m_sensY, 0.1f);
+        im.tableJumpRow();
+        im.createText("Texture UI Image Size");
+        im.tableNextColumn();
+        im.createDragF("##TextureUIImageSize", m_imgTextureSize, 1.0f, 1.0f);
       }
+      im.endTable();
       im.endTabItem();
     }
     // -------------------------- //
@@ -526,8 +533,8 @@ ShaderTest::uInterfaceUpdate()
 
         // IBL
         im.tableNextColumn();
-        im.createCheckBox("IBL Active", m_IBR);
-        if (m_IBR) {
+        im.createCheckBox("IBL Active", m_IBL);
+        if (m_IBL) {
           // Slider for IBL intensity.
           if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
             Path path = m_window.openFileFromExplorer();
@@ -536,8 +543,6 @@ ShaderTest::uInterfaceUpdate()
               // rm.m_mainSkybox->copyFrom(texture);
             }
           }
-          im.tableNextColumn();
-          im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
           if (im.beginDragDropTarget()) {
             const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
             if (id) {
@@ -549,6 +554,8 @@ ShaderTest::uInterfaceUpdate()
           if (im.isItemHovered()) {
             im.setTooltip("Skybox");
           }
+          im.tableNextColumn();
+          im.createDragF("##iblIntensity", m_IBLIntensity, 0.1f, 0.0f, 1.0f);
         }
 
         // EXPOSURE
@@ -753,7 +760,7 @@ ShaderTest::onUpdate()
   emissiveBlur.strength = m_emissiveStrength;
   // IBR parameters.
   CBFloat IBRIntens;
-  IBRIntens.value = m_IBRIntensity;
+  IBRIntens.value = m_IBLIntensity;
   CBVector3 viewPos;
   viewPos.vec1 = camera->m_eye.xyz();
   // exposure parameter.

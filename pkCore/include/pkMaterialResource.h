@@ -59,7 +59,7 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
 
  public:
    String m_albedoID;
-   Color m_albedoColor;
+   Vector3 m_albedoColor;
    String m_normalID;
    String m_aoID;
    String m_roughnessID;
@@ -67,6 +67,6 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
    String m_metallicID;
    float m_metallicValue;
    String m_emissiveID;
-   Color m_emissiveColor;
+   Vector3 m_emissiveColor;
 };
 }

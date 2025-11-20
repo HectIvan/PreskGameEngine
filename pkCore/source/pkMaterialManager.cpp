@@ -76,10 +76,10 @@ MaterialManager::loadMaterial(const String& _ID)
   material->m_metallic = textureMan.loadTexture(metalId);
   material->m_emissive = textureMan.loadTexture(emissId);
 
-  material->m_properties.ColorMultiply = matResource->m_albedoColor.rgb();
+  material->m_properties.ColorMultiply = matResource->m_albedoColor;
   material->m_properties.roughnessMultiply = matResource->m_roughValue;
   material->m_properties.metallicMultiply = matResource->m_metallicValue;
-  material->m_properties.EmissiveMultiply = matResource->m_emissiveColor.rgb();
+  material->m_properties.EmissiveMultiply = matResource->m_emissiveColor;
 
   insertLoadedMaterial(_ID, material);
 

@@ -302,7 +302,7 @@ BaseApp::render()
   skyBoxPass->endPass();
   // IBR Pass.
   api.clearRenderTargetViews(Color::BLACK, IBRPass->getOutputTextures());
-  if (m_IBR) {
+  if (m_IBL) {
     IBRPass->beginPass();
     api.draw(3, 0);
     IBRPass->endPass();

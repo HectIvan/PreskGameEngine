@@ -52,9 +52,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   // check for each texture and see if they are valid to use.
   if (_pMaterial->m_albedo) {
     matResource->m_albedoID = _pMaterial->m_albedo->getID();
-    Vector3 diffColor = _pMaterial->m_properties.ColorMultiply;
-    diffColor *= 255.0f;
-    matResource->m_albedoColor = Color(diffColor);
+    matResource->m_albedoColor = _pMaterial->m_properties.ColorMultiply;
   }
   if (_pMaterial->m_normal) {
     matResource->m_normalID = _pMaterial->m_normal->getID();
@@ -72,9 +70,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   }
   if (_pMaterial->m_emissive) {
     matResource->m_emissiveID = _pMaterial->m_emissive->getID();
-    Vector3 emissColor = _pMaterial->m_properties.EmissiveMultiply;
-    emissColor *= 255.0f;
-    matResource->m_emissiveColor = Color(emissColor);
+    matResource->m_emissiveColor = _pMaterial->m_properties.EmissiveMultiply;
   }
 
   matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
@@ -83,7 +79,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   SIZE_T diffLength = matResource->m_albedoID.length();
   file.write(reinterpret_cast<const ANSICHAR*>(&diffLength), sizeof(SIZE_T));
   file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_albedoID.c_str()), diffLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoColor), sizeof(Color));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoColor), sizeof(Vector3));
   // normal write
   SIZE_T normalLength = matResource->m_normalID.length();
   file.write(reinterpret_cast<const ANSICHAR*>(&normalLength), sizeof(SIZE_T));
@@ -109,7 +105,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
   file.write(reinterpret_cast<const ANSICHAR*>(&emissLength), sizeof(SIZE_T));
   file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_emissiveID.c_str()),
              emissLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveColor), sizeof(Color));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveColor), sizeof(Vector3));
 
   file.close();
 

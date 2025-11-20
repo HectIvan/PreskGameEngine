@@ -165,6 +165,51 @@ class UInterface : public Module<UInterface>
   createSpace();
 
   /**
+   * @brief Begin a table in the UI.
+   * @param _name Name of the table.
+   * @param _columns Column ammount of the table.
+   */
+  bool
+  beginTable(const ANSICHAR* _name, const int32 _columns = 2);
+
+  /**
+   * @brief Setup a column in the table.
+   * @param _name Name of the column.
+   */
+  void
+  tableSetupColumn(const ANSICHAR* _name);
+
+  /**
+   * @brief Create a row with the table headers.
+   */
+  void
+  tableHeadersRow();
+
+  /**
+   * @brief Move to the next row in the table.
+   */
+  void
+  tableNextRow();
+
+  /**
+   * @brief Move to the next row in the table.
+   */
+  void
+  tableJumpRow();
+
+  /**
+   * @brief Move to the next column in the table.
+   */
+  void
+  tableNextColumn();
+
+  /**
+   * @brief End the table in the UI.
+   */
+  void
+  endTable();
+
+  /**
    * @brief Begin a tab bar in the UI.
    * @param _name Name of the tab bar.
    * @return Wether the tab bar was created or not.

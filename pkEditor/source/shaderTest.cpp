@@ -519,15 +519,16 @@ ShaderTest::uInterfaceUpdate()
     }
     // -------------------------- //
     // Graphics tab.
+    // -------------------------- //
     if (im.beginTabItem("Graphics")) {
-      // ------------IBL------------ //
-      if (im.collapsingHeader("IBL", kPK_DefaultOpen)) {
+      // table parameters
+      if (im.beginTable("Graphics")) {
+
+        // IBL
+        im.tableNextColumn();
         im.createCheckBox("IBL Active", m_IBR);
         if (m_IBR) {
           // Slider for IBL intensity.
-          im.sameLine();
-          im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
-          // Button for loading an HDRI image.
           if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
             Path path = m_window.openFileFromExplorer();
             if (path.toString() != "") {
@@ -535,6 +536,8 @@ ShaderTest::uInterfaceUpdate()
               // rm.m_mainSkybox->copyFrom(texture);
             }
           }
+          im.tableNextColumn();
+          im.createDragF("##iblIntensity", m_IBRIntensity, 0.1f, 0.0f, 1.0f);
           if (im.beginDragDropTarget()) {
             const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
             if (id) {
@@ -543,72 +546,93 @@ ShaderTest::uInterfaceUpdate()
             }
             im.endDragDropTarget();
           }
+          if (im.isItemHovered()) {
+            im.setTooltip("Skybox");
+          }
         }
+
+        // EXPOSURE
+        im.tableJumpRow();
+        im.createText("Exposure");
+        im.tableNextColumn();
+        im.createDragF("##Exposure", m_exposure, 0.1f, 0.0f);
+
+        // LUMINANCE
+        im.tableJumpRow();
+        im.createText("----------Luminance----------");
+        im.tableJumpRow();
+        im.createText("Radius");
+        im.tableNextColumn();
+        im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
+        im.tableJumpRow();
+        im.createText("Strength");
+        im.tableNextColumn();
+        im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
+        im.tableJumpRow();
+        im.createText("Threshhold");
+        im.tableNextColumn();
+        im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
+        im.tableJumpRow();
+
+        // EMISSIVE
+        im.createText("----------Emissive----------");
+        im.tableJumpRow();
+        im.createText("Radius");
+        im.tableNextColumn();
+        im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
+        im.tableJumpRow();
+        im.createText("Strength");
+        im.tableNextColumn();
+        im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
+        im.tableJumpRow();
+
+        // SSAO
+        im.createText("----------SSAO----------");
+        im.tableJumpRow();
+        im.createCheckBox("SSAO", m_ssao);
+        im.tableJumpRow();
+        if (m_ssao) {
+          im.createText("Sample Radius");
+          im.tableNextColumn();
+          im.createDragF("##SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
+          im.tableJumpRow();
+          im.createText("Scale");
+          im.tableNextColumn();
+          im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
+          im.tableJumpRow();
+          im.createText("Bias");
+          im.tableNextColumn();
+          im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
+          im.tableJumpRow();
+          im.createText("Intensity");
+          im.tableNextColumn();
+          im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
+        }
+        im.tableNextRow();
       }
-      if (im.isItemHovered()) {
-        im.setTooltip("Skybox");
-      }
-      // -------------------------- //
+      im.endTable();
 
       // --- Post-Process window --- //
-      im.PushStyleColor(Color(100, 0, 100, 125), Color(130, 0, 130, 125), Color(160, 0, 160, 125));
-      if (im.collapsingHeader("Post-Process", kPK_DefaultOpen)) {
-        im.createDragF("Exposure", m_exposure, 0.1f, 0.0f);
-        // Luminance
-        im.createText("Luminance");
-        // Blur
-        im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
-        im.sameLine();
-        im.createText("Radius");
-        im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
-        im.sameLine();
-        im.createText("Strength");
-        // luminance threshold
-        im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
-        im.sameLine();
-        im.createText("Threshold");
-
-        // Emissive blur pass
-        im.createText("Emissive");
-        im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
-        im.sameLine();
-        im.createText("Radius");
-        im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
-        im.sameLine();
-        im.createText("Strength");
-        // ssao
-        im.createCheckBox("SSAO", m_ssao);
-        if (m_ssao) {
-          im.createDragF("SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
-          im.sameLine();
-          im.createText("Sample Radius");
-          im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
-          im.sameLine();
-          im.createText("Scale");
-          im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
-          im.sameLine();
-          im.createText("Bias");
-          im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
-          im.sameLine();
-          im.createText("Intensity");
-        }
-      }
       if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
-        // display all compiled shaders.
-        Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
-        for (uint32 i = 0; i < shaders.size(); ++i) {
-          SPtr<Shader> shader = shaders[i];
-          String shaderName = shader->getShaderDirectory().getFileName();
-          im.createText(shaderName.c_str());
-          im.sameLine();
-          im.pushID(i);
-          if (im.createButton("Cmp")) {
-            //shader->compileFromFile();
+        if (im.beginTable("Shaders table")) {
+          im.tableNextColumn();
+          // display all compiled shaders.
+          Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
+          for (uint32 i = 0; i < shaders.size(); ++i) {
+            SPtr<Shader> shader = shaders[i];
+            String shaderName = shader->getShaderDirectory().getFileName();
+            im.createText(shaderName.c_str());
+            im.tableNextColumn();
+            im.pushID(i);
+            if (im.createButton("Compile")) {
+              //shader->compileFromFile();
+            }
+            im.popID();
+            im.tableJumpRow();
           }
-          im.popID();
         }
+        im.endTable();
       }
-      im.popStyleColor(3);
       im.endTabItem();
     }
     // -------------------------- //

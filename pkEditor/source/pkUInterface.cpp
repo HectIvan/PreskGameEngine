@@ -137,6 +137,48 @@ UInterface::createSpace()
 }
 
 bool
+UInterface::beginTable(const ANSICHAR* _name, const int32 _columns)
+{
+  return ImGui::BeginTable(_name, _columns);
+}
+
+void
+UInterface::tableSetupColumn(const ANSICHAR* _name)
+{
+  ImGui::TableSetupColumn(_name);
+}
+
+void
+UInterface::tableHeadersRow()
+{
+  ImGui::TableHeadersRow();
+}
+
+void
+UInterface::tableNextRow()
+{
+  ImGui::TableNextRow();
+}
+
+void UInterface::tableJumpRow()
+{
+  tableNextRow();
+  tableNextColumn();
+}
+
+void
+UInterface::tableNextColumn()
+{
+  ImGui::TableNextColumn();
+}
+
+void
+UInterface::endTable()
+{
+  ImGui::EndTable();
+}
+
+bool
 UInterface::beginTabBar(const ANSICHAR* _name)
 {
   return ImGui::BeginTabBar(_name);

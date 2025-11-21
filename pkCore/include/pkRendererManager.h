@@ -35,23 +35,20 @@ namespace pkEngineSDK
 namespace G_BUFFERS
 {
   enum E {
-    kGB_Albedo = 0,
-    kGB_Normal,
-    kGB_DiffuseBRDF, // oren-nayar shadows
-    kGB_SpecularBRDF, // cook-torrance specular
+    kGB_PositionsLight = 0, // positions from the light perspective
+    kGB_Positions, // positions from the camera perspective
+    kGB_Albedo, // object colors
+    kGB_Normal, // object normals
     kGB_ORM, // oclussion roughness metallic
-    kGB_SSAO,
-    kGB_PositionsLight,
-    kGB_Positions,
-    kGB_Emissive,
-    kGB_EmissiveHBlur,
-    kGB_EmissiveBlur,
-    kGB_Skybox,
-    kGB_IBL,
-    kGB_Merge,
-    kGB_Luminance,
-    kGB_LumBlurH,
-    kGB_LumBlur,
+    kGB_SSAO, // screen space ambient occlusion
+    kGB_BRDF, // light buffer
+    kGB_Emissive, // base emissive buffer
+    kGB_EmissiveHBlur, // emissive with horizontal blur
+    kGB_EmissiveBlur, // emissive with full blur
+    kGB_Skybox, // skybox buffer
+    kGB_Luminance, // luminance buffer
+    kGB_LumBlurH, // luminance horizontal blur
+    kGB_LumBlur, // luminance full blur
   };
 };
 
@@ -60,7 +57,6 @@ namespace D_BUFFERS
   enum E {
     kDB_Base = 0,
     kDB_Light,
-    kDB_QuadShadow,
   };
 }
 
@@ -78,13 +74,11 @@ namespace PASS_TYPE
     kP_EmissiveBlur,
     kP_EmissiveHBlur,
     kP_Exposure,
-    kP_IBL,
     kP_Luminance,
     kP_LumBlur,
     kP_LumBlurH,
-    kP_Merge,
-    kP_Shadow,
-    kP_ShadowQuad,
+    kP_LightPositions,
+    kP_Light,
     kP_SkyBox,
     kP_SSAO,
     kP_Tone,

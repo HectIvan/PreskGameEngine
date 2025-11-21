@@ -154,9 +154,9 @@ BaseApp::update()
   Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBVector2x2 shadowsParam;
-  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
-  shadowsParam.vec2 = Vector2(0.0f);
+  CBVector2x2 lightsParam;
+  lightsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
+  lightsParam.vec2 = Vector2(0.0f);
   Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
 
   // light buffers
@@ -195,11 +195,10 @@ BaseApp::update()
   uint32 cBLightSize = sizeof(CBLight);
 
   // get all passes.
-  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
+  SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> IBRPass = rm.getPass(kP_IBL);
-  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> quadLight = rm.getPass(kP_Light);
   SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
   SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
@@ -211,22 +210,20 @@ BaseApp::update()
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
 
-  api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
-  api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
+  api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
+  api.updateConstantBuffer(lightPositions->getCBuffer(1), &lightProj, m4x4Size);
 
   // update shadow-specular quad pass
-  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(3), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(quadLight->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(quadLight->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(quadLight->getCBuffer(2), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(quadLight->getCBuffer(3), &lightsParam, sizeof(Vector4));
+  Vector4 iblParams = Vector4(1.0f);
+  api.updateConstantBuffer(quadLight->getCBuffer(4), &iblParams, sizeof(Vector4));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
-
-  // ibr constant buffers.
-  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
-  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
 
   // luminance constant buffers.
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
@@ -249,15 +246,13 @@ BaseApp::render()
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& renderManager = g_RenderManager();
   // get all passes
-  SPtr<Pass> baseShadow = renderManager.getPass(kP_Shadow);
+  SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   SPtr<Pass> basePass = renderManager.getPass(kP_Base);
-  SPtr<Pass> shadowQuad = renderManager.getPass(kP_ShadowQuad);
   SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
+  SPtr<Pass> quadLight = renderManager.getPass(kP_Light);
   SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
-  SPtr<Pass> IBRPass = renderManager.getPass(kP_IBL);
   SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
-  SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
   SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
   SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
@@ -267,9 +262,9 @@ BaseApp::render()
   Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
   // first shadow pass
-  baseShadow->beginPass();
+  lightPositions->beginPass();
   renderManager.renderActors(actors);
-  baseShadow->endPass();
+  lightPositions->endPass();
 
   // base pass
   basePass->beginPass(Color::BLACK);
@@ -283,10 +278,10 @@ BaseApp::render()
   //        uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   //        uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
   // if shadows are set to be rendered
-  api.clearRenderTargetViews(Color::WHITE, shadowQuad->getOutputTextures());
-  shadowQuad->beginPass();
+  api.clearRenderTargetViews(Color::WHITE, quadLight->getOutputTextures());
+  quadLight->beginPass();
   api.draw(3, 0);
-  shadowQuad->endPass();
+  quadLight->endPass();
 
   // ssao pass
   api.clearRenderTargetViews(Color::WHITE, ssaoPass->getOutputTextures());
@@ -300,13 +295,6 @@ BaseApp::render()
   skyBoxPass->beginPass();
   api.draw(3, 0);
   skyBoxPass->endPass();
-  // IBR Pass.
-  api.clearRenderTargetViews(Color::BLACK, IBRPass->getOutputTextures());
-  if (m_IBL) {
-    IBRPass->beginPass();
-    api.draw(3, 0);
-    IBRPass->endPass();
-  }
 
   // emissive Horizontal Blur pass
   emissHBlurPass->beginPass();
@@ -317,11 +305,6 @@ BaseApp::render()
   emissBlurPass->beginPass();
   api.draw(3, 0);
   emissBlurPass->endPass();
-
-  // Quad merge pass.
-  mergePass->beginPass();
-  api.draw(3, 0);
-  mergePass->endPass();
 
   // Quad luminosity pass.
   lumPass->beginPass();

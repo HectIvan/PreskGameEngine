@@ -31,10 +31,10 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-  float4 diffuse : SV_Target0;
-  float4 normal : SV_Target1;
+  float4 albedo : SV_Target0; // object color
+  float4 normal : SV_Target1; // normal map
   float4 orm : SV_Target2; // occlusion, roughness, metallic
-  float4 emissive : SV_Target3;
+  float4 emissive : SV_Target3; // emissive color
   float4 posWS : SV_Target4; // world space position
 };
 
@@ -57,7 +57,7 @@ PS_OUTPUT PS(PS_INPUT input)
   normalSam = normalize(mul(normalSam, TBN));
   // fill up all outputs with their respective values.
   output.normal = float4(normalSam, 1.0f);
-  output.diffuse = float4(colorSam.rgb * colorMultiplier, 1.0f);
+  output.albedo = float4(colorSam.rgb * colorMultiplier, colorSam.a);
   output.orm = float4(AO.r, roughSam.g * roughnessFactor, metallicSam.b * metallicFactor, 1.0f);
   output.emissive = emissSam * float4(emissiveMultiplier, 1.0f);
   output.posWS = float4(input.PosWS, 1.0f);

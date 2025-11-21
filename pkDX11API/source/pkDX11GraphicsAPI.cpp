@@ -1673,6 +1673,7 @@ DX11GraphicsAPI::getFormatFromBytes(const uint32 _bpp)
   if (_bpp == 1) {
     return PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM;
   }
+  return -1;
 }
 
 SPtr<Texture>
@@ -1838,7 +1839,7 @@ DX11GraphicsAPI::createTexture(uint32 _width,
     }
   }
 
-  return tex;
+  return dxTex;
 }
 
 void

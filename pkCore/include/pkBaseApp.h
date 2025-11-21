@@ -28,13 +28,11 @@
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
-using pkEngineSDK::PASS_TYPE::kP_IBL;
-using pkEngineSDK::PASS_TYPE::kP_Shadow;
-using pkEngineSDK::PASS_TYPE::kP_ShadowQuad;
+using pkEngineSDK::PASS_TYPE::kP_LightPositions;
+using pkEngineSDK::PASS_TYPE::kP_Light;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_SSAO;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_Merge;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_LumBlur;

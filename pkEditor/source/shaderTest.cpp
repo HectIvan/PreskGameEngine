@@ -679,11 +679,10 @@ ShaderTest::onUpdate()
   RendererManager& rm = g_RenderManager();
 
   // get all passes.
-  SPtr<Pass> baseShadow = rm.getPass(kP_Shadow);
+  SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
   SPtr<Pass> basePass = rm.getPass(kP_Base);
   SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> IBRPass = rm.getPass(kP_IBL);
-  SPtr<Pass> quadShadows = rm.getPass(kP_ShadowQuad);
+  SPtr<Pass> lightQuad = rm.getPass(kP_Light);
   SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
   SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
@@ -759,8 +758,8 @@ ShaderTest::onUpdate()
   emissiveBlur.radius = m_emissiveBlur;
   emissiveBlur.strength = m_emissiveStrength;
   // IBR parameters.
-  CBFloat IBRIntens;
-  IBRIntens.value = m_IBLIntensity;
+  Vector4 IBRIntens;
+  IBRIntens.x = m_IBLIntensity;
   CBVector3 viewPos;
   viewPos.vec1 = camera->m_eye.xyz();
   // exposure parameter.
@@ -781,25 +780,22 @@ ShaderTest::onUpdate()
   uint32 cBLightSize = sizeof(CBLight);
 
   // update normal && base shadow pass buffers.
+  api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
+  api.updateConstantBuffer(lightPositions->getCBuffer(1), &lightProj, m4x4Size);
+
   api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
 
-  api.updateConstantBuffer(baseShadow->getCBuffer(0), &lightView, m4x4Size);
-  api.updateConstantBuffer(baseShadow->getCBuffer(1), &lightProj, m4x4Size);
-
   // update shadow-specular quad pass
-  api.updateConstantBuffer(quadShadows->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(quadShadows->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(quadShadows->getCBuffer(3), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(lightQuad->getCBuffer(0), &cBLight, cBLightSize);
+  api.updateConstantBuffer(lightQuad->getCBuffer(1), &cBCamera, cBCamSize);
+  api.updateConstantBuffer(lightQuad->getCBuffer(2), &lightViewProj, m4x4Size);
+  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, sizeof(Vector4));
+  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, sizeof(Vector4));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
   api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
-
-  // ibr constant buffers.
-  api.updateConstantBuffer(IBRPass->getCBuffer(0), &IBRIntens, sizeof(Vector4));
-  api.updateConstantBuffer(IBRPass->getCBuffer(1), &viewPos, sizeof(CBVector3));
 
   // luminance constant buffers.
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));

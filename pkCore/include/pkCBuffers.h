@@ -38,8 +38,19 @@ struct CBTransform
   Matrix4 transform;
 };
 
-struct CBSSAO
+struct CBSSAO // 16 bytes
 {
+  CBSSAO() = default;
+  CBSSAO(float _sampleRad,
+         float _scale,
+         float _bias,
+         float _intensity)
+    :
+    sample_rad(_sampleRad),
+    scale(_scale),
+    bias(_bias),
+    intensity(_intensity) {
+  }
   float sample_rad;
   float scale;
   float bias;
@@ -107,14 +118,30 @@ struct CBAOData
   float unused;
 };
 
-struct CBVector2x2
+struct CBVector2x2 // 16 bytes
 {
+  CBVector2x2() = default;
+  CBVector2x2(const Vector2& _vec1, const Vector2& _vec2)
+    : vec1(_vec1),
+      vec2(_vec2) {}
+
   Vector2 vec1;
   Vector2 vec2;
 };
 
-struct CBBlur
+struct CBBlur // 32 bytes
 {
+  CBBlur() = default;
+  CBBlur(const Vector2 _winSize,
+         const Vector2 _blurDir,
+         const float _radius,
+         const float _strength)
+    :
+    WinSize(_winSize),
+    BlurDirection(_blurDir),
+    radius(_radius),
+    strength(_strength) {}
+
   Vector2 WinSize;
   Vector2 BlurDirection;
   float radius;
@@ -122,14 +149,20 @@ struct CBBlur
   Vector2 _unused;
 };
 
-struct CBFloat
+struct CBFloat // 16 bytes
 {
+  CBFloat() = default;
+  CBFloat(const float _value) : value(_value) {}
+
   float value;
   Vector3 unused;
 };
 
-struct CBVector3
+struct CBVector3 // 16 bytes
 {
+  CBVector3() = default;
+  CBVector3(const Vector3& _vec) : vec1(_vec) {}
+
   Vector3 vec1;
   float unused;
 };

@@ -49,6 +49,7 @@ namespace G_BUFFERS
     kGB_Luminance, // luminance buffer
     kGB_LumBlurH, // luminance horizontal blur
     kGB_LumBlur, // luminance full blur
+    kGB_CubeMap , // luminance full blur
   };
 };
 
@@ -157,6 +158,14 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    */
   SPtr<Texture>
   getUAVBuffer(const UAV_BUFFERS::E _type);
+
+  /**
+   * @brief Generate a cubemap from a texture.
+   * @param _pInput Texture to convert.
+   * @param _pOutput Output cubemap texture.
+   */
+  void
+  generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput);
 
   /**
    * @brief Render a list of actors.

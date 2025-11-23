@@ -470,16 +470,22 @@ class DX11GraphicsAPI : public GraphicsAPI
   /**
    * @brief Clear all render target views of a vector.
    * @param _color New render target color.
+   * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) override;
+  clearRenderTargetViews(const Color& _color,
+                         const Vector<SPtr<Texture>>& _rtvs,
+                         const uint32 _mipslice = -1) override;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
+   * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
+  clearRenderTargetView(const Color& _color,
+                        const SPtr<Texture>& _rtv,
+                        const uint32 _mipSlice = -1) override;
 
   /**
    * @brief Clear access view.

@@ -97,6 +97,16 @@ RendererManager::init()
     m_mainSkybox->copyFrom(skyboxResource);
   }
 
+  // positions texture for the light.
+  txDesc.width = 2048;
+  txDesc.height = 2048;
+  txDesc.mipLevels = 11;
+  SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
+  txDesc.mipLevels = 1;
+
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
@@ -123,6 +133,8 @@ RendererManager::init()
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+
+  generateCubeMap(m_mainSkybox, cubeMapRT);
   
   // create the passes needed
   createPasses();
@@ -161,6 +173,7 @@ RendererManager::createPasses()
   SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
   SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
   SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
   // Depth textures
   SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -360,6 +373,79 @@ SPtr<Texture>
 RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
 {
   return m_uavBuffers.find(_type)->second;
+}
+
+void
+RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput)
+{
+  GraphicsAPI& api = g_GraphicAPI();
+  Logger& log = g_Logger();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+
+  // get vertex shader resource.
+  SPtr<BaseResource> vShadRes = assetMan.getResourceBydirectory("resources/pkQuadShader.pks");
+  SPtr<BaseResource> pShadRes = assetMan.getResourceBydirectory("resources/pkCubeMapShader.pks");
+
+  if (!vShadRes || !pShadRes) {
+    const String msg = "Could not find shader resources to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+
+  // create the vertex shader.
+  SPtr<Shader> vShader = api.internalCreateShader();
+  vShader->compileFromResource(vShadRes);
+  api.createVShader(vShader);
+  SPtr<InputLayout> iLayout = make_shared<InputLayout>();
+  iLayout = api.createInputLayoutFromVShader(vShader);
+
+  if (!vShader) {
+    const String msg = "Could not create vertex shader to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+
+  // create the pixel shader.
+  SPtr<Shader> pShader = api.internalCreateShader();
+  pShader->compileFromResource(pShadRes);
+  api.createPShader(pShader);
+
+  if (!pShader) {
+    const String msg = "Could not create pixel shader to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+
+  // create the sampler state.
+  SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
+                                                           PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+
+  Vector2 viewportSize = _pOutput->getSize();
+
+  // create constant buffer.
+  SPtr<ConstantBuffer> cBuffer = api.createConstantBuffer(sizeof(CBFloat));
+
+  // set the necessary resources.
+  api.setViewport(viewportSize);
+  api.setInputLayout(iLayout);
+  api.setVShader(vShader);
+  api.setPShader(pShader);
+  api.setSampler(samplerState);
+  api.pSSetShaderResourceViews({ _pInput });
+  api.pSSetConstantBuffers({ cBuffer }, 0);
+
+  // iterate through each face of the cubemap.
+  for (uint32 i = 0; i < 6; ++i) {
+    api.setRenderTarget(_pOutput, nullptr, i);
+    api.clearRenderTargetViews(Color::BLACK, { _pOutput }, i);
+    CBFloat data(static_cast<float>(i));
+    api.updateConstantBuffer(cBuffer, &data, sizeof(CBFloat));
+    api.draw(3, 0);
+  }
+
+  // unbind resources.
+  api.pSSetShaderResourceViews({ nullptr });
+  api.unbindRenderTargets(1);
 }
 
 template<class T> void

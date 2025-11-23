@@ -704,9 +704,7 @@ ShaderTest::onUpdate()
   Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBVector2x2 shadowsParam;
-  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
-  shadowsParam.vec2 = Vector2(0.0f);
+  CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // to do: win size could change, swap this to use the specific texture size.
   // to do: change this to another method
   if (camera) {
     view = camera->m_view.getTransposed();
@@ -743,41 +741,25 @@ ShaderTest::onUpdate()
   }
 
   // luminance parameters.
-  CBVector2x2 lum;
-  lum.vec1 = winSize;
-  lum.vec2.x = m_lumThreshold;
+  CBVector2x2 lum(winSize, Vector2(m_lumThreshold, 0.0f));
   // blur parameters.
-  CBBlur blur;
-  blur.WinSize = winSize;
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
-  blur.radius = m_blurRadius;
-  blur.strength = m_blurStrength;
+  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
   // emissive blur parameters
-  CBBlur emissiveBlur;
-  emissiveBlur.WinSize = winSize;
-  emissiveBlur.radius = m_emissiveBlur;
-  emissiveBlur.strength = m_emissiveStrength;
+  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlur, m_emissiveStrength);
   // IBR parameters.
-  Vector4 IBRIntens;
-  IBRIntens.x = m_IBLIntensity;
-  CBVector3 viewPos;
-  viewPos.vec1 = camera->m_eye.xyz();
+  CBFloat IBRIntens(m_IBLIntensity);
+  CBVector3 viewPos(camera->m_eye.xyz());
   // exposure parameter.
-  CBFloat exposure;
-  exposure.value = m_exposure;
+  CBFloat exposure(m_exposure);
   // SSAO
-  CBSSAO ssao;
-  ssao.sample_rad = m_ssaoSampleRad;
-  ssao.scale = m_ssaoScale;
-  ssao.bias = m_ssaoBias;
-  ssao.intensity = m_ssaoIntensity;
-  CBVector2x2 ssaoWin;
-  ssaoWin.vec1 = ssaoPass->getViewportSize();
+  CBSSAO ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
+  CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
 
   // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
+  uint32 cbBlurSize = sizeof(CBBlur);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
@@ -790,8 +772,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lightQuad->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(lightQuad->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(lightQuad->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, sizeof(Vector4));
-  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, sizeof(CBVector2x2));
+  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, sizeof(CBFloat));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
@@ -801,14 +783,14 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
   // Emissive blur constant buffers;
   emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, cbBlurSize);
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, cbBlurSize);
   // lum blur constant buffers
   blur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, cbBlurSize);
   blur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, cbBlurSize);
 
   api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, sizeof(CBFloat));
 

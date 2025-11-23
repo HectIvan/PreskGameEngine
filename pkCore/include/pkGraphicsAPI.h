@@ -464,16 +464,22 @@ public:
   /**
    * @brief Clear all render target views of a vector.
    * @param _color New render target color.
+   * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) = 0;
+  clearRenderTargetViews(const Color& _color,
+                         const Vector<SPtr<Texture>>& _rtvs,
+                         const uint32 _mipSlice = -1) = 0;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
+   * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
+  clearRenderTargetView(const Color& _color,
+                        const SPtr<Texture>& _rtv,
+                        const uint32 _mipSlice = -1) = 0;
 
   /**
    * @brief Clear access view.

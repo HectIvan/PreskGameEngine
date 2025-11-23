@@ -279,7 +279,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 diffuseIBL = IBL * (albedoTex / PI);
   
-  float4 finalColor = float4((albedoTex * diffuseBRDF) + (specularBRDF * IBL) + diffuseIBL, 1.0f);
+  float4 finalColor = float4((albedoTex * diffuseBRDF) + (specularBRDF * IBL) + (diffuseIBL * ao), 1.0f);
   
   return finalColor;
 }

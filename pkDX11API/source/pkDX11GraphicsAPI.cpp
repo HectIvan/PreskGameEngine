@@ -262,34 +262,51 @@ DX11GraphicsAPI::dispatch(uint32 _countX, uint32 _countY, uint32 _countZ)
 }
 
 void
-DX11GraphicsAPI::clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs)
+DX11GraphicsAPI::clearRenderTargetViews(const Color& _color,
+                                        const Vector<SPtr<Texture>>& _rtvs,
+                                        const uint32 _mipSlice)
 {
   for (uint32 i = 0; i < _rtvs.size(); ++i) {
-    clearRenderTargetView(_color, _rtvs[i]);
+    clearRenderTargetView(_color, _rtvs[i], _mipSlice);
   }
 }
 
 void
-DX11GraphicsAPI::clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv)
+DX11GraphicsAPI::clearRenderTargetView(const Color& _color,
+                                       const SPtr<Texture>& _rtv,
+                                       const uint32 _mipSlice)
 {
   PK_ASSERT(_rtv);
+  Logger& log = g_Logger();
   // Texture to a DirectX texture
   SPtr<DX11Texture> dxRTV = reinterpret_pointer_cast<DX11Texture>(_rtv);
   // If the casting failed.
   if (!dxRTV) {
-    g_Logger().print("Failed to clear the render target view");
+    const String msg = "Failed to clear the render target view.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return;
   }
   // clear the render target
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
   if (!device) {
-    g_Logger().print("Failed to utilize the DX device in the clearing of the Render TV.");
+    const String msg = "Failed to utilize the DX device in the clearing of the Render TV.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return;
   }
   float color[4] = { static_cast<float>(_color.getR()),
                      static_cast<float>(_color.getG()),
                      static_cast<float>(_color.getB()),
                      static_cast<float>(_color.getA()) };
+
+  // if there is a mip slice specified to be cleared, clear said slice only and return.
+  if (_mipSlice > -1) {
+    ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[_mipSlice];
+    if (rtv) {
+      device->m_pImmediateContext->ClearRenderTargetView(rtv, color);
+    }
+    return;
+  }
+  // if no mipSlice is specified, clear all the slices.
   for (uint32 i = 0; i < dxRTV->m_rTVs.size(); ++i) {
     ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[i];
     if (rtv) {

@@ -226,6 +226,7 @@ struct TextureDesc
   int32 bindFlags;
   int32 mipLevels = 1;
   int32 shaderResourceFormat;
+  bool isCube = false;
 };
 
 struct TextureAsset

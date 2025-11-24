@@ -184,42 +184,42 @@ public:
    * @returtn Vertex Shader.
    */
   virtual SPtr<Shader>
-  createVShader(SPtr<Shader> _pShader) = 0;
+  createVShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create a pixel shader.
    * @return Pixel Shader.
    */
   virtual SPtr<Shader>
-  createPShader(SPtr<Shader> _pShader) = 0;
+  createPShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create a compute shader.
    * @return Compute shader.
    */
   virtual SPtr<Shader>
-  createCShader(SPtr<Shader> _pShader) = 0;
+  createCShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setVShader(const SPtr<Shader> _pShader) = 0;
+  setVShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setPShader(const SPtr<Shader> _pShader) = 0;
+  setPShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set a compute shader.
    * @param _pShader Compute shader.
    */
   virtual void
-  setCShader(const SPtr<Shader> _pShader) = 0;
+  setCShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -288,23 +288,25 @@ public:
   createTexture(const TextureDesc& _desc) = 0;
 
   /**
-  * @brief Create a texture.
-  * @param _data Data of the image loaded.
-  * @param _width How wide is the texture.
-  * @param _height How tall is the texture.
-  * @param _format Format of the texture.
-  * @param _usage What usage will the api give the texture.
-  * @param _bindFlags flag for binding to the pipeline stages.
-  * @param _mipLevels The maximum number of mipmap levels in the texture.
-  **/
+   * @brief Create a texture.
+   * @param _width How wide is the texture.
+   * @param _height How tall is the texture.
+   * @param _format Format of the texture.
+   * @param _usage What usage will the api give the texture.
+   * @param _bindFlags flag for binding to the pipeline stages.
+   * @param _shaderResourceFormat Format of the shader resource view.
+   * @param _mipLevels The maximum number of mipmap levels in the texture.
+   * @param _isCube If the texture is a cube map.
+   */
   virtual SPtr<Texture>
-  createTexture(uint32 _width,
-                uint32 _height,
-                int32 _format,
-                int32 _usage,
+  createTexture(const uint32 _width,
+                const uint32 _height,
+                const int32 _format,
+                const int32 _usage,
                 int32 _bindFlags,
-                int32 _shaderResourceFormat,
-                int32 _mipLevels = 1) = 0;
+                const int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
+                const bool _isCube = false) = 0;
 
   /**
    * @brief Create a texture from a pk resource.
@@ -393,9 +395,9 @@ public:
    * @param _size Size of the data to store.
    */
   virtual void
-  updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
                        const void* _pNewData,
-                       SIZE_T _size) = 0;
+                       const SIZE_T _size) = 0;
 
   /**
    * @brief Set resources to a vertex shader.
@@ -486,7 +488,8 @@ public:
    * @param _color New view color.
    */
   virtual void
-  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
+  clearUnorderedAccessView(const SPtr<Texture>& _uav,
+                           const Color& _color = Color(1, 1, 1, 0)) = 0;
 
   /**
    * @brief Clear all unordered access views of a vector.
@@ -494,7 +497,7 @@ public:
    * @param _color New view color.
    */
   virtual void
-  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+  clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
                             const Color& _color = Color(1,1,1,0)) = 0;
 
   /**

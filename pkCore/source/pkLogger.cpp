@@ -201,7 +201,7 @@ Logger::createLogFiles()
   Vector<LogMSG> logs = getMessageLog();
 
   // create log file
-  ofstream logFile("log/Log.txt", ios::out);
+  ofstream logFile("log/Log.txt", ios::out | ios::trunc);
   for (uint32 i = 0; i < logs.size(); ++i) {
 
     String message = "";

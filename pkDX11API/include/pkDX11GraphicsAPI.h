@@ -195,40 +195,40 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @return Vertex Shader.
    */
   SPtr<Shader>
-  createVShader(SPtr<Shader> _pShader) override;
+  createVShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create a pixel shader.
    * @return Pixel Shader.
    */
   SPtr<Shader>
-  createPShader(SPtr<Shader> _pShader) override;
+  createPShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create a compute shader.
    * @return Compute shader.
    */
   SPtr<Shader>
-  createCShader(SPtr<Shader> _pShader) override;
+  createCShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set the vertex shader to the device context.
    */
   void
-  setVShader(const SPtr<Shader> _pShader) override;
+  setVShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
    */
   void
-  setPShader(const SPtr<Shader> _pShader) override;
+  setPShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set a compute shader.
    * @return Compute shader.
    */
   void
-  setCShader(const SPtr<Shader> _pShader) override;
+  setCShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -301,17 +301,19 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _format Format of the texture.
    * @param _usage What usage will the api give the texture.
    * @param _bindFlags flag for binding to the pipeline stages.
+   * @param _shaderResourceFormat Format of the shader resource view.
    * @param _mipLevels The maximum number of mipmap levels in the texture.
-   * @param _data Data of the image loaded.
+   * @param _isCube If the texture is a cube map.
    */
   SPtr<Texture>
-  createTexture(uint32 _width,
-                uint32 _height,
-                int32 _format,
-                int32 _usage,
+  createTexture(const uint32 _width,
+                const uint32 _height,
+                const int32 _format,
+                const int32 _usage,
                 int32 _bindFlags,
-                int32 _shaderResourceFormat,
-                int32 _mipLevels = 1) override;
+                const int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
+                const bool _isCube = false) override;
 
   /**
    * @brief Create a texture from a pk resource.
@@ -399,9 +401,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _size Size of the data to store.
    */
   void
-  updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
                        const void* _pNewData,
-                       SIZE_T _size) override;
+                       const SIZE_T _size) override;
 
   /**
    * @brief Set resources to a vertex shader.
@@ -492,7 +494,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _color New view color.
    */
   void
-  clearUnorderedAccessView(SPtr<Texture> _uav,
+  clearUnorderedAccessView(const SPtr<Texture>& _uav,
                            const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**
@@ -500,7 +502,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _color New view color.
    */
   void
-  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+  clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
                             const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**

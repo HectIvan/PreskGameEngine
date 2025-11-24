@@ -46,7 +46,6 @@ Pass::Pass(PassDesc& _desc)
     m_pVShader->compileFromResource(res);
     api.createVShader(m_pVShader);
     // create the input layout for the shader
-    m_pInputLayout = make_shared<InputLayout>();
     m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
   };
   // Try to create the pixel shader if there's a path.

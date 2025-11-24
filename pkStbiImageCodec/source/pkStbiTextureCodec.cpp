@@ -48,7 +48,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     return nullptr;
   }
 
-  ofstream file(resourcePath, ios::out | ios::binary);
+  ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
 
   // if the file cannot be open/created, return a warning and a nullptr.
   if (!file.is_open()) {

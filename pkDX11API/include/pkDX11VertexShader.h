@@ -28,9 +28,7 @@ class DX11VertexShader : public DX11Shader
 {
 public:
   DX11VertexShader() = default;
-  virtual ~DX11VertexShader() {
-    safeRelease(m_pShader);
-  }
+  ~DX11VertexShader() override = default;
 
  public:
   ID3D11VertexShader* m_pShader = nullptr;

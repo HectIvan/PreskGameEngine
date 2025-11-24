@@ -17,6 +17,7 @@ RendererManager::init()
   AssetResourceManager& assetMan = g_AssetResourceManager();
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
+  TextureCodec& texCodec = g_TextureCodec();
 
   uint32 winHeight = api.getSwapChain()->getHeight();
   uint32 winWidth = api.getSwapChain()->getWidth();
@@ -89,6 +90,8 @@ RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  
+  texCodec.createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -97,15 +100,17 @@ RendererManager::init()
     m_mainSkybox->copyFrom(skyboxResource);
   }
 
-  // positions texture for the light.
+  // Cube map for the skybox
   txDesc.width = 2048;
   txDesc.height = 2048;
   txDesc.mipLevels = 11;
+  txDesc.isCube = true;
   SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
   txDesc.mipLevels = 1;
+  txDesc.isCube = false;
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
@@ -382,6 +387,12 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
 
+  if (!_pInput || !_pOutput) {
+    const String msg = "Input or Output are null.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+
   // get vertex shader resource.
   SPtr<BaseResource> vShadRes = assetMan.getResourceBydirectory("resources/pkQuadShader.pks");
   SPtr<BaseResource> pShadRes = assetMan.getResourceBydirectory("resources/pkCubeMapShader.pks");
@@ -392,29 +403,29 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
     return;
   }
 
+  vShadRes->load();
+  pShadRes->load();
+
   // create the vertex shader.
   SPtr<Shader> vShader = api.internalCreateShader();
   vShader->compileFromResource(vShadRes);
-  api.createVShader(vShader);
-  SPtr<InputLayout> iLayout = make_shared<InputLayout>();
-  iLayout = api.createInputLayoutFromVShader(vShader);
-
   if (!vShader) {
     const String msg = "Could not create vertex shader to generate cubeMap.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
     return;
   }
+  api.createVShader(vShader);
+  SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // create the pixel shader.
   SPtr<Shader> pShader = api.internalCreateShader();
   pShader->compileFromResource(pShadRes);
-  api.createPShader(pShader);
-
   if (!pShader) {
     const String msg = "Could not create pixel shader to generate cubeMap.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
     return;
   }
+  api.createPShader(pShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
@@ -437,7 +448,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   // iterate through each face of the cubemap.
   for (uint32 i = 0; i < 6; ++i) {
     api.setRenderTarget(_pOutput, nullptr, i);
-    api.clearRenderTargetViews(Color::BLACK, { _pOutput }, i);
+    api.clearRenderTargetView(Color::BLACK, _pOutput, i);
     CBFloat data(static_cast<float>(i));
     api.updateConstantBuffer(cBuffer, &data, sizeof(CBFloat));
     api.draw(3, 0);
@@ -446,6 +457,9 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   // unbind resources.
   api.pSSetShaderResourceViews({ nullptr });
   api.unbindRenderTargets(1);
+  log.print(vShader.use_count());
+  log.print(pShader.use_count());
+  _CrtSetBreakAlloc(7256);
 }
 
 template<class T> void

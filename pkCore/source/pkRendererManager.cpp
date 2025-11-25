@@ -7,6 +7,7 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTextureCodec.h"
+#include "pkShaderManager.h"
 
 namespace pkEngineSDK
 {
@@ -223,7 +224,7 @@ RendererManager::createPasses()
   pDesc.vSDirectory = "resources/pkQuadShader.pks";
   pDesc.pSDirectory = "resources/pkLightShader.pks";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4), sizeof(Vector4)};
-  pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox };
+  pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
   pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
@@ -386,6 +387,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   GraphicsAPI& api = g_GraphicAPI();
   Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
+  ShaderManager& shaderMan = g_ShaderManager();
 
   if (!_pInput || !_pOutput) {
     const String msg = "Input or Output are null.";
@@ -417,6 +419,10 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.createVShader(vShader);
   SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
+  // save shader
+  ShaderKey vShaderKey("resources/pkQuadShader.pks", "vs_5_0", "VS");
+  shaderMan.insertShader(vShaderKey, vShader);
+
   // create the pixel shader.
   SPtr<Shader> pShader = api.internalCreateShader();
   pShader->compileFromResource(pShadRes);
@@ -426,6 +432,10 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
     return;
   }
   api.createPShader(pShader);
+
+  // save shader
+  ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "ps_5_0", "PS");
+  shaderMan.insertShader(pShaderKey, pShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
@@ -455,11 +465,9 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   }
 
   // unbind resources.
+  api.waitDevice();
   api.pSSetShaderResourceViews({ nullptr });
   api.unbindRenderTargets(1);
-  log.print(vShader.use_count());
-  log.print(pShader.use_count());
-  _CrtSetBreakAlloc(7256);
 }
 
 template<class T> void

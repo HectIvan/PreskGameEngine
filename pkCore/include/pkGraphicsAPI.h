@@ -78,6 +78,12 @@ public:
   getDevice() = 0;
 
   /**
+   * @brief Wait for the device to be idle.
+   */
+  virtual void
+  waitDevice() = 0;
+
+  /**
    * @brief Set the Client viewport.
    * @param _size Size of the viewport.
    */
@@ -111,7 +117,7 @@ public:
    * @param _pBlendState Blend state to set.
    */
   virtual void
-  setBlendState(const SPtr<BlendState> _pBlendState) = 0;
+  setBlendState(const SPtr<BlendState>& _pBlendState) = 0;
 
   /**
    * @brief Create the Rasterizer state.
@@ -126,7 +132,7 @@ public:
    * @param _pRasterizerState Rasterizer state to set.
    */
   virtual void
-  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) = 0;
+  setRasterizerState(const SPtr<RasterizerState>& _pRasterizerState) = 0;
 
   /**
    * @brief Create the sampler state.
@@ -239,7 +245,7 @@ public:
    * @return Input layout pointer
    */
   virtual SPtr<InputLayout>
-  createInputLayoutFromVShader(const SPtr<Shader> _pShader) = 0;
+  createInputLayoutFromVShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create the Input Layout.
@@ -519,9 +525,10 @@ public:
 
   /**
    * @brief Unbind the Vertex Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  vSUnbindConstantBuffers() = 0;
+  vSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -534,9 +541,10 @@ public:
 
   /**
    * @brief Unbind the Pixel Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  pSUnbindConstantBuffers() = 0;
+  pSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.
@@ -549,9 +557,10 @@ public:
 
   /**
    * @brief Unbind the compute Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  cSUnbindConstantBuffers() = 0;
+  cSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Draw the indexed data.

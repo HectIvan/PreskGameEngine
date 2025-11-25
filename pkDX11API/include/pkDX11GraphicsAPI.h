@@ -89,6 +89,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   getDevice() override { return m_pDevice; }
 
   /**
+   * @brief Wait for the device to be idle.
+   */
+  void
+  waitDevice() override;
+
+  /**
    * @brief Set the Client viewport.
    * @param _size Size of the viewport.
    */
@@ -122,7 +128,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pBlendState Blend state to set.
    */
   void
-  setBlendState(const SPtr<BlendState> _pBlendState) override;
+  setBlendState(const SPtr<BlendState>& _pBlendState) override;
 
   /**
    * @brief Create the Rasterizer state.
@@ -137,7 +143,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pRasterizerState Rasterizer state to set.
    */
   void
-  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) override;
+  setRasterizerState(const SPtr<RasterizerState>& _pRasterizerState) override;
 
   /**
    * @brief Create the sampler state.
@@ -247,7 +253,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pShader Shader to use.
    */
   SPtr<InputLayout>
-  createInputLayoutFromVShader(const SPtr<Shader> _pShader) override;
+  createInputLayoutFromVShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create the Input Layout.
@@ -525,7 +531,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Unbind the Vertex Shader constant buffers.
    */
   void
-  vSUnbindConstantBuffers() override;
+  vSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -538,9 +544,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind the Pixel Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   void
-  pSUnbindConstantBuffers() override;
+  pSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Set the Compute Shader Constant Buffer
@@ -553,9 +560,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind the compute Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   void
-  cSUnbindConstantBuffers() override;
+  cSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Draw the indexed data.
@@ -601,6 +609,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
  private:
   // api device
-  SPtr<Device> m_pDevice;
+  SPtr<DX11Device> m_pDevice;
 };
 }

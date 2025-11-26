@@ -104,13 +104,13 @@ RendererManager::init()
   // Cube map for the skybox
   txDesc.width = 2048;
   txDesc.height = 2048;
-  txDesc.mipLevels = 11;
+  // txDesc.mipLevels = 11;
   txDesc.isCube = true;
   SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
-  txDesc.mipLevels = 1;
+  // txDesc.mipLevels = 1;
   txDesc.isCube = false;
 
   // ---------------------------------------------------------- //
@@ -456,9 +456,9 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.pSSetConstantBuffers({ cBuffer }, 0);
 
   // iterate through each face of the cubemap.
+  api.clearRenderTargetView(Color::BLACK, _pOutput);
   for (uint32 i = 0; i < 6; ++i) {
     api.setRenderTarget(_pOutput, nullptr, i);
-    api.clearRenderTargetView(Color::BLACK, _pOutput, i);
     CBFloat data(static_cast<float>(i));
     api.updateConstantBuffer(cBuffer, &data, sizeof(CBFloat));
     api.draw(3, 0);

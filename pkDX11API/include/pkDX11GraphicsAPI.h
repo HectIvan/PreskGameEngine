@@ -168,8 +168,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(const SPtr<Texture> _pRTarget,
-                  const SPtr<Texture> _pDepthSV = nullptr,
+  setRenderTarget(const SPtr<Texture>& _pRTarget,
+                  const SPtr<Texture>& _pDepthSV = nullptr,
                   const uint32 _mipLevel = 0) override;
 
   /**
@@ -179,7 +179,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const SPtr<Texture>& _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) override;
 
   /**

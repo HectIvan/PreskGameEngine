@@ -157,8 +157,8 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(const SPtr<Texture> _pRTarget,
-                  const SPtr<Texture> _pDepthSV = nullptr,
+  setRenderTarget(const SPtr<Texture>& _pRTarget,
+                  const SPtr<Texture>& _pDepthSV = nullptr,
                   const uint32 _mipLevel = 0) = 0;
 
   /**
@@ -168,7 +168,7 @@ public:
    */
   virtual void
   setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const SPtr<Texture>& _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) = 0;
 
   /**

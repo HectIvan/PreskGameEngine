@@ -544,7 +544,7 @@ DX11GraphicsAPI::resizeSwapChain(const Vector2 _size)
 
 void
 DX11GraphicsAPI::setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-                                  const SPtr<Texture> _pDepthSV,
+                                  const SPtr<Texture>& _pDepthSV,
                                   const uint32 _mipLevel)
 {
   // reinterpret the depth stencil view to a DirectX texture
@@ -583,8 +583,8 @@ DX11GraphicsAPI::unbindRenderTargets(const SIZE_T _count)
 }
 
 void
-DX11GraphicsAPI::setRenderTarget(const SPtr<Texture> _pRTarget,
-                                 const SPtr<Texture> _pDepthSV,
+DX11GraphicsAPI::setRenderTarget(const SPtr<Texture>& _pRTarget,
+                                 const SPtr<Texture>& _pDepthSV,
                                  const uint32 _mipLevel)
 {
   // reinterpet render target
@@ -1473,6 +1473,10 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
     sDesc.Texture2D.MostDetailedMip = 0;
     sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
+    if (_isCube) {
+      sDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+    }
+
     // create the shader resource view
     hr = m_pDevice->m_pd3dDevice->CreateShaderResourceView(dxTex->m_t2d, &sDesc, &dxTex->m_sRV);
     // if failed to create shader resource view
@@ -1523,19 +1527,45 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
     memset(&rtvDesc, 0, sizeof(rtvDesc));
     rtvDesc.Format = desc.Format;
-    rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
-    dxTex->m_rTVs.resize(_mipLevels);
 
-    for (int32 i = 0; i < _mipLevels; ++i) {
-      rtvDesc.Texture2D.MipSlice = i;
-      hr = m_pDevice->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
-                                                           &rtvDesc,
-                                                           &dxTex->m_rTVs[i]);
-      if (FAILED(hr)) {
-        const String errMsg = log.getMessageError(hr);
-        const String msg = "Failed to create a render target view. Error message: " + errMsg;
-        log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    // if it's a cube texture.
+    if (_isCube) {
+      rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+      dxTex->m_rTVs.resize(6 * _mipLevels);
+      
+      for (uint32 cubeFace = 0; cubeFace < 6; ++cubeFace) {
+        for (int32 mip = 0; mip < _mipLevels; ++mip) {
+          rtvDesc.Texture2DArray.FirstArraySlice = cubeFace;
+          rtvDesc.Texture2DArray.MipSlice = mip;
+          rtvDesc.Texture2DArray.ArraySize = 1;
+
+          const uint32 index = cubeFace * _mipLevels + mip;
+          hr = m_pDevice->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
+                                                               &rtvDesc,
+                                                               &dxTex->m_rTVs[index]);
+
+          if (FAILED(hr)) {
+            const String msg = "Failed to create a render target view for a cube texture.";
+            log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+          }
+        }
+      }
+    }
+    // if it's not a cube texture.
+    else {
+      rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+      dxTex->m_rTVs.resize(_mipLevels);
+      for (int32 i = 0; i < _mipLevels; ++i) {
+        rtvDesc.Texture2D.MipSlice = i;
+        hr = m_pDevice->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
+                                                             &rtvDesc,
+                                                             &dxTex->m_rTVs[i]);
+        if (FAILED(hr)) {
+          const String errMsg = log.getMessageError(hr);
+          const String msg = "Failed to create a render target view. Error message: " + errMsg;
+          log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+        }
       }
     }
   }

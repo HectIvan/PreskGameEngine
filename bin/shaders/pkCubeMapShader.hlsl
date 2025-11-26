@@ -20,6 +20,7 @@ float2 SampleEquirectangular(float3 dir)
   float2 uv;
   uv.x = atan2(dir.z, dir.x) / (2.0 * PI) + 0.5;
   uv.y = acos(dir.y) / PI;
+  uv.y = 1.0f - uv.y;
   return uv;
 }
 

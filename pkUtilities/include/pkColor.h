@@ -30,20 +30,20 @@ struct PK_UTILITY_EXPORT Color final
 {
   Color() = default;
   // constructor with select colors
-  Color(uint8 r, uint8 g, uint8 b, uint8 a = 255)
+  Color(uint8 _r, uint8 _g, uint8 _b, uint8 _a = 255)
   {
-    _color.R = r;
-    _color.G = g;
-    _color.B = b;
-    _color.A = a;
+    _color.R = _r;
+    _color.G = _g;
+    _color.B = _b;
+    _color.A = _a;
   }
   // constructor with one set color & alpha
-  explicit Color(uint8 rgb, uint8 a)
+  explicit Color(uint8 _rgb, uint8 _a)
   {
-    _color.R = rgb;
-    _color.G = rgb;
-    _color.B = rgb;
-    _color.A = a;
+    _color.R = _rgb;
+    _color.G = _rgb;
+    _color.B = _rgb;
+    _color.A = _a;
   }
   // constructor with a vector3 & alpha.
   explicit Color(const Vector3 _rgb, const uint8 _a = 255)
@@ -54,14 +54,14 @@ struct PK_UTILITY_EXPORT Color final
     _color.A = _a;
   }
   // construct color with another
-  Color(const Color& other)
+  Color(const Color& _other)
   {
-    _color.fullColor = other._color.fullColor;
+    _color.fullColor = _other._color.fullColor;
   }
   // construct color from one single value
-  Color(uint32 other)
+  Color(uint32 _other)
   {
-    _color.fullColor = static_cast<uint32>(other);
+    _color.fullColor = static_cast<uint32>(_other);
   }
 
   virtual ~Color() = default;

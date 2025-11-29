@@ -54,6 +54,20 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   // onShutDown();
 
   /**
+   * @brief Create a flat color texture.
+   * @param _name Name of the texture.
+   * @param _width Width of the texture.
+   * @param _height Height of the texture.
+   * @param color Color to fill the texture with.
+   * @return Pointer to the newly created texture.
+   */
+  SPtr<Texture>
+  createFlatTexture(const String _name,
+                    const int32 _width,
+                    const int32 _height,
+                    const Color color);
+
+  /**
    * @brief Load texture from a texture id.
    * @param _ID ID of the texture to load.
    * @return Pointer to the newly created texture.

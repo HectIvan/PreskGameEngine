@@ -337,7 +337,7 @@ public:
    * @param _pTexture Texture to use.
    */
   virtual void
-  GenerateMips(SPtr<Texture>& _pTexture) = 0;
+  generateMips(const SPtr<Texture>& _pTexture) = 0;
 
   /**
    * @brief Create a VertexBuffer.
@@ -347,7 +347,7 @@ public:
    */
   virtual SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     uint32 _usage = 0) = 0;
+                     const uint32 _usage = 0) = 0;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -358,9 +358,9 @@ public:
    */
   virtual void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  uint32 _start = 0,
-                  uint32 _bufferCount = 1,
-                  uint32 _offset = 0) = 0;
+                  const uint32 _start = 0,
+                  const uint32 _bufferCount = 1,
+                  const uint32 _offset = 0) = 0;
 
   /**
    * @brief Create an IndexBuffer.
@@ -370,7 +370,7 @@ public:
    */
   virtual SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    uint32 _usage = 0) = 0;
+                    const uint32 _usage = 0) = 0;
 
   /**
    * @brief Set the index buffer.
@@ -379,8 +379,8 @@ public:
    */
   virtual void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 uint32 _format = 42, // kPK_FORMAT_R32_UINT
-                 uint32 _offset = 0) = 0;
+                 const uint32 _format = 42, // kPK_FORMAT_R32_UINT
+                 const uint32 _offset = 0) = 0;
 
   /**
    * @brief Create the constant buffer.
@@ -390,9 +390,9 @@ public:
    * @return Pointer to the constant buffer
    */
   virtual SPtr<ConstantBuffer>
-  createConstantBuffer(uint32 _size,
+  createConstantBuffer(const uint32 _size,
                        const void* _pData = nullptr,
-                       uint32 _usage = 0) = 0;
+                       const uint32 _usage = 0) = 0;
 
   /**
    * @brief Update the constant buffer.
@@ -411,7 +411,8 @@ public:
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   virtual void
-  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -426,7 +427,8 @@ public:
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   virtual void
-  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -441,7 +443,8 @@ public:
    * @param _start In what slot of the pixel shader will the resources be allocated
    */
   virtual void
-  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a compute shader.
@@ -457,10 +460,10 @@ public:
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   virtual void
-  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
-                            uint32 _start = 0,
-                            uint32* _initialCounts = nullptr,
-                            uint32 _mipLevels = 0) = 0;
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextures,
+                            const uint32 _start = 0,
+                            const uint32* _initialCounts = nullptr,
+                            const uint32 _mipLevels = 0) = 0;
 
   /**
    * @brief Unbind unordered views from a compute shader.

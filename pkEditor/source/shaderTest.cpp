@@ -108,25 +108,12 @@ ShaderTest::onInit()
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
-  // SPtr<Actor> pistol = activeScene->instantiate("Pistol");
-  // pistol->addComponent(modelCod.loadModel(Path("models/drakefire_pistol_low.obj")));
-  // pistol->setScale(30.0f);
-  // pistol->setPosition(10.0f, 15.0f, 0.0f);
-  // 
-  // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
-  // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-  // 
-  // SPtr<Actor> coat = activeScene->instantiate("Coat");
-  // SPtr<BaseResource> res = assetMan.loadResource(Path("resources/export3dcoat.pkm"));
-  // coat->addComponent(resourceMan.loadPKModel(res->m_id));
-  // coat->setPosition(11.0f, 5.2f, 0.0f);
-
   m_IBL = true;
   m_vSync = false;
   m_IBLIntensity = 1.0f;
   // luminance blur
-  m_blurRadius = 0.001f;
-  m_blurStrength = 20.0f;
+  m_blurRadius = 18.0f;
+  m_blurStrength = 1.0f;
   m_lumThreshold = 6.0f;
   // emissive blur
   m_emissiveBlur = 5.0f;

@@ -17,8 +17,6 @@ TextureManager::init()
   const Vector<String> paths = { "resources/FlatDiff.pkt",
                                  "resources/FlatNormal.pkt",
                                  "resources/FlatWhite.pkt",
-                                 "resources/FlatWhite.pkt",
-                                 "resources/FlatWhite.pkt",
                                  "resources/FlatBlack.pkt" };
 
   Vector<String> ids;
@@ -37,11 +35,13 @@ TextureManager::init()
   m_albID = ids[0];
   m_normalID = ids[1];
   m_AOID = ids[2];
-  m_roughID = ids[3];
-  m_metallicID = ids[4];
-  m_emissiveID = ids[5];
+  m_roughID = ids[2];
+  m_metallicID = ids[2];
+  m_emissiveID = ids[3];
 
   loadDefaultMatTextures();
+
+  // createFlatTexture("FlatRed", 1, 1, Color::RED);
 }
 
 void
@@ -58,8 +58,32 @@ TextureManager::loadDefaultMatTextures()
 SPtr<Texture>
 TextureManager::createEmptyTexture()
 {
+  return g_GraphicAPI().createEmptyTexture();
+}
+
+SPtr<Texture>
+TextureManager::createFlatTexture(const String _name,
+                                  const int32 _width,
+                                  const int32 _height,
+                                  const Color color)
+{
   GraphicsAPI& api = g_GraphicAPI();
-  return api.createEmptyTexture();
+  TextureCodec& texCodec = g_TextureCodec();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+  Vector<uint8> data = { color.getR(), color.getG(), color.getB(), color.getA() };
+  SPtr<TextureResource> resource = texCodec.createResource(_name,
+                                                           _width,
+                                                           _height,
+                                                           4,
+                                                           PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT,
+                                                           1,
+                                                           data);
+  assetMan.insertNewResource(resource);
+
+  SPtr<Texture> texture = api.createTextureFromResource(resource,
+                                                        PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE);
+
+  return texture;
 }
 
 SPtr<Texture>

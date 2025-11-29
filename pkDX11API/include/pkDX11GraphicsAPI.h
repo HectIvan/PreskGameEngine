@@ -345,7 +345,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pTexture Texture to use.
    */
   void
-  GenerateMips(SPtr<Texture>& _pTexture) override;
+  generateMips(const SPtr<Texture>& _pTexture) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -354,7 +354,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     uint32 _usage = 0) override;
+                     const uint32 _usage = 0) override;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -365,9 +365,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  uint32 _start = 0,
-                  uint32 _bufferCount = 1,
-                  uint32 _offset = 0) override;
+                  const uint32 _start = 0,
+                  const uint32 _bufferCount = 1,
+                  const uint32 _offset = 0) override;
 
   /**
    * @brief Create an IndexBuffer.
@@ -376,7 +376,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    uint32 _usage = 0) override;
+                    const uint32 _usage = 0) override;
 
   /**
    * @brief Set the index buffer.
@@ -385,8 +385,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 uint32 _format = 42,
-                 uint32 _offset = 0) override;
+                 const uint32 _format = 42,
+                 const uint32 _offset = 0) override;
 
   /**
    * @brief Create the constant buffer.
@@ -396,9 +396,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _usage What usage will be given to the buffer.
    */
   SPtr<ConstantBuffer>
-  createConstantBuffer(uint32 _size,
+  createConstantBuffer(const uint32 _size,
                        const void* _pData = nullptr,
-                       uint32 _usage = 0) override;
+                       const uint32 _usage = 0) override;
 
   /**
    * @brief Update the constant buffer.
@@ -417,7 +417,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -432,7 +433,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -447,7 +449,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources of a compute shader.
@@ -463,10 +466,10 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   void
-  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
-                            uint32 _start = 0,
-                            uint32* _initialCounts = nullptr,
-                            uint32 _mipLevels = 0) override;
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextures,
+                            const uint32 _start = 0,
+                            const uint32* _initialCounts = nullptr,
+                            const uint32 _mipLevels = 0) override;
 
   /**
    * @brief Unbind unordered views of a compute shader.

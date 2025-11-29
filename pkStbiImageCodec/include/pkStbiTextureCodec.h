@@ -27,6 +27,25 @@ class StbiTextureCodec : public TextureCodec
   virtual ~StbiTextureCodec() = default;
 
   /**
+   * @brief Create a texture resource.
+   * @param _name Name of the texture.
+   * @param _width Width of the texture.
+   * @param _height Height of the texture.
+   * @param _bpp Bits per pixel of the texture.
+   * @param _format Format of the texture.
+   * @param _mipCount Mip map count of the texture.
+   * @param _data Data of the texture.
+   */
+  SPtr<TextureResource>
+  createResource(const String _name,
+                 const int32 _width,
+                 const int32 _height,
+                 const int32 _bpp,
+                 const uint32 _format,
+                 const uint32 _mipCount,
+                 Vector<uint8>& _data) override;
+
+  /**
    * @brief Create a texture resource from a file using STBI.
    * @param _path Where to look for the file.
    * @return texture resource.

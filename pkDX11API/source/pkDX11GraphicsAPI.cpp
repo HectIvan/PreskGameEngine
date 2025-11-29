@@ -146,11 +146,12 @@ DX11GraphicsAPI::init(const Window& _window)
 }
 
 SPtr<ConstantBuffer>
-DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _usage)
+DX11GraphicsAPI::createConstantBuffer(const uint32 _size,
+                                      const void* _pData,
+                                      const uint32 _usage)
 {
   Logger& log = g_Logger();
-  auto dxCB = make_shared<DX11ConstantBuffer>();
-  int32 hr;
+  // buffer description.
   D3D11_BUFFER_DESC bDesc;
   bDesc.Usage = static_cast<D3D11_USAGE>(_usage);
   bDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -165,16 +166,22 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
     subData.SysMemSlicePitch = 0;
   }
 
-  hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bDesc,
-                                             _pData ? &subData : nullptr,
-                                             &dxCB->pCBuffer);
+  // create the constant buffer.
+  auto dxCB = make_shared<DX11ConstantBuffer>();
+  const int32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bDesc,
+                                                         _pData ? &subData : nullptr,
+                                                         &dxCB->pCBuffer);
+  // check for errors.
   if (FAILED(hr)) {
-    String errMsg = log.getMessageError(hr);
+    const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create the DX constant buffer. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
-  log.registerMessage("Created a DirectX constant buffer", __FILE__, __LINE__);
+
+  const String msg = "Created a DirectX constant buffer of size " + to_string(_size) + ".";
+  log.registerMessage(msg, __FILE__, __LINE__);
   return dxCB;
 }
 
@@ -391,10 +398,11 @@ DX11GraphicsAPI::createPShader(SPtr<Shader>& _pShader)
                                                   &dxPShader->m_pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
+    safeRelease(dxPShader->m_pSBlob);
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a DX Pixel Shader. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    safeRelease(dxPShader->m_pSBlob);
+    log.throwError(msg);
     return nullptr;
   }
   log.registerMessage("Created a DirectX Pixel Shader.", __FILE__, __LINE__);
@@ -424,10 +432,11 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
                                                     &dxCShader->m_pShader);
   // check if the creation was successful
   if (FAILED(hr)) {
+    safeRelease(dxCShader->m_pSBlob);
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a DX Compute Shader. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    safeRelease(dxCShader->m_pSBlob);
+    log.throwError(msg);
     return nullptr;
   }
   log.registerMessage("Created a DirectX Compute Shader.", __FILE__, __LINE__);
@@ -481,9 +490,6 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   Logger& log = g_Logger();
   // initialize device and swap chain
   m_pDevice = make_shared<DX11Device>();
-  SPtr<DX11SwapChain> pSwapChain = make_shared<DX11SwapChain>();
-  pSwapChain->setHeight(_height);
-  pSwapChain->setWidth(_width);
   /**
   * Create the device and swap chains
   **/
@@ -502,6 +508,9 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   sd.SampleDesc.Quality = 0;
   sd.Windowed = true;
 
+  SPtr<DX11SwapChain> pSwapChain = make_shared<DX11SwapChain>();
+  pSwapChain->setHeight(_height);
+  pSwapChain->setWidth(_width);
   for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++) {
     // try and create the device and swap chain with the current driver type
     m_pDevice->m_pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
@@ -537,6 +546,7 @@ DX11GraphicsAPI::resizeSwapChain(const Vector2 _size)
   if (!swapChain) {
     const String msg = "Swap chain not a directX 11 Swap chain.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return;
   }
   swapChain->resizebuffers(_size);
@@ -600,8 +610,6 @@ SPtr<SamplerState>
 DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
 {
   Logger& log = g_Logger();
-  // sampler state creation
-  SPtr<DX11SamplerState> pSamState = make_shared<DX11SamplerState>();
   // sampler state description
   D3D11_SAMPLER_DESC sampDesc;
   ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -613,11 +621,14 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   sampDesc.MinLOD = 0;
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-  int32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc, &pSamState->m_pSampler);
-  if (hr != 0x00000000) {
-    String errMsg = g_Logger().getMessageError(hr);
+  SPtr<DX11SamplerState> pSamState = make_shared<DX11SamplerState>();
+  const uint32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc,
+                                                                &pSamState->m_pSampler);
+  if (FAILED(hr)) {
+    const String errMsg = g_Logger().getMessageError(hr);
     const String msg = "Failed to create a sampler state. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
   return pSamState;
@@ -665,8 +676,6 @@ DX11GraphicsAPI::createBlendState()
 {
   Logger& log = g_Logger();
   // create the blend state
-  SPtr<DX11BlendState> pBlendState = make_shared<DX11BlendState>();
-  PK_ASSERT(pBlendState);
   PK_ASSERT(m_pDevice);
   // Create the description
   D3D11_BLEND_DESC blendDesc = {};
@@ -683,12 +692,15 @@ DX11GraphicsAPI::createBlendState()
     blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
   }
 
-  int32 hr = m_pDevice->m_pd3dDevice->CreateBlendState(&blendDesc, &pBlendState->m_pBlendState);
+  SPtr<DX11BlendState> pBlendState = make_shared<DX11BlendState>();
+  const uint32 hr = m_pDevice->m_pd3dDevice->CreateBlendState(&blendDesc,
+                                                              &pBlendState->m_pBlendState);
 
   if (FAILED(hr)) {
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create Blend state. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
   log.registerMessage("Created a Blend State.", __FILE__, __LINE__);
@@ -699,31 +711,27 @@ SPtr<RasterizerState>
 DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
 {
   Logger& log = g_Logger();
-  // create the rasterizer state
-  SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
-  dxRS->m_pRasterizer = nullptr;
-  // rasterizer description for directx
+  // rasterizer description for directx.
   D3D11_RASTERIZER_DESC rDesc = {};
   rDesc.FillMode = static_cast<D3D11_FILL_MODE>(_desc.fillMode);
   rDesc.CullMode = static_cast<D3D11_CULL_MODE>(_desc.cullMode);
   rDesc.FrontCounterClockwise = _desc.frontCounterClockwise;
   rDesc.DepthClipEnable = _desc.depthClipEnable;
 
-  // Create the rasterizer state.
-  auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
-  if (!device) {
-    const String msg = "Failed to utilize the DX device in the creation of a Rasterizer State.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
-    return nullptr;
-  }
+  // create the rasterizer state.
+  SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
+  const uint32 hr = m_pDevice->m_pd3dDevice->CreateRasterizerState(&rDesc,
+                                                                   &dxRS->m_pRasterizer);
 
-  HRESULT hr = device->m_pd3dDevice->CreateRasterizerState(&rDesc, &dxRS->m_pRasterizer);
+  // check for errors.
   if (FAILED(hr)) {
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a Rasterizer State. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
+
   log.registerMessage("Created a Rasterizer State.", __FILE__, __LINE__);
   return dxRS;
 }
@@ -732,7 +740,6 @@ void
 DX11GraphicsAPI::setBlendState(const SPtr<BlendState>& _pBlendState)
 {
   PK_ASSERT(_pBlendState);
-  PK_ASSERT(m_pDevice);
 
   Logger& log = g_Logger();
   // Reinterpret to a DirectX Blend State
@@ -751,8 +758,7 @@ DX11GraphicsAPI::setRasterizerState(const SPtr<RasterizerState>& _pRasterizerSta
   PK_ASSERT(m_pDevice);
 
   // Reinterpret to a DirectX Rasterizer State
-  SPtr<DX11RasterizerState> dxRS =
-       reinterpret_pointer_cast<DX11RasterizerState>(_pRasterizerState);
+  SPtr<DX11RasterizerState> dxRS = reinterpret_pointer_cast<DX11RasterizerState>(_pRasterizerState);
   // Set the rasterizer state
   m_pDevice->m_pImmediateContext->RSSetState(dxRS ? dxRS->m_pRasterizer : nullptr);
 }
@@ -763,7 +769,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
                                        const ANSICHAR* _szShaderModel)
 {
   Logger& log = g_Logger();
-  int32 hr = S_OK;
+  uint32 hr = S_OK;
 
   DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -801,8 +807,8 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
   // if there's an error.
   if (pErrorBlob) {
     const ANSICHAR* msg = reinterpret_cast<ANSICHAR*>(pErrorBlob->GetBufferPointer());
-    SIZE_T len = pErrorBlob->GetBufferSize();
-    String error(msg, len);
+    const SIZE_T len = pErrorBlob->GetBufferSize();
+    const String error(msg, len);
     String fullMSG = "Shader failed to compile. Error message: " + error;
     // if the compilation outright failed
     if (FAILED(hr)) {
@@ -825,7 +831,6 @@ SPtr<InputLayout>
 DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
 {
   PK_ASSERT(_pShader);
-  PK_ASSERT(m_pDevice);
 
   Logger& log = g_Logger();
   // create the input layout pointer
@@ -917,6 +922,7 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
   if (!pLayout) {
     const String msg = "Failed to create the input layout.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
   return pLayout;
@@ -933,7 +939,6 @@ SPtr<InputLayout>
 DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                    const SPtr<Shader> _pVShader)
 {
-  PK_ASSERT(m_pDevice);
   PK_ASSERT(_pVShader);
 
   Logger& log = g_Logger();
@@ -941,14 +946,15 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
   SPtr<DX11InputLayout> pInputL = make_shared<DX11InputLayout>();
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pVShader);
   
-  int32 hr;
+  uint32 hr;
   // define the input layout
   Vector<D3D11_INPUT_ELEMENT_DESC> dxLayout;
-  dxLayout.resize(_vDesc.size());
+  const SIZE_T layoutSize = _vDesc.size();
+  dxLayout.resize(layoutSize);
 
   uint32 offset = 0;
 
-  for (uint32 i = 0; i < _vDesc.size(); ++i) {
+  for (uint32 i = 0; i < layoutSize; ++i) {
     auto& element = dxLayout[i];
     memset(&element, 0, sizeof(D3D11_INPUT_ELEMENT_DESC));
     element.Format = static_cast<DXGI_FORMAT>(_vDesc[i].format);
@@ -986,10 +992,11 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                                   dxVShader->m_pSBlob->getBufferSize(),
                                                   &pInputL->m_pVertexLayout);
   // failed to create the input layout
-  if (hr != 0x00000000) {
+  if (FAILED(hr)) {
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create the input layout. Error message: " + errMsg;
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    log.throwError(msg);
     return nullptr;
   }
 
@@ -1005,7 +1012,7 @@ DX11GraphicsAPI::vSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   Vector<ID3D11Buffer*> buffers(count);
 
   // set all buffers
-  for (uint32 i = 0; i < _pCBuffers.size(); ++i) {
+  for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Constant buffer
     auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
     // set the buffer
@@ -1119,10 +1126,10 @@ DX11GraphicsAPI::setSampler(const SPtr<SamplerState> _pSamLinear,
 }
 
 void
-DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
-                                          uint32 _start)
+DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                                          const uint32 _start)
 {
-  uint32 count = static_cast<uint32>(_pTextures.size());
+  const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> vResourceVector(count);
 
   for (uint32 i = 0; i < _pTextures.size(); ++i) {
@@ -1145,10 +1152,10 @@ DX11GraphicsAPI::pSUnbindShaderResourceViews(const SIZE_T _count)
 }
 
 void
-DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
-                                          uint32 _start)
+DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                                          const uint32 _start)
 {
-  uint32 count = static_cast<uint32>(_pTextures.size());
+  const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> vResourceVector(count);
 
   for (uint32 i = 0; i < _pTextures.size(); ++i) {
@@ -1171,8 +1178,8 @@ DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T _count)
 }
 
 void
-DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures,
-                                          uint32 _start)
+DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                                          const uint32 _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> uavVector(count);
@@ -1197,10 +1204,10 @@ DX11GraphicsAPI::cSUnbindShaderResourceViews(const SIZE_T _count)
 }
 
 void
-DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
-                                           uint32 _start,
-                                           uint32* _initialCounts,
-                                           uint32 _mipLevel)
+DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextures,
+                                           const uint32 _start,
+                                           const uint32* _initialCounts,
+                                           const uint32 _mipLevel)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11UnorderedAccessView*> uavVector(count);
@@ -1277,9 +1284,9 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
                                                     resource->m_width * resource->m_bpp,
                                                     0);
 
-  const bool generateMips = (mipLevels == 0 || mipLevels > 1);
-  if (generateMips) {
-    GenerateMips(tempTexture);
+  const bool genMips = (mipLevels == 0 || mipLevels > 1);
+  if (genMips) {
+    generateMips(tempTexture);
   }
 
   // set the path
@@ -1310,7 +1317,7 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
 }
 
 void
-DX11GraphicsAPI::GenerateMips(SPtr<Texture>& _pTexture)
+DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
 {
   auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!texture) {
@@ -1424,9 +1431,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
   }
 
   // create the texture
-  SPtr<Texture> tex = make_shared<DX11Texture>();
-  auto dxTex = reinterpret_pointer_cast<DX11Texture>(tex);
-  tex->setSize(Vector2(_width, _height));
+  SPtr<DX11Texture> dxTex = make_shared<DX11Texture>();
+  dxTex->setSize(Vector2(_width, _height));
 
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -1517,6 +1523,7 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
       const String errMsg = log.getMessageError(hr);
       const String msg = "Failed to create the depth stencil. Error message: " + errMsg;
       log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+      return nullptr;
     }
   }
   /**
@@ -1546,8 +1553,11 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
                                                                &dxTex->m_rTVs[index]);
 
           if (FAILED(hr)) {
-            const String msg = "Failed to create a render target view for a cube texture.";
+            const String errMsg = log.getMessageError(hr);
+            const String msg = "Failed to create a render target view. Error message: " +
+                               errMsg;
             log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+            return nullptr;
           }
         }
       }
@@ -1565,6 +1575,7 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
           const String errMsg = log.getMessageError(hr);
           const String msg = "Failed to create a render target view. Error message: " + errMsg;
           log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+          return nullptr;
         }
       }
     }
@@ -1590,6 +1601,7 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
         const String msg = "Failed to create an unordered access view. Error message: " +
                             errMsg;
         log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+        return nullptr;
       }
     }
   }
@@ -1617,7 +1629,7 @@ DX11GraphicsAPI::setInputLayout( const SPtr<InputLayout> _pInputLayout)
 
 SPtr<VertexBuffer>
 DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                                    uint32 _usage)
+                                    const uint32 _usage)
 {
   Logger& log = g_Logger();
   auto dxVB = make_shared<DX11VertexBuffer>();
@@ -1641,7 +1653,7 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   InitData.pSysMem = _vertex.data(); // pointer to the initialization data
   InitData.SysMemPitch = byteWidth; // distance between values
 
-  const int32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
+  const uint32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
   if (FAILED(hr)) {
     const String errMsg = log.getMessageError(hr);
     const String msg = "Failed to create a vertex buffer. Error message: " + errMsg;
@@ -1653,9 +1665,9 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
 
 void
 DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                                 uint32 _start,
-                                 uint32 _bufferCount,
-                                 uint32 _offset)
+                                 const uint32 _start,
+                                 const uint32 _bufferCount,
+                                 const uint32 _offset)
 {
   // reinterpret vertex buffer.
   const auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
@@ -1677,7 +1689,7 @@ DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
 
 SPtr<IndexBuffer>
 DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
-                                   uint32 _usage)
+                                   const uint32 _usage)
 {
   Logger& log = g_Logger();
   auto dxIB = make_shared<DX11IndexBuffer>();
@@ -1710,8 +1722,8 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
 
 void
 DX11GraphicsAPI::setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                                uint32 _format,
-                                uint32 _offset)
+                                const uint32 _format,
+                                const uint32 _offset)
 {
   // reinterpret pointer
   auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);

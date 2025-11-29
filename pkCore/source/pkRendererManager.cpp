@@ -18,17 +18,16 @@ RendererManager::init()
   AssetResourceManager& assetMan = g_AssetResourceManager();
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
-  TextureCodec& texCodec = g_TextureCodec();
 
-  uint32 winHeight = api.getSwapChain()->getHeight();
-  uint32 winWidth = api.getSwapChain()->getWidth();
+  const uint32 winHeight = api.getSwapChain()->getHeight();
+  const uint32 winWidth = api.getSwapChain()->getWidth();
 
   float sizeMulShadow = 10.0f;
 
   // Texture description
   TextureDesc txDesc;
   txDesc.width = winWidth;
-  txDesc.height = winHeight;
+  txDesc.height = winHeight;  
   txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
   txDesc.usage = kPK_USAGE_DEFAULT;
@@ -92,7 +91,7 @@ RendererManager::init()
 
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   
-  texCodec.createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
+  // texCodec.createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -104,13 +103,11 @@ RendererManager::init()
   // Cube map for the skybox
   txDesc.width = 2048;
   txDesc.height = 2048;
-  // txDesc.mipLevels = 11;
   txDesc.isCube = true;
   SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
-  // txDesc.mipLevels = 1;
   txDesc.isCube = false;
 
   // ---------------------------------------------------------- //
@@ -392,6 +389,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   if (!_pInput || !_pOutput) {
     const String msg = "Input or Output are null.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    log.throwError(msg);
     return;
   }
 
@@ -402,6 +400,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   if (!vShadRes || !pShadRes) {
     const String msg = "Could not find shader resources to generate cubeMap.";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    log.throwError(msg);
     return;
   }
 
@@ -417,10 +416,10 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
     return;
   }
   api.createVShader(vShader);
-  SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
+  const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // save shader
-  ShaderKey vShaderKey("resources/pkQuadShader.pks", "vs_5_0", "VS");
+  const ShaderKey vShaderKey("resources/pkQuadShader.pks", "vs_5_0", "VS");
   shaderMan.insertShader(vShaderKey, vShader);
 
   // create the pixel shader.
@@ -434,17 +433,18 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.createPShader(pShader);
 
   // save shader
-  ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "ps_5_0", "PS");
+  const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "ps_5_0", "PS");
   shaderMan.insertShader(pShaderKey, pShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
                                                            PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear);
 
-  Vector2 viewportSize = _pOutput->getSize();
+  const Vector2 viewportSize = _pOutput->getSize();
 
   // create constant buffer.
-  SPtr<ConstantBuffer> cBuffer = api.createConstantBuffer(sizeof(CBFloat));
+  const uint32 CBFloatSize = sizeof(CBFloat);
+  SPtr<ConstantBuffer> cBuffer = api.createConstantBuffer(CBFloatSize);
 
   // set the necessary resources.
   api.setViewport(viewportSize);
@@ -459,8 +459,8 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.clearRenderTargetView(Color::BLACK, _pOutput);
   for (uint32 i = 0; i < 6; ++i) {
     api.setRenderTarget(_pOutput, nullptr, i);
-    CBFloat data(static_cast<float>(i));
-    api.updateConstantBuffer(cBuffer, &data, sizeof(CBFloat));
+    const CBFloat data(static_cast<float>(i));
+    api.updateConstantBuffer(cBuffer, &data, CBFloatSize);
     api.draw(3, 0);
   }
 
@@ -481,35 +481,35 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
-  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-  SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
-  // for each actor
-  for (uint32 i = 0; i < _gameActors.size(); ++i) {
-    SPtr<Actor> currActor = _gameActors[i];
+  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+  
+  // iterate through each actor.
+  const uint32 actorCount = static_cast<uint32>(_gameActors.size());
+  const uint32 sizeMatrix = sizeof(Matrix4);
+  for (uint32 i = 0; i < actorCount; ++i) {
+    const SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
     if (!currActor->isActive()) {
       continue;
     }
-    // Get the final matrix by taking into account the parent actors
+    // use the parent transform to modify the current transform.
     SPtr<Actor> parent = currActor->m_parent;
     Matrix4 transform = currActor->m_transform;
-    // while there's a parent
     while (parent) {
-      // add the parent transform to the current transform matrix
       transform *= parent->m_transform;
-      // the next parent will be the parent of this parent
       parent = parent->m_parent;
     }
-    // set the current actor transform as the world in which the shader will work 
-    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
-    api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
+    // set the current actor transform.
+    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeMatrix);
+    api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeMatrix);
 
-    // render the model of the actor
-    SPtr<Model> model = currActor->getComponent<Model>();
+    // render the model of the actor.
+    const SPtr<Model> model = currActor->getComponent<Model>();
     if (model && model->isActive()) {
       renderModel(model);
     }
-    // if the actor has children, do the same for them (recursive)
+    // if the actor has children, do the same for them.
     if (!currActor->m_children.empty()) {
       renderActors(currActor->m_children);
     }
@@ -523,32 +523,31 @@ RendererManager::renderModel(const SPtr<Model>& _model)
   // get a reference from managers and passes.
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
-  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
   // for each mesh in the model
-  for (uint32 i = 0; i < _model->meshes.size(); ++i) {
+  const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
+  const uint32 sizeProps = sizeof(CBMaterialProps);
+  for (uint32 i = 0; i < meshCount; ++i) {
     // get the material
-    SPtr<Mesh> mesh = _model->meshes[i];
+    const SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
-    SPtr<Material> material = mesh->material;
+    const SPtr<Material> material = mesh->material;
     if (mesh->getActive() &&  material) {
-      // set the material textures to the shader
-      Vector<SPtr<Texture>> textures = { material->m_albedo,
-                                         material->m_normal,
-                                         material->m_height,
-                                         material->m_metallic,
-                                         material->m_oclussion,
-                                         material->m_roughness,
-                                         material->m_emissive };
+      // render the mesh.
+      const Vector<SPtr<Texture>> textures = { material->m_albedo,
+                                               material->m_normal,
+                                               material->m_height,
+                                               material->m_metallic,
+                                               material->m_oclussion,
+                                               material->m_roughness,
+                                               material->m_emissive };
       api.pSSetShaderResourceViews(textures);
-      api.updateConstantBuffer(basePass->getCBuffer(3),
-                               &material->m_properties,
-                               sizeof(CBMaterialProps));
-      // draw the mesh
+      api.updateConstantBuffer(basePass->getCBuffer(3), &material->m_properties, sizeProps);
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }
     // update the offsets

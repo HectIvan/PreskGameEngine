@@ -67,3 +67,12 @@ float4 PS(PS_INPUT input) : SV_Target
   float3 color = hdrTexture.Sample(samState, eqUV).rgb;
   return float4(color, 1.0);
 }
+
+// ask what this does
+// technique11 CubemapConversion
+// {
+//   pass P0
+//   {
+//     SetPixelShader( CompileShader( ps_5_0, PS() ) );
+//   }
+// }

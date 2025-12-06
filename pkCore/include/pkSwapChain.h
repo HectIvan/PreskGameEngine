@@ -1,15 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkSwapChain pkSwapChain.h
-* @Hector Ivan Muñoz Ceballos
-* @date 17/12/2024
-* @Swap Chain file for the Presk Game Engine.
-*
-* This file contains the Swap Chain class of the engine
-*
-* @bug No bug known.
-*/
-/************************************************************************/
+ * @file    pkSwapChain.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    17/12/2024
+ * @brief   Swap Chain file for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/

@@ -20,6 +20,8 @@
 #include "pkPrerequisitesCore.h"
 #include "pkPath.h"
 
+#define PK_ID_SIZE 36
+
 namespace pkEngineSDK
 {
 
@@ -31,7 +33,8 @@ namespace RESOURCE_TYPE
     kMesh,
     kMaterial,
     kShader,
-    kTexture
+    kTexture,
+    kActor
   };
 }
 

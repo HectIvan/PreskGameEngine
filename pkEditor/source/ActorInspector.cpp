@@ -206,7 +206,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
       im.sameLine();
       SPtr<Model> model = reinterpret_pointer_cast<Model>(_pComponent);
       if (im.createButton("Save")) {
-        Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
+        const Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
         modelCod.createResourceFromModel(model, resourcePath);
       }
       // model section

@@ -70,12 +70,12 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   // for each mesh in the model.
   for (uint32 i = 0; i < meshCount; ++i) {
     // aquire needed objects
-    SPtr<Mesh> mesh = _pModel->meshes[i];
+    const SPtr<Mesh> mesh = _pModel->meshes[i];
     MeshAssetHeader meshHeader;
-    uint32 indicesCount = static_cast<uint32>(mesh->indexVector.size());
-    uint32 verticesCount = static_cast<uint32>(mesh->vertexVector.size());
-    String name = mesh->getName();
-    SIZE_T nameSize = name.length();
+    const uint32 indicesCount = static_cast<uint32>(mesh->indexVector.size());
+    const uint32 verticesCount = static_cast<uint32>(mesh->vertexVector.size());
+    const String name = mesh->getName();
+    const SIZE_T nameSize = name.length();
     meshHeader.indexCount = indicesCount;
     meshHeader.vertexCount = verticesCount;
     meshHeader.nameSize = nameSize;
@@ -85,6 +85,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     file.write(reinterpret_cast<const ANSICHAR*>(meshHeader.name.c_str()), nameSize);
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
+    file.write(reinterpret_cast<const ANSICHAR*>(&mesh->m_transform), sizeof(Matrix4));
 
     // write all vertices of the mesh.
     file.write(reinterpret_cast<const ANSICHAR*>(mesh->vertexVector.data()),
@@ -98,8 +99,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     assetMan.insertNewResource(matResource);
 
     // to do: find a better way to do this
-
-    SIZE_T matIDSize = matResource->m_id.length();
+    const SIZE_T matIDSize = matResource->m_id.length();
     file.write(reinterpret_cast<const ANSICHAR*>(&matIDSize), sizeof(SIZE_T));
     file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_id.c_str()), matIDSize);
   }

@@ -163,14 +163,15 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    * @param _gameActors The actors to render.
    */
   void
-  renderActors(const Vector<SPtr<Actor>> _gameActors);
+  renderActors(const Vector<SPtr<Actor>>& _gameActors);
 
   /**
    * @brief Render a given model
    * @param _model Pointer to the model to render
+   * @param _actorTransform Transform matrix of the actor itself.
    */
   void
-  renderModel(const SPtr<Model>& _model);
+  renderModel(const SPtr<Model>& _model, const Matrix4& _actorTransform);
 
   /**
    * @brief Update a constant buffer.

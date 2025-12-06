@@ -22,6 +22,7 @@ namespace pkEngineSDK
 {
 
 class Actor;
+class BaseResource;
 
 class PK_CORE_EXPORT ActorCodec : public Module<ActorCodec>
 {

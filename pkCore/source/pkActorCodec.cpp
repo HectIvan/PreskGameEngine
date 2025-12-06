@@ -123,4 +123,10 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
 
   return actorRes;
 }
+
+PK_CORE_EXPORT ActorCodec&
+g_ActorCodec()
+{
+  return ActorCodec::instance();
+}
 }

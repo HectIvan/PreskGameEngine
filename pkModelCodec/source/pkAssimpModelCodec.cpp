@@ -289,8 +289,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // albedo texture loading.
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -320,8 +320,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // normal texture loading.
       if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -351,8 +351,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // ambient occlusion texture loading.
       if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -382,8 +382,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // metallic texture loading.
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -413,8 +413,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // roughness texture loading.
       if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -445,8 +445,8 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       // emissive texture loading.
       if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
         // load the texture.
-        Path newPath(path.C_Str());
-        SPtr<Texture> texture = getTextureFromPath(newPath);
+        const Path newPath(path.C_Str());
+        const SPtr<Texture> texture = getTextureFromPath(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.

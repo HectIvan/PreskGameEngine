@@ -37,7 +37,10 @@ ModelResource::load()
 
   // read through each mesh in the model.
   for (uint32 i = 0; i < modelHeader.meshCount; ++i) {
+    // create the mesh
+    SPtr<Mesh> mesh = make_shared<Mesh>();
     MeshAssetHeader meshHeader;
+
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.nameSize), sizeof(SIZE_T));
     meshHeader.name.resize(meshHeader.nameSize);
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.name[0]), meshHeader.nameSize);
@@ -45,6 +48,7 @@ ModelResource::load()
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
 
     // get vertices data
+    file.read(reinterpret_cast<ANSICHAR*>(&mesh->m_transform), sizeof(Matrix4));
     uint32 meshVerticesSize = sizeof(SimpleVertex) * meshHeader.vertexCount;
     Vector<ANSICHAR> meshVertices(meshVerticesSize);
     file.read(meshVertices.data(), meshVerticesSize);
@@ -58,8 +62,6 @@ ModelResource::load()
     Vector<uint32> indices = Vector<uint32>(meshHeader.indexCount);
     memcpy(indices.data(), meshIndices.data(), meshIndicesSize);
 
-    // create the mesh
-    SPtr<Mesh> mesh = make_shared<Mesh>();
     // set mesh data.
     mesh->setName(meshHeader.name); // to do: temporary placeholder for the mesh name.
     mesh->vertexCount = meshHeader.vertexCount;

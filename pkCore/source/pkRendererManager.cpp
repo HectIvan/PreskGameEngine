@@ -18,8 +18,8 @@ RendererManager::init()
   GraphicsAPI& api = g_GraphicAPI();
   TextureManager& tm = g_TextureManager();
 
-  uint32 winHeight = api.getSwapChain()->getHeight();
-  uint32 winWidth = api.getSwapChain()->getWidth();
+  const uint32 winHeight = api.getSwapChain()->getHeight();
+  const uint32 winWidth = api.getSwapChain()->getWidth();
 
   float sizeMulShadow = 10.0f;
 
@@ -34,61 +34,61 @@ RendererManager::init()
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
   // render target for scene colors.
-  SPtr<Texture> albedoRT = api.createTexture(txDesc);
+  const SPtr<Texture> albedoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRT });
 
   // create the normal render target that will store the normals of the world.
-  SPtr<Texture> normalRT = api.createTexture(txDesc);
+  const SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
   // render target for the metallic result.
-  SPtr<Texture> ormRT = api.createTexture(txDesc);
+  const SPtr<Texture> ormRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
 
-  SPtr<Texture> ssaoRT = api.createTexture(txDesc);
+  const SPtr<Texture> ssaoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
 
   // BRDF texture.
-  SPtr<Texture> brdfRT = api.createTexture(txDesc);
+  const SPtr<Texture> brdfRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
 
   // skybox texture.
-  SPtr<Texture> skyboxRT = api.createTexture(txDesc);
+  const SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
 
   // positions texture.
-  SPtr<Texture> posRT = api.createTexture(txDesc);
+  const SPtr<Texture> posRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // positions texture for the light.
   txDesc.width = winWidth * sizeMulShadow;
   txDesc.height = winHeight * sizeMulShadow;
-  SPtr<Texture> posLightRT = api.createTexture(txDesc);
+  const SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
 
   // emissive texture.
-  SPtr<Texture> emissiveRT = api.createTexture(txDesc);
+  const SPtr<Texture> emissiveRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Emissive, emissiveRT });
 
-  SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
+  const SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveHBlur, emissiveHBlurRT });
 
-  SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
+  const SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveBlur, emissiveBlurRT });
 
   // luminance texture.
-  SPtr<Texture> lumRT = api.createTexture(txDesc);
+  const SPtr<Texture> lumRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, lumRT });
 
-  SPtr<Texture> lumBlurHRT = api.createTexture(txDesc);
+  const SPtr<Texture> lumBlurHRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlurH, lumBlurHRT });
 
-  SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
+  const SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  const SPtr<BaseResource> resSky = make_shared<TextureResource>();
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -111,7 +111,7 @@ RendererManager::init()
   // light depth buffer
   txDesc.width = winWidth * sizeMulShadow;
   txDesc.height = winHeight * sizeMulShadow;
-  SPtr<Texture> shadowDepth = api.createTexture(txDesc);
+  const SPtr<Texture> shadowDepth = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Light, shadowDepth });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
@@ -149,22 +149,22 @@ RendererManager::createPasses()
   PassDesc pDesc = PassDesc();
 
   // Textures
-  SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
-  SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
-  SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
-  SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
-  SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
-  SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
-  SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
-  SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
-  SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
-  SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
-  SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
-  SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  const SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
+  const SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
+  const SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
+  const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
+  const SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
+  const SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
+  const SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
+  const SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
+  const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
+  const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
+  const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
+  const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
 
   // Depth textures
-  SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
-  SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
+  const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
+  const SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -369,15 +369,12 @@ RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuf
 }
 
 void
-RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
+RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
 {
-  RendererManager& rManager = g_RenderManager();
-  GraphicsAPI& api = g_GraphicAPI();
-  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-  SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
   // for each actor
-  for (uint32 i = 0; i < _gameActors.size(); ++i) {
-    SPtr<Actor> currActor = _gameActors[i];
+  const uint32 actorCount = static_cast<uint32>(_gameActors.size());
+  for (uint32 i = 0; i < actorCount; ++i) {
+    const SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
     if (!currActor->isActive()) {
       continue;
@@ -393,13 +390,11 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       parent = parent->m_parent;
     }
     // set the current actor transform as the world in which the shader will work 
-    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
-    api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
 
     // render the model of the actor
-    SPtr<Model> model = currActor->getComponent<Model>();
+    const SPtr<Model> model = currActor->getComponent<Model>();
     if (model && model->isActive()) {
-      renderModel(model);
+      renderModel(model, transform);
     }
     // if the actor has children, do the same for them (recursive)
     if (!currActor->m_children.empty()) {
@@ -410,12 +405,15 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 
 
 void
-RendererManager::renderModel(const SPtr<Model>& _model)
+RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTransform)
 {
   // get a reference from managers and passes.
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
-  SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+
+  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
@@ -424,19 +422,23 @@ RendererManager::renderModel(const SPtr<Model>& _model)
   // for each mesh in the model
   for (uint32 i = 0; i < _model->meshes.size(); ++i) {
     // get the material
-    SPtr<Mesh> mesh = _model->meshes[i];
+    const SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
-    SPtr<Material> material = mesh->material;
+    const SPtr<Material> material = mesh->material;
     if (mesh->getActive() &&  material) {
       // set the material textures to the shader
-      Vector<SPtr<Texture>> textures = { material->m_albedo,
-                                         material->m_normal,
-                                         material->m_height,
-                                         material->m_metallic,
-                                         material->m_oclussion,
-                                         material->m_roughness,
-                                         material->m_emissive };
+      const Vector<SPtr<Texture>> textures = { material->m_albedo,
+                                               material->m_normal,
+                                               material->m_height,
+                                               material->m_metallic,
+                                               material->m_oclussion,
+                                               material->m_roughness,
+                                               material->m_emissive };
+      // update resources & constant buffers
+      const Matrix4 transform = mesh->m_transform * _actorTransform;
       api.pSSetShaderResourceViews(textures);
+      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
+      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
       api.updateConstantBuffer(basePass->getCBuffer(3),
                                &material->m_properties,
                                sizeof(CBMaterialProps));

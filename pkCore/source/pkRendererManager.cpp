@@ -435,7 +435,7 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
                                                material->m_roughness,
                                                material->m_emissive };
       // update resources & constant buffers
-      const Matrix4 transform = mesh->m_transform * _actorTransform;
+      const Matrix4 transform = _actorTransform * mesh->m_transform;
       api.pSSetShaderResourceViews(textures);
       api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
       api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));

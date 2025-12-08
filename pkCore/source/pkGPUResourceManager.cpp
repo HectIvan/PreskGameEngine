@@ -13,19 +13,7 @@ namespace pkEngineSDK
 void
 GPUResourceManager::init()
 {
-  m_defaultMaterial = newMaterial(m_defaultMatName);
-}
-
-SPtr<Material>
-GPUResourceManager::newMaterial(String _name)
-{
-  // create the material.
-  if (_name == m_defaultMatName) {
-    _name = "<Invalid Name>";
-  }
-  SPtr<Material> pMatComp = make_shared<Material>(_name);
-  // return the material.
-  return pMatComp;
+  
 }
 
 SPtr<Model>

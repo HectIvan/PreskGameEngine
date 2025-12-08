@@ -388,9 +388,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _usage What usage will be given to the buffer.
    */
   SPtr<ConstantBuffer>
-  createConstantBuffer(uint32 _size,
+  createConstantBuffer(const uint32 _size,
                        const void* _pData = nullptr,
-                       uint32 _usage = 0) override;
+                       const uint32 _usage = 0) override;
 
   /**
    * @brief Update the constant buffer.
@@ -399,9 +399,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _size Size of the data to store.
    */
   void
-  updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+  updateConstantBuffer(SPtr<ConstantBuffer>& _pCBuffer,
                        const void* _pNewData,
-                       SIZE_T _size) override;
+                       const SIZE_T _size) override;
 
   /**
    * @brief Set resources to a vertex shader.
@@ -555,8 +555,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _startIndexLocation Which index will be the starting point.
    */
   void
-  draw(uint32 _indexCount,
-       uint32 _startIndexLocation) override;
+  draw(const uint32 _indexCount, const uint32 _startIndexLocation) override;
 
   /**
    * @brief Draw the indexed data.
@@ -565,9 +564,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _baseVertexLocation Which vertex will be the starting point.
    */
   void
-  drawIndexed(uint32 _indexCount,
-              uint32 _startIndexLocation,
-              uint32 _baseVertexLocation) override;
+  drawIndexed(const uint32 _indexCount,
+              const uint32 _startIndexLocation,
+              const uint32 _baseVertexLocation) override;
 
   /**
    * @brief Compute shader draw call.
@@ -576,7 +575,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _countZ Thread group size in the Z axis.
    */
   void
-  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
+  dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ) override;
 
   /**
    * @brief Present the result to the screen.
@@ -584,7 +583,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _flags Swap chain presentation options.
    */
   void
-  present(uint32 _syncInterval, uint32 _flags) override;
+  present(const uint32 _syncInterval, const uint32 _flags) override;
   
  public:
 

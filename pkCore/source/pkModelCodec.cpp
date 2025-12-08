@@ -17,6 +17,7 @@
 #include "pkAssetResourceManager.h"
 #include "pkLogger.h"
 #include "pkMaterialCodec.h"
+#include "pkMaterialManager.h"
 #include "pkModel.h"
 #include "pkModelCodec.h"
 #include "pkModelResource.h"
@@ -32,6 +33,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
   MaterialCodec& matCodec = g_MaterialCodec();
+  MaterialManager& matMan = g_MaterialManager();
 
   const String fileName = _path.getFileNameWithoutExtension();
   const String filePath = "resources/" + fileName + ".pkm";
@@ -64,7 +66,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
 
   // get and write model header.
   ModelAssetHeader mHeader;
-  uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
+  const uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
   mHeader.meshCount = meshCount;
   file.write(reinterpret_cast<const ANSICHAR*>(&mHeader.meshCount), sizeof(uint32));
   // for each mesh in the model.
@@ -86,7 +88,10 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&mesh->m_transform), sizeof(Matrix4));
-
+    // write mesh activity.
+    const bool isActive = mesh->getActive();
+    const uint8 isActiveRaw = isActive ? 1 : 0;
+    file.write(reinterpret_cast<const ANSICHAR*>(&isActiveRaw), sizeof(uint8));
     // write all vertices of the mesh.
     file.write(reinterpret_cast<const ANSICHAR*>(mesh->vertexVector.data()),
                sizeof(SimpleVertex) * verticesCount);
@@ -96,12 +101,13 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
 
     // create the material resource
     SPtr<MaterialResource> matResource = matCodec.createResource(mesh->material);
-    assetMan.insertNewResource(matResource);
-
     // to do: find a better way to do this
     const SIZE_T matIDSize = matResource->m_id.length();
     file.write(reinterpret_cast<const ANSICHAR*>(&matIDSize), sizeof(SIZE_T));
     file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_id.c_str()), matIDSize);
+
+    assetMan.insertNewResource(matResource);
+    matMan.insertLoadedMaterial(matResource->m_id, mesh->material);
   }
   file.close();
 

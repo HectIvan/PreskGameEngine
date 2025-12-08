@@ -154,7 +154,9 @@ DX11GraphicsAPI::init(const Window& _window)
 }
 
 SPtr<ConstantBuffer>
-DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _usage)
+DX11GraphicsAPI::createConstantBuffer(const uint32 _size,
+                                      const void* _pData,
+                                      const uint32 _usage)
 {
   Logger& log = g_Logger();
   auto dxCB = make_shared<DX11ConstantBuffer>();
@@ -194,9 +196,9 @@ DX11GraphicsAPI::createConstantBuffer(uint32 _size, const void* _pData, uint32 _
 }
 
 void
-DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
+DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer>& _pCBuffer,
                                       const void* _pNewData,
-                                      SIZE_T _size)
+                                      const SIZE_T _size)
 {
   // cast to DX11ConstantBuffer
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
@@ -221,9 +223,9 @@ DX11GraphicsAPI::updateConstantBuffer(SPtr<ConstantBuffer> _pCBuffer,
 }
 
 void
-DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
-                             uint32 _startIndexLocation,
-                             uint32 _baseVertexLocation)
+DX11GraphicsAPI::drawIndexed(const uint32 _indexCount,
+                             const uint32 _startIndexLocation,
+                             const uint32 _baseVertexLocation)
 {
   // draw the data
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -237,7 +239,7 @@ DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
 }
 
 void
-DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
+DX11GraphicsAPI::draw(const uint32 _indexCount, const uint32 _startIndexLocation)
 {
   // draw the data
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -250,7 +252,7 @@ DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
 }
 
 void
-DX11GraphicsAPI::dispatch(uint32 _countX, uint32 _countY, uint32 _countZ)
+DX11GraphicsAPI::dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ)
 {
   // draw the data
   auto device = reinterpret_pointer_cast<DX11Device>(m_pDevice);
@@ -1250,7 +1252,7 @@ DX11GraphicsAPI::cSUnbindConstantBuffers()
 }
 
 void
-DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
+DX11GraphicsAPI::present(const uint32 _syncInterval, const uint32 _flags)
 {
   Logger& log = g_Logger();
   // reinterpret the swap chain to a DirectX swap chain

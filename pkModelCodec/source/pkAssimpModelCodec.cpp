@@ -24,6 +24,7 @@
 #include "pkGPUResourceManager.h"
 #include "pkLogger.h"
 #include "pkFileSystem.h"
+#include "pkMaterialManager.h"
 #include "pkMaterialResource.h"
 #include "pkModelResource.h"
 #include "pkTexture.h"
@@ -195,12 +196,13 @@ SPtr<Mesh>
 processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  GPUResourceManager& rm = g_GPUResourceManager();
+  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  MaterialManager& matMan = g_MaterialManager();
   Logger& log = g_Logger();
 
   // check if the mesh is already in storage
   String meshName(_mesh->mName.C_Str());
-  SPtr<Mesh> meshProcess = rm.searchMesh(meshName);
+  SPtr<Mesh> meshProcess = resourceMan.searchMesh(meshName);
   // if a mesh can be found
   if (meshProcess) {
     log.registerMessage("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__);
@@ -213,6 +215,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   meshProcess->m_transform = _transform;
   meshProcess->vertexCount = _mesh->mNumVertices;
   meshProcess->vertexVector.resize(_mesh->mNumVertices);
+  meshProcess->setActive(true);
 
   // exist checks
   const aiVector3D* meshTexCoords = _mesh->mTextureCoords[0];
@@ -266,12 +269,12 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   /**
    * Material loading
    */
-  meshProcess->material = rm.m_defaultMaterial;
+  meshProcess->material = matMan.m_defaultMaterial;
   if (_mesh->mMaterialIndex >= 0) {
     // material data
     const aiMaterial* materialA = _scene->mMaterials[_mesh->mMaterialIndex];
     const String matName = materialA->GetName().C_Str();
-    meshProcess->material = rm.newMaterial(matName);
+    meshProcess->material = matMan.newMaterial(matName);
     // material 
     Path filePath;
     

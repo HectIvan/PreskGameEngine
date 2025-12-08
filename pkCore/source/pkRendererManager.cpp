@@ -419,8 +419,10 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
+  const SIZE_T sizeMatrix = sizeof(Matrix4);
+  const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
   // for each mesh in the model
-  for (uint32 i = 0; i < _model->meshes.size(); ++i) {
+  for (uint32 i = 0; i < meshCount; ++i) {
     // get the material
     const SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
@@ -429,16 +431,15 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       // set the material textures to the shader
       const Vector<SPtr<Texture>> textures = { material->m_albedo,
                                                material->m_normal,
-                                               material->m_height,
-                                               material->m_metallic,
                                                material->m_oclussion,
                                                material->m_roughness,
+                                               material->m_metallic,
                                                material->m_emissive };
       // update resources & constant buffers
       const Matrix4 transform = _actorTransform * mesh->m_transform;
       api.pSSetShaderResourceViews(textures);
-      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
-      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
+      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeMatrix);
+      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeMatrix);
       api.updateConstantBuffer(basePass->getCBuffer(3),
                                &material->m_properties,
                                sizeof(CBMaterialProps));

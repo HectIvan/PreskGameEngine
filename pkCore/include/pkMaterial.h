@@ -84,6 +84,20 @@ class Material : public Component
   getType() override { return COMPONENT_TYPE::kMaterial; }
 
   /**
+   * @brief Set the material name.
+   * @param _name The material name.
+   */
+  void
+  setName(const String _name) { m_name = _name; }
+
+  /**
+   * @brief Get the material name.
+   * @return The material name.
+   */
+  String
+  getNameS() const { return m_name; }
+
+  /**
    * @brief Get the name of the component.
    */
   const ANSICHAR*
@@ -95,14 +109,6 @@ class Material : public Component
    */
   static COMPONENT_TYPE::E
   getObjType() { return COMPONENT_TYPE::kMaterial; }
-
-  /**
-   * @brief Set a texture of the material.
-   * @param _pTexture Texture to change.
-   * @param _pNewTexture New texture.
-   */
-  void
-  setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture);
 
   /**
    * @brief Set the albedo texture.
@@ -152,20 +158,6 @@ class Material : public Component
    */
   PKFORCEINLINE void
   setEmissive(const SPtr<Texture>& _pTexture) { m_emissive = _pTexture; }
-
-  /**
-   * @brief Set the material name.
-   * @param _name The material name.
-   */
-  void
-  setName(const String _name) { m_name = _name; }
-
-  /**
-   * @brief Get the material name.
-   * @return The material name.
-   */
-  String
-  getNameS() const { return m_name; }
 
  public:
   String m_name;

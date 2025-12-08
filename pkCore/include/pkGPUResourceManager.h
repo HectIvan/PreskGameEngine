@@ -56,14 +56,6 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
   init();
 
   /**
-   * @brief Create a new Material component.
-   * @param _name Name of the new material.
-   * @return Pointer to the new material object.
-   */
-  SPtr<Material>
-  newMaterial(String _name = "newMaterial");
-
-  /**
    * @brief Loads a model from a .pkm file.
    * @param _ID Resource ID.
    * @return Pointer to the model if loaded; nullptr if failed.
@@ -98,10 +90,6 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
  public:
   UMap<String, SPtr<Model>> m_models;
   Vector<SPtr<Mesh>> m_meshes;
-
-  // unique string for the default material
-  String m_defaultMatName = "defaultMaterial";
-  SPtr<Material> m_defaultMaterial;
 
   // assets
   // UMap<UUID, Asset> materials

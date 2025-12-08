@@ -41,6 +41,14 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
   // onShutDown();
 
   /**
+   * @brief Create a new Material component.
+   * @param _name Name of the new material.
+   * @return Pointer to the new material object.
+   */
+  SPtr<Material>
+  newMaterial(String _name = "newMaterial");
+
+  /**
    * @brief Load texture from a texture id.
    * @param _ID ID of the material to load.
    * @return Pointer to the newly created material.
@@ -67,6 +75,10 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
  public:
   // save materials with the material id
   UMap<String, SPtr<Material>> m_materials;
+
+  // unique string for the default material
+  String m_defaultMatName = "defaultMaterial";
+  SPtr<Material> m_defaultMaterial;
 };
 PK_CORE_EXPORT MaterialManager&
 g_MaterialManager();

@@ -72,7 +72,7 @@ class PK_CORE_EXPORT Mesh
    * @param _active Mesh active.
    */
   void
-  setActive(bool _active) { m_active = _active; }
+  setActive(const bool _active) { m_active = _active; }
 
   /**
    * @brief Get if the mesh is active.

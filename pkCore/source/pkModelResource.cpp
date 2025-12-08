@@ -15,7 +15,8 @@ ModelResource::load()
     return;
   }
 
-  MaterialManager& materialMan = g_MaterialManager();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+  MaterialManager& matMan = g_MaterialManager();
   Logger& log = g_Logger();
 
   ifstream file(m_resourcePath, ios::in | ios::binary);
@@ -46,24 +47,29 @@ ModelResource::load()
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.name[0]), meshHeader.nameSize);
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
-
-    // get vertices data
     file.read(reinterpret_cast<ANSICHAR*>(&mesh->m_transform), sizeof(Matrix4));
-    uint32 meshVerticesSize = sizeof(SimpleVertex) * meshHeader.vertexCount;
+    mesh->setName(meshHeader.name);
+    // get mesh activity.
+    uint8 isActiveRaw;
+    file.read(reinterpret_cast<ANSICHAR*>(&isActiveRaw), sizeof(uint8));
+    bool isActive = (isActiveRaw != 0);
+    mesh->setActive(isActive);
+
+    // get vertices data.
+    const uint32 meshVerticesSize = sizeof(SimpleVertex) * meshHeader.vertexCount;
     Vector<ANSICHAR> meshVertices(meshVerticesSize);
     file.read(meshVertices.data(), meshVerticesSize);
     Vector<SimpleVertex> vertices = Vector<SimpleVertex>(meshHeader.vertexCount);
     memcpy(vertices.data(), meshVertices.data(), meshVerticesSize);
 
     // get indices data.
-    uint32 meshIndicesSize = sizeof(uint32) * meshHeader.indexCount;
+    const uint32 meshIndicesSize = sizeof(uint32) * meshHeader.indexCount;
     Vector<ANSICHAR> meshIndices(meshIndicesSize);
     file.read(meshIndices.data(), meshIndicesSize);
     Vector<uint32> indices = Vector<uint32>(meshHeader.indexCount);
     memcpy(indices.data(), meshIndices.data(), meshIndicesSize);
 
     // set mesh data.
-    mesh->setName(meshHeader.name); // to do: temporary placeholder for the mesh name.
     mesh->vertexCount = meshHeader.vertexCount;
     mesh->numIndex = meshHeader.indexCount;
     // fill in mesh data.
@@ -79,7 +85,11 @@ ModelResource::load()
     file.read(reinterpret_cast<ANSICHAR*>(&matID[0]), matIDSize);
 
     // to do: make a default material
-    mesh->material = materialMan.loadMaterial(matID);
+    mesh->material = matMan.m_defaultMaterial;
+    SPtr<BaseResource> matRes = assetMan.loadResource(matID);
+    if (matRes) {
+      mesh->material = matMan.loadMaterial(matRes->m_id);
+    }
     m_meshes[i] = mesh;
   }
 

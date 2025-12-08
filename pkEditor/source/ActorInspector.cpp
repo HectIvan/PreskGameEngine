@@ -15,6 +15,7 @@
 #include "pkLight.h"
 #include "pkLogger.h"
 #include "pkMaterial.h"
+#include "pkMaterialManager.h"
 #include "pkModel.h"
 #include "pkPath.h"
 #include "pkPlatformMath.h"
@@ -37,11 +38,13 @@ using pkEngineSDK::COMPONENT_TYPE::kUnknown;
 using pkEngineSDK::GPUResourceManager;
 using pkEngineSDK::g_GPUResourceManager;
 using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_MaterialManager;
 using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Light;
 using pkEngineSDK::Material;
+using pkEngineSDK::MaterialManager;
 using pkEngineSDK::MaterialProps;
 using pkEngineSDK::Math;
 using pkEngineSDK::Matrix4;
@@ -124,7 +127,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
   // get the user interface manager
   UInterface& im = g_uInterface();
   TextureManager& tm = g_TextureManager();
-  GPUResourceManager& GPUResourceMan = g_GPUResourceManager();
+  MaterialManager& matMan = g_MaterialManager();
   ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
@@ -248,7 +251,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             // Mesh material data
             SPtr<Material> material = mesh->material;
             const String matName = material->getNameS();
-            const String defaultMatName = GPUResourceMan.m_defaultMaterial->getName();
+            const String defaultMatName = matMan.m_defaultMaterial->getName();
             if (material && matName != defaultMatName) {
               im.createText("Material Name: ");
               im.sameLine();
@@ -588,7 +591,7 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             else {
               im.pushID(i);
               if (im.createButton("<Create new material>")) {
-                mesh->material = GPUResourceMan.newMaterial();
+                mesh->material = matMan.newMaterial();
               }
               im.popID();
             }

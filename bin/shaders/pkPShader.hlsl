@@ -1,15 +1,11 @@
 Texture2D diffuseTex : register(t0);
 Texture2D normalTex : register(t1);
-Texture2D heightTex : register(t2);
-Texture2D metallicTex : register(t3);
-Texture2D occlusionTex : register(t4);
-Texture2D roughnessTex : register(t5);
-Texture2D emissiveTex : register(t6);
+Texture2D occlusionTex : register(t2);
+Texture2D roughnessTex : register(t3);
+Texture2D metallicTex : register(t4);
+Texture2D emissiveTex : register(t5);
 
 SamplerState samLinear : register(s0);
-
-#define M_PI 3.14159f
-#define DELTA 1.0f
 
 cbuffer MaterialProps : register(b3)
 {

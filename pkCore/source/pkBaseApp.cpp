@@ -56,6 +56,7 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
   g_ShaderManager().createShaderResources();
   assetResource.init("resources");
   assetResource.loadAssetsFromResourcesFolder();
+  g_MaterialManager().init();
   g_SceneManager().init();
   g_RenderManager().init();
   g_TextureManager().init();

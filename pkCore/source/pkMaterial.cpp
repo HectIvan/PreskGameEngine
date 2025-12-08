@@ -39,9 +39,4 @@ Material::init()
   setEmissive(tm.m_defaultEmissive);
 }
 
-void
-Material::setTexture(SPtr<Texture>& _pTexture, SPtr<Texture>& _pNewTexture)
-{
-  _pTexture = _pNewTexture;
-}
 }

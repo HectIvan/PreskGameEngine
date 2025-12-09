@@ -208,7 +208,6 @@ Pass::compileShaders()
   }
 }
 
-// to do: properly link passes with the textures
 void
 Pass::beginPass(Color _color)
 {

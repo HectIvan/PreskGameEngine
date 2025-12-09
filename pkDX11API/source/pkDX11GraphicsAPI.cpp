@@ -1075,12 +1075,10 @@ DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   m_pDevice->m_pImmediateContext->CSSetConstantBuffers(_startSlot, count, buffers.data());
 }
 
-// to do: change this to dynamic size
 void
 DX11GraphicsAPI::cSUnbindConstantBuffers(const uint32 _count)
 {
   Vector<ID3D11Buffer*> buffers(_count, nullptr);
-  // set the buffers
   m_pDevice->m_pImmediateContext->CSSetConstantBuffers(0, _count, buffers.data());
 }
 

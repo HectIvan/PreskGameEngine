@@ -20,7 +20,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
 
-// to do: swap chain creation failes to create more than 1 render target.
+// to do: swap chain creation fails to create more than 1 render target.
 namespace pkEngineSDK
 {
 

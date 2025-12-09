@@ -61,7 +61,7 @@ ModelResource::load()
     // create the mesh
     SPtr<Mesh> mesh = make_shared<Mesh>();
     // set mesh data.
-    mesh->setName(meshHeader.name); // to do: temporary placeholder for the mesh name.
+    mesh->setName(meshHeader.name);
     mesh->vertexCount = meshHeader.vertexCount;
     mesh->numIndex = meshHeader.indexCount;
     // fill in mesh data.
@@ -76,7 +76,6 @@ ModelResource::load()
     matID.resize(matIDSize);
     file.read(reinterpret_cast<ANSICHAR*>(&matID[0]), matIDSize);
 
-    // to do: make a default material
     mesh->material = materialMan.loadMaterial(matID);
     m_meshes[i] = mesh;
   }

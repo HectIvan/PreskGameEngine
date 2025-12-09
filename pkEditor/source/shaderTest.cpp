@@ -183,34 +183,34 @@ ShaderTest::input()
   EventQueue& eventQueue = g_EventManager();
   UInterface& im = g_uInterface();
   // bool interfaceHovered = im.isHoveredWithItems();
-  bool itemActive = im.isItemActive();
-  float deltaTime = g_TimeManager().m_deltaTime;
-  // set camera speed with deltaTime
-  float speed = m_cameraSpeed * deltaTime;
+  const bool itemActive = im.isItemActive();
+  const float deltaTime = g_TimeManager().m_deltaTime;
+  const float speed = m_cameraSpeed * deltaTime;
   // if the user wants to exit the app.
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
     ApplicationRun(false);
   }
+  SPtr<Camera> cameraComp = m_camera->getComponent<Camera>();
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(speed);
+    cameraComp->moveForwardLocal(speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
+    cameraComp->moveForwardLocal(-speed);
   }
   // move left/right
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveRightLocal(-speed);
+    cameraComp->moveRightLocal(-speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveRightLocal(speed);
+    cameraComp->moveRightLocal(speed);
   }
   // move up/down
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveUpLocal(speed);
+    cameraComp->moveUpLocal(speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveUpLocal(-speed);
+    cameraComp->moveUpLocal(-speed);
   }
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
@@ -220,7 +220,7 @@ ShaderTest::input()
     posDif.y *= m_sensY;
     m_lastCursorPos = eventQueue.mousePosition;
     posDif *= Math::DEG2RAD;
-    m_camera->getComponent<Camera>()->rotate(-posDif.y, -posDif.x, 0.0f);
+    cameraComp->rotate(-posDif.y, -posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }
@@ -376,7 +376,8 @@ ShaderTest::uInterfaceUpdate()
           if (im.isItemHovered()) {
             const String tooltip = "Name: " + assetName + "\n" +
                                    "Asset ID: " + asset.first + "\n" + 
-                                   "Asset type: " + asset.second->getTypeString();
+                                   "Asset type: " + asset.second->getTypeString() + "\n" +
+                                   "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
             im.setTooltip(tooltip.c_str());
           }
           Vector2 itemPos = im.getItemPosition();
@@ -426,7 +427,7 @@ ShaderTest::uInterfaceUpdate()
       im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
       if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
         // to do: change this to a more efficient option
-        Vector<String> options = { "model", "light", "camera" };
+        const Vector<String> options = { "model", "light", "camera" };
         int32 val = -1;
         if (im.beginCombo("Components", val, options)) {
           // if a model component is to be added.

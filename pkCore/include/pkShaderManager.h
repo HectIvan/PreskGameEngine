@@ -23,7 +23,6 @@
 namespace pkEngineSDK
 {
 
-// to do: temporary shader key, change for a UUID
 struct ShaderKey
 {
   ShaderKey(const String _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :

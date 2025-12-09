@@ -262,6 +262,7 @@
 #if PK_DEBUG_MODE
 # define PK_DEBUG_ONLY(x) x
 # define PK_ASSERT(x) assert(x)
+# define PK_STATIC_ASSERT(x) static_assert(x)
 #else
 # define PK_DEBUG_ONLY(x)
 # define PK_ASSERT(x)

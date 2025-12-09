@@ -16,11 +16,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesUtilities.h"
-
-namespace uuids
-{
-class uuid;
-}
+#include "uuid.h"
 
 namespace pkEngineSDK
 {
@@ -29,7 +25,7 @@ class PK_UTILITY_EXPORT UUID
 {
  public:
   UUID() = default;
-  UUID(uuids::uuid _uuid);
+  UUID(const uuids::uuid& _uuid);
   ~UUID() = default;
 
   /**
@@ -46,18 +42,16 @@ class PK_UTILITY_EXPORT UUID
 
   /**
    * @brief Get the UUID string.
+   * @return String of the ID.
    */
   String
   uuidToString();
-
-  int64
-  getRawUUID() { return static_cast<int64>(*m_uuid); }
 
  public:
   static const String PK_NAME_GEN_SEED;
   static const String PK_DEFAULT_UUID;
   
  private:
-  uuids::uuid* m_uuid;
+  uuids::uuid m_uuid;
 };
 }

@@ -21,9 +21,7 @@
 #include "pkPath.h"
 #include "pkUUID.h"
 
-#define PK_RESOURCE_ID_SIZE 36
 #define PK_RESOURCE_NAME_SIZE 64
-#define PK_RESOURCE_ORIGINAL_PATH_SIZE 256
 #define PK_RESOURCE_PATH_SIZE 256
 
 namespace pkEngineSDK
@@ -46,7 +44,7 @@ struct BaseHeader
 {
   UUID ID;
   ANSICHAR name[PK_RESOURCE_NAME_SIZE];
-  ANSICHAR originalPath[PK_RESOURCE_ORIGINAL_PATH_SIZE];
+  ANSICHAR originalPath[PK_RESOURCE_PATH_SIZE];
   ANSICHAR path[PK_RESOURCE_PATH_SIZE];
 };
 
@@ -87,9 +85,9 @@ class PK_CORE_EXPORT BaseResource
    */
   void
   writeBaseHeader(ofstream& _file,
-                  const String& _ID,
-                  const String& _fileName,
-                  const String& _resourcePath);
+                  const UUID& _ID,
+                  const ANSICHAR* _fileName,
+                  const ANSICHAR* _resourcePath);
 
   /**
    * @brief Get the resource type.
@@ -108,8 +106,8 @@ class PK_CORE_EXPORT BaseResource
  public:
   UUID m_id;
   ANSICHAR m_name[PK_RESOURCE_NAME_SIZE];
-  bool m_isLoaded = false;
-  ANSICHAR m_originalPath[PK_RESOURCE_ORIGINAL_PATH_SIZE];
+  ANSICHAR m_originalPath[PK_RESOURCE_PATH_SIZE];
   ANSICHAR m_resourcePath[PK_RESOURCE_PATH_SIZE];
+  bool m_isLoaded = false;
 };
 }

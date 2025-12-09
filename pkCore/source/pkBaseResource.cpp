@@ -38,19 +38,15 @@ BaseResource::loadBaseHeader(ifstream& _file)
   BaseHeader baseHeader;
 
   // write the base resource header.
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.IDSize), sizeof(SIZE_T));
-  baseHeader.ID.resize(baseHeader.IDSize);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.ID[0]), baseHeader.IDSize);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.nameSize), sizeof(SIZE_T));
-  baseHeader.name.resize(baseHeader.nameSize);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.name[0]), baseHeader.nameSize);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.pathSize), sizeof(SIZE_T));
-  baseHeader.path.resize(baseHeader.pathSize);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.path[0]), baseHeader.pathSize);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.ID), sizeof(UUID));
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.name[0]), PK_RESOURCE_NAME_SIZE);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.originalPath[0]), PK_RESOURCE_PATH_SIZE);
+  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.path[0]), PK_RESOURCE_PATH_SIZE);
 
   m_id = baseHeader.ID;
-  m_name = baseHeader.name;
-  m_resourcePath = baseHeader.path;
+  strcpy_s(m_name, PK_RESOURCE_NAME_SIZE, baseHeader.name);
+  strcpy_s(m_originalPath, PK_RESOURCE_PATH_SIZE, baseHeader.originalPath);
+  strcpy_s(m_resourcePath, PK_RESOURCE_PATH_SIZE, baseHeader.path);
 
   return baseHeader;
 }
@@ -64,10 +60,10 @@ BaseResource::writeBaseHeader(ofstream& _file,
   BaseHeader header;
   header.ID = _ID;
   strcpy_s(header.name, PK_RESOURCE_NAME_SIZE, _fileName);
+  strcpy_s(header.originalPath, PK_RESOURCE_PATH_SIZE, _fileName);
   strcpy_s(header.path, PK_RESOURCE_PATH_SIZE, _resourcePath);
 
-  _file.write(reinterpret_cast<const ANSICHAR*>(header.ID.uuidToString().c_str()),
-                                                PK_RESOURCE_ID_SIZE);
-  _file << header.name << header.path;
+  _file.write(reinterpret_cast<const ANSICHAR*>(&header.ID), sizeof(UUID));
+  _file << header.name << header.originalPath << header.path;
 }
 }

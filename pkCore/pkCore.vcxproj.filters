@@ -276,11 +276,8 @@
     <ClInclude Include="include\pkShaderCodec.h">
       <Filter>include\codecs</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkActorCodec.h">
-      <Filter>include\codecs</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkActorResource.h">
-      <Filter>include\resources</Filter>
+    <ClInclude Include="include\pkTexture3D.h">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -407,11 +404,8 @@
     <ClCompile Include="source\pkShaderCodec.cpp">
       <Filter>source\codecs</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkActorResource.cpp">
-      <Filter>source\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkActorCodec.cpp">
-      <Filter>source\codecs</Filter>
+    <ClCompile Include="source\pkTexture3D.cpp">
+      <Filter>source\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

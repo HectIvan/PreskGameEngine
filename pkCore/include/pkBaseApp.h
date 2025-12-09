@@ -116,7 +116,7 @@ class PK_CORE_EXPORT BaseApp
    * @param _run Run state.
    */
   void
-  ApplicationRun(bool _run) { m_run = _run; }
+  ApplicationRun(const bool _run) { m_run = _run; }
 
  public:
   // system

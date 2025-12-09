@@ -28,15 +28,6 @@ class TextureResource;
 class ModelResource;
 class MaterialResource;
 
-// to do: placeholder for the id.
-namespace ASSET_ID
-{
-  enum E
-  {
-    kUnknown = 0
-  };
-}
-
 class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
 {
  public:

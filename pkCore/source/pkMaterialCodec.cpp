@@ -26,7 +26,7 @@ namespace pkEngineSDK
 {
 
 SPtr<MaterialResource>
-MaterialCodec::createResource(const SPtr<Material> _pMaterial)
+MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
 {
   if (!_pMaterial) {
     return nullptr;
@@ -35,7 +35,7 @@ MaterialCodec::createResource(const SPtr<Material> _pMaterial)
 
   const String materialName = _pMaterial->getNameS();
   const String filePath = "resources/" + materialName + ".pkmat";
-  ofstream file(filePath, ios::out | ios::binary);
+  ofstream file(filePath, ios::out | ios::binary | ios::trunc);
 
   if (!file.is_open()) {
     const String msg = "Failed to create material resource " + materialName + ".";

@@ -89,6 +89,12 @@ class DX11GraphicsAPI : public GraphicsAPI
   getDevice() override { return m_pDevice; }
 
   /**
+   * @brief Wait for the device to be idle.
+   */
+  void
+  waitDevice() override;
+
+  /**
    * @brief Set the Client viewport.
    * @param _size Size of the viewport.
    */
@@ -122,7 +128,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pBlendState Blend state to set.
    */
   void
-  setBlendState(const SPtr<BlendState> _pBlendState) override;
+  setBlendState(const SPtr<BlendState>& _pBlendState) override;
 
   /**
    * @brief Create the Rasterizer state.
@@ -137,7 +143,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pRasterizerState Rasterizer state to set.
    */
   void
-  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) override;
+  setRasterizerState(const SPtr<RasterizerState>& _pRasterizerState) override;
 
   /**
    * @brief Create the sampler state.
@@ -162,8 +168,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(const SPtr<Texture> _pRTarget,
-                  const SPtr<Texture> _pDepthSV = nullptr,
+  setRenderTarget(const SPtr<Texture>& _pRTarget,
+                  const SPtr<Texture>& _pDepthSV = nullptr,
                   const uint32 _mipLevel = 0) override;
 
   /**
@@ -173,7 +179,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const SPtr<Texture>& _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) override;
 
   /**
@@ -195,40 +201,40 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @return Vertex Shader.
    */
   SPtr<Shader>
-  createVShader(SPtr<Shader> _pShader) override;
+  createVShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create a pixel shader.
    * @return Pixel Shader.
    */
   SPtr<Shader>
-  createPShader(SPtr<Shader> _pShader) override;
+  createPShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create a compute shader.
    * @return Compute shader.
    */
   SPtr<Shader>
-  createCShader(SPtr<Shader> _pShader) override;
+  createCShader(SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set the vertex shader to the device context.
    */
   void
-  setVShader(const SPtr<Shader> _pShader) override;
+  setVShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
    */
   void
-  setPShader(const SPtr<Shader> _pShader) override;
+  setPShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set a compute shader.
    * @return Compute shader.
    */
   void
-  setCShader(const SPtr<Shader> _pShader) override;
+  setCShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -247,7 +253,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pShader Shader to use.
    */
   SPtr<InputLayout>
-  createInputLayoutFromVShader(const SPtr<Shader> _pShader) override;
+  createInputLayoutFromVShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Create the Input Layout.
@@ -301,17 +307,19 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _format Format of the texture.
    * @param _usage What usage will the api give the texture.
    * @param _bindFlags flag for binding to the pipeline stages.
+   * @param _shaderResourceFormat Format of the shader resource view.
    * @param _mipLevels The maximum number of mipmap levels in the texture.
-   * @param _data Data of the image loaded.
+   * @param _isCube If the texture is a cube map.
    */
   SPtr<Texture>
-  createTexture(uint32 _width,
-                uint32 _height,
-                int32 _format,
-                int32 _usage,
+  createTexture(const uint32 _width,
+                const uint32 _height,
+                const int32 _format,
+                const int32 _usage,
                 int32 _bindFlags,
-                int32 _shaderResourceFormat,
-                int32 _mipLevels = 1) override;
+                const int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
+                const bool _isCube = false) override;
 
   /**
    * @brief Create a texture from a pk resource.
@@ -337,7 +345,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pTexture Texture to use.
    */
   void
-  GenerateMips(SPtr<Texture>& _pTexture) override;
+  generateMips(const SPtr<Texture>& _pTexture) override;
 
   /**
    * @brief Create the vertex buffer.
@@ -346,7 +354,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     uint32 _usage = 0) override;
+                     const uint32 _usage = 0) override;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -357,9 +365,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  uint32 _start = 0,
-                  uint32 _bufferCount = 1,
-                  uint32 _offset = 0) override;
+                  const uint32 _start = 0,
+                  const uint32 _bufferCount = 1,
+                  const uint32 _offset = 0) override;
 
   /**
    * @brief Create an IndexBuffer.
@@ -368,7 +376,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    uint32 _usage = 0) override;
+                    const uint32 _usage = 0) override;
 
   /**
    * @brief Set the index buffer.
@@ -377,8 +385,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 uint32 _format = 42,
-                 uint32 _offset = 0) override;
+                 const uint32 _format = 42,
+                 const uint32 _offset = 0) override;
 
   /**
    * @brief Create the constant buffer.
@@ -399,7 +407,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _size Size of the data to store.
    */
   void
-  updateConstantBuffer(SPtr<ConstantBuffer>& _pCBuffer,
+  updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
                        const void* _pNewData,
                        const SIZE_T _size) override;
 
@@ -409,7 +417,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -424,7 +433,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -439,7 +449,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) override;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) override;
 
   /**
    * @brief Unbind resources of a compute shader.
@@ -455,10 +466,10 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   void
-  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
-                            uint32 _start = 0,
-                            uint32* _initialCounts = nullptr,
-                            uint32 _mipLevels = 0) override;
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextures,
+                            const uint32 _start = 0,
+                            const uint32* _initialCounts = nullptr,
+                            const uint32 _mipLevels = 0) override;
 
   /**
    * @brief Unbind unordered views of a compute shader.
@@ -470,23 +481,29 @@ class DX11GraphicsAPI : public GraphicsAPI
   /**
    * @brief Clear all render target views of a vector.
    * @param _color New render target color.
+   * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) override;
+  clearRenderTargetViews(const Color& _color,
+                         const Vector<SPtr<Texture>>& _rtvs,
+                         const uint32 _mipslice = -1) override;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
+   * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) override;
+  clearRenderTargetView(const Color& _color,
+                        const SPtr<Texture>& _rtv,
+                        const uint32 _mipSlice = -1) override;
 
   /**
    * @brief Clear access view.
    * @param _color New view color.
    */
   void
-  clearUnorderedAccessView(SPtr<Texture> _uav,
+  clearUnorderedAccessView(const SPtr<Texture>& _uav,
                            const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**
@@ -494,7 +511,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _color New view color.
    */
   void
-  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+  clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
                             const Color& _color = Color(1, 1, 1, 0)) override;
 
   /**
@@ -517,7 +534,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Unbind the Vertex Shader constant buffers.
    */
   void
-  vSUnbindConstantBuffers() override;
+  vSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -530,9 +547,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind the Pixel Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   void
-  pSUnbindConstantBuffers() override;
+  pSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Set the Compute Shader Constant Buffer
@@ -545,9 +563,10 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Unbind the compute Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   void
-  cSUnbindConstantBuffers() override;
+  cSUnbindConstantBuffers(const uint32 _count = 8) override;
 
   /**
    * @brief Draw the indexed data.
@@ -555,7 +574,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _startIndexLocation Which index will be the starting point.
    */
   void
-  draw(const uint32 _indexCount, const uint32 _startIndexLocation) override;
+  draw(uint32 _indexCount,
+       uint32 _startIndexLocation) override;
 
   /**
    * @brief Draw the indexed data.
@@ -564,9 +584,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _baseVertexLocation Which vertex will be the starting point.
    */
   void
-  drawIndexed(const uint32 _indexCount,
-              const uint32 _startIndexLocation,
-              const uint32 _baseVertexLocation) override;
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) override;
 
   /**
    * @brief Compute shader draw call.
@@ -575,7 +595,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _countZ Thread group size in the Z axis.
    */
   void
-  dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ) override;
+  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
 
   /**
    * @brief Present the result to the screen.
@@ -583,7 +603,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _flags Swap chain presentation options.
    */
   void
-  present(const uint32 _syncInterval, const uint32 _flags) override;
+  present(uint32 _syncInterval, uint32 _flags) override;
   
  public:
 
@@ -592,6 +612,6 @@ class DX11GraphicsAPI : public GraphicsAPI
 
  private:
   // api device
-  SPtr<Device> m_pDevice;
+  SPtr<DX11Device> m_pDevice;
 };
 }

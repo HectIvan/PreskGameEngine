@@ -46,7 +46,6 @@ Pass::Pass(PassDesc& _desc)
     m_pVShader->compileFromResource(res);
     api.createVShader(m_pVShader);
     // create the input layout for the shader
-    m_pInputLayout = make_shared<InputLayout>();
     m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
   };
   // Try to create the pixel shader if there's a path.
@@ -209,7 +208,6 @@ Pass::compileShaders()
   }
 }
 
-// to do: properly link passes with the textures
 void
 Pass::beginPass(Color _color)
 {
@@ -254,9 +252,9 @@ Pass::endPass()
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
   // set all to nullptr
-  SIZE_T resourceCount = m_inputTex.size();
-  SIZE_T uavCount = m_uavTex.size();
-  SIZE_T renderTargetCount = m_outputTex.size();
+  const SIZE_T resourceCount = m_inputTex.size();
+  const SIZE_T uavCount = m_uavTex.size();
+  const SIZE_T renderTargetCount = m_outputTex.size();
 
   if (renderTargetCount > 0) {
     api.unbindRenderTargets(renderTargetCount);

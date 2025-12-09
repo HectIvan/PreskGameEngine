@@ -78,6 +78,12 @@ public:
   getDevice() = 0;
 
   /**
+   * @brief Wait for the device to be idle.
+   */
+  virtual void
+  waitDevice() = 0;
+
+  /**
    * @brief Set the Client viewport.
    * @param _size Size of the viewport.
    */
@@ -111,7 +117,7 @@ public:
    * @param _pBlendState Blend state to set.
    */
   virtual void
-  setBlendState(const SPtr<BlendState> _pBlendState) = 0;
+  setBlendState(const SPtr<BlendState>& _pBlendState) = 0;
 
   /**
    * @brief Create the Rasterizer state.
@@ -126,7 +132,7 @@ public:
    * @param _pRasterizerState Rasterizer state to set.
    */
   virtual void
-  setRasterizerState(const SPtr<RasterizerState> _pRasterizerState) = 0;
+  setRasterizerState(const SPtr<RasterizerState>& _pRasterizerState) = 0;
 
   /**
    * @brief Create the sampler state.
@@ -151,8 +157,8 @@ public:
    * @param _DepthSV Depth stencil view to use.
    */
   virtual void
-  setRenderTarget(const SPtr<Texture> _pRTarget,
-                  const SPtr<Texture> _pDepthSV = nullptr,
+  setRenderTarget(const SPtr<Texture>& _pRTarget,
+                  const SPtr<Texture>& _pDepthSV = nullptr,
                   const uint32 _mipLevel = 0) = 0;
 
   /**
@@ -162,7 +168,7 @@ public:
    */
   virtual void
   setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
-                   const SPtr<Texture> _pDepthSV = nullptr,
+                   const SPtr<Texture>& _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) = 0;
 
   /**
@@ -184,42 +190,42 @@ public:
    * @returtn Vertex Shader.
    */
   virtual SPtr<Shader>
-  createVShader(SPtr<Shader> _pShader) = 0;
+  createVShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create a pixel shader.
    * @return Pixel Shader.
    */
   virtual SPtr<Shader>
-  createPShader(SPtr<Shader> _pShader) = 0;
+  createPShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create a compute shader.
    * @return Compute shader.
    */
   virtual SPtr<Shader>
-  createCShader(SPtr<Shader> _pShader) = 0;
+  createCShader(SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setVShader(const SPtr<Shader> _pShader) = 0;
+  setVShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
    */
   virtual void
-  setPShader(const SPtr<Shader> _pShader) = 0;
+  setPShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set a compute shader.
    * @param _pShader Compute shader.
    */
   virtual void
-  setCShader(const SPtr<Shader> _pShader) = 0;
+  setCShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Compile a shader from a specific file.
@@ -239,7 +245,7 @@ public:
    * @return Input layout pointer
    */
   virtual SPtr<InputLayout>
-  createInputLayoutFromVShader(const SPtr<Shader> _pShader) = 0;
+  createInputLayoutFromVShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Create the Input Layout.
@@ -288,23 +294,25 @@ public:
   createTexture(const TextureDesc& _desc) = 0;
 
   /**
-  * @brief Create a texture.
-  * @param _data Data of the image loaded.
-  * @param _width How wide is the texture.
-  * @param _height How tall is the texture.
-  * @param _format Format of the texture.
-  * @param _usage What usage will the api give the texture.
-  * @param _bindFlags flag for binding to the pipeline stages.
-  * @param _mipLevels The maximum number of mipmap levels in the texture.
-  **/
+   * @brief Create a texture.
+   * @param _width How wide is the texture.
+   * @param _height How tall is the texture.
+   * @param _format Format of the texture.
+   * @param _usage What usage will the api give the texture.
+   * @param _bindFlags flag for binding to the pipeline stages.
+   * @param _shaderResourceFormat Format of the shader resource view.
+   * @param _mipLevels The maximum number of mipmap levels in the texture.
+   * @param _isCube If the texture is a cube map.
+   */
   virtual SPtr<Texture>
-  createTexture(uint32 _width,
-                uint32 _height,
-                int32 _format,
-                int32 _usage,
+  createTexture(const uint32 _width,
+                const uint32 _height,
+                const int32 _format,
+                const int32 _usage,
                 int32 _bindFlags,
-                int32 _shaderResourceFormat,
-                int32 _mipLevels = 1) = 0;
+                const int32 _shaderResourceFormat,
+                int32 _mipLevels = 1,
+                const bool _isCube = false) = 0;
 
   /**
    * @brief Create a texture from a pk resource.
@@ -329,7 +337,7 @@ public:
    * @param _pTexture Texture to use.
    */
   virtual void
-  GenerateMips(SPtr<Texture>& _pTexture) = 0;
+  generateMips(const SPtr<Texture>& _pTexture) = 0;
 
   /**
    * @brief Create a VertexBuffer.
@@ -339,7 +347,7 @@ public:
    */
   virtual SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     uint32 _usage = 0) = 0;
+                     const uint32 _usage = 0) = 0;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -350,9 +358,9 @@ public:
    */
   virtual void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  uint32 _start = 0,
-                  uint32 _bufferCount = 1,
-                  uint32 _offset = 0) = 0;
+                  const uint32 _start = 0,
+                  const uint32 _bufferCount = 1,
+                  const uint32 _offset = 0) = 0;
 
   /**
    * @brief Create an IndexBuffer.
@@ -362,7 +370,7 @@ public:
    */
   virtual SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    uint32 _usage = 0) = 0;
+                    const uint32 _usage = 0) = 0;
 
   /**
    * @brief Set the index buffer.
@@ -371,8 +379,8 @@ public:
    */
   virtual void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 uint32 _format = 42, // kPK_FORMAT_R32_UINT
-                 uint32 _offset = 0) = 0;
+                 const uint32 _format = 42, // kPK_FORMAT_R32_UINT
+                 const uint32 _offset = 0) = 0;
 
   /**
    * @brief Create the constant buffer.
@@ -393,7 +401,7 @@ public:
    * @param _size Size of the data to store.
    */
   virtual void
-  updateConstantBuffer(SPtr<ConstantBuffer>& _pCBuffer,
+  updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
                        const void* _pNewData,
                        const SIZE_T _size) = 0;
 
@@ -403,7 +411,8 @@ public:
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   virtual void
-  vSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a vertex shader.
@@ -418,7 +427,8 @@ public:
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   virtual void
-  pSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a pixel shader.
@@ -433,7 +443,8 @@ public:
    * @param _start In what slot of the pixel shader will the resources be allocated
    */
   virtual void
-  cSSetShaderResourceViews(const Vector<SPtr<Texture>> _pTextures, uint32 _start = 0) = 0;
+  cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+                           const uint32 _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a compute shader.
@@ -449,10 +460,10 @@ public:
    * @param _initialCounts Array of initial values for append or consume UAVs.
    */
   virtual void
-  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>> _pTextures,
-                            uint32 _start = 0,
-                            uint32* _initialCounts = nullptr,
-                            uint32 _mipLevels = 0) = 0;
+  cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextures,
+                            const uint32 _start = 0,
+                            const uint32* _initialCounts = nullptr,
+                            const uint32 _mipLevels = 0) = 0;
 
   /**
    * @brief Unbind unordered views from a compute shader.
@@ -464,23 +475,30 @@ public:
   /**
    * @brief Clear all render target views of a vector.
    * @param _color New render target color.
+   * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetViews(const Color& _color, Vector<SPtr<Texture>> _rtvs) = 0;
+  clearRenderTargetViews(const Color& _color,
+                         const Vector<SPtr<Texture>>& _rtvs,
+                         const uint32 _mipSlice = -1) = 0;
 
   /**
    * @brief Clear the render target fiew and fill the screen with a new color.
    * @param _color New screen color.
+   * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetView(const Color& _color, SPtr<Texture> _rtv) = 0;
+  clearRenderTargetView(const Color& _color,
+                        const SPtr<Texture>& _rtv,
+                        const uint32 _mipSlice = -1) = 0;
 
   /**
    * @brief Clear access view.
    * @param _color New view color.
    */
   virtual void
-  clearUnorderedAccessView(SPtr<Texture> _uav, const Color& _color = Color(1, 1, 1, 0)) = 0;
+  clearUnorderedAccessView(const SPtr<Texture>& _uav,
+                           const Color& _color = Color(1, 1, 1, 0)) = 0;
 
   /**
    * @brief Clear all unordered access views of a vector.
@@ -488,7 +506,7 @@ public:
    * @param _color New view color.
    */
   virtual void
-  clearUnorderedAccessViews(Vector<SPtr<Texture>> _uavs,
+  clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
                             const Color& _color = Color(1,1,1,0)) = 0;
 
   /**
@@ -510,9 +528,10 @@ public:
 
   /**
    * @brief Unbind the Vertex Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  vSUnbindConstantBuffers() = 0;
+  vSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Set the Pixel Shader constant buffer.
@@ -525,9 +544,10 @@ public:
 
   /**
    * @brief Unbind the Pixel Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  pSUnbindConstantBuffers() = 0;
+  pSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Set the Compute Shader Constant Buffer.
@@ -540,9 +560,10 @@ public:
 
   /**
    * @brief Unbind the compute Shader constant buffers.
+   * @param _count How many buffers will be unbound.
    */
   virtual void
-  cSUnbindConstantBuffers() = 0;
+  cSUnbindConstantBuffers(const uint32 _count = 8) = 0;
 
   /**
    * @brief Draw the indexed data.
@@ -550,7 +571,8 @@ public:
    * @param _startIndexLocation Which index will be the starting point.
    */
   virtual void
-  draw(const uint32 _indexCount, const uint32 _startIndexLocation) = 0;
+  draw(uint32 _indexCount,
+       uint32 _startIndexLocation) = 0;
 
   /**
    * @brief Draw the indexed data.
@@ -559,9 +581,9 @@ public:
    * @param _baseVertexLocation Which vertex will be the starting point.
    */
   virtual void
-  drawIndexed(const uint32 _indexCount,
-              const uint32 _startIndexLocation,
-              const uint32 _baseVertexLocation) = 0;
+  drawIndexed(uint32 _indexCount,
+              uint32 _startIndexLocation,
+              uint32 _baseVertexLocation) = 0;
 
   /**
    * @brief Compute shader draw call.
@@ -570,7 +592,7 @@ public:
    * @param _countZ Thread group size in the Z axis.
    */
   virtual void
-  dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ) = 0;
+  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) = 0;
 
   /**
    * @brief Present the result to the screen.
@@ -578,7 +600,7 @@ public:
    * @param _flags Swap chain presentation options.
    */
   virtual void
-  present(const uint32 _syncInterval, const uint32 _flags) = 0;
+  present(uint32 _syncInterval, uint32 _flags) = 0;
 
 };
 

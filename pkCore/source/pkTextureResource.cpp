@@ -39,8 +39,8 @@ TextureResource::load()
   m_bpp = texHeader.bpp;
   m_format = texHeader.format;
   m_mipMapCount = texHeader.mipMapCount;
-  uint32 dataSize = m_width * m_height * m_bpp;
-  m_data.resize(static_cast<SIZE_T>(dataSize));
+  const SIZE_T dataSize = static_cast<SIZE_T>(m_width * m_height * m_bpp);
+  m_data.resize(dataSize);  
 
   file.read(reinterpret_cast<ANSICHAR*>(&m_data[0]), dataSize);
 

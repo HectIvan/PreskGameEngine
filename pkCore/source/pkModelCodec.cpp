@@ -37,7 +37,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
 
   const String fileName = _path.getFileNameWithoutExtension();
   const String filePath = "resources/" + fileName + ".pkm";
-  ofstream file(filePath, ios::out | ios::binary);
+  ofstream file(filePath, ios::out | ios::binary | ios::trunc);
   // char error[256];
   // strerror_s(error, sizeof(error), errno); // last error of io.
   if (!file.is_open()) {

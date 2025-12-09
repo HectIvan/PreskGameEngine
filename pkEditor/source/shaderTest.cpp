@@ -108,25 +108,12 @@ ShaderTest::onInit()
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
 
-  // SPtr<Actor> pistol = activeScene->instantiate("Pistol");
-  // pistol->addComponent(modelCod.loadModel(Path("models/drakefire_pistol_low.obj")));
-  // pistol->setScale(30.0f);
-  // pistol->setPosition(10.0f, 15.0f, 0.0f);
-  // 
-  // SPtr<Actor> sponza = activeScene->instantiate("Sponza");
-  // sponza->addComponent(resourceMan.loadModel(Path("models/sponza.obj")));
-  // 
-  // SPtr<Actor> coat = activeScene->instantiate("Coat");
-  // SPtr<BaseResource> res = assetMan.loadResource(Path("resources/export3dcoat.pkm"));
-  // coat->addComponent(resourceMan.loadPKModel(res->m_id));
-  // coat->setPosition(11.0f, 5.2f, 0.0f);
-
   m_IBL = true;
   m_vSync = false;
   m_IBLIntensity = 1.0f;
   // luminance blur
-  m_blurRadius = 0.001f;
-  m_blurStrength = 20.0f;
+  m_blurRadius = 18.0f;
+  m_blurStrength = 1.0f;
   m_lumThreshold = 6.0f;
   // emissive blur
   m_emissiveBlur = 5.0f;
@@ -196,34 +183,34 @@ ShaderTest::input()
   EventQueue& eventQueue = g_EventManager();
   UInterface& im = g_uInterface();
   // bool interfaceHovered = im.isHoveredWithItems();
-  bool itemActive = im.isItemActive();
-  float deltaTime = g_TimeManager().m_deltaTime;
-  // set camera speed with deltaTime
-  float speed = m_cameraSpeed * deltaTime;
+  const bool itemActive = im.isItemActive();
+  const float deltaTime = g_TimeManager().m_deltaTime;
+  const float speed = m_cameraSpeed * deltaTime;
   // if the user wants to exit the app.
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
     ApplicationRun(false);
   }
+  SPtr<Camera> cameraComp = m_camera->getComponent<Camera>();
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(speed);
+    cameraComp->moveForwardLocal(speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveForwardLocal(-speed);
+    cameraComp->moveForwardLocal(-speed);
   }
   // move left/right
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveRightLocal(-speed);
+    cameraComp->moveRightLocal(-speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveRightLocal(speed);
+    cameraComp->moveRightLocal(speed);
   }
   // move up/down
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveUpLocal(speed);
+    cameraComp->moveUpLocal(speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
-    m_camera->getComponent<Camera>()->moveUpLocal(-speed);
+    cameraComp->moveUpLocal(-speed);
   }
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
@@ -233,7 +220,7 @@ ShaderTest::input()
     posDif.y *= m_sensY;
     m_lastCursorPos = eventQueue.mousePosition;
     posDif *= Math::DEG2RAD;
-    m_camera->getComponent<Camera>()->rotate(-posDif.y, -posDif.x, 0.0f);
+    cameraComp->rotate(-posDif.y, -posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }
@@ -389,7 +376,8 @@ ShaderTest::uInterfaceUpdate()
           if (im.isItemHovered()) {
             const String tooltip = "Name: " + assetName + "\n" +
                                    "Asset ID: " + asset.first + "\n" + 
-                                   "Asset type: " + asset.second->getTypeString();
+                                   "Asset type: " + asset.second->getTypeString() + "\n" +
+                                   "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
             im.setTooltip(tooltip.c_str());
           }
           Vector2 itemPos = im.getItemPosition();
@@ -439,7 +427,7 @@ ShaderTest::uInterfaceUpdate()
       im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
       if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
         // to do: change this to a more efficient option
-        Vector<String> options = { "model", "light", "camera" };
+        const Vector<String> options = { "model", "light", "camera" };
         int32 val = -1;
         if (im.beginCombo("Components", val, options)) {
           // if a model component is to be added.
@@ -704,9 +692,7 @@ ShaderTest::onUpdate()
   Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
   CBCamera cBCamera;
-  CBVector2x2 shadowsParam;
-  shadowsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
-  shadowsParam.vec2 = Vector2(0.0f);
+  CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // to do: win size could change, swap this to use the specific texture size.
   // to do: change this to another method
   if (camera) {
     view = camera->m_view.getTransposed();
@@ -743,41 +729,25 @@ ShaderTest::onUpdate()
   }
 
   // luminance parameters.
-  CBVector2x2 lum;
-  lum.vec1 = winSize;
-  lum.vec2.x = m_lumThreshold;
+  CBVector2x2 lum(winSize, Vector2(m_lumThreshold, 0.0f));
   // blur parameters.
-  CBBlur blur;
-  blur.WinSize = winSize;
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
-  blur.radius = m_blurRadius;
-  blur.strength = m_blurStrength;
+  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
   // emissive blur parameters
-  CBBlur emissiveBlur;
-  emissiveBlur.WinSize = winSize;
-  emissiveBlur.radius = m_emissiveBlur;
-  emissiveBlur.strength = m_emissiveStrength;
+  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlur, m_emissiveStrength);
   // IBR parameters.
-  Vector4 IBRIntens;
-  IBRIntens.x = m_IBLIntensity;
-  CBVector3 viewPos;
-  viewPos.vec1 = camera->m_eye.xyz();
+  CBFloat IBRIntens(m_IBLIntensity);
+  CBVector3 viewPos(camera->m_eye.xyz());
   // exposure parameter.
-  CBFloat exposure;
-  exposure.value = m_exposure;
+  CBFloat exposure(m_exposure);
   // SSAO
-  CBSSAO ssao;
-  ssao.sample_rad = m_ssaoSampleRad;
-  ssao.scale = m_ssaoScale;
-  ssao.bias = m_ssaoBias;
-  ssao.intensity = m_ssaoIntensity;
-  CBVector2x2 ssaoWin;
-  ssaoWin.vec1 = ssaoPass->getViewportSize();
+  CBSSAO ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
+  CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
 
   // data type sizes.
   uint32 m4x4Size = sizeof(Matrix4);
   uint32 cBCamSize = sizeof(CBCamera);
   uint32 cBLightSize = sizeof(CBLight);
+  uint32 cbBlurSize = sizeof(CBBlur);
 
   // update normal && base shadow pass buffers.
   api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
@@ -790,8 +760,8 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lightQuad->getCBuffer(0), &cBLight, cBLightSize);
   api.updateConstantBuffer(lightQuad->getCBuffer(1), &cBCamera, cBCamSize);
   api.updateConstantBuffer(lightQuad->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, sizeof(Vector4));
-  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, sizeof(Vector4));
+  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, sizeof(CBVector2x2));
+  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, sizeof(CBFloat));
 
   // skybox constant buffers.
   api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
@@ -801,14 +771,14 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
   // Emissive blur constant buffers;
   emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, cbBlurSize);
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, cbBlurSize);
   // lum blur constant buffers
   blur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, cbBlurSize);
   blur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, cbBlurSize);
 
   api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, sizeof(CBFloat));
 

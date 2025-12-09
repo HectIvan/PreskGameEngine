@@ -7,6 +7,7 @@
 #include "pkSceneManager.h"
 #include "pkTextureManager.h"
 #include "pkTextureCodec.h"
+#include "pkShaderManager.h"
 
 namespace pkEngineSDK
 {
@@ -26,7 +27,7 @@ RendererManager::init()
   // Texture description
   TextureDesc txDesc;
   txDesc.width = winWidth;
-  txDesc.height = winHeight;
+  txDesc.height = winHeight;  
   txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
   txDesc.usage = kPK_USAGE_DEFAULT;
@@ -34,61 +35,63 @@ RendererManager::init()
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
   
   // render target for scene colors.
-  const SPtr<Texture> albedoRT = api.createTexture(txDesc);
+  SPtr<Texture> albedoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRT });
 
   // create the normal render target that will store the normals of the world.
-  const SPtr<Texture> normalRT = api.createTexture(txDesc);
+  SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
   // render target for the metallic result.
-  const SPtr<Texture> ormRT = api.createTexture(txDesc);
+  SPtr<Texture> ormRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
 
-  const SPtr<Texture> ssaoRT = api.createTexture(txDesc);
+  SPtr<Texture> ssaoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
 
   // BRDF texture.
-  const SPtr<Texture> brdfRT = api.createTexture(txDesc);
+  SPtr<Texture> brdfRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
 
   // skybox texture.
-  const SPtr<Texture> skyboxRT = api.createTexture(txDesc);
+  SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
 
   // positions texture.
-  const SPtr<Texture> posRT = api.createTexture(txDesc);
+  SPtr<Texture> posRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   // positions texture for the light.
   txDesc.width = winWidth * sizeMulShadow;
   txDesc.height = winHeight * sizeMulShadow;
-  const SPtr<Texture> posLightRT = api.createTexture(txDesc);
+  SPtr<Texture> posLightRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_PositionsLight, posLightRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
 
   // emissive texture.
-  const SPtr<Texture> emissiveRT = api.createTexture(txDesc);
+  SPtr<Texture> emissiveRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Emissive, emissiveRT });
 
-  const SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
+  SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveHBlur, emissiveHBlurRT });
 
-  const SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
+  SPtr<Texture> emissiveBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveBlur, emissiveBlurRT });
 
   // luminance texture.
-  const SPtr<Texture> lumRT = api.createTexture(txDesc);
+  SPtr<Texture> lumRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Luminance, lumRT });
 
-  const SPtr<Texture> lumBlurHRT = api.createTexture(txDesc);
+  SPtr<Texture> lumBlurHRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlurH, lumBlurHRT });
 
-  const SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
+  SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  const SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  
+  // texCodec.createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -96,6 +99,16 @@ RendererManager::init()
     SPtr<Texture> skyboxResource = tm.loadTexture(resSky->m_id);
     m_mainSkybox->copyFrom(skyboxResource);
   }
+
+  // Cube map for the skybox
+  txDesc.width = 2048;
+  txDesc.height = 2048;
+  txDesc.isCube = true;
+  SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
+  txDesc.width = winWidth;
+  txDesc.height = winHeight;
+  txDesc.isCube = false;
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
@@ -111,7 +124,7 @@ RendererManager::init()
   // light depth buffer
   txDesc.width = winWidth * sizeMulShadow;
   txDesc.height = winHeight * sizeMulShadow;
-  const SPtr<Texture> shadowDepth = api.createTexture(txDesc);
+  SPtr<Texture> shadowDepth = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Light, shadowDepth });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
@@ -123,6 +136,8 @@ RendererManager::init()
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+
+  generateCubeMap(m_mainSkybox, cubeMapRT);
   
   // create the passes needed
   createPasses();
@@ -149,22 +164,23 @@ RendererManager::createPasses()
   PassDesc pDesc = PassDesc();
 
   // Textures
-  const SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
-  const SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
-  const SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
-  const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
-  const SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
-  const SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
-  const SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
-  const SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
-  const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
-  const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
-  const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
-  const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
+  SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
+  SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
+  SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
+  SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
+  SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
+  SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
+  SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
+  SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
+  SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
+  SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
+  SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
   // Depth textures
-  const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
-  const SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
+  SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
+  SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -205,7 +221,7 @@ RendererManager::createPasses()
   pDesc.vSDirectory = "resources/pkQuadShader.pks";
   pDesc.pSDirectory = "resources/pkLightShader.pks";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4), sizeof(Vector4)};
-  pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox };
+  pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
   pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
@@ -362,6 +378,98 @@ RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
   return m_uavBuffers.find(_type)->second;
 }
 
+void
+RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput)
+{
+  GraphicsAPI& api = g_GraphicAPI();
+  Logger& log = g_Logger();
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+  ShaderManager& shaderMan = g_ShaderManager();
+
+  if (!_pInput || !_pOutput) {
+    const String msg = "Input or Output are null.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    log.throwError(msg);
+    return;
+  }
+
+  // get vertex shader resource.
+  SPtr<BaseResource> vShadRes = assetMan.getResourceBydirectory("resources/pkQuadShader.pks");
+  SPtr<BaseResource> pShadRes = assetMan.getResourceBydirectory("resources/pkCubeMapShader.pks");
+
+  if (!vShadRes || !pShadRes) {
+    const String msg = "Could not find shader resources to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    log.throwError(msg);
+    return;
+  }
+
+  vShadRes->load();
+  pShadRes->load();
+
+  // create the vertex shader.
+  SPtr<Shader> vShader = api.internalCreateShader();
+  vShader->compileFromResource(vShadRes);
+  if (!vShader) {
+    const String msg = "Could not create vertex shader to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+  api.createVShader(vShader);
+  const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
+
+  // save shader
+  const ShaderKey vShaderKey("resources/pkQuadShader.pks", "vs_5_0", "VS");
+  shaderMan.insertShader(vShaderKey, vShader);
+
+  // create the pixel shader.
+  SPtr<Shader> pShader = api.internalCreateShader();
+  pShader->compileFromResource(pShadRes);
+  if (!pShader) {
+    const String msg = "Could not create pixel shader to generate cubeMap.";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    return;
+  }
+  api.createPShader(pShader);
+
+  // save shader
+  const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "ps_5_0", "PS");
+  shaderMan.insertShader(pShaderKey, pShader);
+
+  // create the sampler state.
+  SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
+                                                           PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+
+  const Vector2 viewportSize = _pOutput->getSize();
+
+  // create constant buffer.
+  const uint32 CBFloatSize = sizeof(CBFloat);
+  SPtr<ConstantBuffer> cBuffer = api.createConstantBuffer(CBFloatSize);
+
+  // set the necessary resources.
+  api.setViewport(viewportSize);
+  api.setInputLayout(iLayout);
+  api.setVShader(vShader);
+  api.setPShader(pShader);
+  api.setSampler(samplerState);
+  api.pSSetShaderResourceViews({ _pInput });
+  api.pSSetConstantBuffers({ cBuffer }, 0);
+
+  // iterate through each face of the cubemap.
+  api.clearRenderTargetView(Color::BLACK, _pOutput);
+  for (uint32 i = 0; i < 6; ++i) {
+    api.setRenderTarget(_pOutput, nullptr, i);
+    const CBFloat data(static_cast<float>(i));
+    api.updateConstantBuffer(cBuffer, &data, CBFloatSize);
+    api.draw(3, 0);
+  }
+
+  // unbind resources.
+  api.waitDevice();
+  api.pSSetShaderResourceViews({ nullptr });
+  api.unbindRenderTargets(1);
+}
+
 template<class T> void
 RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuffer)
 {
@@ -369,34 +477,39 @@ RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuf
 }
 
 void
-RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
+RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 {
-  // for each actor
+  RendererManager& rManager = g_RenderManager();
+  GraphicsAPI& api = g_GraphicAPI();
+  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+  
+  // iterate through each actor.
   const uint32 actorCount = static_cast<uint32>(_gameActors.size());
+  const uint32 sizeMatrix = sizeof(Matrix4);
   for (uint32 i = 0; i < actorCount; ++i) {
     const SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
     if (!currActor->isActive()) {
       continue;
     }
-    // Get the final matrix by taking into account the parent actors
+    // use the parent transform to modify the current transform.
     SPtr<Actor> parent = currActor->m_parent;
     Matrix4 transform = currActor->m_transform;
-    // while there's a parent
     while (parent) {
-      // add the parent transform to the current transform matrix
       transform *= parent->m_transform;
-      // the next parent will be the parent of this parent
       parent = parent->m_parent;
     }
-    // set the current actor transform as the world in which the shader will work 
+    // set the current actor transform.
+    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeMatrix);
+    api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeMatrix);
 
-    // render the model of the actor
+    // render the model of the actor.
     const SPtr<Model> model = currActor->getComponent<Model>();
     if (model && model->isActive()) {
-      renderModel(model, transform);
+      renderModel(model);
     }
-    // if the actor has children, do the same for them (recursive)
+    // if the actor has children, do the same for them.
     if (!currActor->m_children.empty()) {
       renderActors(currActor->m_children);
     }
@@ -405,45 +518,36 @@ RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
 
 
 void
-RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTransform)
+RendererManager::renderModel(const SPtr<Model>& _model)
 {
   // get a reference from managers and passes.
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
-
   const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
-
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
   uint32 currentVertexOrigin = 0;
   uint32 currentIndexOrigin = 0;
-  const SIZE_T sizeMatrix = sizeof(Matrix4);
-  const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
   // for each mesh in the model
+  const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
+  const uint32 sizeProps = sizeof(CBMaterialProps);
   for (uint32 i = 0; i < meshCount; ++i) {
     // get the material
     const SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
     const SPtr<Material> material = mesh->material;
     if (mesh->getActive() &&  material) {
-      // set the material textures to the shader
+      // render the mesh.
       const Vector<SPtr<Texture>> textures = { material->m_albedo,
                                                material->m_normal,
+                                               material->m_height,
+                                               material->m_metallic,
                                                material->m_oclussion,
                                                material->m_roughness,
-                                               material->m_metallic,
                                                material->m_emissive };
-      // update resources & constant buffers
-      const Matrix4 transform = _actorTransform * mesh->m_transform;
       api.pSSetShaderResourceViews(textures);
-      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeMatrix);
-      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeMatrix);
-      api.updateConstantBuffer(basePass->getCBuffer(3),
-                               &material->m_properties,
-                               sizeof(CBMaterialProps));
-      // draw the mesh
+      api.updateConstantBuffer(basePass->getCBuffer(3), &material->m_properties, sizeProps);
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }
     // update the offsets

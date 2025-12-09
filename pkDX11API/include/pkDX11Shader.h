@@ -30,7 +30,7 @@ class DX11Shader : public Shader
 {
  public:
   DX11Shader() = default;
-  virtual ~DX11Shader() {
+  ~DX11Shader() override {
     safeRelease(m_pSBlob);
   }
 

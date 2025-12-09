@@ -81,7 +81,6 @@ Camera::moveForward(float _offset)
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
-// to do: change return of xyz from copy to reference (maybe)
 void
 Camera::moveForwardLocal(float _offset)
 {

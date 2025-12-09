@@ -36,25 +36,61 @@ loadPlugin()
 }
 
 SPtr<TextureResource>
+StbiTextureCodec::createResource(const String _name,
+                                 const int32 _width,
+                                 const int32 _height,
+                                 const int32 _bpp,
+                                 const uint32 _format,
+                                 const uint32 _mipCount,
+                                 Vector<uint8>& _data)
+{
+  Logger& log = g_Logger();
+
+  const String resourcePath = "resources/" + Path(_name).getFileNameWithoutExtension() + ".pkt";
+
+  ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
+
+  // if the file cannot be open/created, return a warning and a nullptr.
+  if (!file.is_open()) {
+    const String msg = "Failed to generate resource for texture " + resourcePath + ".";
+    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    return nullptr;
+  }
+
+  const SIZE_T dataSize = static_cast<SIZE_T>(_width * _height * _bpp);
+
+  // create texture resource.
+  SPtr<TextureResource> textureRes = make_shared<TextureResource>();
+
+  textureRes->m_originalPath = _name;
+  textureRes->m_resourcePath = resourcePath;
+  textureRes->m_name = _name;
+  textureRes->m_id = UUID::generateRandomUUID();
+
+  textureRes->writeBaseHeader(file, textureRes->m_id, _name, resourcePath);
+
+  file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeof(int32));
+  file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeof(int32));
+  file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeof(int32));
+  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeof(uint32));
+  file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeof(uint32));
+  file.write(reinterpret_cast<ANSICHAR*>(&_data[0]), dataSize);
+
+  file.close();
+
+  return textureRes;
+}
+
+SPtr<TextureResource>
 StbiTextureCodec::createResourceFromFile(const Path _path)
 {
   Logger& log = g_Logger();
-  bool canCreateResource = true;
 
   const String fileName = _path.getFileNameWithoutExtension();
   const String resourcePath = "resources/" + fileName + ".pkt";
 
   if (!FileSystem::fileExists(_path)) {
     return nullptr;
-  }
-
-  ofstream file(resourcePath, ios::out | ios::binary);
-
-  // if the file cannot be open/created, return a warning and a nullptr.
-  if (!file.is_open()) {
-    canCreateResource = false;
-    const String msg = "Failed to generate resource for texture " + resourcePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
   }
 
   // load data using stbi.
@@ -93,43 +129,17 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
     bpp = 4;
   }
 
-  const SIZE_T dataSize = static_cast<SIZE_T>(width) * static_cast<SIZE_T>(height) * bpp;
+  const SIZE_T dataSize = static_cast<SIZE_T>(width * height * bpp);
+  Vector<uint8> finalData(dataSize);
+  memcpy(finalData.data(), data, dataSize);
 
-  // create texture resource.
-  SPtr<TextureResource> textureRes = make_shared<TextureResource>();
-
-  textureRes->m_originalPath = _path.toString();
-  textureRes->m_resourcePath = resourcePath;
-  textureRes->m_name = fileName;
-  textureRes->m_id = UUID::generateRandomUUID();
-
-  textureRes->m_width = width;
-  textureRes->m_height = height;
-  textureRes->m_bpp = bpp;
-  textureRes->m_format = static_cast<uint32>(format);
-  textureRes->m_mipMapCount = mipcount;
-  textureRes->m_data.resize(dataSize);//  = new unsigned char[dataSize];
-  memcpy(textureRes->m_data.data(), data, dataSize);
-
-  // write the data into the pkt file.
-  if (canCreateResource) {
-    // generate the base resource header.
-    textureRes->writeBaseHeader(file, textureRes->m_id, fileName, resourcePath);
-
-    TextureAssetHeader texHeader;
-    texHeader.width = textureRes->m_width;
-    texHeader.height = textureRes->m_height;
-    texHeader.bpp = textureRes->m_bpp;
-    texHeader.format = textureRes->m_format;
-    texHeader.mipMapCount = textureRes->m_mipMapCount;
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.width), sizeof(int32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.height), sizeof(int32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.bpp), sizeof(int32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.format), sizeof(uint32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&texHeader.mipMapCount), sizeof(uint32));
-    file.write(reinterpret_cast<ANSICHAR*>(&data[0]), dataSize);
-    file.close();
-  }
+  SPtr<TextureResource> textureRes = createResource(fileName,
+                                                    width,
+                                                    height,
+                                                    bpp,
+                                                    static_cast<uint32>(format),
+                                                    mipcount,
+                                                    finalData);
 
   if (data) { stbi_image_free(data); }
 

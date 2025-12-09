@@ -28,9 +28,7 @@ class DX11PixelShader : public DX11Shader
 {
  public:
   DX11PixelShader() = default;
-  virtual ~DX11PixelShader() {
-    safeRelease(m_pShader);
-  }
+  ~DX11PixelShader() override = default;
 
  public:
   ID3D11PixelShader* m_pShader = nullptr;

@@ -53,7 +53,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   // attempt to create the shader resource.
   const String shaderName = shaderDir.getFileNameWithoutExtension();
   const String resourceDir = "resources/" + shaderName + ".pks";
-  ofstream file(resourceDir, ios::out | ios::binary);
+  ofstream file(resourceDir, ios::out | ios::binary | ios::trunc);
 
   // check if the resource creation failed.
   if (!file.is_open()) {
@@ -87,7 +87,8 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   // register the creation.
   const String msg = "Created shader resource " +
-                     resourceDir +
+                     shaderName + 
+                     ".pks" +
                      " of size " +
                      to_string(pointerSize);
   log.registerMessage(msg, __FILE__, __LINE__);

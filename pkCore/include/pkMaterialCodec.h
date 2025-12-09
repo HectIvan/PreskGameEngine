@@ -36,7 +36,7 @@ class PK_CORE_EXPORT MaterialCodec : public Module<MaterialCodec>
    * @return True if the material was saved successfully, false otherwise.
    */
   SPtr<MaterialResource>
-  createResource(const SPtr<Material> _pMaterial);
+  createResource(const SPtr<Material>& _pMaterial);
 };
 
 PK_CORE_EXPORT MaterialCodec&

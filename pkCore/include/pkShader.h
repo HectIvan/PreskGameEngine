@@ -31,6 +31,14 @@ class PK_CORE_EXPORT Shader
   Shader() {};
   virtual ~Shader() = default;
 
+  // deletes the possibility of using said constructor and operator in the class.
+  Shader(const Shader&) = delete;
+  Shader& operator=(const Shader&) = delete;
+
+  // movement functions deleted.
+  Shader(Shader&&) noexcept = delete;
+  Shader& operator=(Shader&&) noexcept = delete;
+
   /**
    * @brief Compile the shader from a file.
    */

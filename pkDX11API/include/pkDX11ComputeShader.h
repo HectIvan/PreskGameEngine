@@ -28,9 +28,7 @@ namespace pkEngineSDK
   {
   public:
     DX11ComputeShader() = default;
-    virtual ~DX11ComputeShader() {
-      safeRelease(m_pShader);
-    }
+    ~DX11ComputeShader() override = default;
 
   public:
     ID3D11ComputeShader* m_pShader = nullptr;

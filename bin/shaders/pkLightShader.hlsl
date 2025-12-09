@@ -13,6 +13,7 @@ Texture2D albedoMap : register(t3); // albedo
 Texture2D normalMap : register(t4); // normals
 Texture2D ormMap : register(t5); // occlusion (R), roughness (G), metallic (B)
 Texture2D skybox : register(t6); // skybox texture
+Texture2D cubeMap : register(t7); // skybox texture
 // sampler state
 SamplerState samState : register(s0);
 
@@ -267,6 +268,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 V = normalize(worldPos - Eye.xyz);
   float3 view = reflect(V, normal);
+  view.z *= -1.0f;
   float2 skyboxUV = getSkyBoxUV(view);
   
   // get the skybox sample depending on roughness levels.
@@ -279,7 +281,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 diffuseIBL = IBL * (albedoTex / PI);
   
-  float4 finalColor = float4((albedoTex * diffuseBRDF) + (specularBRDF * IBL) + diffuseIBL, 1.0f);
+  float4 finalColor = float4((albedoTex * diffuseBRDF) + (specularBRDF * IBL) + (diffuseIBL * ao), 1.0f);
   
   return finalColor;
 }

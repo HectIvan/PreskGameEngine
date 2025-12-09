@@ -23,8 +23,10 @@ ModelResource::load()
 
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
-    const String msg = "Failed to open a model resource at directory " + m_resourcePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Failed to open a model resource at directory " +
+                       String(m_resourcePath) +
+                       ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return;
   }
 

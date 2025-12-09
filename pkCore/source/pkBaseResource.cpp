@@ -57,23 +57,17 @@ BaseResource::loadBaseHeader(ifstream& _file)
 
 void
 BaseResource::writeBaseHeader(ofstream& _file,
-                              const String& _ID,
-                              const String& _fileName,
-                              const String& _resourcePath)
+                              const UUID& _ID,
+                              const ANSICHAR* _fileName,
+                              const ANSICHAR* _resourcePath)
 {
   BaseHeader header;
   header.ID = _ID;
-  header.IDSize = _ID.length();
-  header.name = _fileName;
-  header.nameSize = _fileName.length();
-  header.path = _resourcePath;
-  header.pathSize = _resourcePath.length();
+  strcpy_s(header.name, PK_RESOURCE_NAME_SIZE, _fileName);
+  strcpy_s(header.path, PK_RESOURCE_PATH_SIZE, _resourcePath);
 
-  _file.write(reinterpret_cast<const ANSICHAR*>(&header.IDSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const ANSICHAR*>(header.ID.c_str()), header.IDSize);
-  _file.write(reinterpret_cast<const ANSICHAR*>(&header.nameSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const ANSICHAR*>(header.name.c_str()), header.nameSize);
-  _file.write(reinterpret_cast<const ANSICHAR*>(&header.pathSize), sizeof(SIZE_T));
-  _file.write(reinterpret_cast<const ANSICHAR*>(header.path.c_str()), header.pathSize);
+  _file.write(reinterpret_cast<const ANSICHAR*>(header.ID.uuidToString().c_str()),
+                                                PK_RESOURCE_ID_SIZE);
+  _file << header.name << header.path;
 }
 }

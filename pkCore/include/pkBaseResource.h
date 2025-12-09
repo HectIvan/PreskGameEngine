@@ -19,8 +19,12 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkPath.h"
+#include "pkUUID.h"
 
-#define PK_ID_SIZE 36
+#define PK_RESOURCE_ID_SIZE 36
+#define PK_RESOURCE_NAME_SIZE 64
+#define PK_RESOURCE_ORIGINAL_PATH_SIZE 256
+#define PK_RESOURCE_PATH_SIZE 256
 
 namespace pkEngineSDK
 {
@@ -40,12 +44,10 @@ namespace RESOURCE_TYPE
 
 struct BaseHeader
 {
-  String ID;
-  SIZE_T IDSize;
-  String name;
-  SIZE_T nameSize;
-  String path;
-  SIZE_T pathSize;
+  UUID ID;
+  ANSICHAR name[PK_RESOURCE_NAME_SIZE];
+  ANSICHAR originalPath[PK_RESOURCE_ORIGINAL_PATH_SIZE];
+  ANSICHAR path[PK_RESOURCE_PATH_SIZE];
 };
 
 class PK_CORE_EXPORT BaseResource
@@ -104,10 +106,10 @@ class PK_CORE_EXPORT BaseResource
   getTypeString() const = 0;
 
  public:
-  String m_id;
-  String m_name;
+  UUID m_id;
+  ANSICHAR m_name[PK_RESOURCE_NAME_SIZE];
   bool m_isLoaded = false;
-  String m_originalPath;
-  String m_resourcePath;
+  ANSICHAR m_originalPath[PK_RESOURCE_ORIGINAL_PATH_SIZE];
+  ANSICHAR m_resourcePath[PK_RESOURCE_PATH_SIZE];
 };
 }

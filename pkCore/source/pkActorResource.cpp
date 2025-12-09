@@ -27,6 +27,7 @@ ActorResource::load()
   if (m_isLoaded) {
     return;
   }
+
   Logger& log = g_Logger();
 
   ifstream file(m_resourcePath, ios::in | ios::binary);
@@ -46,7 +47,9 @@ ActorResource::load()
   file.read(reinterpret_cast<ANSICHAR*>(&m_position), v3Size);
   file.read(reinterpret_cast<ANSICHAR*>(&m_rotation), v3Size);
   file.read(reinterpret_cast<ANSICHAR*>(&m_scale), v3Size);
-  file.read(reinterpret_cast<ANSICHAR*>(&m_isActive), sizeof(bool));
+  uint8 isActiveRaw;
+  file.read(reinterpret_cast<ANSICHAR*>(&isActiveRaw), sizeof(uint8));
+  m_isActive = (isActiveRaw != 0);
   file.read(reinterpret_cast<ANSICHAR*>(&m_componentCount), sizeof(uint32));
 
   // check for components.
@@ -54,8 +57,8 @@ ActorResource::load()
     COMPONENT_TYPE::E compType;
     file.read(reinterpret_cast<ANSICHAR*>(&compType), sizeof(COMPONENT_TYPE::E));
 
-    if (compType == COMPONENT_TYPE::kUnknown) {
-      
+    if (compType == COMPONENT_TYPE::kUnknown) { // if the component is unknown, skip it.
+      continue;
     }
     if (compType == COMPONENT_TYPE::kModel) {
       

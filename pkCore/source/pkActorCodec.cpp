@@ -49,6 +49,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   const Vector3 rotation = _pActor->m_rotation;
   const Vector3 scale = _pActor->m_scale;
   const bool isActive = _pActor->isActive();
+  const uint8 isActiveRaw = isActive ? 1 : 0;
   const uint32 componentCount = static_cast<uint32>(_pActor->m_components.size());
 
   SPtr<ActorResource> actorRes = make_shared<ActorResource>();
@@ -63,7 +64,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   file.write(reinterpret_cast<const ANSICHAR*>(&position), v3Size);
   file.write(reinterpret_cast<const ANSICHAR*>(&rotation), v3Size);
   file.write(reinterpret_cast<const ANSICHAR*>(&scale), v3Size);
-  file.write(reinterpret_cast<const ANSICHAR*>(&isActive), sizeof(bool));
+  file.write(reinterpret_cast<const ANSICHAR*>(&isActiveRaw), sizeof(uint32));
   file.write(reinterpret_cast<const ANSICHAR*>(&componentCount), sizeof(uint32));
 
   // if the actor has a parent, save its ID.
@@ -76,7 +77,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   }
   else {
     const SIZE_T idSize = UUID::PK_DEFAULT_UUID.length();
-    file.write(reinterpret_cast<const ANSICHAR*>(false), sizeof(bool));
+    file.write(reinterpret_cast<const ANSICHAR*>(0), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&idSize), sizeof(SIZE_T));
     file.write(reinterpret_cast<const ANSICHAR*>(&UUID::PK_DEFAULT_UUID), sizeof(ANSICHAR));
   }

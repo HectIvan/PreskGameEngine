@@ -73,7 +73,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
-  loadTexture(const String& _ID);
+  loadTexture(const UUID& _ID);
 
   /**
    * @brief Get a saved texture via its ID.
@@ -81,7 +81,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @return Pointer to the saved texture.
    */
   SPtr<Texture>
-  getTexture(const String& _ID);
+  getTexture(const UUID& _ID);
 
   /**
    * @brief Get a saved texture via its resource path.
@@ -98,11 +98,11 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @param _pTexture Texture to store.
    */
   void
-  insertLoadedTexture(const String& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
+  insertLoadedTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
 
  public:
   // save textures with the texture id
-  UMap<String, SPtr<Texture>> m_textures;
+  UMap<UUID, SPtr<Texture>> m_textures;
   // save textures with the texture path
   UMap<String, SPtr<Texture>> m_texturesPath;
 
@@ -116,13 +116,13 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   SPtr<Texture> m_defaultHeight;
   SPtr<Texture> m_defaultEmissive;
 
-  String m_albID;
-  String m_normalID;
-  String m_AOID;
-  String m_roughID;
-  String m_metallicID;
-  String m_heightID;
-  String m_emissiveID;
+  UUID m_albID;
+  UUID m_normalID;
+  UUID m_AOID;
+  UUID m_roughID;
+  UUID m_metallicID;
+  UUID m_heightID;
+  UUID m_emissiveID;
 };
 PK_CORE_EXPORT TextureManager&
 g_TextureManager();

@@ -46,7 +46,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @return Pointer to the loaded resource.
    */
   SPtr<BaseResource>
-  loadResource(const String& _ID);
+  loadResource(const UUID& _ID);
 
   /**
    * @brief Save a resource to a file.
@@ -72,7 +72,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @brief Get all resources in the manager.
    * @return The map with all resources
    */
-  UMap<String, SPtr<BaseResource>>
+  UMap<UUID, SPtr<BaseResource>>
   getAllResources() {
     return m_allResources;
   }
@@ -103,7 +103,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @brief Get all resources in the manager.
    * @return The map with all loaded resources
    */
-  UMap<String, SPtr<BaseResource>>
+  UMap<UUID, SPtr<BaseResource>>
   getAllLoadedResources() {
     return m_loadedResources;
   }
@@ -114,7 +114,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @return Pointer to the resource.
    */
   SPtr<BaseResource>
-  getResource(const String&_ID);
+  getResource(const UUID&_ID);
 
   /**
    * @brief Get a resource via the resource directory.
@@ -125,8 +125,8 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   getResourceBydirectory(const String& _directory);
 
  private:
-  UMap<String, SPtr<BaseResource>> m_loadedResources;
-  UMap<String, SPtr<BaseResource>> m_allResources;
+  UMap<UUID, SPtr<BaseResource>> m_loadedResources;
+  UMap<UUID, SPtr<BaseResource>> m_allResources;
   Path m_resourcesFolder;
 };
 

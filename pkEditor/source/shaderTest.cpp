@@ -45,6 +45,7 @@ using pkEngineSDK::stringToLower;
 using pkEngineSDK::TextureCodec;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::TextureResource;
+using pkEngineSDK::UUID;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "imgui_impl_win32.h"
@@ -268,9 +269,9 @@ ShaderTest::uInterfaceUpdate()
     m_selectedActor = currentScene->getActor(m_sActorIndex);
   }
   if (im.beginDragDropTarget()) {
-    const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+    const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
-      SPtr<Model> model = gpuResourceMan.loadPKModel(id);
+      SPtr<Model> model = gpuResourceMan.loadPKModel(*id);
       if (model) {
         SPtr<Actor> newActor = currentScene->instantiate(model->getName());
         newActor->addComponent(model);
@@ -293,14 +294,14 @@ ShaderTest::uInterfaceUpdate()
       m_sActorIndex = 0;
     }
   }
-  uint32 actorCount = currentScene->getActorCount();
+  const uint32 actorCount = currentScene->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
     SPtr<Actor> currentActor = currentScene->getActor(i);
     if (im.createButton(currentActor->getName(),
-      Color(0, 0, 0, 0),
-      Color(50, 50, 50, 50),
-      Color(100, 100, 100, 50),
-      true)) {
+                        Color(0, 0),
+                        Color(50, 50),
+                        Color(100, 50),
+                        true)) {
       m_selectedActor = currentActor;
       m_sActorIndex = i;
     }
@@ -369,13 +370,13 @@ ShaderTest::uInterfaceUpdate()
           if (im.beginDragDropSource()) {
             const String dragText = "Dragging " + assetName;
             im.createText(dragText.c_str());
-            const ANSICHAR* data = asset.first.c_str();
+            const ANSICHAR* data = asset.first.toString().c_str();
             im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
             im.endDragDropSource();
           }
           if (im.isItemHovered()) {
             const String tooltip = "Name: " + assetName + "\n" +
-                                   "Asset ID: " + asset.first + "\n" + 
+                                   "Asset ID: " + asset.first.toString() + "\n" +
                                    "Asset type: " + asset.second->getTypeString() + "\n" +
                                    "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
             im.setTooltip(tooltip.c_str());
@@ -444,9 +445,9 @@ ShaderTest::uInterfaceUpdate()
           }
         }
         if (im.beginDragDropTarget()) {
-          const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+          UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
           if (id) {
-            SPtr<Model> model = gpuResourceMan.loadPKModel(id);
+            SPtr<Model> model = gpuResourceMan.loadPKModel(*id);
             m_selectedActor->addComponent(model);
           }
           im.endDragDropTarget();
@@ -532,9 +533,9 @@ ShaderTest::uInterfaceUpdate()
             }
           }
           if (im.beginDragDropTarget()) {
-            const ANSICHAR* id = reinterpret_cast<const ANSICHAR*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+            const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
             if (id) {
-              SPtr<Texture> texture = tm.loadTexture(id);
+              SPtr<Texture> texture = tm.loadTexture(*id);
               rm.m_mainSkybox->copyFrom(texture);
             }
             im.endDragDropTarget();

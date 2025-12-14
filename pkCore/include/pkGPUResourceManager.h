@@ -21,6 +21,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
 #include "pkPath.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
@@ -61,7 +62,7 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
    * @return Pointer to the model if loaded; nullptr if failed.
    */
   SPtr<Model>
-  loadPKModel(const String& _ID);
+  loadPKModel(const UUID& _ID);
 
   /**
    * @brief search for a specific mesh
@@ -77,7 +78,7 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
    * @param _pModel Model to store.
    */
   void
-  insertModelMemory(const String& _ID, const SPtr<Model>& _pModel);
+  insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel);
 
   /**
    * @brief Get a model from memory.
@@ -85,10 +86,10 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
    * @return Pointer to the model. null if its not stored.
    */
   SPtr<Model>
-  getModelMemory(const String& _ID);
+  getModelMemory(const UUID& _ID);
 
  public:
-  UMap<String, SPtr<Model>> m_models;
+  UMap<UUID, SPtr<Model>> m_models;
   Vector<SPtr<Mesh>> m_meshes;
 
   // assets

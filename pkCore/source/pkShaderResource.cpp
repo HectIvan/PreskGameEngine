@@ -30,13 +30,12 @@ ShaderResource::load()
     return;
   }
 
-  Logger& log = g_Logger();
   ifstream file(m_resourcePath, ios::in | ios::binary);
 
   // check if the resource could be opened.
   if (!file.is_open()) {
-    const String msg = "Failed to load resource at path: " + m_resourcePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    const String msg = "Failed to load resource at path: " + String(m_resourcePath) + ".";
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
   // load the base resource header.
@@ -49,9 +48,8 @@ ShaderResource::load()
   file.close();
 
   // register the action.
-  const String msg = "Loaded shader resource " + m_resourcePath + ".";
-  log.registerMessage(msg, __FILE__, __LINE__);
-
+  const String msg = "Loaded shader resource " + String(m_resourcePath) + ".";
+  LOG_REGISTER(msg, __FILE__, __LINE__);
   m_isLoaded = true;
 }
 }

@@ -19,7 +19,7 @@ TextureManager::init()
                                  "resources/FlatWhite.pkt",
                                  "resources/FlatBlack.pkt" };
 
-  Vector<String> ids;
+  Vector<UUID> ids;
   ids.resize(paths.size(), UUID::PK_DEFAULT_UUID);
 
   for (uint32 i = 0; i < paths.size(); ++i) {
@@ -87,7 +87,7 @@ TextureManager::createFlatTexture(const String _name,
 }
 
 SPtr<Texture>
-TextureManager::loadTexture(const String& _ID)
+TextureManager::loadTexture(const UUID& _ID)
 {
   GraphicsAPI& api = g_GraphicAPI();
   Logger& log = g_Logger();
@@ -102,7 +102,7 @@ TextureManager::loadTexture(const String& _ID)
   // check if the resource is saved in the resource manager. otherwise, resource doesnt exist.
   SPtr<BaseResource> resource = g_AssetResourceManager().getResource(_ID);
   if (!resource) {
-    const String msg = "Failed to find a resource with the ID: " + _ID + ".";
+    const String msg = "Failed to find a resource with the ID: " + _ID.toString() + ".";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
     return nullptr;
   }
@@ -118,14 +118,15 @@ TextureManager::loadTexture(const String& _ID)
   }
   texture->setID(resource->m_id);
 
-  insertLoadedTexture(resource->m_id, resource->m_resourcePath, texture);
+  const Path resPath = Path(resource->m_resourcePath);
+  insertLoadedTexture(resource->m_id, resPath, texture);
 
   // return the final texture
   return texture;
 }
 
 SPtr<Texture>
-TextureManager::getTexture(const String& _ID)
+TextureManager::getTexture(const UUID& _ID)
 {
   // search if the texture has been stored before
   auto it = m_textures.find(_ID);
@@ -147,7 +148,7 @@ TextureManager::getTextureFromPath(const String& _path)
 }
 
 void
-TextureManager::insertLoadedTexture(const String& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
+TextureManager::insertLoadedTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
 {
   m_textures.insert({ _ID, _pTexture });
   m_texturesPath.insert({ _path.toString(), _pTexture });

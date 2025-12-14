@@ -17,7 +17,7 @@ GPUResourceManager::init()
 }
 
 SPtr<Model>
-GPUResourceManager::loadPKModel(const String& _ID)
+GPUResourceManager::loadPKModel(const UUID& _ID)
 {
   // check if the model has already been stored.
   SPtr<Model> model = getModelMemory(_ID);
@@ -77,16 +77,16 @@ GPUResourceManager::searchMesh(const String _name)
 }
 
 void
-GPUResourceManager::insertModelMemory(const String& _ID, const SPtr<Model>& _pModel)
+GPUResourceManager::insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel)
 {
   m_models.insert({ _ID, _pModel });
 }
 
 SPtr<Model>
-GPUResourceManager::getModelMemory(const String& _ID)
+GPUResourceManager::getModelMemory(const UUID& _ID)
 {
   for (auto& model : m_models) {
-    if (_ID == model.first) {
+    if (_ID.toString() == model.first.toString()) { // to do: make a == operator
       return model.second;
     }
   }

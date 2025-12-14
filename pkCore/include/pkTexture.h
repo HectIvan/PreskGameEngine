@@ -17,6 +17,7 @@
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkColor.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
@@ -336,18 +337,18 @@ class PK_CORE_EXPORT Texture
    * @param _ID ID for the texture.
    */
   void
-  setID(const String& _ID) { m_id = _ID; }
+  setID(const UUID& _ID) { m_id = _ID; }
 
   /**
    * @brief Get the texture ID.
    * @return The texture ID.
    */
-  String
+  UUID
   getID() { return m_id; }
 
  private:
   Path m_name;
-  String m_id;
+  UUID m_id;
   uint32 m_width;
   uint32 m_height;
 };

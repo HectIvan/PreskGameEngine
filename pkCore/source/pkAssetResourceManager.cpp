@@ -33,7 +33,7 @@ AssetResourceManager::init(const String _resourcesPath)
 }
 
 SPtr<BaseResource>
-AssetResourceManager::loadResource(const String& _ID)
+AssetResourceManager::loadResource(const UUID& _ID)
 {
   // check if the file is stored in the map
   SPtr<BaseResource> resource = getResource(_ID);
@@ -80,7 +80,7 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
       resource->softLoad(path);
       insertNewResource(resource);
       // register the action in the log.
-      const String msg = "Stored resource " + resource->m_resourcePath + ".";
+      const String msg = "Stored resource " + String(resource->m_resourcePath) + ".";
       g_Logger().registerMessage(msg, __FILE__, __LINE__);
     }
   }
@@ -97,7 +97,7 @@ AssetResourceManager::isPKResource(const Path _path)
 }
 
 SPtr<BaseResource>
-AssetResourceManager::getResource(const String& _ID)
+AssetResourceManager::getResource(const UUID& _ID)
 {
   auto it = m_allResources.find(_ID);
   if (it != m_allResources.end()) {

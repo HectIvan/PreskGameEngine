@@ -16,14 +16,15 @@ ModelResource::load()
   }
 
   MaterialManager& materialMan = g_MaterialManager();
-  Logger& log = g_Logger();
 
   ifstream file(m_resourcePath, ios::in | ios::binary);
 
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
-    const String msg = "Failed to open a model resource at directory " + m_resourcePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Failed to open a model resource at directory " +
+                       String(m_resourcePath) +
+                       ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return;
   }
 
@@ -70,13 +71,14 @@ ModelResource::load()
     mesh->indexVector.resize(meshHeader.indexCount);
     memcpy(mesh->indexVector.data(), indices.data(), meshIndicesSize);
 
-    SIZE_T matIDSize;
-    String matID;
-    file.read(reinterpret_cast<ANSICHAR*>(&matIDSize), sizeof(SIZE_T));
-    matID.resize(matIDSize);
-    file.read(reinterpret_cast<ANSICHAR*>(&matID[0]), matIDSize);
+    UUID matID;
+    file.read(reinterpret_cast<ANSICHAR*>(&matID), sizeof(UUID));
 
     mesh->material = materialMan.loadMaterial(matID);
+    if (!mesh->material) {
+      mesh->material = materialMan.m_defaultMaterial;
+    }
+
     m_meshes[i] = mesh;
   }
 

@@ -42,7 +42,7 @@ MaterialManager::newMaterial(String _name)
 }
 
 SPtr<Material>
-MaterialManager::loadMaterial(const String& _ID)
+MaterialManager::loadMaterial(UUID& _ID)
 {
   Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
@@ -55,8 +55,8 @@ MaterialManager::loadMaterial(const String& _ID)
   // get the resource and check if its loaded.
   SPtr<BaseResource> resource = assetMan.getResource(_ID);
   if (!resource) {
-    const String msg = "Resource not found. ID: " + _ID + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Resource not found. ID: " + _ID.toString() + ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
   if (!resource->m_isLoaded) {
@@ -65,19 +65,19 @@ MaterialManager::loadMaterial(const String& _ID)
 
   SPtr<MaterialResource> matResource = reinterpret_pointer_cast<MaterialResource>(resource);
   if (!matResource) {
-    const String msg = "Resource is not  amaterial resource: " + _ID + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Resource is not  amaterial resource: " + _ID.toString() + ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
   material = make_shared<Material>();
 
-  const String diffId = matResource->m_albedoID;
-  const String normId = matResource->m_normalID;
-  const String aoId = matResource->m_aoID;
-  const String roughId = matResource->m_roughnessID;
-  const String metalId = matResource->m_metallicID;
-  const String emissId = matResource->m_emissiveID;
+  const UUID diffId = matResource->m_albedoID;
+  const UUID normId = matResource->m_normalID;
+  const UUID aoId = matResource->m_aoID;
+  const UUID roughId = matResource->m_roughnessID;
+  const UUID metalId = matResource->m_metallicID;
+  const UUID emissId = matResource->m_emissiveID;
 
   material->setName(resource->m_name);
 
@@ -99,7 +99,7 @@ MaterialManager::loadMaterial(const String& _ID)
 }
 
 SPtr<Material>
-MaterialManager::getMaterial(const String& _ID)
+MaterialManager::getMaterial(const UUID& _ID)
 {
   // search if the texture has been stored before
   auto it = m_materials.find(_ID);
@@ -110,7 +110,7 @@ MaterialManager::getMaterial(const String& _ID)
 }
 
 void
-MaterialManager::insertLoadedMaterial(const String& _ID, const SPtr<Material>& _pMaterial)
+MaterialManager::insertLoadedMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial)
 {
   m_materials.insert({ _ID, _pMaterial });
 }

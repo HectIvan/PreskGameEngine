@@ -23,13 +23,13 @@
 namespace pkEngineSDK
 {
 
-#define LOG_REGISTER(_msg, _file, _line) g_Logger().registerMessage(_msg                       \
-                                                                    _file                      \
+#define LOG_REGISTER(_msg, _file, _line) g_Logger().registerMessage(_msg,                     \
+                                                                    _file,                    \
                                                                     _line);
 
-#define LOG_WARNING(_msg, _file, _line) g_Logger().registerMessage(_msg                       \
-                                                                   _file                      \
-                                                                   _line                      \
+#define LOG_WARNING(_msg, _file, _line) g_Logger().registerMessage(_msg,                      \
+                                                                   _file,                     \
+                                                                   _line,                     \
                                                                    LOG_MSG_TYPE::kWarning);
 
 #define LOG_ERROR(_msg, _file, _line) g_Logger().registerMessage(_msg,                        \
@@ -37,10 +37,12 @@ namespace pkEngineSDK
                                                                  _line,                       \
                                                                  LOG_MSG_TYPE::kError);
 
-#define LOG_FATAL(_msg, _file, _line) g_Logger().registerMessage(_msg                       \
-                                                                 _file                      \
-                                                                 _line                      \
+#define LOG_FATAL(_msg, _file, _line) g_Logger().registerMessage(_msg,                        \
+                                                                 _file,                       \
+                                                                 _line,                       \
                                                                  LOG_MSG_TYPE::kFatal);
+
+#define THROW_ERROR(_msg) g_Logger().throwError(_msg);
 
 namespace LOG_MSG_TYPE
 {

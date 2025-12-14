@@ -21,16 +21,6 @@
 namespace pkEngineSDK
 {
 
-struct MaterialAssetHeader
-{
-  SIZE_T albedoIDSize;
-  SIZE_T normalIDSize;
-  SIZE_T aoIDSize;
-  SIZE_T roughnessIDSize;
-  SIZE_T metallicIDSize;
-  SIZE_T emissiveIDSize;
-};
-
 class PK_CORE_EXPORT MaterialResource : public BaseResource
 {
  public:
@@ -58,15 +48,15 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   getTypeString() const override { return "Material"; }
 
  public:
-   String m_albedoID;
+   UUID m_albedoID;
    Vector3 m_albedoColor;
-   String m_normalID;
-   String m_aoID;
-   String m_roughnessID;
+   UUID m_normalID;
+   UUID m_aoID;
+   UUID m_roughnessID;
    float m_roughValue;
-   String m_metallicID;
+   UUID m_metallicID;
    float m_metallicValue;
-   String m_emissiveID;
+   UUID m_emissiveID;
    Vector3 m_emissiveColor;
 };
 }

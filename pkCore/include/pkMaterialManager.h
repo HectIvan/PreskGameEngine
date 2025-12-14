@@ -18,6 +18,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkMaterial.h"
 #include "pkModule.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
@@ -54,7 +55,7 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    * @return Pointer to the newly created material.
    */
   SPtr<Material>
-  loadMaterial(const String& _ID);
+  loadMaterial(UUID& _ID);
 
   /**
    * @brief Get a saved material via its ID.
@@ -62,7 +63,7 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    * @return Pointer to the saved material.
    */
   SPtr<Material>
-  getMaterial(const String& _ID);
+  getMaterial(const UUID& _ID);
   
   /**
    * @brief Store a loaded material into the memory for later use.
@@ -70,11 +71,11 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    * @param _pMaterial Material to store.
    */
   void
-  insertLoadedMaterial(const String& _ID, const SPtr<Material>& _pMaterial);
+  insertLoadedMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial);
 
  public:
   // save materials with the material id
-  UMap<String, SPtr<Material>> m_materials;
+  UMap<UUID, SPtr<Material>> m_materials;
 
   // unique string for the default material
   String m_defaultMatName = "defaultMaterial";

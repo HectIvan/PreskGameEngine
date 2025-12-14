@@ -44,8 +44,6 @@ StbiTextureCodec::createResource(const String _name,
                                  const uint32 _mipCount,
                                  Vector<uint8>& _data)
 {
-  Logger& log = g_Logger();
-
   const String resourcePath = "resources/" + Path(_name).getFileNameWithoutExtension() + ".pkt";
 
   ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
@@ -53,7 +51,7 @@ StbiTextureCodec::createResource(const String _name,
   // if the file cannot be open/created, return a warning and a nullptr.
   if (!file.is_open()) {
     const String msg = "Failed to generate resource for texture " + resourcePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
@@ -61,19 +59,16 @@ StbiTextureCodec::createResource(const String _name,
 
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
+  textureRes->m_id = UUID::generateRandomUUIDFromString(_name + "Texture");
+  textureRes->writeBaseHeader(file, textureRes->m_id, _name.c_str(), resourcePath.c_str());
 
-  textureRes->m_originalPath = _name;
-  textureRes->m_resourcePath = resourcePath;
-  textureRes->m_name = _name;
-  textureRes->m_id = UUID::generateRandomUUID();
-
-  textureRes->writeBaseHeader(file, textureRes->m_id, _name, resourcePath);
-
-  file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeof(int32));
-  file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeof(int32));
-  file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeof(int32));
-  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeof(uint32));
-  file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeof(uint32));
+  const SIZE_T sizeInt32 = sizeof(int32);
+  const SIZE_T sizeUint32 = sizeof(uint32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeInt32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeInt32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeInt32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeUint32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeUint32);
   file.write(reinterpret_cast<ANSICHAR*>(&_data[0]), dataSize);
 
   file.close();
@@ -90,6 +85,8 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   const String resourcePath = "resources/" + fileName + ".pkt";
 
   if (!FileSystem::fileExists(_path)) {
+    const String msg = "Texture file does not exist at path " + _path.toString() + ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 

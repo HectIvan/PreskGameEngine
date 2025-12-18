@@ -28,8 +28,7 @@ struct ModelAssetHeader
 
 struct MeshAssetHeader
 {
-  SIZE_T nameSize;
-  String name;
+  char name[PK_RESOURCE_NAME_SIZE];
   uint32 vertexCount;
   uint32 indexCount;
 };

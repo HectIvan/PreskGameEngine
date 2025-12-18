@@ -27,7 +27,6 @@ GPUResourceManager::loadPKModel(const UUID& _ID)
 
   GraphicsAPI& api = g_GraphicAPI();
   AssetResourceManager& assetResMgr = g_AssetResourceManager();
-  Logger& log = g_Logger();
 
   // get the model resource.
   auto resource = assetResMgr.getResource(_ID);
@@ -40,14 +39,16 @@ GPUResourceManager::loadPKModel(const UUID& _ID)
 
   // check if the resource is a valid model resource.
   if (!modelRes) {
-    const String msg = "Failed to load model resource of ID: " + resource->m_id + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Failed to load model resource of ID: " +
+                       resource->m_id.toString() +
+                       ".";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
   // save the model data.
   model = make_shared<Model>();
-  model->setName(modelRes->m_name.c_str());
+  model->setName(modelRes->m_name);
   model->index = modelRes->m_index;
   model->vertex = modelRes->m_vertex;
   model->meshes = modelRes->m_meshes;

@@ -91,7 +91,7 @@ RendererManager::init()
 
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   
-  // texCodec.createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
+  g_TextureCodec().createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -137,7 +137,7 @@ RendererManager::init()
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
-  generateCubeMap(m_mainSkybox, cubeMapRT);
+  // generateCubeMap(m_mainSkybox, cubeMapRT);
   
   // create the passes needed
   createPasses();
@@ -388,8 +388,8 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
 
   if (!_pInput || !_pOutput) {
     const String msg = "Input or Output are null.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
-    log.throwError(msg);
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
 
@@ -399,8 +399,8 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
 
   if (!vShadRes || !pShadRes) {
     const String msg = "Could not find shader resources to generate cubeMap.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
-    log.throwError(msg);
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
 
@@ -477,16 +477,10 @@ RendererManager::updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuf
 }
 
 void
-RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
+RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
 {
-  RendererManager& rManager = g_RenderManager();
-  GraphicsAPI& api = g_GraphicAPI();
-  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
-  
   // iterate through each actor.
   const uint32 actorCount = static_cast<uint32>(_gameActors.size());
-  const uint32 sizeMatrix = sizeof(Matrix4);
   for (uint32 i = 0; i < actorCount; ++i) {
     const SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
@@ -500,14 +494,11 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
       transform *= parent->m_transform;
       parent = parent->m_parent;
     }
-    // set the current actor transform.
-    api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeMatrix);
-    api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeMatrix);
 
     // render the model of the actor.
     const SPtr<Model> model = currActor->getComponent<Model>();
     if (model && model->isActive()) {
-      renderModel(model);
+      renderModel(model, transform);
     }
     // if the actor has children, do the same for them.
     if (!currActor->m_children.empty()) {
@@ -518,12 +509,14 @@ RendererManager::renderActors(const Vector<SPtr<Actor>> _gameActors)
 
 
 void
-RendererManager::renderModel(const SPtr<Model>& _model)
+RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTransform)
 {
   // get a reference from managers and passes.
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
   const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
@@ -546,7 +539,10 @@ RendererManager::renderModel(const SPtr<Model>& _model)
                                                material->m_oclussion,
                                                material->m_roughness,
                                                material->m_emissive };
+      const Matrix4 transform = mesh->m_transform * _actorTransform;
       api.pSSetShaderResourceViews(textures);
+      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
+      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
       api.updateConstantBuffer(basePass->getCBuffer(3), &material->m_properties, sizeProps);
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }

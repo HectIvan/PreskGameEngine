@@ -29,6 +29,16 @@ class PK_UTILITY_EXPORT UUID
   ~UUID() = default;
 
   /**
+   * @brief Compare operator.
+   * @param _other UUID to compare to.
+   * @return Wether the UUID is the same or not.
+   */
+  bool
+  operator==(const UUID& _other) const {
+    return (m_uuid == _other.m_uuid);
+  }
+
+  /**
    * @brief Generate a completely random UUID.
    */
   static UUID
@@ -51,7 +61,19 @@ class PK_UTILITY_EXPORT UUID
   static const String PK_NAME_GEN_SEED;
   static const UUID PK_DEFAULT_UUID;
   
- private:
   uuids::uuid m_uuid;
+ private:
+};
+}
+
+// to do: how could i do this without exposing the uuid?
+namespace std {
+template<>
+struct hash<pkEngineSDK::UUID>
+{
+  SIZE_T
+  operator()(const pkEngineSDK::UUID& _key) const {
+    return hash<uuids::uuid>()(_key.m_uuid);
+  }
 };
 }

@@ -336,7 +336,7 @@ ShaderTest::uInterfaceUpdate()
     // resources window.
     if (im.beginTabItem("Resources")) {
       if (im.createButton("Model Resource")) {
-        Path path = m_window.openFileFromExplorer();
+        const Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
           if (resource) {
@@ -346,7 +346,7 @@ ShaderTest::uInterfaceUpdate()
       }
       im.sameLine();
       if (im.createButton("Texture Resource")) {
-        Path path = m_window.openFileFromExplorer();
+        const Path path = m_window.openFileFromExplorer();
         if (path.toString() != "") {
           SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
           if (resource) {
@@ -358,7 +358,7 @@ ShaderTest::uInterfaceUpdate()
       im.createInputText("##Search", &m_searchResource);
       im.endTabItem();
       for (auto& asset : assetMan.getAllResources()) {
-        const Path assetPath = asset.second->m_resourcePath;
+        const Path assetPath = String(asset.second->m_resourcePath);
         const String assetName = assetPath.getFileName();
         const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
         const String assetNameLower = stringToLower(assetName);
@@ -370,8 +370,8 @@ ShaderTest::uInterfaceUpdate()
           if (im.beginDragDropSource()) {
             const String dragText = "Dragging " + assetName;
             im.createText(dragText.c_str());
-            const ANSICHAR* data = asset.first.toString().c_str();
-            im.setDragDropPayload("RESOURCE_PAYLOAD", data, strlen(data) + 1);
+            const UUID* data = &asset.first;
+            im.setDragDropPayload("RESOURCE_PAYLOAD", data, sizeof(UUID));
             im.endDragDropSource();
           }
           if (im.isItemHovered()) {

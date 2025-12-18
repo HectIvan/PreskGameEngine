@@ -12,7 +12,6 @@ BaseResource::softLoad(const Path& _path)
   if (!FileSystem::fileExists(_path)) {
     return false;
   }
-  Logger& log = g_Logger();
 
   const String path = _path.toString();
   ifstream file(path, ios::in | ios::binary);
@@ -20,8 +19,8 @@ BaseResource::softLoad(const Path& _path)
   // if the direcory cannot be opened, return a warning and a nullptr.
   if (!file.is_open()) {
     const String msg = "Failed to load header resource at path: " + path + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
-    return "";
+    LOG_WARNING(msg, __FILE__, __LINE__);
+    return false;
   }
 
   loadBaseHeader(file);
@@ -31,39 +30,44 @@ BaseResource::softLoad(const Path& _path)
   return true;
 }
 
-BaseHeader
-BaseResource::loadBaseHeader(ifstream& _file)
+void
+BaseResource::fillBaseHeader(const String& _uuidString,
+                             const String& _name,
+                             const String& _originalPath,
+                             const String& _resourcePath)
 {
-  // generate the base resource header.
-  BaseHeader baseHeader;
-
-  // write the base resource header.
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.ID), sizeof(UUID));
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.name[0]), PK_RESOURCE_NAME_SIZE);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.originalPath[0]), PK_RESOURCE_PATH_SIZE);
-  _file.read(reinterpret_cast<ANSICHAR*>(&baseHeader.path[0]), PK_RESOURCE_PATH_SIZE);
-
-  m_id = baseHeader.ID;
-  strcpy_s(m_name, PK_RESOURCE_NAME_SIZE, baseHeader.name);
-  strcpy_s(m_originalPath, PK_RESOURCE_PATH_SIZE, baseHeader.originalPath);
-  strcpy_s(m_resourcePath, PK_RESOURCE_PATH_SIZE, baseHeader.path);
-
-  return baseHeader;
+  m_id = UUID::generateRandomUUIDFromString(_uuidString);
+  strcpy_s(m_name, PK_RESOURCE_NAME_SIZE, _name.c_str());
+  strcpy_s(m_originalPath, PK_RESOURCE_PATH_SIZE, _originalPath.c_str());
+  strcpy_s(m_resourcePath, PK_RESOURCE_PATH_SIZE, _resourcePath.c_str());
 }
 
 void
-BaseResource::writeBaseHeader(ofstream& _file,
-                              const UUID& _ID,
-                              const ANSICHAR* _fileName,
-                              const ANSICHAR* _resourcePath)
+BaseResource::loadBaseHeader(ifstream& _file)
 {
-  BaseHeader header;
-  header.ID = _ID;
-  strcpy_s(header.name, PK_RESOURCE_NAME_SIZE, _fileName);
-  strcpy_s(header.originalPath, PK_RESOURCE_PATH_SIZE, _fileName);
-  strcpy_s(header.path, PK_RESOURCE_PATH_SIZE, _resourcePath);
-
-  _file.write(reinterpret_cast<const ANSICHAR*>(&header.ID), sizeof(UUID));
-  _file << header.name << header.originalPath << header.path;
+  _file.read(reinterpret_cast<ANSICHAR*>(&m_id), sizeof(UUID));
+  _file.read(reinterpret_cast<ANSICHAR*>(&m_name), PK_RESOURCE_NAME_SIZE);
+  _file.read(reinterpret_cast<ANSICHAR*>(&m_originalPath), PK_RESOURCE_PATH_SIZE);
+  _file.read(reinterpret_cast<ANSICHAR*>(&m_resourcePath), PK_RESOURCE_PATH_SIZE);
 }
+
+void
+BaseResource::writeBaseHeader(ofstream& _file)
+{
+  _file.write(reinterpret_cast<const ANSICHAR*>(&m_id), sizeof(UUID));
+  _file.write(reinterpret_cast<const ANSICHAR*>(m_name), PK_RESOURCE_NAME_SIZE);
+  _file.write(reinterpret_cast<const ANSICHAR*>(m_originalPath), PK_RESOURCE_PATH_SIZE);
+  _file.write(reinterpret_cast<const ANSICHAR*>(m_resourcePath), PK_RESOURCE_PATH_SIZE);
+}
+
+// void
+// BaseResource::writeBaseHeader(ofstream& _file,
+//                               const UUID& _ID,
+//                               const ANSICHAR* _fileName,
+//                               const ANSICHAR* _originalPath,
+//                               const ANSICHAR* _resourcePath)
+// {
+//   _file.write(reinterpret_cast<const ANSICHAR*>(&_ID), sizeof(UUID));
+//   _file << _fileName << _originalPath << _resourcePath;
+// }
 }

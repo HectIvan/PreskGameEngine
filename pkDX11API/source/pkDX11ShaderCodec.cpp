@@ -34,7 +34,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   // check if the shader is not null.
   if (!_pShader) {
     const String msg = "Shader is null!";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
@@ -46,7 +46,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
     const String msg = "Failed to reinterpret a shader " +
                        shaderDir.toString() +
                        " into a DirectX shader.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
@@ -58,19 +58,16 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   // check if the resource creation failed.
   if (!file.is_open()) {
     const String msg = "Failed to generate the shader resource: " + resourceDir + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
   SPtr<ShaderResource> resource = make_shared<ShaderResource>();
 
-  resource->m_id = UUID::generateRandomUUIDFromString(shaderName + " Shader");
-  resource->m_name = shaderName;
+  resource->fillBaseHeader(shaderName + "Shader", shaderName, shaderDir.toString(), resourceDir);
   resource->m_isLoaded = true;
-  resource->m_originalPath = shaderDir.toString();
-  resource->m_resourcePath = resourceDir;
 
-  resource->writeBaseHeader(file, resource->m_id, shaderName, resourceDir);
+  resource->writeBaseHeader(file);
 
   const void* pointer = shader->m_pSBlob->getBufferPointer();
   const SIZE_T pointerSize = shader->m_pSBlob->getBufferSize();
@@ -91,7 +88,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
                      ".pks" +
                      " of size " +
                      to_string(pointerSize);
-  log.registerMessage(msg, __FILE__, __LINE__);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 
   return resource;
 }

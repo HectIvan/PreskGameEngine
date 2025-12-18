@@ -32,8 +32,8 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
   resource->load();
   // check if there is data in the shader
   if (resource->m_data.empty()) {
-    const String msg = "Data from resource " + _pResource->m_name + " is empty.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    const String msg = "Data from resource " + String(_pResource->m_name) + " is empty.";
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return;
   }
 
@@ -57,11 +57,11 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
                        " from the shader resource " +
                        resource->m_resourcePath +
                        ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
 
-  const String msg = "Created shader from resource " + resource->m_resourcePath + ".";
+  const String msg = "Created shader from resource " + String(resource->m_resourcePath) + ".";
   log.registerMessage(msg, __FILE__, __LINE__);
 }
 

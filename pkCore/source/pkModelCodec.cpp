@@ -28,9 +28,8 @@ namespace pkEngineSDK
 {
 
 SPtr<BaseResource>
-ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path)
+ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _path)
 {
-  Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
   MaterialCodec& matCodec = g_MaterialCodec();
   MaterialManager& matMan = g_MaterialManager();
@@ -42,7 +41,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
   // strerror_s(error, sizeof(error), errno); // last error of io.
   if (!file.is_open()) {
     const String msg = "Failed to save model at path " + filePath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
@@ -51,12 +50,8 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
    */
   SPtr<ModelResource> modelRes = make_shared<ModelResource>();
 
-  modelRes->m_originalPath = _path.toString();
-  modelRes->m_resourcePath = filePath;
-  modelRes->m_name = fileName;
-  modelRes->m_id = UUID::generateRandomUUIDFromString(fileName + " Model");
-
-  modelRes->writeBaseHeader(file, modelRes->m_id, fileName, modelRes->m_resourcePath);
+  modelRes->fillBaseHeader(fileName + "Model", fileName, _path.toString(), filePath);
+  modelRes->writeBaseHeader(file);
 
   modelRes->m_meshes = _pModel->meshes;
   modelRes->m_index = _pModel->index;
@@ -77,14 +72,11 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     const uint32 indicesCount = static_cast<uint32>(mesh->indexVector.size());
     const uint32 verticesCount = static_cast<uint32>(mesh->vertexVector.size());
     const String name = mesh->getName();
-    const SIZE_T nameSize = name.length();
     meshHeader.indexCount = indicesCount;
     meshHeader.vertexCount = verticesCount;
-    meshHeader.nameSize = nameSize;
-    meshHeader.name = name;
+    strcpy_s(meshHeader.name, PK_RESOURCE_NAME_SIZE, name.c_str());
     // write the mesh header.
-    file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.nameSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const ANSICHAR*>(meshHeader.name.c_str()), nameSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(meshHeader.name), PK_RESOURCE_NAME_SIZE);
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));
     file.write(reinterpret_cast<const ANSICHAR*>(&mesh->m_transform), sizeof(Matrix4));
@@ -102,9 +94,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path _path
     // create the material resource
     SPtr<MaterialResource> matResource = matCodec.createResource(mesh->material);
     // to do: find a better way to do this
-    const SIZE_T matIDSize = matResource->m_id.length();
-    file.write(reinterpret_cast<const ANSICHAR*>(&matIDSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_id.c_str()), matIDSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_id), sizeof(UUID));
 
     assetMan.insertNewResource(matResource);
     matMan.insertLoadedMaterial(matResource->m_id, mesh->material);

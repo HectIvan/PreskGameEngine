@@ -38,7 +38,7 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
    * @return Model resource.
    */
   SPtr<BaseResource>
-  createResourceFromModel(const SPtr<Model>& _pModel, const Path _path);
+  createResourceFromModel(const SPtr<Model>& _pModel, const Path& _path);
 
   /**
    * @brief Create a model resource from a given path.

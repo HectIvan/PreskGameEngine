@@ -71,7 +71,6 @@ aiTransformToMatrix4(aiMatrix4x4 _transform);
 SPtr<BaseResource>
 AssimpModelCodec::createResourceFromFile(const Path _path)
 {
-  Logger& log = g_Logger();
   SPtr<Model> model = make_shared<Model>();
 
   const String modelPath = FileSystem::getAbsolutePath(_path).string();
@@ -83,7 +82,7 @@ AssimpModelCodec::createResourceFromFile(const Path _path)
                                            aiProcess_FlipUVs);
   if (!scene) {
     const String msg = "Assimp failed to load model at directory " + modelPath + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 

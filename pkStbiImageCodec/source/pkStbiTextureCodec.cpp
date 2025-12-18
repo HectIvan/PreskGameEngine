@@ -44,7 +44,8 @@ StbiTextureCodec::createResource(const String _name,
                                  const uint32 _mipCount,
                                  Vector<uint8>& _data)
 {
-  const String resourcePath = "resources/" + Path(_name).getFileNameWithoutExtension() + ".pkt";
+  const String textureName = Path(_name).getFileNameWithoutExtension();
+  const String resourcePath = "resources/" + textureName + ".pkt";
 
   ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
 
@@ -59,8 +60,9 @@ StbiTextureCodec::createResource(const String _name,
 
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
-  textureRes->m_id = UUID::generateRandomUUIDFromString(_name + "Texture");
-  textureRes->writeBaseHeader(file, textureRes->m_id, _name.c_str(), resourcePath.c_str());
+
+  textureRes->fillBaseHeader(_name + "Texture", textureName, _name, resourcePath);
+  textureRes->writeBaseHeader(file);
 
   const SIZE_T sizeInt32 = sizeof(int32);
   const SIZE_T sizeUint32 = sizeof(uint32);

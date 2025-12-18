@@ -55,7 +55,7 @@ PS_OUTPUT PS(PS_INPUT input)
   output.normal = float4(normalSam, 1.0f);
   output.albedo = float4(colorSam.rgb * colorMultiplier, colorSam.a);
   output.orm = float4(AO.r, roughSam.g * roughnessFactor, metallicSam.b * metallicFactor, 1.0f);
-  output.emissive = emissSam * float4(emissiveMultiplier, 1.0f);
+  output.emissive = float4(emissiveMultiplier * emissSam.xyz, 1.0f);
   output.posWS = float4(input.PosWS, 1.0f);
   
   return output;

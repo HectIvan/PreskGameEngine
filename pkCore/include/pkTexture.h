@@ -343,8 +343,8 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture ID.
    * @return The texture ID.
    */
-  UUID
-  getID() { return m_id; }
+  UUID*
+  getID() { return &m_id; }
 
  private:
   Path m_name;

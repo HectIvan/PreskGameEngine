@@ -44,7 +44,6 @@ MaterialManager::newMaterial(String _name)
 SPtr<Material>
 MaterialManager::loadMaterial(UUID& _ID)
 {
-  Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
   TextureManager& textureMan = g_TextureManager();
   // check if material has been stored in memory.

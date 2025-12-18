@@ -90,7 +90,6 @@ SPtr<Texture>
 TextureManager::loadTexture(const UUID& _ID)
 {
   GraphicsAPI& api = g_GraphicAPI();
-  Logger& log = g_Logger();
   // check if the texture has been stored before.
   SPtr<Texture> texture = getTexture(_ID);
   if (texture) {
@@ -103,7 +102,7 @@ TextureManager::loadTexture(const UUID& _ID)
   SPtr<BaseResource> resource = g_AssetResourceManager().getResource(_ID);
   if (!resource) {
     const String msg = "Failed to find a resource with the ID: " + _ID.toString() + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
   

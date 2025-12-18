@@ -69,25 +69,46 @@ class PK_CORE_EXPORT BaseResource
   softLoad(const Path& _path);
 
   /**
+   * @brief Fill the base resource header with the necessary data.
+   * @param _uuidString String from where the UUID will b generated.
+   * @param _name Name of the resource.
+   * @param _originalPath Path of the original resource (if one exists).
+   * @param _resourcePath Path of the current resource.
+   */
+  void
+  fillBaseHeader(const String& _uuidString,
+                 const String& _name,
+                 const String& _originalPath,
+                 const String& _resourcePath);
+
+  /**
    * @brief load the base resource header from a read stream.
    * @param _file File ifstream.
-   * @return The base resource header.
    */
-  BaseHeader
+  void
   loadBaseHeader(ifstream& _file);
+
+  /**
+   * @brief Write the base header of the resource.
+   * @param _file File in which to write the data.
+   */
+  void
+  writeBaseHeader(ofstream& _file);
 
   /**
    * @brief Write the base resource header in a write stream.
    * @param _file File ofstream.
    * @param _ID Resource ID.
    * @param _fileName Name of the file.
+   * @param _originalPath OriginalPath of the file (if there's one).
    * @param _resourcePath resource path.
    */
-  void
-  writeBaseHeader(ofstream& _file,
-                  const UUID& _ID,
-                  const ANSICHAR* _fileName,
-                  const ANSICHAR* _resourcePath);
+  // void
+  // writeBaseHeader(ofstream& _file,
+  //                 const UUID& _ID,
+  //                 const ANSICHAR* _fileName,
+  //                 const ANSICHAR* _originalPath,
+  //                 const ANSICHAR* _resourcePath);
 
   /**
    * @brief Get the resource type.

@@ -45,67 +45,54 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
 
   SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
 
-  matResource->m_id = UUID::generateRandomUUIDFromString(materialName + " Material");
-  matResource->m_name = materialName;
-  matResource->m_resourcePath = filePath;
+  matResource->fillBaseHeader(materialName + "Material", materialName, "", filePath);
+  matResource->writeBaseHeader(file);
 
   // check for each texture and see if they are valid to use.
   if (_pMaterial->m_albedo) {
-    matResource->m_albedoID = _pMaterial->m_albedo->getID();
+    matResource->m_albedoID = *_pMaterial->m_albedo->getID();
     matResource->m_albedoColor = _pMaterial->m_properties.ColorMultiply;
   }
   if (_pMaterial->m_normal) {
-    matResource->m_normalID = _pMaterial->m_normal->getID();
+    matResource->m_normalID = *_pMaterial->m_normal->getID();
   }
   if (_pMaterial->m_oclussion) {
-    matResource->m_aoID = _pMaterial->m_oclussion->getID();
+    matResource->m_aoID = *_pMaterial->m_oclussion->getID();
   }
   if (_pMaterial->m_roughness) {
-    matResource->m_roughnessID = _pMaterial->m_roughness->getID();
+    matResource->m_roughnessID = *_pMaterial->m_roughness->getID();
     matResource->m_roughValue = _pMaterial->m_properties.roughnessMultiply;
   }
   if (_pMaterial->m_metallic) {
-    matResource->m_metallicID = _pMaterial->m_metallic->getID();
+    matResource->m_metallicID = *_pMaterial->m_metallic->getID();
     matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
   }
   if (_pMaterial->m_emissive) {
-    matResource->m_emissiveID = _pMaterial->m_emissive->getID();
+    matResource->m_emissiveID = *_pMaterial->m_emissive->getID();
     matResource->m_emissiveColor = _pMaterial->m_properties.EmissiveMultiply;
   }
 
-  matResource->writeBaseHeader(file, matResource->m_id, materialName, filePath);
+
+  const SIZE_T IDSize = sizeof(UUID);
+  const SIZE_T V3Size = sizeof(Vector3);
+  const SIZE_T FSize = sizeof(float);
 
   // albedo write
-  SIZE_T diffLength = matResource->m_albedoID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&diffLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_albedoID.c_str()), diffLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoColor), sizeof(Vector3));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoID), IDSize);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoColor), V3Size);
   // normal write
-  SIZE_T normalLength = matResource->m_normalID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&normalLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_normalID.c_str()), normalLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_normalID), IDSize);
   // AO write
-  SIZE_T aoLength = matResource->m_aoID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&aoLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_aoID.c_str()), aoLength);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_aoID), IDSize);
   // roughness write
-  SIZE_T roughLength = matResource->m_roughnessID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&roughLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_roughnessID.c_str()),
-             roughLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_roughValue), sizeof(float));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_roughnessID), IDSize);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_roughValue), FSize);
   // metallic write
-  SIZE_T metalLength = matResource->m_metallicID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&metalLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_metallicID.c_str()),
-             metalLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_metallicValue), sizeof(float));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_metallicID), IDSize);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_metallicValue), FSize);
   // emissive write
-  SIZE_T emissLength = matResource->m_emissiveID.length();
-  file.write(reinterpret_cast<const ANSICHAR*>(&emissLength), sizeof(SIZE_T));
-  file.write(reinterpret_cast<const ANSICHAR*>(matResource->m_emissiveID.c_str()),
-             emissLength);
-  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveColor), sizeof(Vector3));
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveID), IDSize);
+  file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_emissiveColor), V3Size);
 
   file.close();
 

@@ -39,4 +39,9 @@ Material::init()
   setEmissive(tm.m_defaultEmissive);
 }
 
+const Vector<SPtr<Texture>>
+Material::getTextures()
+{
+  return { m_albedo, m_normal, m_oclussion, m_roughness, m_metallic, m_emissive };
+}
 }

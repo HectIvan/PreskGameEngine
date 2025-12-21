@@ -159,6 +159,13 @@ class Material : public Component
   PKFORCEINLINE void
   setEmissive(const SPtr<Texture>& _pTexture) { m_emissive = _pTexture; }
 
+  /**
+   * @brief Get textures in the order the shader requires them.
+   * @return Vector of the needed textures.
+   */
+  const Vector<SPtr<Texture>>
+  getTextures();
+
  public:
   String m_name;
   bool m_castShadow;

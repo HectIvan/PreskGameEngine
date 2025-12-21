@@ -2,7 +2,8 @@
 * Shadows Pixel shader
 ***************************************************************************************/
 
-#define PI 3.14159265359
+#define PI 3.14159265359f
+#define SMALL_NUMBER 1.0f
 
 // resources depth textures
 Texture2D depthMap : register(t0); // basic R32 float depth
@@ -194,7 +195,7 @@ float4 PS(PS_INPUT input) : SV_Target0
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
-  float3 albedoTex = albedoMap.Sample(samState, input.TexCoord).rgb;
+  float3 albedo = albedoMap.Sample(samState, input.TexCoord).rgb;
   float3 ormValues = ormMap.Sample(samState, input.TexCoord).rgb;
   float ao = ormValues.r;
   float metallic = ormValues.b;
@@ -211,25 +212,21 @@ float4 PS(PS_INPUT input) : SV_Target0
   }
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
+  float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   float3 normal = normalize(normalTex.xyz);
+  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metallic.rrr);
+  float3 Half = normalize(viewDir + lightDir);
+  float VoH = saturate(dot(viewDir, Half));
+  float3 F = Fresnel(F0, max(VoH, 0.0f));
+
   
   // Diffuse BRDF
   float shadowColor = 1.0f - ShadowIntensity;
-  float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  
   float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughness);
-  float lamb = max(orenNaya, shadowColor);
-  float3 diffuseBRDF = lerp(lamb, shadowColor, 1.0f - lamb);
   
-  // fresnel value
-  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedoTex, metallic.xxx);
-  float3 Half = normalize(viewDir + lightDir);
-  float VoH = saturate(dot(viewDir, Half));
-  float3 F = Fresnel(F0, VoH);
-
   // Diffuse energy weight
-  float3 kS = F;
   float3 kD = (1.0f - F) * (1.0f - metallic);
+  float3 fLambert = albedo / PI;
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
@@ -238,28 +235,8 @@ float4 PS(PS_INPUT input) : SV_Target0
                                                  metallic,
                                                  F0);
   
-  float3 specularBRDF = (specCookTorrance) * SpecIntensity * ao;
-  
-  diffuseBRDF *= kD;
-  
-  /**
-   * shadow mapping;
-   */
-  float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
-  float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
-  float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
-  lightUV.y = -lightUV.y;
-  
-  float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
-  
-  float lightHit = magnitude(worldPos - LightPos);
-  float worldHit = magnitude(lightWorldPos - LightPos);
-  
-  float tolerance = 2.0f * orenNaya;
-  
-  if (lightHit > worldHit + tolerance) {
-    diffuseBRDF = diffuseBRDF * kD * shadowColor.xxx;
-  }
+  float3 specularBRDF = (specCookTorrance * LightColor);
+  float3 diffuseBRDF = orenNaya * fLambert * kD;
   
   /**
    * IBL calculations
@@ -278,10 +255,26 @@ float4 PS(PS_INPUT input) : SV_Target0
   // specular IBL
   float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb * IBLIntensity;
   
-  float3 diffuseIBL = IBL * (albedoTex / PI);
+  float3 diffuseIBL = IBL * fLambert;
+    
+    /**
+   * shadow mapping;
+   */
+  float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
+  float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
+  float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
+  lightUV.y = -lightUV.y;
   
-  float4 finalColor = float4(diffuseBRDF + specularBRDF, 1.0f);
+  float3 lightWorldPos = lightPosMap.Sample(samState, lightUV).xyz;
   
-  // float4 finalColor = float4(IBL, 1.0f);
+  float lightHit = magnitude(worldPos - LightPos);
+  float worldHit = magnitude(lightWorldPos - LightPos);
+  
+  float4 finalColor = float4(diffuseBRDF + specularBRDF + diffuseIBL, 0.0f);
+    
+  if (lightHit > worldHit + SMALL_NUMBER) {
+    finalColor *= shadowColor.xxxx;
+  }
+  
   return finalColor;
 }

@@ -106,9 +106,14 @@ RendererManager::init()
   txDesc.isCube = true;
   SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
+  txDesc.isCube = false;
+
+  txDesc.width = 512;
+  txDesc.height = 512;
+  SPtr<Texture> LUTRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_LUT, LUTRT });
   txDesc.width = winWidth;
   txDesc.height = winHeight;
-  txDesc.isCube = false;
 
   // ---------------------------------------------------------- //
   // DEPTH TARGETS
@@ -381,28 +386,20 @@ RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
 void
 RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput)
 {
+  PK_ASSERT(_pInput);
+  PK_ASSERT(_pOutput);
+
   GraphicsAPI& api = g_GraphicAPI();
   Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
   ShaderManager& shaderMan = g_ShaderManager();
 
-  if (!_pInput || !_pOutput) {
-    const String msg = "Input or Output are null.";
-    LOG_FATAL(msg, __FILE__, __LINE__);
-    THROW_ERROR(msg);
-    return;
-  }
-
   // get vertex shader resource.
   SPtr<BaseResource> vShadRes = assetMan.getResourceBydirectory("resources/pkQuadShader.pks");
   SPtr<BaseResource> pShadRes = assetMan.getResourceBydirectory("resources/pkCubeMapShader.pks");
 
-  if (!vShadRes || !pShadRes) {
-    const String msg = "Could not find shader resources to generate cubeMap.";
-    LOG_FATAL(msg, __FILE__, __LINE__);
-    THROW_ERROR(msg);
-    return;
-  }
+  PK_ASSERT(vShadRes);
+  PK_ASSERT(pShadRes);
 
   vShadRes->load();
   pShadRes->load();
@@ -427,7 +424,8 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   pShader->compileFromResource(pShadRes);
   if (!pShader) {
     const String msg = "Could not create pixel shader to generate cubeMap.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
   api.createPShader(pShader);
@@ -468,6 +466,16 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.waitDevice();
   api.pSSetShaderResourceViews({ nullptr });
   api.unbindRenderTargets(1);
+
+  LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
+}
+
+void
+RendererManager::generateLUT(const SPtr<Texture>& _pOutput)
+{
+  PK_ASSERT(_pOutput);
+
+  LOG_REGISTER("Generated a LUT.", __FILE__, __LINE__);
 }
 
 template<class T> void
@@ -531,19 +539,14 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
     // get if the mesh is active or not, if it's not, dont render and keep going.
     const SPtr<Material> material = mesh->material;
     if (mesh->getActive() &&  material) {
-      // render the mesh.
-      const Vector<SPtr<Texture>> textures = { material->m_albedo,
-                                               material->m_normal,
-                                               material->m_height,
-                                               material->m_metallic,
-                                               material->m_oclussion,
-                                               material->m_roughness,
-                                               material->m_emissive };
+      // set resources to the pixel shader.
+      api.pSSetShaderResourceViews(material->getTextures());
+      // update the constant buffers.
       const Matrix4 transform = mesh->m_transform * _actorTransform;
-      api.pSSetShaderResourceViews(textures);
       api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
       api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
       api.updateConstantBuffer(basePass->getCBuffer(3), &material->m_properties, sizeProps);
+      // render the mesh.
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }
     // update the offsets

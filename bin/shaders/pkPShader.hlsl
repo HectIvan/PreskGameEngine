@@ -1,4 +1,4 @@
-Texture2D diffuseTex : register(t0);
+Texture2D albedoTex : register(t0);
 Texture2D normalTex : register(t1);
 Texture2D occlusionTex : register(t2);
 Texture2D roughnessTex : register(t3);
@@ -39,7 +39,7 @@ PS_OUTPUT PS(PS_INPUT input)
   PS_OUTPUT output = (PS_OUTPUT) 0;
   // texture sampling
   float4 AO = occlusionTex.Sample(samLinear, input.Tex);
-  float4 colorSam = diffuseTex.Sample(samLinear, input.Tex);
+  float4 colorSam = albedoTex.Sample(samLinear, input.Tex);
   float4 metallicSam = metallicTex.Sample(samLinear, input.Tex);
   float3 normalSam = normalTex.Sample(samLinear, input.Tex).rgb * 2.0f - 1.0f;
   float4 roughSam = roughnessTex.Sample(samLinear, input.Tex);

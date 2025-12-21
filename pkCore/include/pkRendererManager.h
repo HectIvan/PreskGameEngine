@@ -50,6 +50,7 @@ namespace G_BUFFERS
     kGB_LumBlurH, // luminance horizontal blur
     kGB_LumBlur, // luminance full blur
     kGB_CubeMap , // luminance full blur
+    kGB_LUT , // Look-Up Table
   };
 };
 
@@ -166,6 +167,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    */
   void
   generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput);
+
+  /**
+   * @brief Generate a LUT.
+   * @param _pOutput Texture output.
+   */
+  void
+  generateLUT(const SPtr<Texture>& _pOutput);
 
   /**
    * @brief Render a list of actors.

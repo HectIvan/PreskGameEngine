@@ -191,9 +191,11 @@ BaseApp::update()
   viewPos.vec1 = Vector3::ZERO;
 
   // data type sizes.
-  uint32 m4x4Size = sizeof(Matrix4);
-  uint32 cBCamSize = sizeof(CBCamera);
-  uint32 cBLightSize = sizeof(CBLight);
+  const uint32 m4x4Size = sizeof(Matrix4);
+  const uint32 v4Size = sizeof(Vector4);
+  const uint32 cBCamSize = sizeof(CBCamera);
+  const uint32 cBLightSize = sizeof(CBLight);
+  const uint32 cBlurSize = sizeof(CBBlur);
 
   // get all passes.
   SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
@@ -215,29 +217,25 @@ BaseApp::update()
   api.updateConstantBuffer(lightPositions->getCBuffer(1), &lightProj, m4x4Size);
 
   // update shadow-specular quad pass
-  api.updateConstantBuffer(quadLight->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(quadLight->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(quadLight->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(quadLight->getCBuffer(3), &lightsParam, sizeof(Vector4));
   Vector4 iblParams = Vector4(1.0f);
-  api.updateConstantBuffer(quadLight->getCBuffer(4), &iblParams, sizeof(Vector4));
+  quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &iblParams },
+                            { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
 
   // skybox constant buffers.
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
+  skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   // luminance constant buffers.
-  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, sizeof(CBVector2x2));
+  lumPass->updateCBuffers({ &lum }, { v4Size });
   // Emissive blur constant buffers;
   emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(emissHBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  emissHBlur->updateCBuffers({ &emissiveBlur }, { cBlurSize });
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(emissBlur->getCBuffer(0), &emissiveBlur, sizeof(CBBlur));
+  emissBlur->updateCBuffers({ &emissiveBlur }, { cBlurSize });
   // lum blur constant buffers
   blur.BlurDirection = Vector2(1.0f, 0.0f);
-  api.updateConstantBuffer(lumBlurHPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  lumBlurHPass->updateCBuffers({ &blur }, { cBlurSize });
   blur.BlurDirection = Vector2(0.0f, 1.0f);
-  api.updateConstantBuffer(lumBlurPass->getCBuffer(0), &blur, sizeof(CBBlur));
+  lumBlurPass->updateCBuffers({ &blur }, { cBlurSize });
 }
 
 void

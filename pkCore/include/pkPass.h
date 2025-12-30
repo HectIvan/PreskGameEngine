@@ -114,19 +114,28 @@ public:
   getCBuffers() { return m_cBuffers; }
 
   /**
+   * @brief Update the constant buffers of a pass.
+   * @param _data Array of data to use in the update.
+   * @param _sizes Size of each data blob.
+   */
+  void
+  updateCBuffers(const Vector<const void*>& _data,
+                 const Vector<SIZE_T>& _sizes);
+
+  /**
    * @brief Get the constant buffer in the index position.
    * @param _index Where to look for the cbuffer.
    * @return Pointer to the cbuffer.
    */
   SPtr<ConstantBuffer>&
-  getCBuffer(uint32 _index) { return m_cBuffers[_index]; }
+  getCBuffer(const uint32 _index) { return m_cBuffers[_index]; }
 
   /**
    * @brief Start pass based parameter setting.
    * @param _color Clear color.
    */
   void
-  beginPass(Color _color = Color(0, 1, 1, 0));
+  beginPass(const Color _color = Color(0, 1, 1, 0));
 
   /**
    * @brief Set all parameters to null;

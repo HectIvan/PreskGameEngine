@@ -209,6 +209,23 @@ Pass::compileShaders()
 }
 
 void
+Pass::updateCBuffers(const Vector<const void*>& _data,
+                     const Vector<SIZE_T>& _sizes)
+{
+  const SIZE_T blobCount = _data.size();
+  // assert that all data counts are the same.
+  PK_ASSERT(blobCount == _sizes.size());
+  PK_ASSERT(m_cBuffers.size() == blobCount);
+
+  GraphicsAPI& api = g_GraphicAPI();
+  
+  const uint32 CBufferCount = static_cast<uint32>(m_cBuffers.size());
+  for (uint32 i = 0; i < CBufferCount; ++i) {
+    api.updateConstantBuffer(m_cBuffers[i], _data[i], _sizes[i]);
+  }
+}
+
+void
 Pass::beginPass(Color _color)
 {
   // get managers

@@ -158,9 +158,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * Set the sampler state.
    */
   void
-  setSampler(const SPtr<SamplerState> _pSamLinear,
-             uint32 _startSlot = 0,
-             uint32 _numSamplers = 1) override;
+  setSampler(const SPtr<SamplerState>& _pSamLinear,
+             const uint32& _startSlot = 0,
+             const uint32& _numSamplers = 1) override;
 
   /**
    * @brief Set the render target to the device.

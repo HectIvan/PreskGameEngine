@@ -661,29 +661,30 @@ ShaderTest::onUpdate()
     input();
   }
 
-  // m_light = g_SceneManager().getActiveScene()->getActorWithComponent<Light>();
-
   // managers
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& rm = g_RenderManager();
 
   // get all passes.
-  SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
-  SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> lightQuad = rm.getPass(kP_Light);
-  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
-  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
-  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
-  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
-  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
+  const SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
+  const SPtr<Pass> basePass = rm.getPass(kP_Base);
+  const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  const SPtr<Pass> lightQuad = rm.getPass(kP_Light);
+  const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
+  const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
 
   Vector2 winSize = api.getSwapChain()->getSize();
 
-  // camera data
+  SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
+
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
+  // if the actor camera does not have a camera component, search the scene for an actor with a camera.
+  if (!camera) {
+    // m_camera = activeScene->getActorWithComponent<Camera>();
+  }
+  // camera data
+  CBCamera cBCamera;
   Matrix4 view = Matrix4::IDENTITY;
   Matrix4 proj = Matrix4::IDENTITY;
   Matrix4 invView = Matrix4::IDENTITY;
@@ -692,7 +693,6 @@ ShaderTest::onUpdate()
   Matrix4 viewTransp = Matrix4::IDENTITY;
   Matrix4 projTransp = Matrix4::IDENTITY;
   // main camera buffer
-  CBCamera cBCamera;
   CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // to do: win size could change, swap this to use the specific texture size.
   // to do: change this to another method
   if (camera) {
@@ -702,8 +702,8 @@ ShaderTest::onUpdate()
     invProj = proj.inverse();
     viewTransp = view.getTransposed();
     projTransp = proj.getTransposed();
-    CreateCBCamera::create(cBCamera, camera);
     invViewProj = (proj * view).inverse();
+    cBCamera = CBCamera(camera);
 
     shadowsParam.vec2 = camera->m_farNear;
   }
@@ -711,6 +711,11 @@ ShaderTest::onUpdate()
 
   // light data
   SPtr<Light> light = m_light->getComponent<Light>();
+  // if the actor light does not have a light component, search the scene for an actor with a light.
+  if (!light) {
+    //m_light = activeScene->getActorWithComponent<Light>();
+  }
+
   SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
   // light buffers
   CBLight cBLight;
@@ -725,30 +730,24 @@ ShaderTest::onUpdate()
     lightView = lightCamera->m_view.getTransposed();
     lightProj = lightCamera->m_projection.getTransposed();
     lightViewProj = lightProj * lightView;
-    CreateCBLight::create(cBLight, light);
-    CreateCBCamera::create(cBLightCam, lightCamera);
+    cBLight = CBLight(light);
+    cBLightCam = CBCamera(lightCamera);
   }
 
   // luminance parameters.
-  CBVector2x2 lum(winSize, Vector2(m_lumThreshold, 0.0f));
-  // blur parameters.
-  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
-  // emissive blur parameters
-  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlur, m_emissiveStrength);
+  const CBVector2x2 lum(winSize, Vector2(m_lumThreshold, 0.0f));
   // IBR parameters.
-  CBFloat IBRIntens(m_IBLIntensity);
-  CBVector3 viewPos(camera->m_eye.xyz());
+  const CBFloat IBLIntens(m_IBLIntensity);
   // exposure parameter.
-  CBFloat exposure(m_exposure);
+  const CBFloat exposure(m_exposure);
   // SSAO
-  CBSSAO ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
-  CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
+  const Vector4 ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
+  const Vector4 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
 
   // data type sizes.
   const SIZE_T m4x4Size = sizeof(Matrix4);
   const SIZE_T cBCamSize = sizeof(CBCamera);
   const SIZE_T cBLightSize = sizeof(CBLight);
-  const SIZE_T cbBlurSize = sizeof(CBBlur);
   const SIZE_T v4Size = sizeof(Vector4);
 
   // update normal && base shadow pass buffers.
@@ -759,25 +758,18 @@ ShaderTest::onUpdate()
   api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
 
   // update shadow-specular quad pass
-  api.updateConstantBuffer(lightQuad->getCBuffer(0), &cBLight, cBLightSize);
-  api.updateConstantBuffer(lightQuad->getCBuffer(1), &cBCamera, cBCamSize);
-  api.updateConstantBuffer(lightQuad->getCBuffer(2), &lightViewProj, m4x4Size);
-  api.updateConstantBuffer(lightQuad->getCBuffer(3), &shadowsParam, v4Size);
-  api.updateConstantBuffer(lightQuad->getCBuffer(4), &IBRIntens, v4Size);
-  // lightQuad->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBRIntens },
-  //                           { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
+  lightQuad->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
+                            { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
 
   // skybox constant buffers.
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(0), &viewTransp, m4x4Size);
-  api.updateConstantBuffer(skyBoxPass->getCBuffer(1), &projTransp, m4x4Size);
+  skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   // luminance constant buffers.
   api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, v4Size);
 
-  api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, sizeof(CBFloat));
+  api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, v4Size);
 
-  api.updateConstantBuffer(ssaoPass->getCBuffer(0), &ssao, sizeof(CBSSAO));
-  api.updateConstantBuffer(ssaoPass->getCBuffer(1), &ssaoWin, sizeof(CBVector2x2));
+  ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v4Size, v4Size });
 }
 
 void

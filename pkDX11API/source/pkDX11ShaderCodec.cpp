@@ -29,8 +29,6 @@ namespace pkEngineSDK
 SPtr<BaseResource>
 DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 {
-  Logger& log = g_Logger();
-  
   // check if the shader is not null.
   if (!_pShader) {
     const String msg = "Shader is null!";

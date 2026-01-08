@@ -11,12 +11,20 @@ namespace pkEngineSDK {
 
 const Vector4 Vector4::ZERO = Vector4(0);
 
-Vector4::Vector4(Vector3 _vec, float _w)
+Vector4::Vector4(const Vector3& _vec, const float& _w)
 {
   x = _vec.x;
   y = _vec.y;
   z = _vec.z;
   w = _w;
+}
+
+Vector4::Vector4(const Vector2& _v1, const Vector2& _v2)
+{
+  x = _v1.x;
+  y = _v1.y;
+  z = _v2.x;
+  w = _v2.y;
 }
 
 Vector4

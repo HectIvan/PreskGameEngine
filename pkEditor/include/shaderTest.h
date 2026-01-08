@@ -44,8 +44,6 @@ using pkEngineSDK::CBVector3;
 using pkEngineSDK::CBView;
 using pkEngineSDK::Color;
 using pkEngineSDK::ConstantBuffer;
-using pkEngineSDK::CreateCBCamera;
-using pkEngineSDK::CreateCBLight;
 using pkEngineSDK::D_BUFFERS::kDB_Base;
 using pkEngineSDK::D_BUFFERS::kDB_Light;
 using pkEngineSDK::EventQueue;

@@ -24,9 +24,9 @@
 namespace pkEngineSDK
 {
 
-class Pass
+class PK_CORE_EXPORT Pass
 {
-public:
+ public:
   Pass();
   Pass(PassDesc& _desc);
   virtual ~Pass();

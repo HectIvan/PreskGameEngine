@@ -147,9 +147,9 @@ public:
   * Set the sampler state.
   **/
   virtual void
-  setSampler(const SPtr<SamplerState> _pSamLinear,
-             uint32 _startSlot = 0,
-             uint32 _numSamplers = 1) = 0;
+  setSampler(const SPtr<SamplerState>& _pSamLinear,
+             const uint32& _startSlot = 0,
+             const uint32& _numSamplers = 1) = 0;
 
   /**
    * @brief Set the render target to the device.

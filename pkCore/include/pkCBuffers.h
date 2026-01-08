@@ -59,15 +59,33 @@ struct CBSSAO // 16 bytes
 
 struct CBCamera
 {
+  CBCamera() = default;
+  CBCamera(const SPtr<Camera>& _pCam) {
+    eye = _pCam->m_eye;
+    forward = _pCam->getForward();
+    view = _pCam->m_view;
+    projection = _pCam->m_projection;
+  }
   Vector4 eye = Vector4(0.0f, 0.0f, 0.0f, 1.0f); // 16
   Vector3 forward = Vector3::FORWARD; // 12
   Matrix4 view = Matrix4::IDENTITY; // 64
   Matrix4 projection = Matrix4::IDENTITY; // 64
   float unused; // 4
-}; // 176 bytes
+}; // 160 bytes
 
 struct CBLight
 {
+  CBLight() = default;
+  CBLight(const SPtr<Light>& _pLight) {
+    direction = Vector4(_pLight->m_direction, 9.9999f);
+    position = Vector4(_pLight->m_position, 9.9999f);
+    color = Vector4(_pLight->m_color, 1.0f);
+    shadowIntensity = _pLight->m_shadowIntensity;
+    spotExponent = _pLight->m_spotExponent;
+    spotCutoff = _pLight->m_spotCutoff;
+    specIntensity = _pLight->m_specIntensity;
+    transform = _pLight->m_transform;
+  }
   Vector4 direction = Vector4(0.0f, -1.0f, 0.0f, 0.0f); // 16
   Vector4 position = Vector4(0.0f, 50.0f, 0.0f, 1.0f); // 32
   Vector4 color = Vector4(1.0f); // 48
@@ -76,34 +94,6 @@ struct CBLight
   float spotCutoff = 0.9f; // 60
   float specIntensity = 1.0f; // 64
   Matrix4 transform = Matrix4::IDENTITY; // 128
-};
-
-/* to do: find a better way of creating the buffers from the object, i feel like they'll have
-          my head for doing this. */
-struct CreateCBLight
-{
-  static void
-  create(CBLight& _lightDesc, SPtr<Light> _pLight) {
-    _lightDesc.direction = Vector4(_pLight->m_direction, 9.9999f);
-    _lightDesc.position = Vector4(_pLight->m_position, 9.9999f);
-    _lightDesc.color = Vector4(_pLight->m_color, 1.0f);
-    _lightDesc.shadowIntensity = _pLight->m_shadowIntensity;
-    _lightDesc.spotExponent = _pLight->m_spotExponent;
-    _lightDesc.spotCutoff = _pLight->m_spotCutoff;
-    _lightDesc.specIntensity = _pLight->m_specIntensity;
-    _lightDesc.transform = _pLight->m_transform;
-  }
-};
-
-struct CreateCBCamera
-{
-  static void
-    create(CBCamera& _camDesc, SPtr<Camera> _pCam) {
-    _camDesc.eye = _pCam->m_eye;
-    _camDesc.forward = _pCam->getForward();
-    _camDesc.view = _pCam->m_view;
-    _camDesc.projection = _pCam->m_projection;
-  }
 };
 
 struct CBAOData

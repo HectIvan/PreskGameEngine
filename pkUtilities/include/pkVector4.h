@@ -33,7 +33,8 @@ class PK_UTILITY_EXPORT Vector4
  public:
   Vector4() = default;
   PKFORCEINLINE Vector4(float _val) : x(_val), y(_val), z(_val), w(_val) {};
-  PKFORCEINLINE Vector4(Vector3 _vec, float _w);
+  PKFORCEINLINE Vector4(const Vector3& _vec, const float& _w);
+  Vector4(const Vector2& _v1, const Vector2& _v2);
   PKFORCEINLINE Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {};
   ~Vector4() = default;
 

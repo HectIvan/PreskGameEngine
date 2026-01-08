@@ -193,9 +193,7 @@ DX11GraphicsAPI::updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
   auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffer);
   // casting failed
   if (!dxCB) {
-    const String msg = ("Reinterpret constant buffer of size " +
-                        to_string(_size) +
-                        " to DX11ConstantBuffer failed.");
+    const String msg = ("Failed to use Constant buffer of size " + to_string(_size));
     LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
@@ -207,9 +205,6 @@ DX11GraphicsAPI::updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
                                                     _pNewData,
                                                     size,
                                                     0);
-
-  const String msg = "Updated a DirectX constant buffer of size " + to_string(_size) + ".";
-  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 void
@@ -285,7 +280,8 @@ void
 DX11GraphicsAPI::clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
                                            const Color& _color)
 {
-  for (uint32 i = 0; i < _uavs.size(); ++i) {
+  const uint32 uavCount = static_cast<uint32>(_uavs.size());
+  for (uint32 i = 0; i < uavCount; ++i) {
     clearUnorderedAccessView(_uavs[i], _color);
   }
 }
@@ -307,7 +303,9 @@ DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const Color
                      static_cast<float>(_color.getG()),
                      static_cast<float>(_color.getB()),
                      static_cast<float>(_color.getA()) };
-  for (uint32 i = 0; i < dxUAV->m_uAVs.size(); ++i) {
+
+  const uint32 uavCount = static_cast<uint32>(dxUAV->m_uAVs.size());
+  for (uint32 i = 0; i < uavCount; ++i) {
     ID3D11UnorderedAccessView* uav = dxUAV->m_uAVs[i];
     if (uav) {
       m_pDevice->m_pImmediateContext->ClearUnorderedAccessViewFloat(uav, color);
@@ -915,8 +913,14 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
 SPtr<Texture>
 DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
-  return createTexture(_desc.width, _desc.height, _desc.format, _desc.usage,
-                       _desc.bindFlags, _desc.shaderResourceFormat, _desc.mipLevels, _desc.isCube);
+  return createTexture(_desc.width,
+                       _desc.height,
+                       _desc.format,
+                       _desc.usage,
+                       _desc.bindFlags,
+                       _desc.shaderResourceFormat,
+                       _desc.mipLevels,
+                       _desc.isCube);
 }
 
 SPtr<InputLayout>
@@ -1089,9 +1093,9 @@ DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
 }
 
 void
-DX11GraphicsAPI::setSampler(const SPtr<SamplerState> _pSamLinear,
-                            uint32 _startSlot,
-                            uint32 _numSamplers)
+DX11GraphicsAPI::setSampler(const SPtr<SamplerState>& _pSamLinear,
+                            const uint32& _startSlot,
+                            const uint32& _numSamplers)
 {
   // reinterpret to DirectX sampler state
   auto dxSS = reinterpret_pointer_cast<DX11SamplerState>(_pSamLinear);
@@ -1138,7 +1142,7 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTexture
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> vResourceVector(count);
 
-  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+  for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
     auto dxSRV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
     // set the resource
@@ -1164,7 +1168,7 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTexture
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11ShaderResourceView*> uavVector(count);
 
-  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+  for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
     auto dxUAV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
     // set the resource
@@ -1192,7 +1196,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextur
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<ID3D11UnorderedAccessView*> uavVector(count);
 
-  for (uint32 i = 0; i < _pTextures.size(); ++i) {
+  for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
     auto dxUAV = reinterpret_pointer_cast<DX11Texture>(_pTextures[i]);
     // set the resource
@@ -1668,11 +1672,7 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
                                    const uint32 _usage)
 {
   auto dxIB = make_shared<DX11IndexBuffer>();
-  /***************************************************************/
-  /**
-  * Define and create the buffer
-  **/
-  /***************************************************************/
+  // Define and create the buffer
   D3D11_BUFFER_DESC bd;
   memset(&bd, 0, sizeof(bd));
   bd.ByteWidth = sizeof(uint32) * static_cast<uint32>(_index.size()); // size of the buffer
@@ -1701,7 +1701,7 @@ DX11GraphicsAPI::setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
                                 const uint32 _offset)
 {
   // reinterpret pointer
-  auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
+  const auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);
   // if failed to cast to DX11IndexBuffer
   if (!dxIB) {
     const String msg = "Failed to set the index buffer.";

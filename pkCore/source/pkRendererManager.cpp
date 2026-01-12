@@ -38,13 +38,22 @@ RendererManager::init()
   SPtr<Texture> albedoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Albedo, albedoRT });
 
+  SPtr<Texture> albedoTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspAlbedo, albedoTranspRT });
+
   // create the normal render target that will store the normals of the world.
   SPtr<Texture> normalRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Normal, normalRT });
 
+  SPtr<Texture> normalTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspNormal, normalTranspRT });
+
   // render target for the metallic result.
   SPtr<Texture> ormRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
+
+  SPtr<Texture> ormTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspORM, ormTranspRT });
 
   SPtr<Texture> ssaoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
@@ -61,6 +70,9 @@ RendererManager::init()
   SPtr<Texture> posRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
+  SPtr<Texture> posTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspPos, posRT });
+
   // positions texture for the light.
   txDesc.width = winWidth * sizeMulShadow;
   txDesc.height = winHeight * sizeMulShadow;
@@ -72,6 +84,9 @@ RendererManager::init()
   // emissive texture.
   SPtr<Texture> emissiveRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Emissive, emissiveRT });
+
+  SPtr<Texture> emissiveTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspEmiss, emissiveTranspRT });
 
   SPtr<Texture> emissiveHBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_EmissiveHBlur, emissiveHBlurRT });
@@ -125,6 +140,9 @@ RendererManager::init()
   // camera depth buffer
   SPtr<Texture> depthBuffer = api.createTexture(txDesc);
   m_depthBuffers.insert({ D_BUFFERS::kDB_Base, depthBuffer });
+
+  SPtr<Texture> transparencyDepth = api.createTexture(txDesc);
+  m_depthBuffers.insert({ D_BUFFERS::kDB_Transparency, transparencyDepth });
 
   // light depth buffer
   txDesc.width = winWidth * sizeMulShadow;
@@ -183,9 +201,16 @@ RendererManager::createPasses()
   SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
   SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
+  SPtr<Texture> transpAlbedo = getGBuffer(G_BUFFERS::kGB_TranspAlbedo);
+  SPtr<Texture> transpNormal = getGBuffer(G_BUFFERS::kGB_TranspNormal);
+  SPtr<Texture> transpORM = getGBuffer(G_BUFFERS::kGB_TranspORM);
+  SPtr<Texture> transpEmiss = getGBuffer(G_BUFFERS::kGB_TranspEmiss);
+  SPtr<Texture> transpPos = getGBuffer(G_BUFFERS::kGB_TranspPos);
+
   // Depth textures
   SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
   SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
+  SPtr<Texture> transpDepth = getDepthBuffer(D_BUFFERS::kDB_Transparency);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -210,6 +235,17 @@ RendererManager::createPasses()
   SPtr<Pass> basePass = make_shared<Pass>(pDesc);
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Base, basePass });
+
+  /****************************************************************************
+   * Create the transparency pass.
+   ***************************************************************************/
+  pDesc.pSDirectory = "resources/pkPSTransparency.pks";
+  pDesc.outputs = { transpAlbedo, transpNormal, transpORM, transpEmiss, transpPos };
+  pDesc.pDepth = transpDepth;
+  // make the pass
+  SPtr<Pass> transparencyPass = make_shared<Pass>(pDesc);
+  // insert to the pass map.
+  m_passes.insert({ PASS_TYPE::kP_Transparency, transparencyPass });
 
   /****************************************************************************
    * Shadow Pass
@@ -522,8 +558,12 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   // get a reference from managers and passes.
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
+
   const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> transparencyPass = rManager.getPass(PASS_TYPE::kP_Transparency);
   const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+
+  const SIZE_T mat4x4Size = sizeof(Matrix4);
 
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
@@ -543,9 +583,11 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       api.pSSetShaderResourceViews(material->getTextures());
       // update the constant buffers.
       const Matrix4 transform = mesh->m_transform * _actorTransform;
-      api.updateConstantBuffer(basePass->getCBuffer(2), &transform, sizeof(Matrix4));
-      api.updateConstantBuffer(lightPositionsPass->getCBuffer(2), &transform, sizeof(Matrix4));
-      api.updateConstantBuffer(basePass->getCBuffer(3), &material->m_properties, sizeProps);
+      basePass->updateCBuffer(2, &transform, mat4x4Size);
+      basePass->updateCBuffer(3, &material->m_properties, sizeProps);
+      transparencyPass->updateCBuffer(2, &transform, mat4x4Size);
+      transparencyPass->updateCBuffer(3, &material->m_properties, sizeProps);
+      lightPositionsPass->updateCBuffer(2, &transform, mat4x4Size);
       // render the mesh.
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }

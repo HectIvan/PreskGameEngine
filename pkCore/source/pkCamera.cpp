@@ -1,6 +1,6 @@
 #include "pkCamera.h"
 #include "pkLogger.h"
-#include <iostream>
+#include "pkActor.h"
 
 namespace pkEngineSDK
 {
@@ -12,15 +12,22 @@ Camera::init(const CameraDesc& _desc)
 }
 
 void
-Camera::init(uint32 _width,
-             uint32 _height,
-             float _halfFOV,
-             float _nearZ,
-             float _farZ,
-             Vector3 _eye,
-             Vector3 _at,
-             Vector3 _up,
-             CAMERA_PROJ::E _camMode)
+Camera::update(Actor& _owner)
+{
+  rotation(_owner.m_rotation);
+  // m_view *= Matrix4::translation(_owner.m_position);
+}
+
+void
+Camera::init(const uint32& _width,
+             const uint32& _height,
+             const float& _halfFOV,
+             const float& _nearZ,
+             const float& _farZ,
+             const Vector3& _eye,
+             const Vector3& _at,
+             const Vector3& _up,
+             const CAMERA_PROJ::E& _camMode)
 {
   // creation parameters
   m_descriptor = CameraDesc(_width, _height, _halfFOV, _nearZ,
@@ -140,6 +147,15 @@ void
 Camera::rotate(Vector3 _rotate)
 {
   rotate(_rotate.x, _rotate.y, _rotate.z);
+}
+
+void
+Camera::rotation(Vector3 _rotation)
+{
+  m_view = Matrix4::rotation(_rotation);
+  m_at = m_eye + m_view.getForwardVector();
+  m_up = m_eye.xyz() + m_view.getUpVector();
+  m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 Vector3

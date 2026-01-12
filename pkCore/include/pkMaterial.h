@@ -25,6 +25,8 @@
 namespace pkEngineSDK
 {
 
+class Actor;
+
 struct MaterialProps
 {
   // union {
@@ -75,6 +77,13 @@ class Material : public Component
    */
   void
   init();
+
+  /**
+   * @brief Update the material.
+   * @param _owner The actor that owns this material.
+   */
+  void
+  update(Actor& _owner) override;
 
   /**
    * @brief Get the component type of this component.

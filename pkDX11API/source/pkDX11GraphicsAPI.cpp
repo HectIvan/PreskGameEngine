@@ -208,9 +208,9 @@ DX11GraphicsAPI::updateConstantBuffer(const SPtr<ConstantBuffer>& _pCBuffer,
 }
 
 void
-DX11GraphicsAPI::drawIndexed(uint32 _indexCount,
-                             uint32 _startIndexLocation,
-                             uint32 _baseVertexLocation)
+DX11GraphicsAPI::drawIndexed(const uint32 _indexCount,
+                             const uint32 _startIndexLocation,
+                             const uint32 _baseVertexLocation)
 {
   m_pDevice->m_pImmediateContext->DrawIndexed(_indexCount,
                                               _startIndexLocation,
@@ -224,7 +224,7 @@ DX11GraphicsAPI::draw(uint32 _indexCount, uint32 _startIndexLocation)
 }
 
 void
-DX11GraphicsAPI::dispatch(uint32 _countX, uint32 _countY, uint32 _countZ)
+DX11GraphicsAPI::dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ)
 {
   m_pDevice->m_pImmediateContext->Dispatch(_countX, _countY, _countZ);
 }
@@ -314,7 +314,7 @@ DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const Color
 }
 
 void
-DX11GraphicsAPI::clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV)
+DX11GraphicsAPI::clearDepthBuffer(const float _depth, const SPtr<Texture>& _pDepthSV)
 {
   // check if a depth stencil is being sent
   if (_pDepthSV) {
@@ -1070,7 +1070,7 @@ DX11GraphicsAPI::cSUnbindConstantBuffers(const uint32 _count)
 }
 
 void
-DX11GraphicsAPI::present(uint32 _syncInterval, uint32 _flags)
+DX11GraphicsAPI::present(const uint32 _syncInterval, const uint32 _flags)
 {
   // reinterpret the swap chain to a DirectX swap chain
   auto dxSwapChain = reinterpret_pointer_cast<DX11SwapChain>(m_pSwapChain);
@@ -1591,7 +1591,7 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
 }
 
 void
-DX11GraphicsAPI::setInputLayout( const SPtr<InputLayout> _pInputLayout)
+DX11GraphicsAPI::setInputLayout(const SPtr<InputLayout>& _pInputLayout)
 {
   // reinterpret to a DirectX input layout
   const SPtr<DX11InputLayout> dxIL = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);

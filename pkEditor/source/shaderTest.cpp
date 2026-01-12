@@ -94,8 +94,9 @@ ShaderTest::onInit()
   // create light
   m_light = activeScene->instantiate("Light");
   m_light->setPosition(0.0f, 1000.0f, 0.0f);
+  m_light->setRotation(1.5, 0, 0);
   m_light->addComponent(make_shared<Light>());
-  SPtr<Light> lightCom = m_light->getComponent<Light>();
+  const SPtr<Light> lightCom = m_light->getComponent<Light>();
 
   // add camera component
   m_light->addComponent(make_shared<Camera>());
@@ -216,25 +217,12 @@ ShaderTest::input()
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
-    // m_selectedActor = nullptr;
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
-    m_lastCursorPos = eventQueue.mousePosition;
     posDif *= Math::DEG2RAD;
-    cameraComp->rotate(-posDif.y, -posDif.x, 0.0f);
+    m_camera->m_rotation += Vector3(-posDif.y, -posDif.x, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
-}
-
-bool
-findShader(const Vector<ShaderType>& _list, const Path& _path)
-{
-  for (uint32 i = 0; i < _list.size(); ++i) {
-    if (_list[i].path.toString() == _path.toString()) {
-      return true;
-    }
-  }
-  return false;
 }
 
 void
@@ -673,12 +661,13 @@ ShaderTest::onUpdate()
   const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
+  const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
 
-  Vector2 winSize = api.getSwapChain()->getSize();
+  const Vector2 winSize = api.getSwapChain()->getSize();
 
-  SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
+  const SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
 
-  SPtr<Camera> camera = m_camera->getComponent<Camera>();
+  const SPtr<Camera> camera = m_camera->getComponent<Camera>();
   // if the actor camera does not have a camera component, search the scene for an actor with a camera.
   if (!camera) {
     // m_camera = activeScene->getActorWithComponent<Camera>();
@@ -751,11 +740,14 @@ ShaderTest::onUpdate()
   const SIZE_T v4Size = sizeof(Vector4);
 
   // update normal && base shadow pass buffers.
-  api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
-  api.updateConstantBuffer(lightPositions->getCBuffer(1), &lightProj, m4x4Size);
+  lightPositions->updateCBuffer(0, &lightView, m4x4Size);
+  lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
 
-  api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
-  api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
+  basePass->updateCBuffer(0, &view, m4x4Size);
+  basePass->updateCBuffer(1, &proj, m4x4Size);
+
+  transparencyPass->updateCBuffer(0, &view, m4x4Size);
+  transparencyPass->updateCBuffer(1, &proj, m4x4Size);
 
   // update shadow-specular quad pass
   lightQuad->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
@@ -764,10 +756,8 @@ ShaderTest::onUpdate()
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
-  // luminance constant buffers.
-  api.updateConstantBuffer(lumPass->getCBuffer(0), &lum, v4Size);
-
-  api.updateConstantBuffer(tonePass->getCBuffer(0), &exposure, v4Size);
+  lumPass->updateCBuffer(0, &lum, v4Size);
+  tonePass->updateCBuffer(0, &exposure, v4Size);
 
   ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v4Size, v4Size });
 }

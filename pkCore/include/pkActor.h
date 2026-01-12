@@ -191,21 +191,21 @@ class PK_CORE_EXPORT Actor
    * @brief Set the position relative to its local axis.
    */
   void
-  setPositionLocal(Vector3 _offset);
+  setPositionLocal(const Vector3& _offset);
   
   /**
    * @brief Set the actor position relative to its local forward.
    * @param _offset How much will the movement be.
    */
   void
-  setPositionForwardLocal(float _offset);
+  setPositionForwardLocal(const float& _offset);
 
   /**
    * @brief adds a component of type T.
    * @param _pComponent Pointer of the component to add.
    */
   void
-  addComponent(SPtr<Component> _pComponent);
+  addComponent(const SPtr<Component>& _pComponent);
 
   /**
    * @brief Get the component of type T.
@@ -245,7 +245,7 @@ class PK_CORE_EXPORT Actor
    * @param _name Name of the actor
    */
   void
-  setName(String _name) { m_name = _name.c_str(); }
+  setName(const String _name) { m_name = _name.c_str(); }
 
   /**
    * @brief Get the actor name as a const char*.
@@ -259,7 +259,7 @@ class PK_CORE_EXPORT Actor
    * @brief _deltaTime Time between frames.
    */
   void
-  update(float _deltaTime);
+  update(const float _deltaTime);
 
   /**
    * @brief Get a specific child of the actor.
@@ -267,7 +267,7 @@ class PK_CORE_EXPORT Actor
    * @return Pointer to the actor.
    */
   SPtr<Actor>
-  getChild(uint32 _index = 0);
+  getChild(const uint32 _index = 0);
 
   /**
    * @brief Get a pointer to the parent.
@@ -281,7 +281,7 @@ class PK_CORE_EXPORT Actor
    * @param _active State of the actor.
    */
   void
-  setActive(bool _active) { m_active = _active; }
+  setActive(const bool _active) { m_active = _active; }
 
   /**
    * @brief If the actor is active or not.

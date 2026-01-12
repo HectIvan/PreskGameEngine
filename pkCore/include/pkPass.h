@@ -123,6 +123,15 @@ class PK_CORE_EXPORT Pass
                  const Vector<SIZE_T>& _sizes);
 
   /**
+   * @brief Update a specific constant buffer.
+   * @param _index Index of the cbuffer to update.
+   * @param _data Data to use in the update.
+   * @param _size Size of the data.
+   */
+  void
+  updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size);
+
+  /**
    * @brief Get the constant buffer in the index position.
    * @param _index Where to look for the cbuffer.
    * @return Pointer to the cbuffer.

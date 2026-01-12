@@ -1,6 +1,7 @@
 #include "pkMaterial.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
+#include "pkActor.h"
 
 namespace pkEngineSDK
 {
@@ -37,6 +38,11 @@ Material::init()
   setMetallic(tm.m_defaultMetallic);
   setRoughness(tm.m_defaultRough);
   setEmissive(tm.m_defaultEmissive);
+}
+
+void
+Material::update(Actor& _owner)
+{
 }
 
 const Vector<SPtr<Texture>>

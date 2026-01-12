@@ -261,7 +261,7 @@ public:
    * @param _pInputLayout What input layout to use.
    */
   virtual void
-  setInputLayout(const SPtr<InputLayout> _pInputLayout) = 0;
+  setInputLayout(const SPtr<InputLayout>& _pInputLayout) = 0;
 
   /**
    * @brief Get bytes per pixel from the format.
@@ -515,7 +515,7 @@ public:
    * @param _pDepthSV Depth stencil view to clear.
    */
   virtual void
-  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) = 0;
+  clearDepthBuffer(const float _depth, const SPtr<Texture>& _pDepthSV) = 0;
 
   /**
    * @brief Set the Vertex Shader constant buffers.
@@ -581,9 +581,9 @@ public:
    * @param _baseVertexLocation Which vertex will be the starting point.
    */
   virtual void
-  drawIndexed(uint32 _indexCount,
-              uint32 _startIndexLocation,
-              uint32 _baseVertexLocation) = 0;
+  drawIndexed(const uint32 _indexCount,
+              const uint32 _startIndexLocation,
+              const uint32 _baseVertexLocation) = 0;
 
   /**
    * @brief Compute shader draw call.
@@ -592,7 +592,7 @@ public:
    * @param _countZ Thread group size in the Z axis.
    */
   virtual void
-  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) = 0;
+  dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ) = 0;
 
   /**
    * @brief Present the result to the screen.
@@ -600,8 +600,7 @@ public:
    * @param _flags Swap chain presentation options.
    */
   virtual void
-  present(uint32 _syncInterval, uint32 _flags) = 0;
-
+  present(const uint32 _syncInterval, const uint32 _flags) = 0;
 };
 
 PK_CORE_EXPORT GraphicsAPI&

@@ -29,6 +29,13 @@ class GravityComponent : public Component
   virtual ~GravityComponent() = default;
 
   /**
+   * @brief Update the component.
+   * @param _owner Actor that owns the component.
+   */
+  void
+  update(Actor& _owner) override;
+
+  /**
    * @brief Set wether the component will affect the Actor
    */
   void

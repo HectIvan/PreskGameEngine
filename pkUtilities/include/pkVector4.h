@@ -505,5 +505,17 @@ class PK_UTILITY_EXPORT Vector4
   float x, y, z, w;
 
   static const Vector4 ZERO;
+
+  static const Vector4 FORWARD;
+
+  static const Vector4 BACK;
+
+  static const Vector4 RIGHT;
+
+  static const Vector4 LEFT;
+
+  static const Vector4 UP;
+
+  static const Vector4 DOWN;
 };
 }

@@ -25,6 +25,8 @@
 namespace pkEngineSDK
 {
 
+class Actor;
+
 namespace COMPONENT_TYPE
 {
   enum E
@@ -55,6 +57,13 @@ class PK_CORE_EXPORT Component
    */
   virtual const ANSICHAR*
   getName() = 0;
+  
+  /**
+   * @brief Update the component.
+   * @param _owner The actor that owns this component.
+   */
+  virtual void
+  update(Actor& _owner) = 0;
 
   /**
    * @brief Set the component activity.

@@ -33,6 +33,7 @@ using pkEngineSDK::PASS_TYPE::kP_Light;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_SSAO;
 using pkEngineSDK::PASS_TYPE::kP_Tone;
+using pkEngineSDK::PASS_TYPE::kP_Transparency;
 using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_LumBlur;

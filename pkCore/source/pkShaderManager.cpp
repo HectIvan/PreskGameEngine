@@ -36,6 +36,7 @@ ShaderManager::createShaderResources()
   ShaderKey luminance("shaders/pkLuminanceQuad.hlsl", "PS", "ps_5_0");
   ShaderKey toneMap("shaders/pkToneMap.hlsl", "PS", "ps_5_0");
   ShaderKey cubeMap("shaders/pkCubeMapShader.hlsl", "PS", "ps_5_0");
+  ShaderKey transparency("shaders/pkPSTransparency.hlsl", "PS", "ps_5_0");
 
   // initialize all shaders and create the resources.
   initShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
@@ -49,6 +50,7 @@ ShaderManager::createShaderResources()
   initShaderResource(luminance, PK_SHADER_TYPE::kPixel);
   initShaderResource(toneMap, PK_SHADER_TYPE::kPixel);
   initShaderResource(cubeMap, PK_SHADER_TYPE::kPixel);
+  initShaderResource(transparency, PK_SHADER_TYPE::kPixel);
 }
 
 SPtr<Shader>

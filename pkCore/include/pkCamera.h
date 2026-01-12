@@ -25,6 +25,8 @@
 namespace pkEngineSDK
 {
 
+class Actor;
+
 namespace CAMERA_PROJ
 {
   enum E : uint32
@@ -74,6 +76,13 @@ class PK_CORE_EXPORT Camera : public Component
   init(const CameraDesc& _desc);
 
   /**
+   * @brief Update the camera component.
+   * @param _owner The actor that owns this component.
+   */
+  void
+  update(Actor& _owner) override;
+
+  /**
    * @brief Initialize the camera.
    * @param _width Width to the view.
    * @param _height Height of the view.
@@ -86,15 +95,15 @@ class PK_CORE_EXPORT Camera : public Component
    * @param _camMode Wether Camera perspective.
    */
   void
-  init(uint32 _width,
-       uint32 _height,
-       float _halfFOV,
-       float _nearZ,
-       float _farZ,
-       Vector3 _eye,
-       Vector3 _at,
-       Vector3 _up,
-       CAMERA_PROJ::E _camMode = CAMERA_PROJ::kPerspective
+  init(const uint32& _width,
+       const uint32& _height,
+       const float& _halfFOV,
+       const float& _nearZ,
+       const float& _farZ,
+       const Vector3& _eye,
+       const Vector3& _at,
+       const Vector3& _up,
+       const CAMERA_PROJ::E& _camMode = CAMERA_PROJ::kPerspective
   );
 
   /**
@@ -153,20 +162,27 @@ class PK_CORE_EXPORT Camera : public Component
   moveUpLocal(float _offset);
 
   /**
-   * @brief Rotate the camera by rotating the At vector.
-   * @param _x New x rotation.
-   * @param _y New y rotation.
-   * @param _z New z rotation.
+   * @brief Rotate the camera.
+   * @param _x x rotation amount.
+   * @param _y y rotation amount.
+   * @param _z z rotation amount.
    */
   void
   rotate(float _x, float _y, float _z);
 
   /**
-   * @brief Rotate the camera by rotating the At vector.
-   * @param _rotate New rotation vector.
+   * @brief Rotate the camera.
+   * @param _rotate Rotation amount.
    */
   void
   rotate(Vector3 _rotate);
+
+  /**
+   * @brief Set the rotation of the camera.
+   * @param _rotation New rotation values.
+   */
+  void
+  rotation(Vector3 _rotation);
 
   /**
    * @brief Get the forward vector of the camera.

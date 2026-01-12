@@ -15,6 +15,11 @@ Model::Model()
 }
 
 void
+Model::update(Actor& _owner)
+{
+}
+
+void
 Model::clean()
 {
   vertex.clear();

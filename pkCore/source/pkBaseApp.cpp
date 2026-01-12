@@ -208,13 +208,17 @@ BaseApp::update()
   SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
   SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
   SPtr<Pass> tonePass = rm.getPass(kP_Tone);
+  SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
 
   // update normal && base shadow pass buffers.
-  api.updateConstantBuffer(basePass->getCBuffer(0), &view, m4x4Size);
-  api.updateConstantBuffer(basePass->getCBuffer(1), &proj, m4x4Size);
+  basePass->updateCBuffer(0, &view, m4x4Size);
+  basePass->updateCBuffer(1, &proj, m4x4Size);
 
-  api.updateConstantBuffer(lightPositions->getCBuffer(0), &lightView, m4x4Size);
-  api.updateConstantBuffer(lightPositions->getCBuffer(1), &lightProj, m4x4Size);
+  lightPositions->updateCBuffer(0, &lightView, m4x4Size);
+  lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
+
+  transparencyPass->updateCBuffer(0, &lightView, m4x4Size);
+  transparencyPass->updateCBuffer(1, &lightProj, m4x4Size);
 
   // update shadow-specular quad pass
   Vector4 iblParams = Vector4(1.0f);
@@ -225,17 +229,17 @@ BaseApp::update()
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   // luminance constant buffers.
-  lumPass->updateCBuffers({ &lum }, { v4Size });
+  lumPass->updateCBuffer(0, &lum, v4Size);
   // Emissive blur constant buffers;
   emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
-  emissHBlur->updateCBuffers({ &emissiveBlur }, { cBlurSize });
-  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
-  emissBlur->updateCBuffers({ &emissiveBlur }, { cBlurSize });
+  emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
+  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f); 
+  emissBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
   // lum blur constant buffers
   blur.BlurDirection = Vector2(1.0f, 0.0f);
-  lumBlurHPass->updateCBuffers({ &blur }, { cBlurSize });
+  lumBlurHPass->updateCBuffer(0, &blur, cBlurSize);
   blur.BlurDirection = Vector2(0.0f, 1.0f);
-  lumBlurPass->updateCBuffers({ &blur }, { cBlurSize });
+  lumBlurPass->updateCBuffer(0, &blur, cBlurSize);
 }
 
 void
@@ -245,20 +249,21 @@ BaseApp::render()
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& renderManager = g_RenderManager();
   // get all passes
-  SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
-  SPtr<Pass> basePass = renderManager.getPass(kP_Base);
-  SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
-  SPtr<Pass> quadLight = renderManager.getPass(kP_Light);
-  SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
-  SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
-  SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
-  SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
-  SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
-  SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
+  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
+  const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
+  const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
+  const SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
+  const SPtr<Pass> quadLight = renderManager.getPass(kP_Light);
+  const SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
+  const SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
+  const SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
+  const SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
+  const SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
+  const SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
+  const SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
 
-  SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
   // Get all actors
-  Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
+  const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
   // first shadow pass
   lightPositions->beginPass();
@@ -269,6 +274,10 @@ BaseApp::render()
   basePass->beginPass(Color::BLACK);
   renderManager.renderActors(actors);
   basePass->endPass();
+
+  transparencyPass->beginPass(Color::BLACK);
+  renderManager.renderActors(actors);
+  transparencyPass->endPass();
 
   // get texel size of compute passes
   //        Vector2 texSize = api.getSwapChain()->getSize();

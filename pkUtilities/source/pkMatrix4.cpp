@@ -16,10 +16,8 @@ const Matrix4 Matrix4::ZERO = Matrix4(0);
 
 Matrix4::Matrix4(const float& val)
 {
-  for (int i = 0; i < 4; ++i)
-  {
-    for (int j = 0; j < 4; ++j)
-    {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
       matrix[i][j] = val;
     }
   }
@@ -48,7 +46,7 @@ Matrix4::Matrix4(const Matrix4& _matrix)
   matrix[3][3] = _matrix.matrix[3][3];
 }
 
-Matrix4::Matrix4(Vector4 R0, Vector4 R1, Vector4 R2, Vector4 R3)
+Matrix4::Matrix4(const Vector4& R0, const Vector4& R1, const Vector4& R2, const Vector4& R3)
 {
   matrix[0][0] = R0.x;
   matrix[0][1] = R0.y;
@@ -71,10 +69,10 @@ Matrix4::Matrix4(Vector4 R0, Vector4 R1, Vector4 R2, Vector4 R3)
   matrix[3][3] = R3.w;
 }
 
-Matrix4::Matrix4(float m00, float m01, float m02, float m03,
-                 float m10, float m11, float m12, float m13,
-                 float m20, float m21, float m22, float m23,
-                 float m30, float m31, float m32, float m33)
+Matrix4::Matrix4(const float& m00, const float& m01, const float& m02, const float& m03,
+                 const float& m10, const float& m11, const float& m12, const float& m13,
+                 const float& m20, const float& m21, const float& m22, const float& m23,
+                 const float& m30, const float& m31, const float& m32, const float& m33)
 {
   matrix[0][0] = m00; matrix[0][1] = m01; matrix[0][2] = m02; matrix[0][3] = m03;
   matrix[1][0] = m10; matrix[1][1] = m11;	matrix[1][2] = m12; matrix[1][3] = m13;
@@ -233,10 +231,14 @@ Matrix4::inverse()
 
   det = 1.0f / det;
 
-  return Matrix4(inv[0] * det, inv[1] * det, inv[2] * det, inv[3] * det,
-                 inv[4] * det, inv[5] * det, inv[6] * det, inv[7] * det,
-                 inv[8] * det, inv[9] * det, inv[10] * det, inv[11] * det,
-                 inv[12] * det, inv[13] * det, inv[14] * det, inv[15] * det);
+  for (uint32 i = 0; i < 16; ++i) {
+    inv[i] = inv[i] * det;
+  }
+
+  return Matrix4(inv[0], inv[1], inv[2], inv[3],
+                 inv[4], inv[5], inv[6], inv[7],
+                 inv[8], inv[9], inv[10], inv[11],
+                 inv[12], inv[13], inv[14], inv[15]);
 }
 
 Matrix4
@@ -427,13 +429,13 @@ Matrix4::getRotationNoScale(Vector3 _scale)
 }
 
 Matrix4
-Matrix4::rotation(Vector3& _rot)
+Matrix4::rotation(const Vector3& _rot)
 {
   return rotation(_rot.x, _rot.y, _rot.z);
 }
 
 Matrix4
-Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
+Matrix4::rotation(const float& _angleX, const float& _angleY, const float& _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M = rotationZ(_angleZ) * rotationY(_angleY) * rotationX(_angleX);
@@ -441,7 +443,7 @@ Matrix4::rotation(float _angleX, float _angleY, float _angleZ)
 }
 
 Matrix4
-Matrix4::rotationZ(float& _angle)
+Matrix4::rotationZ(const float& _angle)
 {
   Matrix4 M = Matrix4::IDENTITY;
 
@@ -457,7 +459,7 @@ Matrix4::rotationZ(float& _angle)
 }
 
 Matrix4
-Matrix4::rotationY(float& _angle)
+Matrix4::rotationY(const float& _angle)
 {
   Matrix4 M = Matrix4::IDENTITY;
 
@@ -474,7 +476,7 @@ Matrix4::rotationY(float& _angle)
 }
 
 Matrix4
-Matrix4::rotationX(float& _angle)
+Matrix4::rotationX(const float& _angle)
 {
   Matrix4 M = IDENTITY;
 
@@ -491,7 +493,7 @@ Matrix4::rotationX(float& _angle)
 }
 
 void
-Matrix4::setRotation(Matrix4 _rotation)
+Matrix4::setRotation(const Matrix4& _rotation)
 {
   matrix[0][0] = _rotation.matrix[0][0];
   matrix[0][1] = _rotation.matrix[0][1];
@@ -507,20 +509,17 @@ Matrix4::setRotation(Matrix4 _rotation)
 }
 
 Matrix4
-Matrix4::lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector3 _upDir)
+Matrix4::lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& _upDir)
 {
-  Vector4 EyeDirection;
-  Matrix4 M;
-
-  EyeDirection = _atPos - _eyePos;
+  const Vector4 EyeDirection = _atPos - _eyePos;
   Vector4 upDir = Vector4(_upDir, 0.0f);
-  M = lookToLH(_eyePos, EyeDirection, upDir);
+  const Matrix4 M = lookToLH(_eyePos, EyeDirection, upDir);
 
   return M;
 }
 
 Matrix4
-Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
+Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir)
 {
   Vector4 negEyePosition;
   Vector4 R0, R1, R2;
@@ -569,7 +568,11 @@ Matrix4::lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir)
 }
 
 Matrix4
-Matrix4::perspectiveFOVLH(float _halfFOV, float _width, float _height, float _nearZ, float _farZ)
+Matrix4::perspectiveFOVLH(const float& _halfFOV,
+                          const float& _width,
+                          const float& _height,
+                          const float& _nearZ,
+                          const float& _farZ)
 {
   Matrix4 M(0.0f);
 
@@ -583,12 +586,12 @@ Matrix4::perspectiveFOVLH(float _halfFOV, float _width, float _height, float _ne
 }
 
 Matrix4
-Matrix4::orthographicFOVLH(float _left,
-                           float _right,
-                           float _top,
-                           float _bottom,
-                           float _nearZ,
-                           float _farZ)
+Matrix4::orthographicFOVLH(const float& _left,
+                           const float& _right,
+                           const float& _top,
+                           const float& _bottom,
+                           const float& _nearZ,
+                           const float& _farZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][0] = 2.0f / (_right - _left);

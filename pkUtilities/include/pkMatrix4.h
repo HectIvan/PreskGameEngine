@@ -30,21 +30,19 @@ class PK_UTILITY_EXPORT Matrix4
   Matrix4() = default;
   Matrix4(const float& val);
   Matrix4(const Matrix4& _matrix);
-  Matrix4(Vector4 R0, Vector4 R1, Vector4 R2, Vector4 R3);
-  Matrix4(float m00, float m01, float m02, float m03,
-          float m10, float m11, float m12, float m13,
-          float m20, float m21, float m22, float m23,
-          float m30, float m31, float m32, float m33);
+  Matrix4(const Vector4& R0, const Vector4& R1, const Vector4& R2, const Vector4& R3);
+  Matrix4(const float& m00, const float& m01, const float& m02, const float& m03,
+          const float& m10, const float& m11, const float& m12, const float& m13,
+          const float& m20, const float& m21, const float& m22, const float& m23,
+          const float& m30, const float& m31, const float& m32, const float& m33);
   // --------------------------------------------------------------//
   // Matrix4 = Matrix4
   // --------------------------------------------------------------//
   PKFORCEINLINE Matrix4&
   operator=(const Matrix4& other)
   {
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         matrix[i][j] = other.matrix[i][j];
       }
     }
@@ -57,10 +55,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator+(const Matrix4& other) const
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] + other.matrix[i][j];
       }
     }
@@ -73,10 +69,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator+(const float& other) const
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] + other;
       }
     }
@@ -89,10 +83,8 @@ class PK_UTILITY_EXPORT Matrix4
   PKFORCEINLINE Matrix4
   operator+=(const Matrix4& other)
   {
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         matrix[i][j] += other.matrix[i][j];
       }
     }
@@ -107,10 +99,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator-(const float& other)
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] - other;
       }
     }
@@ -126,10 +116,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator-(float& other)
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] - other;
       }
     }
@@ -145,10 +133,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator-(Matrix4& other)
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] - other.matrix[i][j];
       }
     }
@@ -162,10 +148,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator*(const float& other) const
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] * other;
       }
     }
@@ -205,10 +189,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator*(const float& other)
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] * other;
       }
     }
@@ -223,10 +205,8 @@ class PK_UTILITY_EXPORT Matrix4
   operator*(float& other)
   {
     Matrix4 result;
-    for (int i = 0; i < 4; ++i)
-    {
-      for (int j = 0; j < 4; ++j)
-      {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
         result.matrix[i][j] = matrix[i][j] * other;
       }
     }
@@ -564,7 +544,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at the rotations given to it.
    */
   static Matrix4
-  rotation(float _angleX, float _angleY, float _angleZ);
+  rotation(const float& _angleX, const float& _angleY, const float& _angleZ);
 
   /**
    * @brief The rotation matrix that is created from
@@ -573,7 +553,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at the rotations given to it.
    */
   static Matrix4
-  rotation(Vector3& _rot);
+  rotation(const Vector3& _rot);
   
   /**
    * @brief The rotation matrix at the z coordinate.
@@ -582,7 +562,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at z with the rotation given to it.
    */
   PKFORCEINLINE static Matrix4
-  rotationZ(float& _angle);
+  rotationZ(const float& _angle);
   
   /**
    * @brief The rotation matrix at the y coordinate.
@@ -591,7 +571,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at y with the rotation given to it.
    */
   static Matrix4
-  rotationY(float& _angle);
+  rotationY(const float& _angle);
   
   /**
    * @brief The rotation matrix at the x coordinate.
@@ -600,14 +580,14 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix at x with the rotation given to it.
    */
   static Matrix4
-  rotationX(float& _angle);
+  rotationX(const float& _angle);
 
   /**
    * @brief Set the matrix rotation.
    * @param _rotation New matrix rotation.
    */
   void
-  setRotation(Matrix4 _rotation);
+  setRotation(const Matrix4& _rotation);
 
   /**
    * @brief Look at matrix.
@@ -616,7 +596,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _upPos Direction of the up vector.
    */
   static Matrix4
-  lookAtLH(Vector4 _eyePos, Vector4 _atPos, Vector3 _upDir);
+  lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& _upDir);
 
   /**
    * @brief Matrix look to.
@@ -625,7 +605,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _upDir Direction of the up vector.
    */
   static Matrix4
-  lookToLH(Vector4 _eyePos, Vector4 _eyeDir, Vector4 _upDir);
+  lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir);
 
   /**
    * @brief Get the perspective matrix.
@@ -637,11 +617,11 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The return matrix.
    */
   static Matrix4
-  perspectiveFOVLH(float _halfFOV,
-                   float _width,
-                   float _height,
-                   float _nearZ,
-                   float _farZ);
+  perspectiveFOVLH(const float& _halfFOV,
+                   const float& _width,
+                   const float& _height,
+                   const float& _nearZ,
+                   const float& _farZ);
 
   /**
    * @brief Get the orthographic matrix.
@@ -654,12 +634,12 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The orthographic matrix.
    */
   static Matrix4
-  orthographicFOVLH(float _left,
-                    float _right,
-                    float _top,
-                    float _bottom,
-                    float _nearZ,
-                    float _farZ);
+  orthographicFOVLH(const float& _left,
+                    const float& _right,
+                    const float& _top,
+                    const float& _bottom,
+                    const float& _nearZ,
+                    const float& _farZ);
 
   float matrix[4][4];
   static const Matrix4 IDENTITY;

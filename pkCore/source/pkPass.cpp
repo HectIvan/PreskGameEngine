@@ -226,6 +226,13 @@ Pass::updateCBuffers(const Vector<const void*>& _data,
 }
 
 void
+Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size)
+{
+  PK_ASSERT(_index < m_cBuffers.size());
+  g_GraphicAPI().updateConstantBuffer(m_cBuffers[_index], _data, _size);
+}
+
+void
 Pass::beginPass(Color _color)
 {
   // get managers

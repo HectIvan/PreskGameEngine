@@ -10,6 +10,12 @@
 namespace pkEngineSDK {
 
 const Vector4 Vector4::ZERO = Vector4(0);
+const Vector4 Vector4::FORWARD(0.0f, 0.0f, 1.0f, 0.0f);
+const Vector4 Vector4::BACK(0.0f, 0.0f, -1.0f, 0.0f);
+const Vector4 Vector4::LEFT(-1.0f, 0.0f, 0.0f, 0.0f);
+const Vector4 Vector4::RIGHT(1.0f, 0.0f, 0.0f, 0.0f);
+const Vector4 Vector4::UP(0.0f, 1.0f, 0.0f, 0.0f);
+const Vector4 Vector4::DOWN(0.0f, -1.0f, 0.0f, 0.0f);
 
 Vector4::Vector4(const Vector3& _vec, const float& _w)
 {

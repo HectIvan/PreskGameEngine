@@ -8,6 +8,10 @@
 
 namespace pkEngineSDK
 {
+void
+GravityComponent::update(Actor& _owner)
+{
+}
 
 void
 GravityComponent::applyGravity(SPtr<Actor> _pActor, float _deltaTime)

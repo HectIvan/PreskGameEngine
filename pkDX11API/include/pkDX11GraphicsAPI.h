@@ -268,7 +268,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @brief Set input layout
    */
   void
-  setInputLayout(const SPtr<InputLayout> _pInputLayout) override;
+  setInputLayout(const SPtr<InputLayout>& _pInputLayout) override;
 
   /**
    * @brief Get bytes per pixel from the format.
@@ -519,7 +519,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _pDepthSV Depth stencil to clear.s
    */
   void
-  clearDepthBuffer(float _depth, SPtr<Texture> _pDepthSV) override;
+  clearDepthBuffer(const float _depth, const SPtr<Texture>& _pDepthSV) override;
 
   /**
    * @brief Set the Vertex Shader constant buffers.
@@ -584,9 +584,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _baseVertexLocation Which vertex will be the starting point.
    */
   void
-  drawIndexed(uint32 _indexCount,
-              uint32 _startIndexLocation,
-              uint32 _baseVertexLocation) override;
+  drawIndexed(const uint32 _indexCount,
+              const uint32 _startIndexLocation,
+              const uint32 _baseVertexLocation) override;
 
   /**
    * @brief Compute shader draw call.
@@ -595,7 +595,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _countZ Thread group size in the Z axis.
    */
   void
-  dispatch(uint32 _countX, uint32 _countY, uint32 _countZ) override;
+  dispatch(const uint32 _countX, const uint32 _countY, const uint32 _countZ) override;
 
   /**
    * @brief Present the result to the screen.
@@ -603,10 +603,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _flags Swap chain presentation options.
    */
   void
-  present(uint32 _syncInterval, uint32 _flags) override;
+  present(const uint32 _syncInterval, const uint32 _flags) override;
   
  public:
-
   // swap chain
   SPtr<SwapChain> m_pSwapChain;
 

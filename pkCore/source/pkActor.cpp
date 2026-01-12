@@ -120,9 +120,9 @@ Actor::setRotation(float _x, float _y, float _z)
   m_rotation = Vector3(_x, _y, _z);
   Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
 
-  m_forward = (rotMat * Vector4(Vector3::FORWARD, 0.0f)).xyz().normalized();
-  m_right = (rotMat * Vector4(Vector3::RIGHT, 0.0f)).xyz().normalized();
-  m_up = (rotMat * Vector4(Vector3::UP, 0.0f)).xyz().normalized();
+  m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
+  m_right = (rotMat * Vector4::RIGHT).xyz().normalized();
+  m_up = (rotMat * Vector4::UP).xyz().normalized();
 
   generateNewTransform();
 }
@@ -159,33 +159,9 @@ Actor::setScale(float _x, float _y, float _z)
 void
 Actor::update(float)
 {
-  for (uint32 i = 0; i < m_components.size(); ++i) {
-    SPtr<Component> component = m_components[i];
-    switch (component->getType()) {
-      case COMPONENT_TYPE::kLight: {
-        SPtr<Light> light = reinterpret_pointer_cast<Light>(component);
-        light->m_position = getPosition3();
-        light->m_transform = m_transform;
-        break;
-      }
-      case COMPONENT_TYPE::kCamera: {
-        SPtr<Camera> camera = reinterpret_pointer_cast<Camera>(component);
-        // camera->moveForward();
-        break;
-      }
-      case COMPONENT_TYPE::kMaterial: {
-        break;
-      }
-      case COMPONENT_TYPE::kModel: {
-        break;
-      }
-      case COMPONENT_TYPE::kUnknown: {
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+  const uint32 compCount = static_cast<uint32>(m_components.size());
+  for (uint32 i = 0; i < compCount; ++i) {
+    m_components[i]->update(*this);
   }
 }
 
@@ -224,39 +200,39 @@ Actor::generateNewTransform()
 void
 Actor::generateNewLocalTransform()
 {
-  Vector3 rot = m_rotation * Math::DEG2RAD;
+  const Vector3 rot = m_rotation * Math::DEG2RAD;
 
-  Matrix4 posMat = Matrix4::translation(m_position);
-  Matrix4 rotMat = Matrix4::rotation(rot);
-  Matrix4 scaleMat = Matrix4::scale(m_scale);
+  const Matrix4 posMat = Matrix4::translation(m_position);
+  const Matrix4 rotMat = Matrix4::rotation(rot);
+  const Matrix4 scaleMat = Matrix4::scale(m_scale);
 
   m_transform = scaleMat * rotMat * posMat;
 }
 
 void
-Actor::setPositionLocal(Vector3 _offset)
+Actor::setPositionLocal(const Vector3& _offset)
 {
   m_position = _offset;
   generateNewLocalTransform();
 }
 
 void
-Actor::setPositionForwardLocal(float _offset)
+Actor::setPositionForwardLocal(const float& _offset)
 {
-  Vector3 offset = m_forward * _offset;
+  const Vector3 offset = m_forward * _offset;
   m_position += offset;
   generateNewLocalTransform();
 }
 
 void
-Actor::addComponent(SPtr<Component> _pComponent)
+Actor::addComponent(const SPtr<Component>& _pComponent)
 {
   // if the component exists, insert it into the list.
   if (_pComponent) {
     m_components.push_back(_pComponent);
     // log registry.
-    String msg = "Inserted Actor component: " + String(_pComponent->getName());
-    g_Logger().registerMessage(msg, __FILE__, __LINE__);
+    const String msg = "Inserted Actor component: " + String(_pComponent->getName());
+    LOG_REGISTER(msg, __FILE__, __LINE__);
   }
 }
 }

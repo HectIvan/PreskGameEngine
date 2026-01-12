@@ -235,6 +235,7 @@
     <ClInclude Include="include\pkSceneManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkLight.cpp" />
     <ClCompile Include="source\pkTexture3D.cpp" />
     <ClCompile Include="source\pkActor.cpp" />
     <ClCompile Include="source\pkAssetResourceManager.cpp" />

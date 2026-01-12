@@ -23,6 +23,8 @@
 namespace pkEngineSDK
 {
 
+class Actor;
+
 namespace LIGHT_TYPE
 {
   enum E : uint32
@@ -61,6 +63,13 @@ class PK_CORE_EXPORT Light : public Component
    */
   const char*
   getName() override { return "Light"; }
+
+  /**
+   * @brief Update the component.
+   * @param _owner The actor that owns this component.
+   */
+  void
+  update(Actor& _owner) override;
 
   /**
    * @brief Get the component type of this component.

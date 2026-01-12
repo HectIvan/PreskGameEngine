@@ -49,8 +49,13 @@ namespace G_BUFFERS
     kGB_Luminance, // luminance buffer
     kGB_LumBlurH, // luminance horizontal blur
     kGB_LumBlur, // luminance full blur
-    kGB_CubeMap , // luminance full blur
-    kGB_LUT , // Look-Up Table
+    kGB_CubeMap, // luminance full blur
+    kGB_LUT, // Look-Up Table
+    kGB_TranspAlbedo, // transparency albedo
+    kGB_TranspNormal, // transparency normals
+    kGB_TranspORM, // transparency orm
+    kGB_TranspEmiss, // transparency orm
+    kGB_TranspPos, // transparency positions
   };
 };
 
@@ -59,6 +64,7 @@ namespace D_BUFFERS
   enum E {
     kDB_Base = 0,
     kDB_Light,
+    kDB_Transparency,
   };
 }
 
@@ -73,6 +79,7 @@ namespace PASS_TYPE
 {
   enum E {
     kP_Base = 0,
+    kP_Transparency,
     kP_EmissiveBlur,
     kP_EmissiveHBlur,
     kP_Exposure,

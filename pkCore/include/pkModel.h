@@ -32,6 +32,14 @@ class PK_CORE_EXPORT Model : public Component
   virtual ~Model() {
     clean();
   }
+
+  /**
+   * @brief Update the model component.
+   * @param _owner Actor that owns the component.
+   */
+  void
+  update(Actor& _owner) override;
+
   /**
    * @brief Get the map of bones assigned to the model.
    * @return The bone map.

@@ -61,6 +61,12 @@ class PK_CORE_EXPORT BaseResource
   load() = 0;
 
   /**
+   * @brief Unload the resource.
+   */
+  virtual void
+  unload() = 0;
+
+  /**
    * @brief Soft load the resource (used by the asset manager to know what resource is what).
    * @param _path Path to soft load.
    * @return If the soft load was successful.

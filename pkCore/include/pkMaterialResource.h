@@ -34,6 +34,12 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   load() override;
 
   /**
+   * @brief Unload the material resource.
+   */
+  void
+  unload() override;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */

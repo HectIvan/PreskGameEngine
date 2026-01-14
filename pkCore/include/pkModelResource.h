@@ -46,6 +46,12 @@ class PK_CORE_EXPORT ModelResource : public BaseResource
   load() override;
 
   /**
+   * @brief Unload the model resource.
+   */
+  void
+  unload() override;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */

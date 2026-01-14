@@ -304,6 +304,24 @@ class UInterface : public Module<UInterface>
              Color _active = Color(139, 174, 220, 125));
 
   /**
+   * @brief Begin a popup item in the UI.
+   */
+  bool
+  beginPopUpItem(const ANSICHAR* _name);
+
+  /**
+   * @brief Create a menu item in the popup.
+   */
+  bool
+  menuItem(const ANSICHAR* _name);
+
+  /**
+   * @brief End the popup item in the UI.
+   */
+  void
+  endPopUpItem();
+
+  /**
    * @brief Begin a UI tab.
    * @param _name Name of the tab.
    * @return Wether the tab is open or not.

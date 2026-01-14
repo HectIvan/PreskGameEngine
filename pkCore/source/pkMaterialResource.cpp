@@ -85,4 +85,22 @@ MaterialResource::load()
 
   file.close();
 }
+
+void
+MaterialResource::unload()
+{
+  m_isLoaded = false;
+  const UUID noID = UUID::PK_DEFAULT_UUID;
+  m_albedoID = noID;
+  m_normalID = noID;
+  m_aoID = noID;
+  m_roughnessID = noID;
+  m_metallicID = noID;
+  m_emissiveID = noID;
+  m_isLoaded = false;
+  m_albedoColor = Vector3(1.0f);
+  m_roughValue = 1.0f;
+  m_metallicValue = 1.0f;
+  m_emissiveColor = Vector3(1.0f);
+}
 }

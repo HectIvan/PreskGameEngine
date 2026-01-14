@@ -42,6 +42,12 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
   load() override;
 
   /**
+   * @brief Unload the texture resource.
+   */
+  void
+  unload() override;
+
+  /**
    * @brief Get the resource type.
    * @return The resource type.
    */

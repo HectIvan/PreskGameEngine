@@ -83,7 +83,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @param _pResource Asset Resource to insert.
    */
   void
-  insertNewResource(SPtr<BaseResource> _pResource)
+  insertNewResource(const SPtr<BaseResource>& _pResource)
   {
     m_allResources.insert({_pResource->m_id, _pResource});
   }
@@ -94,9 +94,30 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @param _pResource Loaded Asset Resource to insert.
    */
   void
-  insertLoadedResource(SPtr<BaseResource> _pResource)
+  insertLoadedResource(const SPtr<BaseResource>& _pResource)
   {
     m_loadedResources.insert({ _pResource->m_id, _pResource});
+  }
+
+  /**
+   * @brief Remove a resource from the loaded resources map.
+   * @param _UUID resource ID.
+   */
+  void
+  removeLoadedResource(const UUID& _ID)
+  {
+    m_loadedResources.erase(_ID);
+  }
+
+  /**
+   * @brief Remove a resource from the resource manager.
+   * @param _UUID resource ID.
+   */
+  void
+  removeResource(const UUID& _ID)
+  {
+    m_loadedResources.erase(_ID);
+    m_allResources.erase(_ID);
   }
 
   /**

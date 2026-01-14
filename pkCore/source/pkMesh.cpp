@@ -19,13 +19,17 @@ Mesh::Mesh(Vector<SimpleVertex> _vertex,
 void
 Mesh::clean()
 {
-  // Empty the vertex vector
   vertexVector.clear();
-  // Empty the index vector
   indexVector.clear();
 
-  materialPath = "";
+  m_transform = Matrix4::IDENTITY;
   vertexCount = 0;
   numIndex = 0;
+
+  material = nullptr;
+  materialPath = "";
+
+  m_name = "";
+  m_active = true;
 }
 }

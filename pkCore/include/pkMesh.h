@@ -91,7 +91,6 @@ class PK_CORE_EXPORT Mesh
   uint32 numIndex;
 
   SPtr<Material> material;
-
   String materialPath;
 
  private:

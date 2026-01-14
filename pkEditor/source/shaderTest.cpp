@@ -303,7 +303,7 @@ ShaderTest::uInterfaceUpdate()
   im.startWindowCreate(m_loggerWin.name);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
-  Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
+  // Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
 
   // -------------------------- //
   im.sameLine();
@@ -383,7 +383,8 @@ ShaderTest::uInterfaceUpdate()
               assetNameLower.find(searchResLower.c_str()) != String::npos) {
 
             im.tableSetColumnIndex(column);
-            if (im.selectable2(assetName.c_str(), Vector2(m_resourceItemSize))) {
+            const ANSICHAR* assetNameCstr = assetName.c_str();
+            if (im.selectable2(assetNameCstr, Vector2(m_resourceItemSize))) {
 
             }
             if (im.beginDragDropSource()) {
@@ -399,6 +400,30 @@ ShaderTest::uInterfaceUpdate()
                 "Asset type: " + asset.second->getTypeString() + "\n" +
                 "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
               im.setTooltip(tooltip.c_str());
+            }
+            // pop-up menu for each resource
+            if (im.beginPopUpItem(assetNameCstr)) {
+              if (im.menuItem("Load")) {
+                asset.second->load();
+                assetMan.insertLoadedResource(asset.second);
+              }
+              if (im.menuItem("Unload")) {
+                assetMan.removeLoadedResource(asset.first);
+                asset.second->unload();
+              }
+              if (im.menuItem("Remove")) {
+                assetMan.removeResource(asset.first);
+              }
+              if (im.menuItem("_______________________")) {
+                
+              }
+              if (im.menuItem("Delete (Non-Functional)")) {
+                
+              }
+              if (im.isItemHovered()) {
+                im.setTooltip("THIS ACTION CANNOT BE UNDONE");
+              }
+              im.endPopUpItem();
             }
 
             // if the resource window is full, jump to next row.

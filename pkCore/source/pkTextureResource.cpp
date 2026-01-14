@@ -41,4 +41,16 @@ TextureResource::load()
 
   return;
 }
+
+void
+TextureResource::unload()
+{
+  m_isLoaded = false;
+  m_width = 0;
+  m_height = 0;
+  m_bpp = 0;
+  m_format = 0;
+  m_mipMapCount = 0;
+  m_data.clear();
+}
 }

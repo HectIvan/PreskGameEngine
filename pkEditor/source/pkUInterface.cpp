@@ -556,6 +556,24 @@ UInterface::selectable(const ANSICHAR* _name,
   return result;
 }
 
+bool
+UInterface::beginPopUpItem(const ANSICHAR* _name)
+{
+  return ImGui::BeginPopupContextItem(_name);
+}
+
+bool
+UInterface::menuItem(const ANSICHAR* _name)
+{
+  return ImGui::MenuItem(_name);
+}
+
+void
+UInterface::endPopUpItem()
+{
+  ImGui::EndPopup();
+}
+
 void
 UInterface::endCombo()
 {

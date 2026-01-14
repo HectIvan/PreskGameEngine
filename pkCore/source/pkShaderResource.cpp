@@ -52,4 +52,11 @@ ShaderResource::load()
   LOG_REGISTER(msg, __FILE__, __LINE__);
   m_isLoaded = true;
 }
+
+void
+ShaderResource::unload()
+{
+  m_isLoaded = false;
+  m_data.clear();
+}
 }

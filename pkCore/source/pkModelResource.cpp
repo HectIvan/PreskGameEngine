@@ -91,4 +91,19 @@ ModelResource::load()
 
   return;
 }
+
+void
+ModelResource::unload()
+{
+  m_isLoaded = false;
+  m_vertex.clear();
+  m_index.clear();
+
+  const uint32 meshCount = static_cast<uint32>(m_meshes.size());
+  for (uint32 i = 0; i < meshCount; ++i) {
+    m_meshes[i]->clean();
+  }
+
+  m_meshes.clear();
+}
 }

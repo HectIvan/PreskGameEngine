@@ -34,6 +34,15 @@ class PK_CORE_EXPORT ShaderResource : public BaseResource
   void
   load() override;
 
+  /**
+   * @brief Unload the shader resource.
+   */
+  void
+  unload() override;
+
+  /**
+   * @brief Get the resource type.
+   */
   RESOURCE_TYPE::E
   getType() const override { return RESOURCE_TYPE::kShader; }
 

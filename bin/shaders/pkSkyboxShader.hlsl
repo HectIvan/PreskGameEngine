@@ -55,5 +55,5 @@ float4 PS(PS_INPUT input) : SV_Target
   float2 skyboxUV = getSkyBoxUV(viewDir);
   float3 color = skyboxMap.SampleLevel(samState, skyboxUV, 0).rgb;
   
-  return sRGBToLinear(float4(color, 1.0f));
+  return float4(color, 1.0f);
 }

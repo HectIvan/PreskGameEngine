@@ -208,16 +208,6 @@ float4 PS(PS_INPUT input) : SV_Target0
   float roughness = ormValues.g;
   float3 worldPos = posMap.Sample(samState, input.TexCoord).xyz;
   
-  
-  /**
-   * alpha values
-   */
-  // if its the max depth value
-  float alpha = 1.0f;
-  if (depthTex.r == 1) {
-    alpha = 0.0f;
-  }
-  
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   float3 normal = normalize(normalTex.xyz);
@@ -226,7 +216,6 @@ float4 PS(PS_INPUT input) : SV_Target0
   float VoH = saturate(dot(viewDir, Half));
   float3 F = Fresnel(F0, max(VoH, 0.0f));
 
-  
   // Diffuse BRDF
   float shadowColor = 1.0f - ShadowIntensity;
   float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughness);

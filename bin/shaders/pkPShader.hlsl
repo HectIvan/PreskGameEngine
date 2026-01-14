@@ -46,7 +46,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float4 emissSam = emissiveTex.Sample(samLinear, input.Tex);
 
   if (colorSam.a <= 0.95f) {
-    clip(-1);
+    discard;
   }
   // modify the normal vector 
   float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);

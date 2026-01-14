@@ -659,10 +659,14 @@ ShaderTest::onUpdate()
   const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
   const SPtr<Pass> lightQuad = rm.getPass(kP_Light);
   const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  const SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  const SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
+  const SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
+  const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
   const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
   const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
-  SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
+  const SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
 
   const Vector2 winSize = api.getSwapChain()->getSize();
 
@@ -761,7 +765,31 @@ ShaderTest::onUpdate()
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   lumPass->updateCBuffer(0, &lum, v4Size);
+
+  // Emissive blur constant buffers;
+  CBBlur emissiveBlur;
+  emissiveBlur.WinSize = winSize;
+  emissiveBlur.radius = m_emissiveBlur;
+  emissiveBlur.strength = m_emissiveStrength;
+  emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
+  const uint32 cBlurSize = sizeof(CBBlur);
+  emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
+  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
+  emissBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
+  // lum blur constant buffers
+  CBBlur blur;
+  blur.WinSize = winSize;
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  blur.radius = m_blurRadius;
+  blur.strength = m_blurStrength;
+  blur.BlurDirection = Vector2(1.0f, 0.0f);
+  lumBlurHPass->updateCBuffer(0, &blur, cBlurSize);
+  blur.BlurDirection = Vector2(0.0f, 1.0f);
+  lumBlurPass->updateCBuffer(0, &blur, cBlurSize);
+
   tonePass->updateCBuffer(0, &exposure, v4Size);
+
+
 
   ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v4Size, v4Size });
 }

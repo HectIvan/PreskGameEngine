@@ -192,6 +192,13 @@ class UInterface : public Module<UInterface>
   tableNextRow();
 
   /**
+   * @brief Set the current working column index.
+   * @param _index Index of the column to move to.
+   */
+  void
+  tableSetColumnIndex(const uint32 _index);
+
+  /**
    * @brief Move to the next row in the table.
    */
   void
@@ -268,10 +275,33 @@ class UInterface : public Module<UInterface>
    * @brief Create a selectable widget.
    * @param _name Name of the widget.
    * @param _size Size of the widget.
+   * @param _base Base color.
+   * @param _hover Hover color.
+   * @param _active Active color.
    * @return If clicked this frame.
    */
   bool
-  selectable(const ANSICHAR* _name, const Vector2 _size = Vector2(0.0f));
+  selectable2(const ANSICHAR* _name,
+              const Vector2 _size = Vector2(0.0f),
+              Color _base = Color(39, 74, 120, 125),
+              Color _hover = Color(89, 124, 170, 125),
+              Color _active = Color(139, 174, 220, 125));
+
+  /**
+   * @brief Create a selectable for a dropdown combo.
+   * @param _name Name of the selectable.
+   * @param _selected option to search for.
+   * @param _base Base color.
+   * @param _hover Hover color.
+   * @param _active Active color.
+   * @return If it was selected.
+   */
+  bool
+  selectable(const ANSICHAR* _name,
+             const String _selected,
+             Color _base =  Color(39, 74, 120, 125),
+             Color _hover = Color(89, 124, 170, 125),
+             Color _active = Color(139, 174, 220, 125));
 
   /**
    * @brief Begin a UI tab.
@@ -323,6 +353,12 @@ class UInterface : public Module<UInterface>
                float& _param,
                float _step = 5.0f,
                float _largeStep = 10.0f);
+
+  bool
+  createInputUInt32(const ANSICHAR* _name,
+                    uint32& _param,
+                    const uint32 _step = 1,
+                    const uint32 _largeStep = 10);
 
   /**
    * @brief Create an input float.
@@ -451,6 +487,38 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
+  createDragU(const ANSICHAR* _name,
+              uint32& _value,
+              const uint32 _speed = 1,
+              const uint32 _min = 1,
+              const uint32 _max = 99999);
+
+  /**
+   * @brief Create a drag input.
+   * @param _name Name of the item.
+   * @param _value Value to modify.
+   * @param _speed Modification speed.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @result If there was a change.
+   */
+  bool
+  createDragI(const ANSICHAR* _name,
+              int32& _value,
+              const int32 _speed = 1,
+              const int32 _min = 1,
+              const int32 _max = 99999);
+
+  /**
+   * @brief Create a drag input.
+   * @param _name Name of the item.
+   * @param _value Value to modify.
+   * @param _speed Modification speed.
+   * @param _min Minimum value.
+   * @param _max Maximum value.
+   * @result If there was a change.
+   */
+  bool
   createDragF(const ANSICHAR* _name,
               float& _value,
               float _speed = 1.0f,
@@ -516,15 +584,6 @@ class UInterface : public Module<UInterface>
    */
   bool
   beginCombo(const ANSICHAR* _name, int32& _previewVal, const Vector<String>& _options);
-
-  /**
-   * @brief Create a selectable for a dropdown combo.
-   * @param _name Name of the selectable.
-   * @param _selected option to search for.
-   * @return If it was selected.
-   */
-  bool
-  selectable(const ANSICHAR* _name, const String _selected);
 
   /**
    * @brief End the creation of a dropdown combo.

@@ -160,6 +160,12 @@ UInterface::tableNextRow()
   ImGui::TableNextRow();
 }
 
+void
+UInterface::tableSetColumnIndex(const uint32 _index)
+{
+  ImGui::TableSetColumnIndex(_index);
+}
+
 void UInterface::tableJumpRow()
 {
   tableNextRow();
@@ -231,12 +237,6 @@ UInterface::endDragDropTarget()
 }
 
 bool
-UInterface::selectable(const ANSICHAR* _name, const Vector2 _size)
-{
-  return ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
-}
-
-bool
 UInterface::beginTabItem(const ANSICHAR* _name)
 {
   return ImGui::BeginTabItem(_name);
@@ -282,6 +282,15 @@ bool
 UInterface::createInputF(const ANSICHAR* _name, float& _param, float _step, float _largeStep)
 {
   return ImGui::InputFloat(_name, &_param, _step, _largeStep);
+}
+
+bool
+UInterface::createInputUInt32(const ANSICHAR* _name,
+                              uint32& _param,
+                              const uint32 _step,
+                              const uint32 _largeStep)
+{
+  return ImGui::InputInt(_name, reinterpret_cast<int32*>(&_param), _step, _largeStep);
 }
 
 bool
@@ -409,6 +418,26 @@ UInterface::createSliderVector3(const ANSICHAR* _name,
 }
 
 bool
+UInterface::createDragU(const ANSICHAR* _name,
+                        uint32& _value,
+                        const uint32 _speed,
+                        const uint32 _min,
+                        const uint32 _max)
+{
+  return ImGui::DragInt(_name, reinterpret_cast<int32*>(&_value), _speed, _min, _max);
+}
+
+bool
+UInterface::createDragI(const ANSICHAR* _name,
+                        int32& _value,
+                        const int32 _speed,
+                        const int32 _min,
+                        const int32 _max)
+{
+  return ImGui::DragInt(_name, &_value, _speed, _min, _max);
+}
+
+bool
 UInterface::createDragF(const ANSICHAR* _name,
                         float& _value,
                         float _speed,
@@ -502,9 +531,29 @@ UInterface::beginCombo(const ANSICHAR* _name,
 }
 
 bool
-UInterface::selectable(const ANSICHAR* _name, const String _selected)
+UInterface::selectable2(const ANSICHAR* _name,
+                        const Vector2 _size,
+                        Color _base,
+                        Color _hover,
+                        Color _active)
 {
-  return ImGui::Selectable(_name, _selected == _name);
+  PushStyleColor(_base, _hover, _active);
+  bool result = ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
+  ImGui::PopStyleColor(3);
+  return result;
+}
+
+bool
+UInterface::selectable(const ANSICHAR* _name,
+                       const String _selected,
+                       Color _base,
+                       Color _hover,
+                       Color _active)
+{
+  PushStyleColor(_base, _hover, _active);
+  bool result = ImGui::Selectable(_name, _selected == _name);
+  ImGui::PopStyleColor(3);
+  return result;
 }
 
 void

@@ -343,41 +343,76 @@ ShaderTest::uInterfaceUpdate()
         }
       }
       im.sameLine();
+      im.createText("Search:");
+      im.sameLine();
       im.createInputText("##Search", &m_searchResource);
-      im.endTabItem();
-      for (auto& asset : assetMan.getAllResources()) {
-        const Path assetPath = String(asset.second->m_resourcePath);
-        const String assetName = assetPath.getFileName();
-        const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
-        const String assetNameLower = stringToLower(assetName);
-        if (asset.second->getType() != kShader && 
-            assetNameLower.find(searchResLower.c_str()) != String::npos) {
-          if (im.createButton(assetName.c_str())) {
+      im.sameLine();
+      // resoruces header
+      if (im.beginTable("resources params", 4)) {
+        im.tableNextRow();
 
-          }
-          if (im.beginDragDropSource()) {
-            const String dragText = "Dragging " + assetName;
-            im.createText(dragText.c_str());
-            const UUID* data = &asset.first;
-            im.setDragDropPayload("RESOURCE_PAYLOAD", data, sizeof(UUID));
-            im.endDragDropSource();
-          }
-          if (im.isItemHovered()) {
-            const String tooltip = "Name: " + assetName + "\n" +
-                                   "Asset ID: " + asset.first.toString() + "\n" +
-                                   "Asset type: " + asset.second->getTypeString() + "\n" +
-                                   "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
-            im.setTooltip(tooltip.c_str());
-          }
-          Vector2 itemPos = im.getItemPosition();
-          Vector2 itemSize = im.getItemSize();
-          if (itemPos.x + itemSize.x < logWinSize.x) {
-            im.sameLine();
+        im.tableNextColumn();
+        im.createText("Item Size:");
+
+        im.tableNextColumn();
+        im.createDragU("##ItemSize", m_resourceItemSize, 1, 1, 999);
+
+        im.tableNextColumn();
+        im.createText("Column Count:");
+
+        im.tableNextColumn();
+        im.createDragU("##ColumnCount", m_resourceWindowCount, 1, 1, 64);
+
+        im.endTable();
+      }
+      im.endTabItem();
+      // -------------------------- //
+      // window for displaying resources
+      // -------------------------- //
+      uint32 column = 0;
+      if (im.beginTable("Editor App", m_resourceWindowCount)) {
+        im.tableNextRow();
+        for (auto& asset : assetMan.getAllResources()) {
+          // search filter
+          const Path assetPath = String(asset.second->m_resourcePath);
+          const String assetName = assetPath.getFileName();
+          const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
+          const String assetNameLower = stringToLower(assetName);
+          // resource search filter result
+          if (asset.second->getType() != kShader &&
+              assetNameLower.find(searchResLower.c_str()) != String::npos) {
+
+            im.tableSetColumnIndex(column);
+            if (im.selectable2(assetName.c_str(), Vector2(m_resourceItemSize))) {
+
+            }
+            if (im.beginDragDropSource()) {
+              const String dragText = "Dragging " + assetName;
+              im.createText(dragText.c_str());
+              const UUID* data = &asset.first;
+              im.setDragDropPayload("RESOURCE_PAYLOAD", data, sizeof(UUID));
+              im.endDragDropSource();
+            }
+            if (im.isItemHovered()) {
+              const String tooltip = "Name: " + assetName + "\n" +
+                "Asset ID: " + asset.first.toString() + "\n" +
+                "Asset type: " + asset.second->getTypeString() + "\n" +
+                "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
+              im.setTooltip(tooltip.c_str());
+            }
+
+            // if the resource window is full, jump to next row.
+            ++column;
+            if (column >= m_resourceWindowCount) {
+              column = 0;
+              im.tableNextRow();
+            }
           }
         }
       }
+      im.endTable();
     }
-      im.endTabBar();
+    im.endTabBar();
   }
   // -------------------------- //
 

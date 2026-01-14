@@ -182,6 +182,8 @@ class ShaderTest : public BaseApp
   float m_IBLIntensity;
   float m_exposure;
 
+  uint32 m_resourceWindowCount = 8;
+  uint32 m_resourceItemSize = 128;
 
   String m_searchMesh;
   String m_searchResource;

@@ -662,6 +662,7 @@ ShaderTest::onUpdate()
   const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
   const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
+  SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
 
   const Vector2 winSize = api.getSwapChain()->getSize();
 
@@ -752,6 +753,9 @@ ShaderTest::onUpdate()
   // update shadow-specular quad pass
   lightQuad->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
+
+  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
+                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
 
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });

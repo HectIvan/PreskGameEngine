@@ -45,7 +45,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float4 roughSam = roughnessTex.Sample(samLinear, input.Tex);
   float4 emissSam = emissiveTex.Sample(samLinear, input.Tex);
 
-  if (colorSam.a <= 0.4f) {
+  if (colorSam.a <= 0.95f) {
     clip(-1);
   }
   // modify the normal vector 

@@ -209,6 +209,7 @@ BaseApp::update()
   SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
   SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
+  SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
 
   // update normal && base shadow pass buffers.
   basePass->updateCBuffer(0, &view, m4x4Size);
@@ -224,6 +225,9 @@ BaseApp::update()
   Vector4 iblParams = Vector4(1.0f);
   quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &iblParams },
                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
+
+  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &iblParams },
+                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
 
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
@@ -261,6 +265,7 @@ BaseApp::render()
   const SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
   const SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
   const SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
+  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
 
   // Get all actors
   const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
@@ -285,11 +290,13 @@ BaseApp::render()
   //        uint32 threadHeight = 16;
   //        uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   //        uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
-  // if shadows are set to be rendered
-  api.clearRenderTargetViews(Color::WHITE, quadLight->getOutputTextures());
-  quadLight->beginPass();
+  quadLight->beginPass(Color::WHITE);
   api.draw(3, 0);
   quadLight->endPass();
+
+  transparencyBRDF->beginPass(Color::WHITE);
+  api.draw(3, 0);
+  transparencyBRDF->endPass();
 
   // ssao pass
   api.clearRenderTargetViews(Color::WHITE, ssaoPass->getOutputTextures());

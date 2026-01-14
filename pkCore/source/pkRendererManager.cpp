@@ -62,6 +62,9 @@ RendererManager::init()
   SPtr<Texture> brdfRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
 
+  SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
+
   // skybox texture.
   SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
@@ -71,7 +74,7 @@ RendererManager::init()
   m_gBuffers.insert({ G_BUFFERS::kGB_Positions, posRT });
 
   SPtr<Texture> posTranspRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_TranspPos, posRT });
+  m_gBuffers.insert({ G_BUFFERS::kGB_TranspPos, posTranspRT });
 
   // positions texture for the light.
   txDesc.width = winWidth * sizeMulShadow;
@@ -206,6 +209,7 @@ RendererManager::createPasses()
   SPtr<Texture> transpORM = getGBuffer(G_BUFFERS::kGB_TranspORM);
   SPtr<Texture> transpEmiss = getGBuffer(G_BUFFERS::kGB_TranspEmiss);
   SPtr<Texture> transpPos = getGBuffer(G_BUFFERS::kGB_TranspPos);
+  SPtr<Texture> brdfTranspRT = getGBuffer(G_BUFFERS::kGB_BRDFTransp);
 
   // Depth textures
   SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -268,6 +272,15 @@ RendererManager::createPasses()
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Light, lightQuad });
+
+  /****************************************************************************
+   * Shadow Specular Transparency Quad Pass
+   ***************************************************************************/
+  pDesc.inputs = { transpDepth, transpPos, posLightRT, transpAlbedo, transpNormal, transpORM, m_mainSkybox, cubeMapRT };
+  pDesc.outputs = { brdfTranspRT };
+  SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_LightTransparency, lightTranspQuad });
 
   /****************************************************************************
    * Skybox Quad pass
@@ -359,7 +372,9 @@ RendererManager::createPasses()
                    emissRT,
                    emissBlurRT,
                    skyboxRT,
-                   DepthBuffer };
+                   DepthBuffer,
+                   transpDepth,
+                   brdfTranspRT };
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> TonePass = make_shared<Pass>(pDesc);

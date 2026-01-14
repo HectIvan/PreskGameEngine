@@ -42,6 +42,7 @@ namespace G_BUFFERS
     kGB_ORM, // oclussion roughness metallic
     kGB_SSAO, // screen space ambient occlusion
     kGB_BRDF, // light buffer
+    kGB_BRDFTransp, // light transparency buffer
     kGB_Emissive, // base emissive buffer
     kGB_EmissiveHBlur, // emissive with horizontal blur
     kGB_EmissiveBlur, // emissive with full blur
@@ -88,6 +89,7 @@ namespace PASS_TYPE
     kP_LumBlurH,
     kP_LightPositions,
     kP_Light,
+    kP_LightTransparency,
     kP_SkyBox,
     kP_SSAO,
     kP_Tone,

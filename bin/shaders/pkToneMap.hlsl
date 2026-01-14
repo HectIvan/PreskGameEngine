@@ -5,6 +5,8 @@ Texture2D emissive : register(t2);
 Texture2D emissiveBlur : register(t3);
 Texture2D skybox : register(t4);
 Texture2D depth : register(t5);
+Texture2D transpDepth : register(t6);
+Texture2D transpAlbedo : register(t7);
 
 // sampler
 SamplerState samState : register(s0);
@@ -32,6 +34,9 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 skyboxSample = skybox.Sample(samState, input.TexCoord);
   float depthSample = depth.Sample(samState, input.TexCoord).r;
   
+  float transpDepthSample = transpDepth.Sample(samState, input.TexCoord).r;
+  float4 transpAlbedoSample = transpAlbedo.Sample(samState, input.TexCoord);
+  
   finalColor = baseSample;
   
   if (depthSample >= 1.0f) {
@@ -39,6 +44,11 @@ float4 PS(PS_INPUT input) : SV_Target0
   }
   
   finalColor += lumBlurSample + emissiveSample + emissiveBlurSample;
+  
+  // transparency blending
+  if (depthSample > transpDepthSample) {
+    finalColor = lerp(finalColor, transpAlbedoSample, transpAlbedoSample.a);
+  }
   
   const float gamma = 2.2f;
   // exposure tone mapping

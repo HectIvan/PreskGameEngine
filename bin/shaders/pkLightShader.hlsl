@@ -195,12 +195,19 @@ float4 PS(PS_INPUT input) : SV_Target0
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
-  float3 albedo = albedoMap.Sample(samState, input.TexCoord).rgb;
+  float4 albedo = albedoMap.Sample(samState, input.TexCoord);
+  
+  // check if the alpha is below threshold
+  if (albedo.a <= 0.05f) {
+    discard;
+  }
+  
   float3 ormValues = ormMap.Sample(samState, input.TexCoord).rgb;
   float ao = ormValues.r;
   float metallic = ormValues.b;
   float roughness = ormValues.g;
   float3 worldPos = posMap.Sample(samState, input.TexCoord).xyz;
+  
   
   /**
    * alpha values
@@ -214,7 +221,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   float3 normal = normalize(normalTex.xyz);
-  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metallic.rrr);
+  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic.rrr);
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));
   float3 F = Fresnel(F0, max(VoH, 0.0f));
@@ -226,7 +233,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   // Diffuse energy weight
   float3 kD = (1.0f - F) * (1.0f - metallic);
-  float3 fLambert = albedo / PI;
+  float3 fLambert = albedo.rgb / PI;
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
@@ -276,5 +283,5 @@ float4 PS(PS_INPUT input) : SV_Target0
     finalColor *= shadowColor.xxxx;
   }
   
-  return finalColor;
+  return float4(finalColor.rgb, albedo.a);
 }

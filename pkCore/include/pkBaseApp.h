@@ -30,6 +30,7 @@ using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
 using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
 using pkEngineSDK::PASS_TYPE::kP_LightPositions;
 using pkEngineSDK::PASS_TYPE::kP_Light;
+using pkEngineSDK::PASS_TYPE::kP_LightTransparency;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_SSAO;
 using pkEngineSDK::PASS_TYPE::kP_Tone;

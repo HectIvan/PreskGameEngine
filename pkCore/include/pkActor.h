@@ -18,6 +18,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkComponent.h"
 #include "pkMatrix4.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {
@@ -35,21 +36,21 @@ class PK_CORE_EXPORT Actor
    * @param _transform Transform of the actor.
    */
   void
-  setTransform(Matrix4 _transform);
+  setTransform(const Matrix4& _transform);
 
   /**
    * @brief Set the position of the actor.
    * @param _translation Translation matrix.
    */
   void
-  setPosition(Matrix4 _translation);
+  setPosition(Matrix4& _translation);
   
   /**
    * @brief Set the position of the actor.
    * @param _translation Translation vector.
    */
   void
-  setPosition(Vector3 _position);
+  setPosition(const Vector3& _position);
 
   /**
    * @brief Set the position of the actor.
@@ -58,50 +59,55 @@ class PK_CORE_EXPORT Actor
    * @param _z Translation in the Z vector.
    */
   void
-  setPosition(float _x, float _y, float _z);
+  setPosition(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Modify the actor translation with a new value.
    * @param _addPos Vector with the positon increase values.
    */
   void
-  move(Vector3 _addPos);
+  move(const Vector3& _addPos);
 
   /**
    * @brief Move the actor on the forward vector.
+   * @param _offset How much will the movement be.
    */
   void
-  moveForward(float _offset);
+  moveForward(const float& _offset);
 
   /**
    * @brief Move the actor relative to its forward vector.
+   * @param _offset How much will the movement be.
    */
   void
-  moveForwardLocal(float _offset);
+  moveForwardLocal(const float& _offset);
 
   /**
    * @brief Move the actor on the right vector.
    */
   void
-  moveRight(float _offset);
+  moveRight(const float& _offset);
 
   /**
    * @brief Move the actor relative to its right vector.
+   * @param _offset How much will the movement be.
    */
   void
-  moveRightLocal(float _offset);
+  moveRightLocal(const float& _offset);
 
   /**
-   * @brief Move the actor on the up vector
+   * @brief Move the actor on the up vector.
+   * @param _offset How much will the movement be.
    */
   void
-  moveUp(float _offset);
+  moveUp(const float& _offset);
 
   /**
    * @brief Move the actor relative to its up vector.
+   * @param _offset How much will the movement be.
    */
   void
-  moveUpLocal(float _offset);
+  moveUpLocal(const float& _offset);
 
   /**
    * @brief Move the actor using the verlet integration.
@@ -109,7 +115,7 @@ class PK_CORE_EXPORT Actor
    * @param _force Force that the object will move with.
    */
   void
-  moveVerlet(Vector3 _direction, float _force);
+  moveVerlet(const Vector3& _direction, const float& _force);
 
   /**
    * @brief Modify the actor translation with a new value.
@@ -118,7 +124,7 @@ class PK_CORE_EXPORT Actor
    * @param _addZ Increase in the Z axis.
    */
   void
-  move(float _addX, float _addY, float _addZ);
+  move(const float& _addX, const float& _addY, const float& _addZ);
   
   /**
    * @brief Get the actor position.
@@ -132,37 +138,60 @@ class PK_CORE_EXPORT Actor
    * @param _rotation Rotation Vector.
    */
   void
-  setRotation(Vector3 _rotation);
+  setRotation(const Vector3& _rotation, const PK_ROT_TYPE::E _rotType = PK_ROT_TYPE::kDegrees);
 
   /**
    * @brief Set the rotation of the Actor.
    * @param _x Rotation in the X vector.
    * @param _y Rotation in the Y vector.
    * @param _z Rotation in the Z vector.
+   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  setRotation(float _x, float _y, float _z);
+  setRotation(const float& _x,
+              const float& _y,
+              const float& _z,
+              const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+
+  /**
+   * @brief Rotate the Actor.
+   * @param _rotation Rotation Vector.
+   */
+  void
+  rotate(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+
+  /**
+   * @brief Rotate the Actor.
+   * @param _x Rotation in the X vector.
+   * @param _y Rotation in the Y vector.
+   * @param _z Rotation in the Z vector.
+   */
+  void
+  rotate(const float& _x,
+         const float& _y,
+         const float& _z,
+         const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
 
   /**
    * @brief Set the scale of the Actor.
    * @param _scale Scale Matrix.
    */
   void
-  setScale(Matrix4 _scale);
+  setScale(Matrix4& _scale);
 
   /**
    * @brief Set the scale of the Actor.
    * @param _val Scale in all axis.
    */
   void
-  setScale(float _val);
+  setScale(const float& _val);
 
   /**
    * @brief Set the scale of the Actor.
    * @param _scale Scale Vector.
    */
   void
-  setScale(Vector3 _scale);
+  setScale(const Vector3& _scale);
 
   /**
    * @brief Set the scale of the Actor.
@@ -171,7 +200,7 @@ class PK_CORE_EXPORT Actor
    * @param _z Scale in the z.
    */
   void
-  setScale(float _x, float _y, float _z);
+  setScale(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Get the actor scale.

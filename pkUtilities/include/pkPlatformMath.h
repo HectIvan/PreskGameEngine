@@ -29,6 +29,14 @@
 namespace pkEngineSDK 
 {
 
+namespace PK_ROT_TYPE
+{
+  enum E {
+    kDegrees = 0,
+    kRadians
+  };
+}
+
 class PK_UTILITY_EXPORT PlatformMath
 {
  public:

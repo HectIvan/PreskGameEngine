@@ -88,13 +88,13 @@ ShaderTest::onInit()
                                          Vector3::FORWARD + camPos * -1.0f, // target
                                          Vector3(0.0f, 1.0f, 0.0f)); // up vector
   // camera sensitivity
-  m_sensX = 0.3f;
-  m_sensY = 0.3f;
+  m_sensX = 30.0f;
+  m_sensY = 30.0f;
 
   // create light
   m_light = activeScene->instantiate("Light");
   m_light->setPosition(0.0f, 1000.0f, 0.0f);
-  m_light->setRotation(1.5, 0, 0);
+  m_light->setRotation(90, 0, 0);
   m_light->addComponent(make_shared<Light>());
   const SPtr<Light> lightCom = m_light->getComponent<Light>();
 
@@ -114,7 +114,7 @@ ShaderTest::onInit()
   m_vSync = false;
   m_IBLIntensity = 1.0f;
   // luminance blur
-  m_blurRadius = 18.0f;
+  m_blurRadius = 0.01f;
   m_blurStrength = 1.0f;
   m_lumThreshold = 6.0f;
   // emissive blur
@@ -219,8 +219,7 @@ ShaderTest::input()
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
-    posDif *= Math::DEG2RAD;
-    m_camera->m_rotation += Vector3(-posDif.y, -posDif.x, 0.0f);
+    m_camera->rotate(-posDif.y, -posDif.x, 0.0f, kDegrees);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }

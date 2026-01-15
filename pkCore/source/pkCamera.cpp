@@ -135,24 +135,39 @@ Camera::moveUpLocal(float _offset)
 }
 
 void
-Camera::rotate(float _x, float _y, float _z)
+Camera::rotate(const Vector3& _rotate, const PK_ROT_TYPE::E& _rotType)
 {
-  m_view *= Matrix4::rotation(_x, _y, _z);
+  rotate(_rotate.x, _rotate.y, _rotate.z, _rotType);
+}
+
+void
+Camera::rotate(const float& _x,
+               const float& _y,
+               const float& _z,
+               const PK_ROT_TYPE::E& _rotType)
+{
+  Vector3 rot = Vector3(_x, _y, _z);
+
+  if (_rotType == PK_ROT_TYPE::kDegrees) {
+    rot *= Math::DEG2RAD;
+  }
+
+  m_view *= Matrix4::rotation(rot);
   m_at = m_eye + m_view.getForwardVector();
   m_up = m_eye.xyz() + m_view.getUpVector();
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
-Camera::rotate(Vector3 _rotate)
+Camera::rotation(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType)
 {
-  rotate(_rotate.x, _rotate.y, _rotate.z);
-}
+  Vector3 rot = _rotation;
 
-void
-Camera::rotation(Vector3 _rotation)
-{
-  m_view = Matrix4::rotation(_rotation);
+  if (_rotType == PK_ROT_TYPE::kDegrees) {
+    rot *= Math::DEG2RAD;
+  }
+
+  m_view = Matrix4::rotation(rot);
   m_at = m_eye + m_view.getForwardVector();
   m_up = m_eye.xyz() + m_view.getUpVector();
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);

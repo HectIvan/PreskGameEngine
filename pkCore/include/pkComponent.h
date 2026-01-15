@@ -21,6 +21,7 @@
 **/
 /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkPlatformMath.h"
 
 namespace pkEngineSDK
 {

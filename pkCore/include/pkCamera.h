@@ -163,26 +163,32 @@ class PK_CORE_EXPORT Camera : public Component
 
   /**
    * @brief Rotate the camera.
-   * @param _x x rotation amount.
-   * @param _y y rotation amount.
-   * @param _z z rotation amount.
+   * @param _rotate Rotation amount.
+   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  rotate(float _x, float _y, float _z);
+  rotate(const Vector3& _rotate, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
 
   /**
    * @brief Rotate the camera.
-   * @param _rotate Rotation amount.
+   * @param _x x rotation amount.
+   * @param _y y rotation amount.
+   * @param _z z rotation amount.
+   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  rotate(Vector3 _rotate);
+  rotate(const float& _x,
+         const float& _y,
+         const float& _z,
+         const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
 
   /**
    * @brief Set the rotation of the camera.
    * @param _rotation New rotation values.
+   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  rotation(Vector3 _rotation);
+  rotation(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
 
   /**
    * @brief Get the forward vector of the camera.

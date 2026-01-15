@@ -39,6 +39,9 @@ using pkEngineSDK::PASS_TYPE::kP_Luminance;
 using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
 using pkEngineSDK::PASS_TYPE::kP_LumBlur;
 
+using pkEngineSDK::PK_ROT_TYPE::kDegrees;
+using pkEngineSDK::PK_ROT_TYPE::kRadians;
+
 namespace pkEngineSDK
 {
 

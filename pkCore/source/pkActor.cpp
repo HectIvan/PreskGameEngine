@@ -25,100 +25,141 @@ Actor::Actor()
 }
 
 void
-Actor::setTransform(Matrix4 _transform)
+Actor::setTransform(const Matrix4& _transform)
 {
   m_transform = _transform;
 }
 
 void
-Actor::setPosition(Matrix4 _translation)
+Actor::setPosition(Matrix4& _translation)
 {
   setPosition(_translation.getTranslation3());
 }
 
 void
-Actor::setPosition(Vector3 _position)
+Actor::setPosition(const Vector3& _position)
 {
   setPosition(_position.x, _position.y, _position.z);
 }
 
 void
-Actor::setPosition(float _x, float _y, float _z)
+Actor::setPosition(const float& _x, const float& _y, const float& _z)
 {
   m_position = Vector3(_x, _y, _z);
   generateNewTransform();
 }
 
 void
-Actor::move(Vector3 _addPos)
+Actor::move(const Vector3& _addPos)
 {
   move(_addPos.x, _addPos.y, _addPos.z);
 }
 
 void
-Actor::moveForward(float _offset)
+Actor::moveForward(const float& _offset)
 {
   move(Vector3::FORWARD * _offset);
 }
 
 void
-Actor::moveForwardLocal(float _offset)
+Actor::moveForwardLocal(const float& _offset)
 {
   Vector3 newOffset = m_transform.getForwardVector() * _offset;
   move(newOffset);
 }
 
 void
-Actor::moveRight(float _offset)
+Actor::moveRight(const float& _offset)
 {
   move(Vector3::RIGHT * _offset);
 }
 
 void
-Actor::moveRightLocal(float _offset)
+Actor::moveRightLocal(const float& _offset)
 {
   Vector3 newOffset = m_transform.getRightVector() * _offset;
   move(newOffset);
 }
 
 void
-Actor::moveUp(float _offset)
+Actor::moveUp(const float& _offset)
 {
   move(Vector3::UP * _offset);
 }
 
 void
-Actor::moveUpLocal(float _offset)
+Actor::moveUpLocal(const float& _offset)
 {
   Vector3 newOffset = m_transform.getUpVector() * _offset;
   move(newOffset);
 }
 
 void
-Actor::moveVerlet(Vector3 _direction, float _force)
+Actor::moveVerlet(const Vector3& _direction, const float& _force)
 {
   m_transform.setTranslation((m_transform.getTranslation3() * 2) -
                               m_prevTransform.getTranslation3() + (_direction * _force));
 }
 
 void
-Actor::move(float _addX, float _addY, float _addZ)
+Actor::move(const float& _addX, const float& _addY, const float& _addZ)
 {
   m_position += Vector3(_addX, _addY, _addZ);
   generateNewTransform();
 }
 
 void
-Actor::setRotation(Vector3 _rotation)
+Actor::setRotation(const Vector3& _rotation, const PK_ROT_TYPE::E _rotType)
 {
-  setRotation(_rotation.x, _rotation.y, _rotation.z);
+  setRotation(_rotation.x, _rotation.y, _rotation.z, _rotType);
 }
 
 void
-Actor::setRotation(float _x, float _y, float _z)
+Actor::setRotation(const float& _x,
+                   const float& _y,
+                   const float& _z,
+                   const PK_ROT_TYPE::E& _rotType)
 {
-  m_rotation = Vector3(_x, _y, _z);
-  Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
+  // m_rotation = Vector3(_x, _y, _z);
+  // Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
+
+  Vector3 rot = Vector3(_x, _y, _z);
+
+  if (_rotType == PK_ROT_TYPE::kRadians) {
+    rot *= Math::RAD2DEG;
+  }
+
+  m_rotation = rot;
+  Matrix4 rotMat = Matrix4::rotation(rot);
+  
+  // ---------------------------------------------------------------
+  m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
+  m_right = (rotMat * Vector4::RIGHT).xyz().normalized();
+  m_up = (rotMat * Vector4::UP).xyz().normalized();
+
+  generateNewTransform();
+}
+
+void
+Actor::rotate(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType)
+{
+  rotate(_rotation.x, _rotation.y, _rotation.z, _rotType);
+}
+
+void
+Actor::rotate(const float& _x,
+              const float& _y,
+              const float& _z,
+              const PK_ROT_TYPE::E& _rotType)
+{
+  Vector3 addRot = Vector3(_x, _y, _z);
+
+  if (_rotType == PK_ROT_TYPE::kDegrees) {
+    addRot *= Math::DEG2RAD;
+  }
+
+  m_rotation += addRot;
+  Matrix4 rotMat = Matrix4::rotation(m_rotation);
 
   m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
   m_right = (rotMat * Vector4::RIGHT).xyz().normalized();
@@ -128,30 +169,33 @@ Actor::setRotation(float _x, float _y, float _z)
 }
 
 void
-Actor::setScale(Matrix4 _scale)
+Actor::setScale(Matrix4& _scale)
 {
   setScale(_scale.getScale3());
 }
 
 void
-Actor::setScale(float _val) {
+Actor::setScale(const float& _val) {
   setScale(_val, _val, _val);
 }
 
 void
-Actor::setScale(Vector3 _scale)
+Actor::setScale(const Vector3& _scale)
 {
   setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
-Actor::setScale(float _x, float _y, float _z)
+Actor::setScale(const float& _x, const float& _y, const float& _z)
 {
   // make sure scale is never 0
-  if (_x == 0.0f) { _x = Math::SMALL_NUMBER; }
-  if (_y == 0.0f) { _y = Math::SMALL_NUMBER; }
-  if (_z == 0.0f) { _z = Math::SMALL_NUMBER; }
-  m_scale = Vector3(_x, _y, _z);
+  float x = _x;
+  float y = _y;
+  float z = _z;
+  if (_x == 0.0f) { x = Math::SMALL_NUMBER; }
+  if (_y == 0.0f) { y = Math::SMALL_NUMBER; }
+  if (_z == 0.0f) { z = Math::SMALL_NUMBER; }
+  m_scale = Vector3(x, y, z);
 
   generateNewTransform();
 }

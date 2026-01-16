@@ -409,9 +409,18 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _scaleZ The scale on the Z coordinate.
    * @return This matrix transposed.
    */
-  static Matrix4
-  matrixScaling(float& _scaleX, float& _scaleY, float& _scaleZ);
+  static const Matrix4
+  matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ);
   
+  /**
+   * @brief The translation matrix that is created from
+   * the Vector3 given to it.
+   * @param _position vector position.
+   * @return The translation matrix at the position given to it.
+   */
+  static const Matrix4
+  translation(const Vector3& _position);
+
   /**
    * @brief The translation matrix that is created from
    * the 3 coordinates given to it.
@@ -420,44 +429,37 @@ class PK_UTILITY_EXPORT Matrix4
    * @param offsetZ Coordinate at Z.
    * @return The translation matrix at the position given to it.
    */
-  static Matrix4
-  translation(float& _offsetX, float& _offsetY, float& _offsetZ);
-
-  /**
-   * @brief The translation matrix that is created from
-   * the Vector3 given to it.
-   * @param _position vector position.
-   * @return The translation matrix at the position given to it.
-   */
-  static Matrix4
-  translation(Vector3 _position);
+  static const Matrix4
+  translation(const float& _offsetX, const float& _offsetY, const float& _offsetZ);
 
   /**
    * @brief Set the translation
    * @param _pos vector position.
    */
   void
-  setTranslation(Vector3 _pos);
+  setTranslation(const Vector3& _pos);
 
   /**
    * @brief Set the translation
-   * @param _pos vector position.
+   * @param _x Coordinate at X.
+   * @param _y Coordinate at Y.
+   * @param _z Coordinate at Z.
    */
   void
-  setTranslation(float _x, float _y, float _z);
+  setTranslation(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Get the current matrix translation.
    * @return The matrix translation.
    */
-  Matrix4
+  const Matrix4
   getTranslation();
 
   /**
    * @brief Get the current Vector3 translation.
    * @return The Vector translation.
    */
-  Vector3
+  const Vector3
   getTranslation3();
   
   /**
@@ -466,21 +468,21 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _position Vector position.
    * @return The translation matrix at the position given to it.
    */
-  static Matrix4
-  scale(Vector3& _scale);
+  static const Matrix4
+  scale(const Vector3& _scale);
 
   /**
    * @brief Get the current scale matrix.
    * @return The scale matrix.
    */
-  Matrix4
+  const Matrix4
   getScale();
 
   /**
    * @brief Get the current scale vector.
    * @return The scale vector.
    */
-  Vector3
+  const Vector3
   getScale3();
 
   /**
@@ -488,14 +490,21 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _scale New scale.
    */
   void
-  setScale(Matrix4 _scale);
+  setScale(const Vector3& _scale);
 
   /**
    * @brief Set the scale of the matrix.
    * @param _scale New scale.
    */
   void
-  setScale(Vector3 _scale);
+  setScale(Matrix4& _scale);
+
+  /**
+   * @brief Set the scale of the matrix.
+   * @param _val Value of the scale.
+   */
+  void
+  setScale(const float& _val);
 
   /**
    * @brief Set the scale of the matrix.
@@ -504,27 +513,20 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _z Scale in z.
    */
   void
-  setScale(float _x, float _y, float _z);
-
-  /**
-   * @brief Set the scale of the matrix.
-   * @param _val Value of the scale.
-   */
-  void
-  setScale(float _val);
+  setScale(const float& _x, const float& _y, const float& _z);
 
   /**
    * Get a matrix rotation from an axis and an angle
    * 
    */
   static Matrix4
-  MatrixRotationAxis(Vector3 _axis, float _angle);
+  MatrixRotationAxis(Vector3& _axis, const float& _angle);
 
   /**
    * @brief Get the rotation matrix.
    * @return The rotation matrix.
    */
-  Matrix4
+  const Matrix4
   getRotation();
 
   /**
@@ -532,8 +534,8 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _scale Scale to extract from the rotation matrix.
    * @return The rotation matrix.
    */
-  Matrix4
-  getRotationNoScale(Vector3 _scale);
+  const Matrix4
+  getRotationNoScale(const Vector3& _scale);
   
   /**
    * @brief The rotation matrix that is created from
@@ -543,7 +545,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _angleZ Angle at Z.
    * @return The rotation matrix at the rotations given to it.
    */
-  static Matrix4
+  static const Matrix4
   rotation(const float& _angleX, const float& _angleY, const float& _angleZ);
 
   /**
@@ -552,7 +554,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _rot Vector rotations.
    * @return The rotation matrix at the rotations given to it.
    */
-  static Matrix4
+  static const Matrix4
   rotation(const Vector3& _rot);
   
   /**

@@ -21,7 +21,7 @@
 
 #include "pkAssetResourceManager.h"
 #include "pkAssimpModelCodec.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkLogger.h"
 #include "pkFileSystem.h"
 #include "pkMaterialManager.h"
@@ -195,7 +195,7 @@ SPtr<Mesh>
 processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  GPUResourceManager& resourceMan = g_GPUResourceManager();
+  ModelManager& resourceMan = g_ModelManager();
   MaterialManager& matMan = g_MaterialManager();
   Logger& log = g_Logger();
 

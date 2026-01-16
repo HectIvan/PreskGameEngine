@@ -11,7 +11,7 @@
  */
  /*****************************************************************************/
 #include "pkAssetResourceManager.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkLogger.h"
 #include "pkMaterialResource.h"
 #include "pkModelCodec.h"

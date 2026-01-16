@@ -1,8 +1,8 @@
 #include "pkAssetResourceManager.h"
 #include "pkLogger.h"
-#include "pkGPUResourceManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkModel.h"
+#include "pkModelManager.h"
 #include "pkModelResource.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
@@ -11,13 +11,13 @@ namespace pkEngineSDK
 {
 
 void
-GPUResourceManager::init()
+ModelManager::init()
 {
   
 }
 
 SPtr<Model>
-GPUResourceManager::loadPKModel(const UUID& _ID)
+ModelManager::loadPKModel(const UUID& _ID)
 {
   // check if the model has already been stored.
   SPtr<Model> model = getModelMemory(_ID);
@@ -66,7 +66,7 @@ GPUResourceManager::loadPKModel(const UUID& _ID)
 }
 
 SPtr<Mesh>
-GPUResourceManager::searchMesh(const String _name)
+ModelManager::searchMesh(const String _name)
 {
   for (uint32 i = 0; i < m_meshes.size(); ++i) {
     SPtr<Mesh> mesh = m_meshes[i];
@@ -78,13 +78,13 @@ GPUResourceManager::searchMesh(const String _name)
 }
 
 void
-GPUResourceManager::insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel)
+ModelManager::insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel)
 {
   m_models.insert({ _ID, _pModel });
 }
 
 SPtr<Model>
-GPUResourceManager::getModelMemory(const UUID& _ID)
+ModelManager::getModelMemory(const UUID& _ID)
 {
   for (auto& model : m_models) {
     if (_ID.toString() == model.first.toString()) { // to do: make a == operator
@@ -94,9 +94,9 @@ GPUResourceManager::getModelMemory(const UUID& _ID)
   return nullptr;
 }
 
-PK_CORE_EXPORT GPUResourceManager&
-g_GPUResourceManager()
+PK_CORE_EXPORT ModelManager&
+g_ModelManager()
 {
-  return GPUResourceManager::instance();
+  return ModelManager::instance();
 }
 }

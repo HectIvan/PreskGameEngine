@@ -28,7 +28,7 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
   AssetResourceManager::startUp();
   DLLManager::startUp();
   EventQueue::startUp();
-  GPUResourceManager::startUp();
+  ModelManager::startUp();
   MaterialCodec::startUp();
   MaterialManager::startUp();
   RendererManager::startUp();
@@ -60,7 +60,7 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
   g_SceneManager().init();
   g_RenderManager().init();
   g_TextureManager().init();
-  g_GPUResourceManager().init();
+  g_ModelManager().init();
 
   onInit();
 }
@@ -129,7 +129,7 @@ BaseApp::messageLoop()
   // if the program is shut dowor closes for any reason, close everything properly.
   // Logger::shutDown();
   // RendererManager::shutDown();
-  // GPUResourceManager::shutDown();
+  // ModelManager::shutDown();
   // SceneManager::shutDown();
   // TextureManager::shutDown();
   // TimeManager::shutDown();

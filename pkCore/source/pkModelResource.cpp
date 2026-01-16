@@ -1,5 +1,5 @@
 #include "pkAssetResourceManager.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkLogger.h"
 #include "pkMaterialManager.h"
 #include "pkModelResource.h"

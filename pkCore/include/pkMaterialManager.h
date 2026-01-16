@@ -26,7 +26,7 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
 {
  public:
-   MaterialManager() = default;
+  MaterialManager() = default;
   virtual ~MaterialManager() = default;
 
   /**
@@ -55,7 +55,7 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    * @return Pointer to the newly created material.
    */
   SPtr<Material>
-  loadMaterial(UUID& _ID);
+  loadMaterial(const UUID& _ID);
 
   /**
    * @brief Get a saved material via its ID.

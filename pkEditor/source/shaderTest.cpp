@@ -1,7 +1,7 @@
 #include "ActorInspector.h"
 #include "pkAssetResourceManager.h"
 #include "pkColor.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkGraphicTypes.h"
 #include "pkLogger.h"
@@ -16,6 +16,7 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "shaderTest.h"
+#include "pkMaterialManager.h"
 
 using pkEngineSDK::AssetResourceManager;
 using pkEngineSDK::ANSICHAR;
@@ -24,6 +25,7 @@ using pkEngineSDK::GraphicsAPI;
 using pkEngineSDK::g_AssetResourceManager;
 using pkEngineSDK::g_GraphicAPI;
 using pkEngineSDK::g_Logger;
+using pkEngineSDK::g_MaterialManager;
 using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_ShaderManager;
@@ -39,6 +41,7 @@ using pkEngineSDK::Math;
 using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelResource;
 using pkEngineSDK::RESOURCE_TYPE::kShader;
+using pkEngineSDK::RESOURCE_TYPE::kMaterial;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::ShaderManager;
 using pkEngineSDK::stringToLower;
@@ -228,7 +231,7 @@ void
 ShaderTest::uInterfaceUpdate()
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
-  GPUResourceManager& gpuResourceMan = g_GPUResourceManager();
+  ModelManager& modelMan = g_ModelManager();
   ModelCodec& modelCodec = g_ModelCodec();
   RendererManager& rm = g_RenderManager();
   SceneManager& sm = g_SceneManager();
@@ -258,7 +261,7 @@ ShaderTest::uInterfaceUpdate()
   if (im.beginDragDropTarget()) {
     const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
-      SPtr<Model> model = gpuResourceMan.loadPKModel(*id);
+      SPtr<Model> model = modelMan.loadPKModel(*id);
       if (model) {
         SPtr<Actor> newActor = currentScene->instantiate(model->getName());
         newActor->addComponent(model);
@@ -384,7 +387,12 @@ ShaderTest::uInterfaceUpdate()
             im.tableSetColumnIndex(column);
             const ANSICHAR* assetNameCstr = assetName.c_str();
             if (im.selectable2(assetNameCstr, Vector2(m_resourceItemSize))) {
-
+              if (asset.second->getType() == kMaterial) {
+                const SPtr<Material> mat = g_MaterialManager().getMaterial(asset.first);
+                if (mat) {
+                  m_selectedMaterial = mat;
+                }
+              }
             }
             if (im.beginDragDropSource()) {
               const String dragText = "Dragging " + assetName;
@@ -448,7 +456,7 @@ ShaderTest::uInterfaceUpdate()
   m_rightWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
   if (im.beginTabBar("InspectorTab")) {
     // -------------------------- //
-    // actor tab
+    // Actor tab
     if (m_selectedActor && im.beginTabItem("Actor")) {
       ActorInspector inspector(m_selectedActor);
       // transform window
@@ -484,7 +492,7 @@ ShaderTest::uInterfaceUpdate()
             if (path.toString() != "") {
               SPtr<BaseResource> resource = make_shared<ModelResource>();
               resource->softLoad(path);
-              m_selectedActor->addComponent(gpuResourceMan.loadPKModel(resource->m_id));
+              m_selectedActor->addComponent(modelMan.loadPKModel(resource->m_id));
               
               // const String ID = assetManager.createModelResource(path);
               // m_selectedActor->addComponent(assetManager.loadResource(path));
@@ -494,7 +502,7 @@ ShaderTest::uInterfaceUpdate()
         if (im.beginDragDropTarget()) {
           UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
           if (id) {
-            SPtr<Model> model = gpuResourceMan.loadPKModel(*id);
+            SPtr<Model> model = modelMan.loadPKModel(*id);
             m_selectedActor->addComponent(model);
           }
           im.endDragDropTarget();
@@ -512,7 +520,7 @@ ShaderTest::uInterfaceUpdate()
       im.endTabItem();
     }
     // -------------------------- //
-    // app tab.
+    // App tab.
     if (im.beginTabItem("App")) {
       // get framerate
       float f_fps = 1.0f / g_TimeManager().m_deltaTime;
@@ -679,6 +687,12 @@ ShaderTest::uInterfaceUpdate()
       im.endTabItem();
     }
     // -------------------------- //
+    // Material tab.
+    // -------------------------- //
+    if (m_selectedMaterial && im.beginTabItem(m_selectedMaterial->getName())) {
+
+      im.endTabItem();
+    }
     im.endTabBar();
   }
   im.endWindowCreate();

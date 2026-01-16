@@ -11,7 +11,7 @@
 **/
 /*********************************************/
 #include "pkCamera.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkLight.h"
 #include "pkLogger.h"
 #include "pkMaterial.h"
@@ -36,8 +36,8 @@ using pkEngineSDK::COMPONENT_TYPE::kLight;
 using pkEngineSDK::COMPONENT_TYPE::kMaterial;
 using pkEngineSDK::COMPONENT_TYPE::kModel;
 using pkEngineSDK::COMPONENT_TYPE::kUnknown;
-using pkEngineSDK::GPUResourceManager;
-using pkEngineSDK::g_GPUResourceManager;
+using pkEngineSDK::ModelManager;
+using pkEngineSDK::g_ModelManager;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_MaterialManager;
 using pkEngineSDK::g_ModelCodec;

@@ -266,11 +266,13 @@ float4 PS(PS_INPUT input) : SV_Target0
   float lightHit = magnitude(worldPos - LightPos);
   float worldHit = magnitude(lightWorldPos - LightPos);
   
-  float4 finalColor = float4(diffuseBRDF + specularBRDF + diffuseIBL, 0.0f);
+  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL;
     
+  // float NoL = max(dot(normal, lightDir), 0.0f);
+  // float bias = SMALL_NUMBER * tan(acos(NoL));
   if (lightHit > worldHit + SMALL_NUMBER) {
-    finalColor *= shadowColor.xxxx;
+    finalColor *= shadowColor.xxx;
   }
   
-  return float4(finalColor.rgb, albedo.a);
+  return float4(finalColor, albedo.a);
 }

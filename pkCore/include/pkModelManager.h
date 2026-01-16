@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /**
- * @file    pkGPUResourceManager.h
+ * @file    pkModelManager.h
  * @author  Héctor Iván Muñoz Ceballos
  * @date    04/02/2025
  * @brief   Resource Manager used for the engine
@@ -44,11 +44,11 @@ struct MeshMemory
 };
 
 
-class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
+class PK_CORE_EXPORT ModelManager : public Module<ModelManager>
 {
  public:
-  GPUResourceManager() = default;
-  virtual ~GPUResourceManager() = default;
+  ModelManager() = default;
+  virtual ~ModelManager() = default;
 
   /**
    * @brief Initialize the GPU resource manager.
@@ -96,6 +96,6 @@ class PK_CORE_EXPORT GPUResourceManager : public Module<GPUResourceManager>
   // UMap<UUID, Asset> materials
 };
 
-PK_CORE_EXPORT GPUResourceManager&
-g_GPUResourceManager();
+PK_CORE_EXPORT ModelManager&
+g_ModelManager();
 }

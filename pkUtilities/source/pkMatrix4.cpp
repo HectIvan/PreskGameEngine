@@ -255,8 +255,8 @@ Matrix4::getTransposed()
   return result;
 }
 
-Matrix4
-Matrix4::matrixScaling(float& _scaleX, float& _scaleY, float& _scaleZ)
+const Matrix4
+Matrix4::matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ)
 {
   return Matrix4(Vector4(_scaleX, 0.0f, 0.0f, 0.0f),
                  Vector4(0.0f, _scaleY, 0.0f, 0.0f),
@@ -264,14 +264,14 @@ Matrix4::matrixScaling(float& _scaleX, float& _scaleY, float& _scaleZ)
                  Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-Matrix4
-Matrix4::translation(Vector3 _position)
+const Matrix4
+Matrix4::translation(const Vector3& _position)
 {
   return translation(_position.x, _position.y, _position.z);
 }
 
-Matrix4
-Matrix4::translation(float& _offsetX, float& _offsetY, float& _offsetZ)
+const Matrix4
+Matrix4::translation(const float& _offsetX, const float& _offsetY, const float& _offsetZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][3] = _offsetX;
@@ -281,7 +281,7 @@ Matrix4::translation(float& _offsetX, float& _offsetY, float& _offsetZ)
 }
 
 void
-Matrix4::setTranslation(Vector3 _pos)
+Matrix4::setTranslation(const Vector3& _pos)
 {
   matrix[0][3] = _pos.x;
   matrix[1][3] = _pos.y;
@@ -289,14 +289,14 @@ Matrix4::setTranslation(Vector3 _pos)
 }
 
 void
-Matrix4::setTranslation(float _x, float _y, float _z)
+Matrix4::setTranslation(const float& _x, const float& _y, const float& _z)
 {
   matrix[0][3] = _x;
   matrix[1][3] = _y;
   matrix[2][3] = _z;
 }
 
-Matrix4
+const Matrix4
 Matrix4::getTranslation()
 {
   Matrix4 M = Matrix4::IDENTITY;
@@ -306,32 +306,32 @@ Matrix4::getTranslation()
   return M;
 }
 
-Vector3
+const Vector3
 Matrix4::getTranslation3()
 {
   return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
 
-Matrix4
-Matrix4::scale(Vector3& _scale)
+const Matrix4
+Matrix4::scale(const Vector3& _scale)
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.setScale(_scale);
   return M;
 }
 
-Matrix4
+const Matrix4
 Matrix4::getScale()
 {
   Matrix4 M = Matrix4::IDENTITY;
-  Vector3 scale = getScale3();
+  const Vector3 scale = getScale3();
   M.matrix[0][3] = scale.x;
   M.matrix[1][3] = scale.y;
   M.matrix[2][3] = scale.z;
   return M;
 }
 
-Vector3
+const Vector3
 Matrix4::getScale3()
 {
   return Vector3(matrix[0][3],
@@ -340,25 +340,25 @@ Matrix4::getScale3()
 }
 
 void
-Matrix4::setScale(Vector3 _scale)
+Matrix4::setScale(const Vector3& _scale)
 {
   setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
-Matrix4::setScale(Matrix4 _scale)
+Matrix4::setScale(Matrix4& _scale)
 {
   setScale(_scale.getScale3());
 }
 
 void
-Matrix4::setScale(float _val)
+Matrix4::setScale(const float& _val)
 {
   setScale(_val, _val, _val);
 }
 
 void
-Matrix4::setScale(float _x, float _y, float _z)
+Matrix4::setScale(const float& _x, const float& _y, const float& _z)
 {
   matrix[0][0] *= _x;
   matrix[1][1] *= _y;
@@ -366,7 +366,7 @@ Matrix4::setScale(float _x, float _y, float _z)
 }
 
 Matrix4
-Matrix4::MatrixRotationAxis(Vector3 _axis, float _angle)
+Matrix4::MatrixRotationAxis(Vector3& _axis, const float& _angle)
 {
   PK_ASSERT(!_axis.isZero());
   PK_ASSERT(!_axis.hasNan());
@@ -400,7 +400,7 @@ Matrix4::MatrixRotationAxis(Vector3 _axis, float _angle)
   return Result;
 }
 
-Matrix4
+const Matrix4
 Matrix4::getRotation()
 {
   Matrix4 rot = Matrix4::IDENTITY;
@@ -418,8 +418,8 @@ Matrix4::getRotation()
   return rot;
 }
 
-Matrix4
-Matrix4::getRotationNoScale(Vector3 _scale)
+const Matrix4
+Matrix4::getRotationNoScale(const Vector3& _scale)
 {
   Matrix4 rotMat = getRotation();
   rotMat.matrix[0][0] /= _scale.x;
@@ -428,13 +428,13 @@ Matrix4::getRotationNoScale(Vector3 _scale)
   return rotMat;
 }
 
-Matrix4
+const Matrix4
 Matrix4::rotation(const Vector3& _rot)
 {
   return rotation(_rot.x, _rot.y, _rot.z);
 }
 
-Matrix4
+const Matrix4
 Matrix4::rotation(const float& _angleX, const float& _angleY, const float& _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;

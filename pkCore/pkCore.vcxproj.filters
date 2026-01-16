@@ -204,7 +204,7 @@
     <ClInclude Include="include\pkRendererManager.h">
       <Filter>include\managers</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkGPUResourceManager.h">
+    <ClInclude Include="include\pkModelManager.h">
       <Filter>include\managers</Filter>
     </ClInclude>
     <ClInclude Include="include\pkTextureManager.h">
@@ -341,7 +341,7 @@
     <ClCompile Include="source\pkRendererManager.cpp">
       <Filter>source\managers</Filter>
     </ClCompile>
-    <ClCompile Include="source\pkGPUResourceManager.cpp">
+    <ClCompile Include="source\pkModelManager.cpp">
       <Filter>source\managers</Filter>
     </ClCompile>
     <ClCompile Include="source\pkTextureManager.cpp">

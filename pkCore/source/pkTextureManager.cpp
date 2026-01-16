@@ -1,5 +1,5 @@
 #include "pkAssetResourceManager.h"
-#include "pkGPUResourceManager.h"
+#include "pkModelManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkTextureCodec.h"
 #include "pkTextureManager.h"

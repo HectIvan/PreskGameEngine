@@ -29,58 +29,11 @@
 #include "pkVector3.h"
 #include "pkWindowDesc.h"
 
-using pkEngineSDK::Actor;
 using pkEngineSDK::BaseApp;
-using pkEngineSDK::Camera;
-using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBCamera;
-using pkEngineSDK::CBFloat;
-using pkEngineSDK::CBLight;
-using pkEngineSDK::CBProjection;
-using pkEngineSDK::CBSSAO;
-using pkEngineSDK::CBTransform;
-using pkEngineSDK::CBVector2x2;
-using pkEngineSDK::CBVector3;
-using pkEngineSDK::CBView;
-using pkEngineSDK::Color;
-using pkEngineSDK::ConstantBuffer;
-using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Light;
-using pkEngineSDK::EventQueue;
-using pkEngineSDK::GPUResourceManager;
-using pkEngineSDK::G_BUFFERS::kGB_Albedo;
-using pkEngineSDK::G_BUFFERS::kGB_Normal;
-using pkEngineSDK::g_EventManager;
-using pkEngineSDK::g_GPUResourceManager;
-using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_TimeManager;
 using pkEngineSDK::g_uInterface;
-using pkEngineSDK::int32;
-using pkEngineSDK::Light;
-using pkEngineSDK::Material;
-using pkEngineSDK::Matrix4;
-using pkEngineSDK::make_shared;
-using pkEngineSDK::Model;
-using pkEngineSDK::Pass;
-using pkEngineSDK::Path;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
-using pkEngineSDK::PlatformPointer;
-using pkEngineSDK::PKWindowDesc;
-using pkEngineSDK::RendererManager;
-using pkEngineSDK::Scene;
-using pkEngineSDK::Shader;
-using pkEngineSDK::SPtr;
-using pkEngineSDK::String;
-using pkEngineSDK::Texture;
-using pkEngineSDK::TimeManager;
-using pkEngineSDK::to_string;
-using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UIWindow;
-using pkEngineSDK::Vector;
-using pkEngineSDK::Vector2;
-using pkEngineSDK::Vector3;
-using pkEngineSDK::Vector4;
 
 struct ShaderType
 {
@@ -141,6 +94,7 @@ class ShaderTest : public BaseApp
 
  public:
   SPtr<Actor> m_selectedActor;
+  SPtr<Material> m_selectedMaterial;
   int32 m_sActorIndex;
   Vector2 m_lastCursorPos;
 

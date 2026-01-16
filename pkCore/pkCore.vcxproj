@@ -213,7 +213,7 @@
     <ClInclude Include="include\pkRasterizerState.h" />
     <ClInclude Include="include\pkRendererManager.h" />
     <ClInclude Include="include\pkRenderTargetView.h" />
-    <ClInclude Include="include\pkGPUResourceManager.h" />
+    <ClInclude Include="include\pkModelManager.h" />
     <ClInclude Include="include\pkScene.h" />
     <ClInclude Include="include\pkScriptManager.h" />
     <ClInclude Include="include\pkShaderCodec.h" />
@@ -261,7 +261,7 @@
     <ClCompile Include="source\pkModelResource.cpp" />
     <ClCompile Include="source\pkPass.cpp" />
     <ClCompile Include="source\pkRendererManager.cpp" />
-    <ClCompile Include="source\pkGPUResourceManager.cpp" />
+    <ClCompile Include="source\pkModelManager.cpp" />
     <ClCompile Include="source\pkScene.cpp" />
     <ClCompile Include="source\pkSceneManager.cpp" />
     <ClCompile Include="source\pkScriptManager.cpp" />

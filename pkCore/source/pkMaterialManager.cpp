@@ -42,7 +42,7 @@ MaterialManager::newMaterial(String _name)
 }
 
 SPtr<Material>
-MaterialManager::loadMaterial(UUID& _ID)
+MaterialManager::loadMaterial(const UUID& _ID)
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
   TextureManager& textureMan = g_TextureManager();

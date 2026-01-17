@@ -92,7 +92,7 @@ MaterialManager::loadMaterial(const UUID& _ID)
   material->m_properties.metallicMultiply = matResource->m_metallicValue;
   material->m_properties.EmissiveMultiply = matResource->m_emissiveColor;
 
-  insertLoadedMaterial(_ID, material);
+  insertMaterial(_ID, material);
 
   return material;
 }
@@ -109,7 +109,7 @@ MaterialManager::getMaterial(const UUID& _ID)
 }
 
 void
-MaterialManager::insertLoadedMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial)
+MaterialManager::insertMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial)
 {
   m_materials.insert({ _ID, _pMaterial });
 }

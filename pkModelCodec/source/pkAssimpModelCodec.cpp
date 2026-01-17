@@ -101,7 +101,7 @@ getTextureFromPath(const Path& _path)
   AssetResourceManager& assetMan = g_AssetResourceManager();
 
   // if a texture with this path has already been loaded.
-  SPtr<Texture> texture = tm.getTextureFromPath(_path.toString());
+  SPtr<Texture> texture = tm.getTexture(_path.toString());
   if (texture) {
     return texture;
   }
@@ -195,16 +195,15 @@ SPtr<Mesh>
 processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform)
 {
   // modules
-  ModelManager& resourceMan = g_ModelManager();
   MaterialManager& matMan = g_MaterialManager();
   Logger& log = g_Logger();
 
   // check if the mesh is already in storage
-  String meshName(_mesh->mName.C_Str());
-  SPtr<Mesh> meshProcess = resourceMan.searchMesh(meshName);
+  const String meshName(_mesh->mName.C_Str());
+  SPtr<Mesh> meshProcess = g_ModelManager().searchMesh(meshName);
   // if a mesh can be found
   if (meshProcess) {
-    log.registerMessage("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__);
+    LOG_REGISTER("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__)
     return meshProcess;
   }
 
@@ -261,9 +260,6 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       meshProcess->indexVector.push_back(face.mIndices[j]);
     }
   }
-  // for (uint32 i = 0; i < _mesh->mNumBones; ++i) {
-  //   mesh->mBones[i].
-  // }
 
   /**
    * Material loading

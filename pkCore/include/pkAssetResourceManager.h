@@ -50,9 +50,11 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
 
   /**
    * @brief Save a resource to a file.
+   * @param _ID Resource ID.
+   * @return Pointer to the unloaded resource.
    */
   SPtr<BaseResource>
-  unloadResource();
+  unloadResource(const UUID& _ID);
 
   /**
    * @brief Get assets from the set resources folder.
@@ -97,6 +99,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   insertLoadedResource(const SPtr<BaseResource>& _pResource)
   {
     m_loadedResources.insert({ _pResource->m_id, _pResource});
+    m_allResources.insert({ _pResource->m_id, _pResource });
   }
 
   /**
@@ -106,19 +109,23 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   void
   removeLoadedResource(const UUID& _ID)
   {
+    removeResourceFromManagers(_ID);
     m_loadedResources.erase(_ID);
   }
 
   /**
-   * @brief Remove a resource from the resource manager.
+   * @brief remove an object created from a resource from all managers.
+   * @param _ID ID of the resource.
+   */
+  void
+  removeResourceFromManagers(const UUID& _ID);
+
+  /**
+   * @brief Delete a resource from the resource manager.
    * @param _UUID resource ID.
    */
   void
-  removeResource(const UUID& _ID)
-  {
-    m_loadedResources.erase(_ID);
-    m_allResources.erase(_ID);
-  }
+  deleteResource(const UUID& _ID);
 
   /**
    * @brief Get all resources in the manager.

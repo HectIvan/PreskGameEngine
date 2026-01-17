@@ -118,7 +118,7 @@ TextureManager::loadTexture(const UUID& _ID)
   texture->setID(resource->m_id);
 
   const Path resPath = Path(resource->m_resourcePath);
-  insertLoadedTexture(resource->m_id, resPath, texture);
+  insertTexture(resource->m_id, resPath, texture);
 
   // return the final texture
   return texture;
@@ -136,7 +136,7 @@ TextureManager::getTexture(const UUID& _ID)
 }
 
 SPtr<Texture>
-TextureManager::getTextureFromPath(const String& _path)
+TextureManager::getTexture(const String& _path)
 {
   // search if the texture has been stored before
   auto it = m_texturesPath.find(_path);
@@ -146,8 +146,24 @@ TextureManager::getTextureFromPath(const String& _path)
   return nullptr;
 }
 
+PKFORCEINLINE void
+TextureManager::deleteTexture(const UUID& _ID)
+{
+  SPtr<Texture> texture = getTexture(_ID);
+  if (texture) {
+    m_textures.erase(_ID);
+    // also erase from path map
+    for (auto it = m_texturesPath.begin(); it != m_texturesPath.end(); ++it) {
+      if (it->second == texture) {
+        m_texturesPath.erase(it);
+        break;
+      }
+    }
+  }
+}
+
 void
-TextureManager::insertLoadedTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
+TextureManager::insertTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
 {
   m_textures.insert({ _ID, _pTexture });
   m_texturesPath.insert({ _path.toString(), _pTexture });

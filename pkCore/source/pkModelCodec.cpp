@@ -97,7 +97,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _pat
     file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_id), sizeof(UUID));
 
     assetMan.insertNewResource(matResource);
-    matMan.insertLoadedMaterial(matResource->m_id, mesh->material);
+    matMan.insertMaterial(matResource->m_id, mesh->material);
   }
   file.close();
 

@@ -97,6 +97,7 @@ ActorInspector::Inspect()
 {
   // get the user interface manager
   UInterface& im = g_uInterface();
+  MaterialManager& matMan = g_MaterialManager();
   // change the position
   Vector3 newTranslation = m_actor->m_position;
   im.createText("Position");
@@ -123,12 +124,12 @@ void
 ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
                                       Window& _window,
                                       String& _searchMesh,
-                                      float& _imgTexSize)
+                                      float& _imgTexSize,
+                                      SPtr<Material>& _pMaterialInspect)
 {
   Vector2 texSize = Vector2(_imgTexSize, _imgTexSize);
   // get the user interface manager
   UInterface& im = g_uInterface();
-  TextureManager& tm = g_TextureManager();
   MaterialManager& matMan = g_MaterialManager();
   ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
@@ -251,343 +252,40 @@ ActorInspector::createComponentWindow(SPtr<Component>& _pComponent,
             im.pushID(i);
             im.createCheckBox("Active ", mesh->getActive());
             // Mesh material data
-            SPtr<Material> material = mesh->material;
-            String matName = material->getNameS();
-            const String defaultMatName = matMan.m_defaultMaterial->getName();
-            if (material && matName != defaultMatName) {
-              im.createText("Material Name: ");
-              im.sameLine();
-              im.createInputText("##MaterialName: ", &matName);
-              // get material
-              MaterialProps& matProps = material->m_properties;
-              // get the textures
-              const SPtr<Texture> albedo = material->m_albedo;
-              const SPtr<Texture> normal = material->m_normal;
-              const SPtr<Texture> oclussion = material->m_oclussion;
-              const SPtr<Texture> rough = material->m_roughness;
-              const SPtr<Texture> metallic = material->m_metallic;
-              const SPtr<Texture> emissive = material->m_emissive;
-
-              /***************************************************************/
-              /*------------------------albedo button-----------------------*/
-              /***************************************************************/
-              if (albedo) {
-                const String albName = albedo->getNameString() + "diff";
-                if (im.createButtonImage(albName.c_str(), albedo, texSize)) {
-                  // opened window to set albedo texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setAlbedo(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + albName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = albedo->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setAlbedo(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Albedo Texture");
-                }
-                im.sameLine();
-                im.colorEdit("Color Multiply", matProps.ColorMultiply);
-              }
-              else {
-                if (im.createButton("##AlbedoButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setAlbedo(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Albedo texture is null.");
-                }
-              }
-              
-              /***************************************************************/
-              /*------------------------Normal button------------------------*/
-              /***************************************************************/
-
-              if (normal) {
-                const String norName = normal->getNameString() + "norm";
-                if (im.createButtonImage(norName.c_str(), normal, texSize)) {
-                  // opened window to set normal texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setNormal(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + norName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = normal->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setNormal(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Normal Texture");
-                }
-              }
-              else {
-                if (im.createButton("##NormalButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setNormal(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Normal texture is null.");
-                }
-              }
-              
-              /***************************************************************/
-              /*----------------------oclussion button-----------------------*/
-              /***************************************************************/
-
-              if (oclussion) {
-                const String occName = oclussion->getNameString() + "ao";
-                if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {
-                  // opened window to set occlusion texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setOcclusion(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + occName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = oclussion->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setOclussion(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Ambient Occlusion Texture");
-                }
-              }
-              else {
-                if (im.createButton("##OclussionButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setOclussion(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Oclussion texture is null.");
-                }
-              }
-              
-              /***************************************************************/
-              /*-----------------------roughness button----------------------*/
-              /***************************************************************/
-
-              if (rough) {
-                const String roughName = rough->getNameString() + "rough";
-                if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
-                  // opened window to set rough texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setRoughness(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + roughName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = rough->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setRoughness(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Roughness Texture");
-                }
-                im.sameLine();
-                im.createDragF("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
-              }
-              else {
-                if (im.createButton("##RoughnessButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setRoughness(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Roughness texture is null.");
-                }
-              }
-              
-              /***************************************************************/
-              /*-----------------------metallic button-----------------------*/
-              /***************************************************************/
-
-              if (metallic) {
-                const String metName = metallic->getNameString() + "metal";
-                if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
-                  // opened window to set metallic texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setMetallic(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + metName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = metallic->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setMetallic(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Metallic Texture");
-                }
-                im.sameLine();
-                im.createDragF("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
-              }
-              else {
-                if (im.createButton("##MetallicButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setMetallic(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Metallic texture is null.");
-                }
-              }
-              
-              /***************************************************************/
-              /*-----------------------emissive button-----------------------*/
-              /***************************************************************/
-
-              if (emissive) {
-                const String emissName = emissive->getNameString() + "emissive";
-                if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
-                  // opened window to set metallic texture
-                  const Path path(_window.openFileFromExplorer());
-                  if (path.toString() != "") {
-                    // SPtr<Texture> texture = tm.loadTexture(path);
-                    // meshMat->setEmissive(texture);
-                  }
-                }
-                if (im.beginDragDropSource()) {
-                  const String dragText = "Dragging " + emissName;
-                  im.createText(dragText.c_str());
-                  const UUID* textureID = emissive->getID();
-                  im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
-                  im.endDragDropSource();
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setEmissive(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                // hover tooltip.
-                if (im.isItemHovered()) {
-                  im.setTooltip("Emissive Texture");
-                }
-                im.sameLine();
-                im.colorEdit("Emissive Color", matProps.EmissiveMultiply);
-              }
-              else {
-                if (im.createButton("##EmissiveButton")) {
-
-                }
-                if (im.beginDragDropTarget()) {
-                  const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-                  if (id) {
-                    SPtr<Texture> texture = tm.loadTexture(*id);
-                    material->setEmissive(texture);
-                  }
-                  im.endDragDropTarget();
-                }
-                if (im.isItemHovered()) {
-                  im.setTooltip("Warning!!! Emissive texture is null.");
-                }
-              }
-            }
-            else {
+            if (!mesh->material) {
               im.pushID(i);
               if (im.createButton("<Create new material>")) {
                 mesh->material = matMan.newMaterial();
               }
               im.popID();
+            }
+            else {
+              const ANSICHAR* matName = mesh->material->getName();
+              const String matNameString = String(matName);
+              if (im.selectable2("##Inspect", Vector2(50))) {
+                _pMaterialInspect = mesh->material;
+              }
+              // if (im.beginDragDropSource()) {
+              //   const String dragText = "Dragging " + matNameString;
+              //   im.createText(dragText.c_str());
+              //   const UUID* textureID = mesh->material->getID();
+              //   im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+              //   im.endDragDropSource();
+              // }
+              if (im.beginDragDropTarget()) {
+                const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+                if (id) {
+                  SPtr<Material> ddMat = matMan.loadMaterial(*id);
+                  mesh->material = ddMat;
+                }
+                im.endDragDropTarget();
+              }
+              if (im.isItemHovered()) {
+                const String tooltip = "Inspect " + matNameString + ".";
+                im.setTooltip(tooltip.c_str());
+              }
+              im.sameLine();
+              im.createText(matName);
             }
             im.popID();
           }

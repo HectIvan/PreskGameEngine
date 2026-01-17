@@ -13,6 +13,7 @@
 #include "pkAssetResourceManager.h"
 #include "pkModelManager.h"
 #include "pkLogger.h"
+#include "pkMaterialManager.h"
 #include "pkMaterialResource.h"
 #include "pkModelCodec.h"
 #include "pkModelResource.h"
@@ -20,6 +21,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkShaderResource.h"
 #include "pkTextureCodec.h"
+#include "pkTextureManager.h"
 #include "pkTextureResource.h"
 #include "pkFileSystem.h"
 #include "pkUUID.h"
@@ -38,6 +40,7 @@ AssetResourceManager::loadResource(const UUID& _ID)
   // check if the file is stored in the map
   SPtr<BaseResource> resource = getResource(_ID);
   if (!resource) {
+    LOG_WARNING("No resource of ID " + _ID.toString() + " found.", __FILE__, __LINE__);
     return nullptr;
   }
   resource->load();
@@ -45,17 +48,25 @@ AssetResourceManager::loadResource(const UUID& _ID)
 }
 
 SPtr<BaseResource>
-AssetResourceManager::unloadResource()
+AssetResourceManager::unloadResource(const UUID& _ID)
 {
-  return SPtr<BaseResource>();
+  SPtr<BaseResource> resource = getResource(_ID);
+  if (!resource) {
+    LOG_WARNING("No resource of ID " + _ID.toString() + " found.", __FILE__, __LINE__);
+    return nullptr;
+  }
+  resource->unload();
+  return resource;
 }
 
 void
-AssetResourceManager::loadAssetsFromResourcesFolder ()
+AssetResourceManager::loadAssetsFromResourcesFolder()
 {
+  // clear all previously stored resources.
   m_allResources.clear();
-  Vector<Path> paths = FileSystem::getFilesFromFolder(m_resourcesFolder);
-  uint32 pathCount = static_cast<uint32>(paths.size());
+
+  const Vector<Path> paths = FileSystem::getFilesFromFolder(m_resourcesFolder);
+  const uint32 pathCount = static_cast<uint32>(paths.size());
 
   // iterate through all found resources.
   for (uint32 i = 0; i < pathCount; ++i) {
@@ -81,7 +92,7 @@ AssetResourceManager::loadAssetsFromResourcesFolder ()
       insertNewResource(resource);
       // register the action in the log.
       const String msg = "Stored resource " + String(resource->m_resourcePath) + ".";
-      g_Logger().registerMessage(msg, __FILE__, __LINE__);
+      LOG_REGISTER(msg, __FILE__, __LINE__);
     }
   }
 }
@@ -94,6 +105,33 @@ AssetResourceManager::isPKResource(const Path _path)
     return true;
   }
   return false;
+}
+
+void
+AssetResourceManager::removeResourceFromManagers(const UUID& _ID)
+{
+  SPtr<BaseResource> resource = getResource(_ID);
+
+  if (resource) {
+    const RESOURCE_TYPE::E resType = resource->getType();
+    if (RESOURCE_TYPE::kModel == resType) {
+      g_ModelManager().deleteModel(_ID);
+    }
+    if (RESOURCE_TYPE::kMaterial == resType) {
+      g_MaterialManager().deleteMaterial(_ID);
+    }
+    if (RESOURCE_TYPE::kTexture == resType) {
+      g_TextureManager().deleteTexture(_ID);
+    }
+  }
+}
+
+void
+AssetResourceManager::deleteResource(const UUID& _ID)
+{
+  removeResourceFromManagers(_ID);
+  m_loadedResources.erase(_ID);
+  m_allResources.erase(_ID);
 }
 
 SPtr<BaseResource>

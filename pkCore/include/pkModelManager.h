@@ -62,7 +62,7 @@ class PK_CORE_EXPORT ModelManager : public Module<ModelManager>
    * @return Pointer to the model if loaded; nullptr if failed.
    */
   SPtr<Model>
-  loadPKModel(const UUID& _ID);
+  createModel(const UUID& _ID);
 
   /**
    * @brief search for a specific mesh
@@ -70,30 +70,42 @@ class PK_CORE_EXPORT ModelManager : public Module<ModelManager>
    * @return Pointer to the mesh if found;
    */
   SPtr<Mesh>
-  searchMesh(const String _name);
+  searchMesh(const String& _name);
 
   /**
-   * @brief Insert a model into the memory.
+   * @brief Insert a model into the umap.
    * @param _ID ID of the model to store.
    * @param _pModel Model to store.
    */
-  void
-  insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel);
+  PKFORCEINLINE void
+  insertModel(const UUID& _ID, const SPtr<Model>& _pModel)
+  {
+    m_models.insert({ _ID, _pModel });
+  }
 
   /**
-   * @brief Get a model from memory.
+   * @brief Get a model from a UUID.
    * @param _ID ID of the model to look for.
    * @return Pointer to the model. null if its not stored.
    */
   SPtr<Model>
-  getModelMemory(const UUID& _ID);
+  getModel(const UUID& _ID);
 
- public:
+  /**
+   * @brief Delete a model from the manager.
+   * @param _ID ID of the model to delete.
+   */
+  PKFORCEINLINE void
+  deleteModel(const UUID& _ID)
+  {
+    m_models.erase(_ID);
+  }
+
+ private:
   UMap<UUID, SPtr<Model>> m_models;
+  /* to do: we can probably change the way we search meshes to a map, by creating a unique ID for each mesh,
+     combining the model name + mesh name to get a unique ID for all meshes avoiding name conflicts. */
   Vector<SPtr<Mesh>> m_meshes;
-
-  // assets
-  // UMap<UUID, Asset> materials
 };
 
 PK_CORE_EXPORT ModelManager&

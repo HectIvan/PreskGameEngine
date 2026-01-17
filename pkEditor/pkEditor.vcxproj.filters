@@ -70,6 +70,9 @@
     <ClCompile Include="source\imgui_widgets.cpp">
       <Filter>Source Files\interface\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="source\MaterialInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -101,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="include\imstb_truetype.h">
       <Filter>include\Interface\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialInspector.h">
+      <Filter>include\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

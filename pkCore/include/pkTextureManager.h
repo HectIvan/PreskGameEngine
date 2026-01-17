@@ -89,7 +89,14 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @return Pointer to the saved texture.
    */
   SPtr<Texture>
-  getTextureFromPath(const String& _path);
+  getTexture(const String& _path);
+
+  /**
+   * @brief Delete a texture from the texture manager.
+   * @param _ID ID of the texture.
+   */
+  PKFORCEINLINE void
+  deleteTexture(const UUID& _ID);
   
   /**
    * @brief Store a loaded texture into the memory for later use.
@@ -98,7 +105,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @param _pTexture Texture to store.
    */
   void
-  insertLoadedTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
+  insertTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
 
  public:
   // save textures with the texture id

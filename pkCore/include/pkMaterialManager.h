@@ -64,6 +64,16 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    */
   SPtr<Material>
   getMaterial(const UUID& _ID);
+
+  /**
+   * @brief Delete a material from the memory.
+   * @param _ID ID of the material to delete.
+   */
+  PKFORCEINLINE void
+  deleteMaterial(const UUID& _ID)
+  {
+    m_materials.erase(_ID);
+  }
   
   /**
    * @brief Store a loaded material into the memory for later use.
@@ -71,7 +81,7 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
    * @param _pMaterial Material to store.
    */
   void
-  insertLoadedMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial);
+  insertMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial);
 
  public:
   // save materials with the material id
@@ -81,6 +91,7 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
   String m_defaultMatName = "defaultMaterial";
   SPtr<Material> m_defaultMaterial;
 };
+
 PK_CORE_EXPORT MaterialManager&
 g_MaterialManager();
 }

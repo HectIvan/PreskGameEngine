@@ -17,6 +17,7 @@
 #include "pkTimeManager.h"
 #include "shaderTest.h"
 #include "pkMaterialManager.h"
+#include "MaterialInspector.h"
 
 using pkEngineSDK::AssetResourceManager;
 using pkEngineSDK::ANSICHAR;
@@ -239,6 +240,7 @@ ShaderTest::uInterfaceUpdate()
   TextureCodec& textureCodec = g_TextureCodec();
   TextureManager& tm = g_TextureManager();
   UInterface& im = g_uInterface();
+  MaterialInspector matInspector(m_selectedMaterial);
 
   im.setCurrentContext();
   im.newFrameAPI();
@@ -261,7 +263,7 @@ ShaderTest::uInterfaceUpdate()
   if (im.beginDragDropTarget()) {
     const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
-      SPtr<Model> model = modelMan.loadPKModel(*id);
+      SPtr<Model> model = modelMan.createModel(*id);
       if (model) {
         SPtr<Actor> newActor = currentScene->instantiate(model->getName());
         newActor->addComponent(model);
@@ -388,6 +390,10 @@ ShaderTest::uInterfaceUpdate()
             const ANSICHAR* assetNameCstr = assetName.c_str();
             if (im.selectable2(assetNameCstr, Vector2(m_resourceItemSize))) {
               if (asset.second->getType() == kMaterial) {
+                if (!asset.second->m_isLoaded) {
+                  asset.second->load();
+                  // g_MaterialManager().insertMaterial();
+                }
                 const SPtr<Material> mat = g_MaterialManager().getMaterial(asset.first);
                 if (mat) {
                   m_selectedMaterial = mat;
@@ -403,9 +409,9 @@ ShaderTest::uInterfaceUpdate()
             }
             if (im.isItemHovered()) {
               const String tooltip = "Name: " + assetName + "\n" +
-                "Asset ID: " + asset.first.toString() + "\n" +
-                "Asset type: " + asset.second->getTypeString() + "\n" +
-                "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
+                                     "Asset ID: " + asset.first.toString() + "\n" +
+                                     "Asset type: " + asset.second->getTypeString() + "\n" +
+                                     "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
               im.setTooltip(tooltip.c_str());
             }
             // pop-up menu for each resource
@@ -419,7 +425,7 @@ ShaderTest::uInterfaceUpdate()
                 asset.second->unload();
               }
               if (im.menuItem("Remove")) {
-                assetMan.removeResource(asset.first);
+                assetMan.deleteResource(asset.first);
               }
               if (im.menuItem("_______________________")) {
                 
@@ -492,17 +498,14 @@ ShaderTest::uInterfaceUpdate()
             if (path.toString() != "") {
               SPtr<BaseResource> resource = make_shared<ModelResource>();
               resource->softLoad(path);
-              m_selectedActor->addComponent(modelMan.loadPKModel(resource->m_id));
-              
-              // const String ID = assetManager.createModelResource(path);
-              // m_selectedActor->addComponent(assetManager.loadResource(path));
+              m_selectedActor->addComponent(modelMan.createModel(resource->m_id));
             }
           }
         }
         if (im.beginDragDropTarget()) {
           UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
           if (id) {
-            SPtr<Model> model = modelMan.loadPKModel(*id);
+            SPtr<Model> model = modelMan.createModel(*id);
             m_selectedActor->addComponent(model);
           }
           im.endDragDropTarget();
@@ -513,7 +516,8 @@ ShaderTest::uInterfaceUpdate()
           inspector.createComponentWindow(m_selectedActor->getComponents()[i],
                                           m_window,
                                           m_searchMesh,
-                                          m_imgTextureSize);
+                                          m_imgTextureSize,
+                                          m_selectedMaterial);
         }
       }
       im.popStyleColor(3);
@@ -690,8 +694,7 @@ ShaderTest::uInterfaceUpdate()
     // Material tab.
     // -------------------------- //
     if (m_selectedMaterial && im.beginTabItem(m_selectedMaterial->getName())) {
-
-      im.endTabItem();
+      matInspector.createMaterialWindow(m_window, m_imgTextureSize);
     }
     im.endTabBar();
   }

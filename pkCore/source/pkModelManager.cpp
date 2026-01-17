@@ -17,10 +17,10 @@ ModelManager::init()
 }
 
 SPtr<Model>
-ModelManager::loadPKModel(const UUID& _ID)
+ModelManager::createModel(const UUID& _ID)
 {
   // check if the model has already been stored.
-  SPtr<Model> model = getModelMemory(_ID);
+  SPtr<Model> model = getModel(_ID);
   if (model) {
     return model;
   }
@@ -60,15 +60,16 @@ ModelManager::loadPKModel(const UUID& _ID)
   api.setIndexBuffer(model->m_indexB);
   api.setVertexBuffer(model->m_vertexB);
 
-  insertModelMemory(modelRes->m_id, model);
+  insertModel(modelRes->m_id, model);
 
   return model;
 }
 
 SPtr<Mesh>
-ModelManager::searchMesh(const String _name)
+ModelManager::searchMesh(const String& _name)
 {
-  for (uint32 i = 0; i < m_meshes.size(); ++i) {
+  const uint32 meshCount = static_cast<uint32>(m_meshes.size());
+  for (uint32 i = 0; i < meshCount; ++i) {
     SPtr<Mesh> mesh = m_meshes[i];
     if (_name == mesh->getName()) {
       return mesh;
@@ -77,17 +78,12 @@ ModelManager::searchMesh(const String _name)
   return nullptr;
 }
 
-void
-ModelManager::insertModelMemory(const UUID& _ID, const SPtr<Model>& _pModel)
-{
-  m_models.insert({ _ID, _pModel });
-}
-
 SPtr<Model>
-ModelManager::getModelMemory(const UUID& _ID)
+ModelManager::getModel(const UUID& _ID)
 {
+  const String idStr = _ID.toString();
   for (auto& model : m_models) {
-    if (_ID.toString() == model.first.toString()) { // to do: make a == operator
+    if (idStr == model.first.toString()) { // to do: make a == operator for UUID objects.
       return model.second;
     }
   }

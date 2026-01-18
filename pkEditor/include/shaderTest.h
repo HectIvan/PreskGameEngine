@@ -15,6 +15,7 @@
 * Includes
 **/
 /*********************************************/
+#include "ActorInspector.h"
 #include "pkActor.h"
 #include "pkBaseApp.h"
 #include "pkCamera.h"
@@ -28,6 +29,9 @@
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkWindowDesc.h"
+#include "MaterialInspector.h"
+#include "ResourceInspector.h"
+#include "SceneInspector.h"
 
 using pkEngineSDK::BaseApp;
 using pkEngineSDK::g_uInterface;
@@ -93,9 +97,7 @@ class ShaderTest : public BaseApp
   onRender() override;
 
  public:
-  SPtr<Actor> m_selectedActor;
   SPtr<Material> m_selectedMaterial;
-  int32 m_sActorIndex;
   Vector2 m_lastCursorPos;
 
   Vector<float> m_fpsList;
@@ -118,9 +120,6 @@ class ShaderTest : public BaseApp
   float m_emissiveBlur;
   float m_emissiveStrength;
 
-  // UI texture image size
-  float m_imgTextureSize;
-
   // low window log/resources search.
   bool m_currentTab;
   bool m_showErrors;
@@ -136,15 +135,14 @@ class ShaderTest : public BaseApp
   float m_IBLIntensity;
   float m_exposure;
 
-  uint32 m_resourceWindowCount = 8;
-  uint32 m_resourceItemSize = 128;
-
-  String m_searchMesh;
-  String m_searchResource;
-
   UIWindow m_sceneGraphWin;
   UIWindow m_loggerWin;
   UIWindow m_rightWin;
 
   SPtr<Texture> m_eyeIcon;
+
+  ActorInspector m_actorInspector;
+  MaterialInspector m_materialInspector;
+  ResourceInspector m_resourceInspector;
+  SceneInspector m_sceneInspector;
 };

@@ -73,6 +73,12 @@
     <ClCompile Include="source\MaterialInspector.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="source\ResourceInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SceneInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -106,6 +112,12 @@
       <Filter>include\Interface\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="include\MaterialInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneInspector.h">
       <Filter>include\Editor</Filter>
     </ClInclude>
   </ItemGroup>

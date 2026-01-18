@@ -20,6 +20,7 @@
 
 using pkEngineSDK::Material;
 using pkEngineSDK::SPtr;
+using pkEngineSDK::uint32;
 using pkEngineSDK::Window;
 
 class MaterialInspector
@@ -30,14 +31,28 @@ class MaterialInspector
   virtual ~MaterialInspector() = default;
 
   /**
+   * @brief Set the material to inspect.
+   * @param _pMaterial Pointer to the material.
+   */
+  void
+  setMaterial(const SPtr<Material>& _pMaterial) { m_material = _pMaterial; }
+
+  /**
+   * @brief Get the material being inspected.
+   * @return Pointer to the material.
+   */
+  SPtr<Material>&
+  getMaterial() { return m_material; }
+
+  /**
    * @brief Create a window for the ui based on the material properties.
    * @param _window Main window.
    * @param _imgTexSize Size of the texture preview image.
    */
   void
-  createMaterialWindow(const Window& _window,
-                       const float& _imgTexSize);
+  createMaterialWindow(const Window& _window);
 
- public:
+ private:
   SPtr<Material> m_material;
+  float m_iconSize = 45.0f;
 };

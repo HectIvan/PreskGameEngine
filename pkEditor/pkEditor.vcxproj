@@ -176,6 +176,8 @@
     <ClCompile Include="source\pkEditorApp.cpp" />
     <ClCompile Include="source\pkImGui_win32.cpp" />
     <ClCompile Include="source\pkUInterface.cpp" />
+    <ClCompile Include="source\ResourceInspector.cpp" />
+    <ClCompile Include="source\SceneInspector.cpp" />
     <ClCompile Include="source\shaderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +192,8 @@
     <ClInclude Include="include\imstb_truetype.h" />
     <ClInclude Include="include\MaterialInspector.h" />
     <ClInclude Include="include\pkUInterface.h" />
+    <ClInclude Include="include\ResourceInspector.h" />
+    <ClInclude Include="include\SceneInspector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

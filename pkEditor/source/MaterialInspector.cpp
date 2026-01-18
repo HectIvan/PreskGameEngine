@@ -24,8 +24,7 @@ using pkEngineSDK::UUID;
 using pkEngineSDK::Vector2;
 
 void
-MaterialInspector::createMaterialWindow(const Window& _window,
-                                        const float& _imgTexSize)
+MaterialInspector::createMaterialWindow(const Window& _window)
 {
   // if no material is selected.
   if (!m_material) {
@@ -35,9 +34,14 @@ MaterialInspector::createMaterialWindow(const Window& _window,
   UInterface& im = g_uInterface();
   TextureManager& tm = g_TextureManager();
 
-  const Vector2 texSize = Vector2(_imgTexSize, _imgTexSize);
 
   String matName = m_material->getName();
+
+  im.createText("Texture UI Image Size");
+  im.sameLine();
+  im.createDragF("##TextureUIImageSize", m_iconSize, 1.0f, 1.0f);
+
+  const Vector2 texSize = Vector2(m_iconSize, m_iconSize);
 
   im.createText("Material Name: ");
   im.sameLine();

@@ -1,4 +1,3 @@
-#include "ActorInspector.h"
 #include "pkAssetResourceManager.h"
 #include "pkColor.h"
 #include "pkModelManager.h"
@@ -17,7 +16,6 @@
 #include "pkTimeManager.h"
 #include "shaderTest.h"
 #include "pkMaterialManager.h"
-#include "MaterialInspector.h"
 
 using pkEngineSDK::AssetResourceManager;
 using pkEngineSDK::ANSICHAR;
@@ -41,11 +39,8 @@ using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::Math;
 using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelResource;
-using pkEngineSDK::RESOURCE_TYPE::kShader;
-using pkEngineSDK::RESOURCE_TYPE::kMaterial;
 using pkEngineSDK::SceneManager;
 using pkEngineSDK::ShaderManager;
-using pkEngineSDK::stringToLower;
 using pkEngineSDK::TextureCodec;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::TextureResource;
@@ -77,6 +72,7 @@ ShaderTest::onInit()
 
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
+  m_sceneInspector.setScene(activeScene);
 
   // create camera
   m_cameraSpeed = 20.0f;
@@ -126,10 +122,7 @@ ShaderTest::onInit()
   m_emissiveStrength = 30.0f;
   // exposure
   m_exposure = 1.0f;
-  // testure size
-  m_imgTextureSize = 45.0f;
 
-  m_sActorIndex = 0;
   m_fpsSize = 20;
 
   m_showErrors = true;
@@ -224,6 +217,7 @@ ShaderTest::input()
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
     m_camera->rotate(-posDif.y, -posDif.x, 0.0f, kDegrees);
+    Math::clamp(-85.0f, 85.0f, m_camera->m_rotation.x);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }
@@ -231,73 +225,28 @@ ShaderTest::input()
 void
 ShaderTest::uInterfaceUpdate()
 {
-  AssetResourceManager& assetMan = g_AssetResourceManager();
   ModelManager& modelMan = g_ModelManager();
-  ModelCodec& modelCodec = g_ModelCodec();
   RendererManager& rm = g_RenderManager();
   SceneManager& sm = g_SceneManager();
   ShaderManager& shaderMan = g_ShaderManager();
-  TextureCodec& textureCodec = g_TextureCodec();
   TextureManager& tm = g_TextureManager();
   UInterface& im = g_uInterface();
-  MaterialInspector matInspector(m_selectedMaterial);
 
   im.setCurrentContext();
   im.newFrameAPI();
   im.windowNewFrame();
   im.uINewFrame();
 
-  Vector2 winRect = m_window.getClientWidthHeight();
-  SPtr<Scene> currentScene = sm.getActiveScene();
+  const Vector2 winRect = m_window.getClientWidthHeight();
+  const SPtr<Scene> currentScene = sm.getActiveScene();
 
   // --- Scene graph window --- //
   im.setNextWindowParams(m_sceneGraphWin);
   im.startWindowCreate(m_sceneGraphWin.name);
   m_sceneGraphWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
-  if (im.createButton("+")) {
-    currentScene->instantiate("Actor");
-    m_sActorIndex = currentScene->getActorCount() - 1;
-    m_selectedActor = currentScene->getActor(m_sActorIndex);
-  }
-  if (im.beginDragDropTarget()) {
-    const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-    if (id) {
-      SPtr<Model> model = modelMan.createModel(*id);
-      if (model) {
-        SPtr<Actor> newActor = currentScene->instantiate(model->getName());
-        newActor->addComponent(model);
-        m_selectedActor = newActor;
-      }
-    }
-    im.endDragDropTarget();
-  }
-  if (m_selectedActor) {
-    im.sameLine();
-    if (im.createButton("Delete")) {
-      m_selectedActor->~Actor();
-      m_selectedActor = nullptr;
-      currentScene->m_actors.erase(currentScene->m_actors.begin() + m_sActorIndex);
-      m_sActorIndex = 0;
-    }
-    im.sameLine();
-    if (im.createButton("^")) {
-      m_selectedActor = nullptr;
-      m_sActorIndex = 0;
-    }
-  }
-  const uint32 actorCount = currentScene->getActorCount();
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Actor> currentActor = currentScene->getActor(i);
-    if (im.createButton(currentActor->getName(),
-                        Color(0, 0),
-                        Color(50, 50),
-                        Color(100, 50),
-                        true)) {
-      m_selectedActor = currentActor;
-      m_sActorIndex = i;
-    }
-  }
+  m_sceneInspector.setScene(currentScene);
+  m_sceneInspector.createSceneGraphWindow();
   im.endWindowCreate();
   // -------------------------- //
 
@@ -305,6 +254,8 @@ ShaderTest::uInterfaceUpdate()
   // Create log window
   im.setNextWindowParams(m_loggerWin);
   im.startWindowCreate(m_loggerWin.name);
+  SPtr<Actor> selectedActor = m_sceneInspector.getActor();
+  m_actorInspector.setActor(selectedActor);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
   // Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
@@ -327,127 +278,7 @@ ShaderTest::uInterfaceUpdate()
     }
     // resources window.
     if (im.beginTabItem("Resources")) {
-      if (im.createButton("Model Resource")) {
-        const Path path = m_window.openFileFromExplorer();
-        if (path.toString() != "") {
-          SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
-          if (resource) {
-            assetMan.insertNewResource(resource);
-          }
-        }
-      }
-      im.sameLine();
-      if (im.createButton("Texture Resource")) {
-        const Path path = m_window.openFileFromExplorer();
-        if (path.toString() != "") {
-          SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
-          if (resource) {
-            assetMan.insertNewResource(resource);
-          }
-        }
-      }
-      im.sameLine();
-      im.createText("Search:");
-      im.sameLine();
-      im.createInputText("##Search", &m_searchResource);
-      im.sameLine();
-      // resoruces header
-      if (im.beginTable("resources params", 4)) {
-        im.tableNextRow();
-
-        im.tableNextColumn();
-        im.createText("Item Size:");
-
-        im.tableNextColumn();
-        im.createDragU("##ItemSize", m_resourceItemSize, 1, 1, 999);
-
-        im.tableNextColumn();
-        im.createText("Column Count:");
-
-        im.tableNextColumn();
-        im.createDragU("##ColumnCount", m_resourceWindowCount, 1, 1, 64);
-
-        im.endTable();
-      }
-      im.endTabItem();
-      // -------------------------- //
-      // window for displaying resources
-      // -------------------------- //
-      uint32 column = 0;
-      if (im.beginTable("Editor App", m_resourceWindowCount)) {
-        im.tableNextRow();
-        for (auto& asset : assetMan.getAllResources()) {
-          // search filter
-          const Path assetPath = String(asset.second->m_resourcePath);
-          const String assetName = assetPath.getFileName();
-          const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
-          const String assetNameLower = stringToLower(assetName);
-          // resource search filter result
-          if (asset.second->getType() != kShader &&
-              assetNameLower.find(searchResLower.c_str()) != String::npos) {
-
-            im.tableSetColumnIndex(column);
-            const ANSICHAR* assetNameCstr = assetName.c_str();
-            if (im.selectable2(assetNameCstr, Vector2(m_resourceItemSize))) {
-              if (asset.second->getType() == kMaterial) {
-                if (!asset.second->m_isLoaded) {
-                  asset.second->load();
-                  // g_MaterialManager().insertMaterial();
-                }
-                const SPtr<Material> mat = g_MaterialManager().getMaterial(asset.first);
-                if (mat) {
-                  m_selectedMaterial = mat;
-                }
-              }
-            }
-            if (im.beginDragDropSource()) {
-              const String dragText = "Dragging " + assetName;
-              im.createText(dragText.c_str());
-              const UUID* data = &asset.first;
-              im.setDragDropPayload("RESOURCE_PAYLOAD", data, sizeof(UUID));
-              im.endDragDropSource();
-            }
-            if (im.isItemHovered()) {
-              const String tooltip = "Name: " + assetName + "\n" +
-                                     "Asset ID: " + asset.first.toString() + "\n" +
-                                     "Asset type: " + asset.second->getTypeString() + "\n" +
-                                     "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
-              im.setTooltip(tooltip.c_str());
-            }
-            // pop-up menu for each resource
-            if (im.beginPopUpItem(assetNameCstr)) {
-              if (im.menuItem("Load")) {
-                asset.second->load();
-                assetMan.insertLoadedResource(asset.second);
-              }
-              if (im.menuItem("Unload")) {
-                assetMan.removeLoadedResource(asset.first);
-                asset.second->unload();
-              }
-              if (im.menuItem("Remove")) {
-                assetMan.deleteResource(asset.first);
-              }
-              if (im.menuItem("_______________________")) {
-                
-              }
-              if (im.menuItem("Delete (Non-Functional)")) {
-                
-              }
-              if (im.isItemHovered()) {
-                im.setTooltip("THIS ACTION CANNOT BE UNDONE");
-              }
-              im.endPopUpItem();
-            }
-
-            // if the resource window is full, jump to next row.
-            ++column;
-            if (column >= m_resourceWindowCount) {
-              column = 0;
-              im.tableNextRow();
-            }
-          }
-        }
-      }
+      m_resourceInspector.createResourceWindow(m_window, m_selectedMaterial);
       im.endTable();
     }
     im.endTabBar();
@@ -463,26 +294,26 @@ ShaderTest::uInterfaceUpdate()
   if (im.beginTabBar("InspectorTab")) {
     // -------------------------- //
     // Actor tab
-    if (m_selectedActor && im.beginTabItem("Actor")) {
-      ActorInspector inspector(m_selectedActor);
+    // -------------------------- //
+    if (selectedActor && im.beginTabItem("Actor")) {
       // transform window
       im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
       if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
-        String name = m_selectedActor->getName();
+        String name = selectedActor->getName();
         im.createText("Name:   ");
         im.sameLine();
         if (im.createInputText("##Name", &name)) {
-          m_selectedActor->setName(name);
+          selectedActor->setName(name);
         }
         // activity checkbox
         im.sameLine();
-        im.createCheckBox("##ActiveActor", m_selectedActor->isActive());
+        im.createCheckBox("##ActiveActor", selectedActor->isActive());
         if (m_eyeIcon) {
           im.sameLine();
           im.createImage(m_eyeIcon, Vector2(15));
         }
         // inspect actor transform matrix
-        inspector.Inspect();
+        m_actorInspector.inspectTransform();
       }
       im.popStyleColor(3);
       // ---- Components window ---- //
@@ -498,7 +329,7 @@ ShaderTest::uInterfaceUpdate()
             if (path.toString() != "") {
               SPtr<BaseResource> resource = make_shared<ModelResource>();
               resource->softLoad(path);
-              m_selectedActor->addComponent(modelMan.createModel(resource->m_id));
+              selectedActor->addComponent(modelMan.createModel(resource->m_id));
             }
           }
         }
@@ -506,25 +337,19 @@ ShaderTest::uInterfaceUpdate()
           UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
           if (id) {
             SPtr<Model> model = modelMan.createModel(*id);
-            m_selectedActor->addComponent(model);
+            selectedActor->addComponent(model);
           }
           im.endDragDropTarget();
         }
-        // create all components
-        uint32 componentCount = static_cast<uint32>(m_selectedActor->getComponents().size());
-        for (uint32 i = 0; i < componentCount; ++i) {
-          inspector.createComponentWindow(m_selectedActor->getComponents()[i],
-                                          m_window,
-                                          m_searchMesh,
-                                          m_imgTextureSize,
-                                          m_selectedMaterial);
-        }
+        // inspect actor components
+        m_actorInspector.inspectComponents(m_selectedMaterial);
       }
       im.popStyleColor(3);
       im.endTabItem();
     }
     // -------------------------- //
     // App tab.
+    // -------------------------- //
     if (im.beginTabItem("App")) {
       // get framerate
       float f_fps = 1.0f / g_TimeManager().m_deltaTime;
@@ -565,9 +390,6 @@ ShaderTest::uInterfaceUpdate()
         im.tableNextColumn();
         im.createDragF("##YSens", m_sensY, 0.1f);
         im.tableJumpRow();
-        im.createText("Texture UI Image Size");
-        im.tableNextColumn();
-        im.createDragF("##TextureUIImageSize", m_imgTextureSize, 1.0f, 1.0f);
       }
       im.endTable();
       im.endTabItem();
@@ -694,7 +516,8 @@ ShaderTest::uInterfaceUpdate()
     // Material tab.
     // -------------------------- //
     if (m_selectedMaterial && im.beginTabItem(m_selectedMaterial->getName())) {
-      matInspector.createMaterialWindow(m_window, m_imgTextureSize);
+      m_materialInspector.setMaterial(m_selectedMaterial);
+      m_materialInspector.createMaterialWindow(m_window);
     }
     im.endTabBar();
   }

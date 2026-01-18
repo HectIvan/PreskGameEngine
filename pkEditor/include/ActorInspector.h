@@ -36,26 +36,26 @@ class ActorInspector
   virtual ~ActorInspector() = default;
 
   /**
-   * @brief Inspect the components of the actor.
+   * @brief Actor Transform Inspector.
    */
   void
-  Inspect();
+  inspectTransform();
 
   /**
-   * @brief Create a window for the ui based on the component of the actor.
-   * @param _pComponent Component to use.
-   * @param _window Main window.
-   * @param _searchMesh Search string for a mesh in the model.
-   * @param _imgTexSize Image texture size.
+   * @brief Set the actor to inspect.
+   * @param _pActor Pointer to the actor.
+   */
+  void
+  setActor(SPtr<Actor>& _pActor) { m_actor = _pActor; }
+
+  /**
+   * @brief Inspect the currently selected actor.
    * @param _pMaterialInspect Material to set on the inspector.
    */
   void
-  createComponentWindow(SPtr<Component>& _pComponent,
-                        Window& _window,
-                        String& _searchMesh,
-                        float& _imgTexSize,
-                        SPtr<Material>& _pMaterialInspect);
+  inspectComponents(SPtr<Material>& _pMaterialInspect);
 
- public:
+ private:
   SPtr<Actor> m_actor;
+  String m_searchMesh;
 };

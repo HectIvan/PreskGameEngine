@@ -195,8 +195,8 @@ Window::getSize() const
 String
 Window::openFileFromExplorer() const
 {
-  OPENFILENAME ofn;       // common dialog box structure
-  ANSICHAR szFile[MAX_PATH] = { 0 }; // buffer for file name
+  OPENFILENAME ofn = { 0 };       // common dialog box structure
+  ANSICHAR szFile[256] = {0}; // buffer for file name
 
   // Initialize OPENFILENAME
   ZeroMemory(&ofn, sizeof(ofn));
@@ -206,12 +206,29 @@ Window::openFileFromExplorer() const
   ofn.nMaxFile = sizeof(szFile);
   ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.TXT\0";
   ofn.nFilterIndex = 1;
-  ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+  ofn.Flags = OFN_PATHMUSTEXIST |
+              OFN_FILEMUSTEXIST |
+              OFN_NOCHANGEDIR |
+              OFN_ALLOWMULTISELECT |
+              OFN_EXPLORER;
 
   // Display the Open dialog box
   if (GetOpenFileNameA(&ofn) == TRUE)
   {
-    return String(ofn.lpstrFile);
+    // WCHAR* path = szFile;
+    // const SIZE_T pathLen = wcslen(path);
+    // Multiple files selected.
+    // if (ofn.nFileOffset > pathLen) {
+      // WCHAR* file = path + pathLen + 1;
+      // while (*file) {
+      //   // Process each selected file.
+      //   file += wcslen(file) + 1;
+      // }
+    // }
+    // one file selected.
+    // else {
+      return String(ofn.lpstrFile);
+    // }
   }
   return String("");
 }

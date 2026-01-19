@@ -85,9 +85,12 @@ using WString = std::wstring;
 PKFORCEINLINE String
 stringToLower(const String& _string)
 {
-  String newString = _string;
-  for (uint32 i = 0; i < newString.length(); ++i) {
-    newString[i] = tolower(newString[i]);
+  String newString;
+  const uint32 length = static_cast<uint32>(_string.length());
+  newString.resize(length);
+
+  for (uint32 i = 0; i < length; ++i) {
+    newString[i] = tolower(_string[i]);
   }
   
   return newString;

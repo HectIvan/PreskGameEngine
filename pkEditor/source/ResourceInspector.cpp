@@ -30,16 +30,17 @@ using pkEngineSDK::ModelCodec;
 using pkEngineSDK::Path;
 using pkEngineSDK::RESOURCE_TYPE::kMaterial;
 using pkEngineSDK::RESOURCE_TYPE::kShader;
+using RES_TYPE = pkEngineSDK::RESOURCE_TYPE::E;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::stringToLower;
 using pkEngineSDK::TextureCodec;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UUID;
 using pkEngineSDK::Vector2;
+using pkEngineSDK::UMap;
 
 void
-ResourceInspector::createResourceWindow(const Window& _window,
-                                        SPtr<Material>& _pSelectedMaterial)
+ResourceInspector::createResourceWindow(const Window& _window)
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
   ModelCodec& modelCodec = g_ModelCodec();
@@ -96,30 +97,21 @@ ResourceInspector::createResourceWindow(const Window& _window,
   uint32 column = 0;
   if (im.beginTable("Editor App", m_columnCount)) {
     im.tableNextRow();
-    for (auto& asset : assetMan.getAllResources()) {
+    const UMap<UUID, SPtr<BaseResource>> allResources = assetMan.getAllResources();
+    for (auto& asset : allResources) {
       // search filter
       const Path assetPath = String(asset.second->m_resourcePath);
       const String assetName = assetPath.getFileName();
-      const String searchResLower = stringToLower(m_searchResource); // tolower(m_searchResource.c_str());
+      const String searchResLower = stringToLower(m_searchResource);
       const String assetNameLower = stringToLower(assetName);
+    
       // resource search filter result
-      if (asset.second->getType() != kShader &&
-        assetNameLower.find(searchResLower.c_str()) != String::npos) {
-
+      const RES_TYPE assetType = asset.second->getType();
+      if (assetType != kShader && assetNameLower.find(searchResLower) != String::npos) {
         im.tableSetColumnIndex(column);
         const ANSICHAR* assetNameCstr = assetName.c_str();
-        if (im.selectable2(assetNameCstr, Vector2(m_itemSize))) {
-          if (asset.second->getType() == kMaterial) {
-            if (!asset.second->m_isLoaded) {
-              asset.second->load();
-              // g_MaterialManager().insertMaterial();
-            }
-            SPtr<Material> mat = g_MaterialManager().getMaterial(asset.first);
-            if (mat) {
-              _pSelectedMaterial = mat;
-            }
-          }
-        }
+        // create selectable image for each resource
+        if (im.selectable2(assetNameCstr, Vector2(m_itemSize))) {}
         if (im.beginDragDropSource()) {
           const String dragText = "Dragging " + assetName;
           im.createText(dragText.c_str());
@@ -129,9 +121,9 @@ ResourceInspector::createResourceWindow(const Window& _window,
         }
         if (im.isItemHovered()) {
           const String tooltip = "Name: " + assetName + "\n" +
-            "Asset ID: " + asset.first.toString() + "\n" +
-            "Asset type: " + asset.second->getTypeString() + "\n" +
-            "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
+                                 "Asset ID: " + asset.first.toString() + "\n" +
+                                 "Asset type: " + asset.second->getTypeString() + "\n" +
+                                 "Loaded: " + (asset.second->m_isLoaded ? "Yes" : "No");
           im.setTooltip(tooltip.c_str());
         }
         // pop-up menu for each resource

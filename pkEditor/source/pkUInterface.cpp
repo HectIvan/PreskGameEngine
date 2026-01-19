@@ -275,7 +275,10 @@ UInterface::createText(const ANSICHAR* _text)
 bool
 UInterface::createInputText(const ANSICHAR* _name, String* _param)
 {
-  return ImGui::InputText(_name, _param->data(), _param->capacity() + 1);
+  _param->resize(256);
+  bool changed = ImGui::InputText(_name, _param->data(), _param->size());
+  _param->resize(strlen(_param->data()));
+  return changed;
 }
 
 bool

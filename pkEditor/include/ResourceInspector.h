@@ -36,7 +36,7 @@ class ResourceInspector
    * @param _pSelectedMaterial Pointer to the selected material.
    */
   void
-  createResourceWindow(const Window& _window, SPtr<Material>& _pSelectedMaterial);
+  createResourceWindow(const Window& _window);
 
  private:
   String m_searchResource;

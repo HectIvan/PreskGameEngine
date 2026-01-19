@@ -278,7 +278,7 @@ ShaderTest::uInterfaceUpdate()
     }
     // resources window.
     if (im.beginTabItem("Resources")) {
-      m_resourceInspector.createResourceWindow(m_window, m_selectedMaterial);
+      m_resourceInspector.createResourceWindow(m_window);
       im.endTable();
     }
     im.endTabBar();

@@ -42,7 +42,7 @@ Vector3::operator^(const Vector3& other) const
   return cross(other);
 }
 
-Vector3
+const Vector3
 Vector3::cross(const Vector3& _other) const
 {
   return Vector3((y * _other.z) - (z * _other.y),
@@ -112,33 +112,33 @@ Vector3::distanceTo(const Vector3& _other)
 }
 
 void
-Vector3::clamp(float _x, float _y)
+Vector3::clamp(const float& _x, const float& _y)
 {
   x = Math::clamp(x, _x, _y);
   y = Math::clamp(y, _x, _y);
   z = Math::clamp(z, _x, _y);
 }
 
-Vector3
-Vector3::reflect(Vector3 _direction, Vector3 _normal)
+const Vector3
+Vector3::reflect(const Vector3& _direction, const Vector3& _normal)
 {
   return _direction + (_normal * -2.0f) * ((Vector3::dotProd(_direction, _normal)));
 }
 
 float
-Vector3::dotProd(const Vector3 _this, const Vector3 _other)
+Vector3::dotProd(const Vector3& _this, const Vector3& _other)
 {
   return (_this.x * _other.x) + (_this.y * _other.y) + (_this.z * _other.z);
 }
 
 float
-Vector3::dotProd(const Vector3 _this, const Vector4 _other)
+Vector3::dotProd(const Vector3& _this, const Vector4& _other)
 {
   return (_this.x * _other.x) + (_this.y * _other.y) + (_this.z * _other.z);
 }
 
 bool
-Vector3::isZero()
+Vector3::isZero() const
 {
   if (!(x == 0.0f)) { return false; }
   if (!(y == 0.0f)) { return false; }
@@ -147,7 +147,7 @@ Vector3::isZero()
 }
 
 bool
-Vector3::hasNan()
+Vector3::hasNan() const
 {
   if (Math::isNan(x)) { return true; }
   if (Math::isNan(y)) { return true; }

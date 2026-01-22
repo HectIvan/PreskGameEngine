@@ -24,6 +24,8 @@
 
 namespace pkEngineSDK {
 
+class Quaternion;
+
 class PK_UTILITY_EXPORT Matrix4
 {
  public:
@@ -260,39 +262,46 @@ class PK_UTILITY_EXPORT Matrix4
   }
 
   /**
+  * @brief Get the rotation matrix on 3 axis.
+  * @return The rotation Quaternion.
+  */
+  const Quaternion
+  getLocalRotation() const;
+
+  /**
    * @brief get the forward vector from a view matrix.
    * @return the forward vector.
    */
-  Vector3
-  getForwardVector();
+  const Vector3
+  getForwardVector() const;
 
   /**
    * @brief get the up vector from a view matrix.
    * @return the up vector.
    */
-  Vector3
-  getUpVector();
+  const Vector3
+  getUpVector() const;
 
   /**
    * @brief get the right vector from a view matrix.
    * @return the right vector.
    */
-  Vector3
-  getRightVector();
+  const Vector3
+  getRightVector() const;
 
   /**
    * @brief Get the position of the view matrix.
    * @return The position of the view.
    */
-  Vector3
-  getViewPosition();
+  const Vector3
+  getViewPosition() const;
 
   /**
    * @brief Get the inverse matrix.
    * @return The inverse matrix.
    */
-  Matrix4
-  inverse();
+  const Matrix4
+  inverse() const;
 
   /**
    * @brief Multiply a matrix with another.
@@ -399,8 +408,8 @@ class PK_UTILITY_EXPORT Matrix4
    * @brief The transposed of this matrix.
    * @return This matrix transposed.
    */
-  Matrix4
-  getTransposed();
+  const Matrix4
+  getTransposed() const;
   
   /**
    * @brief Scale a matrix to the desired scales.
@@ -410,7 +419,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return This matrix transposed.
    */
   static const Matrix4
-  matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ);
+  matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ) ;
   
   /**
    * @brief The translation matrix that is created from
@@ -453,14 +462,14 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The matrix translation.
    */
   const Matrix4
-  getTranslation();
+  getTranslation() const;
 
   /**
    * @brief Get the current Vector3 translation.
    * @return The Vector translation.
    */
   const Vector3
-  getTranslation3();
+  getTranslation3() const;
   
   /**
    * @brief The translation matrix that is created from
@@ -483,7 +492,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The scale vector.
    */
   const Vector3
-  getScale3();
+  getScale3() const;
 
   /**
    * @brief Set the scale of the matrix.
@@ -520,14 +529,14 @@ class PK_UTILITY_EXPORT Matrix4
    * 
    */
   static Matrix4
-  MatrixRotationAxis(Vector3& _axis, const float& _angle);
+  MatrixRotationAxis(const Vector3& _axis, const float& _angle);
 
   /**
    * @brief Get the rotation matrix.
    * @return The rotation matrix.
    */
   const Matrix4
-  getRotation();
+  getRotation() const;
 
   /**
    * @brief Get the rotation matrix without a scale.
@@ -535,7 +544,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @return The rotation matrix.
    */
   const Matrix4
-  getRotationNoScale(const Vector3& _scale);
+  getRotationNoScale(const Vector3& _scale) const;
   
   /**
    * @brief The rotation matrix that is created from
@@ -556,19 +565,25 @@ class PK_UTILITY_EXPORT Matrix4
    */
   static const Matrix4
   rotation(const Vector3& _rot);
+
+  /**
+   * @brief The rotation matrix that is created from a rotation quaternion.
+   * @param _quat Rotation quaternion.
+   * @return The rotation matrix at the rotations given to it.
+   */
+  static const Matrix4
+  rotation(const Quaternion& _quat);
   
   /**
    * @brief The rotation matrix at the z coordinate.
-   * created from the angle given to it.
    * @param angle angle to rotate.
    * @return The rotation matrix at z with the rotation given to it.
    */
-  PKFORCEINLINE static Matrix4
+  static Matrix4
   rotationZ(const float& _angle);
   
   /**
    * @brief The rotation matrix at the y coordinate.
-   * created from the angle given to it.
    * @param angle angle to rotate.
    * @return The rotation matrix at y with the rotation given to it.
    */
@@ -577,7 +592,6 @@ class PK_UTILITY_EXPORT Matrix4
   
   /**
    * @brief The rotation matrix at the x coordinate.
-   * created from the angle given to it.
    * @param angle angle to rotate.
    * @return The rotation matrix at x with the rotation given to it.
    */
@@ -597,7 +611,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _atPos Value of the at vector.
    * @param _upPos Direction of the up vector.
    */
-  static Matrix4
+  static const Matrix4
   lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& _upDir);
 
   /**
@@ -606,7 +620,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _eyeDir Direction where its looking at.
    * @param _upDir Direction of the up vector.
    */
-  static Matrix4
+  static const Matrix4
   lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir);
 
   /**
@@ -618,7 +632,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _farZ Far Z distance.
    * @return The return matrix.
    */
-  static Matrix4
+  static const Matrix4
   perspectiveFOVLH(const float& _halfFOV,
                    const float& _width,
                    const float& _height,
@@ -635,7 +649,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _farZ Far Z distance.
    * @return The orthographic matrix.
    */
-  static Matrix4
+  static const Matrix4
   orthographicFOVLH(const float& _left,
                     const float& _right,
                     const float& _top,

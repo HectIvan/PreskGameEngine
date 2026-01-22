@@ -5,6 +5,7 @@
 /*********************************************/
 #include "pkMath.h"
 #include "pkMatrix4.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK {
 
@@ -80,32 +81,43 @@ Matrix4::Matrix4(const float& m00, const float& m01, const float& m02, const flo
   matrix[3][0] = m30; matrix[3][1] = m31; matrix[3][2] = m32; matrix[3][3] = m33;
 }
 
-Vector3
-Matrix4::getForwardVector()
+const Quaternion
+Matrix4::getLocalRotation() const
+{
+  Quaternion localRotation;
+  localRotation.x = Math::atan2(matrix[2][1], matrix[2][2]);
+  localRotation.y = Math::asin(-matrix[2][0]);
+  localRotation.z = Math::atan2(matrix[1][0], matrix[0][0]);
+  localRotation.w = 1.0f; // Assuming no scaling, w can be set to 1.0f
+  return localRotation;
+}
+
+const Vector3
+Matrix4::getForwardVector() const
 {
   return Vector3(matrix[0][2], matrix[1][2], matrix[2][2]);
 }
 
-Vector3
-Matrix4::getUpVector()
+const Vector3
+Matrix4::getUpVector() const
 {
   return Vector3(matrix[0][1], matrix[1][1], matrix[2][1]);
 }
 
-Vector3
-Matrix4::getRightVector()
+const Vector3
+Matrix4::getRightVector() const
 {
   return Vector3(matrix[0][0], matrix[1][0], matrix[2][0]);
 }
 
-Vector3
-Matrix4::getViewPosition()
+const Vector3
+Matrix4::getViewPosition() const
 {
   return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
 }
 
-Matrix4
-Matrix4::inverse()
+const Matrix4
+Matrix4::inverse() const
 {
   // Cofactors
   Vector<float> inv;
@@ -241,8 +253,8 @@ Matrix4::inverse()
                  inv[12], inv[13], inv[14], inv[15]);
 }
 
-Matrix4
-Matrix4::getTransposed()
+const Matrix4
+Matrix4::getTransposed() const
 {
   Matrix4 result;
   for (int i = 0; i < 4; ++i)
@@ -297,7 +309,7 @@ Matrix4::setTranslation(const float& _x, const float& _y, const float& _z)
 }
 
 const Matrix4
-Matrix4::getTranslation()
+Matrix4::getTranslation() const
 {
   Matrix4 M = Matrix4::IDENTITY;
   M.matrix[0][3] = matrix[0][3];
@@ -307,7 +319,7 @@ Matrix4::getTranslation()
 }
 
 const Vector3
-Matrix4::getTranslation3()
+Matrix4::getTranslation3() const
 {
   return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
@@ -332,7 +344,7 @@ Matrix4::getScale()
 }
 
 const Vector3
-Matrix4::getScale3()
+Matrix4::getScale3() const
 {
   return Vector3(matrix[0][3],
                  matrix[1][3],
@@ -366,23 +378,33 @@ Matrix4::setScale(const float& _x, const float& _y, const float& _z)
 }
 
 Matrix4
-Matrix4::MatrixRotationAxis(Vector3& _axis, const float& _angle)
+Matrix4::MatrixRotationAxis(const Vector3& _axis, const float& _angle)
 {
   PK_ASSERT(!_axis.isZero());
   PK_ASSERT(!_axis.hasNan());
 
-  _axis.normalize();
+  const Vector3 axis = _axis.normalized();
   
   //Compute rotation matrix from axis and angle
-  float s = Math::sin(_angle);
-  float c = Math::cos(_angle);
-  float t = 1.0f - c;
+  const float s = Math::sin(_angle);
+  const float c = Math::cos(_angle);
+  const float t = 1.0f - c;
 
-  float x = _axis.x;  float y = _axis.y;  float z = _axis.z;
+  const float x = axis.x;
+  const float y = axis.y;
+  const float z = axis.z;
 
-  float tx = t * x;  float ty = t * y;  float tz = t * z;
-  float txy = tx * y;  float txz = tx * z;  float tyz = ty * z;
-  float sx = s * x;  float sy = s * y;  float sz = s * z;
+  const float tx = t * x;
+  const float ty = t * y;
+  const float tz = t * z;
+
+  const float txy = tx * y;
+  const float txz = tx * z;
+  const float tyz = ty * z;
+
+  const float sx = s * x;
+  const float sy = s * y;
+  const float sz = s * z;
 
   Matrix4 Result = Matrix4::IDENTITY;
   Result.matrix[0][0] = tx * x + c;
@@ -401,7 +423,7 @@ Matrix4::MatrixRotationAxis(Vector3& _axis, const float& _angle)
 }
 
 const Matrix4
-Matrix4::getRotation()
+Matrix4::getRotation() const
 {
   Matrix4 rot = Matrix4::IDENTITY;
   rot.matrix[0][0] = matrix[0][0];
@@ -419,7 +441,7 @@ Matrix4::getRotation()
 }
 
 const Matrix4
-Matrix4::getRotationNoScale(const Vector3& _scale)
+Matrix4::getRotationNoScale(const Vector3& _scale) const
 {
   Matrix4 rotMat = getRotation();
   rotMat.matrix[0][0] /= _scale.x;
@@ -432,6 +454,39 @@ const Matrix4
 Matrix4::rotation(const Vector3& _rot)
 {
   return rotation(_rot.x, _rot.y, _rot.z);
+}
+
+/*
+ * Rotation matrix from quaternion
+    1.0f - 2.0f*qy*qy - 2.0f*qz*qz,     2.0f*qx*qy - 2.0f*qz*qw,        2.0f*qx*qz + 2.0f*qy*qw,        0.0f,
+    2.0f*qx*qy + 2.0f*qz*qw,            1.0f - 2.0f*qx*qx - 2.0f*qz*qz, 2.0f*qy*qz - 2.0f*qx*qw,        0.0f,
+    2.0f*qx*qz - 2.0f*qy*qw,            2.0f*qy*qz + 2.0f*qx*qw,        1.0f - 2.0f*qx*qx - 2.0f*qy*qy, 0.0f,
+    0.0f,                               0.0f,                           0.0f,                           1.0f);
+*/
+const Matrix4
+Matrix4::rotation(const Quaternion& _quat)
+{
+  const Quaternion quat = _quat.normalized();
+
+  const float w = quat.w;
+  const float x = quat.x;
+  const float y = quat.y;
+  const float z = quat.z;
+
+  Matrix4 M = Matrix4::IDENTITY;
+  M.matrix[0][0] = 1.0f - 2.0f * y * y - 2.0f * z * z;
+  M.matrix[0][1] = 2.0f * x * y - 2.0f * z * w;
+  M.matrix[0][2] = 2.0f * x * z + 2.0f * y * w;
+
+  M.matrix[1][0] = 2.0f * x * y + 2.0f * z * w;
+  M.matrix[1][1] = 1.0f - 2.0f * x * x - 2.0f * z * z;
+  M.matrix[1][2] = 2.0f * y * z - 2.0f * x * w;
+
+  M.matrix[2][0] = 2.0f * x * z - 2.0f * y * w;
+  M.matrix[2][1] = 2.0f * y * z + 2.0f * x * w;
+  M.matrix[2][2] = 1.0f - 2.0f * x * x - 2.0f * y * y;
+
+  return M;
 }
 
 const Matrix4
@@ -447,8 +502,8 @@ Matrix4::rotationZ(const float& _angle)
 {
   Matrix4 M = Matrix4::IDENTITY;
 
-  float fSinAngle = sinf(_angle);
-  float fCosAngle = cosf(_angle);
+  const float fSinAngle = sinf(_angle);
+  const float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
   M.matrix[0][1] = -fSinAngle;
@@ -463,8 +518,8 @@ Matrix4::rotationY(const float& _angle)
 {
   Matrix4 M = Matrix4::IDENTITY;
 
-  float fSinAngle = sinf(_angle);
-  float fCosAngle = cosf(_angle);
+  const float fSinAngle = sinf(_angle);
+  const float fCosAngle = cosf(_angle);
 
   M.matrix[0][0] = fCosAngle;
   M.matrix[0][2] = fSinAngle;
@@ -480,8 +535,8 @@ Matrix4::rotationX(const float& _angle)
 {
   Matrix4 M = IDENTITY;
 
-  float fSinAngle = sinf(_angle);
-  float fCosAngle = cosf(_angle);
+  const float fSinAngle = sinf(_angle);
+  const float fCosAngle = cosf(_angle);
 
   M.matrix[1][1] = fCosAngle;
   M.matrix[1][2] = -fSinAngle;
@@ -508,7 +563,7 @@ Matrix4::setRotation(const Matrix4& _rotation)
   matrix[2][2] = _rotation.matrix[2][2];
 }
 
-Matrix4
+const Matrix4
 Matrix4::lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& _upDir)
 {
   const Vector4 EyeDirection = _atPos - _eyePos;
@@ -518,7 +573,7 @@ Matrix4::lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& 
   return M;
 }
 
-Matrix4
+const Matrix4
 Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir)
 {
   Vector4 negEyePosition;
@@ -567,7 +622,7 @@ Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDi
   return M;
 }
 
-Matrix4
+const Matrix4
 Matrix4::perspectiveFOVLH(const float& _halfFOV,
                           const float& _width,
                           const float& _height,
@@ -576,16 +631,19 @@ Matrix4::perspectiveFOVLH(const float& _halfFOV,
 {
   Matrix4 M(0.0f);
 
-  M.matrix[0][0] = 1.0f / tanf(_halfFOV);
-  M.matrix[1][1] = _width / tanf(_halfFOV) / _height;
-  M.matrix[2][2] = _farZ / (_farZ - _nearZ);
+  const float tHFov = tanf(_halfFOV);
+  const float far_near = _farZ - _nearZ;
+
+  M.matrix[0][0] = 1.0f / tHFov;
+  M.matrix[1][1] = _width / tHFov / _height;
+  M.matrix[2][2] = _farZ / (far_near);
   M.matrix[2][3] = 1.0f;
-  M.matrix[3][2] = -_nearZ * (_farZ / (_farZ - _nearZ));
+  M.matrix[3][2] = -_nearZ * (_farZ / far_near);
 
   return M;
 }
 
-Matrix4
+const Matrix4
 Matrix4::orthographicFOVLH(const float& _left,
                            const float& _right,
                            const float& _top,
@@ -593,15 +651,19 @@ Matrix4::orthographicFOVLH(const float& _left,
                            const float& _nearZ,
                            const float& _farZ)
 {
+  const float far_near = _farZ - _nearZ;
+  const float top_bottom = _top - _bottom;
+  const float right_left = _right - _left;
+
   Matrix4 M = Matrix4::IDENTITY;
-  M.matrix[0][0] = 2.0f / (_right - _left);
-  M.matrix[0][3] = -(_right + _left) / (_right - _left);
+  M.matrix[0][0] = 2.0f / right_left;
+  M.matrix[0][3] = -(_right + _left) / right_left;
 
-  M.matrix[1][1] = 2.0f / (_top - _bottom);
-  M.matrix[1][3] = -(_top + _bottom) / (_top - _bottom);
+  M.matrix[1][1] = 2.0f / top_bottom;
+  M.matrix[1][3] = -(_top + _bottom) / top_bottom;
 
-  M.matrix[2][2] = 1.0f / (_farZ - _nearZ);
-  M.matrix[2][3] = -_nearZ / (_farZ - _nearZ);
+  M.matrix[2][2] = 1.0f / far_near;
+  M.matrix[2][3] = -_nearZ / far_near;
   return M;
 }
 }

@@ -261,7 +261,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _other The other vector.
    * @return The cross Vector.
    */
-  Vector3
+  const Vector3
   cross(const Vector3& _other) const;
 
   /**
@@ -322,7 +322,7 @@ class PK_UTILITY_EXPORT Vector3
    * @param _y Maximum clamp range.
    */
   PKFORCEINLINE void
-  clamp(float _x, float _y);
+  clamp(const float& _x, const float& _y);
 
   /**
    * @Brief Gets the reflected vector off a normal.
@@ -330,8 +330,8 @@ class PK_UTILITY_EXPORT Vector3
    * @param _normal The normal of the surface collision.
    * @return The reflected vector.
    */
-  static Vector3
-  reflect(Vector3 _direction, Vector3 _normal);
+  static const Vector3
+  reflect(const Vector3& _direction, const Vector3& _normal);
 
   /**
    * @Brief Calculate the dot product of one vector with this one.
@@ -340,7 +340,7 @@ class PK_UTILITY_EXPORT Vector3
    * @return The final dot product.
    */
   PKFORCEINLINE static float
-  dotProd(const Vector3 _this, const Vector3 _other);
+  dotProd(const Vector3& _this, const Vector3& _other);
 
   /**
    * @Brief Calculate the dot product of one vector with this one.
@@ -348,21 +348,21 @@ class PK_UTILITY_EXPORT Vector3
    * @return The final dot product.
    */
   PKFORCEINLINE static float
-  dotProd(const Vector3 _this, const Vector4 _other);
+  dotProd(const Vector3& _this, const Vector4& _other);
 
   /**
    * @brief Check if the vector is a zero vector.
    * @return Wether the vector is 0 or not.
    */
   PKFORCEINLINE bool
-  isZero();
+  isZero() const;
 
   /**
    * @brief Check if the vector has a non number.
    * @return wether the vector has or does not have a nan.
    */
   PKFORCEINLINE bool
-  hasNan();
+  hasNan() const;
 
   /**
    * @brief Get a Vector3 with random values.

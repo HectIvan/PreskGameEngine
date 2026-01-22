@@ -151,6 +151,15 @@ class PK_UTILITY_EXPORT PlatformMath
   atan(const float _x);
 
   /**
+   * @brief Get the atan2 of _x.
+   * @param _x Value to calculate atan2.
+   * @param _y Second value to calculate atan2.
+   * @return atan2 of _x and _y.
+   */
+  static float
+  atan2(const float _x, const float _y);
+
+  /**
    * @brief clamps a float between 2 functions.
    * @param _t Float to clamp.
    * @param _x Minimum clamping value.

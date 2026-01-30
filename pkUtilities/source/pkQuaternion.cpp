@@ -20,15 +20,42 @@
 namespace pkEngineSDK
 {
 
+const Quaternion Quaternion::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f);
+
 Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
 {
   // float a = 1 + _vTo.dotProd(_vFrom);
+  const Vector3 f = _vFrom.normalized();
+  const Vector3 t = _vTo.normalized();
 
-  const Vector3 vec = _vFrom.cross(_vTo);
-  x = vec.x;
-  y = vec.y;
-  z = vec.z;
-  normalize();
+  const float FdT = f.dotProd(t);
+
+  if (FdT >= 1.0f) {
+    // vectors are the same
+    w = 1.0f;
+    x = 0.0f;
+    y = 0.0f;
+    z = 0.0f;
+  }
+  // if vectors are opposite.
+  else if (FdT <= -1.0f) {
+    Vector3 ortho = Vector3::RIGHT.cross(f);
+    if (ortho.magnitudeSquare() < 0.0001f) {
+      ortho = Vector3::UP.cross(f);
+    }
+    ortho.normalize();
+    w = 0.0f;
+    x = ortho.x;
+    y = ortho.y;
+    z = ortho.z;
+  }
+  else {
+    const Vector3 cross = f.cross(t);
+    w = 1.0f + FdT;
+    x = cross.x;
+    y = cross.y;
+    z = cross.z;  
+  }
 }
 
 /* q = (sina * x * ​sin(radian / 2),
@@ -117,6 +144,16 @@ Quaternion::operator*(const Quaternion& _other) const
   return p;
 }
 
+const Vector3
+Quaternion::rotate(const Vector3& _vector) const
+{
+  const Vector3 u = Vector3(x, y, z);
+  const Vector3 t = u.cross(_vector);
+
+  return _vector + (t * (2.0f * w)) + (t * u * 2);
+}
+
+
 const Quaternion
 Quaternion::operator*(const float& _scalar) const
 {
@@ -146,30 +183,30 @@ Quaternion::axisAngle(const Vector3& _axis, const float& _angle)
   return Quaternion(w, x, y, z);
 }
 
-const Vector3
-Quaternion::rotate(const Vector3& _vector) const
-{
-  const Quaternion& p = *this;
-
-  // q = P (x,0)
-  Quaternion q;
-  q.x = p.w * _vector.x + p.y * _vector.z - p.z * _vector.y;
-  q.y = p.w * _vector.y + p.z * _vector.x - p.x * _vector.z;
-  q.z = p.w * _vector.z + p.x * _vector.y - p.y * _vector.x;
-  
-  q.w = -p.x * _vector.x - p.y * _vector.y - p.z * _vector.z;
-  
-  // r = q P*
-  Vector3 r;
-  r.x = q.w * -p.x + p.w * q.x - q.y * p.z + q.z * p.y;
-  r.y = q.w * -p.y + p.w * q.y - q.z * p.x + q.x * p.z;
-  r.z = q.w * -p.z + p.w * q.z - q.x * p.y + q.y * p.x;
-  
-  // Vector3 r = (p * Quaternion(0.0f, _vector) * p.conjugate());
-
-  // return r;
-  return r;
-}
+// const Vector3
+// Quaternion::rotate(const Vector3& _vector) const
+// {
+//   const Quaternion& p = *this;
+// 
+//   // q = P (x,0)
+//   Quaternion q;
+//   q.x = p.w * _vector.x + p.y * _vector.z - p.z * _vector.y;
+//   q.y = p.w * _vector.y + p.z * _vector.x - p.x * _vector.z;
+//   q.z = p.w * _vector.z + p.x * _vector.y - p.y * _vector.x;
+//   
+//   q.w = -p.x * _vector.x - p.y * _vector.y - p.z * _vector.z;
+//   
+//   // r = q P*
+//   Vector3 r;
+//   r.x = q.w * -p.x + p.w * q.x - q.y * p.z + q.z * p.y;
+//   r.y = q.w * -p.y + p.w * q.y - q.z * p.x + q.x * p.z;
+//   r.z = q.w * -p.z + p.w * q.z - q.x * p.y + q.y * p.x;
+//   
+//   // Vector3 r = (p * Quaternion(0.0f, _vector) * p.conjugate());
+// 
+//   // return r;
+//   return r;
+// }
 
 const Quaternion
 Quaternion::operator*=(const Quaternion& _other)
@@ -186,7 +223,7 @@ Quaternion::rotate(const Quaternion& _quat) const
 }
 
 const Quaternion
-Quaternion::fromEuler(const Vector3& _vector) const
+Quaternion::fromEuler(const Vector3& _vector)
 {
   float cx = Math::cos(_vector.x * 0.5f);
   float sx = Math::sin(_vector.x * 0.5f);
@@ -203,8 +240,35 @@ Quaternion::fromEuler(const Vector3& _vector) const
   return q;
 }
 
-// same as inverse but makes a new one instead of moddifying the current quaternion.
-FORCEINLINE Quaternion
+/**
+ source: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+ */
+const Vector3
+Quaternion::toEuler() const
+{
+  Vector3 euler;
+
+  const Quaternion q = *this;
+
+ 
+  const float sinr_cosp = 2.0f * (q.w * q.x + q.y * q.z);
+  const float cosr_cosp = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+  euler.x = Math::atan2(sinr_cosp, cosr_cosp);
+
+  
+  const float sinp = Math::sqrt(1.0f + 2.0f * (q.w * q.y - q.x * q.z));
+  const float cosp = Math::sqrt(1.0f - 2.0f * (q.w * q.y - q.x * q.z));
+  euler.y = 2.0f * Math::atan2(sinp, cosp) - Math::PI * 0.5f;
+
+  
+  const float siny_cosp = 2.0f * (q.w * q.z + q.x * q.y);
+  const float cosy_cosp = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+  euler.z = Math::atan2(siny_cosp, cosy_cosp);
+
+  return euler;
+}
+
+Quaternion
 Quaternion::conjugate() const
 {
   return Quaternion(w, -x, -y, -z);
@@ -226,7 +290,10 @@ const Quaternion
 Quaternion::normalize()
 {
   float mag = magnitude();
-  if (mag == 0.0f) { return *this; }
+  if (mag < Math::SMALL_NUMBER) {
+    *this = Quaternion::IDENTITY;
+    return *this;
+  }
   mag = 1.0f / mag;
   x *= mag;
   y *= mag;

@@ -19,6 +19,7 @@
 #include "pkComponent.h"
 #include "pkMatrix4.h"
 #include "pkPlatformMath.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK
 {
@@ -138,27 +139,23 @@ class PK_CORE_EXPORT Actor
    * @param _rotation Rotation Vector.
    */
   void
-  setRotation(const Vector3& _rotation, const PK_ROT_TYPE::E _rotType = PK_ROT_TYPE::kDegrees);
+  setRotation(const Vector3& _rotation);
 
   /**
    * @brief Set the rotation of the Actor.
    * @param _x Rotation in the X vector.
    * @param _y Rotation in the Y vector.
    * @param _z Rotation in the Z vector.
-   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  setRotation(const float& _x,
-              const float& _y,
-              const float& _z,
-              const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  setRotation(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Rotate the Actor.
    * @param _rotation Rotation Vector.
    */
   void
-  rotate(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  rotate(const Vector3& _rotation);
 
   /**
    * @brief Rotate the Actor.
@@ -167,10 +164,7 @@ class PK_CORE_EXPORT Actor
    * @param _z Rotation in the Z vector.
    */
   void
-  rotate(const float& _x,
-         const float& _y,
-         const float& _z,
-         const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  rotate(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Set the scale of the Actor.
@@ -213,7 +207,9 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor rotation.
    * @return The actor rotation.
    */
-  PKFORCEINLINE Vector3&
+  // PKFORCEINLINE Vector3&
+  // getRotation() { return m_rotation; 
+  PKFORCEINLINE Quaternion&
   getRotation() { return m_rotation; }
 
   /**
@@ -259,7 +255,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get all the components of the actor.
    * @return Vector with all the components.
    */
-  Vector<SPtr<Component>>&
+  const Vector<SPtr<Component>>&
   getComponents() { return m_components; }
 
   /**
@@ -302,7 +298,7 @@ class PK_CORE_EXPORT Actor
    * @brief Get a pointer to the parent.
    * @return Pointer to the actor.
    */
-  SPtr<Actor>
+  const SPtr<Actor>&
   getParent() { return m_parent; }
 
   /**
@@ -310,7 +306,7 @@ class PK_CORE_EXPORT Actor
    * @param _active State of the actor.
    */
   void
-  setActive(const bool _active) { m_active = _active; }
+  setActive(const bool& _active) { m_active = _active; }
 
   /**
    * @brief If the actor is active or not.
@@ -341,7 +337,7 @@ class PK_CORE_EXPORT Actor
   generateNewLocalTransform();
 
  public:
-   // transform parameters
+  // transform parameters
   Vector3 m_forward;
   Vector3 m_right;
   Vector3 m_up;
@@ -354,7 +350,7 @@ class PK_CORE_EXPORT Actor
   SPtr<Actor> m_parent;
 
   Vector3 m_scale;
-  Vector3 m_rotation;
+  Quaternion m_rotation;
   Vector3 m_position;
 
  private:

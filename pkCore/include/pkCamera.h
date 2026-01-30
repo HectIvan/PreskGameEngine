@@ -26,6 +26,7 @@ namespace pkEngineSDK
 {
 
 class Actor;
+class Quaternion;
 
 namespace CAMERA_PROJ
 {
@@ -163,32 +164,26 @@ class PK_CORE_EXPORT Camera : public Component
 
   /**
    * @brief Rotate the camera.
-   * @param _rotate Rotation amount.
-   * @param _rotType Rotation type (degrees or radians).
+   * @param _rotation Rotation amount.
    */
   void
-  rotate(const Vector3& _rotate, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  rotate(const Vector3& _rotation);
 
   /**
    * @brief Rotate the camera.
    * @param _x x rotation amount.
    * @param _y y rotation amount.
    * @param _z z rotation amount.
-   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  rotate(const float& _x,
-         const float& _y,
-         const float& _z,
-         const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  rotate(const float& _x, const float& _y, const float& _z);
 
   /**
    * @brief Set the rotation of the camera.
    * @param _rotation New rotation values.
-   * @param _rotType Rotation type (degrees or radians).
    */
   void
-  rotation(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType = PK_ROT_TYPE::kDegrees);
+  rotation(const Quaternion& _rotation);
 
   /**
    * @brief Get the forward vector of the camera.

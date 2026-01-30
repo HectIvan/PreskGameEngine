@@ -43,9 +43,6 @@
     <Filter Include="include\camera">
       <UniqueIdentifier>{56118060-0e7b-45ed-9067-e272e3634412}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\camera">
-      <UniqueIdentifier>{03eecd44-c9d4-4fec-87ec-fed8d6bc6887}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\base app">
       <UniqueIdentifier>{d4ee8979-e08f-40e5-a7c9-74bafca0d1b7}</UniqueIdentifier>
     </Filter>

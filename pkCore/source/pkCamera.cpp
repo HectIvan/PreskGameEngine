@@ -135,22 +135,17 @@ Camera::moveUpLocal(float _offset)
 }
 
 void
-Camera::rotate(const Vector3& _rotate, const PK_ROT_TYPE::E& _rotType)
+Camera::rotate(const Vector3& _rotate)
 {
-  rotate(_rotate.x, _rotate.y, _rotate.z, _rotType);
+  rotate(_rotate.x, _rotate.y, _rotate.z);
 }
 
 void
-Camera::rotate(const float& _x,
-               const float& _y,
-               const float& _z,
-               const PK_ROT_TYPE::E& _rotType)
+Camera::rotate(const float& _x, const float& _y, const float& _z)
 {
-  Vector3 rot = Vector3(_x, _y, _z);
+  const Vector3 rotVec = Vector3(_x, _y, _z);
 
-  if (_rotType == PK_ROT_TYPE::kDegrees) {
-    rot *= Math::DEG2RAD;
-  }
+  Quaternion rot = Quaternion::fromEuler(rotVec);
 
   m_view *= Matrix4::rotation(rot);
   m_at = m_eye + m_view.getForwardVector();
@@ -159,13 +154,9 @@ Camera::rotate(const float& _x,
 }
 
 void
-Camera::rotation(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType)
+Camera::rotation(const Quaternion& _rotation)
 {
-  Vector3 rot = _rotation;
-
-  if (_rotType == PK_ROT_TYPE::kDegrees) {
-    rot *= Math::DEG2RAD;
-  }
+  Quaternion rot = _rotation;
 
   m_view = Matrix4::rotation(rot);
   m_at = m_eye + m_view.getForwardVector();

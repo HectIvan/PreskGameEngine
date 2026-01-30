@@ -71,26 +71,6 @@ ActorInspector::ActorInspector(SPtr<Actor> _pActor)
 {
   m_actor = _pActor;
 }
-/*
-void
-buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window& _window)
-{
-  TextureManager& tm = g_TextureManager();
-  UInterface& im = g_uInterface();
-  // create the buttons
-  if (im.createButtonImage(_name.c_str(), _pTexture)) {
-    // opened window to set albedo texture
-    Path path(_window.openFileFromExplorer());
-    if (path.toString() != "") {
-      SPtr<Texture> texture = tm.loadTexture(path);
-      meshMat->setAlbedo(texture);
-    }
-  }
-  // hover tooltip.
-  if (im.isItemHovered()) {
-    im.setTooltip("Albedo Texture");
-  }
-}*/
 
 void
 ActorInspector::inspectTransform()
@@ -106,11 +86,11 @@ ActorInspector::inspectTransform()
     // m_actor->setPositionLocal(newTranslation);
   }
   // change the rotation
-  Vector3 newRotation = m_actor->m_rotation;
+  Vector3 newRotation = m_actor->m_rotation.toEuler() * Math::RAD2DEG;
   im.createText("Rotation");
   im.sameLine();
   im.createDrag3("##Rotation",newRotation, 1.0f);
-  m_actor->setRotation(newRotation);
+  m_actor->setRotation(newRotation * Math::DEG2RAD);
   // change the scale
   Vector3 newScale = m_actor->m_scale;
   im.createText("Scale   ");

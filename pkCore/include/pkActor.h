@@ -256,6 +256,24 @@ class PK_CORE_EXPORT Actor
   }
 
   /**
+   * @brief Get a vector with all the components of a specific type.
+   * @return Vector of components.
+   */
+  template<typename T>
+  Vector<SPtr<T>>
+  getComponents()
+  {
+    Vector<SPtr<T>> comps;
+    for (auto& comp : m_components) {
+      if (T::getObjType() == comp->getType()) {
+        SPtr<T> obj = reinterpret_pointer_cast<T>(comp);
+        comps.push_back(obj);
+      }
+    }
+    return comps;
+  }
+
+  /**
    * @brief Get all the components of the actor.
    * @return Vector with all the components.
    */

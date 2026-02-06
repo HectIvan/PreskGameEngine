@@ -67,30 +67,10 @@ using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
 
-ActorInspector::ActorInspector(SPtr<Actor> _pActor)
+ActorInspector::ActorInspector(const SPtr<Actor>& _pActor)
 {
   m_actor = _pActor;
 }
-/*
-void
-buttonForTexture(String _name, String _tooltip, SPtr<Texture>& _pTexture, Window& _window)
-{
-  TextureManager& tm = g_TextureManager();
-  UInterface& im = g_uInterface();
-  // create the buttons
-  if (im.createButtonImage(_name.c_str(), _pTexture)) {
-    // opened window to set albedo texture
-    Path path(_window.openFileFromExplorer());
-    if (path.toString() != "") {
-      SPtr<Texture> texture = tm.loadTexture(path);
-      meshMat->setAlbedo(texture);
-    }
-  }
-  // hover tooltip.
-  if (im.isItemHovered()) {
-    im.setTooltip("Albedo Texture");
-  }
-}*/
 
 void
 ActorInspector::inspectTransform()
@@ -109,7 +89,7 @@ ActorInspector::inspectTransform()
   Vector3 newRotation = m_actor->m_rotation;
   im.createText("Rotation");
   im.sameLine();
-  im.createDrag3("##Rotation",newRotation, 1.0f);
+  im.createDrag3("##Rotation", newRotation, 1.0f);
   m_actor->setRotation(newRotation);
   // change the scale
   Vector3 newScale = m_actor->m_scale;
@@ -118,7 +98,42 @@ ActorInspector::inspectTransform()
   im.createDrag3("##Scale", newScale);
   m_actor->setScale(newScale);
 }
+/*
+void
+ActorInspector::inspectTransform()
+{
+  // get the user interface manager
+  UInterface& im = g_uInterface();
 
+  if (im.beginTable("Transform")) {
+    im.tableJumpRow();
+    im.createText("Position");
+    im.tableNextColumn();
+    // change the position
+    Vector3 newTranslation = m_actor->m_position;
+    if (im.createDrag3("##Position", newTranslation)) {
+      m_actor->setPosition(newTranslation);
+    }
+    im.tableJumpRow();
+    
+    im.createText("Rotation");
+    im.tableNextColumn();
+    Vector3 newRotation = m_actor->m_rotation;
+    if (im.createDrag3("##Rotation", newRotation, 1.0f)) {
+      m_actor->setRotation(newRotation);
+    }
+    im.tableJumpRow();
+    
+    im.createText("Scale");
+    im.tableNextColumn();
+    Vector3 newScale = m_actor->m_scale;
+    if (im.createDrag3("##Scale", newScale)) {
+      m_actor->setScale(newScale);
+    }
+    im.endTable();
+  }
+}
+*/
 void
 ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
 {
@@ -128,9 +143,19 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
   ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
-  const uint32 compCount = static_cast<uint32>(m_actor->m_components.size());
+  // non constant in case a component is removed in runtime.
+  uint32 compCount = static_cast<uint32>(m_actor->m_components.size());
   for (uint32 i = 0; i < compCount; ++i) {
+    im.pushID(i);
     SPtr<Component> pComponent = m_actor->m_components[i];
+    // remove the component from the list and update the component count.
+    if (im.createButton("X")) {
+      m_actor->m_components.erase(m_actor->m_components.begin() + i);
+      compCount -= 1;
+    }
+    if (im.isItemHovered()) {
+      im.setTooltip("Remove Component.");
+    }
     switch (pComponent->getType())
     {
     case kCamera:
@@ -195,7 +220,8 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
     }
     case kModel:
     { // to do: the ammount of code here is getting a bit ridiculous.
-      if (im.collapsingHeader("Model")) {
+      const ANSICHAR* name = pComponent->getName();
+      if (im.collapsingHeader(name)) {
         // Component activity
         im.createCheckBox("Active ", pComponent->isActive());
         im.sameLine();
@@ -204,6 +230,10 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
           const Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
           modelCod.createResourceFromModel(model, resourcePath);
         }
+        if (im.isItemHovered()) {
+          im.setTooltip("Save model as a resource.");
+        }
+        
         // model section
         Vector<SPtr<Mesh>> meshes = model->getMeshes();
         // display total model vertex count.
@@ -220,9 +250,9 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         im.createText("Search: ");
         im.sameLine();
         im.createInputText("##Search", &m_searchMesh);
-        for (uint32 i = 0; i < meshes.size(); ++i) {
+        for (uint32 j = 0; j < meshes.size(); ++j) {
           // get mesh
-          SPtr<Mesh> mesh = meshes[i];
+          SPtr<Mesh> mesh = meshes[j];
           String name = mesh->getName();
           const String searchMeshLower = stringToLower(m_searchMesh);
           const String meshNameLower = stringToLower(name);
@@ -238,11 +268,11 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
               im.sameLine();
               String indexCount = to_string(mesh->indexVector.size());
               im.createText(indexCount.c_str());
-              im.pushID(i);
+              im.pushID(j);
               im.createCheckBox("Active ", mesh->getActive());
               // Mesh material data
               if (!mesh->material) {
-                im.pushID(i);
+                im.pushID(j);
                 if (im.createButton("<Create new material>")) {
                   mesh->material = matMan.newMaterial();
                 }
@@ -286,6 +316,7 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
     default:
       break;
     }
+    im.popID();
   }
   im.popStyleColor(3);
 }

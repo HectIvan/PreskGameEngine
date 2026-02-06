@@ -554,10 +554,14 @@ RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
       parent = parent->m_parent;
     }
 
-    // render the model of the actor.
-    const SPtr<Model> model = currActor->getComponent<Model>();
-    if (model && model->isActive()) {
-      renderModel(model, transform);
+    // render model components in the actor.
+    const Vector<SPtr<Model>> models = currActor->getComponents<Model>();
+    const uint32 modelCount = static_cast<uint32>(models.size());
+    for (uint32 i = 0; i < modelCount; ++i) {
+      const SPtr<Model> model = models[i];
+      if (model && model->isActive()) {
+        renderModel(model, transform);
+      }
     }
     // if the actor has children, do the same for them.
     if (!currActor->m_children.empty()) {

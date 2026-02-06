@@ -182,15 +182,6 @@ class PK_UTILITY_EXPORT Quaternion
   const Quaternion
   normalized() const;
 
-  /**
-   * @brief Get the quaternion as a Vector3.
-   */
-  Vector3
-  xyz() const
-  {
-    return Vector3(x, y, z);
-  }
-
  public:
   float w;
   float x;

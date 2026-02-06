@@ -279,7 +279,6 @@ ShaderTest::uInterfaceUpdate()
     // resources window.
     if (im.beginTabItem("Resources")) {
       m_resourceInspector.createResourceWindow(m_window);
-      im.endTable();
     }
     im.endTabBar();
   }
@@ -323,6 +322,14 @@ ShaderTest::uInterfaceUpdate()
         const Vector<String> options = { "model", "light", "camera" };
         int32 val = -1;
         if (im.beginCombo("Components", val, options)) {
+          if (im.beginDragDropTarget()) {
+            const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
+            if (id) {
+              SPtr<Model> loadedModel = modelMan.createModel(*id);
+              modelMan.insertModel(*id, loadedModel);
+            }
+            im.endDragDropTarget();
+          }
           // if a model component is to be added.
           if (val == 0) {
             Path path = m_window.openFileFromExplorer();

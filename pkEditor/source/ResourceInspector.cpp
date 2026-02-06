@@ -159,5 +159,6 @@ ResourceInspector::createResourceWindow(const Window& _window)
         }
       }
     }
+    im.endTable();
   }
 }

@@ -32,7 +32,7 @@ class ActorInspector
 {
  public:
   ActorInspector() = default;
-  ActorInspector(SPtr<Actor> _pActor);
+  ActorInspector(const SPtr<Actor>& _pActor);
   virtual ~ActorInspector() = default;
 
   /**

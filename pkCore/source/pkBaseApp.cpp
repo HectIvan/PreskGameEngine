@@ -285,17 +285,19 @@ BaseApp::render()
   transparencyPass->endPass();
 
   // get texel size of compute passes
-  //        Vector2 texSize = api.getSwapChain()->getSize();
-  //        uint32 threadWidth = 16;
-  //        uint32 threadHeight = 16;
-  //        uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-  //        uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+
+  const Vector2 texSize = api.getSwapChain()->getSize();
+  const uint32 threadWidth = 16;
+  const uint32 threadHeight = 16;
+  const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+
   quadLight->beginPass(Color::WHITE);
-  api.draw(3, 0);
+  api.dispatch(x, y, 0);
   quadLight->endPass();
 
   transparencyBRDF->beginPass(Color::WHITE);
-  api.draw(3, 0);
+  api.dispatch(x, y, 0);
   transparencyBRDF->endPass();
 
   // ssao pass

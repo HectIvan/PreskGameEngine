@@ -29,7 +29,8 @@ ShaderManager::createShaderResources()
   ShaderKey basePixel("shaders/pkPShader.hlsl", "PS", "ps_5_0");
   ShaderKey positions("shaders/pkPShaderDepth.hlsl", "PS", "ps_5_0");
   ShaderKey quad("shaders/pkQuadShader.hlsl", "VS", "vs_5_0");
-  ShaderKey shadowMap("shaders/pkLightShader.hlsl", "PS", "ps_5_0");
+  ShaderKey BRDFShader("shaders/pkLightShader.hlsl", "PS", "ps_5_0");
+  ShaderKey cBRDFShader("shaders/pkCLightShader.hlsl", "CSMain", "cs_5_0");
   ShaderKey skybox("shaders/pkSkyboxShader.hlsl", "PS", "ps_5_0");
   ShaderKey ssao("shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
   ShaderKey blur("shaders/pkBlur.hlsl", "PS", "ps_5_0");
@@ -43,7 +44,8 @@ ShaderManager::createShaderResources()
   initShaderResource(basePixel, PK_SHADER_TYPE::kPixel);
   initShaderResource(positions, PK_SHADER_TYPE::kPixel);
   initShaderResource(quad, PK_SHADER_TYPE::kVertex);
-  initShaderResource(shadowMap, PK_SHADER_TYPE::kPixel);
+  initShaderResource(BRDFShader, PK_SHADER_TYPE::kPixel);
+  initShaderResource(cBRDFShader, PK_SHADER_TYPE::kCompute);
   initShaderResource(skybox, PK_SHADER_TYPE::kPixel);
   initShaderResource(ssao, PK_SHADER_TYPE::kPixel);
   initShaderResource(blur, PK_SHADER_TYPE::kPixel);

@@ -58,13 +58,6 @@ RendererManager::init()
   SPtr<Texture> ssaoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
 
-  // BRDF texture.
-  SPtr<Texture> brdfRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
-
-  SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
-
   // skybox texture.
   SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
@@ -163,6 +156,13 @@ RendererManager::init()
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
+  // BRDF texture.
+  SPtr<Texture> brdfRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
+
+  SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
+
   // generateCubeMap(m_mainSkybox, cubeMapRT);
   
   // create the passes needed
@@ -190,31 +190,31 @@ RendererManager::createPasses()
   PassDesc pDesc = PassDesc();
 
   // Textures
-  SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
-  SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
-  SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
-  SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
-  SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
-  SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
-  SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
-  SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
-  SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
-  SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
-  SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
-  SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
-  SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
+  const SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
+  const SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
+  const SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
+  const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
+  const SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
+  const SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
+  const SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
+  const SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
+  const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
+  const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
+  const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
+  const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  const SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
-  SPtr<Texture> transpAlbedo = getGBuffer(G_BUFFERS::kGB_TranspAlbedo);
-  SPtr<Texture> transpNormal = getGBuffer(G_BUFFERS::kGB_TranspNormal);
-  SPtr<Texture> transpORM = getGBuffer(G_BUFFERS::kGB_TranspORM);
-  SPtr<Texture> transpEmiss = getGBuffer(G_BUFFERS::kGB_TranspEmiss);
-  SPtr<Texture> transpPos = getGBuffer(G_BUFFERS::kGB_TranspPos);
-  SPtr<Texture> brdfTranspRT = getGBuffer(G_BUFFERS::kGB_BRDFTransp);
+  const SPtr<Texture> transpAlbedo = getGBuffer(G_BUFFERS::kGB_TranspAlbedo);
+  const SPtr<Texture> transpNormal = getGBuffer(G_BUFFERS::kGB_TranspNormal);
+  const SPtr<Texture> transpORM = getGBuffer(G_BUFFERS::kGB_TranspORM);
+  const SPtr<Texture> transpEmiss = getGBuffer(G_BUFFERS::kGB_TranspEmiss);
+  const SPtr<Texture> transpPos = getGBuffer(G_BUFFERS::kGB_TranspPos);
+  const SPtr<Texture> brdfTranspRT = getGBuffer(G_BUFFERS::kGB_BRDFTransp);
 
   // Depth textures
-  SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
-  SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
-  SPtr<Texture> transpDepth = getDepthBuffer(D_BUFFERS::kDB_Transparency);
+  const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
+  const SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
+  const SPtr<Texture> transpDepth = getDepthBuffer(D_BUFFERS::kDB_Transparency);
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
@@ -261,13 +261,15 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_LightPositions, ligtPosPass });
 
   /****************************************************************************
-   * Shadow Specular Quad Pass
+   * BRDF Quad Pass
    ***************************************************************************/
-  pDesc.vSDirectory = "resources/pkQuadShader.pks";
-  pDesc.pSDirectory = "resources/pkLightShader.pks";
+  pDesc.vSDirectory = "";
+  pDesc.pSDirectory = "";
+  pDesc.cSDirectory = "resources/pkCLightShader.pks";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4), sizeof(Vector4)};
   pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
-  pDesc.outputs = { brdfRT };
+  pDesc.outputs = {};
+  pDesc.uavs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -277,7 +279,8 @@ RendererManager::createPasses()
    * Shadow Specular Transparency Quad Pass
    ***************************************************************************/
   pDesc.inputs = { transpDepth, transpPos, posLightRT, transpAlbedo, transpNormal, transpORM, m_mainSkybox, cubeMapRT };
-  pDesc.outputs = { brdfTranspRT };
+  pDesc.outputs = {};
+  pDesc.uavs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LightTransparency, lightTranspQuad });
@@ -285,10 +288,13 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
+  pDesc.vSDirectory = "resources/pkQuadShader.pks";
   pDesc.pSDirectory = "resources/pkSkyboxShader.pks";
+  pDesc.cSDirectory = "";
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxRT };
+  pDesc.uavs = {};
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 

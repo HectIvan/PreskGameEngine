@@ -19,9 +19,11 @@ DX11Shader::compileFromFile()
 
 void
 DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
-  Logger& log = g_Logger();
   // if the resource is not a shader resource.
-  if (RESOURCE_TYPE::kShader != _pResource->getType()) {
+  if (!_pResource || RESOURCE_TYPE::kShader != _pResource->getType()) {
+    const String msg = "Resource is not a shader.";
+    LOG_ERROR(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
 
@@ -46,7 +48,8 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
   // if the blob failed to be created.
   if (!m_pSBlob) {
     const String msg = "Failed to create sBlob of size " + blobSizeString + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
 
@@ -58,11 +61,12 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
                        resource->m_resourcePath +
                        ".";
     LOG_ERROR(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return;
   }
 
   const String msg = "Created shader from resource " + String(resource->m_resourcePath) + ".";
-  log.registerMessage(msg, __FILE__, __LINE__);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 void

@@ -311,45 +311,15 @@ class PK_UTILITY_EXPORT Matrix4
   Matrix4
   operator*(const Matrix4& other) const
   {
-    Matrix4 result;
-    
-    float x = matrix[0][0];
-    float y = matrix[0][1];
-    float z = matrix[0][2];
-    float w = matrix[0][3];
-    
-    // first row
-    result.matrix[0][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    result.matrix[0][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    result.matrix[0][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    result.matrix[0][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    // second row
-    x = matrix[1][0];
-    y = matrix[1][1];
-    z = matrix[1][2];
-    w = matrix[1][3];
-    result.matrix[1][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    result.matrix[1][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    result.matrix[1][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    result.matrix[1][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    // third row
-    x = matrix[2][0];
-    y = matrix[2][1];
-    z = matrix[2][2];
-    w = matrix[2][3];
-    result.matrix[2][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    result.matrix[2][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    result.matrix[2][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    result.matrix[2][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    // fourth row
-    x = matrix[3][0];
-    y = matrix[3][1];
-    z = matrix[3][2];
-    w = matrix[3][3];
-    result.matrix[3][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    result.matrix[3][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    result.matrix[3][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    result.matrix[3][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
+    Matrix4 result = *this;
+    for (uint32 row = 0; row < 4; ++row) {
+      for (uint32 col = 0; col < 4; ++col) {
+        result.matrix[row][col] = result.matrix[row][0] * other.matrix[0][col] +
+                                  result.matrix[row][1] * other.matrix[1][col] +
+                                  result.matrix[row][2] * other.matrix[2][col] +
+                                  result.matrix[row][3] * other.matrix[3][col];
+      }
+    }
     return result;
   }
 
@@ -361,46 +331,7 @@ class PK_UTILITY_EXPORT Matrix4
   Matrix4
   operator*=(const Matrix4& other)
   {
-    float x = matrix[0][0];
-    float y = matrix[0][1];
-    float z = matrix[0][2];
-    float w = matrix[0][3];
-    // first row
-    matrix[0][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    matrix[0][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    matrix[0][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    matrix[0][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    
-    // second row
-    x = matrix[1][0];
-    y = matrix[1][1];
-    z = matrix[1][2];
-    w = matrix[1][3];
-    matrix[1][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    matrix[1][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    matrix[1][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    matrix[1][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    
-    // third row
-    x = matrix[2][0];
-    y = matrix[2][1];
-    z = matrix[2][2];
-    w = matrix[2][3];
-    matrix[2][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    matrix[2][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    matrix[2][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    matrix[2][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-    
-    // fourth row
-    x = matrix[3][0];
-    y = matrix[3][1];
-    z = matrix[3][2];
-    w = matrix[3][3];
-    matrix[3][0] = (other.matrix[0][0] * x) + (other.matrix[1][0] * y) + (other.matrix[2][0] * z) + (other.matrix[3][0] * w);
-    matrix[3][1] = (other.matrix[0][1] * x) + (other.matrix[1][1] * y) + (other.matrix[2][1] * z) + (other.matrix[3][1] * w);
-    matrix[3][2] = (other.matrix[0][2] * x) + (other.matrix[1][2] * y) + (other.matrix[2][2] * z) + (other.matrix[3][2] * w);
-    matrix[3][3] = (other.matrix[0][3] * x) + (other.matrix[1][3] * y) + (other.matrix[2][3] * z) + (other.matrix[3][3] * w);
-  
+    *this = *this * other;
     return *this;
   }
 

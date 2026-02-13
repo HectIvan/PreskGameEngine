@@ -627,8 +627,8 @@ ShaderTest::onUpdate()
   Matrix4 lightViewProj = Matrix4::IDENTITY;
   // to do: change this to another method
   if (light) {
-    lightView = lightCamera->m_view.getTransposed();
-    lightProj = lightCamera->m_projection.getTransposed();
+    lightView = lightCamera->m_view;
+    lightProj = lightCamera->m_projection;
     lightViewProj = lightProj * lightView;
     cBLight = CBLight(light);
     cBLightCam = CBCamera(lightCamera);

@@ -219,21 +219,26 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Set the vertex shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  void
+  bool
   setVShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Set the pixel shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  void
+  bool
   setPShader(const SPtr<Shader>& _pShader) override;
 
   /**
-   * @brief Set a compute shader.
-   * @return Compute shader.
+   * @brief Set the compute shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  void
+  bool
   setCShader(const SPtr<Shader>& _pShader) override;
 
   /**

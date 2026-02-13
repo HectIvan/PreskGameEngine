@@ -22,7 +22,7 @@ RendererManager::init()
   const uint32 winHeight = api.getSwapChain()->getHeight();
   const uint32 winWidth = api.getSwapChain()->getWidth();
 
-  float sizeMulShadow = 10.0f;
+  float sizeMulShadow = 3.0f;
 
   // Texture description
   TextureDesc txDesc;
@@ -163,7 +163,7 @@ RendererManager::init()
   SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
 
-  // generateCubeMap(m_mainSkybox, cubeMapRT);
+  generateCubeMap(m_mainSkybox, cubeMapRT);
   
   // create the passes needed
   createPasses();
@@ -259,7 +259,7 @@ RendererManager::createPasses()
   pDesc.pDepth = LightDepthBuffer;
   SPtr<Pass> ligtPosPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_LightPositions, ligtPosPass });
-
+  
   /****************************************************************************
    * BRDF Quad Pass
    ***************************************************************************/
@@ -267,7 +267,7 @@ RendererManager::createPasses()
   pDesc.pSDirectory = "";
   pDesc.cSDirectory = "resources/pkCLightShader.pks";
   pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4), sizeof(Vector4)};
-  pDesc.inputs = { DepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
+  pDesc.inputs = { DepthBuffer, LightDepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
   pDesc.outputs = {};
   pDesc.uavs = { brdfRT };
   pDesc.pDepth = {};
@@ -278,7 +278,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Specular Transparency Quad Pass
    ***************************************************************************/
-  pDesc.inputs = { transpDepth, transpPos, posLightRT, transpAlbedo, transpNormal, transpORM, m_mainSkybox, cubeMapRT };
+  pDesc.inputs = { transpDepth, LightDepthBuffer, transpPos, posLightRT, transpAlbedo, transpNormal, transpORM, m_mainSkybox, cubeMapRT };
   pDesc.outputs = {};
   pDesc.uavs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);

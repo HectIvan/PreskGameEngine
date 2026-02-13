@@ -1,7 +1,7 @@
 /***************************************************************************************
 * Light Compute shader
 ***************************************************************************************/
-#pragma kernel CS_Main
+// #pragma CS_Main
 
 #define PI 3.14159265359f
 #define SMALL_NUMBER 1.0f
@@ -10,14 +10,15 @@ RWTexture2D<float4> brdfTexture : register(u0);
 
 // resources depth textures
 Texture2D<float4> depthMap : register(t0); // basic R32 float depth
-Texture2D<float4> posMap : register(t1); // world positions RGB32 float
-Texture2D<float4> lightPosMap : register(t2); // light world positions RGB32 float
+Texture2D<float4> depthLightMap : register(t1); // basic R32 float depth
+Texture2D<float4> posMap : register(t2); // world positions RGB32 float
+Texture2D<float4> lightPosMap : register(t3); // light world positions RGB32 float
 // resources textures
-Texture2D<float4> albedoMap : register(t3); // albedo
-Texture2D<float4> normalMap : register(t4); // normals
-Texture2D<float4> ormMap : register(t5); // occlusion (R), roughness (G), metallic (B)
-Texture2D<float4> skybox : register(t6); // skybox texture
-Texture2D<float4> cubeMap : register(t7); // skybox texture
+Texture2D<float4> albedoMap : register(t4); // albedo
+Texture2D<float4> normalMap : register(t5); // normals
+Texture2D<float4> ormMap : register(t6); // occlusion (R), roughness (G), metallic (B)
+Texture2D<float4> skybox : register(t7); // skybox texture
+Texture2D<float4> cubeMap : register(t8); // skybox texture
 // sampler state
 SamplerState samState : register(s0);
 
@@ -37,21 +38,21 @@ cbuffer cbLight : register(b0)
   float SpotExponent; // 56
   float SpotCutoff; // 60
   float SpecIntensity; // 64
-  float4x4 lightTransform; // 128
+  row_major float4x4 lightTransform; // 128
 }
 
 cbuffer Camera : register(b1)
 {
   float4 Eye; // 16
   float3 ForwardCam; // 28
-  float4x4 ViewCam; // 92
-  float4x4 ProjectionCam; // 156
+  row_major float4x4 ViewCam; // 92
+  row_major float4x4 ProjectionCam; // 156
   float _unusedCam0; // 160
 }
 
 cbuffer LightViewProj : register(b2)
 {
-  float4x4 LightViewProj; // 64
+  row_major float4x4 LightViewProj; // 64
 }
 
 cbuffer ShadowParam : register(b3)
@@ -150,11 +151,6 @@ float3 cookTorranceSpecular(float3 normal,
   return lo;
 }
 
-float magnitude(float3 v)
-{
-  return sqrt((v.x * v.x) + (v.y * v.y) * (v.z * v.z));
-}
-
 float OrenNayarDiffuse(float3 N, float3 L, float3 V, float roughness)
 {
   float NoL = saturate(dot(N, L));
@@ -182,6 +178,13 @@ float OrenNayarDiffuse(float3 N, float3 L, float3 V, float roughness)
 [numthreads(16, 16, 1)]
 void CSMain(uint3 DTid : SV_DispatchThreadID)
 {
+  uint width, height;
+  brdfTexture.GetDimensions(width, height);
+
+  if (DTid.x >= width || DTid.y >= height) {
+    return;
+  }
+  
   /**
    * light data
    */
@@ -192,6 +195,7 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
    * texture data
    */
   float4 depthTex = depthMap.Load(int3(DTid.xy, 0));
+  float4 depthLightTex = depthLightMap.Load(int3(DTid.xy, 0));
   float4 normalTex = normalMap.Load(int3(DTid.xy, 0));
   float4 albedo = albedoMap.Load(int3(DTid.xy, 0));
   
@@ -250,27 +254,28 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb * IBLIntensity;
   
   float3 diffuseIBL = IBL * fLambert;
-    
-    /**
-   * shadow mapping;
-   */
+  
+  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL;
+  /**
+  * shadow mapping;
+  */
   float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);
   float3 lightNDC = lightSpacePos.xyz / lightSpacePos.w;
   float2 lightUV = lightNDC.xy * 0.5f + 0.5f;
-  lightUV.y = -lightUV.y;
   
-  float3 lightWorldPos = lightPosMap.Load(int3(DTid.xy, 0)).xyz;
+  float currentDepth = lightNDC.z;
+  float shadowDepth = lightPosMap.SampleLevel(samState, lightUV, 0).r;
   
-  float lightHit = magnitude(worldPos - LightPos);
-  float worldHit = magnitude(lightWorldPos - LightPos);
+  float bias = 0.001f;
   
-  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL;
-    
-  // float NoL = max(dot(normal, lightDir), 0.0f);
-  // float bias = SMALL_NUMBER * tan(acos(NoL));
-  if (lightHit > worldHit + SMALL_NUMBER) {
+  if (lightNDC.z < -1 || lightNDC.z > 1) {
+    // brdfTexture[DTid.xy] = float4(finalColor, albedo.a);
+    // return;
+  }
+
+  if (currentDepth > shadowDepth + bias) {
     finalColor *= shadowColor.xxx;
   }
   
-  brdfTexture[DTid.xy] = float4(finalColor, albedo.a);
+  brdfTexture[DTid.xy] = float4(lightNDC.z * 0.1f, 0, 0, albedo.a);
 }

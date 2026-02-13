@@ -434,7 +434,7 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
 }
 
 
-void
+bool
 DX11GraphicsAPI::setVShader(const SPtr<Shader>& _pShader)
 {
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
@@ -443,9 +443,14 @@ DX11GraphicsAPI::setVShader(const SPtr<Shader>& _pShader)
   m_pDevice->m_pImmediateContext->VSSetShader(dxVShader ? dxVShader->m_pShader : nullptr,
                                               nullptr,
                                               0);
+
+  if (dxVShader) {
+    return true;
+  }
+  return false;
 }
 
-void
+bool
 DX11GraphicsAPI::setPShader(const SPtr<Shader>& _pShader)
 {
   // reinterpret as a DirectX pixel shader
@@ -454,9 +459,13 @@ DX11GraphicsAPI::setPShader(const SPtr<Shader>& _pShader)
   m_pDevice->m_pImmediateContext->PSSetShader(dxPShader ? dxPShader->m_pShader : nullptr,
                                               nullptr,
                                               0);
+  if (dxPShader) {
+    return true;
+  }
+  return false;
 }
 
-void
+bool
 DX11GraphicsAPI::setCShader(const SPtr<Shader>& _pShader)
 {
   // reinterpret as a DirectX compute shader
@@ -465,6 +474,10 @@ DX11GraphicsAPI::setCShader(const SPtr<Shader>& _pShader)
   m_pDevice->m_pImmediateContext->CSSetShader(dxCShader ? dxCShader->m_pShader : nullptr,
                                               nullptr,
                                               0);
+  if (dxCShader) {
+    return true;
+  }
+  return false;
 }
 
 void

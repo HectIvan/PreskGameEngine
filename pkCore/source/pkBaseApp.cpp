@@ -293,11 +293,11 @@ BaseApp::render()
   const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
   quadLight->beginPass(Color::WHITE);
-  api.dispatch(x, y, 0);
+  api.dispatch(x, y, 1);
   quadLight->endPass();
 
   transparencyBRDF->beginPass(Color::WHITE);
-  api.dispatch(x, y, 0);
+  api.dispatch(x, y, 1);
   transparencyBRDF->endPass();
 
   // ssao pass

@@ -209,22 +209,25 @@ public:
   /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  virtual void
+  virtual bool
   setVShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Set the pixel shader to the device context.
    * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  virtual void
+  virtual bool
   setPShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
-   * @brief Set a compute shader.
-   * @param _pShader Compute shader.
+   * @brief Set the compute shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
    */
-  virtual void
+  virtual bool
   setCShader(const SPtr<Shader>& _pShader) = 0;
 
   /**

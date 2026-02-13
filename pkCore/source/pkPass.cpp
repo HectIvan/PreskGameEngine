@@ -14,8 +14,6 @@
 * Includes
 **/
 /*********************************************/
-#include <iostream>
-
 #include "pkAssetResourceManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkPass.h"
@@ -178,7 +176,7 @@ Pass::createCShader(const Path _directory, const ANSICHAR* _entry, const ANSICHA
   if (checkShader) {
     m_pCShader = checkShader;
     const String msg = "Found previously compiled Compute shader: " + key.shaderPath;
-    g_Logger().registerMessage(msg, __FILE__, __LINE__);
+    LOG_REGISTER(msg, __FILE__, __LINE__);
     return;
   }
 
@@ -247,25 +245,24 @@ Pass::beginPass(Color _color)
   // api.resizeSwapChain(m_viewPortSize);
   // set input layout of shader
   api.setInputLayout(getInputLayout());
-  // set the shaders
-  api.setVShader(getVShader());
-  api.setPShader(getPShader());
-  api.setCShader(getCShader());
-  // set resources
-  if (!m_inputTex.empty()) {
+
+  // if there are shaders to set, set them and their resources.
+  if (api.setVShader(getVShader())) { // Vertex shader.
     api.vSSetShaderResourceViews(m_inputTex);
-    api.pSSetShaderResourceViews(m_inputTex);
-    api.cSSetShaderResourceViews(m_inputTex);
+    api.vSSetConstantBuffers(getCBuffers());
   }
-  if (!m_uavTex.empty()) {
+  if (api.setPShader(getPShader())) { // Pixel shader.
+    api.pSSetShaderResourceViews(m_inputTex);
+    api.pSSetConstantBuffers(getCBuffers());
+  }
+  if (api.setCShader(getCShader())) { // Compute shader.
+    api.cSSetShaderResourceViews(m_inputTex);
     api.cSSetUnorderedAccessViews(m_uavTex);
+    api.cSSetConstantBuffers(getCBuffers());
   }
   // set the sampler state
   api.setSampler(getSamplerState());
-  // set constant buffers
-  api.pSSetConstantBuffers(getCBuffers());
-  api.vSSetConstantBuffers(getCBuffers());
-  api.cSSetConstantBuffers(getCBuffers());
+
   // set the rasterizer state
   api.setRasterizerState(m_pRasterizerState);
 }

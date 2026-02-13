@@ -37,229 +37,158 @@ class PK_UTILITY_EXPORT Matrix4
           const float& m10, const float& m11, const float& m12, const float& m13,
           const float& m20, const float& m21, const float& m22, const float& m23,
           const float& m30, const float& m31, const float& m32, const float& m33);
-  // --------------------------------------------------------------//
-  // Matrix4 = Matrix4
-  // --------------------------------------------------------------//
-  PKFORCEINLINE Matrix4&
-  operator=(const Matrix4& other)
-  {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        matrix[i][j] = other.matrix[i][j];
-      }
-    }
-    return *this;
-  }
-  // --------------------------------------------------------------//
-  // Matrix4 + Matrix4
-  // --------------------------------------------------------------//
-  PKFORCEINLINE Matrix4
-  operator+(const Matrix4& other) const
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] + other.matrix[i][j];
-      }
-    }
-    return result;
-  }
-  // --------------------------------------------------------------//
-  // Matrix4 + float
-  // --------------------------------------------------------------//
-  PKFORCEINLINE Matrix4
-  operator+(const float& other) const
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] + other;
-      }
-    }
-    return result;
-  }
-
-  // --------------------------------------------------------------//
-  // Matrix4 += Matrix4
-  // --------------------------------------------------------------//
-  PKFORCEINLINE Matrix4
-  operator+=(const Matrix4& other)
-  {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        matrix[i][j] += other.matrix[i][j];
-      }
-    }
-    return *this;
-  }
   /**
-   * @brief Subtract a float to the matrix4.
-   * @param other The float to use.
-   * @return The subtracted matrix.
+   * @brief Assign a matrix4 to the matrix4.
+   * @param _other The matrix to use.
+   * @return The assigned matrix.
    */
-  PKFORCEINLINE Matrix4
-  operator-(const float& other)
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] - other;
-      }
-    }
-    return result;
-  }
+  Matrix4
+  operator=(const Matrix4& _other);
 
   /**
-   * @brief Subtract a float to the matrix4.
-   * @param other The float to use.
-   * @return The subtracted matrix.
+   * @brief Compare a matrix4 to the matrix4.
+   * @param _other The matrix to use.
+   * @return True if the matrix are equal, false otherwise.
    */
-  PKFORCEINLINE Matrix4
-  operator-(float& other)
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] - other;
-      }
-    }
-    return result;
-  }
+  bool
+  operator==(const Matrix4& _other) const;
+  
+  /**
+   * @brief Add a matrix4 to the matrix4.
+   * @param _other The matrix to use.
+   * @return The added matrix.
+   */
+  Matrix4
+  operator+(const Matrix4& _other) const;
+  
+  /**
+   * @brief Add a float to the matrix4.
+   * @param _other The float to use.
+   * @return The added matrix.
+   */
+  Matrix4
+  operator+(const float& _other) const;
 
   /**
    * @brief Subtract a matrix4 to the matrix4.
    * @param other The matrix to use.
    * @return The subtracted matrix.
    */
-  PKFORCEINLINE Matrix4
-  operator-(Matrix4& other)
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] - other.matrix[i][j];
-      }
-    }
-    return result;
-  }
-
-  // --------------------------------------------------------------//
-  // Matrix4 * float
-  // --------------------------------------------------------------//
-  PKFORCEINLINE Matrix4
-  operator*(const float& other) const
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] * other;
-      }
-    }
-    return result;
-  }
+  Matrix4
+  operator-(const Matrix4& _other) const;
 
   /**
-   * @brief Multiply a Vector3 by a Matrix
-   * @param other The vector to multiply
-   * @return
+   * @brief Subtract a float to the matrix4.
+   * @param _other The float to use.
+   * @return The subtracted matrix.
    */
-  Vector3
-  operator*(const Vector3& other)
-  {
-    matrix[0][0] *= other.x;
-    matrix[1][0] *= other.x;
-    matrix[2][0] *= other.x;
-
-    matrix[0][1] *= other.y;
-    matrix[1][1] *= other.y;
-    matrix[2][1] *= other.y;
-
-    matrix[0][2] *= other.z;
-    matrix[1][2] *= other.z;
-    matrix[2][2] *= other.z;
-
-    return Vector3(matrix[0][0] + matrix[1][0] + matrix[2][0],
-                   matrix[0][1] + matrix[1][1] + matrix[1][1],
-                   matrix[0][2] + matrix[1][2] + matrix[2][2]);
-  }
+  Matrix4
+  operator-(const float& _other) const;
 
   /**
-   * @brief Multiply the Matrix by a float.
-   * @param other The float to use.
+   * @brief Multiply a matrix with another.
+   * @param Other The other matrix.
+   * @return The new matrix.
    */
-  PKFORCEINLINE Matrix4
-  operator*(const float& other)
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] * other;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @brief Multiply the Matrix by a float.
-   * @param other The float to use.
-   */
-  PKFORCEINLINE Matrix4
-  operator*(float& other)
-  {
-    Matrix4 result;
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        result.matrix[i][j] = matrix[i][j] * other;
-      }
-    }
-    return result;
-  }
+  Matrix4
+  operator*(const Matrix4& other) const;
 
   /**
    * @brief Multiply a Vector4 by a Matrix
-   * @param other The vector to multiply
+   * @param _other The vector to multiply
    * @return
    */
-  PKFORCEINLINE Vector4
-  operator*(const Vector4& other)
+  Vector4
+  operator*(const Vector4& _other) const;
+
+  /**
+   * @brief Multiply the Matrix by a float.
+   * @param _other The float to use.
+   * @return The multiplied matrix.
+   */
+  Matrix4
+  operator*(const float& _other) const;
+
+  /**
+   * @brief Add a Matrix to this matrix4.
+   * @param other The matrix to use.
+   * @return The added matrix.
+   */
+  PKFORCEINLINE Matrix4
+  operator+=(const Matrix4& other)
   {
-    float x00 = matrix[0][0] * other.x;
-    float x10 = matrix[1][0] * other.x;
-    float x20 = matrix[2][0] * other.x;
-
-    float y01 = matrix[0][1] * other.y;
-    float y11 = matrix[1][1] * other.y;
-    float y21 = matrix[2][1] * other.y;
-
-    float z02 = matrix[0][2] * other.z;
-    float z12 = matrix[1][2] * other.z;
-    float z22 = matrix[2][2] * other.z;
-    
-    return Vector4(x00 + y01 + z02,
-                   x10 + y11 + z12,
-                   x20 + y21 + z22,
-                   other.w);
+    *this = *this + other;
+    return *this;
   }
 
+  /**
+   * @brief Add a float to this matrix4.
+   * @param other The float to use.
+   * @return The added matrix.
+   */
+  PKFORCEINLINE Matrix4
+  operator+=(const float& other)
+  {
+    *this = *this + other;
+    return *this;
+  }
+
+  /**
+   * @brief Subtract a Matrix to this matrix4.
+   * @param other The matrix to use.
+   * @return The subtracted matrix.
+   */
+  PKFORCEINLINE Matrix4
+  operator-=(const Matrix4& other)
+  {
+    *this = *this - other;
+    return *this;
+  }
+
+  /**
+   * @brief Subtract a float to this matrix4.
+   * @param other The float to use.
+   * @return The subtracted matrix.
+   */
+  PKFORCEINLINE Matrix4
+  operator-=(const float& other)
+  {
+    *this = *this - other;
+    return *this;
+  }
+
+  /**
+   * @brief Multiply this matrix by another matrix.
+   * @brief other The other matrix.
+   * @return This matrix multiplied.
+   */
+  PKFORCEINLINE Matrix4
+  operator*=(const Matrix4& other)
+  {
+    *this = *this * other;
+    return *this;
+  }
+
+  /**
+   * @brief Multiply this matrix by a float.
+   * @brief other The float.
+   * @return This matrix multiplied.
+   */
+  PKFORCEINLINE Matrix4
+  operator*=(const float& other)
+  {
+    *this = *this * other;
+    return *this;
+  }
+
+  /**
+   * @brief Get a Matrix3 from this Matrix4, starting at the coordinates given to it.
+   * @param _x The X coordinate to start from.
+   * @param _y The Y coordinate to start from.
+   * @return The Matrix3 obtained from the Matrix4.
+   */
   Matrix3
-  getMatrix3(int32 _x = 0, int32 _y = 0)
-  {
-    Matrix3 newMat = Matrix3::IDENTITY;
-
-    newMat.matrix[0 + _y][0 + _x] = matrix[0 + _y][0 + _x];
-    newMat.matrix[1 + _y][0 + _x] = matrix[1 + _y][0 + _x];
-    newMat.matrix[2 + _y][0 + _x] = matrix[2 + _y][0 + _x];
-
-    newMat.matrix[0 + _y][1 + _x] = matrix[0 + _y][1 + _x];
-    newMat.matrix[1 + _y][1 + _x] = matrix[1 + _y][1 + _x];
-    newMat.matrix[2 + _y][1 + _x] = matrix[2 + _y][1 + _x];
-
-    newMat.matrix[0 + _y][2 + _x] = matrix[0 + _y][2 + _x];
-    newMat.matrix[1 + _y][2 + _x] = matrix[1 + _y][2 + _x];
-    newMat.matrix[2 + _y][2 + _x] = matrix[2 + _y][2 + _x];
-
-    return newMat;
-  }
+  getMatrix3(const uint32 _x = 0, const uint32 _y = 0) const;
 
   /**
   * @brief Get the rotation matrix on 3 axis.
@@ -302,38 +231,6 @@ class PK_UTILITY_EXPORT Matrix4
    */
   const Matrix4
   inverse() const;
-
-  /**
-   * @brief Multiply a matrix with another.
-   * @param Other The other matrix.
-   * @return The new matrix.
-   */
-  Matrix4
-  operator*(const Matrix4& other) const
-  {
-    Matrix4 result = *this;
-    for (uint32 row = 0; row < 4; ++row) {
-      for (uint32 col = 0; col < 4; ++col) {
-        result.matrix[row][col] = result.matrix[row][0] * other.matrix[0][col] +
-                                  result.matrix[row][1] * other.matrix[1][col] +
-                                  result.matrix[row][2] * other.matrix[2][col] +
-                                  result.matrix[row][3] * other.matrix[3][col];
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @brief Multiply this matrix by another matrix.
-   * @brief other The other matrix.
-   * @return This matrix multiplied.
-   */
-  Matrix4
-  operator*=(const Matrix4& other)
-  {
-    *this = *this * other;
-    return *this;
-  }
 
   /**
    * @brief The transposed of this matrix.

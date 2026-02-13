@@ -15,6 +15,135 @@ const Matrix4 Matrix4::IDENTITY = Matrix4(Vector4(1.0f, 0.0f, 0.0f, 0.0f),
                                           Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 const Matrix4 Matrix4::ZERO = Matrix4(0);
 
+Matrix4
+Matrix4::operator=(const Matrix4& _other)
+{
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      matrix[i][j] = _other.matrix[i][j];
+    }
+  }
+  return *this;
+}
+
+bool
+Matrix4::operator==(const Matrix4& _other) const
+{
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      if (matrix[i][j] != _other.matrix[i][j]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+Matrix4
+Matrix4::operator+(const Matrix4& _other) const
+{
+  Matrix4 result;
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      result.matrix[i][j] = matrix[i][j] + _other.matrix[i][j];
+    }
+  }
+  return result;
+}
+
+Matrix4
+Matrix4::operator+(const float& _other) const
+{
+  Matrix4 result;
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      result.matrix[i][j] = matrix[i][j] + _other;
+    }
+  }
+  return result;
+}
+
+Matrix4
+Matrix4::operator-(const Matrix4& _other) const
+{
+  Matrix4 result;
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      result.matrix[i][j] = matrix[i][j] - _other.matrix[i][j];
+    }
+  }
+  return result;
+}
+
+Matrix4
+Matrix4::operator-(const float& _other) const
+{
+  Matrix4 result;
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      result.matrix[i][j] = matrix[i][j] - _other;
+    }
+  }
+  return result;
+}
+
+Matrix4
+Matrix4::operator*(const Matrix4& other) const
+{
+  Matrix4 result = *this;
+  for (uint32 row = 0; row < 4; ++row) {
+    for (uint32 col = 0; col < 4; ++col) {
+      result.matrix[row][col] = result.matrix[row][0] * other.matrix[0][col] +
+        result.matrix[row][1] * other.matrix[1][col] +
+        result.matrix[row][2] * other.matrix[2][col] +
+        result.matrix[row][3] * other.matrix[3][col];
+    }
+  }
+  return result;
+}
+
+Vector4
+Matrix4::operator*(const Vector4& _other) const
+{
+  const float x00 = matrix[0][0] * _other.x;
+  const float x10 = matrix[1][0] * _other.x;
+  const float x20 = matrix[2][0] * _other.x;
+  const float x30 = matrix[3][0] * _other.x;
+
+  const float y01 = matrix[0][1] * _other.y;
+  const float y11 = matrix[1][1] * _other.y;
+  const float y21 = matrix[2][1] * _other.y;
+  const float y31 = matrix[3][1] * _other.y;
+
+  const float z02 = matrix[0][2] * _other.z;
+  const float z12 = matrix[1][2] * _other.z;
+  const float z22 = matrix[2][2] * _other.z;
+  const float z32 = matrix[3][2] * _other.z;
+
+  const float w03 = matrix[0][3] * _other.w;
+  const float w13 = matrix[1][3] * _other.w;
+  const float w23 = matrix[2][3] * _other.w;
+  const float w33 = matrix[3][3] * _other.w;
+
+  return Vector4(x00 + y01 + z02 + w03,
+                 x10 + y11 + z12 + w13,
+                 x20 + y21 + z22 + w23,
+                 x30 + y31 + z32 + w33
+  );
+}
+
+Matrix4
+Matrix4::operator*(const float& _other) const
+{
+  Matrix4 result;
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      result.matrix[i][j] = matrix[i][j] * _other;
+    }
+  }
+  return result;
+}
+
 Matrix4::Matrix4(const float& val)
 {
   for (int i = 0; i < 4; ++i) {
@@ -79,6 +208,18 @@ Matrix4::Matrix4(const float& m00, const float& m01, const float& m02, const flo
   matrix[1][0] = m10; matrix[1][1] = m11;	matrix[1][2] = m12; matrix[1][3] = m13;
   matrix[2][0] = m20; matrix[2][1] = m21;	matrix[2][2] = m22; matrix[2][3] = m23;
   matrix[3][0] = m30; matrix[3][1] = m31; matrix[3][2] = m32; matrix[3][3] = m33;
+}
+
+Matrix3
+Matrix4::getMatrix3(const uint32 _x, const uint32 _y) const
+{
+  Matrix3 result;
+  for (uint32 i = 0; i < 3; ++i) {
+    for (uint32 j = 0; j < 3; ++j) {
+      result.matrix[i][j] = matrix[i + _y][j + _x];
+    }
+  }
+  return result;
 }
 
 const Quaternion

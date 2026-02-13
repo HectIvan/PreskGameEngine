@@ -434,7 +434,7 @@ PlatformMath::supportPointOBB(OBB& _box, Vector3& _dir)
   Vector3 dir = _dir.normalized();
   // Vector3 dirLocal = _box.m_transform.getTransposed() * dir;
   Vector3 dirSigns = sign3(dir);
-  return _box.m_transform * (_box.m_halfSize * dirSigns);
+  return (_box.m_transform * Vector4((_box.m_halfSize * dirSigns), 0.0f)).xyz(); // to do: ???
 }
 
 Vector3

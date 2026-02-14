@@ -596,13 +596,13 @@ ShaderTest::onUpdate()
   CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // to do: win size could change, swap this to use the specific texture size.
   // to do: change this to another method
   if (camera) {
-    view = camera->m_view.getTransposed();
-    proj = camera->m_projection.getTransposed();
+    view = camera->m_view;
+    proj = camera->m_projection;
     invView = view.inverse();
     invProj = proj.inverse();
     viewTransp = view.getTransposed();
     projTransp = proj.getTransposed();
-    invViewProj = (proj * view).inverse();
+    invViewProj = (view * proj).inverse();
     cBCamera = CBCamera(camera);
 
     shadowsParam.vec2 = camera->m_farNear;
@@ -656,6 +656,7 @@ ShaderTest::onUpdate()
 
   basePass->updateCBuffer(0, &view, m4x4Size);
   basePass->updateCBuffer(1, &proj, m4x4Size);
+  basePass->updateCBuffer(3, &invViewProj, m4x4Size); // to do: wrong matrix update data.
 
   transparencyPass->updateCBuffer(0, &view, m4x4Size);
   transparencyPass->updateCBuffer(1, &proj, m4x4Size);

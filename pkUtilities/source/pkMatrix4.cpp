@@ -90,13 +90,13 @@ Matrix4::operator-(const float& _other) const
 Matrix4
 Matrix4::operator*(const Matrix4& other) const
 {
-  Matrix4 result = *this;
+  Matrix4 result;
   for (uint32 row = 0; row < 4; ++row) {
     for (uint32 col = 0; col < 4; ++col) {
-      result.matrix[row][col] = result.matrix[row][0] * other.matrix[0][col] +
-        result.matrix[row][1] * other.matrix[1][col] +
-        result.matrix[row][2] * other.matrix[2][col] +
-        result.matrix[row][3] * other.matrix[3][col];
+      result.matrix[row][col] = matrix[row][0] * other.matrix[0][col] +
+                                matrix[row][1] * other.matrix[1][col] +
+                                matrix[row][2] * other.matrix[2][col] +
+                                matrix[row][3] * other.matrix[3][col];
     }
   }
   return result;
@@ -128,8 +128,7 @@ Matrix4::operator*(const Vector4& _other) const
   return Vector4(x00 + y01 + z02 + w03,
                  x10 + y11 + z12 + w13,
                  x20 + y21 + z22 + w23,
-                 x30 + y31 + z32 + w33
-  );
+                 x30 + y31 + z32 + w33);
 }
 
 Matrix4
@@ -717,48 +716,25 @@ Matrix4::lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& 
 const Matrix4
 Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir)
 {
-  Vector4 negEyePosition;
   Vector4 R0, R1, R2;
-  Matrix4 M = Matrix4::IDENTITY;
+
   // forward vector
-  Vector4 eyeDirectionNormalized = _eyeDir;
-  eyeDirectionNormalized.normalize();
-  R2 = eyeDirectionNormalized;
-
+  R2 = _eyeDir.normalized();
   // right vector
-  Vector4 R0CrossProduct;
-  R0CrossProduct = _upDir ^ R2;
-  R0CrossProduct.normalize();
-  R0 = R0CrossProduct;
-
+  R0 = (_upDir ^ R2).normalized();
   // up vector
-  Vector4 R1CrossProduct;
-  R1CrossProduct = R2 ^ R0;
-  R1 = R1CrossProduct;
-
-  negEyePosition = _eyePos * -1.0f;
+  R1 = R2 ^ R0;
 
   // get the rows dot product
-  float R0Dot = Vector4::dotProd(negEyePosition, R0);
-  float R1Dot = Vector4::dotProd(negEyePosition, R1);
-  float R2Dot = Vector4::dotProd(negEyePosition, R2);
+  float R0Dot = -Vector4::dotProd(_eyePos, R0);
+  float R1Dot = Vector4::dotProd(_eyePos, R1);
+  float R2Dot = Vector4::dotProd(_eyePos, R2);
 
   // set the matrix
-  M.matrix[0][0] = R0.x;
-  M.matrix[0][1] = R1.x;
-  M.matrix[0][2] = R2.x;
-
-  M.matrix[1][0] = R0.y;
-  M.matrix[1][1] = R1.y;
-  M.matrix[1][2] = R2.y;
-
-  M.matrix[2][0] = R0.z;
-  M.matrix[2][1] = R1.z;
-  M.matrix[2][2] = R2.z;
-
-  M.matrix[3][0] = R0Dot;
-  M.matrix[3][1] = R1Dot;
-  M.matrix[3][2] = R2Dot;
+  Matrix4 M(Vector4(R0.x, R0.y, R0.z, 0.0f),
+            Vector4(R1.x, R1.y, R1.z, 0.0f),
+            Vector4(R2.x, R2.y, R2.z, 0.0f),
+            Vector4(R0Dot, R1Dot, R2Dot, 1.0f));
 
   return M;
 }
@@ -770,13 +746,14 @@ Matrix4::perspectiveFOVLH(const float& _halfFOV,
                           const float& _nearZ,
                           const float& _farZ)
 {
-  Matrix4 M(0.0f);
+  Matrix4 M = Matrix4::IDENTITY;
 
   const float tHFov = tanf(_halfFOV);
   const float far_near = _farZ - _nearZ;
+  const float aspect = _width / _height;
 
-  M.matrix[0][0] = 1.0f / tHFov;
-  M.matrix[1][1] = _width / tHFov / _height;
+  M.matrix[0][0] = 1.0f / (tHFov * aspect);
+  M.matrix[1][1] = _width / tHFov;
   M.matrix[2][2] = _farZ / (far_near);
   M.matrix[2][3] = 1.0f;
   M.matrix[3][2] = -_nearZ * (_farZ / far_near);

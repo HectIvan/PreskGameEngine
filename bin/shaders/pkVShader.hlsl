@@ -4,17 +4,22 @@
 
 cbuffer cbView : register(b0)
 {
-    matrix View;
+  row_major matrix View;
 };
 
 cbuffer cbProjection : register(b1)
 {
-    matrix Projection;
+  row_major matrix Projection;
 };
 
 cbuffer cbWorld : register(b2)
 {
-    matrix World;
+  row_major matrix World;
+};
+
+cbuffer cbWorldInvTransp : register(b4)
+{
+  row_major matrix worldInvTransp;
 };
 
 struct VS_INPUT
@@ -40,7 +45,7 @@ PS_INPUT VS(VS_INPUT input)
 {
   PS_INPUT output = (PS_INPUT) 0;
   // world-view-projection transform matrix
-  float4x4 wvp = mul(World, mul(View, Projection));
+  float4x4 wvp = mul(mul(World, View), Projection);
   
   // position of the mesh vertex in local position.
   float4 vertexLocalPos = float4(input.Position.xyz, 1.0f);
@@ -60,8 +65,8 @@ PS_INPUT VS(VS_INPUT input)
   // normal fix
   // float4x4 transform = worldInvTransp;
   
-  output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
-  output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), World).xyz);
+  output.Normal = normalize(mul(float4(input.Normal, 0.0f), worldInvTransp).xyz);
+  output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), worldInvTransp).xyz);
   // output.Bitangent = normalize(mul(float4(bitangent, 0.0f), World).xyz) * input.Tangent.w;
   output.Bitangent = normalize(cross(output.Normal, output.Tangent)) * input.Tangent.w;
   

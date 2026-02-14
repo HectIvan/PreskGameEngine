@@ -225,7 +225,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBMatrix),
                     sizeof(CBMatrix),
                     sizeof(CBMatrix),
-                    sizeof(CBMaterialProps) };
+                    sizeof(CBMaterialProps),
+                    sizeof(CBMatrix) };
   pDesc.inputs = {};
   pDesc.outputs = { albedoRT, normalRT, ormRT, emissRT, posRT };
   pDesc.pDepth = DepthBuffer;

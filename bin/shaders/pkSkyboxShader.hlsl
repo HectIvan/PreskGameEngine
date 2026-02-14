@@ -6,12 +6,12 @@ SamplerState samState : register(s0);
 
 cbuffer ViewTransposed : register(b0)
 {
-  matrix ViewTransp;
+  row_major matrix ViewTransp;
 }
 
 cbuffer ProjTransposed : register(b1)
 {
-  matrix ProjTransp;
+  row_major matrix ProjTransp;
 }
 
 struct PS_INPUT

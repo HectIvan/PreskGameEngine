@@ -448,7 +448,6 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   PK_ASSERT(_pOutput);
 
   GraphicsAPI& api = g_GraphicAPI();
-  Logger& log = g_Logger();
   AssetResourceManager& assetMan = g_AssetResourceManager();
   ShaderManager& shaderMan = g_ShaderManager();
 

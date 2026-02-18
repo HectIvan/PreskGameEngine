@@ -114,6 +114,9 @@ struct CBVector2x2 // 16 bytes
   CBVector2x2(const Vector2& _vec1, const Vector2& _vec2)
     : vec1(_vec1),
       vec2(_vec2) {}
+  CBVector2x2(const float& _f1, const float& _f2, const float& _f3, const float& _f4)
+    : vec1(_f1, _f2),
+      vec2(_f3, _f4) {}
 
   Vector2 vec1;
   Vector2 vec2;

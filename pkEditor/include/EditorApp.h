@@ -24,6 +24,7 @@
 #include "pkPass.h"
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
+#include "pkPath.h"
 #include "pkTexture.h"
 #include "pkUInterface.h"
 #include "pkVector2.h"
@@ -33,11 +34,16 @@
 #include "ResourceInspector.h"
 #include "SceneInspector.h"
 
+using pkEngineSDK::Texture;
 using pkEngineSDK::BaseApp;
 using pkEngineSDK::g_uInterface;
+using pkEngineSDK::Path;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
+using pkEngineSDK::Shader;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UIWindow;
+using pkEngineSDK::Vector;
+using pkEngineSDK::Vector2;
 
 struct ShaderType
 {
@@ -103,37 +109,18 @@ class EditorApp : public BaseApp
   Vector<float> m_fpsList;
   uint32 m_fpsSize;
 
-  // light source
-  SPtr<Actor> m_light;
-  SPtr<Actor> m_camera;
-
   // camera sensitivity
   float m_sensX;
   float m_sensY;
-  float m_blurRadius;
-  float m_blurStrength;
-  float m_lumThreshold;
+  
   // camera movement speed
   float m_cameraSpeed;
-
-  // emissive blur
-  float m_emissiveBlur;
-  float m_emissiveStrength;
 
   // low window log/resources search.
   bool m_currentTab;
   bool m_showErrors;
   bool m_showWarnings;
   bool m_showActions;
-
-  // ssao parameters.
-  float m_ssaoSampleRad = 3.0f;
-  float m_ssaoScale = 1.0f;
-  float m_ssaoBias = 0.01f;
-  float m_ssaoIntensity = 2.0f;
-
-  float m_IBLIntensity;
-  float m_exposure;
 
   UIWindow m_sceneGraphWin;
   UIWindow m_loggerWin;

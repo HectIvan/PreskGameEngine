@@ -222,9 +222,13 @@ Actor::getChild(uint32 _index)
 void
 Actor::clear()
 {
-  m_components.clear();
+  const uint32 childCount = static_cast<uint32>(m_children.size());
+  for (uint32 i = 0; i < childCount; ++i) {
+    m_children[i]->clear();
+  }
   m_children.clear();
-  if (m_parent) { m_parent->clear(); }
+
+  m_components.clear();
   m_transform = Matrix4::IDENTITY;
   m_name = "";
 }

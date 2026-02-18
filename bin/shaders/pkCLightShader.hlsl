@@ -277,5 +277,5 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
     finalColor *= shadowColor.xxx;
   }
   
-  brdfTexture[DTid.xy] = float4(lightNDC.z * 0.1f, 0, 0, albedo.a);
+  brdfTexture[DTid.xy] = float4(finalColor * ao, albedo.a);
 }

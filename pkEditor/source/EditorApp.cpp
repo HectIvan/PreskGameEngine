@@ -7,7 +7,6 @@
 #include "pkModelCodec.h"
 #include "pkModelResource.h"
 #include "pkPlatformMath.h"
-#include "pkPath.h"
 #include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkShaderManager.h"
@@ -16,35 +15,44 @@
 #include "pkTimeManager.h"
 #include "EditorApp.h"
 #include "pkMaterialManager.h"
+#include "pkEventQueue.h"
 
-using pkEngineSDK::AssetResourceManager;
-using pkEngineSDK::ANSICHAR;
 using pkEngineSDK::BaseResource;
-using pkEngineSDK::GraphicsAPI;
-using pkEngineSDK::g_AssetResourceManager;
-using pkEngineSDK::g_GraphicAPI;
+using pkEngineSDK::Camera;
+using pkEngineSDK::Color;
+using pkEngineSDK::EventQueue;
+using pkEngineSDK::g_EventManager;
 using pkEngineSDK::g_Logger;
-using pkEngineSDK::g_MaterialManager;
-using pkEngineSDK::g_ModelCodec;
+using pkEngineSDK::g_ModelManager;
+using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_SceneManager;
 using pkEngineSDK::g_ShaderManager;
 using pkEngineSDK::g_TextureManager;
-using pkEngineSDK::g_TextureCodec;
+using pkEngineSDK::g_TimeManager;
+using pkEngineSDK::int32;
+using pkEngineSDK::Light;
 using pkEngineSDK::Logger;
 using pkEngineSDK::LogMSG;
 using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
-using pkEngineSDK::LOG_MSG_TYPE::kLog;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
+using pkEngineSDK::LOG_MSG_TYPE::kLog;
+using pkEngineSDK::make_shared;
+using pkEngineSDK::PK_ROT_TYPE::kDegrees;
 using pkEngineSDK::Math;
-using pkEngineSDK::ModelCodec;
+using pkEngineSDK::Model;
+using pkEngineSDK::ModelManager;
 using pkEngineSDK::ModelResource;
-using pkEngineSDK::SceneManager;
-using pkEngineSDK::ShaderManager;
-using pkEngineSDK::TextureCodec;
+using pkEngineSDK::PlatformPointer;
+using pkEngineSDK::PKWindowDesc;
 using pkEngineSDK::TextureManager;
-using pkEngineSDK::TextureResource;
+using pkEngineSDK::to_string;
+using pkEngineSDK::RendererManager;
+using pkEngineSDK::SceneManager;
+using pkEngineSDK::Shader;
+using pkEngineSDK::ShaderManager;
 using pkEngineSDK::UUID;
+using pkEngineSDK::Vector3;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "imgui_impl_win32.h"
@@ -109,19 +117,6 @@ EditorApp::onInit()
                                         lightCom->m_direction, // target
                                         Vector3::FORWARD,
                                         pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
-
-  m_IBL = true;
-  m_vSync = false;
-  m_IBLIntensity = 1.0f;
-  // luminance blur
-  m_blurRadius = 0.01f;
-  m_blurStrength = 1.0f;
-  m_lumThreshold = 6.0f;
-  // emissive blur
-  m_emissiveBlur = 5.0f;
-  m_emissiveStrength = 30.0f;
-  // exposure
-  m_exposure = 1.0f;
 
   m_fpsSize = 20;
 
@@ -463,7 +458,7 @@ EditorApp::uInterfaceUpdate()
         im.tableJumpRow();
         im.createText("Radius");
         im.tableNextColumn();
-        im.createDragF("##EmRadius", m_emissiveBlur, 1.0f, 0.001f);
+        im.createDragF("##EmRadius", m_emissiveBlurRadius, 1.0f, 0.001f);
         im.tableJumpRow();
         im.createText("Strength");
         im.tableNextColumn();
@@ -554,149 +549,6 @@ EditorApp::onUpdate()
   if (m_window.m_isFocused) {
     input();
   }
-
-  // managers
-  GraphicsAPI& api = g_GraphicAPI();
-  RendererManager& rm = g_RenderManager();
-
-  // get all passes.
-  const SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
-  const SPtr<Pass> basePass = rm.getPass(kP_Base);
-  const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  const SPtr<Pass> lightQuad = rm.getPass(kP_Light);
-  const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
-  const SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
-  const SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
-  const SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
-  const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
-  const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
-  const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
-  const SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
-
-  const Vector2 winSize = api.getSwapChain()->getSize();
-
-  const SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
-
-  const SPtr<Camera> camera = m_camera->getComponent<Camera>();
-  // if the actor camera does not have a camera component, search the scene for an actor with a camera.
-  if (!camera) {
-    // m_camera = activeScene->getActorWithComponent<Camera>();
-  }
-  // camera data
-  CBCamera cBCamera;
-  Matrix4 view = Matrix4::IDENTITY;
-  Matrix4 proj = Matrix4::IDENTITY;
-  Matrix4 invView = Matrix4::IDENTITY;
-  Matrix4 invProj = Matrix4::IDENTITY;
-  Matrix4 invViewProj = Matrix4::IDENTITY;
-  Matrix4 viewTransp = Matrix4::IDENTITY;
-  Matrix4 projTransp = Matrix4::IDENTITY;
-  // main camera buffer
-  CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // to do: win size could change, swap this to use the specific texture size.
-  // to do: change this to another method
-  if (camera) {
-    view = camera->m_view;
-    proj = camera->m_projection;
-    invView = view.inverse();
-    invProj = proj.inverse();
-    viewTransp = view.getTransposed();
-    projTransp = proj.getTransposed();
-    invViewProj = (view * proj).inverse();
-    cBCamera = CBCamera(camera);
-
-    shadowsParam.vec2 = camera->m_farNear;
-  }
-  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
-
-  // light data
-  SPtr<Light> light = m_light->getComponent<Light>();
-  // if the actor light does not have a light component, search the scene for an actor with a light.
-  if (!light) {
-    //m_light = activeScene->getActorWithComponent<Light>();
-  }
-
-  SPtr<Camera> lightCamera = m_light->getComponent<Camera>();
-  // light buffers
-  CBLight cBLight;
-  CBCamera cBLightCam;
-
-  // update shadow depth map buffers
-  Matrix4 lightView = Matrix4::IDENTITY;
-  Matrix4 lightProj = Matrix4::IDENTITY;
-  Matrix4 lightViewProj = Matrix4::IDENTITY;
-  // to do: change this to another method
-  if (light) {
-    lightView = lightCamera->m_view;
-    lightProj = lightCamera->m_projection;
-    lightViewProj = lightProj * lightView;
-    cBLight = CBLight(light);
-    cBLightCam = CBCamera(lightCamera);
-  }
-
-  // luminance parameters.
-  const CBVector2x2 lum(winSize, Vector2(m_lumThreshold, 0.0f));
-  // IBR parameters.
-  const CBFloat IBLIntens(m_IBLIntensity);
-  // exposure parameter.
-  const CBFloat exposure(m_exposure);
-  // SSAO
-  const Vector4 ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
-  const Vector4 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
-
-  // data type sizes.
-  const SIZE_T m4x4Size = sizeof(Matrix4);
-  const SIZE_T cBCamSize = sizeof(CBCamera);
-  const SIZE_T cBLightSize = sizeof(CBLight);
-  const SIZE_T v4Size = sizeof(Vector4);
-
-  // update normal && base shadow pass buffers.
-  lightPositions->updateCBuffer(0, &lightView, m4x4Size);
-  lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
-
-  basePass->updateCBuffer(0, &view, m4x4Size);
-  basePass->updateCBuffer(1, &proj, m4x4Size);
-  basePass->updateCBuffer(3, &invViewProj, m4x4Size); // to do: wrong matrix update data.
-
-  transparencyPass->updateCBuffer(0, &view, m4x4Size);
-  transparencyPass->updateCBuffer(1, &proj, m4x4Size);
-
-  // update shadow-specular quad pass
-  lightQuad->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
-                            { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
-
-  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &shadowsParam, &IBLIntens },
-                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
-
-  // skybox constant buffers.
-  skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
-
-  lumPass->updateCBuffer(0, &lum, v4Size);
-
-  // Emissive blur constant buffers;
-  CBBlur emissiveBlur;
-  emissiveBlur.WinSize = winSize;
-  emissiveBlur.radius = m_emissiveBlur;
-  emissiveBlur.strength = m_emissiveStrength;
-  emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
-  const uint32 cBlurSize = sizeof(CBBlur);
-  emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
-  emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f);
-  emissBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
-  // lum blur constant buffers
-  CBBlur blur;
-  blur.WinSize = winSize;
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
-  blur.radius = m_blurRadius;
-  blur.strength = m_blurStrength;
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
-  lumBlurHPass->updateCBuffer(0, &blur, cBlurSize);
-  blur.BlurDirection = Vector2(0.0f, 1.0f);
-  lumBlurPass->updateCBuffer(0, &blur, cBlurSize);
-
-  tonePass->updateCBuffer(0, &exposure, v4Size);
-
-  ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v4Size, v4Size });
 }
 
 void

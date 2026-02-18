@@ -36,7 +36,7 @@ class PK_CORE_EXPORT Actor
    * @param _transform Transform of the actor.
    */
   void
-  setTransform(const Matrix4& _transform);
+  setTransform(const Matrix4& _transform = Matrix4::IDENTITY);
 
   /**
    * @brief Set the position of the actor.

@@ -1,6 +1,9 @@
 #include "pkAssetResourceManager.h"
 #include "pkBaseApp.h"
+#include "pkCBuffers.h"
+#include "pkCamera.h"
 #include "pkDllManager.h"
+#include "pkEventQueue.h"
 #include "pkGraphicsAPI.h"
 #include "pkLogger.h"
 #include "pkLight.h"
@@ -9,7 +12,9 @@
 #include "pkMath.h"
 #include "pkModel.h"
 #include "pkModelCodec.h"
+#include "pkModelManager.h"
 #include "pkPrerequisitesCore.h"
+#include "pkRendererManager.h"
 #include "pkSceneManager.h"
 #include "pkShaderCodec.h"
 #include "pkShaderManager.h"
@@ -18,6 +23,20 @@
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
 #include "pkWindowDesc.h"
+
+using pkEngineSDK::PASS_TYPE::kP_Base;
+using pkEngineSDK::PASS_TYPE::kP_Transparency;
+using pkEngineSDK::PASS_TYPE::kP_LightPositions;
+using pkEngineSDK::PASS_TYPE::kP_SkyBox;
+using pkEngineSDK::PASS_TYPE::kP_Light;
+using pkEngineSDK::PASS_TYPE::kP_LightTransparency;
+using pkEngineSDK::PASS_TYPE::kP_SSAO;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
+using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
+using pkEngineSDK::PASS_TYPE::kP_Luminance;
+using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
+using pkEngineSDK::PASS_TYPE::kP_LumBlur;
+using pkEngineSDK::PASS_TYPE::kP_Tone;
 
 namespace pkEngineSDK
 {
@@ -143,9 +162,52 @@ BaseApp::update()
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& rm = g_RenderManager();
 
-  Vector2 winSize = api.getSwapChain()->getSize();
+  const Vector2 winSize = api.getSwapChain()->getSize();
+  const SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
 
-  // camera data
+  // if the actor camera does not have a camera component, search the scene for an actor with a camera.
+  const SPtr<Camera> camera = m_camera->getComponent<Camera>();
+  if (!camera) {
+    m_camera = activeScene->getActorWithComponent<Camera>();
+  }
+
+  // if the actor light does not have a light component, search the scene for an actor with a light.
+  const SPtr<Light> light = m_light->getComponent<Light>();
+  if (!light) {
+    m_light = activeScene->getActorWithComponent<Light>();
+  }
+
+  // get all passes.
+  const SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
+  const SPtr<Pass> basePass = rm.getPass(kP_Base);
+  const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
+  const SPtr<Pass> quadLight = rm.getPass(kP_Light);
+  const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
+  const SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
+  const SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
+  const SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
+  const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
+  const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
+  const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
+  const SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
+  const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
+
+  // constant buffers.
+  CBCamera cBCamera;
+  CBCamera cBLightCam;
+  CBLight cBLight;
+  CBVector2x2 lightsParam;
+  CBVector2x2 lum(winSize, Vector2(90.0f));
+  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
+  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlurRadius, m_emissiveStrength);
+  CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // will be modified later.
+  const CBVector2x2 windowSize(winSize, Vector2(0.0f));
+  const CBFloat IBLCBuffer(m_IBLIntensity);
+  const CBFloat exposureCBuffer(m_exposure);
+  const CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
+  const CBVector2x2 ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
+
+  // camera data.
   Matrix4 view = Matrix4::IDENTITY;
   Matrix4 proj = Matrix4::IDENTITY;
   Matrix4 invView = Matrix4::IDENTITY;
@@ -153,67 +215,36 @@ BaseApp::update()
   Matrix4 invViewProj = Matrix4::IDENTITY;
   Matrix4 viewTransp = Matrix4::IDENTITY;
   Matrix4 projTransp = Matrix4::IDENTITY;
-  // main camera buffer
-  CBCamera cBCamera;
-  CBVector2x2 lightsParam;
-  lightsParam.vec1 = winSize; // to do: win size could change, swap this to use the specific texture size.
-  lightsParam.vec2 = Vector2(0.0f);
-  Vector4 SkyBoxWinSize(winSize.x, winSize.y, 0.0f, 0.0f);
-
-  // light buffers
-  CBLight cBLight;
-  CBCamera cBLightCam;
-
-  // update shadow depth map buffers
   Matrix4 lightView = Matrix4::IDENTITY;
   Matrix4 lightProj = Matrix4::IDENTITY;
   Matrix4 lightViewProj = Matrix4::IDENTITY;
 
-  // luminance parameters.
-  CBVector2x2 lum;
-  lum.vec1 = winSize;
-  lum.vec2.x = 90.0f;
-  // blur parameters.
-  CBBlur blur;
-  blur.WinSize = winSize;
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
-  blur.radius = 1.0f;
-  blur.strength = 2.0f;
-  // emissive blur parameters
-  CBBlur emissiveBlur;
-  emissiveBlur.WinSize = winSize;
-  emissiveBlur.radius = 30.0f;
-  emissiveBlur.strength = 30.0f;
-  // IBR parameters.
-  CBFloat IBRIntens;
-  IBRIntens.value = 1.0f;
-  CBVector3 viewPos;
-  viewPos.vec1 = Vector3::ZERO;
+
+  if (camera) {
+    view = camera->m_view;
+    proj = camera->m_projection;
+    invView = view.inverse();
+    invProj = proj.inverse();
+    viewTransp = view.getTransposed();
+    projTransp = proj.getTransposed();
+    invViewProj = (view * proj).inverse();
+    cBCamera = CBCamera(camera);
+
+    shadowsParam.vec2 = camera->m_farNear;
+  }
 
   // data type sizes.
   const uint32 m4x4Size = sizeof(Matrix4);
-  const uint32 v4Size = sizeof(Vector4);
+  const uint32 v2x2Size = sizeof(CBVector2x2);
   const uint32 cBCamSize = sizeof(CBCamera);
   const uint32 cBLightSize = sizeof(CBLight);
   const uint32 cBlurSize = sizeof(CBBlur);
-
-  // get all passes.
-  SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
-  SPtr<Pass> basePass = rm.getPass(kP_Base);
-  SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  SPtr<Pass> quadLight = rm.getPass(kP_Light);
-  SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
-  SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
-  SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
-  SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
-  SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
-  SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
-  SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
+  const uint32 cbFloatSize = sizeof(CBFloat);
 
   // update normal && base shadow pass buffers.
   basePass->updateCBuffer(0, &view, m4x4Size);
   basePass->updateCBuffer(1, &proj, m4x4Size);
+  basePass->updateCBuffer(3, &invViewProj, m4x4Size); // to do: wrong matrix update data.
 
   lightPositions->updateCBuffer(0, &lightView, m4x4Size);
   lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
@@ -222,28 +253,29 @@ BaseApp::update()
   transparencyPass->updateCBuffer(1, &lightProj, m4x4Size);
 
   // update shadow-specular quad pass
-  Vector4 iblParams = Vector4(1.0f);
-  quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &iblParams },
-                            { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
+  quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &IBLCBuffer },
+                            { cBLightSize, cBCamSize, m4x4Size, v2x2Size, v2x2Size });
 
-  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &iblParams },
-                             { cBLightSize, cBCamSize, m4x4Size, v4Size, v4Size });
+  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &IBLCBuffer },
+                             { cBLightSize, cBCamSize, m4x4Size, v2x2Size, v2x2Size });
 
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   // luminance constant buffers.
-  lumPass->updateCBuffer(0, &lum, v4Size);
+  lumPass->updateCBuffer(0, &lum, cbFloatSize);
   // Emissive blur constant buffers;
-  emissiveBlur.BlurDirection = Vector2(1.0f, 0.0f);
   emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f); 
   emissBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
   // lum blur constant buffers
-  blur.BlurDirection = Vector2(1.0f, 0.0f);
   lumBlurHPass->updateCBuffer(0, &blur, cBlurSize);
   blur.BlurDirection = Vector2(0.0f, 1.0f);
   lumBlurPass->updateCBuffer(0, &blur, cBlurSize);
+
+  tonePass->updateCBuffer(0, &exposureCBuffer, v2x2Size);
+
+  ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v2x2Size, v2x2Size });
 }
 
 void
@@ -252,12 +284,14 @@ BaseApp::render()
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
   RendererManager& renderManager = g_RenderManager();
+
   // get all passes
-  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
+  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   const SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
-  const SPtr<Pass> quadLight = renderManager.getPass(kP_Light);
+  const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
+  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
   const SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
   const SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   const SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
@@ -265,7 +299,6 @@ BaseApp::render()
   const SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
   const SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
   const SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
-  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
 
   // Get all actors
   const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
@@ -292,9 +325,9 @@ BaseApp::render()
   const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
-  quadLight->beginPass(Color::WHITE);
+  BRDF->beginPass(Color::WHITE);
   api.dispatch(x, y, 1);
-  quadLight->endPass();
+  BRDF->endPass();
 
   transparencyBRDF->beginPass(Color::WHITE);
   api.dispatch(x, y, 1);

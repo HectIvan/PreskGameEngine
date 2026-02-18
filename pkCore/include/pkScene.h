@@ -18,6 +18,8 @@
 #include "pkActor.h"
 #include "pkPrerequisitesCore.h"
 
+using pkEngineSDK::SPtr;
+
 namespace pkEngineSDK
 {
 
@@ -36,9 +38,9 @@ class PK_CORE_EXPORT Scene
    * @return The actor created.
    */
   SPtr<Actor>
-  instantiate(String _name = "",
-              SPtr<Actor> _pParent = nullptr,
-              Matrix4 _transform = Matrix4::IDENTITY);
+  instantiate(const String& _name = "",
+              const SPtr<Actor>& _pParent = nullptr,
+              const Matrix4& _transform = Matrix4::IDENTITY);
 
   /**
    * @brief Set the active state of the current scene.
@@ -90,7 +92,20 @@ class PK_CORE_EXPORT Scene
    */
   template<typename T>
   SPtr<Actor>
-  getActorWithComponent();
+  getActorWithComponent()
+  {
+    // check each actor
+    const uint32 actorCount = static_cast<uint32>(getAllActors().size());
+    for (uint32 i = 0; i < actorCount; ++i) {
+      // check if the data type return is not null
+      const SPtr<Actor> actor = getActor(i);
+      const SPtr<T> check = actor->getComponent<T>();
+      if (check) { // if its not null, return the final value
+        return actor;
+      }
+    }
+    return nullptr;
+  }
 
   /**
    * @brief Get a vector with all actors with a specific component.
@@ -98,14 +113,30 @@ class PK_CORE_EXPORT Scene
    */
   template<typename T>
   Vector<SPtr<Actor>>
-  getAllActorsWithComponent();
+  getAllActorsWithComponent()
+  {
+    // actor list
+    Vector<SPtr<Actor>> list;
+    const uint32 actorCount = static_cast<uint32>(getAllActors().size());
+    // check each actor
+    for (uint32 i = 0; i < actorCount; ++i) {
+      // check if the data type return is not null
+      const SPtr<Actor> actor = getActor(i);
+      const SPtr<T> check = actor->getComponent<T>();
+      if (check) {
+        // if its not null, return the final value
+        list.push_back(actor);
+      }
+    }
+    return list;
+  }
 
   /**
    * @brief Update all actors.
    * @param _deltaTime Time between frames.
    */
   void
-  update(float _deltaTime);
+  update(const float& _deltaTime);
 
   /**
    * @brief Clear all the data from the scene.
@@ -120,7 +151,7 @@ class PK_CORE_EXPORT Scene
    * @param _deltaTime Time between frames.
    */
   void
-  updateActor(SPtr<Actor> _pActor, float _deltaTime);
+  updateActor(const SPtr<Actor>& _pActor, const float& _deltaTime);
 
  public:
   Vector<SPtr<Actor>> m_actors;

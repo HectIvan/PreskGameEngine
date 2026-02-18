@@ -24,7 +24,7 @@ SPtr<Actor>
 createActor()
 {
   SPtr<Actor> gActor = make_shared<Actor>();
-  gActor->setTransform(Matrix4::IDENTITY);
+  gActor->setTransform();
   gActor->setName("");
   return gActor;
 }
@@ -35,15 +35,15 @@ createActor()
  * @param _vector Vector where the actor will be inserted.
  */
 void
-insertActor(SPtr<Actor>& _pActor, Vector<SPtr<Actor>>& _vector)
+insertActor(const SPtr<Actor>& _pActor, Vector<SPtr<Actor>>& _vector)
 {
   _vector.push_back(_pActor);
 }
 
 SPtr<Actor>
-Scene::instantiate(String _name,
-                   SPtr<Actor> _pParent,
-                   Matrix4 _transform)
+Scene::instantiate(const String& _name,
+                   const SPtr<Actor>& _pParent,
+                   const Matrix4& _transform)
 {
   // insert the actor into the vector of actors.
   SPtr<Actor> actor = createActor();
@@ -82,7 +82,7 @@ Scene::instantiate(String _name,
   else { insertActor(actor, m_actors); }
   // log registry.
   String message = "Instantiated actor of name: " + _name;
-  g_Logger().registerMessage(message, __FILE__, __LINE__);
+  LOG_REGISTER(message, __FILE__, __LINE__);
   // return the actor created.
   return actor;
   
@@ -91,10 +91,11 @@ Scene::instantiate(String _name,
 SPtr<Actor>
 Scene::actorFind(String _actorName)
 {
+  const uint32 actorCount = static_cast<uint32>(getAllActors().size());
   // for each actor in the list
-  for (uint32 i = 0; i < getAllActors().size(); ++i) {
+  for (uint32 i = 0; i < actorCount; ++i) {
     // check if the name is the one we're looking for
-    SPtr<Actor> actor = getActor(i);
+    const SPtr<Actor> actor = getActor(i);
     if (actor->getName() == _actorName) {
       return actor;
     }
@@ -103,46 +104,13 @@ Scene::actorFind(String _actorName)
   return nullptr;
 }
 
-template<typename T>
-SPtr<Actor>
-Scene::getActorWithComponent()
-{
-  // check each actor
-  for (uint32 i = 0; i < getAllActors().size(); ++i) {
-    // check if the data type return is not null
-    SPtr<Actor> actor = getActor(i);
-    SPtr<T> check = actor->getComponent<T>();
-    if (check) {
-      // if its not null, return the final value
-      return actor;
-    }
-  }
-}
-
-template<typename T>
-Vector<SPtr<Actor>>
-Scene::getAllActorsWithComponent()
-{
-  // actor list
-  Vector<SPtr<Actor>> list;
-  // check each actor
-  for (uint32 i = 0; i < getAllActors().size(); ++i) {
-    // check if the data type return is not null
-    SPtr<T> check = getActor(i)->getComponent<T>();
-    if (check) {
-      // if its not null, return the final value
-      list.push_back(getActor(i));
-    }
-  }
-  return list;
-}
-
 void
-Scene::update(float _deltaTime)
+Scene::update(const float& _deltaTime)
 {
-  for (uint32 i = 0; i < getAllActors().size(); ++i) {
-    if (getActor(i)->isActive()) {
-      SPtr<Actor> actor = getActor(i);
+  const uint32 actorCount = static_cast<uint32>(getAllActors().size());
+  for (uint32 i = 0; i < actorCount; ++i) {
+    const SPtr<Actor> actor = getActor(i);
+    if (actor->isActive()) {
       updateActor(actor, _deltaTime);
     }
   }
@@ -151,18 +119,21 @@ Scene::update(float _deltaTime)
 void
 Scene::clear()
 {
-  for (uint32 i = 0; i < m_actors.size(); ++i) {
+  const uint32 actorCount = static_cast<uint32>(m_actors.size());
+  for (uint32 i = 0; i < actorCount; ++i) {
     m_actors[i]->clear();
   }
   m_actors.clear();
+  m_name = "";
   m_isActive = false;
 }
 
 void
-Scene::updateActor(SPtr<Actor> _pActor, float _deltaTime)
+Scene::updateActor(const SPtr<Actor>& _pActor, const float& _deltaTime)
 {
   _pActor->update(_deltaTime);
-  for (uint32 i = 0; i < _pActor->m_children.size(); ++i) {
+  const uint32 childCount = static_cast<uint32>(_pActor->m_children.size());
+  for (uint32 i = 0; i < childCount; ++i) {
     updateActor(_pActor->m_children[i], _deltaTime);
   }
 }

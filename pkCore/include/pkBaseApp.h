@@ -15,80 +15,9 @@
 * Includes
 **/
 /*********************************************/
-#include "pkCamera.h"
-#include "pkCBuffers.h"
-#include "pkEventQueue.h"
-#include "pkLight.h"
+#include "pkActor.h"
 #include "pkPrerequisitesCore.h"
-#include "pkRendererManager.h"
-#include "pkModelManager.h"
-#include "pkTimeManager.h"
 #include "pkWindow.h"
-
-using pkEngineSDK::PASS_TYPE::kP_Base;
-using pkEngineSDK::PASS_TYPE::kP_EmissiveHBlur;
-using pkEngineSDK::PASS_TYPE::kP_EmissiveBlur;
-using pkEngineSDK::PASS_TYPE::kP_LightPositions;
-using pkEngineSDK::PASS_TYPE::kP_Light;
-using pkEngineSDK::PASS_TYPE::kP_LightTransparency;
-using pkEngineSDK::PASS_TYPE::kP_SkyBox;
-using pkEngineSDK::PASS_TYPE::kP_SSAO;
-using pkEngineSDK::PASS_TYPE::kP_Tone;
-using pkEngineSDK::PASS_TYPE::kP_Transparency;
-using pkEngineSDK::PASS_TYPE::kP_Luminance;
-using pkEngineSDK::PASS_TYPE::kP_LumBlurH;
-using pkEngineSDK::PASS_TYPE::kP_LumBlur;
-
-using pkEngineSDK::PK_ROT_TYPE::kDegrees;
-using pkEngineSDK::PK_ROT_TYPE::kRadians;
-
-using pkEngineSDK::Actor;
-using pkEngineSDK::Camera;
-using pkEngineSDK::CBBlur;
-using pkEngineSDK::CBCamera;
-using pkEngineSDK::CBFloat;
-using pkEngineSDK::CBLight;
-using pkEngineSDK::CBProjection;
-using pkEngineSDK::CBSSAO;
-using pkEngineSDK::CBTransform;
-using pkEngineSDK::CBVector2x2;
-using pkEngineSDK::CBVector3;
-using pkEngineSDK::CBView;
-using pkEngineSDK::Color;
-using pkEngineSDK::ConstantBuffer;
-using pkEngineSDK::D_BUFFERS::kDB_Base;
-using pkEngineSDK::D_BUFFERS::kDB_Light;
-using pkEngineSDK::EventQueue;
-using pkEngineSDK::ModelManager;
-using pkEngineSDK::G_BUFFERS::kGB_Albedo;
-using pkEngineSDK::G_BUFFERS::kGB_Normal;
-using pkEngineSDK::g_EventManager;
-using pkEngineSDK::g_ModelManager;
-using pkEngineSDK::g_RenderManager;
-using pkEngineSDK::g_TimeManager;
-using pkEngineSDK::int32;
-using pkEngineSDK::Light;
-using pkEngineSDK::Material;
-using pkEngineSDK::Matrix4;
-using pkEngineSDK::make_shared;
-using pkEngineSDK::Model;
-using pkEngineSDK::Pass;
-using pkEngineSDK::Path;
-using pkEngineSDK::PlatformPointer;
-using pkEngineSDK::PKWindowDesc;
-using pkEngineSDK::RendererManager;
-using pkEngineSDK::Scene;
-using pkEngineSDK::Shader;
-using pkEngineSDK::SPtr;
-using pkEngineSDK::String;
-using pkEngineSDK::Texture;
-using pkEngineSDK::TimeManager;
-using pkEngineSDK::to_string;
-using pkEngineSDK::uint32;
-using pkEngineSDK::Vector;
-using pkEngineSDK::Vector2;
-using pkEngineSDK::Vector3;
-using pkEngineSDK::Vector4;
 
 namespace pkEngineSDK
 {
@@ -178,10 +107,32 @@ class PK_CORE_EXPORT BaseApp
   float m_fixedTimer;
 
  protected:
-  bool m_run = true;
-  bool m_vSync;
+  SPtr<Actor> m_light;
+  SPtr<Actor> m_camera;
 
+  bool m_run = true;
+  bool m_vSync = false;
+  
   bool m_ssao = true;
+
   bool m_IBL = true;
+  float m_IBLIntensity = 1.0f;
+
+  float m_exposure = 1.0f;
+
+  // luminance blur
+  float m_blurRadius = 0.1f;
+  float m_blurStrength = 1.0f;
+  float m_lumThreshold = 6.0f;
+
+  // emissive blur
+  float m_emissiveBlurRadius = 5.0f;
+  float m_emissiveStrength = 30.0f;
+
+  // ssao parameters.
+  float m_ssaoSampleRad = 3.0f;
+  float m_ssaoScale = 1.0f;
+  float m_ssaoBias = 0.01f;
+  float m_ssaoIntensity = 2.0f;
 };
 }

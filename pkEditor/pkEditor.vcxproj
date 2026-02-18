@@ -173,12 +173,12 @@
     <ClCompile Include="source\imgui_widgets.cpp" />
     <ClCompile Include="source\MaterialInspector.cpp" />
     <ClCompile Include="source\pkDX11ImGui.cpp" />
-    <ClCompile Include="source\pkEditorApp.cpp" />
+    <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\pkImGui_win32.cpp" />
     <ClCompile Include="source\pkUInterface.cpp" />
     <ClCompile Include="source\ResourceInspector.cpp" />
     <ClCompile Include="source\SceneInspector.cpp" />
-    <ClCompile Include="source\shaderTest.cpp" />
+    <ClCompile Include="source\EditorApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActorInspector.h" />
@@ -194,6 +194,7 @@
     <ClInclude Include="include\pkUInterface.h" />
     <ClInclude Include="include\ResourceInspector.h" />
     <ClInclude Include="include\SceneInspector.h" />
+    <ClInclude Include="include\EditorApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

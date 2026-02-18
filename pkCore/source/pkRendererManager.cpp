@@ -467,7 +467,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   vShader->compileFromResource(vShadRes);
   if (!vShader) {
     const String msg = "Could not create vertex shader to generate cubeMap.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kFatal);
+    LOG_FATAL(msg, __FILE__, __LINE__);
     return;
   }
   api.createVShader(vShader);

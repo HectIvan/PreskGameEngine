@@ -5,9 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\baseApp">
-      <UniqueIdentifier>{5a30d403-aebc-4eaf-939f-d97a3e029491}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{fe17dee2-aed7-4ef6-a8ab-f7c9e7e18a54}</UniqueIdentifier>
     </Filter>
@@ -31,10 +28,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\shaderTest.cpp">
-      <Filter>Source Files\baseApp</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkEditorApp.cpp">
+    <ClCompile Include="source\main.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
     <ClCompile Include="source\pkUInterface.cpp">
@@ -79,6 +73,9 @@
     <ClCompile Include="source\SceneInspector.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="source\EditorApp.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -118,6 +115,9 @@
       <Filter>include\Editor</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EditorApp.h">
       <Filter>include\Editor</Filter>
     </ClInclude>
   </ItemGroup>

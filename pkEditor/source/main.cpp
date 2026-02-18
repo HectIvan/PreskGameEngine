@@ -1,5 +1,5 @@
 #include "pkLogger.h"
-#include "shaderTest.h"
+#include "EditorApp.h"
 
 using pkEngineSDK::Exception;
 using pkEngineSDK::g_Logger;
@@ -8,7 +8,7 @@ using pkEngineSDK::Logger;
 int
 main(int argc, const char** argv)
 {
-  ShaderTest app;
+  EditorApp app;
   Logger::startUp();
   Logger& log = g_Logger();
   log.init();
@@ -16,13 +16,13 @@ main(int argc, const char** argv)
   try {
     app.init(argv, argc);
   }
-  catch (const Exception& e) { // 
-    log.print(e.what());
+  catch (const Exception& e) { // handled exceptions.
+    LOG_PRINT(e.what());
     log.createLogFiles();
     return 1;
   }
-  catch (...) { // non handled exceptions
-    log.print("Unhandled exception");
+  catch (...) { // non handled exceptions.
+    LOG_PRINT("Unhandled exception");
     log.createLogFiles();
     return 2;
   }

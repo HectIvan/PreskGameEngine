@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkShaderTest.h
+ * @file    EditorApp.h
  * @author  Héctor Iván Muñoz Ceballos
  * @date    13/01/2025
- * @brief   Shader specific derived class.
+ * @brief   Editor derived app.
  *
  * @bug    No known bugs.
  */
@@ -46,11 +46,11 @@ struct ShaderType
   SPtr<Shader> shader;
 };
 
-class ShaderTest : public BaseApp
+class EditorApp : public BaseApp
 {
  public:
-  ShaderTest() = default;
-  virtual ~ShaderTest() = default;
+   EditorApp() = default;
+  virtual ~EditorApp() = default;
 
   /**
    * @brief Initialize the shader test.

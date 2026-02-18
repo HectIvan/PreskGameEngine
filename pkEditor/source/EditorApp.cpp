@@ -14,7 +14,7 @@
 #include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkTimeManager.h"
-#include "shaderTest.h"
+#include "EditorApp.h"
 #include "pkMaterialManager.h"
 
 using pkEngineSDK::AssetResourceManager;
@@ -63,7 +63,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
 #endif
 
 void
-ShaderTest::onInit()
+EditorApp::onInit()
 {
   //start the interface
   UInterface::startUp();
@@ -154,7 +154,7 @@ ShaderTest::onInit()
 }
 
 void
-ShaderTest::initWin()
+EditorApp::initWin()
 {
   PKWindowDesc desc;
   desc.width = 1920;
@@ -177,7 +177,7 @@ ShaderTest::initWin()
 }
 
 void
-ShaderTest::input()
+EditorApp::input()
 {
   EventQueue& eventQueue = g_EventManager();
   UInterface& im = g_uInterface();
@@ -223,7 +223,7 @@ ShaderTest::input()
 }
 
 void
-ShaderTest::uInterfaceUpdate()
+EditorApp::uInterfaceUpdate()
 {
   ModelManager& modelMan = g_ModelManager();
   RendererManager& rm = g_RenderManager();
@@ -534,7 +534,7 @@ ShaderTest::uInterfaceUpdate()
 }
 
 void
-ShaderTest::showLogType(bool& _active, uint32 _type)
+EditorApp::showLogType(bool& _active, uint32 _type)
 {
   UInterface& im = g_uInterface();
   Logger& log = g_Logger();
@@ -548,7 +548,7 @@ ShaderTest::showLogType(bool& _active, uint32 _type)
 }
 
 void
-ShaderTest::onUpdate()
+EditorApp::onUpdate()
 {
   // user input
   if (m_window.m_isFocused) {
@@ -696,13 +696,11 @@ ShaderTest::onUpdate()
 
   tonePass->updateCBuffer(0, &exposure, v4Size);
 
-
-
   ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v4Size, v4Size });
 }
 
 void
-ShaderTest::onRender()
+EditorApp::onRender()
 {
   // update the user interface
   uInterfaceUpdate();

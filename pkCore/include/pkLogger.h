@@ -44,6 +44,8 @@ namespace pkEngineSDK
 
 #define THROW_ERROR(_msg) g_Logger().throwError(_msg);
 
+#define LOG_PRINT(_msg) g_Logger().print(_msg);
+
 namespace LOG_MSG_TYPE
 {
   enum E {

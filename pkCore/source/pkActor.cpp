@@ -20,7 +20,7 @@ Actor::Actor()
   m_up = Vector3::UP;
   m_scale = Vector3(1.0f);
   m_position = Vector3(0.0f);
-  m_rotation = Vector3(0.0f);
+  m_rotation = Quaternion(0.0f);
   m_transform = Matrix4::IDENTITY;
 }
 
@@ -109,27 +109,20 @@ Actor::move(const float& _addX, const float& _addY, const float& _addZ)
 }
 
 void
-Actor::setRotation(const Vector3& _rotation, const PK_ROT_TYPE::E _rotType)
+Actor::setRotation(const Vector3& _rotation)
 {
-  setRotation(_rotation.x, _rotation.y, _rotation.z, _rotType);
+  setRotation(_rotation.x, _rotation.y, _rotation.z);
 }
 
 void
-Actor::setRotation(const float& _x,
-                   const float& _y,
-                   const float& _z,
-                   const PK_ROT_TYPE::E& _rotType)
+Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
   // m_rotation = Vector3(_x, _y, _z);
   // Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
 
   Vector3 rot = Vector3(_x, _y, _z);
 
-  if (_rotType == PK_ROT_TYPE::kRadians) {
-    rot *= Math::RAD2DEG;
-  }
-
-  m_rotation = rot;
+  m_rotation = Quaternion::fromEuler(rot).normalized();
   Matrix4 rotMat = Matrix4::rotation(rot);
   
   // ---------------------------------------------------------------
@@ -141,24 +134,18 @@ Actor::setRotation(const float& _x,
 }
 
 void
-Actor::rotate(const Vector3& _rotation, const PK_ROT_TYPE::E& _rotType)
+Actor::rotate(const Vector3& _rotation)
 {
-  rotate(_rotation.x, _rotation.y, _rotation.z, _rotType);
+  rotate(_rotation.x, _rotation.y, _rotation.z);
 }
 
 void
-Actor::rotate(const float& _x,
-              const float& _y,
-              const float& _z,
-              const PK_ROT_TYPE::E& _rotType)
+Actor::rotate(const float& _x, const float& _y, const float& _z)
 {
-  Vector3 addRot = Vector3(_x, _y, _z);
+  const Vector3 addRot = Vector3(_x, _y, _z);
 
-  if (_rotType == PK_ROT_TYPE::kDegrees) {
-    addRot *= Math::DEG2RAD;
-  }
-
-  m_rotation += addRot;
+  m_rotation *= Quaternion::fromEuler(addRot);
+  m_rotation.normalize();
   Matrix4 rotMat = Matrix4::rotation(m_rotation);
 
   m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
@@ -210,7 +197,7 @@ Actor::update(float)
 }
 
 SPtr<Actor>
-Actor::getChild(uint32 _index)
+Actor::getChild(const uint32 _index)
 {
   // if there are children and the index is inside the range of existing children.
   if (!m_children.empty() && _index < m_children.size()) {
@@ -236,7 +223,7 @@ Actor::clear()
 void
 Actor::generateNewTransform()
 {
-  Vector3 rot = m_rotation * Math::DEG2RAD;
+  const Quaternion rot = m_rotation;
 
   Matrix4 posMat = Matrix4::translation(m_position);
   Matrix4 rotMat = Matrix4::rotation(rot);
@@ -248,7 +235,7 @@ Actor::generateNewTransform()
 void
 Actor::generateNewLocalTransform()
 {
-  const Vector3 rot = m_rotation * Math::DEG2RAD;
+  const Quaternion rot = m_rotation;
 
   const Matrix4 posMat = Matrix4::translation(m_position);
   const Matrix4 rotMat = Matrix4::rotation(rot);

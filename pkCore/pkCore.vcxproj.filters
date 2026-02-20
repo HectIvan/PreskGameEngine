@@ -40,6 +40,9 @@
     <Filter Include="include\graphics">
       <UniqueIdentifier>{b55ae11e-c59d-4644-b864-bb64e574335d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\camera">
+      <UniqueIdentifier>{56118060-0e7b-45ed-9067-e272e3634412}</UniqueIdentifier>
+    </Filter>
     <Filter Include="include\base app">
       <UniqueIdentifier>{d4ee8979-e08f-40e5-a7c9-74bafca0d1b7}</UniqueIdentifier>
     </Filter>
@@ -138,6 +141,9 @@
     <ClInclude Include="include\pkConstantBuffer.h">
       <Filter>include\buffers</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkMaterial.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
     <ClInclude Include="include\pkInputLayout.h">
       <Filter>include\api</Filter>
     </ClInclude>
@@ -149,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="include\pkSwapChain.h">
       <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkFrustum.h">
+      <Filter>include\camera</Filter>
     </ClInclude>
     <ClInclude Include="include\pkActor.h">
       <Filter>include\game</Filter>
@@ -267,12 +276,6 @@
     <ClInclude Include="include\pkCamera.h">
       <Filter>include\components</Filter>
     </ClInclude>
-    <ClInclude Include="include\pkFrustum.h">
-      <Filter>include\components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\pkMaterial.h">
-      <Filter>include\components</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -301,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="source\pkWin32EventQueue.cpp">
       <Filter>source\events</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkMaterial.cpp">
+      <Filter>source\graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\pkTexture.cpp">
       <Filter>source\graphics</Filter>
@@ -399,9 +405,6 @@
       <Filter>source\components</Filter>
     </ClCompile>
     <ClCompile Include="source\pkCamera.cpp">
-      <Filter>source\components</Filter>
-    </ClCompile>
-    <ClCompile Include="source\pkMaterial.cpp">
       <Filter>source\components</Filter>
     </ClCompile>
   </ItemGroup>

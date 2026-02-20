@@ -25,12 +25,18 @@ class PK_UTILITY_EXPORT Quaternion
  public:
   Quaternion() = default;
   ~Quaternion() = default;
-
-  Quaternion(float _w, float _x, float _y, float _z) :
+  Quaternion(const float& _val) : 
+    w(_val),
+    x(_val),
+    y(_val),
+    z(_val) {
+  }
+  Quaternion(const float& _w, const float& _x, const float& _y, const float& _z) :
     w(_w),
     x(_x),
     y(_y),
-    z(_z) {}
+    z(_z) {
+  }
 
   /**
    * @brief Negate the quaternion.
@@ -82,12 +88,28 @@ class PK_UTILITY_EXPORT Quaternion
   operator*(const Quaternion& _other) const;
 
   /**
+   * @brief Multiply the quaternion with a vector.
+   * @param _vector Vector to use.
+   * @return Ending vector.
+   */
+  const Vector3
+  rotate(const Vector3& _vector) const;
+
+  /**
    * @brief Multiply the quaternion with a scalar.
    * @param _scalar Scalar to use.
    * @return Ending quaternion.
    */
   const Quaternion
   operator*(const float& _scalar) const;
+
+  /**
+   * @brief Multiply the quaternion with a vector.
+   * @param _vector Vector to use.
+   * @return Ending quaternion.
+   */
+  Quaternion
+  operator*(const Vector3& _vector) const;
 
   /**
    * @brief Multiply this quaternion with another.
@@ -105,14 +127,6 @@ class PK_UTILITY_EXPORT Quaternion
   const Quaternion
   operator*=(const float& _scalar);
 
-  /**
-   * @brief Multiply the quaternion with a vector.
-   * @param _vector Vector to use.
-   * @return Ending quaternion.
-   */
-  Quaternion
-  operator*(const Vector3& _vector) const;
-
   // construct the quaternion that rotates one vector to another
   Quaternion(const Vector3& _vFrom, const Vector3& _vTo);
   // angle+axis, axis must be normalized
@@ -126,8 +140,8 @@ class PK_UTILITY_EXPORT Quaternion
    * @param _vector Vector to rotate.
    * @return Rotated vector.
    */
-  const Vector3
-  rotate(const Vector3& _vector) const;
+  // const Vector3
+  // rotate(const Vector3& _vector) const;
 
   /**
    * @brief Rotate the quaternion respective to another quaternion.
@@ -142,10 +156,20 @@ class PK_UTILITY_EXPORT Quaternion
    * @param _vector Vector3 containing the euler angles in radians.
    * @return The created quaternion.
    */
-  const Quaternion
-  fromEuler(const Vector3& _vector) const;
+  static const Quaternion
+  fromEuler(const Vector3& _vector);
+
+  /**
+   * @brief Convert the quaternion to euler angles.
+   * @return The euler angles in a Vector3.
+   */
+  const Vector3
+  toEuler() const;
   
-  // length utility
+  /**
+   * @brief Get the conjugate of the Quaternion.
+   * @return The conjugated quaternion.
+   */
   Quaternion
   conjugate() const;
 
@@ -187,5 +211,7 @@ class PK_UTILITY_EXPORT Quaternion
   float x;
   float y;
   float z;
+
+  static const Quaternion IDENTITY;
 };
 }

@@ -54,7 +54,7 @@ Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
     w = 1.0f + FdT;
     x = cross.x;
     y = cross.y;
-    z = cross.z;  
+    z = cross.z;
   }
 }
 
@@ -74,6 +74,20 @@ Quaternion::Quaternion(const float& _angleRadian, const Vector3& _axis)
   y = sinA * normAxis.y;
   z = sinA * normAxis.z;
   w = cosA;
+}
+
+Quaternion
+Quaternion::fromAxisAngle(const Vector3& _axis, const float& _angle)
+{
+  const Vector3 axis = _axis.normalized();
+  const float aHalf = _angle * 0.5f;
+
+  float w = Math::cos(aHalf);
+  float x = axis.x * Math::sin(aHalf);
+  float y = axis.y * Math::sin(aHalf);
+  float z = axis.z * Math::sin(aHalf);
+
+  return Quaternion(w, x, y, z);
 }
 
 const Quaternion
@@ -172,17 +186,6 @@ Quaternion::operator*=(const float& _scalar)
   return *this;
 }
 
-Quaternion
-Quaternion::axisAngle(const Vector3& _axis, const float& _angle)
-{
-  const float aHalf = _angle * 0.5f;
-  float w = Math::cos(aHalf);
-  float x = _axis.x * Math::sin(aHalf);
-  float y = _axis.y * Math::sin(aHalf);
-  float z = _axis.z * Math::sin(aHalf);
-  return Quaternion(w, x, y, z);
-}
-
 // const Vector3
 // Quaternion::rotate(const Vector3& _vector) const
 // {
@@ -277,7 +280,7 @@ Quaternion::conjugate() const
 float
 Quaternion::magnitudeSquare() const
 {
-  return Math::sqrt(w) + Math::sqrt(x) + Math::sqrt(y) + Math::sqrt(z);
+  return (w * w) + (x * x) + (y * y) + (z * z);
 }
 
 float
@@ -291,6 +294,7 @@ Quaternion::normalize()
 {
   float mag = magnitude();
   if (mag < Math::SMALL_NUMBER) {
+    assert(!isnan(mag));
     *this = Quaternion::IDENTITY;
     return *this;
   }

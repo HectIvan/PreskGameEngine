@@ -171,7 +171,7 @@ class PK_CORE_EXPORT Actor
    * @param _scale Scale Matrix.
    */
   void
-  setScale(Matrix4& _scale);
+  setScale(const Matrix4& _scale);
 
   /**
    * @brief Set the scale of the Actor.
@@ -370,6 +370,9 @@ class PK_CORE_EXPORT Actor
   Vector3 m_scale;
   Quaternion m_rotation;
   Vector3 m_position;
+
+  float m_jaw = 0.0f;
+  float m_pitch = 0.0f;
 
  private:
   bool m_active = true;

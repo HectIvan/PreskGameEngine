@@ -104,7 +104,7 @@ class EditorApp : public BaseApp
 
  public:
   SPtr<Material> m_selectedMaterial;
-  Vector2 m_lastCursorPos;
+  Vector2 m_lastCursorPos = Vector2(0.0f);
 
   Vector<float> m_fpsList;
   uint32 m_fpsSize;

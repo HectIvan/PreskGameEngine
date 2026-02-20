@@ -142,21 +142,28 @@ Actor::rotate(const Vector3& _rotation)
 void
 Actor::rotate(const float& _x, const float& _y, const float& _z)
 {
-  const Vector3 addRot = Vector3(_x, _y, _z);
+  m_jaw += _x;
+  m_pitch += _y;
 
-  m_rotation *= Quaternion::fromEuler(addRot);
+  const Quaternion yaw = Quaternion::fromAxisAngle(Vector3::UP, m_jaw);
+  const Quaternion pitch = Quaternion::fromAxisAngle(Vector3::RIGHT, m_pitch);
+  const Quaternion roll = Quaternion::fromAxisAngle(Vector3::FORWARD, _z);
+
+
+  m_rotation = yaw * pitch;
   m_rotation.normalize();
+
   Matrix4 rotMat = Matrix4::rotation(m_rotation);
 
-  m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
-  m_right = (rotMat * Vector4::RIGHT).xyz().normalized();
-  m_up = (rotMat * Vector4::UP).xyz().normalized();
+  m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
+  m_right = (Vector4::RIGHT     * rotMat).xyz().normalized();
+  m_up = (Vector4::UP           * rotMat).xyz().normalized();
 
   generateNewTransform();
 }
 
 void
-Actor::setScale(Matrix4& _scale)
+Actor::setScale(const Matrix4& _scale)
 {
   setScale(_scale.getScale3());
 }

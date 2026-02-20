@@ -104,14 +104,6 @@ class PK_UTILITY_EXPORT Quaternion
   operator*(const float& _scalar) const;
 
   /**
-   * @brief Multiply the quaternion with a vector.
-   * @param _vector Vector to use.
-   * @return Ending quaternion.
-   */
-  Quaternion
-  operator*(const Vector3& _vector) const;
-
-  /**
    * @brief Multiply this quaternion with another.
    * @param _other other quaternion to use.
    * @return Ending quaternion.
@@ -131,9 +123,15 @@ class PK_UTILITY_EXPORT Quaternion
   Quaternion(const Vector3& _vFrom, const Vector3& _vTo);
   // angle+axis, axis must be normalized
   Quaternion(const float& _angleRadian, const Vector3& _axis);
-  // create quaternion from axis and angle
+  
+  /**
+   * @brief create quaternion from axis and angle.
+   * @param _axis Axis from where the quaternion will be created.
+   * @param _angle angle of the quaternion (in radians).
+   * @return The created quaternion.
+   */
   static Quaternion
-  axisAngle(const Vector3& _axis, const float& _angle);
+  fromAxisAngle(const Vector3& _axis, const float& _angle);
   
   /**
    * @brief Rotate a vector by this quaternion

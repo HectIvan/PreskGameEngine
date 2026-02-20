@@ -86,11 +86,11 @@ ActorInspector::inspectTransform()
     // m_actor->setPositionLocal(newTranslation);
   }
   // change the rotation
-  Vector3 newRotation = m_actor->m_rotation;
+  Vector3 newRotation = m_actor->m_rotation.toEuler();
   im.createText("Rotation");
   im.sameLine();
   im.createDrag3("##Rotation", newRotation, 1.0f);
-  m_actor->setRotation(newRotation);
+  m_actor->setRotation(newRotation * Math::DEG2RAD);
   // change the scale
   Vector3 newScale = m_actor->m_scale;
   im.createText("Scale   ");

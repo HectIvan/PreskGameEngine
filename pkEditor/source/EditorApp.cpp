@@ -187,10 +187,10 @@ EditorApp::input()
   SPtr<Camera> cameraComp = m_camera->getComponent<Camera>();
   // move forward/backward
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
-    cameraComp->moveForwardLocal(speed);
+    cameraComp->moveForwardLocal(-speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
-    cameraComp->moveForwardLocal(-speed);
+    cameraComp->moveForwardLocal(speed);
   }
   // move left/right
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
@@ -201,18 +201,21 @@ EditorApp::input()
   }
   // move up/down
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
-    cameraComp->moveUpLocal(speed);
+    cameraComp->moveUpLocal(-speed);
   }
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
-    cameraComp->moveUpLocal(-speed);
+    cameraComp->moveUpLocal(speed);
   }
   // rotate camera
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
-    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
+    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
-    m_camera->rotate(posDif.y, posDif.x, 0.0f, kDegrees);
-    Math::clamp(-85.0f, 85.0f, m_camera->m_rotation.x);
+    if (posDif.x != 0.0f || posDif.y != 0.0f) {
+      // im.setMouseCursor(ImGuiMouseCursor_None);
+      posDif = posDif;
+    }
+    m_camera->rotate(posDif.x, posDif.y, 0.0f);
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }

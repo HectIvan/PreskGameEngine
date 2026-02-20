@@ -84,7 +84,7 @@ class PK_CORE_EXPORT Scene
    * @return Pointer to the actor.
    */
   SPtr<Actor>
-  actorFind(String _actorName);
+  actorFind(const String& _actorName);
 
   /**
    * @brief Get an actor with a specific component.

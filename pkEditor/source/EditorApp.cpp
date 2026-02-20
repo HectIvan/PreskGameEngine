@@ -211,7 +211,7 @@ EditorApp::input()
     Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition);
     posDif.x *= m_sensX;
     posDif.y *= m_sensY;
-    m_camera->rotate(-posDif.y, -posDif.x, 0.0f, kDegrees);
+    m_camera->rotate(posDif.y, posDif.x, 0.0f, kDegrees);
     Math::clamp(-85.0f, 85.0f, m_camera->m_rotation.x);
   }
   m_lastCursorPos = eventQueue.mousePosition;

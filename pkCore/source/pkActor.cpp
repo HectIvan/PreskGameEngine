@@ -133,9 +133,9 @@ Actor::setRotation(const float& _x,
   Matrix4 rotMat = Matrix4::rotation(rot);
   
   // ---------------------------------------------------------------
-  m_forward = (rotMat * Vector4::FORWARD).xyz().normalized();
-  m_right = (rotMat * Vector4::RIGHT).xyz().normalized();
-  m_up = (rotMat * Vector4::UP).xyz().normalized();
+  m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
+  m_right = (Vector4::RIGHT * rotMat).xyz().normalized();
+  m_up = (Vector4::UP * rotMat).xyz().normalized();
 
   generateNewTransform();
 }

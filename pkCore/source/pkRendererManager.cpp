@@ -267,8 +267,20 @@ RendererManager::createPasses()
   pDesc.vSDirectory = "";
   pDesc.pSDirectory = "";
   pDesc.cSDirectory = "resources/pkCLightShader.pks";
-  pDesc.cBSizes = { sizeof(CBLight), sizeof(CBCamera), sizeof(Matrix4), sizeof(Vector4), sizeof(Vector4)};
-  pDesc.inputs = { DepthBuffer, LightDepthBuffer, posRT, posLightRT, albedoRT, normalRT, ormRT, m_mainSkybox, cubeMapRT };
+  pDesc.cBSizes = { sizeof(CBLight),
+                    sizeof(CBCamera),
+                    sizeof(Matrix4),
+                    sizeof(Vector4),
+                    sizeof(Vector4)};
+  pDesc.inputs = { DepthBuffer,
+                   LightDepthBuffer,
+                   posRT,
+                   posLightRT,
+                   albedoRT,
+                   normalRT,
+                   ormRT,
+                   m_mainSkybox,
+                   cubeMapRT };
   pDesc.outputs = {};
   pDesc.uavs = { brdfRT };
   pDesc.pDepth = {};
@@ -279,8 +291,15 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Specular Transparency Quad Pass
    ***************************************************************************/
-  pDesc.inputs = { transpDepth, LightDepthBuffer, transpPos, posLightRT, transpAlbedo, transpNormal, transpORM, m_mainSkybox, cubeMapRT };
-  pDesc.outputs = {};
+  pDesc.inputs = { transpDepth,
+                   LightDepthBuffer,
+                   transpPos,
+                   posLightRT,
+                   transpAlbedo,
+                   transpNormal,
+                   transpORM,
+                   m_mainSkybox,
+                   cubeMapRT };
   pDesc.uavs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
   // insert to the passes

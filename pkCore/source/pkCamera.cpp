@@ -56,7 +56,7 @@ Camera::init(const uint32& _width,
                                               _farZ);
   }
   m_rotation = Vector3(0.0f);
-  g_Logger().registerMessage("Created Camera component.", __FILE__, __LINE__);
+  LOG_REGISTER("Created Camera component.", __FILE__, __LINE__);
 }
 
 void

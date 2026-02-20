@@ -81,7 +81,7 @@ Scene::instantiate(const String& _name,
   // otherwise, the actor is part of the scene.
   else { insertActor(actor, m_actors); }
   // log registry.
-  String message = "Instantiated actor of name: " + _name;
+  const String message = "Instantiated actor of name: " + _name;
   LOG_REGISTER(message, __FILE__, __LINE__);
   // return the actor created.
   return actor;
@@ -89,7 +89,7 @@ Scene::instantiate(const String& _name,
 }
 
 SPtr<Actor>
-Scene::actorFind(String _actorName)
+Scene::actorFind(const String& _actorName)
 {
   const uint32 actorCount = static_cast<uint32>(getAllActors().size());
   // for each actor in the list

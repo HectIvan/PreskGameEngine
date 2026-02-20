@@ -253,7 +253,7 @@ Matrix4::getRightVector() const
 const Vector3
 Matrix4::getViewPosition() const
 {
-  return Vector3(matrix[3][0], matrix[3][1], matrix[3][2]);
+  return Vector3(matrix[0][3], matrix[1][3], matrix[2][3]);
 }
 
 const Matrix4
@@ -633,7 +633,10 @@ const Matrix4
 Matrix4::rotation(const float& _angleX, const float& _angleY, const float& _angleZ)
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M = rotationZ(_angleZ) * rotationY(_angleY) * rotationX(_angleX);
+  const Matrix4 X = rotationX(_angleX);
+  const Matrix4 Y = rotationY(_angleY);
+  const Matrix4 Z = rotationZ(_angleZ);
+  M = Z * X * Y;
   return M;
 }
 
@@ -753,10 +756,10 @@ Matrix4::perspectiveFOVLH(const float& _halfFOV,
   const float aspect = _width / _height;
 
   M.matrix[0][0] = 1.0f / (tHFov * aspect);
-  M.matrix[1][1] = _width / tHFov;
-  M.matrix[2][2] = _farZ / (far_near);
+  M.matrix[1][1] = 1.0f / tHFov;
+  M.matrix[2][2] = _farZ / far_near;
   M.matrix[2][3] = 1.0f;
-  M.matrix[3][2] = -_nearZ * (_farZ / far_near);
+  M.matrix[3][2] = -_nearZ * _farZ / far_near;
 
   return M;
 }

@@ -34,13 +34,6 @@ class ActorInspector
   ActorInspector() = default;
   ActorInspector(const SPtr<Actor>& _pActor);
   virtual ~ActorInspector() = default;
-
-  /**
-   * @brief Actor Transform Inspector.
-   */
-  void
-  inspectTransform();
-
   /**
    * @brief Set the actor to inspect.
    * @param _pActor Pointer to the actor.

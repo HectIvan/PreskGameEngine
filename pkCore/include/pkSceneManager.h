@@ -38,28 +38,28 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
    * @param _name Name of the scene.
    */
   void
-  createScene(String _name = "");
+  createScene(const String& _name = "");
 
   /**
    * @brief Deletes a desired scene.
    * @param _index Index of the scene to delete.
    */
   void
-  deleteScene(uint32 _index);
+  deleteScene(const uint32& _index);
 
   /**
    * @brief Set the scene as active.
    * @param _index Scene to set as active.
    */
   void
-  setActive(uint32 _index);
+  setActive(const uint32& _index) const;
 
   /**
    * @brief Get the currently active scene.
    * @return Pointer to the currently active scene.
    */
   SPtr<Scene>
-  getActiveScene();
+  getActiveScene() const;
 
   /**
    * @brief Clear the scene manager.
@@ -67,7 +67,7 @@ class PK_CORE_EXPORT SceneManager : public Module<SceneManager>
   void
   clear();
 
- public:
+ private:
   Vector<SPtr<Scene>> m_scenes;
 };
 

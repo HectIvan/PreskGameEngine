@@ -179,6 +179,7 @@
     <ClCompile Include="source\ResourceInspector.cpp" />
     <ClCompile Include="source\SceneInspector.cpp" />
     <ClCompile Include="source\EditorApp.cpp" />
+    <ClCompile Include="source\TransformInspector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActorInspector.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="include\ResourceInspector.h" />
     <ClInclude Include="include\SceneInspector.h" />
     <ClInclude Include="include\EditorApp.h" />
+    <ClInclude Include="include\TransformInspector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

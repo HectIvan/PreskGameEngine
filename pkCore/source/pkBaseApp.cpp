@@ -221,8 +221,8 @@ BaseApp::update()
 
 
   if (camera) {
-    view = camera->m_view;
-    proj = camera->m_projection;
+    view = camera->getView();
+    proj = camera->getProjection();
     invView = view.inverse();
     invProj = proj.inverse();
     viewTransp = view.getTransposed();
@@ -230,7 +230,7 @@ BaseApp::update()
     invViewProj = (view * proj).inverse();
     cBCamera = CBCamera(camera);
 
-    shadowsParam.vec2 = camera->m_farNear;
+    shadowsParam.vec2 = camera->getFarNear();
   }
 
   // data type sizes.

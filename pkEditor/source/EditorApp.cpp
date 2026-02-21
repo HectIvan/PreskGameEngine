@@ -16,6 +16,7 @@
 #include "EditorApp.h"
 #include "pkMaterialManager.h"
 #include "pkEventQueue.h"
+#include "TransformInspector.h"
 
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::Camera;
@@ -186,36 +187,34 @@ EditorApp::input()
   }
   SPtr<Camera> cameraComp = m_camera->getComponent<Camera>();
   // move forward/backward
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW) && !itemActive) {
-    cameraComp->moveForwardLocal(-speed);
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS) && !itemActive) {
-    cameraComp->moveForwardLocal(speed);
-  }
-  // move left/right
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA) && !itemActive) {
-    cameraComp->moveRightLocal(-speed);
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD) && !itemActive) {
-    cameraComp->moveRightLocal(speed);
-  }
-  // move up/down
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE) && !itemActive) {
-    cameraComp->moveUpLocal(-speed);
-  }
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ) && !itemActive) {
-    cameraComp->moveUpLocal(speed);
-  }
-  // rotate camera
-  if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton) && !itemActive) {
-    Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
-    posDif.x *= m_sensX;
-    posDif.y *= m_sensY;
-    if (posDif.x != 0.0f || posDif.y != 0.0f) {
-      // im.setMouseCursor(ImGuiMouseCursor_None);
-      posDif = posDif;
+  if (!itemActive) {
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
+      cameraComp->moveForwardLocal(-speed);
     }
-    m_camera->rotate(posDif.x, posDif.y, 0.0f);
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
+      cameraComp->moveForwardLocal(speed);
+    }
+    // move left/right
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
+      cameraComp->moveRightLocal(-speed);
+    }
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
+      cameraComp->moveRightLocal(speed);
+    }
+    // move up/down
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
+      cameraComp->moveUpLocal(-speed);
+    }
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
+      cameraComp->moveUpLocal(speed);
+    }
+    // rotate camera
+    if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
+      Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
+      posDif.x *= m_sensX;
+      posDif.y *= m_sensY;
+      m_camera->rotate(posDif.x, posDif.y, 0.0f);
+    }
   }
   m_lastCursorPos = eventQueue.mousePosition;
 }
@@ -310,7 +309,7 @@ EditorApp::uInterfaceUpdate()
           im.createImage(m_eyeIcon, Vector2(15));
         }
         // inspect actor transform matrix
-        m_actorInspector.inspectTransform();
+        TransformInspector::inspect(selectedActor);
       }
       im.popStyleColor(3);
       // ---- Components window ---- //

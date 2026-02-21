@@ -21,6 +21,7 @@ namespace pkEngineSDK {
 
 class Matrix4;
 class Vector4;
+class Quaternion;
 
 class PK_UTILITY_EXPORT Vector3
 {
@@ -79,6 +80,14 @@ class PK_UTILITY_EXPORT Vector3
   {
     return Vector3(x * other, y * other, z * other);
   }
+
+  /**
+   * @brief Multiply the evctor with a quaternion.
+   * @param _other Quaternion with which the multiplication will be made.
+   * @return Multiplied vector
+   */
+  const Vector3
+  operator*(const Quaternion& _other) const;
   
   /**
    * Divide a vector to this vector.

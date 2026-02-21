@@ -61,10 +61,10 @@ struct CBCamera
 {
   CBCamera() = default;
   CBCamera(const SPtr<Camera>& _pCam) {
-    eye = _pCam->m_eye;
+    eye = _pCam->getEye();
     forward = _pCam->getForward();
-    view = _pCam->m_view;
-    projection = _pCam->m_projection;
+    view = _pCam->getView();
+    projection = _pCam->getProjection();
   }
   Vector4 eye = Vector4(0.0f, 0.0f, 0.0f, 1.0f); // 16
   Vector3 forward = Vector3::FORWARD; // 12

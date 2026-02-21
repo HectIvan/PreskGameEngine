@@ -55,7 +55,6 @@ Camera::init(const uint32& _width,
                                               _nearZ,
                                               _farZ);
   }
-  m_rotation = Vector3(0.0f);
   LOG_REGISTER("Created Camera component.", __FILE__, __LINE__);
 }
 
@@ -70,7 +69,7 @@ Camera::setView(const Vector4 _eye, const Vector4 _at, const Vector3 _up)
 }
 
 void
-Camera::move(Vector3 _dist)
+Camera::move(const Vector3& _dist)
 {
   // Vector3 offset = getRight() * _dist.x + getUp() * _dist.y + getForward() * _dist.z;
   m_eye += _dist;
@@ -79,9 +78,9 @@ Camera::move(Vector3 _dist)
 }
 
 void
-Camera::moveForward(float _offset)
+Camera::moveForward(const float& _offset)
 {
-  Vector3 pos = Vector3::FORWARD * _offset;
+  const Vector3 pos = Vector3::FORWARD * _offset;
   m_eye += pos;
   m_at += pos;
   m_up += pos;
@@ -89,28 +88,28 @@ Camera::moveForward(float _offset)
 }
 
 void
-Camera::moveForwardLocal(float _offset)
+Camera::moveForwardLocal(const float& _offset)
 {
-  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  const Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
   m_at += forward * _offset;
   m_eye += forward * _offset;
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 }
 
 void
-Camera::moveRight(float _offset)
+Camera::moveRight(const float& _offset)
 {
-  Vector3 pos = Vector3::RIGHT * _offset;
+  const Vector3 pos = Vector3::RIGHT * _offset;
   m_eye += pos;
   m_at += pos;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
 }
 
 void
-Camera::moveRightLocal(float _offset)
+Camera::moveRightLocal(const float& _offset)
 {
-  Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
-  Vector3 right = m_view.getUpVector().cross(forward);
+  const Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
+  const Vector3 right = m_view.getUpVector().cross(forward);
   m_at += right * _offset;
   m_eye += right * _offset;
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
@@ -119,7 +118,7 @@ Camera::moveRightLocal(float _offset)
 void
 Camera::moveUp(float _offset)
 {
-  Vector3 pos = Vector3::UP * _offset;
+  const Vector3 pos = Vector3::UP * _offset;
   m_eye += pos;
   m_at += pos;
   m_up += pos;
@@ -165,7 +164,7 @@ Camera::rotation(const Quaternion& _rotation)
 }
 
 Vector3
-Camera::getForward()
+Camera::getForward() const
 {
   Vector3 forwardVec = m_view.inverse().getForwardVector();
   forwardVec.normalize();
@@ -173,7 +172,7 @@ Camera::getForward()
 }
 
 Vector3
-Camera::getRight()
+Camera::getRight() const
 {
   Vector3 rightVec = m_view.inverse().getRightVector();
   rightVec.normalize();
@@ -181,7 +180,7 @@ Camera::getRight()
 }
 
 Vector3
-Camera::getUp()
+Camera::getUp() const
 {
   Vector3 upVec = m_view.inverse().getUpVector();
   upVec.normalize();

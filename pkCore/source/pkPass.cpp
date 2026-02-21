@@ -130,7 +130,7 @@ Pass::createVShader(const Path _directory, const ANSICHAR* _entry, const ANSICHA
   if (checkShader) {
     m_pVShader = checkShader;
     const String msg = "Found previously compiled Vertex shader: " + key.shaderPath;
-    g_Logger().registerMessage(msg, __FILE__, __LINE__);
+    LOG_REGISTER(msg, __FILE__, __LINE__);
     return;
   }
   // if it doesnt exist, continue with the compilation and store the shader.
@@ -153,7 +153,7 @@ Pass::createPShader(const Path _directory, const ANSICHAR* _entry, const ANSICHA
   if (checkShader) {
     m_pPShader = checkShader;
     const String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
-    g_Logger().registerMessage(msg, __FILE__, __LINE__);
+    LOG_REGISTER(msg, __FILE__, __LINE__);
     return;
   }
 

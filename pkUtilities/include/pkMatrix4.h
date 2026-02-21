@@ -449,7 +449,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _upDir Direction of the up vector.
    */
   static const Matrix4
-  lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir);
+  lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, const Vector4& _upDir);
 
   /**
    * @brief Get the perspective matrix.

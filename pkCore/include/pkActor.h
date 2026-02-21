@@ -371,8 +371,6 @@ class PK_CORE_EXPORT Actor
   Quaternion m_rotation;
   Vector3 m_position;
 
-  float m_jaw = 0.0f;
-  float m_pitch = 0.0f;
 
  private:
   bool m_active = true;

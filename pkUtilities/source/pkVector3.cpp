@@ -6,6 +6,7 @@
 #include "pkMath.h"
 #include "pkMatrix4.h"
 #include "pkVector3.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK {
 
@@ -16,6 +17,16 @@ const Vector3 Vector3::LEFT(-1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::RIGHT(1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::UP(0.0f, 1.0f, 0.0f);
 const Vector3 Vector3::DOWN(0.0f, -1.0f, 0.0f);
+
+const Vector3
+Vector3::operator*(const Quaternion& _other) const
+{
+  Vector3 vectQuat(_other.x, _other.y, _other.z);
+
+  Vector3 t = vectQuat.cross(*this) * 2.0f;
+
+  return *this + t * _other.w + vectQuat.cross(t);
+}
 
 const Vector3
 Vector3::operator*(const Matrix4& other) const

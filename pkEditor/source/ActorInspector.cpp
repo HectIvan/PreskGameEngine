@@ -72,32 +72,6 @@ ActorInspector::ActorInspector(const SPtr<Actor>& _pActor)
   m_actor = _pActor;
 }
 
-void
-ActorInspector::inspectTransform()
-{
-  // get the user interface manager
-  UInterface& im = g_uInterface();
-  // change the position
-  Vector3 newTranslation = m_actor->m_position;
-  im.createText("Position");
-  im.sameLine();
-  if (im.createDrag3("##Position", newTranslation)) {
-    m_actor->setPosition(newTranslation);
-    // m_actor->setPositionLocal(newTranslation);
-  }
-  // change the rotation
-  Vector3 newRotation = m_actor->m_rotation.toEuler();
-  im.createText("Rotation");
-  im.sameLine();
-  im.createDrag3("##Rotation", newRotation, 1.0f);
-  m_actor->setRotation(newRotation * Math::DEG2RAD);
-  // change the scale
-  Vector3 newScale = m_actor->m_scale;
-  im.createText("Scale   ");
-  im.sameLine();
-  im.createDrag3("##Scale", newScale);
-  m_actor->setScale(newScale);
-}
 /*
 void
 ActorInspector::inspectTransform()
@@ -166,7 +140,7 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         im.createCheckBox("Active ", pComponent->isActive());
         // camera sections
         SPtr<Camera> cam = reinterpret_pointer_cast<Camera>(pComponent);
-        CameraDesc cDesc(cam->m_descriptor);
+        CameraDesc cDesc(cam->getDescriptor());
         im.createText("Camera");
         // parameter change
         im.createText("Half FOV");
@@ -186,8 +160,8 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         }
         // initialize the camera with the new parameters
         if (isChanged) {
-          cDesc.eye = cam->m_eye.xyz();
-          cDesc.at = cam->m_at.xyz();
+          cDesc.eye = cam->getEye().xyz();
+          cDesc.at = cam->getAt().xyz();
           cDesc.up = Vector3::UP;
           cam->init(cDesc);
         }

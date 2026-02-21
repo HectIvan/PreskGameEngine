@@ -20,58 +20,59 @@ SceneManager::init()
   clear();
   createScene("Base scene");
   setActive(0);
-  g_Logger().registerMessage("Initialized Scene Manager.", __FILE__, __LINE__);
+  LOG_REGISTER("Initialized Scene Manager.", __FILE__, __LINE__);
 }
 
 void
-SceneManager::createScene(String _name)
+SceneManager::createScene(const String& _name)
 {
   SPtr<Scene> scene = make_shared<Scene>();
   scene->m_name = _name;
   scene->setActive(false);
   m_scenes.push_back(scene);
-  g_Logger().registerMessage("Created scene '" + _name + "'.", __FILE__, __LINE__);
+  LOG_REGISTER("Created scene '" + _name + "'.", __FILE__, __LINE__);
 }
 
 void
-SceneManager::deleteScene(uint32 _index)
+SceneManager::deleteScene(const uint32& _index)
 {
-  Logger& log = g_Logger().instance();
   // check if the index is inside the range of existing scenes.
   if (_index >= m_scenes.size() - 1 && !(_index < 0)) {
     SPtr<Scene> scene = m_scenes[_index];
-    log.registerMessage("Deleted Scene " + scene->m_name + ".", __FILE__, __LINE__);
     scene->clear();
     m_scenes.erase(m_scenes.begin() + _index);
+    LOG_REGISTER("Deleted Scene " + scene->m_name + ".", __FILE__, __LINE__);
   }
   else {
     const String msg = "Trying to delete an out of range scene.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
   }
 }
 
 void
-SceneManager::setActive(uint32 _index)
+SceneManager::setActive(const uint32& _index) const
 {
   // check if the index is inside the range of existing scenes.
-  if (_index > m_scenes.size() - 1 && !(_index < 0)) {
+  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  if (_index > sceneCount - 1 && !(_index < 0)) {
     String errMsg = "setActive call out of bounds. index accesed: " + to_string(_index);
     errMsg += ". Current scene count: " + to_string(static_cast<uint32>(m_scenes.size()));
-    g_Logger().registerMessage(errMsg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(errMsg, __FILE__, __LINE__);
     return;
   }
 
   // set all scenes as false and set the desired scene as active
-  for (uint32 i = 0; i < m_scenes.size(); ++i) {
+  for (uint32 i = 0; i < sceneCount; ++i) {
     m_scenes[i]->setActive(false);
   }
   m_scenes[_index]->setActive(true);
 }
 
 SPtr<Scene>
-SceneManager::getActiveScene()
+SceneManager::getActiveScene() const
 {
-  for (uint32 i = 0; i < m_scenes.size(); ++i) {
+  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  for (uint32 i = 0; i < sceneCount; ++i) {
     if (m_scenes[i]->m_isActive) {
       return m_scenes[i];
     }
@@ -82,7 +83,8 @@ SceneManager::getActiveScene()
 void
 SceneManager::clear()
 {
-  for (uint32 i = 0; i < m_scenes.size(); ++i) {
+  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  for (uint32 i = 0; i < sceneCount; ++i) {
     m_scenes[i]->clear();
   }
   m_scenes.clear();

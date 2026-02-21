@@ -159,6 +159,14 @@ Quaternion::operator*(const Quaternion& _other) const
 }
 
 const Vector3
+Quaternion::operator*(const Vector3& _other) const
+{
+  Vector3 vectQuat(x, y, z);
+  Vector3 t = vectQuat.cross(_other) * 2.0f;
+  return _other + t * w + vectQuat.cross(t);
+}
+
+const Vector3
 Quaternion::rotate(const Vector3& _vector) const
 {
   const Vector3 u = Vector3(x, y, z);

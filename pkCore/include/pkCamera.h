@@ -21,6 +21,7 @@
 #include "pkVector2.h"
 #include "pkVector3.h"
 #include "pkVector4.h"
+#include "pkQuaternion.h"
 
 namespace pkEngineSDK
 {
@@ -118,35 +119,35 @@ class PK_CORE_EXPORT Camera : public Component
    * @param _dist New position of the camera.
    */
   void
-  move(Vector3 _dist);
+  move(const Vector3& _dist);
 
   /**
    * @brief Move the camera forward in the global axis.
    * @param _offset Distance to move.
    */
   void
-  moveForward(float _offset);
+  moveForward(const float& _offset);
 
   /**
    * @brief Move the camera forward in its local axis.
    * @param _offset Distance to move.
    */
   void
-  moveForwardLocal(float _offset);
+  moveForwardLocal(const float& _offset);
 
   /**
    * @brief Move the camera right in the global axis.
    * @param _offset Distance to move.
    */
   void
-  moveRight(float _offset);
+  moveRight(const float& _offset);
 
   /**
    * @brief Move the camera right in its local axis.
    * @param _offset Distance to move.
    */
   void
-  moveRightLocal(float _offset);
+  moveRightLocal(const float& _offset);
 
   /**
    * @brief Move the camera up in the global axis.
@@ -190,42 +191,84 @@ class PK_CORE_EXPORT Camera : public Component
    * @return The forward vector as a vector4.
    */
   Vector3
-  getForward();
+  getForward() const;
 
   /**
    * @brief Get the right vector of the camera.
    * @return The right vector as a vector4.
    */
   Vector3
-  getRight();
+  getRight() const;
 
   /**
    * @brief Get the up vector of the camera.
    * @return The up vector as a vector4.
    */
   Vector3
-  getUp();
+  getUp() const;
+
+  /**
+   * @brief Get the position of the camera.
+   * @return The position of the camera as a vector4.
+   */
+  FORCEINLINE const Vector4&
+  getEye() const { return m_eye; }
+
+  /**
+   * @brief Get the near and far planes of the camera.
+   * @return The near and far planes as a vector2.
+   */
+  FORCEINLINE const Vector2&
+  getFarNear() const { return m_farNear; }
+
+  /**
+   * @brief Get the view matrix of the camera.
+   * @return The view matrix.
+   */
+  FORCEINLINE const Matrix4&
+  getView() const { return m_view; }
+
+  /**
+   * @brief Get the projection matrix of the camera.
+   * @return The projection matrix.
+   */
+  FORCEINLINE const Matrix4&
+  getProjection() const { return m_projection; }
+
+  /**
+   * @brief Get the point the camera is looking at.
+   * @return The point the camera is looking at as a vector4.
+   */
+  FORCEINLINE const Vector4&
+  getAt() const { return m_at; }
+
+  /**
+   * @brief Get the camera descriptor.
+   * @return The camera descriptor.
+   */
+  FORCEINLINE const CameraDesc
+  getDescriptor() const { return m_descriptor; }
 
   /**
    * @brief Set the forward vector of the camera.
    * @param _vec New forward vector.
    */
-  void
-  setForward(Vector3 _vec) { m_forward = _vec; }
+  FORCEINLINE void
+  setForward(const Vector3& _vec) { m_forward = _vec; }
 
   /**
    * @brief Set the right vector of the camera.
    * @param _vec New right vector.
    */
-  void
-  setRight(Vector3 _vec) { m_right = _vec; }
+  FORCEINLINE void
+  setRight(const Vector3& _vec) { m_right = _vec; }
 
   /**
    * @brief Set the up vector of the camera.
    * @param _vec New up vector.
    */
-  void
-  setUp(Vector3 _vec) { m_up = _vec; }
+  FORCEINLINE void
+  setUp(const Vector3& _vec) { m_up = _vec; }
 
   /**
    * @brief Get the component type of this component.
@@ -247,7 +290,7 @@ class PK_CORE_EXPORT Camera : public Component
   static COMPONENT_TYPE::E
   getObjType() { return COMPONENT_TYPE::kCamera; }
 
- public:
+ private:
   // Camera view
   Matrix4 m_view;
   Matrix4 m_projection;
@@ -256,17 +299,17 @@ class PK_CORE_EXPORT Camera : public Component
   CAMERA_PROJ::E m_projType;
   CameraDesc m_descriptor;
 
-  // Camera position
+  // Camera info
   Vector4 m_eye;
   Vector4 m_at;
-  Vector3 m_up;
 
   // camera vectors
   Vector3 m_forward;
   Vector3 m_right;
+  Vector3 m_up;
 
   // camera rotation and start position
-  Vector3 m_rotation;
+  Quaternion m_rotation = Quaternion::IDENTITY;
   Vector2 m_startPos = Vector2(0.0f);
 
   Vector2 m_farNear;

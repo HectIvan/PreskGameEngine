@@ -88,6 +88,22 @@ class PK_UTILITY_EXPORT Quaternion
   operator*(const Quaternion& _other) const;
 
   /**
+   * @brief multiply this quaternion with another.
+   * @param _other other quaternion to use.
+   * @return Ending quaternion.
+   */
+  const Quaternion
+  operator*=(const Quaternion& _other);
+
+  /**
+   * @brief Multiply this quaternion with a vector.
+   * @param _other Other vector3.
+   * @return Ending vector.
+   */
+  const Vector3
+  operator*(const Vector3& _other) const;
+
+  /**
    * @brief Multiply the quaternion with a vector.
    * @param _vector Vector to use.
    * @return Ending vector.
@@ -102,14 +118,6 @@ class PK_UTILITY_EXPORT Quaternion
    */
   const Quaternion
   operator*(const float& _scalar) const;
-
-  /**
-   * @brief Multiply this quaternion with another.
-   * @param _other other quaternion to use.
-   * @return Ending quaternion.
-   */
-  const Quaternion
-  operator*=(const Quaternion& _other);
 
   /**
    * @brief Multiply this quaternion with a scalar.

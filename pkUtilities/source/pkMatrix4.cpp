@@ -710,14 +710,14 @@ const Matrix4
 Matrix4::lookAtLH(const Vector4& _eyePos, const Vector4& _atPos, const Vector3& _upDir)
 {
   const Vector4 EyeDirection = _atPos - _eyePos;
-  Vector4 upDir = Vector4(_upDir, 0.0f);
+  const Vector4 upDir = Vector4(_upDir, 0.0f);
   const Matrix4 M = lookToLH(_eyePos, EyeDirection, upDir);
 
   return M;
 }
 
 const Matrix4
-Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDir)
+Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, const Vector4& _upDir)
 {
   Vector4 R0, R1, R2;
 
@@ -733,13 +733,10 @@ Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, Vector4& _upDi
   float R1Dot = Vector4::dotProd(_eyePos, R1);
   float R2Dot = Vector4::dotProd(_eyePos, R2);
 
-  // set the matrix
-  Matrix4 M(Vector4(R0.x, R0.y, R0.z, 0.0f),
-            Vector4(R1.x, R1.y, R1.z, 0.0f),
-            Vector4(R2.x, R2.y, R2.z, 0.0f),
-            Vector4(R0Dot, R1Dot, R2Dot, 1.0f));
-
-  return M;
+  return Matrix4(Vector4(R0.x, R0.y, R0.z, 0.0f),
+                 Vector4(R1.x, R1.y, R1.z, 0.0f),
+                 Vector4(R2.x, R2.y, R2.z, 0.0f),
+                 Vector4(R0Dot, R1Dot, R2Dot, 1.0f));
 }
 
 const Matrix4

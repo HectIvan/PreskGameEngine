@@ -31,7 +31,6 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   if (!_pMaterial) {
     return nullptr;
   }
-  Logger& log = g_Logger();
 
   const String materialName = _pMaterial->getNameS();
   const String filePath = "resources/" + materialName + ".pkmat";
@@ -39,7 +38,7 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
 
   if (!file.is_open()) {
     const String msg = "Failed to create material resource " + materialName + ".";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 

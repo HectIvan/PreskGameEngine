@@ -142,22 +142,26 @@ Actor::rotate(const Vector3& _rotation)
 void
 Actor::rotate(const float& _x, const float& _y, const float& _z)
 {
-  m_jaw += _x;
-  m_pitch += _y;
+  // world up rotation.
+  const Quaternion yaw = Quaternion::fromAxisAngle(Vector3::UP, _x);
+  m_rotation *= yaw;
 
-  const Quaternion yaw = Quaternion::fromAxisAngle(Vector3::UP, m_jaw);
-  const Quaternion pitch = Quaternion::fromAxisAngle(Vector3::RIGHT, m_pitch);
-  const Quaternion roll = Quaternion::fromAxisAngle(Vector3::FORWARD, _z);
+  // local right rotation.
+  const Vector3 localRight = m_rotation * Vector3::RIGHT;
+  const Quaternion pitch = Quaternion::fromAxisAngle(localRight, _y);
+  m_rotation *= pitch;
 
+  // local forward rotation.
+  const Vector3 localForward = m_rotation * Vector3::FORWARD;
+  const Quaternion roll = Quaternion::fromAxisAngle(localForward, _z);
+  m_rotation *= roll;
 
-  m_rotation = yaw * pitch;
   m_rotation.normalize();
 
-  Matrix4 rotMat = Matrix4::rotation(m_rotation);
-
-  m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
-  m_right = (Vector4::RIGHT     * rotMat).xyz().normalized();
-  m_up = (Vector4::UP           * rotMat).xyz().normalized();
+  // recalculate directions.
+  m_forward = m_rotation * Vector3::FORWARD;
+  m_right =   m_rotation * Vector3::RIGHT;
+  m_up =      m_rotation * Vector3::UP;
 
   generateNewTransform();
 }

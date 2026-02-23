@@ -21,7 +21,7 @@ namespace pkEngineSDK
 {
   
 void
-UInterface::init()
+UInterface::init(const WindowHandle& _hWnd)
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -43,6 +43,9 @@ UInterface::init()
 
   // ImGui::StyleColorsDark();
   ImGui::StyleColorsClassic();
+
+  // initialize with the window.
+  initWin(_hWnd);
 }
 
 void

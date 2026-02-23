@@ -107,20 +107,20 @@ class EditorApp : public BaseApp
   Vector2 m_lastCursorPos = Vector2(0.0f);
 
   Vector<float> m_fpsList;
-  uint32 m_fpsSize;
+  uint32 m_fpsSize = 20;
 
   // camera sensitivity
-  float m_sensX;
-  float m_sensY;
+  float m_sensX = 1.0f;
+  float m_sensY = 1.0f;
   
   // camera movement speed
-  float m_cameraSpeed;
+  float m_cameraSpeed = 20.0f;
 
   // low window log/resources search.
   bool m_currentTab;
-  bool m_showErrors;
-  bool m_showWarnings;
-  bool m_showActions;
+  bool m_showErrors = true;
+  bool m_showWarnings = false;
+  bool m_showActions = false;
 
   UIWindow m_sceneGraphWin;
   UIWindow m_loggerWin;

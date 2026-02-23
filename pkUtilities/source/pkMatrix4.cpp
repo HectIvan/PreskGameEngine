@@ -18,8 +18,8 @@ const Matrix4 Matrix4::ZERO = Matrix4(0);
 Matrix4
 Matrix4::operator=(const Matrix4& _other)
 {
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       matrix[i][j] = _other.matrix[i][j];
     }
   }
@@ -29,8 +29,8 @@ Matrix4::operator=(const Matrix4& _other)
 bool
 Matrix4::operator==(const Matrix4& _other) const
 {
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       if (matrix[i][j] != _other.matrix[i][j]) {
         return false;
       }
@@ -43,8 +43,8 @@ Matrix4
 Matrix4::operator+(const Matrix4& _other) const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[i][j] + _other.matrix[i][j];
     }
   }
@@ -55,8 +55,8 @@ Matrix4
 Matrix4::operator+(const float& _other) const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[i][j] + _other;
     }
   }
@@ -67,8 +67,8 @@ Matrix4
 Matrix4::operator-(const Matrix4& _other) const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[i][j] - _other.matrix[i][j];
     }
   }
@@ -79,8 +79,8 @@ Matrix4
 Matrix4::operator-(const float& _other) const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[i][j] - _other;
     }
   }
@@ -135,8 +135,8 @@ Matrix4
 Matrix4::operator*(const float& _other) const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[i][j] * _other;
     }
   }
@@ -145,8 +145,8 @@ Matrix4::operator*(const float& _other) const
 
 Matrix4::Matrix4(const float& val)
 {
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       matrix[i][j] = val;
     }
   }
@@ -397,10 +397,8 @@ const Matrix4
 Matrix4::getTransposed() const
 {
   Matrix4 result;
-  for (int i = 0; i < 4; ++i)
-  {
-    for (int j = 0; j < 4; ++j)
-    {
+  for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 j = 0; j < 4; ++j) {
       result.matrix[i][j] = matrix[j][i];
     }
   }

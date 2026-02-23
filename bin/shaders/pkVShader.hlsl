@@ -65,8 +65,8 @@ PS_INPUT VS(VS_INPUT input)
   // normal fix
   // float4x4 transform = worldInvTransp;
   
-  output.Normal = normalize(mul(float4(input.Normal, 0.0f), worldInvTransp).xyz);
-  output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), worldInvTransp).xyz);
+  output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
+  output.Tangent = normalize(mul(float4(input.Tangent.xyz, 0.0f), World).xyz);
   // output.Bitangent = normalize(mul(float4(bitangent, 0.0f), World).xyz) * input.Tangent.w;
   output.Bitangent = normalize(cross(output.Normal, output.Tangent)) * input.Tangent.w;
   

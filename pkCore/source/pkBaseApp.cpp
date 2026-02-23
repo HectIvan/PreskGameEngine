@@ -121,9 +121,7 @@ BaseApp::messageLoop()
     // event window specific input
     eventQueue.windowInput(m_window);
     // update the delta time
-    // m_deltaTime = timeManager.getDeltaTime(delta);
     timeManager.m_deltaTime = timeManager.getDeltaTime(delta);
-    // fixed update timer count.
     m_fixedTimer += timeManager.m_deltaTime;
     // base app update
     update();
@@ -133,11 +131,11 @@ BaseApp::messageLoop()
     if (m_fixedTimer > 0.016f) {
       // fixed update
       fixedUpdate();
-      activeScene->update(timeManager.m_deltaTime);
-      m_fixedTimer = 0;
+      activeScene->update(timeManager.m_fixedDeltaTime);
+      m_fixedTimer = 0.0f;
     }
     else {
-      activeScene->update(timeManager.m_fixedDeltaTime);
+      activeScene->update(timeManager.m_deltaTime);
     }
     // event queue
     eventQueue.poll();
@@ -219,7 +217,6 @@ BaseApp::update()
   Matrix4 lightProj = Matrix4::IDENTITY;
   Matrix4 lightViewProj = Matrix4::IDENTITY;
 
-
   if (camera) {
     view = camera->getView();
     proj = camera->getProjection();
@@ -244,13 +241,12 @@ BaseApp::update()
   // update normal && base shadow pass buffers.
   basePass->updateCBuffer(0, &view, m4x4Size);
   basePass->updateCBuffer(1, &proj, m4x4Size);
-  basePass->updateCBuffer(3, &invViewProj, m4x4Size); // to do: wrong matrix update data.
+
+  transparencyPass->updateCBuffer(0, &view, m4x4Size);
+  transparencyPass->updateCBuffer(1, &proj, m4x4Size);
 
   lightPositions->updateCBuffer(0, &lightView, m4x4Size);
   lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
-
-  transparencyPass->updateCBuffer(0, &lightView, m4x4Size);
-  transparencyPass->updateCBuffer(1, &lightProj, m4x4Size);
 
   // update shadow-specular quad pass
   quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &IBLCBuffer },
@@ -319,18 +315,18 @@ BaseApp::render()
 
   // get texel size of compute passes
 
-  const Vector2 texSize = api.getSwapChain()->getSize();
-  const uint32 threadWidth = 16;
-  const uint32 threadHeight = 16;
-  const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-  const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+  // const Vector2 texSize = api.getSwapChain()->getSize();
+  // const uint32 threadWidth = 16;
+  // const uint32 threadHeight = 16;
+  // const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
+  // const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
   BRDF->beginPass(Color::WHITE);
-  api.dispatch(x, y, 1);
+  api.draw(3, 0);
   BRDF->endPass();
 
   transparencyBRDF->beginPass(Color::WHITE);
-  api.dispatch(x, y, 1);
+  api.draw(3, 0);
   transparencyBRDF->endPass();
 
   // ssao pass

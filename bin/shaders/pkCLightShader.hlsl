@@ -210,9 +210,9 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
   float roughness = ormValues.g;
   float3 worldPos = posMap.Load(int3(DTid.xy, 0)).xyz;
   
-  float3 viewDir = normalize(Eye.xyz - worldPos);
+  float3 viewDir = normalize(worldPos - Eye.xyz);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  float3 normal = normalize(normalTex.xyz);
+  float3 normal = normalize(normalTex.xyz * 2.0f - 1.0f);
   float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic.rrr);
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));

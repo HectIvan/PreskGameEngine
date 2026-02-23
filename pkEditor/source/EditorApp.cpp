@@ -20,6 +20,7 @@
 
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::Camera;
+using pkEngineSDK::CameraDesc;
 using pkEngineSDK::Color;
 using pkEngineSDK::EventQueue;
 using pkEngineSDK::g_EventManager;
@@ -56,9 +57,7 @@ using pkEngineSDK::UUID;
 using pkEngineSDK::Vector3;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
-#include "imgui_impl_win32.h"
-// to do: delete this and replace with own
-#include "Windows.h"
+#include "pkWindow.h"
 
 // Win32 message handler your application need to call.
 // - Intentionally commented out in a '#if 0' block to avoid dragging dependencies on <windows.h> from this helper.
@@ -76,54 +75,33 @@ EditorApp::onInit()
 {
   //start the interface
   UInterface::startUp();
-  g_uInterface().init();
-  g_uInterface().initWin(m_window.getWindowHandle());
+  g_uInterface().init(m_window.getWindowHandle());
 
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
   m_sceneInspector.setScene(activeScene);
 
   // create camera
-  m_cameraSpeed = 20.0f;
+  const Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
+  CameraDesc camDescription;
+  camDescription.width   = m_window.getWidth();
+  camDescription.height  = m_window.getHeight();
+  camDescription.eye     = camPos;
+
   m_camera = activeScene->instantiate("Main Camera");
-  m_camera->addComponent(make_shared<Camera>());
-  Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
-  m_camera->getComponent<Camera>()->init(m_window.getWidth(),
-                                         m_window.getHeight(),
-                                         3.1416f / 4.0f,
-                                         3.0f,
-                                         5000.0f,
-                                         camPos, // position
-                                         Vector3::FORWARD + camPos * -1.0f, // target
-                                         Vector3(0.0f, 1.0f, 0.0f)); // up vector
-  // camera sensitivity
-  m_sensX = 30.0f;
-  m_sensY = 30.0f;
+  m_camera->addComponent(make_shared<Camera>(camDescription));
 
   // create light
+  const Vector3 lightPos = Vector3(0.0f, 1000.0f, 0.0f);
+  CameraDesc lightCamDesc;
+  lightCamDesc.width   = 1920 * 2.0f;
+  lightCamDesc.height  = 1080 * 2.0f;
+  lightCamDesc.eye     = lightPos;
+
   m_light = activeScene->instantiate("Light");
-  m_light->setPosition(0.0f, 1000.0f, 0.0f);
-  m_light->setRotation(90, 0, 0);
+  m_light->setRotation(90.0f, 0.0f, 0.0f);
   m_light->addComponent(make_shared<Light>());
-  const SPtr<Light> lightCom = m_light->getComponent<Light>();
-
-  // add camera component
-  m_light->addComponent(make_shared<Camera>());
-  m_light->getComponent<Camera>()->init(1920 * 2.0f,
-                                        1080 * 2.0f,
-                                        3.1416f / 4.0f,
-                                        3.0f,
-                                        5000.0f,
-                                        lightCom->m_position, // position
-                                        lightCom->m_direction, // target
-                                        Vector3::FORWARD,
-                                        pkEngineSDK::CAMERA_PROJ::kPerspective); // up vector);
-
-  m_fpsSize = 20;
-
-  m_showErrors = true;
-  m_showWarnings = false;
-  m_showActions = false;
+  m_light->addComponent(make_shared<Camera>(lightCamDesc));
 
   // m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
 
@@ -132,7 +110,7 @@ EditorApp::onInit()
    */
   float alpha = 0.4f;
   // scene graph
-  Vector2 winRect = m_window.getClientWidthHeight();
+  const Vector2 winRect = m_window.getClientWidthHeight();
   m_sceneGraphWin.name = activeScene->m_name.c_str();
   m_sceneGraphWin.position = Vector2(0.0f, 0.0f);
   m_sceneGraphWin.size = Vector2(winRect.x * 0.1f, winRect.y * 0.8f);
@@ -189,10 +167,10 @@ EditorApp::input()
   // move forward/backward
   if (!itemActive) {
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-      cameraComp->moveForwardLocal(-speed);
+      cameraComp->moveForwardLocal(speed);
     }
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-      cameraComp->moveForwardLocal(speed);
+      cameraComp->moveForwardLocal(-speed);
     }
     // move left/right
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
@@ -203,16 +181,15 @@ EditorApp::input()
     }
     // move up/down
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
-      cameraComp->moveUpLocal(-speed);
+      cameraComp->moveUpLocal(speed);
     }
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
-      cameraComp->moveUpLocal(speed);
+      cameraComp->moveUpLocal(-speed);
     }
     // rotate camera
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
       Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
-      posDif.x *= m_sensX;
-      posDif.y *= m_sensY;
+      posDif *= Vector2(m_sensX, m_sensY);
       m_camera->rotate(posDif.x, posDif.y, 0.0f);
     }
   }

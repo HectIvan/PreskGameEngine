@@ -161,8 +161,8 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         // initialize the camera with the new parameters
         if (isChanged) {
           cDesc.eye = cam->getEye().xyz();
-          cDesc.at = cam->getAt().xyz();
-          cDesc.up = Vector3::UP;
+          cDesc.forward = cam->getForward();
+          cDesc.right = Vector3::RIGHT;
           cam->init(cDesc);
         }
       }

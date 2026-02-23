@@ -1,18 +1,13 @@
-/************************************************************************/
+/*****************************************************************************/
 /**
-* @pkVector4 pkVector4.h
-* @Hector Ivan Muñoz Ceballos
-* @date 06/09/2024
-* @Vector4 file for the Presk Game Engine.
-*
-* This file contains the Vector4 class of the engine
-*
-* @bug No bug known.
-*
-* @HectIvan 09/09/2024
-* Added comments and missing functions
-*/
-/************************************************************************/
+ * @file    pkVector4.h
+ * @author  Héctor Iván Muñoz Ceballos
+ * @date    06/09/2024
+ * @brief   Vector of 4 values ordered in an x, y, z, w format for the Presk Game Engine.
+ *
+ * @bug    No known bugs.
+ */
+ /*****************************************************************************/
 #pragma once
 
 /*********************************************/
@@ -289,7 +284,7 @@ class PK_UTILITY_EXPORT Vector4
     * @param _y Maximum clamp range.
     */
   PKFORCEINLINE void
-  clamp(float _x, float _y);
+  clamp(const float& _x, const float& _y);
 
   /**
    * @brief Compare 2 vectors to see if their values differ.
@@ -304,8 +299,8 @@ class PK_UTILITY_EXPORT Vector4
    * @param _val The value that all parts of the vector will be set to.
    * @return A Vector4 with all of its parts set to a single value.
    */
-  static Vector4
-  vectorSplatValue(float _val);
+  static const Vector4
+  vectorSplatValue(const float& _val);
 
   /**
    * @brief Calculate the dot product of one vector with this one.

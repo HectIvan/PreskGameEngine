@@ -41,33 +41,41 @@ namespace CAMERA_PROJ
 struct CameraDesc
 {
   CameraDesc() = default;
-  CameraDesc(uint32 _width, uint32 _height, float _halfFOV, float _nearZ, float _farZ,
-             Vector3 _eye, Vector3 _at, Vector3 _up, CAMERA_PROJ::E _camMode) {
+  CameraDesc(const uint32& _width,
+             const uint32& _height,
+             const float& _halfFOV,
+             const float& _nearZ,
+             const float& _farZ,
+             const Vector3& _eye,
+             const Vector3& _forward,
+             const Vector3& _right,
+             const CAMERA_PROJ::E& _camMode) {
     width = _width;
     height = _height;
     halfFOV = _halfFOV;
     nearZ = _nearZ;
     farZ = _farZ;
     eye = _eye;
-    at = _at;
-    up = _up;
+    forward = _forward;
+    right = _right;
     camMode = _camMode;
   }
-  uint32 width;
-  uint32 height;
-  float halfFOV;
-  float nearZ;
-  float farZ;
-  Vector3 eye;
-  Vector3 at;
-  Vector3 up;
-  CAMERA_PROJ::E camMode;
+  uint32 width = 1920;
+  uint32 height = 1080;
+  float halfFOV = Math::PI / 4.0f;
+  float nearZ = 3.0f;
+  float farZ = 5000.0f;
+  Vector3 eye = Vector3(0.0f);
+  Vector3 forward = Vector3::FORWARD;
+  Vector3 right = Vector3::RIGHT;
+  CAMERA_PROJ::E camMode = CAMERA_PROJ::E::kPerspective;
 };
 
 class PK_CORE_EXPORT Camera : public Component
 {
  public:
   Camera() = default;
+  Camera(const CameraDesc& _camDescription);
   virtual ~Camera() = default;
 
   /**
@@ -92,8 +100,8 @@ class PK_CORE_EXPORT Camera : public Component
    * @param _nearZ Nearest point to the camera.
    * @param _farZ Furthest point to the camera.
    * @param _eye Position of the camera view.
-   * @param _at Where the camera will be looking at.
-   * @param _up Up vector of the camera.
+   * @param _forward The forward vector of the camera.
+   * @param _right The right vector of the camera.
    * @param _camMode Wether Camera perspective.
    */
   void
@@ -103,8 +111,8 @@ class PK_CORE_EXPORT Camera : public Component
        const float& _nearZ,
        const float& _farZ,
        const Vector3& _eye,
-       const Vector3& _at,
-       const Vector3& _up,
+       const Vector3& _forward,
+       const Vector3& _right,
        const CAMERA_PROJ::E& _camMode = CAMERA_PROJ::kPerspective
   );
 
@@ -185,6 +193,12 @@ class PK_CORE_EXPORT Camera : public Component
    */
   void
   rotation(const Quaternion& _rotation);
+
+  /**
+   * @brief Update the view matrix of the camera based onn the camera rotation.
+   */
+  void
+  updateView();
 
   /**
    * @brief Get the forward vector of the camera.
@@ -294,9 +308,6 @@ class PK_CORE_EXPORT Camera : public Component
   // Camera view
   Matrix4 m_view;
   Matrix4 m_projection;
-  uint32 m_width;
-  uint32 m_height;
-  CAMERA_PROJ::E m_projType;
   CameraDesc m_descriptor;
 
   // Camera info

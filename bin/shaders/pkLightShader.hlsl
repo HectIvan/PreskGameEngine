@@ -204,13 +204,13 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 ormValues = ormMap.Sample(samState, input.TexCoord).rgb;
   float ao = ormValues.r;
-  float metallic = ormValues.b;
   float roughness = ormValues.g;
+  float metallic = ormValues.b;
   float3 worldPos = posMap.Sample(samState, input.TexCoord).xyz;
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  float3 normal = normalize(normalTex.xyz);
+  float3 normal = normalize(normalTex.xyz * 2.0f - 1.0f);
   float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic.rrr);
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));
@@ -266,12 +266,12 @@ float4 PS(PS_INPUT input) : SV_Target0
   float lightHit = magnitude(worldPos - LightPos);
   float worldHit = magnitude(lightWorldPos - LightPos);
   
-  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL;
+  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL * ao;
     
   // float NoL = max(dot(normal, lightDir), 0.0f);
   // float bias = SMALL_NUMBER * tan(acos(NoL));
   if (lightHit > worldHit + SMALL_NUMBER) {
-    finalColor *= shadowColor.xxx;
+    // finalColor *= shadowColor.xxx;
   }
   
   return float4(finalColor, albedo.a);

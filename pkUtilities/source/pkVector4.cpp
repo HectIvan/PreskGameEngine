@@ -119,7 +119,7 @@ Vector4::distanceTo(const Vector4& _other) const
 }
 
 void
-Vector4::clamp(float _x, float _y)
+Vector4::clamp(const float& _x, const float& _y)
 {
   x = Math::clamp(x, _x, _y);
   y = Math::clamp(y, _x, _y);
@@ -140,8 +140,8 @@ Vector4::isDifferent(const Vector4& _other) const
   return false;
 }
 
-Vector4 
-Vector4::vectorSplatValue(float _val)
+const Vector4
+Vector4::vectorSplatValue(const float& _val)
 {
   Vector4 result;
   result.x = _val;

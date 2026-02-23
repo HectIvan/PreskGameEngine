@@ -78,9 +78,10 @@ class UInterface : public Module<UInterface>
 
   /**
    * @brief Initialize the User Interface for the editor
+   * @param _hWnd Handle to the window to use.
    */
   void
-  init();
+  init(const WindowHandle& _hWnd);
 
   /**
    * @brief Initialize the User Interface through the current api.

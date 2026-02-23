@@ -190,6 +190,16 @@ class PK_UTILITY_EXPORT Vector3
   }
 
   /**
+   * @brief Negates the values of this vector.
+   * @return A Vector with all of its parts negated.
+   */
+  PKFORCEINLINE const Vector3
+  operator-() const
+  {
+    return Vector3(-x, -y, -z);
+  }
+
+  /**
    * @brief Substract a vector to this Vectors values.
    * @param other vector with which the substraction will be made.
    * @return

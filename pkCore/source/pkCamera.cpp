@@ -4,18 +4,26 @@
 
 namespace pkEngineSDK
 {
+Camera::Camera(const CameraDesc& _camDescription)
+{
+  init(_camDescription);
+}
+
 void
 Camera::init(const CameraDesc& _desc)
 {
-  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.at,
-       _desc.up, _desc.camMode);
+  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.forward,
+       _desc.right, _desc.camMode);
 }
 
 void
 Camera::update(Actor& _owner)
 {
-  rotation(_owner.m_rotation);
-  // m_view *= Matrix4::translation(_owner.m_position);
+  m_rotation = _owner.m_rotation;
+  m_forward = _owner.m_forward;
+  m_right = _owner.m_right;
+  m_up = _owner.m_up;
+  updateView();
 }
 
 void
@@ -25,21 +33,20 @@ Camera::init(const uint32& _width,
              const float& _nearZ,
              const float& _farZ,
              const Vector3& _eye,
-             const Vector3& _at,
-             const Vector3& _up,
+             const Vector3& _forward,
+             const Vector3& _right,
              const CAMERA_PROJ::E& _camMode)
 {
   // creation parameters
   m_descriptor = CameraDesc(_width, _height, _halfFOV, _nearZ,
-                            _farZ, _eye, _at, _up, _camMode);
+                            _farZ, _eye, _forward, _right, _camMode);
   m_eye = Vector4(_eye, 1.0f);
-  m_at = Vector4(_at, 0.0f);
-  m_up = _up;
-  m_forward = Vector3::FORWARD;
-  m_right = Vector3::RIGHT;
+  m_at = Vector4(_eye + _forward, 0.0f);
+  m_up = _forward.cross(_right);
+  m_forward = _forward;
+  m_right = _right;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
   m_farNear = Vector2(_farZ, _nearZ);
-  m_projType = _camMode;
   if (_camMode == CAMERA_PROJ::kPerspective) {
     m_projection = Matrix4::perspectiveFOVLH(_halfFOV,
                                              static_cast<float>(_width),
@@ -155,12 +162,23 @@ Camera::rotate(const float& _x, const float& _y, const float& _z)
 void
 Camera::rotation(const Quaternion& _rotation)
 {
-  Quaternion rot = _rotation;
-
-  m_view = Matrix4::rotation(rot);
-  m_at = m_eye + m_view.getForwardVector();
-  m_up = m_eye.xyz() + m_view.getUpVector();
+  Matrix4 rot = Matrix4::rotation(_rotation);
+  m_at = m_eye + rot.getForwardVector();
+  m_up = m_eye.xyz() + rot.getUpVector();
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+}
+
+void
+Camera::updateView()
+{
+  const Quaternion invRot = m_rotation.conjugate();
+  
+  const Matrix4 rot = Matrix4::rotation(invRot);
+  const Matrix4 translation = Matrix4::translation(-m_eye.xyz()).getTransposed();
+  m_view = rot * translation;// Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+
+  /* note: i seem to have accidentally implemented an orbit camera, something that i did intend on doing in the future,
+     but not now, this was intended to be a first person camera, either way, i'll be saving this code for later.*/
 }
 
 Vector3

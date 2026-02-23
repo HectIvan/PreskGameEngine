@@ -58,6 +58,13 @@ RendererManager::init()
   SPtr<Texture> ssaoRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_SSAO, ssaoRT });
 
+  // BRDF texture.
+  SPtr<Texture> brdfRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
+
+  SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
+
   // skybox texture.
   SPtr<Texture> skyboxRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_Skybox, skyboxRT });
@@ -155,13 +162,6 @@ RendererManager::init()
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
-
-  // BRDF texture.
-  SPtr<Texture> brdfRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_BRDF, brdfRT });
-
-  SPtr<Texture> brdfTranspRT = api.createTexture(txDesc);
-  m_gBuffers.insert({ G_BUFFERS::kGB_BRDFTransp, brdfTranspRT });
 
   generateCubeMap(m_mainSkybox, cubeMapRT);
   
@@ -264,16 +264,14 @@ RendererManager::createPasses()
   /****************************************************************************
    * BRDF Quad Pass
    ***************************************************************************/
-  pDesc.vSDirectory = "";
-  pDesc.pSDirectory = "";
-  pDesc.cSDirectory = "resources/pkCLightShader.pks";
+  pDesc.vSDirectory = "resources/pkQuadShader.pks";
+  pDesc.pSDirectory = "resources/pkLightShader.pks";
   pDesc.cBSizes = { sizeof(CBLight),
                     sizeof(CBCamera),
                     sizeof(Matrix4),
                     sizeof(Vector4),
                     sizeof(Vector4)};
   pDesc.inputs = { DepthBuffer,
-                   LightDepthBuffer,
                    posRT,
                    posLightRT,
                    albedoRT,
@@ -281,8 +279,7 @@ RendererManager::createPasses()
                    ormRT,
                    m_mainSkybox,
                    cubeMapRT };
-  pDesc.outputs = {};
-  pDesc.uavs = { brdfRT };
+  pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
   // insert to the passes
@@ -292,7 +289,6 @@ RendererManager::createPasses()
    * Shadow Specular Transparency Quad Pass
    ***************************************************************************/
   pDesc.inputs = { transpDepth,
-                   LightDepthBuffer,
                    transpPos,
                    posLightRT,
                    transpAlbedo,
@@ -300,7 +296,7 @@ RendererManager::createPasses()
                    transpORM,
                    m_mainSkybox,
                    cubeMapRT };
-  pDesc.uavs = { brdfTranspRT };
+  pDesc.outputs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LightTransparency, lightTranspQuad });
@@ -308,7 +304,6 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  pDesc.vSDirectory = "resources/pkQuadShader.pks";
   pDesc.pSDirectory = "resources/pkSkyboxShader.pks";
   pDesc.cSDirectory = "";
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };

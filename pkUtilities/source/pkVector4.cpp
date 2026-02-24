@@ -35,23 +35,26 @@ Vector4::Vector4(const Vector2& _v1, const Vector2& _v2)
 Vector4
 Vector4::operator*(const Matrix4& other) const
 {
-  // new X value
-  float X = (x * other.matrix[0][0]) + 
-            (x * other.matrix[1][0]) + 
-            (x * other.matrix[2][0]);
-  // new Y value
-  float Y = (y * other.matrix[0][1]) + 
-            (y * other.matrix[1][1]) + 
-            (y * other.matrix[2][1]);
-  // new Z value
-  float Z = (z * other.matrix[0][2]) + 
-            (z * other.matrix[1][2]) + 
-            (z * other.matrix[2][2]);
-  // new W value
-  float W = (w * other.matrix[0][3]) + 
-            (w * other.matrix[1][3]) + 
-            (w * other.matrix[2][3]);
-  // return the final vector
+  float X = x * other.matrix[0][0] +
+            y * other.matrix[1][0] +
+            z * other.matrix[2][0] +
+            w * other.matrix[3][0];
+
+  float Y = x * other.matrix[0][1] +
+            y * other.matrix[1][1] +
+            z * other.matrix[2][1] +
+            w * other.matrix[3][1];
+
+  float Z = x * other.matrix[0][2] +
+            y * other.matrix[1][2] +
+            z * other.matrix[2][2] +
+            w * other.matrix[3][2];
+
+  float W = x * other.matrix[0][3] +
+            y * other.matrix[1][3] +
+            z * other.matrix[2][3] +
+            w * other.matrix[3][3];
+
   return Vector4(X, Y, Z, W);
 }
 

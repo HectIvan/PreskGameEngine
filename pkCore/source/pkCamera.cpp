@@ -23,6 +23,7 @@ Camera::update(Actor& _owner)
   m_forward = _owner.m_forward;
   m_right = _owner.m_right;
   m_up = _owner.m_up;
+  m_eye = Vector4(_owner.m_position, 1.0f);
   updateView();
 }
 

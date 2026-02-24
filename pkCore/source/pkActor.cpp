@@ -64,7 +64,7 @@ Actor::moveForward(const float& _offset)
 void
 Actor::moveForwardLocal(const float& _offset)
 {
-  Vector3 newOffset = m_transform.getForwardVector() * _offset;
+  Vector3 newOffset = m_forward * _offset;
   move(newOffset);
 }
 
@@ -77,7 +77,7 @@ Actor::moveRight(const float& _offset)
 void
 Actor::moveRightLocal(const float& _offset)
 {
-  Vector3 newOffset = m_transform.getRightVector() * _offset;
+  Vector3 newOffset = m_right * _offset;
   move(newOffset);
 }
 
@@ -90,7 +90,7 @@ Actor::moveUp(const float& _offset)
 void
 Actor::moveUpLocal(const float& _offset)
 {
-  Vector3 newOffset = m_transform.getUpVector() * _offset;
+  Vector3 newOffset = m_up * _offset;
   move(newOffset);
 }
 
@@ -117,15 +117,16 @@ Actor::setRotation(const Vector3& _rotation)
 void
 Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
-  const Vector3 rot = Vector3(_x, _y, _z);
+  const Vector3 rot(_x, _y, _z);
 
-  m_rotation = Quaternion::fromEuler(rot).normalized();
-  const Matrix4 rotMat = Matrix4::rotation(m_rotation.conjugate());
-  
-  // ---------------------------------------------------------------
-  m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
-  m_right = (Vector4::RIGHT * rotMat).xyz().normalized();
-  m_up = (Vector4::UP * rotMat).xyz().normalized();
+  // Create and normalize rotation
+  m_rotation = Quaternion::fromEuler(rot);
+  m_rotation.normalize();
+
+  // Rotate basis vectors directly using quaternion
+  m_forward = m_rotation.rotate(Vector3::FORWARD).normalized();
+  m_right =   m_rotation.rotate(Vector3::RIGHT).normalized();
+  m_up =      m_rotation.rotate(Vector3::UP).normalized();
 
   generateNewTransform();
 }
@@ -232,10 +233,8 @@ Actor::clear()
 void
 Actor::generateNewTransform()
 {
-  const Quaternion rot = m_rotation;
-
   Matrix4 posMat = Matrix4::translation(m_position);
-  Matrix4 rotMat = Matrix4::rotation(rot);
+  Matrix4 rotMat = Matrix4::rotation(m_rotation);
   Matrix4 scaleMat = Matrix4::scale(m_scale);
 
   m_transform = posMat * rotMat * scaleMat;
@@ -244,10 +243,8 @@ Actor::generateNewTransform()
 void
 Actor::generateNewLocalTransform()
 {
-  const Quaternion rot = m_rotation;
-
   const Matrix4 posMat = Matrix4::translation(m_position);
-  const Matrix4 rotMat = Matrix4::rotation(rot);
+  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
   const Matrix4 scaleMat = Matrix4::scale(m_scale);
 
   m_transform = scaleMat * rotMat * posMat;

@@ -163,28 +163,27 @@ EditorApp::input()
   if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kEsc)) {
     ApplicationRun(false);
   }
-  SPtr<Camera> cameraComp = m_camera->getComponent<Camera>();
   // move forward/backward
   if (!itemActive) {
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kW)) {
-      cameraComp->moveForwardLocal(speed);
+      m_camera->moveForwardLocal(speed);
     }
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kS)) {
-      cameraComp->moveForwardLocal(-speed);
+      m_camera->moveForwardLocal(-speed);
     }
     // move left/right
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kA)) {
-      cameraComp->moveRightLocal(-speed);
+      m_camera->moveRightLocal(-speed);
     }
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kD)) {
-      cameraComp->moveRightLocal(speed);
+      m_camera->moveRightLocal(speed);
     }
     // move up/down
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kE)) {
-      cameraComp->moveUpLocal(speed);
+      m_camera->moveUpLocal(speed);
     }
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kQ)) {
-      cameraComp->moveUpLocal(-speed);
+      m_camera->moveUpLocal(-speed);
     }
     // rotate camera
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {

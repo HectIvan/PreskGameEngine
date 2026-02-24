@@ -166,15 +166,19 @@ Quaternion::operator*(const Vector3& _other) const
   return _other + t * w + vectQuat.cross(t);
 }
 
+// https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
+// 1.- p=(vx,vy,vz,0)⇔p=(v,0)
+// 2.- p′=q×p×q∗
+// 3.- v′=(p′x,p′y,p′z)
 const Vector3
 Quaternion::rotate(const Vector3& _vector) const
 {
-  const Vector3 u = Vector3(x, y, z);
-  const Vector3 t = u.cross(_vector);
+  const Quaternion PureFromVector = Quaternion(0.0f, _vector.x, _vector.y, _vector.z);
+  
+  const Quaternion pure = (*this) * PureFromVector * this->conjugate();
 
-  return _vector + (t * (2.0f * w)) + (t * u * 2);
+  return Vector3(pure.x, pure.y, pure.z);
 }
-
 
 const Quaternion
 Quaternion::operator*(const float& _scalar) const

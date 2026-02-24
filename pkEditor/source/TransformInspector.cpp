@@ -33,4 +33,21 @@ TransformInspector::inspect(SPtr<Actor>& _pActor)
   if (im.createDrag3("##Scale", newScale)) {
     _pActor->setScale(newScale);
   }
+
+  im.createText("");
+
+  Vector3 right = _pActor->m_right;
+  im.createText("Right   ");
+  im.sameLine();
+  im.createDrag3("##Right", right);
+
+  Vector3 up = _pActor->m_up;
+  im.createText("Up      ");
+  im.sameLine();
+  im.createDrag3("##Up", up);
+
+  Vector3 forward = _pActor->m_forward;
+  im.createText("Forward ");
+  im.sameLine();
+  im.createDrag3("##Forward", forward);
 }

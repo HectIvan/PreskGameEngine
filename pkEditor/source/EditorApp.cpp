@@ -89,6 +89,7 @@ EditorApp::onInit()
   camDescription.eye     = camPos;
 
   m_camera = activeScene->instantiate("Main Camera");
+  m_camera->setPosition(camPos);
   m_camera->addComponent(make_shared<Camera>(camDescription));
 
   // create light
@@ -99,6 +100,7 @@ EditorApp::onInit()
   lightCamDesc.eye     = lightPos;
 
   m_light = activeScene->instantiate("Light");
+  m_light->setPosition(lightPos);
   m_light->setRotation(90.0f, 0.0f, 0.0f);
   m_light->addComponent(make_shared<Light>());
   m_light->addComponent(make_shared<Camera>(lightCamDesc));

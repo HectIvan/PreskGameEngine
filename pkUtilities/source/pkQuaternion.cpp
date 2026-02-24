@@ -134,28 +134,33 @@ Quaternion::operator+(const Quaternion& _other) const
   q.z += _other.z;
   return q;
 }
-
+/*
+             a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,  // 1
+             a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,  // i
+             a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,  // j
+             a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w   // k
+*/
 const Quaternion
 Quaternion::operator*(const Quaternion& _other) const
 {
-  Quaternion p = *this;
+  Quaternion result = Quaternion::IDENTITY;
 
-  const float w1 = w;
-  const float x1 = x;
-  const float y1 = y;
-  const float z1 = z;
+  const float aw = w;
+  const float ax = x;
+  const float ay = y;
+  const float az = z;
 
-  const float w2 = _other.w;
-  const float x2 = _other.x;
-  const float y2 = _other.y;
-  const float z2 = _other.z;
+  const float bw = _other.w;
+  const float bx = _other.x;
+  const float by = _other.y;
+  const float bz = _other.z;
 
-  p.w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
-  p.x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
-  p.y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2;
-  p.z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2;
+  result.w = aw * bw - ax * bx - ay * by - az * bz;
+  result.x = aw * bx + ax * bw + ay * bz - az * by;
+  result.y = aw * by - ax * bz + ay * bw + az * bx;
+  result.z = aw * bz + ax * by - ay * bx + az * bw;
 
-  return p;
+  return result;
 }
 
 const Vector3
@@ -164,6 +169,12 @@ Quaternion::operator*(const Vector3& _other) const
   Vector3 vectQuat(x, y, z);
   Vector3 t = vectQuat.cross(_other) * 2.0f;
   return _other + t * w + vectQuat.cross(t);
+}
+
+bool
+Quaternion::hasNan() const
+{
+  return Math::isNan(w) || Math::isNan(x) || Math::isNan(y) || Math::isNan(z);
 }
 
 // https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion

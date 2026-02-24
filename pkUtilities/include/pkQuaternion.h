@@ -104,6 +104,13 @@ class PK_UTILITY_EXPORT Quaternion
   operator*(const Vector3& _other) const;
 
   /**
+   * @brief Check if the quaternion has a NaN value.
+   * @return True if it has a NaN value, false otherwise.
+   */
+  bool
+  hasNan() const;
+
+  /**
    * @brief Multiply the quaternion with a vector.
    * @param _vector Vector to use.
    * @return Ending vector.

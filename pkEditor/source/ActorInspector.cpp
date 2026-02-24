@@ -118,13 +118,13 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
   // for each type of component
   im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   // non constant in case a component is removed in runtime.
-  uint32 compCount = static_cast<uint32>(m_actor->m_components.size());
+  uint32 compCount = m_actor->getComponentCount();
   for (uint32 i = 0; i < compCount; ++i) {
     im.pushID(i);
-    SPtr<Component> pComponent = m_actor->m_components[i];
+    SPtr<Component> pComponent = m_actor->getComponent(i);
     // remove the component from the list and update the component count.
     if (im.createButton("X")) {
-      m_actor->m_components.erase(m_actor->m_components.begin() + i);
+      m_actor->removeComponent(i);
       compCount -= 1;
     }
     if (im.isItemHovered()) {

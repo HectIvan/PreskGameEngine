@@ -1,11 +1,13 @@
 #include "pkUInterface.h"
 #include "TransformInspector.h"
 #include "pkPlatformMath.h"
+#include "pkLogger.h"
 
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::Math;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::Vector3;
+using pkEngineSDK::g_Logger;
 
 void
 TransformInspector::inspect(SPtr<Actor>& _pActor)
@@ -34,7 +36,7 @@ TransformInspector::inspect(SPtr<Actor>& _pActor)
     _pActor->setScale(newScale);
   }
 
-  im.createText("");
+  im.createText("------------------Directions------------------");
 
   Vector3 right = _pActor->m_right;
   im.createText("Right   ");

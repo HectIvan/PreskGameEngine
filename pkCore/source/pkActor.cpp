@@ -12,86 +12,18 @@
 namespace pkEngineSDK
 {
 
-Actor::Actor()
-{
-  setActive(true);
-  m_forward = Vector3::FORWARD;
-  m_right = Vector3::RIGHT;
-  m_up = Vector3::UP;
-  m_scale = Vector3(1.0f);
-  m_position = Vector3(0.0f);
-  m_rotation = Quaternion(0.0f);
-  m_transform = Matrix4::IDENTITY;
-}
-
 void
 Actor::setTransform(const Matrix4& _transform)
 {
   m_transform = _transform;
-}
 
-void
-Actor::setPosition(Matrix4& _translation)
-{
-  setPosition(_translation.getTranslation3());
-}
-
-void
-Actor::setPosition(const Vector3& _position)
-{
-  setPosition(_position.x, _position.y, _position.z);
-}
-
-void
-Actor::setPosition(const float& _x, const float& _y, const float& _z)
-{
-  m_position = Vector3(_x, _y, _z);
-  generateNewTransform();
-}
-
-void
-Actor::move(const Vector3& _addPos)
-{
-  move(_addPos.x, _addPos.y, _addPos.z);
-}
-
-void
-Actor::moveForward(const float& _offset)
-{
-  move(Vector3::FORWARD * _offset);
-}
-
-void
-Actor::moveForwardLocal(const float& _offset)
-{
-  Vector3 newOffset = m_forward * _offset;
-  move(newOffset);
-}
-
-void
-Actor::moveRight(const float& _offset)
-{
-  move(Vector3::RIGHT * _offset);
-}
-
-void
-Actor::moveRightLocal(const float& _offset)
-{
-  Vector3 newOffset = m_right * _offset;
-  move(newOffset);
-}
-
-void
-Actor::moveUp(const float& _offset)
-{
-  move(Vector3::UP * _offset);
-}
-
-void
-Actor::moveUpLocal(const float& _offset)
-{
-  Vector3 newOffset = m_up * _offset;
-  move(newOffset);
+  // m_forward = m_transform.getForwardVector().normalized();
+  // m_right = m_transform.getRightVector().normalized();
+  // m_up = m_transform.getUpVector().normalized();
+  // 
+  // m_position = m_transform.getTranslation3();
+  // m_rotation = Quaternion::fromRotationMatrix(m_transform);
+  // m_scale = m_transform.getScale3();
 }
 
 void
@@ -102,39 +34,22 @@ Actor::moveVerlet(const Vector3& _direction, const float& _force)
 }
 
 void
-Actor::move(const float& _addX, const float& _addY, const float& _addZ)
-{
-  m_position += Vector3(_addX, _addY, _addZ);
-  generateNewTransform();
-}
-
-void
-Actor::setRotation(const Vector3& _rotation)
-{
-  setRotation(_rotation.x, _rotation.y, _rotation.z);
-}
-
-void
 Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
   const Vector3 rot(_x, _y, _z);
 
   // Create and normalize rotation
-  m_rotation = Quaternion::fromEuler(rot);
-  m_rotation.normalize();
+  m_rotation = Quaternion::fromEuler(rot).normalized();
+
+  if (m_rotation.hasNan()) {
+    LOG_ERROR("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
+    m_rotation = Quaternion::IDENTITY;
+  }
 
   // Rotate basis vectors directly using quaternion
   m_forward = m_rotation.rotate(Vector3::FORWARD).normalized();
   m_right =   m_rotation.rotate(Vector3::RIGHT).normalized();
   m_up =      m_rotation.rotate(Vector3::UP).normalized();
-
-  generateNewTransform();
-}
-
-void
-Actor::rotate(const Vector3& _rotation)
-{
-  rotate(_rotation.x, _rotation.y, _rotation.z);
 }
 
 void
@@ -161,25 +76,6 @@ Actor::rotate(const float& _x, const float& _y, const float& _z)
   m_forward = m_rotation * Vector3::FORWARD;
   m_right =   m_rotation * Vector3::RIGHT;
   m_up =      m_rotation * Vector3::UP;
-
-  generateNewTransform();
-}
-
-void
-Actor::setScale(const Matrix4& _scale)
-{
-  setScale(_scale.getScale3());
-}
-
-void
-Actor::setScale(const float& _val) {
-  setScale(_val, _val, _val);
-}
-
-void
-Actor::setScale(const Vector3& _scale)
-{
-  setScale(_scale.x, _scale.y, _scale.z);
 }
 
 void
@@ -192,9 +88,8 @@ Actor::setScale(const float& _x, const float& _y, const float& _z)
   if (_x == 0.0f) { x = Math::SMALL_NUMBER; }
   if (_y == 0.0f) { y = Math::SMALL_NUMBER; }
   if (_z == 0.0f) { z = Math::SMALL_NUMBER; }
-  m_scale = Vector3(x, y, z);
 
-  generateNewTransform();
+  m_scale = Vector3(x, y, z);
 }
 
 void
@@ -204,10 +99,11 @@ Actor::update(float)
   for (uint32 i = 0; i < compCount; ++i) {
     m_components[i]->update(*this);
   }
+  generateNewTransform();
 }
 
-SPtr<Actor>
-Actor::getChild(const uint32 _index)
+const SPtr<Actor>
+Actor::getChild(const uint32& _index) const
 {
   // if there are children and the index is inside the range of existing children.
   if (!m_children.empty() && _index < m_children.size()) {
@@ -219,23 +115,30 @@ Actor::getChild(const uint32 _index)
 void
 Actor::clear()
 {
-  const uint32 childCount = static_cast<uint32>(m_children.size());
+  const uint32 childCount = getChildCount();
+
   for (uint32 i = 0; i < childCount; ++i) {
     m_children[i]->clear();
   }
   m_children.clear();
-
   m_components.clear();
+
   m_transform = Matrix4::IDENTITY;
   m_name = "";
+  m_parent = nullptr;
+
+  // assert that both vectors are now empty.
+  PK_ASSERT(m_children.empty() && "Failed to clear children.");
+  PK_ASSERT(m_components.empty() && "Failed to clear components.");
+
 }
 
 void
 Actor::generateNewTransform()
 {
-  Matrix4 posMat = Matrix4::translation(m_position);
-  Matrix4 rotMat = Matrix4::rotation(m_rotation);
-  Matrix4 scaleMat = Matrix4::scale(m_scale);
+  const Matrix4 posMat = Matrix4::translation(m_position);
+  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
+  const Matrix4 scaleMat = Matrix4::scale(m_scale);
 
   m_transform = posMat * rotMat * scaleMat;
 }
@@ -251,21 +154,6 @@ Actor::generateNewLocalTransform()
 }
 
 void
-Actor::setPositionLocal(const Vector3& _offset)
-{
-  m_position = _offset;
-  generateNewLocalTransform();
-}
-
-void
-Actor::setPositionForwardLocal(const float& _offset)
-{
-  const Vector3 offset = m_forward * _offset;
-  m_position += offset;
-  generateNewLocalTransform();
-}
-
-void
 Actor::addComponent(const SPtr<Component>& _pComponent)
 {
   // if the component exists, insert it into the list.
@@ -275,5 +163,38 @@ Actor::addComponent(const SPtr<Component>& _pComponent)
     const String msg = "Inserted Actor component: " + String(_pComponent->getName());
     LOG_REGISTER(msg, __FILE__, __LINE__);
   }
+}
+
+void
+Actor::removeComponent(const uint32& _index)
+{
+  if (m_components.empty() || _index >= getComponentCount()) {
+    LOG_ERROR("Tried to remove a component with an index that is out of range.",
+              __FILE__,
+              __LINE__);
+    return;
+  }
+
+  m_components.erase(m_components.begin() + _index);
+}
+
+const SPtr<Component>
+Actor::getComponent(const uint32& _index) const
+{
+  const uint32 compCount = getComponentCount();
+
+  // if there are no components or the index is out of range, return a null pointer.
+  if (m_components.empty() || _index >= compCount) {
+    LOG_ERROR("Tried to get a component with an index that is out of range.", __FILE__, __LINE__);
+    return nullptr;
+  }
+
+  // search for the component in the components vector and return it if found.
+  for (uint32 i = 0; i < compCount; ++i) {
+    if (i == _index) {
+      return m_components[i];
+    }
+  }
+  return nullptr;
 }
 }

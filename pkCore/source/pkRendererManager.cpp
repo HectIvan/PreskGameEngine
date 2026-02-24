@@ -567,11 +567,11 @@ RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
       continue;
     }
     // use the parent transform to modify the current transform.
-    SPtr<Actor> parent = currActor->m_parent;
+    SPtr<Actor> parent = currActor->getParent();
     Matrix4 transform = currActor->m_transform;
     while (parent) {
       transform *= parent->m_transform;
-      parent = parent->m_parent;
+      parent = parent->getParent();
     }
 
     // render model components in the actor.
@@ -584,8 +584,8 @@ RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
       }
     }
     // if the actor has children, do the same for them.
-    if (!currActor->m_children.empty()) {
-      renderActors(currActor->m_children);
+    if (currActor->hasChildren()) {
+      renderActors(currActor->getChildren());
     }
   }
 }

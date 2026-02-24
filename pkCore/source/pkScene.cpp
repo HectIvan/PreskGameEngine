@@ -74,9 +74,10 @@ Scene::instantiate(const String& _name,
   // if the parent is not a nullptr (there is a parent that will have this actor).
   if (_pParent) {
     // insert the current actor to the children vector of the parent.
-    insertActor(actor, _pParent->m_children);
+    Vector<SPtr<Actor>> children = _pParent->getChildren();
+    insertActor(actor, children);
     // set the parent as the parent of the current actor.
-    actor->m_parent = _pParent;
+    actor->setParent(_pParent);
   }
   // otherwise, the actor is part of the scene.
   else { insertActor(actor, m_actors); }
@@ -132,9 +133,9 @@ void
 Scene::updateActor(const SPtr<Actor>& _pActor, const float& _deltaTime)
 {
   _pActor->update(_deltaTime);
-  const uint32 childCount = static_cast<uint32>(_pActor->m_children.size());
+  const uint32 childCount = _pActor->getChildCount();
   for (uint32 i = 0; i < childCount; ++i) {
-    updateActor(_pActor->m_children[i], _deltaTime);
+    updateActor(_pActor->getChild(i), _deltaTime);
   }
 }
 }

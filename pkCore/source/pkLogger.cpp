@@ -14,9 +14,12 @@
 * Includes
 **/
 /*********************************************/
-#include "pkPrerequisitesCore.h"
 #include "pkLogger.h"
+#include "pkMatrix4.h"
+#include "pkPrerequisitesCore.h"
+#include "pkQuaternion.h"
 #include "pkTimeManager.h"
+#include "pkVector2.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -24,16 +27,8 @@
 namespace pkEngineSDK
 {
 
-void
-Logger::init(const bool _printLog, const bool _printWarning, const bool _printError)
-{
-  m_printLog = _printLog;
-  m_printWarnings = _printWarning;
-  m_printErrors = _printError;
-}
-
-String
-Logger::getMessageError(int32 _hr)
+const String
+Logger::getMessageError(const int32& _hr) const
 {
   // error log
   ANSICHAR* errorMsg = nullptr;
@@ -64,37 +59,43 @@ namespace pkEngineSDK
 {
 
 void
-Logger::print(String _text)
+Logger::print(const String& _text)
 {
   cout << _text << endl << endl;
 }
 
 void
-Logger::print(float _num)
+Logger::print(const float& _num)
 {
   cout << _num << endl << endl;
 }
 
 void
-Logger::print(Vector2 _vec)
+Logger::print(const Vector2& _vec)
 {
   cout << _vec.x << " " << _vec.y << endl << endl;
 }
 
 void
-Logger::print(Vector3 _vec)
+Logger::print(const Vector3& _vec)
 {
   cout << _vec.x << " " << _vec.y << " " << _vec.z << endl << endl;
 }
 
 void
-Logger::print(Vector4 _vec)
+Logger::print(const Vector4& _vec)
 {
   cout << _vec.x << " " << _vec.y << " " << _vec.z << " " << _vec.w << endl << endl;
 }
 
 void
-Logger::print(Matrix4 _matrix)
+Logger::print(const Quaternion& _quat)
+{
+  cout << _quat.w << " " << _quat.x << " " << _quat.y << " " << _quat.z << endl << endl;
+}
+
+void
+Logger::print(const Matrix4& _matrix)
 {
   // First row.
   cout << _matrix.matrix[0][0] << " "
@@ -118,14 +119,14 @@ Logger::print(Matrix4 _matrix)
        << _matrix.matrix[3][3] << " " << endl << endl;
 }
 
-String
-Logger::toString(const Vector3 _vec)
+const String
+Logger::toString(const Vector3& _vec)
 {
    return String(to_string(_vec.x) + " " + to_string(_vec.y) + " " + to_string(_vec.z));
 }
 
 void
-Logger::throwError(const String _errorMSG)
+Logger::throwError(const String& _errorMSG) const
 {
   throw Runtime_error(_errorMSG);
 }
@@ -137,31 +138,20 @@ Logger::registerMessage(const String& _msg,
                         const LOG_MSG_TYPE::E _type)
 {
   // register the message.
-  String time = g_TimeManager().getCurrentTime();
-  LogMSG message(_msg, _file, _line, time, _type);
+  const String time = g_TimeManager().getCurrentTime();
+  const LogMSG message(_msg, _file, _line, time, _type);
   m_messages.emplace_back(message);
-
-  // check if the message should be print in the console.
-  if (m_printLog && _type == LOG_MSG_TYPE::kLog) {
-    printMessage(message);
-  }
-  if (m_printWarnings && _type == LOG_MSG_TYPE::kWarning) {
-    printMessage(message);
-  }
-  if (m_printErrors && _type == LOG_MSG_TYPE::kError) {
-    printMessage(message);
-  }
 }
 
 void
-Logger::printMessage(const LogMSG& _msg)
+Logger::printMessage(const LogMSG& _msg) const
 {
-  String message = getStringFromLog(_msg);
+  const String message = getStringFromLog(_msg);
   print(message);
 }
 
-String
-Logger::getStringFromLog(const LogMSG& _msg)
+const String
+Logger::getStringFromLog(const LogMSG& _msg) const
 {
   return String("[" + 
                 _msg.time +
@@ -175,50 +165,54 @@ Logger::getStringFromLog(const LogMSG& _msg)
 }
 
 Vector<LogMSG>
-Logger::getMessageLogOfType(const LOG_MSG_TYPE::E _type)
+Logger::getMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 {
   Vector<LogMSG> messages;
-  for (uint32 i = 0; i < m_messages.size(); ++i) {
-    if (m_messages[i].type == _type) {
-      messages.emplace_back(m_messages[i]);
+  const uint32 logCount = static_cast<uint32>(m_messages.size());
+  for (uint32 i = 0; i < logCount; ++i) {
+    const LogMSG& msg = m_messages[i];
+    if (msg.type == _type) {
+      messages.emplace_back(msg);
     }
   }
   return messages;
 }
 
 void
-Logger::printMessageLogOfType(const LOG_MSG_TYPE::E _type)
+Logger::printMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 {
-  Vector<LogMSG> messages = getMessageLogOfType(_type);
-  for (uint32 i = 0; i < messages.size(); ++i) {
+  const Vector<LogMSG> messages = getMessageLogOfType(_type);
+  const uint32 logCount = static_cast<uint32>(messages.size());
+  for (uint32 i = 0; i < logCount; ++i) {
     printMessage(messages[i]);
   }
 }
 
 void
-Logger::createLogFiles()
+Logger::createLogFiles() const
 {
-  Vector<LogMSG> logs = getMessageLog();
+  const Vector<LogMSG> logs = getMessageLog();
 
   // create log file
   ofstream logFile("log/Log.txt", ios::out | ios::trunc);
-  for (uint32 i = 0; i < logs.size(); ++i) {
-
+  const uint32 logCount = static_cast<uint32>(logs.size());
+  for (uint32 i = 0; i < logCount; ++i) {
+    const LogMSG& msg = logs[i];
     String message = "";
-    if (logs[i].type == LOG_MSG_TYPE::kLog) {
+    if (msg.type == LOG_MSG_TYPE::kLog) {
       message += "[LOG] ";
     }
-    if (logs[i].type == LOG_MSG_TYPE::kError) {
+    if (msg.type == LOG_MSG_TYPE::kError) {
       message += "[ERROR] ";
     }
-    if (logs[i].type == LOG_MSG_TYPE::kWarning) {
+    if (msg.type == LOG_MSG_TYPE::kWarning) {
       message += "[WARNING] ";
     }
-    if (logs[i].type == LOG_MSG_TYPE::kFatal) {
+    if (msg.type == LOG_MSG_TYPE::kFatal) {
       message += "[FATAL] ";
     }
 
-    message += getStringFromLog(logs[i]);
+    message += getStringFromLog(msg);
     logFile << message << endl;
   }
   logFile.close();

@@ -41,7 +41,7 @@ Material::init()
 }
 
 void
-Material::update(Actor& _owner)
+Material::update(Actor&)
 {
 }
 

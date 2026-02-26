@@ -11,7 +11,6 @@ main(int argc, const char** argv)
   EditorApp app;
   Logger::startUp();
   Logger& log = g_Logger();
-  log.init();
 
   try {
     app.init(argv, argc);

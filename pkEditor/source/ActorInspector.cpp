@@ -4,12 +4,6 @@
 **/
 /*********************************************/
 #include "ActorInspector.h"
-
-/*********************************************/
-/**
-* Includes
-**/
-/*********************************************/
 #include "pkCamera.h"
 #include "pkModelManager.h"
 #include "pkLight.h"
@@ -72,42 +66,6 @@ ActorInspector::ActorInspector(const SPtr<Actor>& _pActor)
   m_actor = _pActor;
 }
 
-/*
-void
-ActorInspector::inspectTransform()
-{
-  // get the user interface manager
-  UInterface& im = g_uInterface();
-
-  if (im.beginTable("Transform")) {
-    im.tableJumpRow();
-    im.createText("Position");
-    im.tableNextColumn();
-    // change the position
-    Vector3 newTranslation = m_actor->m_position;
-    if (im.createDrag3("##Position", newTranslation)) {
-      m_actor->setPosition(newTranslation);
-    }
-    im.tableJumpRow();
-    
-    im.createText("Rotation");
-    im.tableNextColumn();
-    Vector3 newRotation = m_actor->m_rotation;
-    if (im.createDrag3("##Rotation", newRotation, 1.0f)) {
-      m_actor->setRotation(newRotation);
-    }
-    im.tableJumpRow();
-    
-    im.createText("Scale");
-    im.tableNextColumn();
-    Vector3 newScale = m_actor->m_scale;
-    if (im.createDrag3("##Scale", newScale)) {
-      m_actor->setScale(newScale);
-    }
-    im.endTable();
-  }
-}
-*/
 void
 ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
 {
@@ -125,7 +83,7 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
     // remove the component from the list and update the component count.
     if (im.createButton("X")) {
       m_actor->removeComponent(i);
-      compCount -= 1;
+      --compCount;
     }
     if (im.isItemHovered()) {
       im.setTooltip("Remove Component.");

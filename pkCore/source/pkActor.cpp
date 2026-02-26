@@ -38,18 +38,17 @@ Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
   const Vector3 rot(_x, _y, _z);
 
-  // Create and normalize rotation
+  // Create and normalize rotation.
   m_rotation = Quaternion::fromEuler(rot).normalized();
 
+  // verify that the rotation does not contain NaN values.
   if (m_rotation.hasNan()) {
     LOG_ERROR("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
     m_rotation = Quaternion::IDENTITY;
   }
 
-  // Rotate basis vectors directly using quaternion
-  m_forward = m_rotation.rotate(Vector3::FORWARD).normalized();
-  m_right =   m_rotation.rotate(Vector3::RIGHT).normalized();
-  m_up =      m_rotation.rotate(Vector3::UP).normalized();
+  // Rotate basis vectors directly using quaternion.
+  recalculateDirections();
 }
 
 void
@@ -73,15 +72,13 @@ Actor::rotate(const float& _x, const float& _y, const float& _z)
   m_rotation.normalize();
 
   // recalculate directions.
-  m_forward = m_rotation * Vector3::FORWARD;
-  m_right =   m_rotation * Vector3::RIGHT;
-  m_up =      m_rotation * Vector3::UP;
+  recalculateDirections();
 }
 
 void
 Actor::setScale(const float& _x, const float& _y, const float& _z)
 {
-  // make sure scale is never 0
+  // make sure scale is never 0.
   float x = _x;
   float y = _y;
   float z = _z;
@@ -130,27 +127,6 @@ Actor::clear()
   // assert that both vectors are now empty.
   PK_ASSERT(m_children.empty() && "Failed to clear children.");
   PK_ASSERT(m_components.empty() && "Failed to clear components.");
-
-}
-
-void
-Actor::generateNewTransform()
-{
-  const Matrix4 posMat = Matrix4::translation(m_position);
-  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
-  const Matrix4 scaleMat = Matrix4::scale(m_scale);
-
-  m_transform = posMat * rotMat * scaleMat;
-}
-
-void
-Actor::generateNewLocalTransform()
-{
-  const Matrix4 posMat = Matrix4::translation(m_position);
-  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
-  const Matrix4 scaleMat = Matrix4::scale(m_scale);
-
-  m_transform = scaleMat * rotMat * posMat;
 }
 
 void
@@ -168,6 +144,7 @@ Actor::addComponent(const SPtr<Component>& _pComponent)
 void
 Actor::removeComponent(const uint32& _index)
 {
+  // if there are no components or the index is out of range.
   if (m_components.empty() || _index >= getComponentCount()) {
     LOG_ERROR("Tried to remove a component with an index that is out of range.",
               __FILE__,
@@ -197,4 +174,34 @@ Actor::getComponent(const uint32& _index) const
   }
   return nullptr;
 }
+
+void
+Actor::generateNewTransform()
+{
+  const Matrix4 posMat = Matrix4::translation(m_position);
+  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
+  const Matrix4 scaleMat = Matrix4::scale(m_scale);
+
+  m_transform = posMat * rotMat * scaleMat;
+}
+
+void
+Actor::generateNewLocalTransform()
+{
+  const Matrix4 posMat = Matrix4::translation(m_position);
+  const Matrix4 rotMat = Matrix4::rotation(m_rotation);
+  const Matrix4 scaleMat = Matrix4::scale(m_scale);
+
+  m_transform = scaleMat * rotMat * posMat;
+}
+
+void
+Actor::recalculateDirections()
+{
+  // recalculate directions.
+  m_forward = m_rotation.rotate(Vector3::FORWARD).normalized();
+  m_right   = m_rotation.rotate(Vector3::RIGHT).normalized();
+  m_up      = m_rotation.rotate(Vector3::UP).normalized();
+}
+
 }

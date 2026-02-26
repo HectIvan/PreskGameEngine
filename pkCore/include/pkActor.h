@@ -422,6 +422,12 @@ class PK_CORE_EXPORT Actor
   void
   generateNewLocalTransform();
 
+  /**
+   * @brief Recalculate the forward, right and up vectors of the actor based on the rotation.
+   */
+  void
+  recalculateDirections();
+
  public:
   /**
    * Direction vectors. generated automatically based on the rotation of the actor.

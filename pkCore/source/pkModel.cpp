@@ -15,7 +15,7 @@ Model::Model()
 }
 
 void
-Model::update(Actor& _owner)
+Model::update(Actor&)
 {
 }
 
@@ -29,8 +29,8 @@ Model::clean()
   meshes.clear();
   boneCounter = 0;
 
-  m_vertexB = make_shared<VertexBuffer>();
-  m_indexB = make_shared<IndexBuffer>();
+  m_vertexB = nullptr;
+  m_indexB = nullptr;
 }
 void
 Model::setVerticesIndices()

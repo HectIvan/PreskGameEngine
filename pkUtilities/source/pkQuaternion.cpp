@@ -171,6 +171,31 @@ Quaternion::operator*(const Vector3& _other) const
   return _other + t * w + vectQuat.cross(t);
 }
 
+const Quaternion
+Quaternion::operator*(const float& _scalar) const
+{
+  Quaternion q = *this;
+  q.w *= _scalar;
+  q.x *= _scalar;
+  q.y *= _scalar;
+  q.z *= _scalar;
+  return q;
+}
+
+const Quaternion
+Quaternion::operator*=(const float& _scalar)
+{
+  *this = *this * _scalar;
+  return *this;
+}
+
+const Quaternion
+Quaternion::operator*=(const Quaternion& _other)
+{
+  *this = *this * _other;
+  return *this;
+}
+
 bool
 Quaternion::hasNan() const
 {
@@ -192,59 +217,8 @@ Quaternion::rotate(const Vector3& _vector) const
 }
 
 const Quaternion
-Quaternion::operator*(const float& _scalar) const
-{
-  Quaternion q = *this;
-  q.w *= _scalar;
-  q.x *= _scalar;
-  q.y *= _scalar;
-  q.z *= _scalar;
-  return q;
-}
-
-const Quaternion
-Quaternion::operator*=(const float& _scalar)
-{
-  *this = *this * _scalar;
-  return *this;
-}
-
-// const Vector3
-// Quaternion::rotate(const Vector3& _vector) const
-// {
-//   const Quaternion& p = *this;
-// 
-//   // q = P (x,0)
-//   Quaternion q;
-//   q.x = p.w * _vector.x + p.y * _vector.z - p.z * _vector.y;
-//   q.y = p.w * _vector.y + p.z * _vector.x - p.x * _vector.z;
-//   q.z = p.w * _vector.z + p.x * _vector.y - p.y * _vector.x;
-//   
-//   q.w = -p.x * _vector.x - p.y * _vector.y - p.z * _vector.z;
-//   
-//   // r = q P*
-//   Vector3 r;
-//   r.x = q.w * -p.x + p.w * q.x - q.y * p.z + q.z * p.y;
-//   r.y = q.w * -p.y + p.w * q.y - q.z * p.x + q.x * p.z;
-//   r.z = q.w * -p.z + p.w * q.z - q.x * p.y + q.y * p.x;
-//   
-//   // Vector3 r = (p * Quaternion(0.0f, _vector) * p.conjugate());
-// 
-//   // return r;
-//   return r;
-// }
-
-const Quaternion
-Quaternion::operator*=(const Quaternion& _other)
-{
-  *this = *this * _other;
-  return *this;
-}
-
-Quaternion
 Quaternion::rotate(const Quaternion& _quat) const
 {
-  // should unwrap this for efficiency
   return (*this) * _quat * (*this).conjugate();
 }
 
@@ -294,7 +268,7 @@ Quaternion::toEuler() const
   return euler;
 }
 
-Quaternion
+const Quaternion
 Quaternion::conjugate() const
 {
   return Quaternion(w, -x, -y, -z);

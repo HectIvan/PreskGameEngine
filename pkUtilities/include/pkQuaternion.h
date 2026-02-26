@@ -104,21 +104,6 @@ class PK_UTILITY_EXPORT Quaternion
   operator*(const Vector3& _other) const;
 
   /**
-   * @brief Check if the quaternion has a NaN value.
-   * @return True if it has a NaN value, false otherwise.
-   */
-  bool
-  hasNan() const;
-
-  /**
-   * @brief Multiply the quaternion with a vector.
-   * @param _vector Vector to use.
-   * @return Ending vector.
-   */
-  const Vector3
-  rotate(const Vector3& _vector) const;
-
-  /**
    * @brief Multiply the quaternion with a scalar.
    * @param _scalar Scalar to use.
    * @return Ending quaternion.
@@ -138,6 +123,13 @@ class PK_UTILITY_EXPORT Quaternion
   Quaternion(const Vector3& _vFrom, const Vector3& _vTo);
   // angle+axis, axis must be normalized
   Quaternion(const float& _angleRadian, const Vector3& _axis);
+
+  /**
+   * @brief Check if the quaternion has a NaN value.
+   * @return True if it has a NaN value, false otherwise.
+   */
+  bool
+  hasNan() const;
   
   /**
    * @brief create quaternion from axis and angle.
@@ -147,21 +139,21 @@ class PK_UTILITY_EXPORT Quaternion
    */
   static Quaternion
   fromAxisAngle(const Vector3& _axis, const float& _angle);
-  
+
   /**
-   * @brief Rotate a vector by this quaternion
-   * @param _vector Vector to rotate.
-   * @return Rotated vector.
+   * @brief Multiply the quaternion with a vector.
+   * @param _vector Vector to use.
+   * @return Ending vector.
    */
-  // const Vector3
-  // rotate(const Vector3& _vector) const;
+  const Vector3
+  rotate(const Vector3& _vector) const;
 
   /**
    * @brief Rotate the quaternion respective to another quaternion.
    * @param _quat Quaternion to use for rotation.
    * @return The rotated quaternion
    */
-  Quaternion
+  const Quaternion
   rotate(const Quaternion& _quat) const;
 
   /**
@@ -183,7 +175,7 @@ class PK_UTILITY_EXPORT Quaternion
    * @brief Get the conjugate of the Quaternion.
    * @return The conjugated quaternion.
    */
-  Quaternion
+  const Quaternion
   conjugate() const;
 
   /**

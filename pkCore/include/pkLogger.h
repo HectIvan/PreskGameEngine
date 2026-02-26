@@ -15,13 +15,21 @@
 * Includes
 **/
 /*********************************************/
-#include "pkMatrix4.h"
-#include "pkPrerequisitesCore.h"
-#include "pkVector2.h"
 #include "pkModule.h"
+#include "pkPrerequisitesCore.h"
 
 namespace pkEngineSDK
 {
+
+class Matrix4;
+
+class Quaternion;
+
+class Vector2;
+
+class Vector3;
+
+class Vector4;
 
 #define LOG_REGISTER(_msg, _file, _line) g_Logger().registerMessage(_msg,                     \
                                                                     _file,                    \
@@ -63,7 +71,7 @@ struct LogMSG
          const ANSICHAR* _file,
          const uint32& _line,
          const String& _time,
-         LOG_MSG_TYPE::E _type) :
+         const LOG_MSG_TYPE::E& _type) :
     message(_message),
     file(_file),
     line(_line),
@@ -84,78 +92,76 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   virtual ~Logger() = default;
 
   /**
-   * @brief Initialize the Logger.
-   * @param _toPrint If the logger will print the register when a new entry is done.
-   */
-  void
-  init(const bool _printLog = false,
-       const bool _printWarning = true,
-       const bool _printError = true);
-
-  /**
    * @brief Get the error message from a HRESULT.
    * @param _hr HRESULT to pass.
    * @return The error message.
    */
-  String
-  getMessageError(int32 _hr);
+  const String
+  getMessageError(const int32& _hr) const;
 
   /**
    * @brief Print a string.
    * @param _text Text to print to the console.
    */
   static void
-  print(String _text);
+  print(const String& _text);
   
   /**
    * @brief Print a number.
    * @param _num Number to print to the console.
    */
   static void
-  print(float _num);
+  print(const float& _num);
   
   /**
    * @brief Print a vector.
    * @param _vec Vector to print to the console.
    */
   static void
-  print(Vector2 _vec);
+  print(const Vector2& _vec);
   
   /**
    * @brief Print a vector.
    * @param _vec Vector to print to the console.
    */
   static void
-  print(Vector3 _vec);
+  print(const Vector3& _vec);
   
   /**
    * @brief Print a vector.
    * @param _vec Vector to print to the console.
    */
   static void
-  print(Vector4 _vec);
+  print(const Vector4& _vec);
+
+  /**
+   * @brief Print a quaternion.
+   * @param _vec Quaternion to print to the console.
+   */
+  static void
+  print(const Quaternion& _quat);
   
   /**
    * @brief Print a matrix4.
    * @param _matrix Matrix to print to the console.
    */
   static void
-  print(Matrix4 _matrix);
+  print(const Matrix4& _matrix);
 
   /**
    * @brief Convert a vector3 to String.
    * @param _vec Vector to read.
    * @return A String.
    */
-  static String
-  toString(const Vector3 _vec);
+  static const String
+  toString(const Vector3& _vec);
 
   /**
    * @brief Throw a handled crash.
    * @param _errorMSG Message to send the catch.
    */
   void
-  throwError(const String _errorMSG);
+  throwError(const String& _errorMSG) const;
 
   /**
    * @brief Register a log message into the logger.
@@ -174,21 +180,21 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    * @param _msg Message to print.
    */
   void
-  printMessage(const LogMSG& _msg);
+  printMessage(const LogMSG& _msg) const;
 
   /**
    * @brief Get the full message from a log as a string.
    * @param _msg Message to interpret.
    */
-  String
-  getStringFromLog(const LogMSG& _msg);
+  const String
+  getStringFromLog(const LogMSG& _msg) const;
 
   /**
    * @brief Get the message logs.
    * @return All the messages.
    */
-  Vector<LogMSG>&
-  getMessageLog() { return m_messages; }
+  const Vector<LogMSG>
+  getMessageLog() const { return m_messages; }
 
   // to do: maybe swap this to a template or not.
   /**
@@ -197,26 +203,23 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    * @return All messages of a type.
    */
   Vector<LogMSG>
-  getMessageLogOfType(const LOG_MSG_TYPE::E _type);
+  getMessageLogOfType(const LOG_MSG_TYPE::E& _type);
 
   /**
    * @brief Print the messages from a specific type.
    * @param _type Message type.
    */
   void
-  printMessageLogOfType(const LOG_MSG_TYPE::E _type);
+  printMessageLogOfType(const LOG_MSG_TYPE::E& _type);
 
   /**
    * @brief Create log files for the messages registered.
    */
   void
-  createLogFiles();
+  createLogFiles() const;
 
  private:
   Vector<LogMSG> m_messages;
-  bool m_printLog = false;
-  bool m_printWarnings = false;
-  bool m_printErrors = false;
 };
 PK_CORE_EXPORT Logger&
 g_Logger();

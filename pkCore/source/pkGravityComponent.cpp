@@ -9,7 +9,7 @@
 namespace pkEngineSDK
 {
 void
-GravityComponent::update(Actor& _owner)
+GravityComponent::update(Actor&)
 {
 }
 

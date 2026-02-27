@@ -19,6 +19,98 @@
 
 namespace pkEngineSDK
 {
+
+void
+setPreskStyle()
+{
+  // Presk style from ImThemes
+  ImGuiStyle& style = ImGui::GetStyle();
+
+  style.Alpha = 0.8f;
+  style.DisabledAlpha = 0.3f;
+  style.WindowPadding = ImVec2(11.8f, 2.2f);
+  style.WindowRounding = 0.0f;
+  style.WindowBorderSize = 1.0f;
+  style.WindowMinSize = ImVec2(20.0f, 32.0f);
+  style.WindowTitleAlign = ImVec2(0.0f, 0.5f);
+  style.WindowMenuButtonPosition = ImGuiDir_Left;
+  style.ChildRounding = 10.0f;
+  style.ChildBorderSize = 1.0f;
+  style.PopupRounding = 0.0f;
+  style.PopupBorderSize = 1.0f;
+  style.FramePadding = ImVec2(10.0f, 3.0f);
+  style.FrameRounding = 3.6f;
+  style.FrameBorderSize = 0.0f;
+  style.ItemSpacing = ImVec2(1.4f, 2.5f);
+  style.ItemInnerSpacing = ImVec2(1.4f, 2.5f);
+  style.CellPadding = ImVec2(5.4f, 2.0f);
+  style.IndentSpacing = 20.0f;
+  style.ColumnsMinSpacing = 3.5f;
+  style.ScrollbarSize = 10.0f;
+  style.ScrollbarRounding = 0.0f;
+  style.GrabMinSize = 10.0f;
+  style.GrabRounding = 2.0f;
+  style.TabRounding = 5.2f;
+  style.TabBorderSize = 1.0f;
+  // style.TabMinWidthForCloseButton = 0.0f;
+  style.ColorButtonPosition = ImGuiDir_Left;
+  style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+  style.SelectableTextAlign = ImVec2(0.0f, 0.0f);
+
+  style.Colors[ImGuiCol_Text] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+  style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.49803922f, 0.49803922f, 0.49803922f, 1.0f);
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(0.0726114f, 0.07683488f, 0.07725322f, 0.94f);
+  style.Colors[ImGuiCol_ChildBg] = ImVec4(1e-6f, 9.9999e-7f, 9.9999e-7f, 0.0f);
+  style.Colors[ImGuiCol_PopupBg] = ImVec4(0.078431375f, 0.078431375f, 0.078431375f, 0.94f);
+  style.Colors[ImGuiCol_Border] = ImVec4(0.6730646f, 0.6730678f, 0.87124467f, 0.5f);
+  style.Colors[ImGuiCol_BorderShadow] = ImVec4(1e-6f, 9.9999e-7f, 9.9999e-7f, 0.0f);
+  style.Colors[ImGuiCol_FrameBg] = ImVec4(0.15686277f, 0.47843137f, 0.474291f, 0.54f);
+  style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.48971248f, 0.8573908f, 0.9055794f, 0.4f);
+  style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.0f, 0.93563676f, 1.0f, 0.67f);
+  style.Colors[ImGuiCol_TitleBg] = ImVec4(0.2735361f, 0.4151504f, 0.42489272f, 1.0f);
+  style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.2369541f, 0.57076293f, 0.57510734f, 1.0f);
+  style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1e-6f, 9.9999e-7f, 9.9999e-7f, 0.51f);
+  style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.07565068f, 0.15879828f, 0.15812226f, 1.0f);
+  style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(1e-6f, 9.9999e-7f, 9.9999e-7f, 0.53f);
+  style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.30980393f, 0.30980393f, 0.30980393f, 1.0f);
+  style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40784314f, 0.40784314f, 0.40784314f, 1.0f);
+  style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.50980395f, 0.50980395f, 0.50980395f, 1.0f);
+  style.Colors[ImGuiCol_CheckMark] = ImVec4(0.8423806f, 0.89561385f, 0.9527897f, 1.0f);
+  style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.28160402f, 0.58143f, 0.6309013f, 1.0f);
+  style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.38785022f, 0.74566793f, 0.80686694f, 1.0f);
+  style.Colors[ImGuiCol_Button] = ImVec4(0.0f, 1.0f, 0.9613733f, 0.4f);
+  style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7411765f, 1.0f, 0.9882353f, 0.5882353f);
+  style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7411765f, 1.0f, 0.9882353f, 0.78431374f);
+  style.Colors[ImGuiCol_Header] = ImVec4(0.31759655f, 1.0f, 0.7100518f, 0.31f);
+  style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.31764704f, 1.0f, 0.70297575f, 0.5882353f);
+  style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.31764707f, 1.0f, 0.70980394f, 0.78431374f);
+  style.Colors[ImGuiCol_Separator] = ImVec4(9.9999e-7f, 9.9999e-7f, 1e-6f, 0.5f);
+  style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.09803923f, 0.6903476f, 0.7490196f, 0.78f);
+  style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.11926909f, 0.75107294f, 0.7429378f, 1.0f);
+  style.Colors[ImGuiCol_ResizeGrip] = ImVec4(9.9999e-7f, 9.999999e-7f, 1e-6f, 0.2f);
+  style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.12997107f, 0.7134198f, 0.72103006f, 0.67f);
+  style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.12941177f, 0.7137255f, 0.72156864f, 0.9490196f);
+  style.Colors[ImGuiCol_Tab] = ImVec4(0.10243328f, 0.28755367f, 0.28040308f, 0.862f);
+  style.Colors[ImGuiCol_TabHovered] = ImVec4(0.11140381f, 0.54077256f, 0.531637f, 0.8627451f);
+  style.Colors[ImGuiCol_TabActive] = ImVec4(0.19607842f, 0.6722208f, 0.6784314f, 1.0f);
+  style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.06666667f, 0.14004883f, 0.14509805f, 0.9724f);
+  style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.13333336f, 0.42352942f, 0.41979298f, 1.0f);
+  style.Colors[ImGuiCol_PlotLines] = ImVec4(1.0f, 0.99999f, 0.99999f, 1.0f);
+  style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.19495662f, 0.54077256f, 0.5363201f, 1.0f);
+  style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.14890677f, 0.73819745f, 0.7306093f, 1.0f);
+  style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.0f, 1.0f, 0.98712444f, 1.0f);
+  style.Colors[ImGuiCol_TableHeaderBg] = ImVec4(0.28283814f, 0.28284124f, 0.35622317f, 1.0f);
+  style.Colors[ImGuiCol_TableBorderStrong] = ImVec4(0.30980393f, 0.34548515f, 0.34901962f, 1.0f);
+  style.Colors[ImGuiCol_TableBorderLight] = ImVec4(0.16810034f, 0.3111664f, 0.33476394f, 1.0f);
+  style.Colors[ImGuiCol_TableRowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+  style.Colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.0f, 1.0f, 1.0f, 0.06f);
+  style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25882354f, 0.5882353f, 0.9764706f, 0.35f);
+  style.Colors[ImGuiCol_DragDropTarget] = ImVec4(0.0f, 1.0f, 0.98712444f, 0.9f);
+  style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.25882354f, 0.85634935f, 0.9764706f, 1.0f);
+  style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
+  style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.8f, 0.8f, 0.8f, 0.2f);
+  style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.8f, 0.8f, 0.8f, 0.35f);
+}
   
 void
 UInterface::init(const WindowHandle& _hWnd)
@@ -43,6 +135,7 @@ UInterface::init(const WindowHandle& _hWnd)
 
   // ImGui::StyleColorsDark();
   ImGui::StyleColorsClassic();
+  setPreskStyle();
 
   // initialize with the window.
   initWin(_hWnd);
@@ -762,7 +855,6 @@ UInterface::setNextWindowParams(UIWindow& _windowPrefab)
 {
   setNewWindowSize(_windowPrefab.size);
   setNextWindowPos(_windowPrefab.position);
-  setNextWindowAlpha(_windowPrefab.alpha);
 }
 
 void

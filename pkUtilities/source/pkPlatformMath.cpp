@@ -48,97 +48,103 @@ const float Math::DEG2RAD = PI / 180.0f;
 const float Math::RAD2DEG = 180.0f / PI;
 
 float
-PlatformMath::abs(const float _x)
+PlatformMath::abs(const float& _x)
 {
   return static_cast<float>(std::abs(_x));
 }
 
 float
-PlatformMath::pow(const float _x, const float _y)
+PlatformMath::pow(const float& _x, const float& _y)
 {
   return static_cast<float>(std::pow(_x, _y));
 }
 
 float
-PlatformMath::exp(const float _x)
+PlatformMath::exp(const float& _x)
 {
   return static_cast<float>(std::exp(_x));
 }
 
 float
-PlatformMath::sqrt(const float _x)
+PlatformMath::sqrt(const float& _x)
 {
   return static_cast<float>(std::sqrt(_x));
 }
 
 float
-PlatformMath::min(const float _x, const float _y)
+PlatformMath::min(const float& _x, const float& _y)
 {
   return static_cast<float>(std::min(_x, _y));
 }
 
-float
-PlatformMath::maxf(const float _x, const float _y)
-{
-  return static_cast<float>(std::max(_x, _y));
-}
-
 uint32
-PlatformMath::max(const uint32 _x, const uint32 _y)
+PlatformMath::max(const uint32& _x, const uint32& _y)
 {
   return static_cast<uint32>(std::max(_x, _y));
 }
 
 float
-PlatformMath::sin(const float _x)
+PlatformMath::max(const float& _x, const float& _y)
+{
+  return std::max(_x, _y);
+}
+
+float
+PlatformMath::maxf(const float& _x, const float& _y)
+{
+  return static_cast<float>(std::max(_x, _y));
+}
+
+float
+PlatformMath::sin(const float& _x)
 {
   return static_cast<float>(std::sin(_x));
 }
 
 float
-PlatformMath::sinf(const float _x)
+PlatformMath::sinf(const float& _x)
 {
   return static_cast<float>(std::sinf(_x));
 }
 
 float
-PlatformMath::asin(const float _x)
+PlatformMath::asin(const float& _x)
 {
   return static_cast<float>(std::asin(_x));
 }
 
 float
-PlatformMath::cos(const float _x)
+PlatformMath::cos(const float& _x)
 {
   return static_cast<float>(std::cos(_x));
 }
 
 float
-PlatformMath::acos(const float _x)
+PlatformMath::acos(const float& _x)
 {
   return static_cast<float>(std::acos(_x));
 }
 
 float
-PlatformMath::tan(const float _x)
+PlatformMath::tan(const float& _x)
 {
   return static_cast<float>(std::tan(_x));
 }
 
 float
-PlatformMath::atan(const float _x)
+PlatformMath::atan(const float& _x)
 {
   return static_cast<float>(std::atan(_x));
 }
 
 float
-PlatformMath::atan2(const float _x, const float _y)
+PlatformMath::atan2(const float& _x, const float& _y)
 {
   return static_cast<float>(std::atan2(_x, _y));
 }
 
 float
-PlatformMath::clamp(const float _t, const float _x, const float _y)
+PlatformMath::clamp(const float& _t, const float& _x, const float& _y)
 {
   float t = _t;
   if (t < _x) { t = _x; }
@@ -147,26 +153,26 @@ PlatformMath::clamp(const float _t, const float _x, const float _y)
 }
 
 Vector2
-PlatformMath::clamp(const Vector2 _t, const float _x, const float _y)
+PlatformMath::clamp(const Vector2& _t, const float& _x, const float& _y)
 {
-  Vector2 vec = _t;
-  vec.x = std::ranges::clamp(_t.x, _x, _y);
-  vec.y = std::ranges::clamp(_t.y, _x, _y);
+  Vector2 vec;
+  vec.x = clamp(_t.x, _x, _y);
+  vec.y = clamp(_t.y, _x, _y);
   return vec;
 }
 
 Vector3
-PlatformMath::clamp(const Vector3 _t, const float _x, const float _y)
+PlatformMath::clamp(const Vector3& _t, const float& _x, const float& _y)
 {
-  Vector3 vec = _t;
-  vec.x = std::ranges::clamp(vec.x, _x, _y);
-  vec.y = std::ranges::clamp(vec.y, _x, _y);
-  vec.z = std::ranges::clamp(vec.z, _x, _y);
+  Vector3 vec;
+  vec.x = clamp(_t.x, _x, _y);
+  vec.y = clamp(_t.y, _x, _y);
+  vec.z = clamp(_t.z, _x, _y);
   return vec;
 }
 
 bool
-PlatformMath::isInRange(const float _t, float _x, float _y)
+PlatformMath::isInRange(const float& _t, const float& _x, const float& _y)
 {
   if (_t >= _x && _t <= _y) {
     return true;
@@ -175,7 +181,7 @@ PlatformMath::isInRange(const float _t, float _x, float _y)
 }
 
 bool
-PlatformMath::isInRange(const uint32 _t, uint32 _x, uint32 _y)
+PlatformMath::isInRange(const uint32& _t, const uint32& _x, const uint32& _y)
 {
   if (_t >= _x && _t <= _y) {
     return true;
@@ -184,13 +190,13 @@ PlatformMath::isInRange(const uint32 _t, uint32 _x, uint32 _y)
 }
 
 float
-PlatformMath::lerp(const float _x, const float _y, const float _t)
+PlatformMath::lerp(const float& _x, const float& _y, const float& _t)
 {
   return std::lerp(_x, _y, _t);
 }
 
 Vector3
-PlatformMath::lerp3(const Vector3 _x, const Vector3 _y, const float _t)
+PlatformMath::lerp(const Vector3& _x, const Vector3& _y, const float& _t)
 {
   float x = std::lerp(_x.x, _y.x, _t);
   float y = std::lerp(_x.y, _y.y, _t);
@@ -199,7 +205,7 @@ PlatformMath::lerp3(const Vector3 _x, const Vector3 _y, const float _t)
 }
 
 Vector4
-PlatformMath::lerp4(const Vector4 _x, const Vector4 _y, const float _t)
+PlatformMath::lerp(const Vector4& _x, const Vector4& _y, const float& _t)
 {
   float x = std::lerp(_x.x, _y.x, _t);
   float y = std::lerp(_x.y, _y.y, _t);
@@ -209,7 +215,7 @@ PlatformMath::lerp4(const Vector4 _x, const Vector4 _y, const float _t)
 }
 
 float
-PlatformMath::hookeLaw(float _elasticity, float _displacement)
+PlatformMath::hookeLaw(const float& _elasticity, const float& _displacement)
 {
   // @source: https://www.britannica.com/science/Hookes-law
   // F = KX
@@ -217,21 +223,15 @@ PlatformMath::hookeLaw(float _elasticity, float _displacement)
 }
 
 bool
-PlatformMath::isNan(float _x)
+PlatformMath::isNan(const float& _x)
 {
   return isnan(_x);
 }
 
 float
-PlatformMath::log2(float _x)
+PlatformMath::log2(const float& _x)
 {
   return std::log2f(_x);
-}
-
-float
-PlatformMath::max(float _x, float _y)
-{
-  return std::max(_x, _y);
 }
 
 /**
@@ -243,8 +243,8 @@ PlatformMath::intersectSphereSphere(Sphere& _sphere,
                                     CollisionInfo& _cInfo)
 {
   // get the origin of each sphere
-  Vector3 O1 = _sphere.m_origin;
-  Vector3 O2 = _other.m_origin;
+  const Vector3 O1 = _sphere.m_origin;
+  const Vector3 O2 = _other.m_origin;
 
   float distance = _sphere.m_origin.distanceTo(_other.m_origin);
   float sumRaius = _sphere.m_radius + _other.m_radius;

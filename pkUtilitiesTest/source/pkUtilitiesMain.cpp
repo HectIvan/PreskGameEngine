@@ -108,7 +108,7 @@ TEST_CASE("Platform Math") {
   REQUIRE(b.y == Approx(7.0f));
   REQUIRE(b.z == Approx(1.5f));
   // Do the process
-  Vector3 final3 = Math::lerp3(a, b, timeDif);
+  Vector3 final3 = Math::lerp(a, b, timeDif);
   // Verify final Vector
   REQUIRE(final3.x == Approx(1.16f));
   REQUIRE(final3.y == Approx(1.96f));
@@ -130,7 +130,7 @@ TEST_CASE("Platform Math") {
   REQUIRE(b4.z == Approx(1.5f));
   REQUIRE(b4.w == Approx(9.0f));
   // Do the process
-  Vector4 final4 = Math::lerp4(a4, b4, timeDif);
+  Vector4 final4 = Math::lerp(a4, b4, timeDif);
   // Verify final Vector
   REQUIRE(final4.x == Approx(1.16f));
   REQUIRE(final4.y == Approx(1.96f));

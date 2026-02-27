@@ -60,9 +60,9 @@ Bone::interpolatePosition(float _deltaTime)
   float scaleFactor = getScaleFactor(positions[p0Index].timeStamp,
                                      positions[p1Index].timeStamp,
                                      _deltaTime);
-  Vector3 finalPosition = Math::lerp3(positions[p0Index].position,
-                                              positions[p1Index].position,
-                                              scaleFactor);
+  Vector3 finalPosition = Math::lerp(positions[p0Index].position,
+                                     positions[p1Index].position,
+                                     scaleFactor);
   return Matrix4::translation(finalPosition);
 }
 
@@ -80,9 +80,9 @@ Bone::interpolateRotation(float _deltaTime)
   float scaleFactor = getScaleFactor(rotations[p0Index].timeStamp,
                                      rotations[p1Index].timeStamp,
                                      _deltaTime);
-  Vector4 finalRotation = Math::lerp4(rotations[p0Index].rotation,
-                                              rotations[p1Index].rotation,
-                                              scaleFactor);
+  Vector4 finalRotation = Math::lerp(rotations[p0Index].rotation,
+                                     rotations[p1Index].rotation,
+                                     scaleFactor);
   finalRotation.normalize();
   return Matrix4::rotation(finalRotation.x, finalRotation.y, finalRotation.z);
 }
@@ -98,9 +98,7 @@ Bone::interpolateScale(float _deltaTime)
   float scaleFactor = getScaleFactor(scales[p0Index].timeStamp,
                                      scales[p1Index].timeStamp,
                                      _deltaTime);
-  Vector3 finalScale = Math::lerp3(scales[p0Index].scale,
-                                           scales[p1Index].scale,
-                                           scaleFactor);
+  Vector3 finalScale = Math::lerp(scales[p0Index].scale, scales[p1Index].scale, scaleFactor);
   return Matrix4::scale(finalScale);
 }
 

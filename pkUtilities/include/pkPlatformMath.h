@@ -49,7 +49,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Absolute value of the parameter.
    */
   static float
-  abs(const float _x);
+  abs(const float& _x);
 
   /**
    * @brief Get the power of _x.
@@ -58,7 +58,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Result of _x elevated by the power of _y.
    */
   static float
-  pow(const float _x, const float _y);
+  pow(const float& _x, const float& _y);
 
   /**
    * @brief Get Euler elevated by _x.
@@ -66,7 +66,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Result of Euler elevated by _x.
    */
   static float
-  exp(const float _x);
+  exp(const float& _x);
 
   /**
    * @brief Get the square root of _x.
@@ -74,7 +74,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Square root of _x.
    */
   static float
-  sqrt(const float _x);
+  sqrt(const float& _x);
 
   /**
    * @brief Get the lowest of 2 parameters.
@@ -83,7 +83,15 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Whichever value is the smallest.
    */
   static float
-  min(const float _x, const float _y);
+  min(const float& _x, const float& _y);
+
+  /**
+   * @brief Get the maximum value between 2 uint32.
+   * @param _x First uint32 to compare.
+   * @param _y Second uint32 to compare.
+   */
+  static uint32
+  max(const uint32& _x, const uint32& _y);
 
   /**
    * @brief Get the highest of 2 parameters.
@@ -92,7 +100,15 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Whichever value is the largest.
    */
   static float
-  max(const float _x, const float _y);
+  max(const float& _x, const float& _y);
+
+  /**
+   * @brief Get the maximum value between 2 floats.
+   * @param _x First float to compare.
+   * @param _y Second float to compare.
+   */
+  static float
+  maxf(const float& _x, const float& _y);
 
   /**
    * @brief Get the sin of _x.
@@ -100,7 +116,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return sin of _x.
    */
   static float
-  sin(const float _x);
+  sin(const float& _x);
 
   /**
    * @brief Get the sin of _x.
@@ -108,7 +124,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return sin of _x.
    */
   static float
-  sinf(const float _x);
+  sinf(const float& _x);
 
   /**
    * @brief Get the asin of _x.
@@ -116,7 +132,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return asin of _x.
    */
   static float
-  asin(const float _x);
+  asin(const float& _x);
 
   /**
    * @brief Get the cos of _x.
@@ -124,7 +140,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return cos of _x.
    */
   static float
-  cos(const float _x);
+  cos(const float& _x);
 
   /**
    * @brief Get the acos of _x.
@@ -132,7 +148,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return acos of _x.
    */
   static float
-  acos(const float _x);
+  acos(const float& _x);
 
   /**
    * @brief Get the tan of _x.
@@ -140,7 +156,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return tan of _x.
    */
   static float
-  tan(const float _x);
+  tan(const float& _x);
 
   /**
    * @brief Get the atan of _x.
@@ -148,7 +164,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return atan of _x.
    */
   static float
-  atan(const float _x);
+  atan(const float& _x);
 
   /**
    * @brief Get the atan2 of _x.
@@ -157,7 +173,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return atan2 of _x and _y.
    */
   static float
-  atan2(const float _x, const float _y);
+  atan2(const float& _x, const float& _y);
 
   /**
    * @brief clamps a float between 2 functions.
@@ -167,7 +183,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Clamped float.
    */
   static float
-  clamp(const float _t, const float _x, const float _y);
+  clamp(const float& _t, const float& _x, const float& _y);
 
   /**
    * @brief clamps a Vector2 between 2 functions.
@@ -177,7 +193,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Clamped float.
    */
   static Vector2
-  clamp(const Vector2 _t, const float _x, const float _y);
+  clamp(const Vector2& _t, const float& _x, const float& _y);
 
   /**
    * @brief clamps a Vector3 between 2 functions.
@@ -187,7 +203,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Clamped float.
    */
   static Vector3
-  clamp(const Vector3 _t, const float _x, const float _y);
+  clamp(const Vector3& _t, const float& _x, const float& _y);
 
   /**
    * @brief Check if a float number is in range of 2 values.
@@ -197,7 +213,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return If it's in range or not.
    */
   static bool
-  isInRange(const float _t, float _x, float _y);
+  isInRange(const float& _t, const float& _x, const float& _y);
 
   /**
    * @brief Check if an uint32 number is in range of 2 values.
@@ -207,7 +223,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return If it's in range or not.
    */
   static bool
-  isInRange(const uint32 _t, uint32 _x, uint32 _y);
+  isInRange(const uint32& _t, const uint32& _x, const uint32& _y);
 
   /**
    * @brief Gets the lerped number between 2 numbers in a specific timestamp.
@@ -217,7 +233,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The lerped number.
    */
   static float
-  lerp(const float _x, const float _y, const float _t);
+  lerp(const float& _x, const float& _y, const float& _t);
 
   /**
    * @brief Gets the lerped number between 2 Vector3 in a specific timestamp.
@@ -227,7 +243,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The lerped Vector.
    */
   static Vector3
-  lerp3(const Vector3 _x, const Vector3 _y, const float _t);
+  lerp(const Vector3& _x, const Vector3& _y, const float& _t);
 
   /**
    * @brief Gets the lerped number between 2 Vector4 in a specific timestamp.
@@ -237,7 +253,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The lerped Vector.
    */
   static Vector4
-  lerp4(const Vector4 _x, const Vector4 _y, const float _t);
+  lerp(const Vector4& _x, const Vector4& _y, const float& _t);
 
   /**
    * @brief Hooke's law of elasticity.
@@ -246,37 +262,21 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The force applied.
    */
   static float
-  hookeLaw(float _elasticity, float _displacement);
+  hookeLaw(const float& _elasticity, const float& _displacement);
 
   /**
    * @brief Check if the value is nan.
    * @param _x Value to check.
    */
   static bool
-  isNan(float _x);
+  isNan(const float& _x);
 
   /**
    * @brief get the base 2 log of the number.
    * @param _x Value to calculate the log.
    */
   static float
-  log2(float _x);
-
-  /**
-   * @brief Get the maximum value between 2 floats.
-   * @param _x First float to compare.
-   * @param _y Second float to compare.
-   */
-  static float
-  maxf(const float _x, const float _y);
-
-  /**
-   * @brief Get the maximum value between 2 floats.
-   * @param _x First float to compare.
-   * @param _y Second float to compare.
-   */
-  static uint32
-  max(const uint32 _x, const uint32 _y);
+  log2(const float& _x);
 
   /***************************************************************************
   * 

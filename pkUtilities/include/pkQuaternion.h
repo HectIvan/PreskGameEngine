@@ -141,8 +141,8 @@ class PK_UTILITY_EXPORT Quaternion
   fromAxisAngle(const Vector3& _axis, const float& _angle);
 
   /**
-   * @brief Multiply the quaternion with a vector.
-   * @param _vector Vector to use.
+   * @brief rotate a vector with this quaternion.
+   * @param _vector Vector to rotate.
    * @return Ending vector.
    */
   const Vector3

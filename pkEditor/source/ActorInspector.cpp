@@ -74,7 +74,6 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
   MaterialManager& matMan = g_MaterialManager();
   ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
-  im.PushStyleColor(Color(100, 100, 0, 125), Color(150, 150, 0, 125), Color(200, 200, 0, 125));
   // non constant in case a component is removed in runtime.
   uint32 compCount = m_actor->getComponentCount();
   for (uint32 i = 0; i < compCount; ++i) {
@@ -250,5 +249,4 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
     }
     im.popID();
   }
-  im.popStyleColor(3);
 }

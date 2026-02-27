@@ -246,26 +246,21 @@ Quaternion::fromEuler(const Vector3& _vector)
 const Vector3
 Quaternion::toEuler() const
 {
-  Vector3 euler;
-
   const Quaternion q = *this;
-
  
   const float sinr_cosp = 2.0f * (q.w * q.x + q.y * q.z);
   const float cosr_cosp = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
-  euler.x = Math::atan2(sinr_cosp, cosr_cosp);
-
+  const float vX = Math::atan2(sinr_cosp, cosr_cosp);
   
   const float sinp = Math::sqrt(1.0f + 2.0f * (q.w * q.y - q.x * q.z));
   const float cosp = Math::sqrt(1.0f - 2.0f * (q.w * q.y - q.x * q.z));
-  euler.y = 2.0f * Math::atan2(sinp, cosp) - Math::PI * 0.5f;
-
+  const float vY = 2.0f * Math::atan2(sinp, cosp) - Math::PI * 0.5f;
   
   const float siny_cosp = 2.0f * (q.w * q.z + q.x * q.y);
   const float cosy_cosp = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
-  euler.z = Math::atan2(siny_cosp, cosy_cosp);
+  const float vZ = Math::atan2(siny_cosp, cosy_cosp);
 
-  return euler;
+  return Vector3(vX, vY, vZ);
 }
 
 const Quaternion
@@ -291,7 +286,7 @@ Quaternion::normalize()
 {
   float mag = magnitude();
   if (mag < Math::SMALL_NUMBER) {
-    assert(!isnan(mag));
+    assert(!Math::isNan(mag));
     *this = Quaternion::IDENTITY;
     return *this;
   }

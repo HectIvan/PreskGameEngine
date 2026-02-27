@@ -110,23 +110,19 @@ EditorApp::onInit()
   /**
    * User Interface.
    */
-  float alpha = 0.4f;
   // scene graph
   const Vector2 winRect = m_window.getClientWidthHeight();
   m_sceneGraphWin.name = activeScene->m_name.c_str();
   m_sceneGraphWin.position = Vector2(0.0f, 0.0f);
   m_sceneGraphWin.size = Vector2(winRect.x * 0.1f, winRect.y * 0.8f);
-  m_sceneGraphWin.alpha = alpha;
   // logger window
   m_loggerWin.name = "Logger";
   m_loggerWin.size = Vector2(winRect.x, winRect.y * 0.2f);
   m_loggerWin.position = Vector2(0.0f, winRect.y * 0.8f);
-  m_loggerWin.alpha = alpha;
   // right window
   m_rightWin.name = "Inspector";
   m_rightWin.size = Vector2(400.0f, winRect.y * 0.8f);
   m_rightWin.position = Vector2(winRect.x - 400.0f, 0.0f);
-  m_rightWin.alpha = alpha;
 }
 
 void
@@ -271,7 +267,6 @@ EditorApp::uInterfaceUpdate()
     // -------------------------- //
     if (selectedActor && im.beginTabItem("Actor")) {
       // transform window
-      im.PushStyleColor(Color(100, 255), Color(150, 255), Color(50, 255));
       if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
         String name = selectedActor->getName();
         im.createText("Name:   ");
@@ -289,9 +284,7 @@ EditorApp::uInterfaceUpdate()
         // inspect actor transform matrix
         TransformInspector::inspect(selectedActor);
       }
-      im.popStyleColor(3);
       // ---- Components window ---- //
-      im.PushStyleColor(Color(0, 120, 200, 125), Color(50, 170, 250, 125), Color(0, 60, 100, 125));
       if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
         // to do: change this to a more efficient option
         const Vector<String> options = { "model", "light", "camera" };
@@ -326,7 +319,6 @@ EditorApp::uInterfaceUpdate()
         // inspect actor components
         m_actorInspector.inspectComponents(m_selectedMaterial);
       }
-      im.popStyleColor(3);
       im.endTabItem();
     }
     // -------------------------- //

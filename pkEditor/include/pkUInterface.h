@@ -56,7 +56,6 @@ struct UIWindow {
   Vector2 size;
   Vector2 position;
   const ANSICHAR* name;
-  float alpha;
 
   void
   setNewSizePos(Vector2 _newPos, Vector2 _newSize, Vector2 _winRect) {

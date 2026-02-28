@@ -517,7 +517,7 @@ UInterface::createSliderVector3(const ANSICHAR* _name,
 }
 
 bool
-UInterface::createDragU(const ANSICHAR* _name,
+UInterface::createDrag(const ANSICHAR* _name,
                         uint32& _value,
                         const uint32 _speed,
                         const uint32 _min,
@@ -527,7 +527,7 @@ UInterface::createDragU(const ANSICHAR* _name,
 }
 
 bool
-UInterface::createDragI(const ANSICHAR* _name,
+UInterface::createDrag(const ANSICHAR* _name,
                         int32& _value,
                         const int32 _speed,
                         const int32 _min,
@@ -537,7 +537,7 @@ UInterface::createDragI(const ANSICHAR* _name,
 }
 
 bool
-UInterface::createDragF(const ANSICHAR* _name,
+UInterface::createDrag(const ANSICHAR* _name,
                         float& _value,
                         float _speed,
                         float _min,
@@ -547,7 +547,7 @@ UInterface::createDragF(const ANSICHAR* _name,
 }
 
 bool
-UInterface::createDrag3(const ANSICHAR* _name,
+UInterface::createDrag(const ANSICHAR* _name,
                         Vector3& _value,
                         float _speed,
                         float _min,

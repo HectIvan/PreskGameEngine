@@ -102,17 +102,17 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         // parameter change
         im.createText("Half FOV");
         im.sameLine();
-        if (im.createDragF("##HFOV", cDesc.halfFOV, 1.0f)) {
+        if (im.createDrag("##HFOV", cDesc.halfFOV, 1.0f)) {
           isChanged = true;
         }
         im.createText("Near    ");
         im.sameLine();
-        if (im.createDragF("##Near", cDesc.nearZ, 1.0f)) {
+        if (im.createDrag("##Near", cDesc.nearZ, 1.0f)) {
           isChanged = true;
         }
         im.createText("Far     ");
         im.sameLine();
-        if (im.createDragF("##Far", cDesc.farZ, 1.0f)) {
+        if (im.createDrag("##Far", cDesc.farZ, 1.0f)) {
           isChanged = true;
         }
         // initialize the camera with the new parameters
@@ -137,15 +137,15 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         // Light direction
         Vector4 dir4 = m_actor->m_transform * Vector4(light->m_direction, 0.0f);
         Vector3 dir = dir4.xyz().normalized();
-        im.createDrag3("Direction", dir, 0.0f);
+        im.createDrag("Direction", dir, 0.0f);
         // spot exponent
-        im.createDragF("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f, 1.0f);
+        im.createDrag("Spot Exponent", light->m_spotExponent, 0.1f, 0.0f, 1.0f);
         // Spot cutoff
-        im.createDragF("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
+        im.createDrag("Spot Cutoff", light->m_spotCutoff, 0.01f, 0.0f, 180.0f);
         // shadow intensity
-        im.createDragF("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
+        im.createDrag("Shadow Intensity", light->m_shadowIntensity, 0.05f, 0.0f, 1.0f);
         // Specular Intensity
-        im.createDragF("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
+        im.createDrag("Specular Intensity", light->m_specIntensity, 0.05f, 0.0f, 1.0f);
       }
       break;
     }

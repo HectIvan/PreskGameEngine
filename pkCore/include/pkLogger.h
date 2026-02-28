@@ -50,6 +50,8 @@ class Vector4;
                                                                  _line,                       \
                                                                  LOG_MSG_TYPE::kFatal);
 
+#define LOG_GET_ERR_MSG(_hr) g_Logger().getMessageError(_hr);
+
 #define THROW_ERROR(_msg) g_Logger().throwError(_msg);
 
 #define LOG_PRINT(_msg) g_Logger().print(_msg);
@@ -213,6 +215,13 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   printMessageLogOfType(const LOG_MSG_TYPE::E& _type);
 
   /**
+   * @brief Clear the logs of a specific type.
+   * @param _type Message type.
+   */
+  void
+  clearLogsOfType(const LOG_MSG_TYPE::E& _type);
+
+  /**
    * @brief Create log files for the messages registered.
    */
   void
@@ -220,6 +229,12 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
 
  private:
   Vector<LogMSG> m_messages;
+
+  //--for later--//
+  // Vector<LogMSG> m_reigisters;
+  // Vector<LogMSG> m_warningMessages;
+  // Vector<LogMSG> m_ErrorMessages;
+  // Vector<LogMSG> m_FatalMessages;
 };
 PK_CORE_EXPORT Logger&
 g_Logger();

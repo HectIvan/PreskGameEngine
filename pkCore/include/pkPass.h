@@ -28,8 +28,16 @@ class PK_CORE_EXPORT Pass
 {
  public:
   Pass();
-  Pass(PassDesc& _desc);
-  virtual ~Pass();
+  Pass(const PassDesc& _desc);
+  ~Pass() {
+    clear();
+  }
+
+  /**
+   * @brief Clear the pass of all shaders, states and textures.
+   */
+  void
+  clear();
 
   /**
    * @brief Gets the input layout to the pass.
@@ -181,6 +189,8 @@ class PK_CORE_EXPORT Pass
   getViewportSize() { return m_viewPortSize; }
 
  private:
+  Vector2 m_viewPortSize;
+
   /**
    * Shader pointers
    */
@@ -189,16 +199,17 @@ class PK_CORE_EXPORT Pass
   SPtr<Shader> m_pCShader = nullptr;
 
   SPtr<InputLayout> m_pInputLayout = nullptr;
-  // states
   SPtr<SamplerState> m_pSamplerState = nullptr;
   SPtr<RasterizerState> m_pRasterizerState = nullptr;
 
-  // constant buffers for the shaders.
+  /**
+   * Shader CBuffers.
+   */
   Vector<SPtr<ConstantBuffer>> m_cBuffers;
 
-  Vector2 m_viewPortSize;
-
-  // input and output textures of the pass
+  /**
+   * Textures.
+   */
   Vector<SPtr<Texture>> m_inputTex;
   Vector<SPtr<Texture>> m_outputTex;
   Vector<SPtr<Texture>> m_uavTex;

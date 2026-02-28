@@ -31,7 +31,16 @@ Pass::Pass() {
   m_pSamplerState = make_shared<SamplerState>();
 }
 
-Pass::Pass(PassDesc& _desc)
+void
+Pass::clear()
+{
+  m_cBuffers.clear();
+  m_inputTex.clear();
+  m_outputTex.clear();
+  m_uavTex.clear();
+}
+
+Pass::Pass(const PassDesc& _desc)
 {
   // call the api manager
   GraphicsAPI& api = g_GraphicAPI();
@@ -90,31 +99,6 @@ Pass::Pass(PassDesc& _desc)
   else if (m_uavTex.empty()) {
     m_viewPortSize = m_uavTex[0]->getSize();
   }
-}
-
-Pass::~Pass()
-{
-  for (uint32 i = 0; i < m_cBuffers.size(); ++i) {
-    m_cBuffers[i].reset();
-  }
-  m_cBuffers.clear();
-
-  for (uint32 i = 0; i < m_inputTex.size(); ++i) {
-    m_inputTex[i].reset();
-  }
-  m_inputTex.clear();
-
-  for (uint32 i = 0; i < m_outputTex.size(); ++i) {
-    m_outputTex[i].reset();
-  }
-  m_outputTex.clear();
-
-  for (uint32 i = 0; i < m_uavTex.size(); ++i) {
-    m_uavTex[i].reset();
-  }
-  m_uavTex.clear();
-
-  m_depthTex = nullptr;
 }
 
 void

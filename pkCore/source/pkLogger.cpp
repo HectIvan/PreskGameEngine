@@ -47,7 +47,7 @@ Logger::getMessageError(const int32& _hr) const
     nullptr);
 
   // if no message is found, set the string to unknown error
-  String message = (errorMsg) ? errorMsg : "Unknown Error.";
+  const String message = (errorMsg) ? errorMsg : "Unknown Error.";
   LocalFree(errorMsg);
 
   return message;
@@ -185,6 +185,16 @@ Logger::printMessageLogOfType(const LOG_MSG_TYPE::E& _type)
   const uint32 logCount = static_cast<uint32>(messages.size());
   for (uint32 i = 0; i < logCount; ++i) {
     printMessage(messages[i]);
+  }
+}
+
+void
+Logger::clearLogsOfType(const LOG_MSG_TYPE::E& _type)
+{
+  for (uint32 i = 0; i < m_messages.size(); ++i) {
+    if (m_messages[i].type == _type) {
+      m_messages.erase(m_messages.begin() + i);
+    }
   }
 }
 

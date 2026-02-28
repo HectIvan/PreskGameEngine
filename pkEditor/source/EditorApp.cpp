@@ -18,6 +18,7 @@
 #include "pkEventQueue.h"
 #include "TransformInspector.h"
 
+using pkEngineSDK::Quaternion;
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
@@ -131,7 +132,9 @@ EditorApp::initWin()
   PKWindowDesc desc;
   desc.width = 1920;
   desc.height = 1080;
-  std::string name = "Game Engine Window";
+  desc.posX = 0;
+  desc.posY = 0;
+  desc.name = "Presk Editor App";
   // imgui input
 #if PK_PLATFORM == PK_PLATFORM_WIN32
   desc.funct = [](PlatformPointer _hwnd,
@@ -196,6 +199,7 @@ EditorApp::input()
 void
 EditorApp::uInterfaceUpdate()
 {
+  Logger& log = g_Logger();
   ModelManager& modelMan = g_ModelManager();
   RendererManager& rm = g_RenderManager();
   SceneManager& sm = g_SceneManager();
@@ -242,6 +246,15 @@ EditorApp::uInterfaceUpdate()
       im.createCheckBox("Warnings", m_showWarnings);
       im.sameLine();
       im.createCheckBox("Logs", m_showActions);
+      im.sameLine();
+      if (im.createButton("Clear")) {
+        if (m_showErrors) {
+          log.clearLogsOfType(kError);
+        }
+        if (m_showWarnings) {
+          log.clearLogsOfType(kWarning);
+        }
+      }
       showLogType(m_showErrors, kError);
       showLogType(m_showWarnings, kWarning);
       showLogType(m_showActions, kLog);
@@ -300,7 +313,7 @@ EditorApp::uInterfaceUpdate()
           }
           // if a model component is to be added.
           if (val == 0) {
-            Path path = m_window.openFileFromExplorer();
+            Path path = m_window.openFileFromExplorer("Model Files", "*.fbx;*.obj;*.gltf");
             if (path.toString() != "") {
               SPtr<BaseResource> resource = make_shared<ModelResource>();
               resource->softLoad(path);
@@ -354,15 +367,15 @@ EditorApp::uInterfaceUpdate()
         im.tableJumpRow();
         im.createText("Camera Speed");
         im.tableNextColumn();
-        im.createDragF("##CamSpeed", m_cameraSpeed);
+        im.createDrag("##CamSpeed", m_cameraSpeed);
         im.tableJumpRow();
         im.createText("X Sensitivity");
         im.tableNextColumn();
-        im.createDragF("##XSens", m_sensX, 0.1f);
+        im.createDrag("##XSens", m_sensX, 0.1f);
         im.tableJumpRow();
         im.createText("Y Sensitivity");
         im.tableNextColumn();
-        im.createDragF("##YSens", m_sensY, 0.1f);
+        im.createDrag("##YSens", m_sensY, 0.1f);
         im.tableJumpRow();
       }
       im.endTable();
@@ -381,7 +394,8 @@ EditorApp::uInterfaceUpdate()
         if (m_IBL) {
           // Slider for IBL intensity.
           if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-            Path path = m_window.openFileFromExplorer();
+            Path path = m_window.openFileFromExplorer("Texture Files",
+                                                      "*.png;*.jpeg;*.jpg;*.tga;*.hdr;*.exr");
             if (path.toString() != "") {
               // SPtr<Texture> texture = tm.loadTexture(path);
               // rm.m_mainSkybox->copyFrom(texture);
@@ -399,14 +413,14 @@ EditorApp::uInterfaceUpdate()
             im.setTooltip("Skybox");
           }
           im.tableNextColumn();
-          im.createDragF("##iblIntensity", m_IBLIntensity, 0.1f, 0.0f, 1.0f);
+          im.createDrag("##iblIntensity", m_IBLIntensity, 0.1f, 0.0f, 1.0f);
         }
 
         // EXPOSURE
         im.tableJumpRow();
         im.createText("Exposure");
         im.tableNextColumn();
-        im.createDragF("##Exposure", m_exposure, 0.1f, 0.0f);
+        im.createDrag("##Exposure", m_exposure, 0.1f, 0.0f);
 
         // LUMINANCE
         im.tableJumpRow();
@@ -414,15 +428,15 @@ EditorApp::uInterfaceUpdate()
         im.tableJumpRow();
         im.createText("Radius");
         im.tableNextColumn();
-        im.createDragF("##LumRadius", m_blurRadius, 0.1f, 0.001f);
+        im.createDrag("##LumRadius", m_blurRadius, 0.1f, 0.001f);
         im.tableJumpRow();
         im.createText("Strength");
         im.tableNextColumn();
-        im.createDragF("##LumStrength", m_blurStrength, 0.1f, 0.001f);
+        im.createDrag("##LumStrength", m_blurStrength, 0.1f, 0.001f);
         im.tableJumpRow();
         im.createText("Threshhold");
         im.tableNextColumn();
-        im.createDragF("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
+        im.createDrag("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
         im.tableJumpRow();
 
         // EMISSIVE
@@ -430,11 +444,11 @@ EditorApp::uInterfaceUpdate()
         im.tableJumpRow();
         im.createText("Radius");
         im.tableNextColumn();
-        im.createDragF("##EmRadius", m_emissiveBlurRadius, 1.0f, 0.001f);
+        im.createDrag("##EmRadius", m_emissiveBlurRadius, 1.0f, 0.001f);
         im.tableJumpRow();
         im.createText("Strength");
         im.tableNextColumn();
-        im.createDragF("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
+        im.createDrag("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
         im.tableJumpRow();
 
         // SSAO
@@ -445,19 +459,19 @@ EditorApp::uInterfaceUpdate()
         if (m_ssao) {
           im.createText("Sample Radius");
           im.tableNextColumn();
-          im.createDragF("##SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
+          im.createDrag("##SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
           im.tableJumpRow();
           im.createText("Scale");
           im.tableNextColumn();
-          im.createDragF("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
+          im.createDrag("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
           im.tableJumpRow();
           im.createText("Bias");
           im.tableNextColumn();
-          im.createDragF("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
+          im.createDrag("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
           im.tableJumpRow();
           im.createText("Intensity");
           im.tableNextColumn();
-          im.createDragF("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
+          im.createDrag("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
         }
         im.tableNextRow();
       }
@@ -492,6 +506,33 @@ EditorApp::uInterfaceUpdate()
     if (m_selectedMaterial && im.beginTabItem(m_selectedMaterial->getName())) {
       m_materialInspector.setMaterial(m_selectedMaterial);
       m_materialInspector.createMaterialWindow(m_window);
+      im.endTabItem();
+    }
+    if (im.beginTabItem("Quaternion Test")) {
+      static Quaternion quat;
+      Vector3 quatV = quat.toEuler() * Math::RAD2DEG;
+      im.createText("X: ");
+      im.sameLine();
+      im.createDrag("##TestX", quatV.x);
+      im.createText("Y: ");
+      im.sameLine();
+      im.createDrag("##TestY", quatV.y);
+      im.createText("Z: ");
+      im.sameLine();
+      im.createDrag("##TestZ", quatV.z);
+      quat = Quaternion::fromEuler(quatV * Math::DEG2RAD).normalized();
+      if (quat.hasNan()) {
+        quat = Quaternion::IDENTITY;
+      }
+
+      static Vector3 test;
+      if (test == Vector3::ZERO) {
+        test = Vector3::UP;
+      }
+      test = quat * test;
+      im.createDrag("Direction:", test);
+
+      im.endTabItem();
     }
     im.endTabBar();
   }
@@ -507,7 +548,8 @@ EditorApp::showLogType(bool& _active, uint32 _type)
   Logger& log = g_Logger();
   if (_active) {
     Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
-    for (uint32 i = 0; i < messages.size(); ++i) {
+    const uint32 messageCount = static_cast<uint32>(messages.size());
+    for (uint32 i = 0; i < messageCount; ++i) {
       const String msg = log.getStringFromLog(messages[i]);
       im.createText(msg.c_str());
     }

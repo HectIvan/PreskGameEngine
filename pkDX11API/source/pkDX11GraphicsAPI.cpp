@@ -86,8 +86,10 @@ class ShaderInclude : public ID3DInclude
 };
 
 PKFORCEINLINE void
-throwIfFailed(HRESULT hr) {
+throwIfFailed(const HRESULT& hr) {
   if (FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
+    LOG_FATAL("Error in creation. Error message: " + errMsg, __FILE__, __LINE__);
     PK_ASSERT(false && "Error in creation");
   }
 }
@@ -95,7 +97,10 @@ throwIfFailed(HRESULT hr) {
 extern "C" __declspec(dllexport) void
 loadPlugin()
 {
+  LOG_REGISTER("Starting DirectX 11 API...", __FILE__, __LINE__);
   GraphicsAPI::startUp<DX11GraphicsAPI>();
+
+  LOG_REGISTER("Starting DirectX 11 Shader Codec...", __FILE__, __LINE__);
   ShaderCodec::startUp<DX11ShaderCodec>();
 }
 
@@ -106,7 +111,6 @@ DX11GraphicsAPI::init(const Window& _window)
 #ifdef _DEBUG
   createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif // _DEBUG
-
 
   // graphics api (do not store)
   D3D_DRIVER_TYPE driverTypes[] = {
@@ -513,29 +517,44 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   SPtr<DX11SwapChain> pSwapChain = make_shared<DX11SwapChain>();
   pSwapChain->setHeight(_height);
   pSwapChain->setWidth(_width);
+  int32 hr;
+  int32 dTIndex = 0; // for error log if there is one.
   for (uint32 driverTypeIndex = 0; driverTypeIndex < _numDriverTypes; driverTypeIndex++) {
     // try and create the device and swap chain with the current driver type
     m_pDevice->m_pDriverType = new D3D_DRIVER_TYPE(_driverTypes[driverTypeIndex]);
-    const int32 hr = D3D11CreateDeviceAndSwapChain(nullptr,
-                                                   *m_pDevice->m_pDriverType,
-                                                   nullptr,
-                                                   _createDeviceFlags,
-                                                   _featureLevels,
-                                                   _numFeatureLevels,
-                                                   D3D11_SDK_VERSION,
-                                                   &sd,
-                                                   &pSwapChain->m_pSch,
-                                                   &m_pDevice->m_pd3dDevice,
-                                                   &m_pDevice->m_featureLevel,
-                                                   &m_pDevice->m_pImmediateContext);
+    hr = D3D11CreateDeviceAndSwapChain(nullptr,
+                                       *m_pDevice->m_pDriverType,
+                                       nullptr,
+                                       _createDeviceFlags,
+                                       _featureLevels,
+                                       _numFeatureLevels,
+                                       D3D11_SDK_VERSION,
+                                       &sd,
+                                       &pSwapChain->m_pSch,
+                                       &m_pDevice->m_pd3dDevice,
+                                       &m_pDevice->m_featureLevel,
+                                       &m_pDevice->m_pImmediateContext);
+    dTIndex = driverTypeIndex;
 
     // if creation was successful
     if (hr == 0x00000000) {
       // end the entire process, no need to continue
-      LOG_REGISTER("Created a DirectX device and Swap Chain.", __FILE__, __LINE__);
+      const String msg = "DirectX 11 device and swap chain created successfully with driver type: " +
+                         to_string(*m_pDevice->m_pDriverType);
+      LOG_REGISTER(msg, __FILE__, __LINE__);
       m_pSwapChain = pSwapChain;
       break;
     }
+  }
+  // if the creation failed.
+  if (FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
+    const String msg = "Failed to create DirectX 11 device and swap chain with driver type: " +
+                       to_string(_driverTypes[dTIndex]) +
+                       ". Error message: " + errMsg;
+    m_pSwapChain = nullptr;
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
   }
 }
 

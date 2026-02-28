@@ -37,8 +37,8 @@ struct PK_CORE_EXPORT PKWindowDesc
   uint32 width;
   uint32 height;
 
-  uint32 posX;
-  uint32 posY;
+  int32 posX;
+  int32 posY;
 
   String name;
   WinFunctEvent funct;

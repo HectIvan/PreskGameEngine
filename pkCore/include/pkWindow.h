@@ -57,28 +57,28 @@ class PK_CORE_EXPORT Window
    * @param _y Height of the window.
    */
   void
-  setSize(uint32 _width, uint32 _height);
+  setSize(const uint32& _width, const uint32& _height);
 
   /**
    * @brief Set the size of the window.
    * @param _size Size of the window.
    */
   void
-  setSize(Vector2 _size);
+  setSize(const Vector2& _size);
 
   /**
    * @brief Set the width of the window.
    * @param _x Width that the window will hold.
    */
   void
-  setWidth(uint32 _width);
+  setWidth(const uint32& _width);
 
   /**
    * @brief Set the height of the window.
    * @param _y Height that the window will hold.
    */
   void
-  setHeight(uint32 _height);
+  setHeight(const uint32& _height);
 
   /**
    * @brief Get the current size of the window.
@@ -139,8 +139,10 @@ class PK_CORE_EXPORT Window
   /**
    * @brief Open a file in a file explorer window.
    */
+  // const String& _filter = "All Files\0*.*\0Text Files\0*.TXT\0"
   String
-  openFileFromExplorer() const;
+  openFileFromExplorer(const String& _filterName = "All Files",
+                       const String& _extensions = "*.*") const;
 
   bool m_isFocused;
 
@@ -148,7 +150,12 @@ class PK_CORE_EXPORT Window
   uint32 m_width;
   uint32 m_height;
 
+  int32 m_posX;
+  int32 m_posY;
+
   WindowHandle m_windowH;
   InstanceHandle m_hInstance;
+
+  String m_name;
 };
 }

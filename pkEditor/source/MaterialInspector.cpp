@@ -34,38 +34,32 @@ MaterialInspector::createMaterialWindow(const Window& _window)
   UInterface& im = g_uInterface();
   TextureManager& tm = g_TextureManager();
 
-
-  String matName = m_material->getName();
-
   im.createText("Texture UI Image Size");
   im.sameLine();
-  im.createDragF("##TextureUIImageSize", m_iconSize, 1.0f, 1.0f);
+  im.createDrag("##TextureUIImageSize", m_iconSize, 1.0f, 1.0f);
 
   const Vector2 texSize = Vector2(m_iconSize, m_iconSize);
 
+  String matName = m_material->getName();
   im.createText("Material Name: ");
   im.sameLine();
   im.createInputText("##MaterialName: ", &matName);
   // get material
   MaterialProps& matProps = m_material->m_properties;
   // get the textures
-  const SPtr<Texture> albedo = m_material->m_albedo;
-  const SPtr<Texture> normal = m_material->m_normal;
-  const SPtr<Texture> oclussion = m_material->m_oclussion;
-  const SPtr<Texture> rough = m_material->m_roughness;
-  const SPtr<Texture> metallic = m_material->m_metallic;
-  const SPtr<Texture> emissive = m_material->m_emissive;
+  const SPtr<Texture>& albedo = m_material->m_albedo;
+  const SPtr<Texture>& normal = m_material->m_normal;
+  const SPtr<Texture>& oclussion = m_material->m_oclussion;
+  const SPtr<Texture>& rough = m_material->m_roughness;
+  const SPtr<Texture>& metallic = m_material->m_metallic;
+  const SPtr<Texture>& emissive = m_material->m_emissive;
 
   /***************************************************************/
   /*------------------------albedo button-----------------------*/
   /***************************************************************/
   if (albedo) {
     const String albName = albedo->getNameString() + "diff";
-    if (im.createButtonImage(albName.c_str(), albedo, texSize)) {
-      // opened window to set albedo texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(albName.c_str(), albedo, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + albName;
       im.createText(dragText.c_str());
@@ -109,11 +103,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
 
   if (normal) {
     const String norName = normal->getNameString() + "norm";
-    if (im.createButtonImage(norName.c_str(), normal, texSize)) {
-      // opened window to set normal texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(norName.c_str(), normal, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + norName;
       im.createText(dragText.c_str());
@@ -155,11 +145,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
 
   if (oclussion) {
     const String occName = oclussion->getNameString() + "ao";
-    if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {
-      // opened window to set occlusion texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + occName;
       im.createText(dragText.c_str());
@@ -201,11 +187,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
 
   if (rough) {
     const String roughName = rough->getNameString() + "rough";
-    if (im.createButtonImage(roughName.c_str(), rough, texSize)) {
-      // opened window to set rough texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(roughName.c_str(), rough, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + roughName;
       im.createText(dragText.c_str());
@@ -226,7 +208,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
       im.setTooltip("Roughness Texture");
     }
     im.sameLine();
-    im.createDragF("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
+    im.createDrag("Roughness Strength", matProps.roughnessMultiply, 0.01f, 0.0f, 1.0f);
   }
   else {
     if (im.createButton("##RoughnessButton")) {}
@@ -249,11 +231,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
 
   if (metallic) {
     const String metName = metallic->getNameString() + "metal";
-    if (im.createButtonImage(metName.c_str(), metallic, texSize)) {
-      // opened window to set metallic texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(metName.c_str(), metallic, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + metName;
       im.createText(dragText.c_str());
@@ -274,7 +252,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
       im.setTooltip("Metallic Texture");
     }
     im.sameLine();
-    im.createDragF("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
+    im.createDrag("Metallic Strength", matProps.metallicMultiply, 0.01f, 0.0f, 1.0f);
   }
   else {
     if (im.createButton("##MetallicButton")) {}
@@ -297,11 +275,7 @@ MaterialInspector::createMaterialWindow(const Window& _window)
 
   if (emissive) {
     const String emissName = emissive->getNameString() + "emissive";
-    if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {
-      // opened window to set metallic texture
-      const Path path(_window.openFileFromExplorer());
-      if (path.toString() != "") {}
-    }
+    if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + emissName;
       im.createText(dragText.c_str());

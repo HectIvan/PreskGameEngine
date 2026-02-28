@@ -505,7 +505,7 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDragU(const ANSICHAR* _name,
+  createDrag(const ANSICHAR* _name,
               uint32& _value,
               const uint32 _speed = 1,
               const uint32 _min = 1,
@@ -521,7 +521,7 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDragI(const ANSICHAR* _name,
+  createDrag(const ANSICHAR* _name,
               int32& _value,
               const int32 _speed = 1,
               const int32 _min = 1,
@@ -537,7 +537,7 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDragF(const ANSICHAR* _name,
+  createDrag(const ANSICHAR* _name,
               float& _value,
               float _speed = 1.0f,
               float _min = -99999.9f,
@@ -553,7 +553,7 @@ class UInterface : public Module<UInterface>
    * @result If there was a change.
    */
   bool
-  createDrag3(const ANSICHAR* _name,
+  createDrag(const ANSICHAR* _name,
               Vector3& _value,
               float _speed = 1.0f,
               float _min = -99999.9f,

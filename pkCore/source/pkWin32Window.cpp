@@ -25,7 +25,6 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 void
 Window::create(const PKWindowDesc& _desc)
 {
-  Logger& log = g_Logger();
   /************************************************************************************/
   WNDCLASSEXA wcex;
   m_hInstance = InstanceHandle();
@@ -44,7 +43,7 @@ Window::create(const PKWindowDesc& _desc)
   wcex.lpszClassName = "WindowClass";
   if (!RegisterClassEx(&wcex)) {
     const String msg = "Failed to register a window class.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
   /************************************************************************************/
@@ -54,34 +53,44 @@ Window::create(const PKWindowDesc& _desc)
   **/
   m_width = _desc.width;
   m_height = _desc.height;
+  m_name = _desc.name;
+  m_posX = _desc.posX;
+  m_posY = _desc.posY;
   // adjust window width and height
   RECT rc = { 0, 0, static_cast<LONG>(_desc.width), static_cast<LONG>(_desc.height) };
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
   // create the window
   m_windowH = CreateWindowExA(0,
                               "WindowClass",
-                              _desc.name.c_str(),
+                              m_name.c_str(),
                               WS_OVERLAPPEDWINDOW,
-                              CW_USEDEFAULT,
-                              CW_USEDEFAULT,
+                              m_posX,
+                              m_posY,
                               rc.right - rc.left,
                               rc.bottom - rc.top,
                               nullptr,
                               nullptr,
                               m_hInstance,
                               nullptr);
-  /**
+  /** 
    * Check if creation failed. 
    */
   if (!m_windowH) {
     const String msg = "Failed to create the window.";
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
   auto* eventFunct = new WinFunctEvent(_desc.funct);
   SetWindowLongPtrW(m_windowH, 0, reinterpret_cast<LONG_PTR>(eventFunct));
   ShowWindow(m_windowH, 1);
-  log.registerMessage("Created Window.", __FILE__, __LINE__);
+  const String msg = "Created window: " +
+                     m_name +
+                     " - " +
+                     " Width: " +
+                     to_string(m_width) +
+                     " Height: " +
+                     to_string(m_height);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 Vector2
@@ -89,8 +98,8 @@ Window::getClientWidthHeight() const
 {
   RECT rc;
   GetClientRect(m_windowH, &rc);
-  uint32 width = rc.right - rc.left;
-  uint32 height = rc.bottom - rc.top;
+  const uint32 width = rc.right - rc.left;
+  const uint32 height = rc.bottom - rc.top;
   return Vector2(width, height);
 }
 
@@ -154,20 +163,20 @@ namespace pkEngineSDK
 {
 
 void
-Window::setSize(uint32 _width, uint32 _height)
+Window::setSize(const uint32& _width, const uint32& _height)
 {
   setWidth(_width);
   setHeight(_height);
 }
 
 void
-Window::setSize(Vector2 _size)
+Window::setSize(const Vector2& _size)
 {
   setSize(static_cast<uint32>(_size.x), static_cast<uint32>(_size.y));
 }
 
 void
-Window::setWidth(uint32 _width)
+Window::setWidth(const uint32& _width)
 {
   m_width = _width;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
@@ -177,7 +186,7 @@ Window::setWidth(uint32 _width)
 }
 
 void
-Window::setHeight(uint32 _height)
+Window::setHeight(const uint32& _height)
 {
   m_height = _height;
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
@@ -192,11 +201,25 @@ Window::getSize() const
   return Vector2(m_width, m_height);
 }
 
+void
+appendToCSTR(Vector<ANSICHAR>& _array, const String& _string)
+{
+  _array.insert(_array.end(), _string.begin(), _string.end());
+}
+
 String
-Window::openFileFromExplorer() const
+Window::openFileFromExplorer(const String& _filterName, const String& _extensions) const
 {
   OPENFILENAME ofn = { 0 };       // common dialog box structure
   ANSICHAR szFile[256] = {0}; // buffer for file name
+
+  Vector<ANSICHAR> filter;
+
+  appendToCSTR(filter, _filterName);
+  filter.push_back('\0');
+  appendToCSTR(filter, _extensions);
+  filter.push_back('\0');
+  filter.push_back('\0');
 
   // Initialize OPENFILENAME
   ZeroMemory(&ofn, sizeof(ofn));
@@ -204,7 +227,7 @@ Window::openFileFromExplorer() const
   ofn.hwndOwner = NULL; // or your window handle
   ofn.lpstrFile = szFile;
   ofn.nMaxFile = sizeof(szFile);
-  ofn.lpstrFilter = "All Files\0*.*\0Text Files\0*.TXT\0";
+  ofn.lpstrFilter = filter.data();
   ofn.nFilterIndex = 1;
   ofn.Flags = OFN_PATHMUSTEXIST |
               OFN_FILEMUSTEXIST |

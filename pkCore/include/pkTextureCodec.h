@@ -55,6 +55,15 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
    */
   virtual SPtr<TextureResource>
   createResourceFromFile(const Path _path) = 0;
+
+  /**
+   * @brief Get the possible extensions for texture search in folders.
+   * @return possible extensions for texture search in folders.
+   */
+  const String
+  getPossibleExtensions() const {
+    return "*.png;*.jpeg;*.jpg;*.tga;*.hdr;*.exr";
+  }
 };
 
 PK_CORE_EXPORT TextureCodec&

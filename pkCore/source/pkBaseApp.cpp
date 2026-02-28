@@ -143,14 +143,17 @@ BaseApp::messageLoop()
     render();
   }
 
-  // if the program is shut dowor closes for any reason, close everything properly.
-  // Logger::shutDown();
+  g_Logger().createLogFiles();
+
+  // if the program is shut down closes for any reason, close everything properly.
+  // GraphicsAPI::shutDown();
   // RendererManager::shutDown();
   // ModelManager::shutDown();
   // SceneManager::shutDown();
   // TextureManager::shutDown();
   // TimeManager::shutDown();
   // EventQueue::shutDown();
+  // Logger::shutDown();
 }
 
 void

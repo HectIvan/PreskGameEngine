@@ -46,10 +46,10 @@ ResourceInspector::createResourceWindow(const Window& _window)
   ModelCodec& modelCodec = g_ModelCodec();
   UInterface& im = g_uInterface();
   TextureCodec& textureCodec = g_TextureCodec();
-
   
   if (im.createButton("Model Resource")) {
-    const Path path = _window.openFileFromExplorer();
+    const Path path = _window.openFileFromExplorer("Model Files",
+                                                   modelCodec.getPossibleExtensions());
     if (path.toString() != "") {
       SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
       if (resource) {
@@ -59,7 +59,8 @@ ResourceInspector::createResourceWindow(const Window& _window)
   }
   im.sameLine();
   if (im.createButton("Texture Resource")) {
-    const Path path = _window.openFileFromExplorer();
+    const Path path = _window.openFileFromExplorer("Texture Files",
+                                                   textureCodec.getPossibleExtensions());
     if (path.toString() != "") {
       SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
       if (resource) {
@@ -80,13 +81,13 @@ ResourceInspector::createResourceWindow(const Window& _window)
     im.createText("Item Size:");
 
     im.tableNextColumn();
-    im.createDragU("##ItemSize", m_itemSize, 1, 1, 999);
+    im.createDrag("##ItemSize", m_itemSize, 1, 1, 999);
 
     im.tableNextColumn();
     im.createText("Column Count:");
 
     im.tableNextColumn();
-    im.createDragU("##ColumnCount", m_columnCount, 1, 1, 64);
+    im.createDrag("##ColumnCount", m_columnCount, 1, 1, 64);
 
     im.endTable();
   }

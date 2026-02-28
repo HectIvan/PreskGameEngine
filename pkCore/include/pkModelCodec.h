@@ -47,6 +47,16 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
    */
   virtual SPtr<BaseResource>
   createResourceFromFile(const Path _path) = 0;
+
+  /**
+   * @brief Get the possible extensions for model search in folders.
+   * @return possible extensions for model search in folders.
+   */
+  const String
+  getPossibleExtensions() const
+  {
+    return "*.fbx;*.obj;*.gltf";
+  }
 };
 
 PK_CORE_EXPORT ModelCodec&

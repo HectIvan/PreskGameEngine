@@ -52,6 +52,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   // attempt to create the shader resource.
   const String shaderName = shaderDir.getFileNameWithoutExtension();
   const String resourceDir = PK_RESOURCE_FOLDER + shaderName + ".pks";
+  shader->setShaderDirectory(resourceDir);
   ofstream file(resourceDir, ios::out | ios::binary | ios::trunc);
 
   // check if the resource creation failed.
@@ -68,9 +69,21 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   resource->writeBaseHeader(file);
 
+  strcpy_s(resource->m_shaderDirectory,
+           PK_RESOURCE_PATH_SIZE,
+           shader->getShaderDirectory().c_str());
+  strcpy_s(resource->m_sEntryPoint, PK_RESOURCE_NAME_SIZE, shader->getEntryPoint());
+  strcpy_s(resource->m_sModel, PK_RESOURCE_NAME_SIZE, shader->getShaderModel());
+  resource->m_type = shader->getType();
+  // write shader specific data.
+  file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_shaderDirectory), PK_RESOURCE_PATH_SIZE);
+  file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_sEntryPoint), PK_RESOURCE_NAME_SIZE);
+  file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_sModel), PK_RESOURCE_NAME_SIZE);
+  file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_type), sizeof(PK_SHADER_TYPE::E));
+
+  // write shader data.
   const void* pointer = shader->m_pSBlob->getBufferPointer();
   const SIZE_T pointerSize = shader->m_pSBlob->getBufferSize();
-
   resource->m_data = Vector<ANSICHAR>(static_cast<const ANSICHAR*>(pointer),
                                       static_cast<const ANSICHAR*>(pointer) +
                                       pointerSize );

@@ -18,6 +18,7 @@
 #include "pkShaderManager.h"
 #include "pkGraphicsAPI.h"
 #include "pkBaseResource.h"
+#include "pkAssetResourceManager.h"
 
 namespace pkEngineSDK
 {
@@ -41,54 +42,95 @@ ShaderManager::createShaderResources()
   ShaderKey transparency("shaders/pkPSTransparency.hlsl", "PS", "ps_5_0");
 
   // initialize all shaders and create the resources.
-  initShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
-  initShaderResource(basePixel, PK_SHADER_TYPE::kPixel);
-  initShaderResource(positions, PK_SHADER_TYPE::kPixel);
-  initShaderResource(quad, PK_SHADER_TYPE::kVertex);
-  initShaderResource(BRDFShader, PK_SHADER_TYPE::kPixel);
-  initShaderResource(cBRDFShader, PK_SHADER_TYPE::kCompute);
-  initShaderResource(skybox, PK_SHADER_TYPE::kPixel);
-  initShaderResource(ssao, PK_SHADER_TYPE::kPixel);
-  initShaderResource(blur, PK_SHADER_TYPE::kPixel);
-  initShaderResource(luminance, PK_SHADER_TYPE::kPixel);
-  initShaderResource(toneMap, PK_SHADER_TYPE::kPixel);
-  initShaderResource(cubeMap, PK_SHADER_TYPE::kPixel);
-  initShaderResource(transparency, PK_SHADER_TYPE::kPixel);
+  createShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
+  createShaderResource(basePixel, PK_SHADER_TYPE::kPixel);
+  createShaderResource(positions, PK_SHADER_TYPE::kPixel);
+  createShaderResource(quad, PK_SHADER_TYPE::kVertex);
+  createShaderResource(BRDFShader, PK_SHADER_TYPE::kPixel);
+  createShaderResource(cBRDFShader, PK_SHADER_TYPE::kCompute);
+  createShaderResource(skybox, PK_SHADER_TYPE::kPixel);
+  createShaderResource(ssao, PK_SHADER_TYPE::kPixel);
+  createShaderResource(blur, PK_SHADER_TYPE::kPixel);
+  createShaderResource(luminance, PK_SHADER_TYPE::kPixel);
+  createShaderResource(toneMap, PK_SHADER_TYPE::kPixel);
+  createShaderResource(cubeMap, PK_SHADER_TYPE::kPixel);
+  createShaderResource(transparency, PK_SHADER_TYPE::kPixel);
 }
 
-SPtr<Shader>
-ShaderManager::initShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E _type)
+void
+ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E _type)
 {
   GraphicsAPI& api = g_GraphicAPI();
   // create the shader base.
   ShaderKey key(_shaderData.shaderPath, _shaderData._szEntryPoint, _shaderData._szShaderModel);
-  SPtr<Shader> shader = api.internalCreateShader();
-  shader->setData(key);
-  shader->compileFromFile();
+  SPtr<Shader> tempShader = api.internalCreateShader();
+  tempShader->setData(key);
+  tempShader->compileFromFile();
   // create the shader based on its type.
   if (PK_SHADER_TYPE::kVertex == _type) {
-    api.createVShader(shader);
+    api.createVShader(tempShader);
   }
   if (PK_SHADER_TYPE::kPixel == _type) {
-    api.createPShader(shader);
+    api.createPShader(tempShader);
   }
   if (PK_SHADER_TYPE::kCompute == _type) {
-    api.createCShader(shader);
+    api.createCShader(tempShader);
   }
   // create the resource from the shader.
-  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(shader);
+  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(tempShader);
 
+  /* --------------------if these lines are removed, it DIE.---------------------------
+     
+     current reasons i've thought as to why it causes a heap corruption:
+
+     1.- shader is destroyed and thus, can't be used elsewhere, HOWEVER, this function only creates
+         the .pks file, which is the one that is used to later on create a shader, so this doesnt
+         really make sense.
+
+     2.- resource is destroyed at the exit of this function, HOWEVER, same as before, this should
+         only be creating a .pks file that will be used later to create the shader itself, the
+         shader here is only a temporary shader for creating the shader resource.
+
+     3.- idk, im all out of ideas.
+  */
   key.shaderPath = res->m_resourcePath;
-  insertShader(res->m_id, shader);
-  insertShader(key, shader);
-
-  return shader;
+  insertShader(res->m_id, tempShader);
+  insertShader(key, tempShader);
 }
 
 void
 ShaderManager::insertShader(const UUID& _id, const SPtr<Shader>& _pShader)
 {
   m_shaders.insert({ _id, _pShader });
+}
+
+void
+ShaderManager::createShaders()
+{
+  AssetResourceManager& assetMan = g_AssetResourceManager();
+  GraphicsAPI& api = g_GraphicAPI();
+
+  UMap<UUID, SPtr<BaseResource>>& resources = assetMan.getAllResources();
+  // iterate through all resources.
+  for (auto& resource : resources) {
+    WPtr<BaseResource> res = resource.second;
+    // if the resource is a shader resource, create the shader and compile it.
+    if (RESOURCE_TYPE::kShader == res.lock()->getType()) {
+      res.lock()->load();
+      SPtr<Shader> shader = api.internalCreateShader();
+      shader->compileFromResource(res.lock());
+
+      // create shader specific key
+      const Path dir = shader->getShaderDirectory();
+      const ANSICHAR* entry = shader->getEntryPoint();
+      const ANSICHAR* model = shader->getShaderModel();
+      const ShaderKey key = ShaderKey(dir, entry, model);
+
+      // store the shader
+      insertShader(res.lock()->m_id, shader);
+      insertShader(key, shader);
+    }
+  }
 }
 
 void

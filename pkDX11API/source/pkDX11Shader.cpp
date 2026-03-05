@@ -39,6 +39,12 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
     return;
   }
 
+  // shader specific data.
+  m_shaderDirectory = String(resource->m_shaderDirectory);
+  m_sEntryPoint = resource->m_sEntryPoint;
+  m_sModel = resource->m_sModel;
+  m_shaderType = resource->m_type;
+
   // copy the new data into the blob
   const SIZE_T blobSize = resource->m_data.size();
   m_pSBlob = new PKBlob(resource->m_data);

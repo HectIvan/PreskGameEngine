@@ -16,6 +16,7 @@
  */
  /*********************************************/
 #include "pkPrerequisitesCore.h"
+#include "pkPath.h"
 
 namespace pkEngineSDK
 {
@@ -24,8 +25,13 @@ class ShaderKey
 {
  public:
   ShaderKey() = default;
-  ShaderKey(const String _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :
+  ShaderKey(const String& _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :
     shaderPath(_path),
+    _szEntryPoint(_entryP),
+    _szShaderModel(_shaderModel)
+  {};
+  ShaderKey(const Path& _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :
+    shaderPath(_path.toString()),
     _szEntryPoint(_entryP),
     _szShaderModel(_shaderModel)
   {};

@@ -52,10 +52,9 @@ Pass::Pass(const PixelDesc& _desc)
    * ----------------------- VERTEX SHADER -----------------------
    */
   if (!_desc.vSKey.isEmpty()) {
-    SPtr<Shader> vShaderTemp = shaderMan.getShader(_desc.vSKey); // use count should be 2 here.
-    m_pVShader = vShaderTemp;
+    m_pVShader = shaderMan.getShader(_desc.vSKey);
     // create the input layout for the shader.
-    m_pInputLayout = api.createInputLayoutFromVShader(vShaderTemp);
+    m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader.lock());
     shaderDirty = true;
   };
   // verify if the shader was created correctly.

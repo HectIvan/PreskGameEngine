@@ -18,6 +18,7 @@
  */
  /*********************************************/
 #include "pkBaseResource.h"
+#include "pkShader.h"
 
 namespace pkEngineSDK
 {
@@ -54,6 +55,12 @@ class PK_CORE_EXPORT ShaderResource : public BaseResource
   getTypeString() const override { return "Shader"; }
 
  public:
+  PK_SHADER_TYPE::E m_type;
+
+  ANSICHAR m_shaderDirectory[PK_RESOURCE_PATH_SIZE];
+  ANSICHAR m_sEntryPoint[PK_RESOURCE_NAME_SIZE];
+  ANSICHAR m_sModel[PK_RESOURCE_NAME_SIZE];
+
   Vector<ANSICHAR> m_data;
 };
 }

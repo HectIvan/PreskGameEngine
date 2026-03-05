@@ -70,12 +70,22 @@ class PK_UTILITY_EXPORT Path
 
   /**
    * @brief gets a string of the path.
-   * @return String of the path.
+   * @return path as string.
    */
   String
   toString() const
   {
     return m_path;
+  }
+
+  /**
+   * @brief gets a const ANSICHAR* of the path.
+   * @return path as const ANSICHAR*.
+   */
+  const ANSICHAR*
+  c_str() const
+  {
+    return m_path.c_str();
   }
 
   /**

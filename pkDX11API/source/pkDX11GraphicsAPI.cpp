@@ -359,6 +359,7 @@ DX11GraphicsAPI::createVShader(SPtr<Shader>& _pShader)
                                                    dxVShader->m_pSBlob->getBufferSize(),
                                                    nullptr,
                                                    &dxVShader->m_pShader);
+  dxVShader->setType(PK_SHADER_TYPE::kVertex);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
@@ -391,6 +392,7 @@ DX11GraphicsAPI::createPShader(SPtr<Shader>& _pShader)
                                                   dxPShader->m_pSBlob->getBufferSize(),
                                                   nullptr,
                                                   &dxPShader->m_pShader);
+  dxPShader->setType(PK_SHADER_TYPE::kPixel);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
     safeRelease(dxPShader->m_pSBlob);
@@ -424,6 +426,7 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
                                                     dxCShader->m_pSBlob->getBufferSize(),
                                                     nullptr,
                                                     &dxCShader->m_pShader);
+  dxCShader->setType(PK_SHADER_TYPE::kCompute);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
     safeRelease(dxCShader->m_pSBlob);

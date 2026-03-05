@@ -76,7 +76,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @brief Get all resources in the manager.
    * @return The map with all resources
    */
-  UMap<UUID, SPtr<BaseResource>>
+  UMap<UUID, SPtr<BaseResource>>&
   getAllResources() {
     return m_allResources;
   }

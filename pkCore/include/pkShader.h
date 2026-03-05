@@ -24,6 +24,17 @@
 namespace pkEngineSDK
 {
 
+namespace PK_SHADER_TYPE
+{
+enum E
+{
+  kVertex,
+  kPixel,
+  kCompute,
+  kGeometry,
+};
+}
+
 class BaseResource;
 
 class PK_CORE_EXPORT Shader
@@ -106,6 +117,20 @@ class PK_CORE_EXPORT Shader
     m_sModel = _key._szShaderModel;
   }
 
+  /**
+   * @brief Get the shader type.
+   * @return The shader type.
+   */
+  const PK_SHADER_TYPE::E&
+  getType() const { return m_shaderType; }
+
+  /**
+   * @brief Set the shader type.
+   * @param _type Type of the shader.
+   */
+  void
+  setType(const PK_SHADER_TYPE::E& _type) { m_shaderType = _type; }
+
  protected:
   /**
    * Data used to compile the shader
@@ -113,5 +138,7 @@ class PK_CORE_EXPORT Shader
   Path m_shaderDirectory;
   const ANSICHAR* m_sEntryPoint;
   const ANSICHAR* m_sModel;
+
+  PK_SHADER_TYPE::E m_shaderType;
 };
 }

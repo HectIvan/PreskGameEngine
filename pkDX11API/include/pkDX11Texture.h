@@ -42,10 +42,10 @@ class DX11Texture : public Texture
   {}
   virtual ~DX11Texture()
   {
-    safeRelease(m_sRV);
-    safeRelease(m_dSV);
     m_rTVs.clear();
     m_uAVs.clear();
+    safeRelease(m_sRV);
+    safeRelease(m_dSV);
     if (m_owner) { safeRelease(m_t2d); }
   }
 

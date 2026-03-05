@@ -40,6 +40,12 @@ ShaderResource::load()
   }
   // load the base resource header.
   loadBaseHeader(file);
+
+  // read the shader type.
+  file.read(reinterpret_cast<ANSICHAR*>(&m_shaderDirectory), PK_RESOURCE_PATH_SIZE);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_sEntryPoint), PK_RESOURCE_NAME_SIZE);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_sModel), PK_RESOURCE_NAME_SIZE);
+  file.read(reinterpret_cast<ANSICHAR*>(&m_type), sizeof(PK_SHADER_TYPE::E));
   // load the shader blob.
   SIZE_T blobSize = 0;
   file.read(reinterpret_cast<ANSICHAR*>(&blobSize), sizeof(SIZE_T));

@@ -72,9 +72,10 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
 #endif
 
   g_GraphicAPI().init(m_window);
-  g_ShaderManager().createShaderResources();
   assetResource.init("resources");
+  g_ShaderManager().createShaderResources();
   assetResource.loadAssetsFromResourcesFolder();
+  g_ShaderManager().createShaders();
   g_MaterialManager().init();
   g_SceneManager().init();
   g_RenderManager().init();
@@ -146,14 +147,14 @@ BaseApp::messageLoop()
   g_Logger().createLogFiles();
 
   // if the program is shut down closes for any reason, close everything properly.
-  // GraphicsAPI::shutDown();
-  // RendererManager::shutDown();
-  // ModelManager::shutDown();
-  // SceneManager::shutDown();
-  // TextureManager::shutDown();
-  // TimeManager::shutDown();
-  // EventQueue::shutDown();
-  // Logger::shutDown();
+  GraphicsAPI::shutDown();
+  RendererManager::shutDown();
+  ModelManager::shutDown();
+  SceneManager::shutDown();
+  TextureManager::shutDown();
+  TimeManager::shutDown();
+  EventQueue::shutDown();
+  Logger::shutDown();
 }
 
 void

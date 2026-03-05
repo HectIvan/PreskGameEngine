@@ -20,6 +20,8 @@
 #include "pkModule.h"
 #include "pkBaseResource.h"
 
+#define PK_RESOURCE_FOLDER "resources/"
+
 namespace pkEngineSDK
 {
 
@@ -150,7 +152,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
    * @return Pointer to the resource.
    */
   SPtr<BaseResource>
-  getResourceBydirectory(const String& _directory);
+  getResourceByDirectory(const String& _directory);
 
  private:
   UMap<UUID, SPtr<BaseResource>> m_loadedResources;

@@ -30,16 +30,12 @@ Texture3D::Texture3D(const uint32 _width,
                      const uint32 _height,
                      const Vector<SPtr<Texture>> _textures)
 {
-  Logger& log = g_Logger();
-
   // check if the texture slices meet the width and height sent as parameters.
-  for (uint32 i = 0; i < _textures.size(); ++i) {
+  const uint32 texCount = static_cast<uint32>(_textures.size());
+  for (uint32 i = 0; i < texCount; ++i) {
     SPtr<Texture> texture = _textures[i];
     if (texture->getWidth() != _width || texture->getHeight() != _height) {
-      log.registerMessage("Texture slice size does not match 3D texture size.",
-                          __FILE__,
-                          __LINE__,
-                          LOG_MSG_TYPE::kWarning);
+      LOG_WARNING("Texture slice size does not match 3D texture size.", __FILE__, __LINE__);
       return;
     }
   }
@@ -53,22 +49,14 @@ Texture3D::Texture3D(const uint32 _width,
 void
 Texture3D::addSlice(const SPtr<Texture>& _pTexture, const uint32 _slice)
 {
-  Logger& log = g_Logger();
-
   // check for out of bounds.
   if (_slice < 0 || _slice >= m_slices.size()) {
-    log.registerMessage("Index out of bounds when adding slice to 3D texture.",
-                        __FILE__,
-                        __LINE__,
-                        LOG_MSG_TYPE::kWarning);
+    LOG_WARNING("Index out of bounds when adding slice to 3D texture.", __FILE__, __LINE__);
     return;
   }
   // check for size match.
   if (_pTexture->getWidth() != m_width || _pTexture->getHeight() != m_height) {
-    log.registerMessage("Texture slice size does not match 3D texture size.",
-                        __FILE__,
-                        __LINE__,
-                        LOG_MSG_TYPE::kWarning);
+    LOG_WARNING("Texture slice size does not match 3D texture size.", __FILE__, __LINE__);
     return;
   }
 
@@ -78,14 +66,9 @@ Texture3D::addSlice(const SPtr<Texture>& _pTexture, const uint32 _slice)
 SPtr<Texture>
 Texture3D::getSlice(const uint32 _slice)
 {
-  Logger& log = g_Logger();
-
   // check for out of bounds.
   if (_slice < 0 || _slice >= m_slices.size()) {
-    log.registerMessage("Index out of bounds when getting slice from 3D texture.",
-                        __FILE__,
-                        __LINE__,
-                        LOG_MSG_TYPE::kWarning);
+    LOG_WARNING("Index out of bounds when getting slice from 3D texture.", __FILE__, __LINE__);
     return nullptr;
   }
   return m_slices[_slice];

@@ -40,153 +40,111 @@ Pass::clear()
   m_uavTex.clear();
 }
 
-Pass::Pass(const PassDesc& _desc)
+Pass::Pass(const PixelDesc& _desc)
 {
-  // call the api manager
+  PK_ASSERT(!_desc.outputs.empty() && "Pixel Pass has no output textures.");
+
   GraphicsAPI& api = g_GraphicAPI();
-  AssetResourceManager& assetMan = g_AssetResourceManager();
-  m_pSamplerState = make_shared<SamplerState>();
-  // Try to create the vertex shader if there's a path.
-  if (!_desc.vSDirectory.empty()) {
-    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.vSDirectory);
-    m_pVShader = api.internalCreateShader();
-    m_pVShader->compileFromResource(res);
-    api.createVShader(m_pVShader);
-    // create the input layout for the shader
-    m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader);
+  ShaderManager& shaderMan = g_ShaderManager();
+
+  bool shaderDirty = false;
+  /**
+   * ----------------------- VERTEX SHADER -----------------------
+   */
+  if (!_desc.vSKey.isEmpty()) {
+    SPtr<Shader> vShaderTemp = shaderMan.getShader(_desc.vSKey); // use count should be 2 here.
+    m_pVShader = vShaderTemp;
+    // create the input layout for the shader.
+    m_pInputLayout = api.createInputLayoutFromVShader(vShaderTemp);
+    shaderDirty = true;
   };
-  // Try to create the pixel shader if there's a path.
-  if (!_desc.pSDirectory.empty()) {
-    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.pSDirectory);
-    m_pPShader = api.internalCreateShader();
-    m_pPShader->compileFromResource(res);
-    api.createPShader(m_pPShader);
+  // verify if the shader was created correctly.
+  if (shaderDirty && m_pVShader.expired()) {
+    const String msg = "Failed to internally create vertex shader for pass. Path: " +
+                       _desc.vSKey.shaderPath +
+                       ". Shader is expired.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return;
   }
-  // Try to create the compute shader if there's a path.
-  if (!_desc.cSDirectory.empty()) {
-    SPtr<BaseResource> res = assetMan.getResourceBydirectory(_desc.cSDirectory);
-    m_pCShader = api.internalCreateShader();
-    m_pCShader->compileFromResource(res);
-    api.createCShader(m_pCShader);
+  /**
+   * ----------------------- PIXEL SHADER -----------------------
+   */
+  shaderDirty = false;
+  if (!_desc.pSKey.isEmpty()) {
+    m_pPShader = shaderMan.getShader(_desc.pSKey);
+    shaderDirty = true;
   }
-  // create the sampler state
-  m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
-  // create a buffer for each size in the vector
-  for (uint32 i = 0; i < _desc.cBSizes.size(); ++i) {
-    m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
+  // verify if the shader was created correctly.
+  if (shaderDirty && m_pPShader.expired()) {
+    const String msg = "Failed to internally create pixel shader for pass. Path: " +
+                       _desc.pSKey.shaderPath +
+                       ". Shader is expired.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return;
   }
-  if (_desc.rSExists) {
-    // rasterizer state
-    RASTERIZER_DESC rDesc = {};
-    rDesc.fillMode = _desc.rSFillMode;
-    rDesc.cullMode = _desc.rSCullMode;
-    rDesc.frontCounterClockwise = _desc.rSFrontCounterClockwise;
-    rDesc.depthClipEnable = _desc.rSDepthClipEnable;
-    // create the rasterizer state
-    m_pRasterizerState = api.createRasterizerState(rDesc);
+
+  createBasics(_desc);
+
+  // set input, output and depth.
+  m_inputTex = _desc.inputs;
+  m_outputTex = _desc.outputs;
+  m_depthTex = _desc.pDepth;
+  m_viewPortSize = m_outputTex[0]->getSize();
+}
+
+Pass::Pass(const ComputeDesc& _desc)
+{
+  PK_ASSERT(!m_uavTex.empty() && "Compute Pass has no UAVs set.");
+
+  ShaderManager& shaderMan = g_ShaderManager();
+
+  /**
+   * ----------------------- COMPUTE SHADER -----------------------
+   */
+  bool shaderDirty = false;
+  if (!_desc.cSKey.isEmpty()) {
+    m_pCShader = shaderMan.getShader(_desc.cSKey);
+    shaderDirty = true;
   }
-  // set input, output and depth
+  // verify if the shader was created correctly.
+  if (shaderDirty && m_pCShader.expired()) {
+    const String msg = "Failed to internally create compute shader for pass. Path: " +
+      _desc.cSKey.shaderPath +
+      ". Shader is expired.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return;
+  }
+
+  createBasics(_desc);
+
+  m_viewPortSize = m_uavTex[0]->getSize();
+
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
   m_uavTex = _desc.uavs;
-  m_depthTex = _desc.pDepth;
-
-  // get the viewport size from the needed render target or unordered access view.
-  m_viewPortSize = Vector2(0.0f);
-  if (!m_outputTex.empty()) {
-    m_viewPortSize = m_outputTex[0]->getSize();
-  }
-  else if (m_uavTex.empty()) {
-    m_viewPortSize = m_uavTex[0]->getSize();
-  }
-}
-
-void
-Pass::createVShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
-{
-  ShaderManager& shaderMan = g_ShaderManager();
-
-  // check if the shader already exists
-  const ShaderKey key(_directory.toString(), _entry, _sModel);
-  SPtr<Shader> checkShader = shaderMan.getShader(key);
-
-  // if the shader exists, get the shader and return.
-  if (checkShader) {
-    m_pVShader = checkShader;
-    const String msg = "Found previously compiled Vertex shader: " + key.shaderPath;
-    LOG_REGISTER(msg, __FILE__, __LINE__);
-    return;
-  }
-  // if it doesnt exist, continue with the compilation and store the shader.
-  m_pVShader->setData(_directory, _entry, _sModel);
-  m_pVShader->compileFromFile();
-  g_GraphicAPI().createVShader(m_pVShader);
-  g_ShaderCodec().createResourceFromShader(m_pVShader);
-
-  shaderMan.insertShader(key, m_pVShader);
-}
-
-void
-Pass::createPShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
-{
-  ShaderManager& shaderMan = g_ShaderManager();
-  const ShaderKey key(_directory.toString(), _entry, _sModel);
-  SPtr<Shader> checkShader = shaderMan.getShader(key);
-
-  // if the shader exists, get the shader and return.
-  if (checkShader) {
-    m_pPShader = checkShader;
-    const String msg = "Found previously compiled Pixel shader: " + key.shaderPath;
-    LOG_REGISTER(msg, __FILE__, __LINE__);
-    return;
-  }
-
-  m_pPShader->setData(_directory, _entry, _sModel);
-  m_pPShader->compileFromFile();
-  g_GraphicAPI().createPShader(m_pPShader);
-  g_ShaderCodec().createResourceFromShader(m_pPShader);
-
-  shaderMan.insertShader(key, m_pPShader);
-}
-
-void
-Pass::createCShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
-{
-  ShaderManager& shaderMan = g_ShaderManager();
-  const ShaderKey key(_directory.toString(), _entry, _sModel);
-  SPtr<Shader> checkShader = shaderMan.getShader(key);
-
-  // if the shader exists, get the shader and return.
-  if (checkShader) {
-    m_pCShader = checkShader;
-    const String msg = "Found previously compiled Compute shader: " + key.shaderPath;
-    LOG_REGISTER(msg, __FILE__, __LINE__);
-    return;
-  }
-
-  m_pCShader->setData(_directory, _entry, _sModel);
-  m_pCShader->compileFromFile();
-  g_GraphicAPI().createCShader(m_pCShader);
-  g_ShaderCodec().createResourceFromShader(m_pCShader);
-
-  shaderMan.insertShader(key, m_pCShader);
 }
 
 void
 Pass::compileShaders()
 {
   GraphicsAPI& api = g_GraphicAPI();
-  if (m_pVShader) {
-    m_pVShader->compileFromFile();
-    api.createVShader(m_pVShader);
+  SPtr<Shader> vShader = m_pVShader.lock();
+  if (vShader) {
+    vShader->compileFromFile();
+    m_pVShader = api.createVShader(vShader);
   }
-  if (m_pPShader) {
-    m_pPShader->compileFromFile();
-    api.createPShader(m_pPShader);
+  SPtr<Shader> pShader = m_pPShader.lock();
+  if (pShader) {
+    pShader->compileFromFile();
+    m_pPShader = api.createPShader(pShader);
   }
-  if (m_pCShader) {
-    m_pCShader->compileFromFile();
-    api.createCShader(m_pCShader);
+  SPtr<Shader> cShader = m_pCShader.lock();
+  if (cShader) {
+    cShader->compileFromFile();
+    m_pCShader = api.createCShader(cShader);
   }
 }
 
@@ -194,14 +152,14 @@ void
 Pass::updateCBuffers(const Vector<const void*>& _data,
                      const Vector<SIZE_T>& _sizes)
 {
-  const SIZE_T blobCount = _data.size();
   // assert that all data counts are the same.
+  const SIZE_T blobCount = _data.size();
   PK_ASSERT(blobCount == _sizes.size());
-  PK_ASSERT(m_cBuffers.size() == blobCount);
+  const uint32 CBufferCount = static_cast<uint32>(m_cBuffers.size());
+  PK_ASSERT(CBufferCount == blobCount);
 
   GraphicsAPI& api = g_GraphicAPI();
   
-  const uint32 CBufferCount = static_cast<uint32>(m_cBuffers.size());
   for (uint32 i = 0; i < CBufferCount; ++i) {
     api.updateConstantBuffer(m_cBuffers[i], _data[i], _sizes[i]);
   }
@@ -215,7 +173,7 @@ Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size)
 }
 
 void
-Pass::beginPass(Color _color)
+Pass::beginPass(const Color& _color)
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
@@ -231,15 +189,18 @@ Pass::beginPass(Color _color)
   api.setInputLayout(getInputLayout());
 
   // if there are shaders to set, set them and their resources.
-  if (api.setVShader(getVShader())) { // Vertex shader.
+  SPtr<Shader> vShader = getVShader().lock();
+  if (api.setVShader(vShader)) { // Vertex shader.
     api.vSSetShaderResourceViews(m_inputTex);
     api.vSSetConstantBuffers(getCBuffers());
   }
-  if (api.setPShader(getPShader())) { // Pixel shader.
+  SPtr<Shader> pShader = getPShader().lock();
+  if (api.setPShader(pShader)) { // Pixel shader.
     api.pSSetShaderResourceViews(m_inputTex);
     api.pSSetConstantBuffers(getCBuffers());
   }
-  if (api.setCShader(getCShader())) { // Compute shader.
+  SPtr<Shader> cShader = getCShader().lock();
+  if (api.setCShader(cShader)) { // Compute shader.
     api.cSSetShaderResourceViews(m_inputTex);
     api.cSSetUnorderedAccessViews(m_uavTex);
     api.cSSetConstantBuffers(getCBuffers());
@@ -281,5 +242,30 @@ Pass::endPass()
   api.pSUnbindConstantBuffers();
   api.cSUnbindConstantBuffers();
   api.setRasterizerState(nullptr);
+}
+
+void
+Pass::createBasics(const PassDesc& _desc)
+{
+  GraphicsAPI& api = g_GraphicAPI();
+
+  // create the sampler state
+  m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
+  // create a buffer for each size in the vector
+  const uint32 cBufferCount = static_cast<uint32>(_desc.cBSizes.size());
+  for (uint32 i = 0; i < cBufferCount; ++i) {
+    m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
+  }
+
+  if (_desc.rSExists) {
+    // rasterizer state.
+    RASTERIZER_DESC rDesc = {};
+    rDesc.fillMode = _desc.rSFillMode;
+    rDesc.cullMode = _desc.rSCullMode;
+    rDesc.frontCounterClockwise = _desc.rSFrontCounterClockwise;
+    rDesc.depthClipEnable = _desc.rSDepthClipEnable;
+    // create the rasterizer state.
+    m_pRasterizerState = api.createRasterizerState(rDesc);
+  }
 }
 }

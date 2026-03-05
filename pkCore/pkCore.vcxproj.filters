@@ -276,6 +276,9 @@
     <ClInclude Include="include\pkCamera.h">
       <Filter>include\components</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkShaderKey.h">
+      <Filter>include\managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">

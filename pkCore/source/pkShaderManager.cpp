@@ -17,6 +17,7 @@
 #include "pkShaderCodec.h"
 #include "pkShaderManager.h"
 #include "pkGraphicsAPI.h"
+#include "pkBaseResource.h"
 
 namespace pkEngineSDK
 {
@@ -60,10 +61,9 @@ ShaderManager::initShaderResource(const ShaderKey& _shaderData, const PK_SHADER_
 {
   GraphicsAPI& api = g_GraphicAPI();
   // create the shader base.
+  ShaderKey key(_shaderData.shaderPath, _shaderData._szEntryPoint, _shaderData._szShaderModel);
   SPtr<Shader> shader = api.internalCreateShader();
-  shader->setData(Path(_shaderData.shaderPath),
-                  _shaderData._szEntryPoint,
-                  _shaderData._szShaderModel);
+  shader->setData(key);
   shader->compileFromFile();
   // create the shader based on its type.
   if (PK_SHADER_TYPE::kVertex == _type) {
@@ -76,23 +76,41 @@ ShaderManager::initShaderResource(const ShaderKey& _shaderData, const PK_SHADER_
     api.createCShader(shader);
   }
   // create the resource from the shader.
-  g_ShaderCodec().createResourceFromShader(shader);
+  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(shader);
 
-  insertShader(_shaderData, shader);
+  key.shaderPath = res->m_resourcePath;
+  insertShader(res->m_id, shader);
+  insertShader(key, shader);
 
   return shader;
 }
 
 void
-ShaderManager::insertShader(const ShaderKey& _key, SPtr<Shader> _pShader)
+ShaderManager::insertShader(const UUID& _id, const SPtr<Shader>& _pShader)
 {
-  m_shaders.insert({ _key, _pShader });
+  m_shaders.insert({ _id, _pShader });
+}
+
+void
+ShaderManager::insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader)
+{
+  m_keyShaders.insert({ _key, _pShader });
+}
+
+SPtr<Shader>
+ShaderManager::getShader(const UUID& _id)
+{
+  SPtr<Shader> shader = m_shaders.find(_id)->second;
+  if (shader) {
+    return shader;
+  }
+  return nullptr;
 }
 
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
-  SPtr<Shader> shader = m_shaders.find(_key)->second;
+  SPtr<Shader> shader = m_keyShaders.find(_key)->second;
   if (shader) {
     return shader;
   }
@@ -103,7 +121,7 @@ Vector<SPtr<Shader>>
 ShaderManager::getShaders()
 {
   // create the shader vector.
-  SIZE_T shaderCount = m_shaders.size();
+  const SIZE_T shaderCount = m_shaders.size();
   Vector<SPtr<Shader>> shaders;
   shaders.resize(shaderCount);
 
@@ -129,15 +147,15 @@ ShaderManager::getShaderNames(const bool _getEntry, const bool _getModel)
   uint32 i = 0;
   for (const auto& shaderIt : m_shaders) {
     // get the shader name.
-    SPtr<Shader> shader = shaderIt.second;
-    String shaderName = shader->getShaderDirectory().getFileName();
+    WPtr<Shader> shader = shaderIt.second;
+    String shaderName = shader.lock()->getShaderDirectory().getFileName();
     // get the shader entry point if its set to be retrieved.
     if (_getEntry) {
-      shaderName += " - " + String(shader->getEntryPoint());
+      shaderName += " - " + String(shader.lock()->getEntryPoint());
     }
     // get the shader model if its set to be retrieved.
     if (_getModel) {
-      shaderName += " - " + String(shader->getShaderModel());
+      shaderName += " - " + String(shader.lock()->getShaderModel());
     }
 
     names[i] = shaderName;

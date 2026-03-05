@@ -18,7 +18,6 @@
 #define STBI_ENABLE_OPENEXR
 #include "stb_image.h"
 
-
 #include "pkAssetResourceManager.h"
 #include "pkUUID.h"
 #include "pkFileSystem.h"
@@ -45,7 +44,7 @@ StbiTextureCodec::createResource(const String _name,
                                  Vector<uint8>& _data)
 {
   const String textureName = Path(_name).getFileNameWithoutExtension();
-  const String resourcePath = "resources/" + textureName + ".pkt";
+  const String resourcePath = PK_RESOURCE_FOLDER + textureName + ".pkt";
 
   ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
 
@@ -81,10 +80,8 @@ StbiTextureCodec::createResource(const String _name,
 SPtr<TextureResource>
 StbiTextureCodec::createResourceFromFile(const Path _path)
 {
-  Logger& log = g_Logger();
-
   const String fileName = _path.getFileNameWithoutExtension();
-  const String resourcePath = "resources/" + fileName + ".pkt";
+  const String resourcePath = PK_RESOURCE_FOLDER + fileName + ".pkt";
 
   if (!FileSystem::fileExists(_path)) {
     const String msg = "Texture file does not exist at path " + _path.toString() + ".";
@@ -119,7 +116,7 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   if (!data) {
     const String msg = "STBI failed to load texture " + resourcePath + "."
                        + " Reason:" + stbi_failure_reason();
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kWarning);
+    LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 

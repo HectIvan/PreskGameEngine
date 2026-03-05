@@ -4,6 +4,7 @@
 **/
 /*********************************************/
 #include "ActorInspector.h"
+#include "pkAssetResourceManager.h"
 #include "pkCamera.h"
 #include "pkModelManager.h"
 #include "pkLight.h"
@@ -158,7 +159,7 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         im.sameLine();
         SPtr<Model> model = reinterpret_pointer_cast<Model>(pComponent);
         if (im.createButton("Save")) {
-          const Path resourcePath = Path("resources/" + String(model->getName()) + ".pkm");
+          const Path resourcePath = Path(PK_RESOURCE_FOLDER + String(model->getName()) + ".pkm");
           modelCod.createResourceFromModel(model, resourcePath);
         }
         if (im.isItemHovered()) {

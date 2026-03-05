@@ -183,9 +183,6 @@ RendererManager::onShutDown()
 void
 RendererManager::createPasses()
 {
-  // pass description
-  PassDesc pDesc = PassDesc();
-
   // Textures
   const SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
   const SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
@@ -212,11 +209,15 @@ RendererManager::createPasses()
   const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
   const SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
   const SPtr<Texture> transpDepth = getDepthBuffer(D_BUFFERS::kDB_Transparency);
+
+  PixelDesc pDesc;
+  ComputeDesc cDesc;
+
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
-  pDesc.vSDirectory = "resources/pkVShader.pks";
-  pDesc.pSDirectory = "resources/pkPShader.pks";
+  pDesc.vSKey = ShaderKey("resources/pkVShader.pks", "VS", "vs_5_0");
+  pDesc.pSKey = ShaderKey("resources/pkPShader.pks", "PS", "ps_5_0");
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
   pDesc.cBSizes = { sizeof(CBMatrix),
@@ -241,7 +242,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Create the transparency pass.
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkPSTransparency.pks";
+  pDesc.pSKey = ShaderKey("resources/pkPSTransparency.pks", "PS", "ps_5_0");
   pDesc.outputs = { transpAlbedo, transpNormal, transpORM, transpEmiss, transpPos };
   pDesc.pDepth = transpDepth;
   // make the pass
@@ -252,7 +253,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Shadow Pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkPShaderDepth.pks";
+  pDesc.pSKey = ShaderKey("resources/pkPShaderDepth.pks", "PS", "ps_5_0");
   pDesc.outputs = { posLightRT };
   pDesc.pDepth = LightDepthBuffer;
   SPtr<Pass> ligtPosPass = make_shared<Pass>(pDesc);
@@ -261,8 +262,8 @@ RendererManager::createPasses()
   /****************************************************************************
    * BRDF Quad Pass
    ***************************************************************************/
-  pDesc.vSDirectory = "resources/pkQuadShader.pks";
-  pDesc.pSDirectory = "resources/pkLightShader.pks";
+  pDesc.vSKey = ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
+  pDesc.pSKey = ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBLight),
                     sizeof(CBCamera),
                     sizeof(Matrix4),
@@ -301,19 +302,17 @@ RendererManager::createPasses()
   /****************************************************************************
    * Skybox Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkSkyboxShader.pks";
-  pDesc.cSDirectory = "";
+  pDesc.pSKey = ShaderKey("resources/pkSkyboxShader.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxRT };
-  pDesc.uavs = {};
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
    * Screen Space Ambient Occlusion Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkPSAOshader.pks";
+  pDesc.pSKey = ShaderKey("resources/pkPSAOshader.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBSSAO), sizeof(CBVector2x2) };
   pDesc.inputs = { posRT,
                    normalRT };
@@ -326,7 +325,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Horizontal Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkBlur.pks";
+  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissRT };
   pDesc.outputs = { emissHBlurRT };
@@ -338,7 +337,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Emissive Blur Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkBlur.pks";
+  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissHBlurRT };
   pDesc.outputs = { emissBlurRT };
@@ -349,7 +348,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkLuminanceQuad.pks";
+  pDesc.pSKey = ShaderKey("resources/pkLuminanceQuad.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBVector2x2) };
   pDesc.inputs = { brdfRT };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
@@ -360,7 +359,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Horizontal Blur
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkBlur.pks";
+  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
@@ -372,7 +371,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Luminance Vertical Blur
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkBlur.pks";
+  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { lumBlurRT };
@@ -383,7 +382,7 @@ RendererManager::createPasses()
   /****************************************************************************
    * Tone mapping Quad pass
    ***************************************************************************/
-  pDesc.pSDirectory = "resources/pkToneMap.pks";
+  pDesc.pSKey = ShaderKey("resources/pkToneMap.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBFloat) };
   pDesc.inputs = { brdfRT,
                    lumBlurRT,
@@ -463,8 +462,8 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   ShaderManager& shaderMan = g_ShaderManager();
 
   // get vertex shader resource.
-  SPtr<BaseResource> vShadRes = assetMan.getResourceBydirectory("resources/pkQuadShader.pks");
-  SPtr<BaseResource> pShadRes = assetMan.getResourceBydirectory("resources/pkCubeMapShader.pks");
+  SPtr<BaseResource> vShadRes = assetMan.getResourceByDirectory("resources/pkQuadShader.pks");
+  SPtr<BaseResource> pShadRes = assetMan.getResourceByDirectory("resources/pkCubeMapShader.pks");
 
   PK_ASSERT(vShadRes);
   PK_ASSERT(pShadRes);

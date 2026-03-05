@@ -17,8 +17,8 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
     // Get the buffers in the swap chain
     int32 hr = m_pSch->GetBuffer(i, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
     // if the buffer is not correct
-    if (hr != 0x00000000) {
-      String errMsg = g_Logger().getMessageError(hr);
+    if (PK_FAILED(hr)) {
+      String errMsg = LOG_GET_ERR_MSG(hr);
       g_Logger().print("Failed to get the buffer to create a render target view. Error: " +
         errMsg);
       return;
@@ -37,8 +37,8 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
                                                       nullptr,
                                                       &rTargetView->m_rTVs[0]);
     // if the creation was not successful
-    if (hr != 0x00000000) {
-      String errMsg = g_Logger().getMessageError(hr);
+    if (PK_FAILED(hr)) {
+      String errMsg = LOG_GET_ERR_MSG(hr);
       g_Logger().print("Failed to create a render target view. Error: " + errMsg);
       return;
     }
@@ -61,17 +61,16 @@ DX11SwapChain::getBuffer(const uint32 _index)
 void
 DX11SwapChain::resizebuffers(const Vector2 _size)
 {
-  Logger& log = g_Logger();
   const uint32 hr = m_pSch->ResizeBuffers(m_bufferCount,
                                           static_cast<uint32>(_size.x),
                                           static_cast<uint32>(_size.y),
                                           DXGI_FORMAT_UNKNOWN,
                                           0);
 
-  if (hr != 0x00000000) {
-    const String msgErr = log.getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String msgErr = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to resize the swap chain buffers. Error: " + msgErr;
-    log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
+    LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
 

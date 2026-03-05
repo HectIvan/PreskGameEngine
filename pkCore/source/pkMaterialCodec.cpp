@@ -14,6 +14,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkAssetResourceManager.h"
 #include "pkLogger.h"
 #include "pkMaterialCodec.h"
 #include "pkMaterial.h"
@@ -33,7 +34,7 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   }
 
   const String materialName = _pMaterial->getNameS();
-  const String filePath = "resources/" + materialName + ".pkmat";
+  const String filePath = PK_RESOURCE_FOLDER + materialName + ".pkmat";
   ofstream file(filePath, ios::out | ios::binary | ios::trunc);
 
   if (!file.is_open()) {

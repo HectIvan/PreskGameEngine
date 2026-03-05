@@ -68,12 +68,4 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
   const String msg = "Created shader from resource " + String(resource->m_resourcePath) + ".";
   LOG_REGISTER(msg, __FILE__, __LINE__);
 }
-
-void
-DX11Shader::setData(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel)
-{
-  m_shaderDirectory = _directory;
-  m_sEntryPoint = _entry;
-  m_sModel = _sModel;
-}
 }

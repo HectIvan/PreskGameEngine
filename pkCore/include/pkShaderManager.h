@@ -17,33 +17,9 @@
 /*********************************************/
 #include "pkModule.h"
 #include "pkPath.h"
-#include "pkPrerequisitesCore.h"
 #include "pkShader.h"
-
-namespace pkEngineSDK
-{
-
-struct ShaderKey
-{
-  ShaderKey(const String _path, const ANSICHAR* _entryP, const ANSICHAR* _shaderModel) :
-    shaderPath(_path),
-    _szEntryPoint(_entryP),
-    _szShaderModel(_shaderModel)
-  {};
-  ~ShaderKey() = default;
-
-  bool
-  operator==(const ShaderKey& _other) const {
-    return (shaderPath == _other.shaderPath &&
-            _szEntryPoint == _other._szEntryPoint && 
-            _szShaderModel == _other._szShaderModel);
-  }
-
-  String shaderPath;
-  const ANSICHAR* _szEntryPoint;
-  const ANSICHAR* _szShaderModel;
-};
-}
+#include "pkUUID.h"
+#include "pkShaderKey.h"
 
 namespace std {
 template<>
@@ -96,7 +72,23 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
    * @param _pShader Shader to store.
    */
   void
-  insertShader(const ShaderKey& _key, SPtr<Shader> _pShader);
+  insertShader(const UUID& _id, const SPtr<Shader>& _pShader);
+
+  /**
+   * @brief Insert a shader into the map.
+   * @param _key Shader specific key.
+   * @param _pShader Shader to store.
+   */
+  void
+  insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader);
+
+  /**
+   * @brief Get shader from the shader map.
+   * @param _id ID of the shader to look for.
+   * @return Shader pointer.
+   */
+  SPtr<Shader>
+  getShader(const UUID& _id);
 
   /**
    * @brief Get shader from the shader map.
@@ -123,8 +115,8 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
   getShaderNames(const bool _getEntry = false, const bool _getModel = false);
 
  private:
-  UMap<ShaderKey, SPtr<Shader>> m_shaders;
-  UMap<String, SPtr<Shader>> m_shadersByPath;
+  UMap<UUID, SPtr<Shader>> m_shaders;
+  UMap<ShaderKey, SPtr<Shader>> m_keyShaders;
 };
 
 PK_CORE_EXPORT ShaderManager&

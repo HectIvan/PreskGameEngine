@@ -56,6 +56,7 @@ using pkEngineSDK::Shader;
 using pkEngineSDK::ShaderManager;
 using pkEngineSDK::UUID;
 using pkEngineSDK::Vector3;
+using pkEngineSDK::WPtr;
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include "pkWindow.h"
@@ -190,7 +191,7 @@ EditorApp::input()
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
       Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
       posDif *= Vector2(m_sensX, m_sensY);
-      m_camera->rotate(posDif.x, posDif.y, 0.0f);
+      m_camera->rotate(posDif.x, 0.0f, 0.0f);
     }
   }
   m_lastCursorPos = eventQueue.mousePosition;
@@ -483,9 +484,10 @@ EditorApp::uInterfaceUpdate()
           im.tableNextColumn();
           // display all compiled shaders.
           Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
-          for (uint32 i = 0; i < shaders.size(); ++i) {
-            SPtr<Shader> shader = shaders[i];
-            String shaderName = shader->getShaderDirectory().getFileName();
+          const uint32 shaderCount = static_cast<uint32>(shaders.size());
+          for (uint32 i = 0; i < shaderCount; ++i) {
+            WPtr<Shader> shader = shaders[i];
+            String shaderName = shader.lock()->getShaderDirectory().getFileName();
             im.createText(shaderName.c_str());
             im.tableNextColumn();
             im.pushID(i);

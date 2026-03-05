@@ -145,7 +145,7 @@ AssetResourceManager::getResource(const UUID& _ID)
 }
 
 SPtr<BaseResource>
-AssetResourceManager::getResourceBydirectory(const String& _directory)
+AssetResourceManager::getResourceByDirectory(const String& _directory)
 {
   for (auto resource : m_allResources) {
     if (resource.second->m_resourcePath == _directory) {

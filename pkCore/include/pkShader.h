@@ -19,6 +19,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkPath.h"
+#include "pkShaderKey.h"
 
 namespace pkEngineSDK
 {
@@ -73,15 +74,6 @@ class PK_CORE_EXPORT Shader
   setShaderModel(const char* _sModel) = 0;
 
   /**
-   * @brief Set the shader data.
-   * @param _directory Directory of the shader.
-   * @param _entry Entry point of the shader.
-   * @param _sModel Shader model.
-   */
-  virtual void
-  setData(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel) = 0;
-
-  /**
    * @brief get the current shader directory.
    * @return the Shader directory.
    */
@@ -101,5 +93,25 @@ class PK_CORE_EXPORT Shader
    */
   virtual const ANSICHAR*
   getShaderModel() = 0;
+
+  /**
+   * @brief Set the shader data.
+   * @param _key Shader key containing the data to set.
+   */
+  void
+  setData(const ShaderKey& _key)
+  {
+    m_shaderDirectory = _key.shaderPath;
+    m_sEntryPoint = _key._szEntryPoint;
+    m_sModel = _key._szShaderModel;
+  }
+
+ protected:
+  /**
+   * Data used to compile the shader
+   */
+  Path m_shaderDirectory;
+  const ANSICHAR* m_sEntryPoint;
+  const ANSICHAR* m_sModel;
 };
 }

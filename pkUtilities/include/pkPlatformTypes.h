@@ -94,4 +94,17 @@ using PlatformPointer = int32*;
 #else
 using PlatformPointer = int64*;
 #endif
+
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+#ifndef _PKRESULT_DEFINED
+#define _PKRESULT_DEFINED
+#ifdef __midl
+typedef LONG PKRESULT;
+#else
+typedef _Return_type_success_(return >= 0) long PKRESULT;
+#endif // __midl
+#endif // !_PKRESULT_DEFINED
+#endif
+
+#define PK_FAILED(hr) (((PKRESULT)(hr)) < 0)
 }

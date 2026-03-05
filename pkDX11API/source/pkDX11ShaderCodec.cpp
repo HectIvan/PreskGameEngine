@@ -16,6 +16,7 @@
  * Includes
  */
  /*********************************************/
+#include "pkAssetResourceManager.h"
 #include "pkDX11ShaderCodec.h"
 #include "pkDX11Shader.h"
 #include "pkLogger.h"
@@ -50,7 +51,7 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   // attempt to create the shader resource.
   const String shaderName = shaderDir.getFileNameWithoutExtension();
-  const String resourceDir = "resources/" + shaderName + ".pks";
+  const String resourceDir = PK_RESOURCE_FOLDER + shaderName + ".pks";
   ofstream file(resourceDir, ios::out | ios::binary | ios::trunc);
 
   // check if the resource creation failed.

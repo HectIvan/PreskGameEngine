@@ -28,7 +28,8 @@ class PK_CORE_EXPORT Pass
 {
  public:
   Pass();
-  Pass(const PassDesc& _desc);
+  Pass(const PixelDesc& _desc);
+  Pass(const ComputeDesc& _desc);
   ~Pass() {
     clear();
   }
@@ -61,33 +62,6 @@ class PK_CORE_EXPORT Pass
   getSamplerState() { return m_pSamplerState; }
 
   /**
-   * @brief Create the vertex shader.
-   * @param _directory Directory of the shader.
-   * @param _entry Name of function to execute.
-   * @param _sModel Shader model.
-   */
-  void
-  createVShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
-
-  /**
-   * @brief Create the pixel shader.
-   * @param _directory Directory of the shader.
-   * @param _entry Name of function to execute.
-   * @param _sModel Shader model.
-   */
-  void
-  createPShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
-
-  /**
-   * @brief Create the compute shader.
-   * @param _directory Directory of the shader.
-   * @param _entry Name of function to execute.
-   * @param _sModel Shader model.
-   */
-  void
-  createCShader(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel);
-
-  /**
    * @brief Compile both pixel and vertex shaders;
    */
   void
@@ -97,21 +71,21 @@ class PK_CORE_EXPORT Pass
    * @brief Get the vertex shader.
    * @return The pointer to the vertex shader.
    */
-  SPtr<Shader>&
+  WPtr<Shader>&
   getVShader() { return m_pVShader; }
 
   /**
    * @brief Get the pixel shader.
    * @return The pointer to the pixel shader.
    */
-  SPtr<Shader>&
+  WPtr<Shader>&
   getPShader() { return m_pPShader; }
 
   /**
    * @brief Get the compute shader.
    * @return The pointer to the compute shader.
    */
-  SPtr<Shader>&
+  WPtr<Shader>&
   getCShader() { return m_pCShader; }
 
   /**
@@ -152,7 +126,7 @@ class PK_CORE_EXPORT Pass
    * @param _color Clear color.
    */
   void
-  beginPass(const Color _color = Color(0, 1, 1, 0));
+  beginPass(const Color& _color = Color(0, 1, 1, 0));
 
   /**
    * @brief Set all parameters to null;
@@ -189,14 +163,23 @@ class PK_CORE_EXPORT Pass
   getViewportSize() { return m_viewPortSize; }
 
  private:
+
+  /**
+   * @brief Create the basic members of all passes.
+   * @param _desc Base pass descriptor.
+   */
+  void
+  createBasics(const PassDesc& _desc);
+
+ private:
   Vector2 m_viewPortSize;
 
   /**
    * Shader pointers
    */
-  SPtr<Shader> m_pVShader = nullptr;
-  SPtr<Shader> m_pPShader = nullptr;
-  SPtr<Shader> m_pCShader = nullptr;
+  WPtr<Shader> m_pVShader;
+  WPtr<Shader> m_pPShader;
+  WPtr<Shader> m_pCShader;
 
   SPtr<InputLayout> m_pInputLayout = nullptr;
   SPtr<SamplerState> m_pSamplerState = nullptr;

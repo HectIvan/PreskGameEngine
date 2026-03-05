@@ -68,15 +68,6 @@ class DX11Shader : public Shader
   setShaderModel(const ANSICHAR* _sModel) override { m_sModel = _sModel; }
 
   /**
-   * @brief Set the shader data.
-   * @param _directory Directory of the shader.
-   * @param _entry Entry point of the shader.
-   * @param _sModel Shader model.
-   */
-  void
-  setData(const Path _directory, const ANSICHAR* _entry, const ANSICHAR* _sModel) override;
-
-  /**
    * @brief get the current shader directory.
    * @return the Shader directory.
    */
@@ -102,13 +93,5 @@ class DX11Shader : public Shader
 
  public:
   PKBlob* m_pSBlob = nullptr;
-
- protected:
-  /**
-   * Data used to compile the shader
-   */
-  Path m_shaderDirectory;
-  const ANSICHAR* m_sEntryPoint;
-  const ANSICHAR* m_sModel;
 };
 }

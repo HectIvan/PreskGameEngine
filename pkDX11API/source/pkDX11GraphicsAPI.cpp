@@ -87,7 +87,7 @@ class ShaderInclude : public ID3DInclude
 
 PKFORCEINLINE void
 throwIfFailed(const HRESULT& hr) {
-  if (FAILED(hr)) {
+  if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
     LOG_FATAL("Error in creation. Error message: " + errMsg, __FILE__, __LINE__);
     PK_ASSERT(false && "Error in creation");
@@ -175,8 +175,8 @@ DX11GraphicsAPI::createConstantBuffer(const uint32 _size,
                                                          _pData ? &subData : nullptr,
                                                          &dxCB->pCBuffer);
   // check for errors.
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create the DX constant buffer. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -360,8 +360,8 @@ DX11GraphicsAPI::createVShader(SPtr<Shader>& _pShader)
                                                    nullptr,
                                                    &dxVShader->m_pShader);
   // check if the creation was successful
-  if (hr != 0x00000000) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Vertex Shader. Error message: " + errMsg;
     safeRelease(dxVShader->m_pSBlob);
     LOG_FATAL(msg, __FILE__, __LINE__);
@@ -392,9 +392,9 @@ DX11GraphicsAPI::createPShader(SPtr<Shader>& _pShader)
                                                   nullptr,
                                                   &dxPShader->m_pShader);
   // check if the creation was successful
-  if (FAILED(hr)) {
+  if (PK_FAILED(hr)) {
     safeRelease(dxPShader->m_pSBlob);
-    const String errMsg = g_Logger().getMessageError(hr);
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Pixel Shader. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -425,9 +425,9 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
                                                     nullptr,
                                                     &dxCShader->m_pShader);
   // check if the creation was successful
-  if (FAILED(hr)) {
+  if (PK_FAILED(hr)) {
     safeRelease(dxCShader->m_pSBlob);
-    const String errMsg = g_Logger().getMessageError(hr);
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Compute Shader. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -537,7 +537,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
     dTIndex = driverTypeIndex;
 
     // if creation was successful
-    if (hr == 0x00000000) {
+    if (!PK_FAILED(hr)) {
       // end the entire process, no need to continue
       const String msg = "DirectX 11 device and swap chain created successfully with driver type: " +
                          to_string(*m_pDevice->m_pDriverType);
@@ -547,7 +547,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
     }
   }
   // if the creation failed.
-  if (FAILED(hr)) {
+  if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create DirectX 11 device and swap chain with driver type: " +
                        to_string(_driverTypes[dTIndex]) +
@@ -643,8 +643,8 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   SPtr<DX11SamplerState> pSamState = make_shared<DX11SamplerState>();
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc,
                                                                 &pSamState->m_pSampler);
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a sampler state. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -714,8 +714,8 @@ DX11GraphicsAPI::createBlendState()
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateBlendState(&blendDesc,
                                                               &pBlendState->m_pBlendState);
 
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create Blend state. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -741,8 +741,8 @@ DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
                                                                    &dxRS->m_pRasterizer);
 
   // check for errors.
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a Rasterizer State. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -826,7 +826,7 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
     const String error(msg, len);
     String fullMSG = "Shader failed to compile. Error message: " + error;
     // if the compilation outright failed
-    if (FAILED(hr)) {
+    if (PK_FAILED(hr)) {
       LOG_ERROR(fullMSG, __FILE__, __LINE__);
       return nullptr;
     }
@@ -1011,8 +1011,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
                                                   dxVShader->m_pSBlob->getBufferSize(),
                                                   &pInputL->m_pVertexLayout);
   // failed to create the input layout
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create the input layout. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -1320,8 +1320,8 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
                                                       _directory.getDirectoryWStr().c_str(),
                                                       nullptr,
                                                       &texture->m_sRV);
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DSS texture. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
@@ -1431,7 +1431,6 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
                                const bool _isCube)
 {
   PK_ASSERT(m_pDevice);
-  Logger& log = g_Logger();
 
   bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
   if (generateMips) {
@@ -1474,8 +1473,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
   int32 hr = m_pDevice->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
 
   // if texture creation failed
-  if (FAILED(hr)) {
-    const String errMsg = log.getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a texture. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
@@ -1499,8 +1498,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
     // create the shader resource view
     hr = m_pDevice->m_pd3dDevice->CreateShaderResourceView(dxTex->m_t2d, &sDesc, &dxTex->m_sRV);
     // if failed to create shader resource view
-    if (FAILED(hr)) {
-      const String errMsg = log.getMessageError(hr);
+    if (PK_FAILED(hr)) {
+      const String errMsg = LOG_GET_ERR_MSG(hr);
       const String msg = "Failed to create a shader resource view. Error message: " + errMsg;
       LOG_ERROR(msg, __FILE__, __LINE__);
       return nullptr;
@@ -1533,7 +1532,7 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
 
     hr = m_pDevice->m_pd3dDevice->CreateDepthStencilView(dxTex->m_t2d, &dsvDesc, &dxTex->m_dSV);
     if (!dxTex->m_dSV) {
-      const String errMsg = log.getMessageError(hr);
+      const String errMsg = LOG_GET_ERR_MSG(hr);
       const String msg = "Failed to create the depth stencil. Error message: " + errMsg;
       LOG_ERROR(msg, __FILE__, __LINE__);
       return nullptr;
@@ -1565,8 +1564,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
                                                                &rtvDesc,
                                                                &dxTex->m_rTVs[index]);
 
-          if (FAILED(hr)) {
-            const String errMsg = log.getMessageError(hr);
+          if (PK_FAILED(hr)) {
+            const String errMsg = LOG_GET_ERR_MSG(hr);
             const String msg = "Failed to create a render target view. Error message: " +
                                errMsg;
             LOG_ERROR(msg, __FILE__, __LINE__);
@@ -1584,8 +1583,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
         hr = m_pDevice->m_pd3dDevice->CreateRenderTargetView(dxTex->m_t2d,
                                                              &rtvDesc,
                                                              &dxTex->m_rTVs[i]);
-        if (FAILED(hr)) {
-          const String errMsg = log.getMessageError(hr);
+        if (PK_FAILED(hr)) {
+          const String errMsg = LOG_GET_ERR_MSG(hr);
           const String msg = "Failed to create a render target view. Error message: " + errMsg;
           LOG_ERROR(msg, __FILE__, __LINE__);
           return nullptr;
@@ -1609,8 +1608,8 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
       hr = m_pDevice->m_pd3dDevice->CreateUnorderedAccessView(dxTex->m_t2d,
                                                               &uavDesc,
                                                               &dxTex->m_uAVs[i]);
-      if (FAILED(hr)) {
-        const String errMsg = log.getMessageError(hr);
+      if (PK_FAILED(hr)) {
+        const String errMsg = LOG_GET_ERR_MSG(hr);
         const String msg = "Failed to create an unordered access view. Error message: " +
                             errMsg;
         LOG_ERROR(msg, __FILE__, __LINE__);
@@ -1666,8 +1665,8 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
   InitData.SysMemPitch = byteWidth; // distance between values
 
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxVB->pBuffer);
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a vertex buffer. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
@@ -1718,8 +1717,8 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
   InitData.pSysMem = _index.data(); // pointer to the initialization data
   // create the buffer
   const int32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bd, &InitData, &dxIB->pBuffer);
-  if (FAILED(hr)) {
-    const String errMsg = g_Logger().getMessageError(hr);
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "failed to create an index buffer. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;

@@ -24,6 +24,16 @@
 namespace pkEngineSDK
 {
 
+namespace PASS_MODEL
+{
+enum E
+{
+  kPass_Pixel = 0,
+  kPass_Compute,
+  kPass_Geometry,
+};
+}
+
 class PK_CORE_EXPORT Pass
 {
  public:
@@ -119,7 +129,7 @@ class PK_CORE_EXPORT Pass
    * @return Pointer to the cbuffer.
    */
   SPtr<ConstantBuffer>&
-  getCBuffer(const uint32 _index) { return m_cBuffers[_index]; }
+  getCBuffer(const uint32& _index) { return m_cBuffers[_index]; }
 
   /**
    * @brief Start pass based parameter setting.
@@ -165,6 +175,45 @@ class PK_CORE_EXPORT Pass
  private:
 
   /**
+   * @brief Start pass based parameter setting for pixel shader passes.
+   * @param _color Clear color.
+   */
+  void
+  beginPixel(const Color& _color);
+
+  /**
+   * @brief End pass based parameter setting for pixel shader passes.
+   */
+  void
+  endPixel();
+
+  /**
+   * @brief Start pass based parameter setting for compute shader passes.
+   * @param _color Clear color.
+   */
+  void
+  beginCompute(const Color& _color);
+
+  /**
+   * @brief End pass based parameter setting for compute shader passes.
+   */
+  void
+  endCompute();
+
+  /**
+   * @brief (TO_IMPLEMENT) Start pass based parameter setting for geometry shader passes.
+   * @param _color Clear color.
+   */
+  void
+  beginGeometry(const Color& _color);
+
+  /**
+   * @brief (TO IMPLEMENT) End pass based parameter setting for geometry shader passes.
+   */
+  void
+  endGeometry();
+
+  /**
    * @brief Create the basic members of all passes.
    * @param _desc Base pass descriptor.
    */
@@ -197,5 +246,7 @@ class PK_CORE_EXPORT Pass
   Vector<SPtr<Texture>> m_outputTex;
   Vector<SPtr<Texture>> m_uavTex;
   SPtr<Texture> m_depthTex;
+
+  PASS_MODEL::E m_passModel;
 };
 }

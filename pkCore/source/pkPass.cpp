@@ -92,6 +92,8 @@ Pass::Pass(const PixelDesc& _desc)
   m_outputTex = _desc.outputs;
   m_depthTex = _desc.pDepth;
   m_viewPortSize = m_outputTex[0]->getSize();
+
+  m_passModel = PASS_MODEL::kPass_Pixel;
 }
 
 Pass::Pass(const ComputeDesc& _desc)
@@ -125,6 +127,8 @@ Pass::Pass(const ComputeDesc& _desc)
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
   m_uavTex = _desc.uavs;
+
+  m_passModel = PASS_MODEL::kPass_Compute;
 }
 
 void
@@ -154,9 +158,9 @@ Pass::updateCBuffers(const Vector<const void*>& _data,
 {
   // assert that all data counts are the same.
   const SIZE_T blobCount = _data.size();
-  PK_ASSERT(blobCount == _sizes.size());
+  PK_ASSERT(blobCount == _sizes.size() && "CBuffer blob count & sizes count do not match.");
   const uint32 CBufferCount = static_cast<uint32>(m_cBuffers.size());
-  PK_ASSERT(CBufferCount == blobCount);
+  PK_ASSERT(CBufferCount == blobCount && "CBuffer update count does not match pass CBuffer count.");
 
   GraphicsAPI& api = g_GraphicAPI();
   
@@ -168,43 +172,35 @@ Pass::updateCBuffers(const Vector<const void*>& _data,
 void
 Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size)
 {
-  PK_ASSERT(_index < m_cBuffers.size());
+  PK_ASSERT(_index < m_cBuffers.size() && "CBuffer update index out of range.");
   g_GraphicAPI().updateConstantBuffer(m_cBuffers[_index], _data, _size);
 }
 
 void
 Pass::beginPass(const Color& _color)
 {
-  // get managers
   GraphicsAPI& api = g_GraphicAPI();
-  // clear RTVs and Depth stencil
-  api.clearRenderTargetViews(_color, m_outputTex);
-  api.clearDepthBuffer(1.0f, m_depthTex);
-  // set render targets and depth texture
-  api.setRenderTargets(m_outputTex, m_depthTex);
+
+  // check what type of pass it is and call the corresponding begin function.
+  if (PASS_MODEL::kPass_Pixel == m_passModel) {
+    beginPixel(_color);
+  }
+  else if (PASS_MODEL::kPass_Compute == m_passModel) {
+    beginCompute(_color);
+  }
+  else if (PASS_MODEL::kPass_Geometry == m_passModel) {
+    beginGeometry(_color);
+  }
+  else {
+    const String msg = "Pass model not set correctly.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return;
+  }
+
   // set the viewport size.
   api.setViewport(m_viewPortSize);
-  // api.resizeSwapChain(m_viewPortSize);
-  // set input layout of shader
-  api.setInputLayout(getInputLayout());
 
-  // if there are shaders to set, set them and their resources.
-  SPtr<Shader> vShader = getVShader().lock();
-  if (api.setVShader(vShader)) { // Vertex shader.
-    api.vSSetShaderResourceViews(m_inputTex);
-    api.vSSetConstantBuffers(getCBuffers());
-  }
-  SPtr<Shader> pShader = getPShader().lock();
-  if (api.setPShader(pShader)) { // Pixel shader.
-    api.pSSetShaderResourceViews(m_inputTex);
-    api.pSSetConstantBuffers(getCBuffers());
-  }
-  SPtr<Shader> cShader = getCShader().lock();
-  if (api.setCShader(cShader)) { // Compute shader.
-    api.cSSetShaderResourceViews(m_inputTex);
-    api.cSSetUnorderedAccessViews(m_uavTex);
-    api.cSSetConstantBuffers(getCBuffers());
-  }
   // set the sampler state
   api.setSampler(getSamplerState());
 
@@ -217,31 +213,116 @@ Pass::endPass()
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
-  // set all to nullptr
-  const SIZE_T resourceCount = m_inputTex.size();
-  const SIZE_T uavCount = m_uavTex.size();
-  const SIZE_T renderTargetCount = m_outputTex.size();
 
-  if (renderTargetCount > 0) {
-    api.unbindRenderTargets(renderTargetCount);
+  // check what type of pass it is and call the corresponding end function.
+  if (PASS_MODEL::kPass_Pixel == m_passModel) {
+    endPixel();
   }
+  else if (PASS_MODEL::kPass_Compute == m_passModel) {
+    endCompute();
+  }
+  else if (PASS_MODEL::kPass_Geometry == m_passModel) {
+    endGeometry();
+  }
+
+  else {
+    const String msg = "Pass model not set correctly.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return;
+  }
+  
+  api.setSampler(nullptr);
+  api.setRasterizerState(nullptr);
+}
+
+void
+Pass::beginPixel(const Color& _color)
+{
+  // get managers
+  GraphicsAPI& api = g_GraphicAPI();
+  // clear RTVs and Depth stencil
+  api.clearRenderTargetViews(_color, m_outputTex);
+  api.clearDepthBuffer(1.0f, m_depthTex);
+  // set render targets and depth texture
+  api.setRenderTargets(m_outputTex, m_depthTex);
+  // api.resizeSwapChain(m_viewPortSize);
+  // set input layout of shader
+  api.setInputLayout(getInputLayout());
+
+  // if there are shaders to set, set them and their resources.
+  SPtr<Shader> vShader = m_pVShader.lock();
+  if (api.setVShader(vShader)) { // Vertex shader.
+    api.vSSetShaderResourceViews(m_inputTex);
+    api.vSSetConstantBuffers(getCBuffers());
+  }
+  SPtr<Shader> pShader = getPShader().lock();
+  if (api.setPShader(pShader)) { // Pixel shader.
+    api.pSSetShaderResourceViews(m_inputTex);
+    api.pSSetConstantBuffers(getCBuffers());
+  }
+}
+
+void
+Pass::endPixel()
+{
+  GraphicsAPI& api = g_GraphicAPI();
+
+  const SIZE_T renderTargetCount = m_outputTex.size();
+  const SIZE_T resourceCount = m_inputTex.size();
+
+  api.unbindRenderTargets(renderTargetCount);
+  api.vSUnbindShaderResourceViews(resourceCount);
+  api.pSUnbindShaderResourceViews(resourceCount);
+
+  api.vSUnbindConstantBuffers();
+  api.pSUnbindConstantBuffers();
+
   api.setInputLayout(nullptr);
   api.setVShader(nullptr);
   api.setPShader(nullptr);
+}
+
+void
+Pass::beginCompute(const Color& _color)
+{
+  GraphicsAPI& api = g_GraphicAPI();
+
+  api.clearUnorderedAccessViews(m_uavTex, _color);
+
+  SPtr<Shader> cShader = getCShader().lock();
+  if (api.setCShader(cShader)) { // Compute shader.
+    api.cSSetShaderResourceViews(m_inputTex);
+    api.cSSetUnorderedAccessViews(m_uavTex);
+    api.cSSetConstantBuffers(getCBuffers());
+  }
+}
+
+void
+Pass::endCompute()
+{
+  GraphicsAPI& api = g_GraphicAPI();
+
+  const SIZE_T uavCount = m_uavTex.size();
+  const SIZE_T resourceCount = m_inputTex.size();
+  const SIZE_T cBufferCount = m_cBuffers.size();
+
+  api.cSUnbindShaderResourceViews(resourceCount);
+  api.cSUnbindUnorderedAccessViews(uavCount);
+
+  api.cSUnbindConstantBuffers(cBufferCount);
+
   api.setCShader(nullptr);
-  if (resourceCount > 0) {
-    api.vSUnbindShaderResourceViews(resourceCount);
-    api.pSUnbindShaderResourceViews(resourceCount);
-    api.cSUnbindShaderResourceViews(resourceCount);
-  }
-  if (uavCount > 0) {
-    api.cSUnbindUnorderedAccessViews(uavCount);
-  }
-  api.setSampler(nullptr);
-  api.vSUnbindConstantBuffers();
-  api.pSUnbindConstantBuffers();
-  api.cSUnbindConstantBuffers();
-  api.setRasterizerState(nullptr);
+}
+
+void
+Pass::beginGeometry(const Color&)
+{
+}
+
+void
+Pass::endGeometry()
+{
 }
 
 void

@@ -191,7 +191,7 @@ EditorApp::input()
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
       Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
       posDif *= Vector2(m_sensX, m_sensY);
-      m_camera->rotate(posDif.x, 0.0f, 0.0f);
+      m_camera->rotate(posDif.x, posDif.y, 0.0f);
     }
   }
   m_lastCursorPos = eventQueue.mousePosition;

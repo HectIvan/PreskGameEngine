@@ -19,7 +19,6 @@
 /*********************************************/
 #include "pkDX11Prerequisites.h"
 #include "pkShader.h"
-#include "pkBlob.h"
 
 namespace pkEngineSDK
 {
@@ -30,9 +29,7 @@ class DX11Shader : public Shader
 {
  public:
   DX11Shader() = default;
-  ~DX11Shader() override {
-    safeRelease(m_pSBlob);
-  }
+  virtual ~DX11Shader() = default;
 
   /**
    * @brief Compile the shader from a file.
@@ -45,53 +42,5 @@ class DX11Shader : public Shader
    */
   void
   compileFromResource(const SPtr<BaseResource>& _pBaseResource) override;
-
-  /**
-   * @brief Set the shader directory.
-   * @param _directory Directory of the shader.
-   */
-  void
-  setShaderDirectory(const Path _directory) override { m_shaderDirectory = _directory; }
-
-  /**
-   * @brief Set the entry point of the shader.
-   * @param _entry Entry point of the shader.
-   */
-  void
-  setEntryPoint(const ANSICHAR* _entry) override { m_sEntryPoint = _entry; }
-
-  /**
-   * @brief Set the model of the shader.
-   * @param _sModel Shader model.
-   */
-  void
-  setShaderModel(const ANSICHAR* _sModel) override { m_sModel = _sModel; }
-
-  /**
-   * @brief get the current shader directory.
-   * @return the Shader directory.
-   */
-  const Path&
-  getShaderDirectory() override { return m_shaderDirectory; }
-
-  /**
-   * @brief Get the current shader entry point.
-   * @return The entry point.
-   */
-  const ANSICHAR*
-  getEntryPoint() override { return m_sEntryPoint; }
-
-  /**
-   * @brief Get the current shader model.
-   * @return The shader model.
-   */
-  const ANSICHAR*
-  getShaderModel() override { return m_sModel; }
-
-  void*
-  getBlob() { return m_pSBlob; }
-
- public:
-  PKBlob* m_pSBlob = nullptr;
 };
 }

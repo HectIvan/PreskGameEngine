@@ -9,8 +9,7 @@ namespace pkEngineSDK
 void
 DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
 {
-  for (uint32 i = 0; i < m_bufferCount; ++i)
-  {
+  for (uint32 i = 0; i < m_bufferCount; ++i) {
     // get buffer data
     ID3D11Texture2D* pBackBuffer = nullptr;
     D3D11_TEXTURE2D_DESC* tDesc = new D3D11_TEXTURE2D_DESC();
@@ -18,9 +17,10 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
     int32 hr = m_pSch->GetBuffer(i, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
     // if the buffer is not correct
     if (PK_FAILED(hr)) {
-      String errMsg = LOG_GET_ERR_MSG(hr);
-      g_Logger().print("Failed to get the buffer to create a render target view. Error: " +
-        errMsg);
+      String msg = "Failed to get the buffer to create a render target view. Error: " +
+                   LOG_GET_ERR_MSG(hr);
+      LOG_FATAL(msg, __FILE__, __LINE__);
+      THROW_ERROR(msg);
       return;
     }
     pBackBuffer->GetDesc(tDesc);
@@ -31,15 +31,19 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
     // create the render target view
     auto device = reinterpret_pointer_cast<DX11Device>(_pDevice);
     if (!device) {
-      g_Logger().print("Failed to utilize the DX device in the render target view creation.");
+      const String msg = "Failed to utilize the DX device in the render target view creation.";
+      LOG_FATAL(msg, __FILE__, __LINE__);
+      THROW_ERROR(msg);
+      return;
     }
     hr = device->m_pd3dDevice->CreateRenderTargetView(pBackBuffer,
                                                       nullptr,
                                                       &rTargetView->m_rTVs[0]);
     // if the creation was not successful
     if (PK_FAILED(hr)) {
-      String errMsg = LOG_GET_ERR_MSG(hr);
-      g_Logger().print("Failed to create a render target view. Error: " + errMsg);
+      const String msg = "Failed to create a render target view. Error: " + LOG_GET_ERR_MSG(hr);
+      LOG_FATAL(msg, __FILE__, __LINE__);
+      THROW_ERROR(msg);
       return;
     }
 

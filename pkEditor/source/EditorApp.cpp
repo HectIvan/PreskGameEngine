@@ -507,7 +507,7 @@ EditorApp::uInterfaceUpdate()
     // -------------------------- //
     if (m_selectedMaterial && im.beginTabItem(m_selectedMaterial->getName())) {
       m_materialInspector.setMaterial(m_selectedMaterial);
-      m_materialInspector.createMaterialWindow(m_window);
+      m_materialInspector.createMaterialWindow();
       im.endTabItem();
     }
     if (im.beginTabItem("Quaternion Test")) {

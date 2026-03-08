@@ -147,14 +147,18 @@ BaseApp::messageLoop()
   g_Logger().createLogFiles();
 
   // if the program is shut down closes for any reason, close everything properly.
-  GraphicsAPI::shutDown();
-  RendererManager::shutDown();
-  ModelManager::shutDown();
-  SceneManager::shutDown();
-  TextureManager::shutDown();
   TimeManager::shutDown();
+  TextureManager::shutDown();
+  ShaderManager::shutDown();
+  SceneManager::shutDown();
+  RendererManager::shutDown();
+  MaterialManager::shutDown();
+  MaterialCodec::shutDown();
+  ModelManager::shutDown();
   EventQueue::shutDown();
-  Logger::shutDown();
+  DLLManager::shutDown();
+  AssetResourceManager::shutDown();
+  GraphicsAPI::shutDown();
 }
 
 void
@@ -167,17 +171,17 @@ BaseApp::update()
   const Vector2 winSize = api.getSwapChain()->getSize();
   const SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
 
-  // if the actor camera does not have a camera component, search the scene for an actor with a camera.
-  const SPtr<Camera> camera = m_camera->getComponent<Camera>();
-  if (!camera) {
+  // if there's no actor camera, search the scene for an actor with a camera.
+  if (!m_camera) {
     m_camera = activeScene->getActorWithComponent<Camera>();
   }
+  SPtr<Camera> camera = m_camera->getComponent<Camera>();
 
-  // if the actor light does not have a light component, search the scene for an actor with a light.
-  const SPtr<Light> light = m_light->getComponent<Light>();
-  if (!light) {
+  // if there's no actor light, search the scene for an actor with a light.
+  if (!m_light) {
     m_light = activeScene->getActorWithComponent<Light>();
   }
+ SPtr<Light> light = m_light->getComponent<Light>();
 
   // get all passes.
   const SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
@@ -198,7 +202,7 @@ BaseApp::update()
   CBCamera cBCamera;
   CBCamera cBLightCam;
   CBLight cBLight;
-  CBVector2x2 lightsParam;
+  CBVector2x2 lightsParam; // should be removed later
   CBVector2x2 lum(winSize, Vector2(90.0f));
   CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
   CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlurRadius, m_emissiveStrength);
@@ -232,6 +236,17 @@ BaseApp::update()
     cBCamera = CBCamera(camera);
 
     shadowsParam.vec2 = camera->getFarNear();
+  }
+
+  if (light) {
+    cBLight.color = Vector4(light->m_color, 1.0f);
+    cBLight.direction = Vector4(light->m_direction, 0.0f);
+    cBLight.position = Vector4(light->m_position, 1.0f);
+    cBLight.shadowIntensity = light->m_shadowIntensity;
+    cBLight.specIntensity = light->m_specIntensity;
+    cBLight.spotCutoff = light->m_spotCutoff;
+    cBLight.spotExponent = light->m_spotExponent;
+    cBLight.transform = light->m_transform;
   }
 
   // data type sizes.

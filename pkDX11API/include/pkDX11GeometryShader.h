@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
- * @file    pkDX11PixelShader.h
+ * @file    pkDX11GeometryShader.h
  * @author  Héctor Iván Muñoz Ceballos
- * @date    11/11/2024
- * @brief   This file contains the Pixel Shader class using DirectX11 of the engine
+ * @date    06/03/2026
+ * @brief   Geometry Shader file for the Presk Game Engine.
  *
  * @bug    No known bugs.
  */
@@ -15,20 +15,19 @@
 * Includes
 **/
 /*********************************************/
-#include "pkDX11Prerequisites.h"
 #include "pkDX11Shader.h"
 
 namespace pkEngineSDK {
 
-class DX11PixelShader : public DX11Shader
+class DX11GeometryShader : public DX11Shader
 {
- public:
-  DX11PixelShader() = default;
-  ~DX11PixelShader() override {
+public:
+  DX11GeometryShader() = default;
+  ~DX11GeometryShader() override {
     safeRelease(m_pShader);
   }
 
- public:
-  ID3D11PixelShader* m_pShader = nullptr;
+public:
+  ID3D11GeometryShader* m_pShader = nullptr;
 };
 }

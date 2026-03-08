@@ -28,7 +28,7 @@ class PK_CORE_EXPORT Actor
 {
  public:
   Actor() = default;
-  virtual ~Actor() {
+  ~Actor() {
     clear();
   }
 

@@ -17,6 +17,7 @@
 * Includes
 **/
 /*********************************************/
+#include "pkBlob.h"
 #include "pkPrerequisitesCore.h"
 #include "pkPath.h"
 #include "pkShaderKey.h"
@@ -41,7 +42,9 @@ class PK_CORE_EXPORT Shader
 {
  public:
   Shader() {};
-  virtual ~Shader() = default;
+  virtual ~Shader() {
+    safeRelease(m_pSBlob);
+  }
 
   // deletes the possibility of using said constructor and operator in the class.
   Shader(const Shader&) = delete;
@@ -62,48 +65,6 @@ class PK_CORE_EXPORT Shader
    */
   virtual void
   compileFromResource(const SPtr<BaseResource>& _pBaseResource) = 0;
-
-  /**
-   * @brief Set the shader directory.
-   * @param _directory Directory of the shader.
-   */
-  virtual void
-  setShaderDirectory(const Path _directory) = 0;
-
-  /**
-   * @brief Set the entry point of the shader.
-   * @param _entry Entry point of the shader.
-   */
-  virtual void
-  setEntryPoint(const char* _entry) = 0;
-
-  /**
-   * @brief Set the model of the shader.
-   * @param _sModel Shader model.
-   */
-  virtual void
-  setShaderModel(const char* _sModel) = 0;
-
-  /**
-   * @brief get the current shader directory.
-   * @return the Shader directory.
-   */
-  virtual const Path&
-  getShaderDirectory() = 0;
-
-  /**
-   * @brief Get the current shader entry point.
-   * @return The entry point.
-   */
-  virtual const ANSICHAR*
-  getEntryPoint() = 0;
-
-  /**
-   * @brief Get the current shader model.
-   * @return The shader model.
-   */
-  virtual const ANSICHAR*
-  getShaderModel() = 0;
 
   /**
    * @brief Set the shader data.
@@ -131,13 +92,72 @@ class PK_CORE_EXPORT Shader
   void
   setType(const PK_SHADER_TYPE::E& _type) { m_shaderType = _type; }
 
+  /**
+   * @brief Set the shader directory.
+   * @param _directory Directory of the shader.
+   */
+  void
+  setShaderDirectory(const Path _directory) { m_shaderDirectory = _directory; }
+
+  /**
+   * @brief Set the entry point of the shader.
+   * @param _entry Entry point of the shader.
+   */
+  void
+  setEntryPoint(const ANSICHAR* _entry) { m_sEntryPoint = _entry; }
+
+  /**
+   * @brief Set the model of the shader.
+   * @param _sModel Shader model.
+   */
+  void
+  setShaderModel(const ANSICHAR* _sModel) { m_sModel = _sModel; }
+
+  /**
+   * @brief get the current shader directory.
+   * @return the Shader directory.
+   */
+  const Path&
+  getShaderDirectory() const { return m_shaderDirectory; }
+
+  /**
+   * @brief Get the current shader entry point.
+   * @return The entry point.
+   */
+  const ANSICHAR*
+  getEntryPoint() const { return m_sEntryPoint; }
+
+  /**
+   * @brief Get the current shader model.
+   * @return The shader model.
+   */
+  const ANSICHAR*
+  getShaderModel() const { return m_sModel; }
+
+  /**
+   * @brief Set the shader blob.
+   * @param _pBlob Info blob.
+   */
+  void
+  setBlob(PKBlob* _pBlob) { m_pSBlob = _pBlob; }
+
+  /**
+   * @brief Get the shader blob.
+   * @return the shader blob.
+   */
+  void*
+  getBlob() const { return m_pSBlob; }
+
+ public:
+  PKBlob* m_pSBlob = nullptr;
+
  protected:
   /**
    * Data used to compile the shader
    */
-  Path m_shaderDirectory;
-  const ANSICHAR* m_sEntryPoint;
-  const ANSICHAR* m_sModel;
+  Path m_shaderDirectory = Path();
+  const ANSICHAR* m_sEntryPoint = nullptr;
+  const ANSICHAR* m_sModel = nullptr;
 
   PK_SHADER_TYPE::E m_shaderType;
 };

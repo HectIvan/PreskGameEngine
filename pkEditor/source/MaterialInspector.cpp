@@ -24,7 +24,7 @@ using pkEngineSDK::UUID;
 using pkEngineSDK::Vector2;
 
 void
-MaterialInspector::createMaterialWindow(const Window& _window)
+MaterialInspector::createMaterialWindow()
 {
   // if no material is selected.
   if (!m_material) {

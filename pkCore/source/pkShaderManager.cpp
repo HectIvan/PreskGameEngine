@@ -67,19 +67,31 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADE
   tempShader->setData(key);
   tempShader->compileFromFile();
   // create the shader based on its type.
-  if (PK_SHADER_TYPE::kVertex == _type) {
+  switch (_type) {
+  case PK_SHADER_TYPE::kVertex: {
     api.createVShader(tempShader);
+    break;
   }
-  if (PK_SHADER_TYPE::kPixel == _type) {
+  case PK_SHADER_TYPE::kPixel: {
     api.createPShader(tempShader);
+    break;
   }
-  if (PK_SHADER_TYPE::kCompute == _type) {
+  case PK_SHADER_TYPE::kCompute: {
     api.createCShader(tempShader);
+    break;
+  }
+  case PK_SHADER_TYPE::kGeometry: {
+    api.createGShader(tempShader);
+    break;
+  }
+  default: {
+    break;
+  }
   }
   // create the resource from the shader.
   SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(tempShader);
 
-  /* --------------------if these lines are removed, it DIE.---------------------------
+  /* --------------------if these lines are removed, it crashes.---------------------------
      
      current reasons i've thought as to why it causes a heap corruption:
 
@@ -90,8 +102,6 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADE
      2.- resource is destroyed at the exit of this function, HOWEVER, same as before, this should
          only be creating a .pks file that will be used later to create the shader itself, the
          shader here is only a temporary shader for creating the shader resource.
-
-     3.- idk, im all out of ideas.
   */
   key.shaderPath = res->m_resourcePath;
   insertShader(res->m_id, tempShader);

@@ -140,5 +140,8 @@
     <ClInclude Include="include\pkDX11ShaderCodec.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkDX11GeometryShader.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

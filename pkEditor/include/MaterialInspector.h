@@ -46,11 +46,9 @@ class MaterialInspector
 
   /**
    * @brief Create a window for the ui based on the material properties.
-   * @param _window Main window.
-   * @param _imgTexSize Size of the texture preview image.
    */
   void
-  createMaterialWindow(const Window& _window);
+  createMaterialWindow();
 
  private:
   SPtr<Material> m_material;

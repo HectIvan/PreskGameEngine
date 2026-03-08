@@ -52,9 +52,9 @@ struct KeyScale
   float timeStamp;
 };
 
-template<typename T>
+template<class T>
 void
-safeRelease(T* x) {
+safeRelease(T*& x) {
   if (x) {
     x->Release();
     x = nullptr;

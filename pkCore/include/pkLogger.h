@@ -105,15 +105,11 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    * @brief Print a string.
    * @param _text Text to print to the console.
    */
+  template<typename... arg>
   static void
-  print(const String& _text);
-  
-  /**
-   * @brief Print a number.
-   * @param _num Number to print to the console.
-   */
-  static void
-  print(const float& _num);
+  print(arg&&... _arg) {
+    (cout << ... << _arg) << '\n' << '\n';
+  }
   
   /**
    * @brief Print a vector.
@@ -149,6 +145,14 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
    */
   static void
   print(const Matrix4& _matrix);
+
+  /**
+   * @brief Convert a vector2 to String.
+   * @param _vec Vector to read.
+   * @return A String.
+   */
+  static const String
+  toString(const Vector2& _vec);
 
   /**
    * @brief Convert a vector3 to String.

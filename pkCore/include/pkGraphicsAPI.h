@@ -207,6 +207,13 @@ public:
   createCShader(SPtr<Shader>& _pShader) = 0;
 
   /**
+   * @brief Create a geometry shader.
+   * @return geometry shader.
+   */
+  virtual SPtr<Shader>
+  createGShader(SPtr<Shader>& _pShader) = 0;
+
+  /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    * @return If there was a shader to set.
@@ -229,6 +236,14 @@ public:
    */
   virtual bool
   setCShader(const SPtr<Shader>& _pShader) = 0;
+
+  /**
+   * @brief Set the geometry shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
+   */
+  virtual bool
+  setGShader(const SPtr<Shader>& _pShader) = 0;
 
   /**
    * @brief Compile a shader from a specific file.

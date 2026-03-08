@@ -20,6 +20,7 @@
 #include "pkDX11BlendState.h"
 #include "pkDX11ComputeShader.h"
 #include "pkDX11GraphicsAPI.h"
+#include "pkDX11GeometryShader.h"
 #include "pkDX11IndexBuffer.h"
 #include "pkDX11InputLayout.h"
 #include "pkDX11PixelShader.h"
@@ -440,6 +441,40 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
   return dxCShader;
 }
 
+SPtr<Shader>
+DX11GraphicsAPI::createGShader(SPtr<Shader>& _pShader)
+{
+  PK_ASSERT(_pShader);
+
+  // convert from shader to dx geometry shader
+  SPtr<DX11GeometryShader> dxGShader = reinterpret_pointer_cast<DX11GeometryShader>(_pShader);
+
+  if (!dxGShader) {
+    const String msg = "Shader is not Geometry Shader.";
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return nullptr;
+  }
+
+  uint32 hr;
+  hr = m_pDevice->m_pd3dDevice->CreateGeometryShader(dxGShader->m_pSBlob->getBufferPointer(),
+                                                     dxGShader->m_pSBlob->getBufferSize(),
+                                                     nullptr,
+                                                     &dxGShader->m_pShader);
+  dxGShader->setType(PK_SHADER_TYPE::kGeometry);
+  // check if the creation was successful
+  if (PK_FAILED(hr)) {
+    safeRelease(dxGShader->m_pSBlob);
+    const String errMsg = LOG_GET_ERR_MSG(hr);
+    const String msg = "Failed to create a DX Geometry Shader. Error message: " + errMsg;
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
+    return nullptr;
+  }
+  LOG_REGISTER("Created a DirectX Geometry Shader.", __FILE__, __LINE__);
+  return dxGShader;
+}
+
 
 bool
 DX11GraphicsAPI::setVShader(const SPtr<Shader>& _pShader)
@@ -482,6 +517,21 @@ DX11GraphicsAPI::setCShader(const SPtr<Shader>& _pShader)
                                               nullptr,
                                               0);
   if (dxCShader) {
+    return true;
+  }
+  return false;
+}
+
+bool
+DX11GraphicsAPI::setGShader(const SPtr<Shader>& _pShader)
+{
+  // reinterpret as a DirectX geometry shader
+  SPtr<DX11GeometryShader> dxGShader = reinterpret_pointer_cast<DX11GeometryShader>(_pShader);
+
+  m_pDevice->m_pImmediateContext->GSSetShader(dxGShader ? dxGShader->m_pShader : nullptr,
+                                              nullptr,
+                                              0);
+  if (dxGShader) {
     return true;
   }
   return false;

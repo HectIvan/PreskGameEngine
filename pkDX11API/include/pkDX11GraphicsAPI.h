@@ -218,6 +218,13 @@ class DX11GraphicsAPI : public GraphicsAPI
   createCShader(SPtr<Shader>& _pShader) override;
 
   /**
+   * @brief Create a geometry shader.
+   * @return Geometry shader.
+   */
+  SPtr<Shader>
+  createGShader(SPtr<Shader>& _pShader) override;
+
+  /**
    * @brief Set the vertex shader to the device context.
    * @param _pShader Shader to set.
    * @return If there was a shader to set.
@@ -240,6 +247,14 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   bool
   setCShader(const SPtr<Shader>& _pShader) override;
+
+  /**
+   * @brief Set the geometry shader to the device context.
+   * @param _pShader Shader to set.
+   * @return If there was a shader to set.
+   */
+  bool
+  setGShader(const SPtr<Shader>& _pShader) override;
 
   /**
    * @brief Compile a shader from a specific file.

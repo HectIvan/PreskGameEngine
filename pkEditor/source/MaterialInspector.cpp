@@ -47,12 +47,12 @@ MaterialInspector::createMaterialWindow()
   // get material
   MaterialProps& matProps = m_material->m_properties;
   // get the textures
-  const SPtr<Texture>& albedo = m_material->m_albedo;
-  const SPtr<Texture>& normal = m_material->m_normal;
-  const SPtr<Texture>& oclussion = m_material->m_oclussion;
-  const SPtr<Texture>& rough = m_material->m_roughness;
-  const SPtr<Texture>& metallic = m_material->m_metallic;
-  const SPtr<Texture>& emissive = m_material->m_emissive;
+  const SPtr<Texture>& albedo = m_material->m_albedo.lock();
+  const SPtr<Texture>& normal = m_material->m_normal.lock();
+  const SPtr<Texture>& oclussion = m_material->m_oclussion.lock();
+  const SPtr<Texture>& rough = m_material->m_roughness.lock();
+  const SPtr<Texture>& metallic = m_material->m_metallic.lock();
+  const SPtr<Texture>& emissive = m_material->m_emissive.lock();
 
   /***************************************************************/
   /*------------------------albedo button-----------------------*/
@@ -312,5 +312,4 @@ MaterialInspector::createMaterialWindow()
       im.setTooltip("Warning!!! Emissive texture is null.");
     }
   }
-  im.endTabItem();
 }

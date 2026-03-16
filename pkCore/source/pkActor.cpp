@@ -36,10 +36,8 @@ Actor::moveVerlet(const Vector3& _direction, const float& _force)
 void
 Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
-  const Vector3 rot(_x, _y, _z);
-
   // Create and normalize rotation.
-  m_rotation = Quaternion::fromEuler(rot).normalized();
+  m_rotation = Quaternion::fromEuler(_x, _y, _z).normalized();
 
   // verify that the rotation does not contain NaN values.
   if (m_rotation.hasNan()) {

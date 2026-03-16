@@ -116,23 +116,23 @@ class PK_CORE_EXPORT BaseApp
   bool m_ssao = true;
 
   bool m_IBL = true;
-  float m_IBLIntensity = 1.0f;
+  float m_IBLInt = 1.0f;
 
   float m_exposure = 1.0f;
 
   // luminance blur
-  float m_blurRadius = 0.1f;
-  float m_blurStrength = 1.0f;
+  float m_blurRad = 0.1f;
+  float m_blurStr = 1.0f;
   float m_lumThreshold = 6.0f;
 
   // emissive blur
-  float m_emissiveBlurRadius = 5.0f;
-  float m_emissiveStrength = 30.0f;
+  float m_emissRad = 5.0f;
+  float m_emissStr = 30.0f;
 
   // ssao parameters.
-  float m_ssaoSampleRad = 3.0f;
+  float m_ssaoSRad = 3.0f;
   float m_ssaoScale = 1.0f;
   float m_ssaoBias = 0.01f;
-  float m_ssaoIntensity = 2.0f;
+  float m_ssaoInt = 2.0f;
 };
 }

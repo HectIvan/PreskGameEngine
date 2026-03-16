@@ -204,14 +204,14 @@ BaseApp::update()
   CBLight cBLight;
   CBVector2x2 lightsParam; // should be removed later
   CBVector2x2 lum(winSize, Vector2(90.0f));
-  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRadius, m_blurStrength);
-  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissiveBlurRadius, m_emissiveStrength);
+  CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRad, m_blurStr);
+  CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissRad, m_emissStr);
   CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // will be modified later.
   const CBVector2x2 windowSize(winSize, Vector2(0.0f));
-  const CBFloat IBLCBuffer(m_IBLIntensity);
+  const CBFloat IBLCBuffer(m_IBLInt);
   const CBFloat exposureCBuffer(m_exposure);
   const CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
-  const CBVector2x2 ssao(m_ssaoSampleRad, m_ssaoScale, m_ssaoBias, m_ssaoIntensity);
+  const CBVector2x2 ssao(m_ssaoSRad, m_ssaoScale, m_ssaoBias, m_ssaoInt);
 
   // camera data.
   Matrix4 view = Matrix4::IDENTITY;

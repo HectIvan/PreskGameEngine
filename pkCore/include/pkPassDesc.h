@@ -50,8 +50,8 @@ struct PassDesc
   PK_SAM_STATE_ADRESS::E samAdress;
   PK_SAM_STATE_FILTERS::E samFilters;
   
-  Vector<SPtr<Texture>> inputs;
-  Vector<SPtr<Texture>> outputs;
+  Vector<WPtr<Texture>> inputs;
+  Vector<WPtr<Texture>> outputs;
   // rasterizer state
   bool rSExists;
   RS_CULL_MODE::E rSCullMode;

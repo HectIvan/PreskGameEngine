@@ -90,7 +90,7 @@ Pass::Pass(const PixelDesc& _desc)
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
   m_depthTex = _desc.pDepth;
-  m_viewPortSize = m_outputTex[0]->getSize();
+  m_viewPortSize = m_outputTex[0].lock()->getSize();
 
   m_passModel = PASS_MODEL::kPass_Pixel;
 }

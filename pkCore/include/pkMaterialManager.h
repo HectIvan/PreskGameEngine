@@ -84,12 +84,14 @@ class PK_CORE_EXPORT MaterialManager : public Module<MaterialManager>
   insertMaterial(const UUID& _ID, const SPtr<Material>& _pMaterial);
 
  public:
-  // save materials with the material id
-  UMap<UUID, SPtr<Material>> m_materials;
-
   // unique string for the default material
   String m_defaultMatName = "defaultMaterial";
   SPtr<Material> m_defaultMaterial;
+
+ private:
+  // save materials with the material id
+  UMap<UUID, SPtr<Material>> m_materials;
+
 };
 
 PK_CORE_EXPORT MaterialManager&

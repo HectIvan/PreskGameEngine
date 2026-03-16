@@ -225,7 +225,7 @@ PlatformMath::hookeLaw(const float& _elasticity, const float& _displacement)
 bool
 PlatformMath::isNan(const float& _x)
 {
-  return isnan(_x);
+  return std::isnan(_x);
 }
 
 float

@@ -73,12 +73,6 @@ class Material : public Component
   virtual ~Material() = default;
 
   /**
-   * @brief Initialize the material on defaults.
-   */
-  void
-  init();
-
-  /**
    * @brief Update the material.
    * @param _owner The actor that owns this material.
    */
@@ -172,7 +166,7 @@ class Material : public Component
    * @brief Get textures in the order the shader requires them.
    * @return Vector of the needed textures.
    */
-  const Vector<SPtr<Texture>>
+  const Vector<WPtr<Texture>>
   getTextures();
 
  public:
@@ -180,12 +174,12 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   MaterialProps m_properties;
-  SPtr<Texture> m_albedo;
-  SPtr<Texture> m_normal;
-  SPtr<Texture> m_height;
-  SPtr<Texture> m_metallic;
-  SPtr<Texture> m_oclussion;
-  SPtr<Texture> m_roughness;
-  SPtr<Texture> m_emissive;
+  WPtr<Texture> m_albedo;
+  WPtr<Texture> m_normal;
+  WPtr<Texture> m_height;
+  WPtr<Texture> m_metallic;
+  WPtr<Texture> m_oclussion;
+  WPtr<Texture> m_roughness;
+  WPtr<Texture> m_emissive;
 };
 }

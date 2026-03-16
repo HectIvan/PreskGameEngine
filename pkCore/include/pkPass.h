@@ -148,14 +148,14 @@ class PK_CORE_EXPORT Pass
    * @brief get the input textures of the pass.
    * @return A list of Textures.
    */
-  Vector<SPtr<Texture>>&
+  Vector<WPtr<Texture>>&
   getInputTextures() { return m_inputTex; }
 
   /**
    * @brief get the output textures of the pass.
    * @return A list of Textures.
    */
-  Vector<SPtr<Texture>>&
+  Vector<WPtr<Texture>>&
   getOutputTextures() { return m_outputTex; }
 
   /**
@@ -242,8 +242,8 @@ class PK_CORE_EXPORT Pass
   /**
    * Textures.
    */
-  Vector<SPtr<Texture>> m_inputTex;
-  Vector<SPtr<Texture>> m_outputTex;
+  Vector<WPtr<Texture>> m_inputTex;
+  Vector<WPtr<Texture>> m_outputTex;
   Vector<SPtr<Texture>> m_uavTex;
   SPtr<Texture> m_depthTex;
 

@@ -463,6 +463,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   LOG_REGISTER("Loaded mesh of name " + String(_mesh->mName.C_Str()) + ".", __FILE__, __LINE__);
   return meshProcess;
 }
+  return meshProcess;
 }
 
 Matrix4

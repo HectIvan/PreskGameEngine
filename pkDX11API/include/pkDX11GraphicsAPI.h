@@ -168,7 +168,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTarget(const SPtr<Texture>& _pRTarget,
+  setRenderTarget(const WPtr<Texture>& _pRTarget,
                   const SPtr<Texture>& _pDepthSV = nullptr,
                   const uint32 _mipLevel = 0) override;
 
@@ -178,7 +178,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _DepthSV Depth stencil view to use.
    */
   void
-  setRenderTargets(const Vector<SPtr<Texture>> _rTargets,
+  setRenderTargets(const Vector<WPtr<Texture>> _rTargets,
                    const SPtr<Texture>& _pDepthSV = nullptr,
                    const uint32 _mipLevel = 0) override;
 
@@ -437,7 +437,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the vertex shader will the resources be allocated.
    */
   void
-  vSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+  vSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
                            const uint32 _start = 0) override;
 
   /**
@@ -453,7 +453,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the pixel shader will the resources be allocated.
    */
   void
-  pSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+  pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
                            const uint32 _start = 0) override;
 
   /**
@@ -469,7 +469,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _start In what slot of the compute shader will the resources be allocated.
    */
   void
-  cSSetShaderResourceViews(const Vector<SPtr<Texture>>& _pTextures,
+  cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
                            const uint32 _start = 0) override;
 
   /**
@@ -505,7 +505,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   clearRenderTargetViews(const Color& _color,
-                         const Vector<SPtr<Texture>>& _rtvs,
+                         const Vector<WPtr<Texture>>& _rtvs,
                          const uint32 _mipslice = -1) override;
 
   /**
@@ -515,7 +515,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   clearRenderTargetView(const Color& _color,
-                        const SPtr<Texture>& _rtv,
+                        const WPtr<Texture>& _rtv,
                         const uint32 _mipSlice = -1) override;
 
   /**

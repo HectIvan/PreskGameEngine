@@ -158,6 +158,19 @@ class PK_UTILITY_EXPORT Quaternion
 
   /**
    * @brief Create a quaternion from euler angles.
+   * @param _x X rotation in radians.
+   * @param _y Y rotation in radians.
+   * @param _z Z rotation in radians.
+   * @return The created quaternion.
+   */
+  static const Quaternion
+  fromEuler(const float& _x, const float& _y, const float& _z)
+  {
+    return fromEuler(Vector3(_x, _y, _z));
+  }
+
+  /**
+   * @brief Create a quaternion from euler angles.
    * @param _vector Vector3 containing the euler angles in radians.
    * @return The created quaternion.
    */

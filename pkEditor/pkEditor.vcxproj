@@ -163,7 +163,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\ActiveActorInspector.cpp" />
     <ClCompile Include="source\ActorInspector.cpp" />
+    <ClCompile Include="source\AppInspector.cpp" />
+    <ClCompile Include="source\GraphicsInspector.cpp" />
     <ClCompile Include="source\imgui.cpp" />
     <ClCompile Include="source\imgui_demo.cpp" />
     <ClCompile Include="source\imgui_draw.cpp" />
@@ -171,6 +174,7 @@
     <ClCompile Include="source\imgui_impl_win32.cpp" />
     <ClCompile Include="source\imgui_tables.cpp" />
     <ClCompile Include="source\imgui_widgets.cpp" />
+    <ClCompile Include="source\LogInspector.cpp" />
     <ClCompile Include="source\MaterialInspector.cpp" />
     <ClCompile Include="source\pkDX11ImGui.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -182,7 +186,10 @@
     <ClCompile Include="source\TransformInspector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ActiveActorInspector.h" />
     <ClInclude Include="include\ActorInspector.h" />
+    <ClInclude Include="include\AppInspector.h" />
+    <ClInclude Include="include\GraphicsInspector.h" />
     <ClInclude Include="include\imconfig.h" />
     <ClInclude Include="include\imgui.h" />
     <ClInclude Include="include\imgui_impl_dx11.h" />
@@ -191,6 +198,7 @@
     <ClInclude Include="include\imstb_rectpack.h" />
     <ClInclude Include="include\imstb_textedit.h" />
     <ClInclude Include="include\imstb_truetype.h" />
+    <ClInclude Include="include\LogInspector.h" />
     <ClInclude Include="include\MaterialInspector.h" />
     <ClInclude Include="include\pkUInterface.h" />
     <ClInclude Include="include\ResourceInspector.h" />

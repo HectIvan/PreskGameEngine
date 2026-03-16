@@ -62,13 +62,8 @@ using pkEngineSDK::Vector2;
 using pkEngineSDK::Vector3;
 using pkEngineSDK::Vector4;
 
-ActorInspector::ActorInspector(const SPtr<Actor>& _pActor)
-{
-  m_actor = _pActor;
-}
-
 void
-ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
+ActorInspector::inspectComponents(SPtr<Actor> _pActor, SPtr<Material>& _pMaterialInspect)
 {
   // get the user interface manager
   UInterface& im = g_uInterface();
@@ -76,13 +71,13 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
   ModelCodec& modelCod = g_ModelCodec();
   // for each type of component
   // non constant in case a component is removed in runtime.
-  uint32 compCount = m_actor->getComponentCount();
+  uint32 compCount = _pActor->getComponentCount();
   for (uint32 i = 0; i < compCount; ++i) {
     im.pushID(i);
-    SPtr<Component> pComponent = m_actor->getComponent(i);
+    SPtr<Component> pComponent = _pActor->getComponent(i);
     // remove the component from the list and update the component count.
     if (im.createButton("X")) {
-      m_actor->removeComponent(i);
+      _pActor->removeComponent(i);
       --compCount;
     }
     if (im.isItemHovered()) {
@@ -136,7 +131,7 @@ ActorInspector::inspectComponents(SPtr<Material>& _pMaterialInspect)
         // Light color
         im.colorEdit("Color", light->m_color);
         // Light direction
-        Vector4 dir4 = m_actor->m_transform * Vector4(light->m_direction, 0.0f);
+        Vector4 dir4 = _pActor->m_transform * Vector4(light->m_direction, 0.0f);
         Vector3 dir = dir4.xyz().normalized();
         im.createDrag("Direction", dir, 0.0f);
         // spot exponent

@@ -226,10 +226,10 @@ const Quaternion
 Quaternion::fromEuler(const Vector3& _vector)
 {
   float cx = Math::cos(_vector.x * 0.5f);
-  float sx = Math::sin(_vector.x * 0.5f);
   float cy = Math::cos(_vector.y * 0.5f);
-  float sy = Math::sin(_vector.y * 0.5f);
   float cz = Math::cos(_vector.z * 0.5f);
+  float sx = Math::sin(_vector.x * 0.5f);
+  float sy = Math::sin(_vector.y * 0.5f);
   float sz = Math::sin(_vector.z * 0.5f);
 
   Quaternion q;

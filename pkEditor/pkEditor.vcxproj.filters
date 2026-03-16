@@ -79,6 +79,18 @@
     <ClCompile Include="source\TransformInspector.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="source\AppInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GraphicsInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ActiveActorInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\LogInspector.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pkUInterface.h">
@@ -124,6 +136,18 @@
       <Filter>include\Editor</Filter>
     </ClInclude>
     <ClInclude Include="include\TransformInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AppInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ActiveActorInspector.h">
+      <Filter>include\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogInspector.h">
       <Filter>include\Editor</Filter>
     </ClInclude>
   </ItemGroup>

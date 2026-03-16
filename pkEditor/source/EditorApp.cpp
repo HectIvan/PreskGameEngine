@@ -1,3 +1,7 @@
+#include "ActiveActorInspector.h"
+#include "AppInspector.h"
+#include "GraphicsInspector.h"
+#include "LogInspector.h"
 #include "pkAssetResourceManager.h"
 #include "pkColor.h"
 #include "pkModelManager.h"
@@ -201,11 +205,7 @@ void
 EditorApp::uInterfaceUpdate()
 {
   Logger& log = g_Logger();
-  ModelManager& modelMan = g_ModelManager();
-  RendererManager& rm = g_RenderManager();
   SceneManager& sm = g_SceneManager();
-  ShaderManager& shaderMan = g_ShaderManager();
-  TextureManager& tm = g_TextureManager();
   UInterface& im = g_uInterface();
 
   im.setCurrentContext();
@@ -231,7 +231,6 @@ EditorApp::uInterfaceUpdate()
   im.setNextWindowParams(m_loggerWin);
   im.startWindowCreate(m_loggerWin.name);
   SPtr<Actor> selectedActor = m_sceneInspector.getActor();
-  m_actorInspector.setActor(selectedActor);
   m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
 
   // Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
@@ -242,28 +241,13 @@ EditorApp::uInterfaceUpdate()
   // logger window.
   if (im.beginTabBar("Logger/resources")) {
     if (im.beginTabItem("Logger")) {
-      im.createCheckBox("Errors", m_showErrors);
-      im.sameLine();
-      im.createCheckBox("Warnings", m_showWarnings);
-      im.sameLine();
-      im.createCheckBox("Logs", m_showActions);
-      im.sameLine();
-      if (im.createButton("Clear")) {
-        if (m_showErrors) {
-          log.clearLogsOfType(kError);
-        }
-        if (m_showWarnings) {
-          log.clearLogsOfType(kWarning);
-        }
-      }
-      showLogType(m_showErrors, kError);
-      showLogType(m_showWarnings, kWarning);
-      showLogType(m_showActions, kLog);
+      LogInspector::init(m_showErrors, m_showWarnings, m_showActions);
       im.endTabItem();
     }
     // resources window.
     if (im.beginTabItem("Resources")) {
       m_resourceInspector.createResourceWindow(m_window);
+      im.endTabItem();
     }
     im.endTabBar();
   }
@@ -280,226 +264,26 @@ EditorApp::uInterfaceUpdate()
     // Actor tab
     // -------------------------- //
     if (selectedActor && im.beginTabItem("Actor")) {
-      // transform window
-      if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
-        String name = selectedActor->getName();
-        im.createText("Name:   ");
-        im.sameLine();
-        if (im.createInputText("##Name", &name)) {
-          selectedActor->setName(name);
-        }
-        // activity checkbox
-        im.sameLine();
-        im.createCheckBox("##ActiveActor", selectedActor->isActive());
-        if (m_eyeIcon) {
-          im.sameLine();
-          im.createImage(m_eyeIcon, Vector2(15));
-        }
-        // inspect actor transform matrix
-        TransformInspector::inspect(selectedActor);
-      }
-      // ---- Components window ---- //
-      if (im.collapsingHeader("Components Window", kPK_DefaultOpen)) {
-        // to do: change this to a more efficient option
-        const Vector<String> options = { "model", "light", "camera" };
-        int32 val = -1;
-        if (im.beginCombo("Components", val, options)) {
-          if (im.beginDragDropTarget()) {
-            const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-            if (id) {
-              SPtr<Model> loadedModel = modelMan.createModel(*id);
-              modelMan.insertModel(*id, loadedModel);
-            }
-            im.endDragDropTarget();
-          }
-          // if a model component is to be added.
-          if (val == 0) {
-            Path path = m_window.openFileFromExplorer("Model Files", "*.fbx;*.obj;*.gltf");
-            if (path.toString() != "") {
-              SPtr<BaseResource> resource = make_shared<ModelResource>();
-              resource->softLoad(path);
-              selectedActor->addComponent(modelMan.createModel(resource->m_id));
-            }
-          }
-        }
-        if (im.beginDragDropTarget()) {
-          UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-          if (id) {
-            SPtr<Model> model = modelMan.createModel(*id);
-            selectedActor->addComponent(model);
-          }
-          im.endDragDropTarget();
-        }
-        // inspect actor components
-        m_actorInspector.inspectComponents(m_selectedMaterial);
-      }
+      ActiveActorInspector::init(m_window, selectedActor);
+      // inspect actor components
+      m_actorInspector.inspectComponents(selectedActor, m_selectedMaterial);
       im.endTabItem();
     }
     // -------------------------- //
     // App tab.
     // -------------------------- //
     if (im.beginTabItem("App")) {
-      // get framerate
-      float f_fps = 1.0f / g_TimeManager().m_deltaTime;
-      uint32 fps = static_cast<uint32>(f_fps);
-      String fpsStr = "FPS: " + to_string(fps);
-      String camSpeed = "Camera Speed: " + to_string(static_cast<uint32>(m_cameraSpeed));
-
-      // FPS parameters
-      static const uint32 fpsListSize = 100;
-      static float fpsHistory[fpsListSize] = {};
-      static uint32 fpsOffset = 0;
-
-      // Record the current FPS
-      fpsHistory[fpsOffset] = f_fps;
-      fpsOffset = (fpsOffset + 1) % fpsListSize;
-      // --- Camera window --- //
-      im.createText("vSync");
-      im.sameLine();
-      im.createCheckBox("##vSync", m_vSync);
-      // fps graph
-      im.createText(fpsStr.c_str());
-      im.sameLine();
-      im.plotLines("##LinesFPS", fpsHistory, fpsListSize, fpsOffset);
-      // editor app settings
-      if (im.beginTable("Editor App")) {
-        im.tableJumpRow();
-
-        im.tableJumpRow();
-        im.createText("Camera Speed");
-        im.tableNextColumn();
-        im.createDrag("##CamSpeed", m_cameraSpeed);
-        im.tableJumpRow();
-        im.createText("X Sensitivity");
-        im.tableNextColumn();
-        im.createDrag("##XSens", m_sensX, 0.1f);
-        im.tableJumpRow();
-        im.createText("Y Sensitivity");
-        im.tableNextColumn();
-        im.createDrag("##YSens", m_sensY, 0.1f);
-        im.tableJumpRow();
-      }
-      im.endTable();
+      AppInspector::init(m_cameraSpeed, m_sensX, m_sensY, m_vSync);
       im.endTabItem();
     }
     // -------------------------- //
     // Graphics tab.
     // -------------------------- //
     if (im.beginTabItem("Graphics")) {
-      // table parameters
-      if (im.beginTable("Graphics")) {
-
-        // IBL
-        im.tableNextColumn();
-        im.createCheckBox("IBL Active", m_IBL);
-        if (m_IBL) {
-          // Slider for IBL intensity.
-          if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-            Path path = m_window.openFileFromExplorer("Texture Files",
-                                                      "*.png;*.jpeg;*.jpg;*.tga;*.hdr;*.exr");
-            if (path.toString() != "") {
-              // SPtr<Texture> texture = tm.loadTexture(path);
-              // rm.m_mainSkybox->copyFrom(texture);
-            }
-          }
-          if (im.beginDragDropTarget()) {
-            const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
-            if (id) {
-              SPtr<Texture> texture = tm.loadTexture(*id);
-              rm.m_mainSkybox->copyFrom(texture);
-            }
-            im.endDragDropTarget();
-          }
-          if (im.isItemHovered()) {
-            im.setTooltip("Skybox");
-          }
-          im.tableNextColumn();
-          im.createDrag("##iblIntensity", m_IBLIntensity, 0.1f, 0.0f, 1.0f);
-        }
-
-        // EXPOSURE
-        im.tableJumpRow();
-        im.createText("Exposure");
-        im.tableNextColumn();
-        im.createDrag("##Exposure", m_exposure, 0.1f, 0.0f);
-
-        // LUMINANCE
-        im.tableJumpRow();
-        im.createText("----------Luminance----------");
-        im.tableJumpRow();
-        im.createText("Radius");
-        im.tableNextColumn();
-        im.createDrag("##LumRadius", m_blurRadius, 0.1f, 0.001f);
-        im.tableJumpRow();
-        im.createText("Strength");
-        im.tableNextColumn();
-        im.createDrag("##LumStrength", m_blurStrength, 0.1f, 0.001f);
-        im.tableJumpRow();
-        im.createText("Threshhold");
-        im.tableNextColumn();
-        im.createDrag("##LumThreshold", m_lumThreshold, 0.1f, 0.0f);
-        im.tableJumpRow();
-
-        // EMISSIVE
-        im.createText("----------Emissive----------");
-        im.tableJumpRow();
-        im.createText("Radius");
-        im.tableNextColumn();
-        im.createDrag("##EmRadius", m_emissiveBlurRadius, 1.0f, 0.001f);
-        im.tableJumpRow();
-        im.createText("Strength");
-        im.tableNextColumn();
-        im.createDrag("##EmStrength", m_emissiveStrength, 0.1f, 0.001f);
-        im.tableJumpRow();
-
-        // SSAO
-        im.createText("----------SSAO----------");
-        im.tableJumpRow();
-        im.createCheckBox("SSAO", m_ssao);
-        im.tableJumpRow();
-        if (m_ssao) {
-          im.createText("Sample Radius");
-          im.tableNextColumn();
-          im.createDrag("##SSAO Radius", m_ssaoSampleRad, 0.1f, 0.0f);
-          im.tableJumpRow();
-          im.createText("Scale");
-          im.tableNextColumn();
-          im.createDrag("##SSAOScale", m_ssaoScale, 0.1f, 0.0f);
-          im.tableJumpRow();
-          im.createText("Bias");
-          im.tableNextColumn();
-          im.createDrag("##SSAOBias", m_ssaoBias, 0.001f, 0.0f);
-          im.tableJumpRow();
-          im.createText("Intensity");
-          im.tableNextColumn();
-          im.createDrag("##SSAOIntensity", m_ssaoIntensity, 0.1f, 0.0f);
-        }
-        im.tableNextRow();
-      }
-      im.endTable();
-
-      // --- Post-Process window --- //
-      if (im.collapsingHeader("Shaders", kPK_DefaultOpen)) {
-        if (im.beginTable("Shaders table")) {
-          im.tableNextColumn();
-          // display all compiled shaders.
-          Vector<SPtr<Shader>> shaders = shaderMan.getShaders();
-          const uint32 shaderCount = static_cast<uint32>(shaders.size());
-          for (uint32 i = 0; i < shaderCount; ++i) {
-            WPtr<Shader> shader = shaders[i];
-            String shaderName = shader.lock()->getShaderDirectory().getFileName();
-            im.createText(shaderName.c_str());
-            im.tableNextColumn();
-            im.pushID(i);
-            if (im.createButton("Compile")) {
-              //shader->compileFromFile();
-            }
-            im.popID();
-            im.tableJumpRow();
-          }
-        }
-        im.endTable();
-      }
+      GraphicsInspector::init(m_window, m_IBL, m_IBLInt, // ibl
+                              m_exposure, m_blurRad, m_blurStr, m_lumThreshold, // luminance
+                              m_emissRad, m_emissStr, // emissive section
+                              m_ssao, m_ssaoSRad, m_ssaoScale, m_ssaoBias, m_ssaoInt); // ssao
       im.endTabItem();
     }
     // -------------------------- //
@@ -510,7 +294,7 @@ EditorApp::uInterfaceUpdate()
       m_materialInspector.createMaterialWindow();
       im.endTabItem();
     }
-    if (im.beginTabItem("Quaternion Test")) {
+    /*if (im.beginTabItem("Quaternion Test")) {
       static Quaternion quat;
       Vector3 quatV = quat.toEuler() * Math::RAD2DEG;
       im.createText("X: ");
@@ -535,9 +319,9 @@ EditorApp::uInterfaceUpdate()
       im.createDrag("Direction:", test);
 
       im.endTabItem();
-    }
-    im.endTabBar();
+    }*/
   }
+  im.endTabBar();
   im.endWindowCreate();
   // -------------------------- //
   im.render();

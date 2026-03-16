@@ -531,7 +531,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
 
   // unbind resources.
   api.waitDevice();
-  api.pSSetShaderResourceViews({ nullptr });
+  api.pSUnbindShaderResourceViews(1);
   api.unbindRenderTargets(1);
 
   LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
@@ -613,7 +613,7 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
     const SPtr<Mesh> mesh = _model->meshes[i];
     // get if the mesh is active or not, if it's not, dont render and keep going.
     const SPtr<Material> material = mesh->material;
-    if (mesh->getActive() &&  material) {
+    if (mesh->getActive() && material) {
       // set resources to the pixel shader.
       api.pSSetShaderResourceViews(material->getTextures());
       // update the constant buffers.

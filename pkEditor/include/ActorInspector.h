@@ -32,23 +32,15 @@ class ActorInspector
 {
  public:
   ActorInspector() = default;
-  ActorInspector(const SPtr<Actor>& _pActor);
   virtual ~ActorInspector() = default;
-  /**
-   * @brief Set the actor to inspect.
-   * @param _pActor Pointer to the actor.
-   */
-  void
-  setActor(SPtr<Actor>& _pActor) { m_actor = _pActor; }
 
   /**
    * @brief Inspect the currently selected actor.
    * @param _pMaterialInspect Material to set on the inspector.
    */
   void
-  inspectComponents(SPtr<Material>& _pMaterialInspect);
+  inspectComponents(SPtr<Actor> _pActor, SPtr<Material>& _pMaterialInspect);
 
  private:
-  SPtr<Actor> m_actor;
   String m_searchMesh;
 };

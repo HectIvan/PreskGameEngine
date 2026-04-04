@@ -196,10 +196,7 @@ class PK_CORE_EXPORT Actor
    * @param _rotation Rotation Vector.
    */
   PKFORCEINLINE void
-  rotate(const Vector3& _rotation)
-  {
-    rotate(_rotation.x, _rotation.y, _rotation.z);
-  }
+  rotate(const Vector3& _rotation);
 
   /**
    * @brief Set the rotation of the Actor.
@@ -426,7 +423,13 @@ class PK_CORE_EXPORT Actor
    * @brief Recalculate the forward, right and up vectors of the actor based on the rotation.
    */
   void
-  recalculateDirections();
+  recalculateDirections(const Quaternion& _rot);
+
+  /**
+   * @brief Recalculate the forward, right and up vectors of the actor based on the rotation.
+   */
+  void
+  recalculateDirections(const Vector3& _rot);
 
  public:
   /**

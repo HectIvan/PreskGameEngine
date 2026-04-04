@@ -16,6 +16,7 @@
  /*********************************************/
 #include "pkShaderCodec.h"
 #include "pkShaderManager.h"
+#include "pkShaderResource.h"
 #include "pkGraphicsAPI.h"
 #include "pkBaseResource.h"
 #include "pkAssetResourceManager.h"
@@ -63,7 +64,7 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADE
   GraphicsAPI& api = g_GraphicAPI();
   // create the shader base.
   ShaderKey key(_shaderData.shaderPath, _shaderData._szEntryPoint, _shaderData._szShaderModel);
-  SPtr<Shader> tempShader = api.internalCreateShader();
+  SPtr<Shader> tempShader = api.internalCreateShader(_type);
   tempShader->setData(key);
   tempShader->compileFromFile();
   // create the shader based on its type.
@@ -91,18 +92,6 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADE
   // create the resource from the shader.
   SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(tempShader);
 
-  /* --------------------if these lines are removed, it crashes.---------------------------
-     
-     current reasons i've thought as to why it causes a heap corruption:
-
-     1.- shader is destroyed and thus, can't be used elsewhere, HOWEVER, this function only creates
-         the .pks file, which is the one that is used to later on create a shader, so this doesnt
-         really make sense.
-
-     2.- resource is destroyed at the exit of this function, HOWEVER, same as before, this should
-         only be creating a .pks file that will be used later to create the shader itself, the
-         shader here is only a temporary shader for creating the shader resource.
-  */
   key.shaderPath = res->m_resourcePath;
   insertShader(res->m_id, tempShader);
   insertShader(key, tempShader);
@@ -111,6 +100,10 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADE
 void
 ShaderManager::insertShader(const UUID& _id, const SPtr<Shader>& _pShader)
 {
+  // do the same with m_keyShaders.
+  if (m_shaders.contains(_id)) {
+    m_shaders.find(_id)->second = _pShader;
+  }
   m_shaders.insert({ _id, _pShader });
 }
 
@@ -126,9 +119,10 @@ ShaderManager::createShaders()
     WPtr<BaseResource> res = resource.second;
     // if the resource is a shader resource, create the shader and compile it.
     if (RESOURCE_TYPE::kShader == res.lock()->getType()) {
-      res.lock()->load();
-      SPtr<Shader> shader = api.internalCreateShader();
-      shader->compileFromResource(res.lock());
+      SPtr<ShaderResource> shaderRes = reinterpret_pointer_cast<ShaderResource>(res.lock());
+      shaderRes->load();
+      SPtr<Shader> shader = api.internalCreateShader(shaderRes->m_type);
+      shader->compileFromResource(shaderRes);
 
       // create shader specific key
       const Path dir = shader->getShaderDirectory();
@@ -162,11 +156,12 @@ ShaderManager::getShader(const UUID& _id)
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
-  SPtr<Shader> shader = m_keyShaders.find(_key)->second;
-  if (shader) {
-    return shader;
+  auto it = m_keyShaders.find(_key);
+  if (it == m_keyShaders.end()) {
+    return nullptr;
   }
-  return nullptr;
+
+  return it->second.lock();
 }
 
 Vector<SPtr<Shader>>

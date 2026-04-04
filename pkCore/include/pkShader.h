@@ -42,11 +42,9 @@ class PK_CORE_EXPORT Shader
 {
  public:
   Shader() {};
-  virtual ~Shader() {
-    safeRelease(m_pSBlob);
-  }
+  virtual ~Shader() = default;
 
-  // deletes the possibility of using said constructor and operator in the class.
+  // deletes the possibility of the constructor and operator in the class.
   Shader(const Shader&) = delete;
   Shader& operator=(const Shader&) = delete;
 
@@ -139,17 +137,17 @@ class PK_CORE_EXPORT Shader
    * @param _pBlob Info blob.
    */
   void
-  setBlob(PKBlob* _pBlob) { m_pSBlob = _pBlob; }
+  setBlob(PKBlob _pBlob) { m_pSBlob = _pBlob; }
 
   /**
    * @brief Get the shader blob.
    * @return the shader blob.
    */
-  void*
+  PKBlob
   getBlob() const { return m_pSBlob; }
 
  public:
-  PKBlob* m_pSBlob = nullptr;
+  PKBlob m_pSBlob;
 
  protected:
   /**

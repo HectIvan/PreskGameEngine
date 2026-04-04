@@ -177,7 +177,6 @@ RendererManager::onShutDown()
   m_uavBuffers.clear();
 
   m_passes.clear();
-  m_mainSkybox = nullptr;
 }
 
 void
@@ -472,7 +471,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   pShadRes->load();
 
   // create the vertex shader.
-  SPtr<Shader> vShader = api.internalCreateShader();
+  SPtr<Shader> vShader = api.internalCreateShader(PK_SHADER_TYPE::kVertex);
   vShader->compileFromResource(vShadRes);
   if (!vShader) {
     const String msg = "Could not create vertex shader to generate cubeMap.";
@@ -487,7 +486,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   shaderMan.insertShader(vShaderKey, vShader);
 
   // create the pixel shader.
-  SPtr<Shader> pShader = api.internalCreateShader();
+  SPtr<Shader> pShader = api.internalCreateShader(PK_SHADER_TYPE::kPixel);
   pShader->compileFromResource(pShadRes);
   if (!pShader) {
     const String msg = "Could not create pixel shader to generate cubeMap.";

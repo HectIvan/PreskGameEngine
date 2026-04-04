@@ -111,7 +111,7 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
 
  private:
   UMap<UUID, SPtr<Shader>> m_shaders;
-  UMap<ShaderKey, SPtr<Shader>> m_keyShaders;
+  UMap<ShaderKey, WPtr<Shader>> m_keyShaders;
 };
 
 PK_CORE_EXPORT ShaderManager&

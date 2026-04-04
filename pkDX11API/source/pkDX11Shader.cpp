@@ -14,7 +14,7 @@ namespace pkEngineSDK
 void
 DX11Shader::compileFromFile()
 {
-  m_pSBlob = g_GraphicAPI().compileShaderFromFile(m_shaderDirectory, m_sEntryPoint, m_sModel);
+  m_pSBlob = *g_GraphicAPI().compileShaderFromFile(m_shaderDirectory, m_sEntryPoint, m_sModel);
 }
 
 void
@@ -47,12 +47,13 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
 
   // copy the new data into the blob
   const SIZE_T blobSize = resource->m_data.size();
-  m_pSBlob = new PKBlob(resource->m_data);
+  m_pSBlob = PKBlob(resource->m_data);
 
   const String blobSizeString = to_string(blobSize);
 
+  const bool empty = m_pSBlob.empty();
   // if the blob failed to be created.
-  if (!m_pSBlob) {
+  if (empty) {
     const String msg = "Failed to create sBlob of size " + blobSizeString + ".";
     LOG_ERROR(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
@@ -60,7 +61,7 @@ DX11Shader::compileFromResource(const SPtr<BaseResource>& _pResource) {
   }
 
   // check if the data transfer was succesful.
-  if (!m_pSBlob) {
+  if (empty) {
     const String msg = "Failed to create a shader blob of size " +
                        blobSizeString +
                        " from the shader resource " +

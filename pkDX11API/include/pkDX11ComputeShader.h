@@ -29,6 +29,14 @@ public:
     safeRelease(m_pShader);
   }
 
+  // deletes the possibility of the constructor and operator in the class.
+  DX11ComputeShader(const DX11ComputeShader&) = delete;
+  DX11ComputeShader& operator=(const DX11ComputeShader&) = delete;
+
+  // movement functions deleted.
+  DX11ComputeShader(DX11ComputeShader&&) noexcept = delete;
+  DX11ComputeShader& operator=(DX11ComputeShader&&) noexcept = delete;
+
  public:
   ID3D11ComputeShader* m_pShader = nullptr;
 };

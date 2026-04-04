@@ -183,7 +183,7 @@ public:
    * @return API Specific shader.
    */
   virtual SPtr<Shader>
-  internalCreateShader() = 0;
+  internalCreateShader(const PK_SHADER_TYPE::E& _type) = 0;
 
   /**
    * @brief Create a vertex shader.

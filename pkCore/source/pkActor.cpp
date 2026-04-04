@@ -16,14 +16,6 @@ void
 Actor::setTransform(const Matrix4& _transform)
 {
   m_transform = _transform;
-
-  // m_forward = m_transform.getForwardVector().normalized();
-  // m_right = m_transform.getRightVector().normalized();
-  // m_up = m_transform.getUpVector().normalized();
-  // 
-  // m_position = m_transform.getTranslation3();
-  // m_rotation = Quaternion::fromRotationMatrix(m_transform);
-  // m_scale = m_transform.getScale3();
 }
 
 void
@@ -38,15 +30,21 @@ Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
   // Create and normalize rotation.
   m_rotation = Quaternion::fromEuler(_x, _y, _z).normalized();
-
+  
   // verify that the rotation does not contain NaN values.
   if (m_rotation.hasNan()) {
     LOG_ERROR("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
     m_rotation = Quaternion::IDENTITY;
   }
 
-  // Rotate basis vectors directly using quaternion.
-  recalculateDirections();
+  // m_rotation = Vector3(_x, _y, _z);
+  // Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
+
+  // Vector3 rot = Vector3(_x, _y, _z);
+  // 
+  // m_rotation = rot;
+
+  recalculateDirections(m_rotation);
 }
 
 void
@@ -56,21 +54,24 @@ Actor::rotate(const float& _x, const float& _y, const float& _z)
   const Vector3 localUp = m_rotation * Vector3::UP;
   const Quaternion yaw = Quaternion::fromAxisAngle(localUp, _x);
   m_rotation = yaw * m_rotation;
-
+  
   // local right rotation.
   const Vector3 localRight = m_rotation * Vector3::RIGHT;
   const Quaternion pitch = Quaternion::fromAxisAngle(localRight, _y);
   m_rotation = pitch * m_rotation;
-
+  
   // local forward rotation.
   const Vector3 localForward = m_rotation * Vector3::FORWARD;
   const Quaternion roll = Quaternion::fromAxisAngle(localForward, _z);
   m_rotation = roll * m_rotation;
-
+  
   m_rotation.normalize();
 
-  // recalculate directions.
-  recalculateDirections();
+  // Vector3 addRot = Vector3(_x, _y, _z);
+  // 
+  // m_rotation += addRot;
+
+  recalculateDirections(m_rotation);
 }
 
 void
@@ -194,12 +195,22 @@ Actor::generateNewLocalTransform()
 }
 
 void
-Actor::recalculateDirections()
+Actor::recalculateDirections(const Quaternion& _rot)
 {
   // recalculate directions.
-  m_forward = m_rotation.rotate(Vector3::FORWARD).normalized();
-  m_right   = m_rotation.rotate(Vector3::RIGHT).normalized();
-  m_up      = m_rotation.rotate(Vector3::UP).normalized();
+  m_forward = _rot.rotate(Vector3::FORWARD).normalized();
+  m_right   = _rot.rotate(Vector3::RIGHT).normalized();
+  m_up      = _rot.rotate(Vector3::UP).normalized();
+}
+
+void
+Actor::recalculateDirections(const Vector3& _rot)
+{
+  Matrix4 rotMat = Matrix4::rotation(_rot);
+
+  m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
+  m_right = (Vector4::RIGHT * rotMat).xyz().normalized();
+  m_up = (Vector4::UP * rotMat).xyz().normalized();
 }
 
 }

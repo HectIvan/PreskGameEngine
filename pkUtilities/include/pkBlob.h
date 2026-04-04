@@ -44,6 +44,12 @@ public:
   Release();
 
   /**
+   * @brief Check if the blob is empty.
+   */
+  bool
+  empty() const { return m_blob.empty(); }
+
+  /**
    * @brief Get the size of the buffer.
    * @return Size of the buffer.
    */

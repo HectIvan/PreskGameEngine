@@ -356,8 +356,8 @@ DX11GraphicsAPI::createVShader(SPtr<Shader>& _pShader)
   }
   // create the vertex shader
   uint32 hr;
-  hr = m_pDevice->m_pd3dDevice->CreateVertexShader(dxVShader->m_pSBlob->getBufferPointer(),
-                                                   dxVShader->m_pSBlob->getBufferSize(),
+  hr = m_pDevice->m_pd3dDevice->CreateVertexShader(dxVShader->m_pSBlob.getBufferPointer(),
+                                                   dxVShader->m_pSBlob.getBufferSize(),
                                                    nullptr,
                                                    &dxVShader->m_pShader);
   dxVShader->setType(PK_SHADER_TYPE::kVertex);
@@ -365,7 +365,6 @@ DX11GraphicsAPI::createVShader(SPtr<Shader>& _pShader)
   if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Vertex Shader. Error message: " + errMsg;
-    safeRelease(dxVShader->m_pSBlob);
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
     return nullptr;
@@ -389,14 +388,13 @@ DX11GraphicsAPI::createPShader(SPtr<Shader>& _pShader)
   }
 
   uint32 hr;
-  hr = m_pDevice->m_pd3dDevice->CreatePixelShader(dxPShader->m_pSBlob->getBufferPointer(),
-                                                  dxPShader->m_pSBlob->getBufferSize(),
+  hr = m_pDevice->m_pd3dDevice->CreatePixelShader(dxPShader->m_pSBlob.getBufferPointer(),
+                                                  dxPShader->m_pSBlob.getBufferSize(),
                                                   nullptr,
                                                   &dxPShader->m_pShader);
   dxPShader->setType(PK_SHADER_TYPE::kPixel);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
-    safeRelease(dxPShader->m_pSBlob);
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Pixel Shader. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
@@ -423,14 +421,13 @@ DX11GraphicsAPI::createCShader(SPtr<Shader>& _pShader)
   }
 
   uint32 hr;
-  hr = m_pDevice->m_pd3dDevice->CreateComputeShader(dxCShader->m_pSBlob->getBufferPointer(),
-                                                    dxCShader->m_pSBlob->getBufferSize(),
+  hr = m_pDevice->m_pd3dDevice->CreateComputeShader(dxCShader->m_pSBlob.getBufferPointer(),
+                                                    dxCShader->m_pSBlob.getBufferSize(),
                                                     nullptr,
                                                     &dxCShader->m_pShader);
   dxCShader->setType(PK_SHADER_TYPE::kCompute);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
-    safeRelease(dxCShader->m_pSBlob);
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Compute Shader. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
@@ -457,14 +454,13 @@ DX11GraphicsAPI::createGShader(SPtr<Shader>& _pShader)
   }
 
   uint32 hr;
-  hr = m_pDevice->m_pd3dDevice->CreateGeometryShader(dxGShader->m_pSBlob->getBufferPointer(),
-                                                     dxGShader->m_pSBlob->getBufferSize(),
+  hr = m_pDevice->m_pd3dDevice->CreateGeometryShader(dxGShader->m_pSBlob.getBufferPointer(),
+                                                     dxGShader->m_pSBlob.getBufferSize(),
                                                      nullptr,
                                                      &dxGShader->m_pShader);
   dxGShader->setType(PK_SHADER_TYPE::kGeometry);
   // check if the creation was successful
   if (PK_FAILED(hr)) {
-    safeRelease(dxGShader->m_pSBlob);
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to create a DX Geometry Shader. Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
@@ -663,6 +659,33 @@ DX11GraphicsAPI::unbindRenderTargets(const SIZE_T _count)
   m_pDevice->m_pImmediateContext->OMSetRenderTargets(static_cast<uint32>(_count),
                                                      unbindRT.data(),
                                                      nullptr);
+}
+
+SPtr<Shader>
+DX11GraphicsAPI::internalCreateShader(const PK_SHADER_TYPE::E& _type)
+{
+  switch (_type)
+  {
+  case PK_SHADER_TYPE::kVertex: {
+    return make_shared<DX11VertexShader>();
+    break;
+  }
+  case PK_SHADER_TYPE::kPixel: {
+    return make_shared<DX11PixelShader>();
+    break;
+  }
+  case PK_SHADER_TYPE::kCompute: {
+    return make_shared<DX11ComputeShader>();
+    break;
+  }
+  case PK_SHADER_TYPE::kGeometry: {
+    return make_shared<DX11GeometryShader>();
+    break;
+  }
+  default:
+    return nullptr;
+    break;
+  }
 }
 
 void
@@ -906,8 +929,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
 
   ID3D11ShaderReflection* pVShaderReflection = nullptr;
-  throwIfFailed(D3DReflect(dxVShader->m_pSBlob->getBufferPointer(),
-                           dxVShader->m_pSBlob->getBufferSize(),
+  throwIfFailed(D3DReflect(dxVShader->m_pSBlob.getBufferPointer(),
+                           dxVShader->m_pSBlob.getBufferSize(),
                            __uuidof(ID3D11ShaderReflection),
                            reinterpret_cast<void**>(&pVShaderReflection)));
 
@@ -983,8 +1006,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
 
   m_pDevice->m_pd3dDevice->CreateInputLayout(&inputLayoutDesc[0],
                                              static_cast<uint32>(inputLayoutDesc.size()),
-                                             dxVShader->m_pSBlob->getBufferPointer(),
-                                             dxVShader->m_pSBlob->getBufferSize(),
+                                             dxVShader->m_pSBlob.getBufferPointer(),
+                                             dxVShader->m_pSBlob.getBufferSize(),
                                              &pLayout->m_pVertexLayout);
   if (!pLayout) {
     const String msg = "Failed to create the input layout.";
@@ -1060,8 +1083,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
 
   hr = m_pDevice->m_pd3dDevice->CreateInputLayout(dxLayout.data(),
                                                   static_cast<uint32>(dxLayout.size()),
-                                                  dxVShader->m_pSBlob->getBufferPointer(),
-                                                  dxVShader->m_pSBlob->getBufferSize(),
+                                                  dxVShader->m_pSBlob.getBufferPointer(),
+                                                  dxVShader->m_pSBlob.getBufferSize(),
                                                   &pInputL->m_pVertexLayout);
   // failed to create the input layout
   if (PK_FAILED(hr)) {

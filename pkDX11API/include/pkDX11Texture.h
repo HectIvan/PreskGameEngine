@@ -41,14 +41,7 @@ class DX11Texture : public Texture
     m_owner(false)
   {}
   ~DX11Texture() override {
-    for (auto& rtv : m_rTVs) {
-      safeRelease(rtv);
-    }
     m_rTVs.clear();
-
-    for (auto& uav : m_uAVs) {
-      safeRelease(uav);
-    }
     m_uAVs.clear();
 
     safeRelease(m_sRV);

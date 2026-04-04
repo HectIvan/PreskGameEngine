@@ -82,8 +82,8 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
   file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_type), sizeof(PK_SHADER_TYPE::E));
 
   // write shader data.
-  const void* pointer = shader->m_pSBlob->getBufferPointer();
-  const SIZE_T pointerSize = shader->m_pSBlob->getBufferSize();
+  const void* pointer = shader->m_pSBlob.getBufferPointer();
+  const SIZE_T pointerSize = shader->m_pSBlob.getBufferSize();
   resource->m_data = Vector<ANSICHAR>(static_cast<const ANSICHAR*>(pointer),
                                       static_cast<const ANSICHAR*>(pointer) +
                                       pointerSize );

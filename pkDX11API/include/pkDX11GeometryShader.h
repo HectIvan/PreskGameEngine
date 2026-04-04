@@ -21,13 +21,21 @@ namespace pkEngineSDK {
 
 class DX11GeometryShader : public DX11Shader
 {
-public:
+ public:
   DX11GeometryShader() = default;
   ~DX11GeometryShader() override {
     safeRelease(m_pShader);
   }
 
-public:
+  // deletes the possibility of the constructor and operator in the class.
+  DX11GeometryShader(const DX11GeometryShader&) = delete;
+  DX11GeometryShader& operator=(const DX11GeometryShader&) = delete;
+
+  // movement functions deleted.
+  DX11GeometryShader(DX11GeometryShader&&) noexcept = delete;
+  DX11GeometryShader& operator=(DX11GeometryShader&&) noexcept = delete;
+
+ public:
   ID3D11GeometryShader* m_pShader = nullptr;
 };
 }

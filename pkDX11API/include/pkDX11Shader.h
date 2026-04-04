@@ -31,6 +31,14 @@ class DX11Shader : public Shader
   DX11Shader() = default;
   virtual ~DX11Shader() = default;
 
+  // deletes the possibility of the constructor and operator in the class.
+  DX11Shader(const DX11Shader&) = delete;
+  DX11Shader& operator=(const DX11Shader&) = delete;
+
+  // movement functions deleted.
+  DX11Shader(DX11Shader&&) noexcept = delete;
+  DX11Shader& operator=(DX11Shader&&) noexcept = delete;
+
   /**
    * @brief Compile the shader from a file.
    */

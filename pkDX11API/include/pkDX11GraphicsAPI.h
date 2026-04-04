@@ -194,7 +194,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @return API Specific shader.
    */
   SPtr<Shader>
-  internalCreateShader() override { return make_shared<DX11Shader>(); }
+  internalCreateShader(const PK_SHADER_TYPE::E& _type) override;
 
   /**
    * @brief Create a vertex shader.

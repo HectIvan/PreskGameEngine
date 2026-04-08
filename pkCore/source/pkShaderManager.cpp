@@ -161,7 +161,7 @@ ShaderManager::getShader(const ShaderKey& _key)
     return nullptr;
   }
 
-  return it->second.lock();
+  return it->second;
 }
 
 Vector<SPtr<Shader>>

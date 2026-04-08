@@ -33,6 +33,9 @@ RendererManager::init()
   txDesc.usage = kPK_USAGE_DEFAULT;
   txDesc.mipLevels = 1;
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
+
+  m_targetRT = api.createTexture(txDesc);
+  m_transpTargetRT = api.createTexture(txDesc);
   
   // render target for scene colors.
   SPtr<Texture> albedoRT = api.createTexture(txDesc);
@@ -48,7 +51,7 @@ RendererManager::init()
   SPtr<Texture> normalTranspRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_TranspNormal, normalTranspRT });
 
-  // render target for the metallic result.
+  // render target for the orm result.
   SPtr<Texture> ormRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_ORM, ormRT });
 

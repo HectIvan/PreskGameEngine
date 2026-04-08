@@ -217,8 +217,12 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   // skyboxes
   SPtr<Texture> m_mainSkybox;
 
+  SPtr<Texture> m_targetRT;
+  SPtr<Texture> m_transpTargetRT;
+
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;
+  Vector<SPtr<Light>> m_lights;
 };
 
 PK_CORE_EXPORT RendererManager&

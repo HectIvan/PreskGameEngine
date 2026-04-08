@@ -204,7 +204,6 @@ EditorApp::input()
 void
 EditorApp::uInterfaceUpdate()
 {
-  Logger& log = g_Logger();
   SceneManager& sm = g_SceneManager();
   UInterface& im = g_uInterface();
 

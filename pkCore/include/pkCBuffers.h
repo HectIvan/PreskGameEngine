@@ -38,6 +38,21 @@ struct CBTransform
   Matrix4 transform;
 };
 
+struct CBWVP
+{
+  CBWVP() = default;
+  CBWVP(const Matrix4& _world, const Matrix4& _view, const Matrix4& _projection)
+    :
+    world(_world),
+    view(_view),
+    projection(_projection) {
+  }
+
+  Matrix4 world = Matrix4::IDENTITY;
+  Matrix4 view = Matrix4::IDENTITY;
+  Matrix4 projection = Matrix4::IDENTITY;
+};
+
 struct CBSSAO // 16 bytes
 {
   CBSSAO() = default;
@@ -77,14 +92,15 @@ struct CBLight
 {
   CBLight() = default;
   CBLight(const SPtr<Light>& _pLight) {
-    direction = Vector4(_pLight->m_direction, 9.9999f);
-    position = Vector4(_pLight->m_position, 9.9999f);
     color = Vector4(_pLight->m_color, 1.0f);
+    direction = Vector4(_pLight->m_direction, 1.0f);
+    position = Vector4(_pLight->m_position, 1.0f);
     shadowIntensity = _pLight->m_shadowIntensity;
-    spotExponent = _pLight->m_spotExponent;
-    spotCutoff = _pLight->m_spotCutoff;
     specIntensity = _pLight->m_specIntensity;
+    spotCutoff = _pLight->m_spotCutoff;
+    spotExponent = _pLight->m_spotExponent;
     transform = _pLight->m_transform;
+    viewProj = _pLight->m_viewProj;
   }
   Vector4 direction = Vector4(0.0f, -1.0f, 0.0f, 0.0f); // 16
   Vector4 position = Vector4(0.0f, 50.0f, 0.0f, 1.0f); // 32
@@ -94,6 +110,7 @@ struct CBLight
   float spotCutoff = 0.9f; // 60
   float specIntensity = 1.0f; // 64
   Matrix4 transform = Matrix4::IDENTITY; // 128
+  Matrix4 viewProj = Matrix4::IDENTITY; // 128
 };
 
 struct CBAOData

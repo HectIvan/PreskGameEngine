@@ -304,6 +304,9 @@ class PK_CORE_EXPORT Camera : public Component
   static COMPONENT_TYPE::E
   getObjType() { return COMPONENT_TYPE::kCamera; }
 
+ public:
+  bool m_isMain = false;
+
  private:
   // Camera view
   Matrix4 m_view;

@@ -35,7 +35,8 @@ RendererManager::init()
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
 
   m_targetRT = api.createTexture(txDesc);
-  m_transpTargetRT = api.createTexture(txDesc);
+  m_actorsRT = api.createTexture(txDesc);
+  m_transpActorsRT = api.createTexture(txDesc);
   
   // render target for scene colors.
   SPtr<Texture> albedoRT = api.createTexture(txDesc);
@@ -185,27 +186,33 @@ RendererManager::onShutDown()
 void
 RendererManager::createPasses()
 {
-  // Textures
+  // object data
+  const SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
+
   const SPtr<Texture> albedoRT = getGBuffer(G_BUFFERS::kGB_Albedo);
   const SPtr<Texture> normalRT = getGBuffer(G_BUFFERS::kGB_Normal);
   const SPtr<Texture> ormRT = getGBuffer(G_BUFFERS::kGB_ORM);
-  const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
-  const SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
-  const SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
-  const SPtr<Texture> posLightRT = getGBuffer(G_BUFFERS::kGB_PositionsLight);
   const SPtr<Texture> emissRT = getGBuffer(G_BUFFERS::kGB_Emissive);
-  const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
-  const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
-  const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
-  const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
-  const SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
-
+  const SPtr<Texture> posRT = getGBuffer(G_BUFFERS::kGB_Positions);
+  const SPtr<Texture> brdfRT = getGBuffer(G_BUFFERS::kGB_BRDF);
+ 
+  // transparent data.
   const SPtr<Texture> transpAlbedo = getGBuffer(G_BUFFERS::kGB_TranspAlbedo);
   const SPtr<Texture> transpNormal = getGBuffer(G_BUFFERS::kGB_TranspNormal);
   const SPtr<Texture> transpORM = getGBuffer(G_BUFFERS::kGB_TranspORM);
   const SPtr<Texture> transpEmiss = getGBuffer(G_BUFFERS::kGB_TranspEmiss);
   const SPtr<Texture> transpPos = getGBuffer(G_BUFFERS::kGB_TranspPos);
   const SPtr<Texture> brdfTranspRT = getGBuffer(G_BUFFERS::kGB_BRDFTransp);
+
+  // Skybox pass
+  const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
+
+  // Post Process passes
+  const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
+  const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
+  const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
+  const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
+  const SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
   // Depth textures
   const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -223,11 +230,7 @@ RendererManager::createPasses()
   pDesc.pSKey = ShaderKey("resources/pkPShader.pks", "PS", "ps_5_0");
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
-  pDesc.cBSizes = { sizeof(CBMatrix),
-                    sizeof(CBMatrix),
-                    sizeof(CBMatrix),
-                    sizeof(CBMaterialProps),
-                    sizeof(CBMatrix) };
+  pDesc.cBSizes = { sizeof(CBWVP), sizeof(CBMaterialProps)};
   pDesc.inputs = {};
   pDesc.outputs = { albedoRT, normalRT, ormRT, emissRT, posRT };
   pDesc.pDepth = DepthBuffer;
@@ -255,9 +258,9 @@ RendererManager::createPasses()
   m_passes.insert({ PASS_TYPE::kP_Transparency, transparencyPass });
 
   /****************************************************************************
-   * Shadow Pass
+   * Light positions Pass
    ***************************************************************************/
-  LOG_REGISTER("---------Creating shadow pass.---------", __FILE__, __LINE__);
+  LOG_REGISTER("---------Creating light positions pass.---------", __FILE__, __LINE__);
   pDesc.pSKey = ShaderKey("resources/pkPShaderDepth.pks", "PS", "ps_5_0");
   pDesc.outputs = { posLightRT };
   pDesc.pDepth = LightDepthBuffer;
@@ -271,10 +274,7 @@ RendererManager::createPasses()
   pDesc.vSKey = ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
   pDesc.pSKey = ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBLight),
-                    sizeof(CBCamera),
-                    sizeof(Matrix4),
-                    sizeof(Vector4),
-                    sizeof(Vector4)};
+                    sizeof(CBCamera) };
   pDesc.inputs = { DepthBuffer,
                    posRT,
                    posLightRT,
@@ -399,20 +399,51 @@ RendererManager::createPasses()
   LOG_REGISTER("---------Creating Tone Map pass.---------", __FILE__, __LINE__);
   pDesc.pSKey = ShaderKey("resources/pkToneMap.pks", "PS", "ps_5_0");
   pDesc.cBSizes = { sizeof(CBFloat) };
-  pDesc.inputs = { brdfRT,
-                   lumBlurRT,
-                   emissRT,
-                   emissBlurRT,
-                   skyboxRT,
-                   DepthBuffer,
-                   transpDepth,
-                   brdfTranspRT };
+  pDesc.inputs = { m_targetRT};
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> TonePass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, TonePass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
+
+
+  /****************************************************************************
+   * Merge pass
+   ***************************************************************************/
+  LOG_REGISTER("---------Creating Merge pass.---------", __FILE__, __LINE__);
+  pDesc.pSKey = ShaderKey("resources/pkMergeShader.pks", "PS", "ps_5_0");
+  pDesc.cBSizes = {};
+  pDesc.inputs = { m_actorsRT, m_transpActorsRT, skyboxRT };
+  pDesc.outputs = { m_targetRT };
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
+  SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Merge, mergePass });
+  LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
+
+
+  /****************************************************************************
+   * Material Pass
+   ***************************************************************************/
+  LOG_REGISTER("---------Creating Material Specific pass.---------", __FILE__, __LINE__);
+  pDesc.vSKey = ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
+  pDesc.pSKey = ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0");
+  pDesc.cBSizes = { sizeof(CBLight),
+                    sizeof(CBCamera) };
+  pDesc.inputs = { DepthBuffer,
+                   posRT,
+                   posLightRT,
+                   albedoRT,
+                   normalRT,
+                   ormRT,
+                   m_mainSkybox,
+                   cubeMapRT };
+  pDesc.outputs = { m_actorsRT };
+  pDesc.pDepth = {};
+  SPtr<Pass> matPass = make_shared<Pass>(pDesc);
+  // insert to the passes
+  m_passes.insert({ PASS_TYPE::kP_Material, matPass });
 }
 
 SPtr<Pass>
@@ -613,6 +644,7 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
   const SPtr<Pass> transparencyPass = rManager.getPass(PASS_TYPE::kP_Transparency);
   const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+  const SPtr<Pass> materialPass = rManager.getPass(PASS_TYPE::kP_Material);
 
   const SIZE_T mat4x4Size = sizeof(Matrix4);
 
@@ -624,23 +656,74 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   // for each mesh in the model
   const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
   const uint32 sizeProps = sizeof(CBMaterialProps);
+
+  CBLight cBLight;
+  SPtr<Light> light = m_lights[0];
+  if (light) {
+    cBLight = CBLight(light);
+  }
+
+  CBCamera cBCamera;
+  const uint32 cameracount = static_cast<uint32>(m_cameras.size());
+  for (uint32 i = 0; i < cameracount; ++i) {
+    SPtr<Camera> cam = m_cameras[i];
+    if (cam->m_isMain) {
+      cBCamera = CBCamera(cam);
+      break;
+    }
+  }
+
+
   for (uint32 i = 0; i < meshCount; ++i) {
-    // get the material
     const SPtr<Mesh> mesh = _model->meshes[i];
-    // get if the mesh is active or not, if it's not, dont render and keep going.
     const SPtr<Material> material = mesh->material;
+
+    // if the mesh can be rendered.
     if (mesh->getActive() && material) {
-      // set resources to the pixel shader.
-      api.pSSetShaderResourceViews(material->getTextures());
+      const Matrix4 transform = mesh->m_transform * _actorTransform; // mesh transform is applied first, then the actor transform.
+
       // update the constant buffers.
-      const Matrix4 transform = mesh->m_transform * _actorTransform;
-      basePass->updateCBuffer(2, &transform, mat4x4Size);
-      basePass->updateCBuffer(3, &material->m_properties, sizeProps);
-      transparencyPass->updateCBuffer(2, &transform, mat4x4Size);
-      transparencyPass->updateCBuffer(3, &material->m_properties, sizeProps);
-      lightPositionsPass->updateCBuffer(2, &transform, mat4x4Size);
-      // render the mesh.
+      CBWVP wvp(transform, cBCamera.view, cBCamera.projection);
+
+      basePass->updateCBuffer(0, &wvp, mat4x4Size);
+      basePass->updateCBuffer(1, &material->m_properties, sizeProps);
+      transparencyPass->updateCBuffer(0, &wvp, mat4x4Size);
+      transparencyPass->updateCBuffer(1, &material->m_properties, sizeProps);
+      lightPositionsPass->updateCBuffer(0, &wvp, mat4x4Size);
+
+      /**
+       * Base pass to get the object data, albedo, normal, orm, positions.
+       */
+      basePass->beginPass(Color::BLACK);
+      api.pSSetShaderResourceViews(material->getTextures());
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      basePass->endPass();
+
+      /**
+       * Same as before, but for transparent objects.
+       */
+      transparencyPass->beginPass(Color::BLACK);
+      api.pSSetShaderResourceViews(material->getTextures());
+      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      transparencyPass->endPass();
+
+      /**
+       * Positions from the light perspective.
+       */
+      lightPositionsPass->beginPass(Color::BLACK);
+      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      lightPositionsPass->endPass();
+
+
+      /**
+       * Material specific shader.
+       */
+      materialPass->beginPass();
+      api.setPShader(material->m_shader);
+      materialPass->updateCBuffers({ &cBLight, &cBCamera },
+                                   { sizeof(CBLight), sizeof(CBCamera) });
+      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      materialPass->endPass();
     }
     // update the offsets
     currentIndexOrigin += mesh->numIndex;

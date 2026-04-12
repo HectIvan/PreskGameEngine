@@ -35,6 +35,7 @@ cbuffer cbLight : register(b0)
   float SpotCutoff; // 60
   float SpecIntensity; // 64
   float4x4 lightTransform; // 128
+  float4x4 LightViewProj; // 64
 }
 
 cbuffer Camera : register(b1)
@@ -44,23 +45,6 @@ cbuffer Camera : register(b1)
   float4x4 ViewCam; // 92
   float4x4 ProjectionCam; // 156
   float _unusedCam0; // 160
-}
-
-cbuffer LightViewProj : register(b2)
-{
-  float4x4 LightViewProj; // 64
-}
-
-cbuffer ShadowParam : register(b3)
-{
-  float2 winSize; // 8
-  float2 farNear; // 16
-}
-
-cbuffer IBLIntensity : register(b4)
-{
-  float IBLIntensity;
-  float3 _unusedIBL;
 }
 
 struct PS_INPUT
@@ -249,7 +233,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
   float targetMip = lerp(0.0, mipCount - 1.0, roughness);
   // specular IBL
-  float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb * IBLIntensity;
+  float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
   float3 diffuseIBL = IBL * fLambert;
     

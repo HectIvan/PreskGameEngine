@@ -34,6 +34,7 @@ ShaderManager::createShaderResources()
   ShaderKey positions("shaders/pkPShaderDepth.hlsl", "PS", "ps_5_0");
   ShaderKey quad("shaders/pkQuadShader.hlsl", "VS", "vs_5_0");
   ShaderKey BRDFShader("shaders/pkLightShader.hlsl", "PS", "ps_5_0");
+  ShaderKey mergeShader("shaders/pkMergeShader.hlsl", "PS", "ps_5_0");
   ShaderKey cBRDFShader("shaders/pkCLightShader.hlsl", "CSMain", "cs_5_0");
   ShaderKey skybox("shaders/pkSkyboxShader.hlsl", "PS", "ps_5_0");
   ShaderKey ssao("shaders/pkPSAOshader.hlsl", "PS", "ps_5_0");
@@ -46,6 +47,7 @@ ShaderManager::createShaderResources()
   // initialize all shaders and create the resources.
   createShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
   createShaderResource(basePixel, PK_SHADER_TYPE::kPixel);
+  createShaderResource(mergeShader, PK_SHADER_TYPE::kPixel);
   createShaderResource(positions, PK_SHADER_TYPE::kPixel);
   createShaderResource(quad, PK_SHADER_TYPE::kVertex);
   createShaderResource(BRDFShader, PK_SHADER_TYPE::kPixel);

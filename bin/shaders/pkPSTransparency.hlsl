@@ -7,7 +7,7 @@ Texture2D emissiveTex : register(t5);
 
 SamplerState samLinear : register(s0);
 
-cbuffer MaterialProps : register(b3)
+cbuffer MaterialProps : register(b0)
 {
   float3 colorMultiplier; // base color multiplier
   float roughnessFactor; // roughness factor

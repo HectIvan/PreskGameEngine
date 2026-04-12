@@ -89,5 +89,6 @@ class PK_CORE_EXPORT Light : public Component
   Vector3 m_color = Vector3(1.0f);
 
   Matrix4 m_transform;
+  Matrix4 m_viewProj;
 };
 }

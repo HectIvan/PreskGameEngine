@@ -2,24 +2,11 @@
 * Constant Buffer Structures
 ***************************************************************************************/
 
-cbuffer cbView : register(b0)
-{
-  row_major matrix View;
-};
-
-cbuffer cbProjection : register(b1)
-{
-  row_major matrix Projection;
-};
-
-cbuffer cbWorld : register(b2)
+cbuffer cbWVP : register(b0)
 {
   row_major matrix World;
-};
-
-cbuffer cbWorldInvTransp : register(b4)
-{
-  row_major matrix worldInvTransp;
+  row_major matrix View;
+  row_major matrix Projection;
 };
 
 struct VS_INPUT

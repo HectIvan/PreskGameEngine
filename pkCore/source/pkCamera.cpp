@@ -175,7 +175,7 @@ Camera::updateView()
   
   const Matrix4 rot = Matrix4::rotation(invRot);
   const Matrix4 translation = Matrix4::translation(-m_eye.xyz()).getTransposed();
-  m_view = rot * translation;// Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+  m_view = translation * rot;// Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
 
   /* note: i seem to have accidentally implemented an orbit camera, something that i did intend on doing in the future,
      but not now, this was intended to be a first person camera, either way, i'll be saving this code for later.*/

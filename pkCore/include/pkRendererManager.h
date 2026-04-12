@@ -81,6 +81,8 @@ namespace PASS_TYPE
   enum E {
     kP_Base = 0,
     kP_Transparency,
+    kP_Material,
+    kP_Merge,
     kP_EmissiveBlur,
     kP_EmissiveHBlur,
     kP_Exposure,
@@ -218,11 +220,13 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   SPtr<Texture> m_mainSkybox;
 
   SPtr<Texture> m_targetRT;
-  SPtr<Texture> m_transpTargetRT;
+  SPtr<Texture> m_actorsRT;
+  SPtr<Texture> m_transpActorsRT;
 
   // passes
   UMap<PASS_TYPE::E, SPtr<Pass>> m_passes;
   Vector<SPtr<Light>> m_lights;
+  Vector<SPtr<Camera>> m_cameras;
 };
 
 PK_CORE_EXPORT RendererManager&

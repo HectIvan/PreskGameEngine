@@ -919,7 +919,8 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
     String fullMSG = "Shader failed to compile. Error message: " + error;
     // if the compilation outright failed
     if (PK_FAILED(hr)) {
-      LOG_ERROR(fullMSG, __FILE__, __LINE__);
+      LOG_FATAL(fullMSG, __FILE__, __LINE__);
+      THROW_ERROR(fullMSG);
       return nullptr;
     }
     // if it didnt fail but there's a message, it must be a warning

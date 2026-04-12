@@ -27,6 +27,7 @@
 using pkEngineSDK::PASS_TYPE::kP_Base;
 using pkEngineSDK::PASS_TYPE::kP_Transparency;
 using pkEngineSDK::PASS_TYPE::kP_LightPositions;
+using pkEngineSDK::PASS_TYPE::kP_Merge;
 using pkEngineSDK::PASS_TYPE::kP_SkyBox;
 using pkEngineSDK::PASS_TYPE::kP_Light;
 using pkEngineSDK::PASS_TYPE::kP_LightTransparency;
@@ -175,6 +176,7 @@ BaseApp::update()
     m_camera = activeScene->getActorWithComponent<Camera>();
   }
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
+  camera->m_isMain = true;
 
   // if there's no actor light, search the scene for an actor with a light.
   if (!m_light) {
@@ -183,31 +185,20 @@ BaseApp::update()
  SPtr<Light> light = m_light->getComponent<Light>();
 
   // get all passes.
-  const SPtr<Pass> lightPositions = rm.getPass(kP_LightPositions);
-  const SPtr<Pass> basePass = rm.getPass(kP_Base);
   const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  const SPtr<Pass> quadLight = rm.getPass(kP_Light);
   const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
   const SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
   const SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
   const SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
   const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
   const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  const SPtr<Pass> transparencyPass = rm.getPass(kP_Transparency);
-  const SPtr<Pass> transpBRDF = rm.getPass(kP_LightTransparency);
   const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
 
   // constant buffers.
-  CBCamera cBCamera;
-  CBCamera cBLightCam;
-  CBLight cBLight;
-  CBVector2x2 lightsParam; // should be removed later
   CBVector2x2 lum(winSize, Vector2(90.0f));
   CBBlur blur(winSize, Vector2(1.0f, 0.0f), m_blurRad, m_blurStr);
   CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissRad, m_emissStr);
   CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // will be modified later.
-  const CBVector2x2 windowSize(winSize, Vector2(0.0f));
-  const CBFloat IBLCBuffer(m_IBLInt);
   const CBFloat exposureCBuffer(m_exposure);
   const CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
   const CBVector2x2 ssao(m_ssaoSRad, m_ssaoScale, m_ssaoBias, m_ssaoInt);
@@ -215,69 +206,26 @@ BaseApp::update()
   // camera data.
   Matrix4 view = Matrix4::IDENTITY;
   Matrix4 proj = Matrix4::IDENTITY;
-  Matrix4 invView = Matrix4::IDENTITY;
-  Matrix4 invProj = Matrix4::IDENTITY;
-  Matrix4 invViewProj = Matrix4::IDENTITY;
   Matrix4 viewTransp = Matrix4::IDENTITY;
   Matrix4 projTransp = Matrix4::IDENTITY;
-  Matrix4 lightView = Matrix4::IDENTITY;
-  Matrix4 lightProj = Matrix4::IDENTITY;
-  Matrix4 lightViewProj = Matrix4::IDENTITY;
 
   if (camera) {
     view = camera->getView();
     proj = camera->getProjection();
-    invView = view.inverse();
-    invProj = proj.inverse();
     viewTransp = view.getTransposed();
     projTransp = proj.getTransposed();
-    invViewProj = (view * proj).inverse();
-    cBCamera = CBCamera(camera);
-
-    shadowsParam.vec2 = camera->getFarNear();
-  }
-
-  if (light) {
-    cBLight.color = Vector4(light->m_color, 1.0f);
-    cBLight.direction = Vector4(light->m_direction, 0.0f);
-    cBLight.position = Vector4(light->m_position, 1.0f);
-    cBLight.shadowIntensity = light->m_shadowIntensity;
-    cBLight.specIntensity = light->m_specIntensity;
-    cBLight.spotCutoff = light->m_spotCutoff;
-    cBLight.spotExponent = light->m_spotExponent;
-    cBLight.transform = light->m_transform;
   }
 
   // data type sizes.
   const uint32 m4x4Size = sizeof(Matrix4);
   const uint32 v2x2Size = sizeof(CBVector2x2);
-  const uint32 cBCamSize = sizeof(CBCamera);
-  const uint32 cBLightSize = sizeof(CBLight);
   const uint32 cBlurSize = sizeof(CBBlur);
-  const uint32 cbFloatSize = sizeof(CBFloat);
-
-  // update normal && base shadow pass buffers.
-  basePass->updateCBuffer(0, &view, m4x4Size);
-  basePass->updateCBuffer(1, &proj, m4x4Size);
-
-  transparencyPass->updateCBuffer(0, &view, m4x4Size);
-  transparencyPass->updateCBuffer(1, &proj, m4x4Size);
-
-  lightPositions->updateCBuffer(0, &lightView, m4x4Size);
-  lightPositions->updateCBuffer(1, &lightProj, m4x4Size);
-
-  // update shadow-specular quad pass
-  quadLight->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &IBLCBuffer },
-                            { cBLightSize, cBCamSize, m4x4Size, v2x2Size, v2x2Size });
-
-  transpBRDF->updateCBuffers({ &cBLight, &cBCamera, &lightViewProj, &lightsParam, &IBLCBuffer },
-                             { cBLightSize, cBCamSize, m4x4Size, v2x2Size, v2x2Size });
 
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
   // luminance constant buffers.
-  lumPass->updateCBuffer(0, &lum, cbFloatSize);
+  lumPass->updateCBuffer(0, &lum, sizeof(CBFloat));
   // Emissive blur constant buffers;
   emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f); 
@@ -300,12 +248,13 @@ BaseApp::render()
   RendererManager& renderManager = g_RenderManager();
 
   // get all passes
-  const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
-  const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
-  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
+  // const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
+  // const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
+  // const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   const SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
-  const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
-  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
+  const SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
+  // const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
+  // const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
   const SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
   const SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   const SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
@@ -317,19 +266,40 @@ BaseApp::render()
   // Get all actors
   const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
+
+  /**
+   *  to do: temporary.
+   */
+  renderManager.m_lights.clear();
+  const uint32 actorCount = static_cast<uint32>(actors.size());
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Light> light = actors[i]->getComponent<Light>();
+    if (light) {
+      renderManager.m_lights.push_back(light);
+    }
+  }
+
+  renderManager.m_cameras.clear();
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
+    if (camera) {
+      renderManager.m_cameras.push_back(camera);
+    }
+  }
+
+  renderManager.renderActors(actors);
   // first shadow pass
-  lightPositions->beginPass();
-  renderManager.renderActors(actors);
-  lightPositions->endPass();
-
-  // base pass
-  basePass->beginPass(Color::BLACK);
-  renderManager.renderActors(actors);
-  basePass->endPass();
-
-  transparencyPass->beginPass(Color::BLACK);
-  renderManager.renderActors(actors);
-  transparencyPass->endPass();
+  // lightPositions->beginPass();
+  // lightPositions->endPass();
+  // 
+  // // base pass
+  // basePass->beginPass(Color::BLACK);
+  // renderManager.renderActors(actors);
+  // basePass->endPass();
+  // 
+  // transparencyPass->beginPass(Color::BLACK);
+  // renderManager.renderActors(actors);
+  // transparencyPass->endPass();
 
   // get texel size of compute passes
 
@@ -339,51 +309,57 @@ BaseApp::render()
   // const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   // const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
-  BRDF->beginPass(Color::WHITE);
-  api.draw(3, 0);
-  BRDF->endPass();
-
-  transparencyBRDF->beginPass(Color::WHITE);
-  api.draw(3, 0);
-  transparencyBRDF->endPass();
-
-  // ssao pass
-  api.clearRenderTargetViews(Color::WHITE, ssaoPass->getOutputTextures());
-  if (m_ssao) {
-    ssaoPass->beginPass();
-    api.draw(3, 0);
-    ssaoPass->endPass();
-  }
+  // BRDF->beginPass(Color::WHITE);
+  // api.draw(3, 0);
+  // BRDF->endPass();
+  // 
+  // transparencyBRDF->beginPass(Color::WHITE);
+  // api.draw(3, 0);
+  // transparencyBRDF->endPass();
 
   // render the skybox
   skyBoxPass->beginPass();
   api.draw(3, 0);
   skyBoxPass->endPass();
 
-  // emissive Horizontal Blur pass
-  emissHBlurPass->beginPass();
+  mergePass->beginPass();
   api.draw(3, 0);
-  emissHBlurPass->endPass();
+  mergePass->endPass();
 
-  // emissive pass
-  emissBlurPass->beginPass();
-  api.draw(3, 0);
-  emissBlurPass->endPass();
+  // --------------- post processing --------------- //
 
-  // Quad luminosity pass.
-  lumPass->beginPass();
-  api.draw(3, 0);
-  lumPass->endPass();
-
-  // quad lum blur Horizontal pass.
-  lumBlurHPass->beginPass();
-  api.draw(3, 0);
-  lumBlurHPass->endPass();
-
-  // Quad lum blur Vertical pass.
-  lumBlurPass->beginPass();
-  api.draw(3, 0);
-  lumBlurPass->endPass();
+  // ssao pass
+  // api.clearRenderTargetViews(Color::WHITE, ssaoPass->getOutputTextures());
+  // if (m_ssao) {
+  //   ssaoPass->beginPass();
+  //   api.draw(3, 0);
+  //   ssaoPass->endPass();
+  // }
+  // 
+  // // emissive Horizontal Blur pass
+  // emissHBlurPass->beginPass();
+  // api.draw(3, 0);
+  // emissHBlurPass->endPass();
+  // 
+  // // emissive pass
+  // emissBlurPass->beginPass();
+  // api.draw(3, 0);
+  // emissBlurPass->endPass();
+  // 
+  // // Quad luminosity pass.
+  // lumPass->beginPass();
+  // api.draw(3, 0);
+  // lumPass->endPass();
+  // 
+  // // quad lum blur Horizontal pass.
+  // lumBlurHPass->beginPass();
+  // api.draw(3, 0);
+  // lumBlurHPass->endPass();
+  // 
+  // // Quad lum blur Vertical pass.
+  // lumBlurPass->beginPass();
+  // api.draw(3, 0);
+  // lumBlurPass->endPass();
 
   // Quad Tone pass
   tonePass->beginPass();

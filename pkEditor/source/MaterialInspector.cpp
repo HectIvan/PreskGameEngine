@@ -11,6 +11,7 @@
 #include "MaterialInspector.h"
 #include "pkUInterface.h"
 #include "pkTextureManager.h"
+#include "pkShader.h"
 
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
@@ -44,6 +45,22 @@ MaterialInspector::createMaterialWindow()
   im.createText("Material Name: ");
   im.sameLine();
   im.createInputText("##MaterialName: ", &matName);
+
+  if (m_material->m_shader) {
+    im.createText("Shader - ");
+    im.sameLine();
+    im.createText(m_material->m_shader->getShaderName().c_str());
+    im.createText("Model - ");
+    im.sameLine();
+    im.createText(m_material->m_shader->getShaderModel());
+    im.createText("Entry Point - ");
+    im.sameLine();
+    im.createText(m_material->m_shader->getEntryPoint());
+  }
+  else {
+    im.createText("Warning!!! No shader assigned to this material.");
+  }
+
   // get material
   MaterialProps& matProps = m_material->m_properties;
   // get the textures

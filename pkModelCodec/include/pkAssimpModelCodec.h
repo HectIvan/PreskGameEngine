@@ -32,7 +32,7 @@ class AssimpModelCodec : public ModelCodec
    * @return Pointer to the model resource.
    */
   SPtr<BaseResource>
-  createResourceFromFile(const Path _path) override;
+  createResource(const Path& _path) override;
 
   /**
    * @brief Convert an aiBone to a Bone.

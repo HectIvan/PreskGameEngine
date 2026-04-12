@@ -28,7 +28,7 @@
 namespace pkEngineSDK
 {
 
-extern "C" __declspec(dllexport) void
+PK_EXTERN PK_PLUGIN_EXPORT void
 loadPlugin()
 {
   TextureCodec::startUp<StbiTextureCodec>();

@@ -57,17 +57,11 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
 
   /**
    * @brief Insert a shader into the map.
-   * @param _key Shader specific key.
+   * @param _id Shader specific UUID.
    * @param _pShader Shader to store.
    */
   void
   insertShader(const UUID& _id, const SPtr<Shader>& _pShader);
-
-  /**
-   * @brief Create the shaders from the shader resources.
-   */
-  void
-  createShaders();
 
   /**
    * @brief Insert a shader into the map.
@@ -76,6 +70,12 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
    */
   void
   insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader);
+
+  /**
+   * @brief Create the shaders from the shader resources.
+   */
+  void
+  createShaders();
 
   /**
    * @brief Get shader from the shader map.
@@ -109,9 +109,10 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
   Vector<String> 
   getShaderNames(const bool _getEntry = false, const bool _getModel = false);
 
+ public:
+  const ShaderKey m_defaultShaderKey = ShaderKey("shaders/pkLightShader.hlsl", "PS", "ps_5_0");
  private:
   UMap<UUID, SPtr<Shader>> m_shaders;
-  UMap<ShaderKey, SPtr<Shader>> m_keyShaders;
 };
 
 PK_CORE_EXPORT ShaderManager&

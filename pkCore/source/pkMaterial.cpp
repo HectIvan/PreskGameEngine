@@ -1,7 +1,8 @@
+#include "pkActor.h"
 #include "pkMaterial.h"
+#include "pkShader.h"
 #include "pkTexture.h"
 #include "pkTextureManager.h"
-#include "pkActor.h"
 
 namespace pkEngineSDK
 {

@@ -59,7 +59,6 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
   DLLManager& dllManager = g_DLLManager();
   AssetResourceManager& assetResource = g_AssetResourceManager();
 
-
   initWin();
   initAPI(_argv, _count);
 

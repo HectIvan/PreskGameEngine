@@ -26,6 +26,7 @@ namespace pkEngineSDK
 {
 
 class Actor;
+class Shader;
 
 struct MaterialProps
 {
@@ -169,6 +170,12 @@ class Material : public Component
   const Vector<WPtr<Texture>>
   getTextures();
 
+  /**
+   * @brief Set the shader of the material.
+   */
+  void
+  setShader(const SPtr<Shader>& _pShader) { m_shader = _pShader; }
+
  public:
   String m_name;
   bool m_castShadow;
@@ -181,5 +188,6 @@ class Material : public Component
   WPtr<Texture> m_oclussion;
   WPtr<Texture> m_roughness;
   WPtr<Texture> m_emissive;
+  SPtr<Shader> m_shader;
 };
 }

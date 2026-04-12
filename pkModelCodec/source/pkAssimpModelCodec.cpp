@@ -30,12 +30,11 @@
 #include "pkTexture.h"
 #include "pkTextureCodec.h"
 #include "pkTextureManager.h"
-#include "pkWindow.h"
 
 namespace pkEngineSDK
 {
 
-extern "C" __declspec(dllexport) void
+PK_EXTERN PK_PLUGIN_EXPORT void
 loadPlugin()
 {
   AssimpModelCodec::startUp<AssimpModelCodec>();
@@ -69,7 +68,7 @@ Matrix4
 aiTransformToMatrix4(aiMatrix4x4 _transform);
 
 SPtr<BaseResource>
-AssimpModelCodec::createResourceFromFile(const Path _path)
+AssimpModelCodec::createResource(const Path& _path)
 {
   SPtr<Model> model = make_shared<Model>();
 
@@ -202,7 +201,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   SPtr<Mesh> meshProcess = g_ModelManager().searchMesh(meshName);
   // if a mesh can be found
   if (meshProcess) {
-    LOG_REGISTER("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__)
+    LOG_REGISTER("Found pre-loaded mesh of name " + meshName + ".", __FILE__, __LINE__);
     return meshProcess;
   }
 
@@ -219,9 +218,6 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   const bool hasTexCoords = (meshTexCoords != nullptr);
   const bool tbExist = _mesh->HasTangentsAndBitangents();
   const bool hasNormals = _mesh->HasNormals();
-  // default vectors for when no data is found
-  const Vector3 zero3 = Vector3::ZERO;
-  const Vector2 zero2 = Vector2::ZERO;
 
   // process vertex
   for (uint32 i = 0; i < _mesh->mNumVertices; ++i) {
@@ -231,19 +227,19 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
     // get normal directions
     Vector3 normal = (hasNormals) ?
                      Vector3(_mesh->mNormals[i].x, _mesh->mNormals[i].y, _mesh->mNormals[i].z)
-                     : zero3;
+                     : Vector3::ZERO;
 
     // if there are texture coordinates, store them
-    Vector2 tex = (hasTexCoords) ? Vector2(meshTexCoords[i].x, meshTexCoords[i].y) : zero2;
+    Vector2 tex = (hasTexCoords) ? Vector2(meshTexCoords[i].x, meshTexCoords[i].y) : Vector2::ZERO;
 
     // check if the model has tantents and bitangents
     Vector3 tangent = (tbExist) ? Vector3(_mesh->mTangents[i].x,
                                           _mesh->mTangents[i].y,
-                                          _mesh->mTangents[i].z) : zero3;
+                                          _mesh->mTangents[i].z) : Vector3::ZERO;
 
     Vector3 bitangent = (tbExist) ? Vector3(_mesh->mBitangents[i].x,
                                             _mesh->mBitangents[i].y,
-                                            _mesh->mBitangents[i].z) : zero3;
+                                            _mesh->mBitangents[i].z) : Vector3::ZERO;
     // create and add a new vertex
     SimpleVertex sv = SimpleVertex(pos, normal, tex, tangent, bitangent);
     meshProcess->vertexVector[i] = sv;

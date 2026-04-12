@@ -95,7 +95,7 @@ throwIfFailed(const HRESULT& hr) {
   }
 }
 
-extern "C" __declspec(dllexport) void
+PK_EXTERN PK_PLUGIN_EXPORT void
 loadPlugin()
 {
   LOG_REGISTER("Starting DirectX 11 API...", __FILE__, __LINE__);
@@ -148,6 +148,8 @@ DX11GraphicsAPI::init(const Window& _window)
   dxSCh->createRenderTargetView(m_pDevice);
 
   m_pDevice->setPrimitiveTopology();
+
+  LOG_REGISTER("DirectX 11 swap chain & device initialized.", __FILE__, __LINE__);
 }
 
 SPtr<ConstantBuffer>
@@ -726,6 +728,12 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
     THROW_ERROR(msg);
     return nullptr;
   }
+  const String msg = "Created a DirectX 11 Sampler State. filter: " +
+                      to_string(_filter) +
+                      " address mode: " +
+                      to_string(_mode);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
+
   return pSamState;
 }
 
@@ -797,7 +805,7 @@ DX11GraphicsAPI::createBlendState()
     THROW_ERROR(msg);
     return nullptr;
   }
-  LOG_REGISTER("Created a Blend State.", __FILE__, __LINE__);
+  LOG_REGISTER("Created a DirectX 11 Blend State.", __FILE__, __LINE__);
   return pBlendState;
 }
 
@@ -825,7 +833,15 @@ DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
     return nullptr;
   }
 
-  LOG_REGISTER("Created a Rasterizer State.", __FILE__, __LINE__);
+  const String msg = "Created a DirectX 11 Rasterizer State. Fill mode: " +
+                      to_string(_desc.fillMode) +
+                      " Cull mode: " +
+                      to_string(_desc.cullMode) +
+                      " Front Counter Clockwise: " +
+                      to_string(_desc.frontCounterClockwise) +
+                      " Depth Clip Enable: " +
+                      to_string(_desc.depthClipEnable);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
   return dxRS;
 }
 
@@ -1015,6 +1031,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
     THROW_ERROR(msg);
     return nullptr;
   }
+
+  LOG_REGISTER("Created an DirectX 11 Input layout from a vertex shader.", __FILE__, __LINE__);
   return pLayout;
 }
 
@@ -1094,6 +1112,8 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
     THROW_ERROR(msg);
     return nullptr;
   }
+
+  LOG_REGISTER("Created a DirectX 11 Input layout.", __FILE__, __LINE__);
 
   return pInputL;
 }
@@ -1383,6 +1403,10 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
   tempTexture->setName(String(resource->m_name));
   tempTexture->setID(resource->m_id);
 
+  const String msg = "Created a DirectX 11 texture from a resource. Resource name: " +
+                     String(resource->m_name);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
+
   // return the texture
   return tempTexture;
 }
@@ -1402,6 +1426,10 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
   }
+
+  const String msg = "Created a DirectX 11 texture from a DSS directory. Texture name: " +
+                     texture->getName().toString();
+  LOG_REGISTER(msg, __FILE__, __LINE__);
   return texture;
 }
 
@@ -1420,6 +1448,8 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   if (srv) {
     m_pDevice->m_pImmediateContext->GenerateMips(srv);
   }
+  const String msg = "Generated mips for the texture: " + _pTexture->getName().toString();
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 uint32
@@ -1694,6 +1724,18 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
     }
   }
 
+  const String msg = "Created a DirectX 11 texture. Texture name: " +
+                      dxTex->getName().toString() +
+                      " Width: " + to_string(_width) +
+                      " Height: " + to_string(_height) +
+                      " Format: " + to_string(_format) +
+                      " Usage: " + to_string(_usage) +
+                      " Bind flags: " + to_string(_bindFlags) +
+                      " Shader resource format: " + to_string(_shaderResourceFormat) +
+                      " Mip levels: " + to_string(_mipLevels) +
+                      " Is cube: " + to_string(_isCube);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
+
   return dxTex;
 }
 
@@ -1747,6 +1789,11 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
   }
+
+  const String msg = "Created a DirectX 11 vertex buffer Byte width: " +
+                     to_string(byteWidth) +
+                     " Usage: " + to_string(_usage);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
   return dxVB;
 }
 
@@ -1799,6 +1846,11 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
     LOG_ERROR(msg, __FILE__, __LINE__);
     return nullptr;
   }
+
+  const String msg = "Created a DirectX 11 index buffer. Byte width: " +
+                     to_string(bd.ByteWidth) +
+                     " Usage: " + to_string(_usage);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
   return dxIB;
 }
 

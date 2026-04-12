@@ -297,7 +297,7 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture name.
    * @return Name of the texture.
    */
-  Path&
+  Path& // to do: change this to the actual name.
   getName() { return m_name; }
 
   /**

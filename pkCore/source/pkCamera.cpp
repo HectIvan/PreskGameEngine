@@ -63,7 +63,6 @@ Camera::init(const uint32& _width,
                                               _nearZ,
                                               _farZ);
   }
-  LOG_REGISTER("Created Camera component.", __FILE__, __LINE__);
 }
 
 void

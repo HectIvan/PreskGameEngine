@@ -23,7 +23,6 @@ namespace pkEngineSDK
 {
 
 class BaseResource;
-class ModelResource;
 
 class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
 {
@@ -46,7 +45,7 @@ class PK_CORE_EXPORT ModelCodec : public Module<ModelCodec>
    * @return Pointer to the model resource.
    */
   virtual SPtr<BaseResource>
-  createResourceFromFile(const Path _path) = 0;
+  createResource(const Path& _path) = 0;
 
   /**
    * @brief Get the possible extensions for model search in folders.

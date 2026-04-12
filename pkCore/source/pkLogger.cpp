@@ -185,10 +185,12 @@ Logger::printMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 void
 Logger::clearLogsOfType(const LOG_MSG_TYPE::E& _type)
 {
-  const uint32 logCount = static_cast<uint32>(m_messages.size());
+  uint32 logCount = static_cast<uint32>(m_messages.size());
   for (uint32 i = 0; i < logCount; ++i) {
     if (m_messages[i].type == _type) {
       m_messages.erase(m_messages.begin() + i);
+      --logCount;
+      --i;
     }
   }
 }

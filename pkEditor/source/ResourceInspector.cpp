@@ -51,7 +51,7 @@ ResourceInspector::createResourceWindow(const Window& _window)
     const Path path = _window.openFileFromExplorer("Model Files",
                                                    modelCodec.getPossibleExtensions());
     if (path.toString() != "") {
-      SPtr<BaseResource> resource = modelCodec.createResourceFromFile(path);
+      SPtr<BaseResource> resource = modelCodec.createResource(path);
       if (resource) {
         assetMan.insertNewResource(resource);
       }

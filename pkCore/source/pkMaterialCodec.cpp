@@ -20,6 +20,8 @@
 #include "pkMaterial.h"
 #include "pkMaterialResource.h"
 #include "pkPath.h"
+#include "pkShader.h"
+#include "pkShaderManager.h"
 #include "pkTexture.h"
 #include "pkUUID.h"
 
@@ -32,6 +34,8 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   if (!_pMaterial) {
     return nullptr;
   }
+
+  ShaderManager& sm = g_ShaderManager();
 
   const String materialName = _pMaterial->getNameS();
   const String filePath = PK_RESOURCE_FOLDER + materialName + ".pkmat";
@@ -81,6 +85,13 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   const SIZE_T IDSize = sizeof(UUID);
   const SIZE_T V3Size = sizeof(Vector3);
   const SIZE_T FSize = sizeof(float);
+
+  // if there isnt a shader assigned, search and assign the default shader.
+  if (!_pMaterial->m_shader) {
+    SPtr<Shader> shader = sm.getShader(sm.m_defaultShaderKey);
+    _pMaterial->setShader(shader);
+  }
+  file.write(reinterpret_cast<const ANSICHAR*>(&_pMaterial->m_shader->m_id), sizeof(UUID));
 
   // albedo write
   file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoID), IDSize);

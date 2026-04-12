@@ -54,15 +54,16 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   getTypeString() const override { return "Material"; }
 
  public:
-   UUID m_albedoID;
-   Vector3 m_albedoColor;
-   UUID m_normalID;
-   UUID m_aoID;
-   UUID m_roughnessID;
-   float m_roughValue;
-   UUID m_metallicID;
-   float m_metallicValue;
-   UUID m_emissiveID;
-   Vector3 m_emissiveColor;
+  UUID m_shaderID;
+  UUID m_albedoID;
+  Vector3 m_albedoColor;
+  UUID m_normalID;
+  UUID m_aoID;
+  UUID m_roughnessID;
+  float m_roughValue;
+  UUID m_metallicID;
+  float m_metallicValue;
+  UUID m_emissiveID;
+  Vector3 m_emissiveColor;
 };
 }

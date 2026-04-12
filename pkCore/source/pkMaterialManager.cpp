@@ -19,6 +19,7 @@
 #include "pkMaterialManager.h"
 #include "pkMaterialResource.h"
 #include "pkTextureManager.h"
+#include "pkShaderManager.h"
 
 namespace pkEngineSDK
 {
@@ -79,6 +80,7 @@ MaterialManager::loadMaterial(const UUID& _ID)
   const UUID emissId = matResource->m_emissiveID;
 
   material->setName(resource->m_name);
+  material->m_shader = g_ShaderManager().getShader(matResource->m_shaderID);
 
   material->m_albedo = textureMan.loadTexture(diffId);
   material->m_normal = textureMan.loadTexture(normId);

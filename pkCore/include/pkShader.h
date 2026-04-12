@@ -21,6 +21,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkPath.h"
 #include "pkShaderKey.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
@@ -112,6 +113,13 @@ class PK_CORE_EXPORT Shader
   setShaderModel(const ANSICHAR* _sModel) { m_sModel = _sModel; }
 
   /**
+   * @brief Get the shader name.
+   * @return The shader name.
+   */
+  const String
+  getShaderName() const { return m_shaderDirectory.getFileNameWithoutExtension(); }
+
+  /**
    * @brief get the current shader directory.
    * @return the Shader directory.
    */
@@ -146,8 +154,21 @@ class PK_CORE_EXPORT Shader
   PKBlob
   getBlob() const { return m_pSBlob; }
 
+  /**
+   * @brief Get the shader ID.
+   */
+  const UUID&
+  getID() const { return m_id; }
+
+  /**
+   * @brief Set the shader ID.
+   */
+  void
+  setID(const UUID& _id) { m_id = _id; }
+
  public:
   PKBlob m_pSBlob;
+  UUID m_id;
 
  protected:
   /**

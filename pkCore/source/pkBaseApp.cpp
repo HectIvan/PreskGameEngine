@@ -176,7 +176,6 @@ BaseApp::update()
     m_camera = activeScene->getActorWithComponent<Camera>();
   }
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
-  camera->m_isMain = true;
 
   // if there's no actor light, search the scene for an actor with a light.
   if (!m_light) {
@@ -318,11 +317,11 @@ BaseApp::render()
   // transparencyBRDF->endPass();
 
   // render the skybox
-  skyBoxPass->beginPass();
+  skyBoxPass->beginPass(FColor::CYAN);
   api.draw(3, 0);
   skyBoxPass->endPass();
 
-  mergePass->beginPass();
+  mergePass->beginPass(FColor::CYAN);
   api.draw(3, 0);
   mergePass->endPass();
 
@@ -362,7 +361,7 @@ BaseApp::render()
   // lumBlurPass->endPass();
 
   // Quad Tone pass
-  tonePass->beginPass();
+  tonePass->beginPass(FColor::CYAN);
   api.draw(3, 0);
   // Scene specific app render
   onRender();

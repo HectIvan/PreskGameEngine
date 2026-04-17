@@ -441,6 +441,7 @@ RendererManager::createPasses()
                    cubeMapRT };
   pDesc.outputs = { m_actorsRT };
   pDesc.pDepth = {};
+  pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> matPass = make_shared<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Material, matPass });
@@ -568,7 +569,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.pSSetConstantBuffers({ cBuffer }, 0);
 
   // iterate through each face of the cubemap.
-  api.clearRenderTargetView(Color::BLACK, _pOutput);
+  api.clearRenderTargetView(FColor::BLACK, _pOutput);
   for (uint32 i = 0; i < 6; ++i) {
     api.setRenderTarget(_pOutput, nullptr, i);
     const CBFloat data(static_cast<float>(i));
@@ -673,6 +674,7 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
     }
   }
 
+  materialPass->beginPass(Color(0, 1, 1, 0));
 
   for (uint32 i = 0; i < meshCount; ++i) {
     const SPtr<Mesh> mesh = _model->meshes[i];
@@ -694,7 +696,7 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       /**
        * Base pass to get the object data, albedo, normal, orm, positions.
        */
-      basePass->beginPass(Color::BLACK);
+      basePass->beginPass(FColor::CYAN);
       api.pSSetShaderResourceViews(material->getTextures());
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
       basePass->endPass();
@@ -702,15 +704,15 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       /**
        * Same as before, but for transparent objects.
        */
-      transparencyPass->beginPass(Color::BLACK);
-      api.pSSetShaderResourceViews(material->getTextures());
-      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
-      transparencyPass->endPass();
+      // transparencyPass->beginPass(FColor::CYAN);
+      // api.pSSetShaderResourceViews(material->getTextures());
+      // api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      // transparencyPass->endPass();
 
       /**
        * Positions from the light perspective.
        */
-      lightPositionsPass->beginPass(Color::BLACK);
+      lightPositionsPass->beginPass(FColor::CYAN);
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
       lightPositionsPass->endPass();
 
@@ -718,11 +720,11 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       /**
        * Material specific shader.
        */
-      materialPass->beginPass();
+      materialPass->beginPass(false);
       api.setPShader(material->m_shader);
       materialPass->updateCBuffers({ &cBLight, &cBCamera },
                                    { sizeof(CBLight), sizeof(CBCamera) });
-      api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
+      api.draw(3, 0);
       materialPass->endPass();
     }
     // update the offsets

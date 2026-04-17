@@ -1,5 +1,5 @@
 /***************************************************************************************
-* Shadows Pixel shader
+* PBR Pixel shader
 ***************************************************************************************/
 
 #define PI 3.14159265359f
@@ -178,13 +178,13 @@ float4 PS(PS_INPUT input) : SV_Target0
    * texture data
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
-  float4 normalTex = normalMap.Sample(samState, input.TexCoord);
-  float4 albedo = albedoMap.Sample(samState, input.TexCoord);
   
-  // check if the alpha is below threshold
-  if (albedo.a <= 0.05f) {
+  if (depthTex.r == 0.0f) {
     discard;
   }
+  
+  float4 normalTex = normalMap.Sample(samState, input.TexCoord);
+  float4 albedo = albedoMap.Sample(samState, input.TexCoord);
   
   float3 ormValues = ormMap.Sample(samState, input.TexCoord).rgb;
   float ao = ormValues.r;

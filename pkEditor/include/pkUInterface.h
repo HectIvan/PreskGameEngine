@@ -17,7 +17,6 @@
 * Includes
 **/
 /*********************************************/
-#include "pkColor.h"
 #include "imgui.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
@@ -628,6 +627,15 @@ class UInterface : public Module<UInterface>
    */
   void
   createImage(const SPtr<Texture>& _pTexture, const Vector2 _size);
+
+  /**
+   * @brief Create a color editor.
+   * @param _name Name of the editor.
+   * @param _color Color to set.
+   * @return Wether there was a change.
+   */
+  bool
+  colorEdit(const ANSICHAR* _name, FColor& _color);
 
   /**
    * @brief Create a color editor.

@@ -18,16 +18,16 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 actorTransparentSample = actorsTransparentRender.Sample(samState, input.TexCoord);
   float3 skyboxSample = skyboxRender.Sample(samState, input.TexCoord).rgb;
   
-  float4 finalColor = float4(0, 0, 0, 0);
+  float3 finalColor = float3(0, 0, 0);
   
   if (actorSample.a <= 0.0f)
   {
-    finalColor = float4(skyboxSample, 1.0f);
+    return float4(skyboxSample, 1.0f);
   }
   else
   {
-    finalColor = lerp(finalColor, actorTransparentSample, actorTransparentSample.a);
+    // finalColor = lerp(finalColor, actorTransparentSample.rgb, actorTransparentSample.a);
   }
   
-  return float4(finalColor.rgb, 0);
+  return float4(finalColor, 0);
 }

@@ -69,8 +69,8 @@ TextureManager::createFlatTexture(const String _name,
 {
   GraphicsAPI& api = g_GraphicAPI();
   TextureCodec& texCodec = g_TextureCodec();
-  AssetResourceManager& assetMan = g_AssetResourceManager();
-  Vector<uint8> data = { color.getR(), color.getG(), color.getB(), color.getA() };
+
+  Vector<uint8> data = { color._color.R, color._color.G, color._color.B, color._color.A };
   SPtr<TextureResource> resource = texCodec.createResource(_name,
                                                            _width,
                                                            _height,
@@ -78,7 +78,7 @@ TextureManager::createFlatTexture(const String _name,
                                                            PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT,
                                                            1,
                                                            data);
-  assetMan.insertNewResource(resource);
+  g_AssetResourceManager().insertNewResource(resource);
 
   SPtr<Texture> texture = api.createTextureFromResource(resource,
                                                         PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE);

@@ -26,6 +26,8 @@
 namespace pkEngineSDK
 {
 
+struct FColor;
+
 struct PK_UTILITY_EXPORT Color final
 {
   Color() = default;
@@ -94,75 +96,19 @@ struct PK_UTILITY_EXPORT Color final
   PKFORCEINLINE const Color
   operator=(const Vector3& _other) {
     Color newColor;
-    newColor.setR(_other.x);
-    newColor.setG(_other.y);
-    newColor.setB(_other.z);
-    newColor.setA(1.0f);
+    newColor._color.R = static_cast<uint8>(_other.x);
+    newColor._color.G = static_cast<uint8>(_other.y);
+    newColor._color.B = static_cast<uint8>(_other.z);
+    newColor._color.A = 255;
     return newColor;
   }
 
   /**
-   * @brief Get the red value of the color.
-   * @return The red value as an uint8.
+   * @brief Convert the Color to a FColor.
+   * @return FColor with the converted values.
    */
-  uint8
-  getR() const { return _color.R; }
-
-  /**
-   * @brief Set the red value of the color.
-   * @param _r The red value as an uint8.
-   */
-  void
-  setR(uint8 _r) { _color.R = _r; }
-
-  /**
-   * @brief Get the green value of the color.
-   * @return The green value as an uint8.
-   */
-  uint8
-  getG() const { return _color.G; }
-
-  /**
-   * @brief Set the green value of the color.
-   * @param _g The green value as an uint8.
-   */
-  void
-  setG(uint8 _g) { _color.G = _g; }
-
-  /**
-   * @brief Get the blue value of the color.
-   * @return The blue value as an uint8.
-   */
-  uint8
-  getB() const { return _color.B; }
-
-  /**
-   * @brief Set the blue value of the color.
-   * @param _b The blue value as an uint8.
-   */
-  void
-  setB(uint8 _b) { _color.B = _b; }
-
-  /**
-   * @brief Get the alpha value of the color.
-   * @return The alpha value as an uint8.
-   */
-  uint8
-  getA() const { return _color.A; }
-
-  /**
-   * @brief Set the alpha value of the color.
-   * @param _a The alpha value as an uint8.
-   */
-  void
-  setA(uint8 _a) { _color.A = _a; }
-
-  /**
-   * @brief Get a Vector4 float from the color.
-   * @return The vector.
-   */
-  Vector4
-  colorTo01();
+  FColor
+  toFColor() const;
 
   /**
    * @brief Get the RGB value of the color into a vector.
@@ -190,5 +136,6 @@ struct PK_UTILITY_EXPORT Color final
   static const Color YELLOW;
   static const Color GREEN;
   static const Color MAGENTA;
+  static const Color CYAN;
 };
 }

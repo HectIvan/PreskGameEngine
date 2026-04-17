@@ -237,7 +237,7 @@ DX11GraphicsAPI::dispatch(const uint32 _countX, const uint32 _countY, const uint
 }
 
 void
-DX11GraphicsAPI::clearRenderTargetViews(const Color& _color,
+DX11GraphicsAPI::clearRenderTargetViews(const FColor& _color,
                                         const Vector<WPtr<Texture>>& _rtvs,
                                         const uint32 _mipSlice)
 {
@@ -248,7 +248,7 @@ DX11GraphicsAPI::clearRenderTargetViews(const Color& _color,
 }
 
 void
-DX11GraphicsAPI::clearRenderTargetView(const Color& _color,
+DX11GraphicsAPI::clearRenderTargetView(const FColor& _color,
                                        const WPtr<Texture>& _rtv,
                                        const uint32 _mipSlice)
 {
@@ -261,10 +261,7 @@ DX11GraphicsAPI::clearRenderTargetView(const Color& _color,
     return;
   }
 
-  float color[4] = { static_cast<float>(_color.getR()),
-                     static_cast<float>(_color.getG()),
-                     static_cast<float>(_color.getB()),
-                     static_cast<float>(_color.getA()) };
+  float color[4] = { _color.r, _color.g, _color.b, _color.a };
 
   // if there is a mip slice specified to be cleared, clear said slice only and return.
   if (_mipSlice > -1) {
@@ -285,7 +282,7 @@ DX11GraphicsAPI::clearRenderTargetView(const Color& _color,
 
 void
 DX11GraphicsAPI::clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
-                                           const Color& _color)
+                                           const FColor& _color)
 {
   const uint32 uavCount = static_cast<uint32>(_uavs.size());
   for (uint32 i = 0; i < uavCount; ++i) {
@@ -294,7 +291,7 @@ DX11GraphicsAPI::clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
 }
 
 void
-DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const Color& _color)
+DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const FColor& _color)
 {
   PK_ASSERT(_uav);
   // Texture to a DirectX texture
@@ -306,10 +303,7 @@ DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const Color
     return;
   }
 
-  float color[4] = { static_cast<float>(_color.getR()),
-                     static_cast<float>(_color.getG()),
-                     static_cast<float>(_color.getB()),
-                     static_cast<float>(_color.getA()) };
+  float color[4] = { _color.r, _color.g, _color.b, _color.a };
 
   const uint32 uavCount = static_cast<uint32>(dxUAV->m_uAVs.size());
   for (uint32 i = 0; i < uavCount; ++i) {

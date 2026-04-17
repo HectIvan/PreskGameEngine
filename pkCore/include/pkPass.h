@@ -136,7 +136,13 @@ class PK_CORE_EXPORT Pass
    * @param _color Clear color.
    */
   void
-  beginPass(const Color& _color = Color(0, 1, 1, 0));
+  beginPass(const FColor& _color = FColor::CYAN, const bool& _clearRT = true);
+
+  /**
+   * @brief Start pass based parameter setting without clearing the render targets.
+   */
+  void
+  beginPass(const bool& _clearRT = false);
 
   /**
    * @brief Set all parameters to null;
@@ -179,7 +185,7 @@ class PK_CORE_EXPORT Pass
    * @param _color Clear color.
    */
   void
-  beginPixel(const Color& _color);
+  beginPixel(const FColor& _color, const bool& _clearRT);
 
   /**
    * @brief End pass based parameter setting for pixel shader passes.
@@ -192,7 +198,7 @@ class PK_CORE_EXPORT Pass
    * @param _color Clear color.
    */
   void
-  beginCompute(const Color& _color);
+  beginCompute(const FColor& _color, const bool& _clearUAV);
 
   /**
    * @brief End pass based parameter setting for compute shader passes.
@@ -205,7 +211,7 @@ class PK_CORE_EXPORT Pass
    * @param _color Clear color.
    */
   void
-  beginGeometry(const Color& _color);
+  beginGeometry(const FColor& _color);
 
   /**
    * @brief (TO IMPLEMENT) End pass based parameter setting for geometry shader passes.

@@ -97,6 +97,7 @@ EditorApp::onInit()
   m_camera = activeScene->instantiate("Main Camera");
   m_camera->setPosition(camPos);
   m_camera->addComponent(make_shared<Camera>(camDescription));
+  m_camera->getComponent<Camera>()->m_isMain = true;
 
   // create light
   const Vector3 lightPos = Vector3(0.0f, 1000.0f, 0.0f);

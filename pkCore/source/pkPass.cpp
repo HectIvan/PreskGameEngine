@@ -176,16 +176,16 @@ Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size)
 }
 
 void
-Pass::beginPass(const Color& _color)
+Pass::beginPass(const FColor& _color, const bool& _clearRT)
 {
   GraphicsAPI& api = g_GraphicAPI();
 
   // check what type of pass it is and call the corresponding begin function.
   if (PASS_MODEL::kPass_Pixel == m_passModel) {
-    beginPixel(_color);
+    beginPixel(_color, _clearRT);
   }
   else if (PASS_MODEL::kPass_Compute == m_passModel) {
-    beginCompute(_color);
+    beginCompute(_color, _clearRT);
   }
   else if (PASS_MODEL::kPass_Geometry == m_passModel) {
     beginGeometry(_color);
@@ -205,6 +205,12 @@ Pass::beginPass(const Color& _color)
 
   // set the rasterizer state
   api.setRasterizerState(m_pRasterizerState);
+}
+
+void
+Pass::beginPass(const bool& _clearRT)
+{
+  beginPass(FColor::CYAN, _clearRT);
 }
 
 void
@@ -236,13 +242,15 @@ Pass::endPass()
 }
 
 void
-Pass::beginPixel(const Color& _color)
+Pass::beginPixel(const FColor& _color, const bool& _clearRT)
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
   // clear RTVs and Depth stencil
-  api.clearRenderTargetViews(_color, m_outputTex);
-  api.clearDepthBuffer(1.0f, m_depthTex);
+  if (_clearRT) { // to do: temporary. maybe it should have a flag for depth and another for render targets.
+    api.clearRenderTargetViews(_color, m_outputTex);
+    api.clearDepthBuffer(1.0f, m_depthTex);
+  }
   // set render targets and depth texture
   api.setRenderTargets(m_outputTex, m_depthTex);
   // api.resizeSwapChain(m_viewPortSize);
@@ -283,11 +291,13 @@ Pass::endPixel()
 }
 
 void
-Pass::beginCompute(const Color& _color)
+Pass::beginCompute(const FColor& _color, const bool& _clearUAV)
 {
   GraphicsAPI& api = g_GraphicAPI();
 
-  api.clearUnorderedAccessViews(m_uavTex, _color);
+  if (_clearUAV) {
+    api.clearUnorderedAccessViews(m_uavTex, _color);
+  }
 
   SPtr<Shader> cShader = getCShader().lock();
   if (api.setCShader(cShader)) { // Compute shader.
@@ -315,7 +325,7 @@ Pass::endCompute()
 }
 
 void
-Pass::beginGeometry(const Color&)
+Pass::beginGeometry(const FColor&)
 {
 }
 

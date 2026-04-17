@@ -504,7 +504,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetViews(const Color& _color,
+  clearRenderTargetViews(const FColor& _color,
                          const Vector<WPtr<Texture>>& _rtvs,
                          const uint32 _mipslice = -1) override;
 
@@ -514,7 +514,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _mipSlice Mip slice to clear.
    */
   void
-  clearRenderTargetView(const Color& _color,
+  clearRenderTargetView(const FColor& _color,
                         const WPtr<Texture>& _rtv,
                         const uint32 _mipSlice = -1) override;
 
@@ -524,7 +524,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   clearUnorderedAccessView(const SPtr<Texture>& _uav,
-                           const Color& _color = Color(1, 1, 1, 0)) override;
+                           const FColor& _color = FColor::CYAN) override;
 
   /**
    * @brief Clear all unordered access views of a vector.
@@ -532,7 +532,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
-                            const Color& _color = Color(1, 1, 1, 0)) override;
+                            const FColor& _color = FColor::CYAN) override;
 
   /**
    * @brief Clear the depth buffer.

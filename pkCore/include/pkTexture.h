@@ -17,6 +17,7 @@
 #include "pkPath.h"
 #include "pkPrerequisitesCore.h"
 #include "pkColor.h"
+#include "pkFColor.h"
 #include "pkUUID.h"
 
 namespace pkEngineSDK

@@ -496,7 +496,7 @@ public:
    * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetViews(const Color& _color,
+  clearRenderTargetViews(const FColor& _color,
                          const Vector<WPtr<Texture>>& _rtvs,
                          const uint32 _mipSlice = -1) = 0;
 
@@ -506,7 +506,7 @@ public:
    * @param _mipSlice Mip slice to clear.
    */
   virtual void
-  clearRenderTargetView(const Color& _color,
+  clearRenderTargetView(const FColor& _color,
                         const WPtr<Texture>& _rtv,
                         const uint32 _mipSlice = -1) = 0;
 
@@ -516,7 +516,7 @@ public:
    */
   virtual void
   clearUnorderedAccessView(const SPtr<Texture>& _uav,
-                           const Color& _color = Color(1, 1, 1, 0)) = 0;
+                           const FColor& _color = FColor::CYAN) = 0;
 
   /**
    * @brief Clear all unordered access views of a vector.
@@ -525,7 +525,7 @@ public:
    */
   virtual void
   clearUnorderedAccessViews(const Vector<SPtr<Texture>>& _uavs,
-                            const Color& _color = Color(1,1,1,0)) = 0;
+                            const FColor& _color = FColor::CYAN) = 0;
 
   /**
    * @brief clear the depth buffer.

@@ -580,12 +580,12 @@ UInterface::createButton(String _name,
 
   if (_newcolor) {
     bool result = false;
-    Vector4 tC = _normal.colorTo01();
-    Vector4 hC = _hover.colorTo01();
-    Vector4 cC = _active.colorTo01();
-    ImVec4 tColor = ImVec4(tC.x, tC.y, tC.y, tC.w);
-    ImVec4 hColor = ImVec4(hC.x, hC.y, hC.y, hC.w);
-    ImVec4 cColor = ImVec4(cC.x, cC.y, cC.y, cC.w);
+    FColor tC = _normal.toFColor();
+    FColor hC = _hover.toFColor();
+    FColor cC = _active.toFColor();
+    ImVec4 tColor = ImVec4(tC.r, tC.g, tC.b, tC.a);
+    ImVec4 hColor = ImVec4(hC.r, hC.g, hC.b, hC.a);
+    ImVec4 cColor = ImVec4(cC.r, cC.g, cC.b, cC.a);
 
     ImGui::PushStyleColor(ImGuiCol_Button, tColor);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hColor);
@@ -717,28 +717,32 @@ UInterface::createImage(const SPtr<Texture>& _pTexture, const Vector2 _size)
 }
 
 bool
+UInterface::colorEdit(const ANSICHAR* _name, FColor& _color)
+{
+  float color[4] = { _color.r, _color.g, _color.b, _color.a };
+  bool result = ImGui::ColorEdit4(_name, color);
+  _color.r = color[0];
+  _color.g = color[1];
+  _color.b = color[2];
+  _color.a = color[3];
+  return result;
+}
+
+bool
 UInterface::colorEdit(const ANSICHAR* _name, Color& _color)
 {
-  float color[4] = { static_cast<float>(_color.getR()),
-                     static_cast<float>(_color.getB()),
-                     static_cast<float>(_color.getG()),
-                     static_cast<float>(_color.getA()) };
-  bool result = ImGui::ColorEdit4(_name, color);
-  _color.setA(static_cast<uint8>(color[3]));
-  _color.setR(static_cast<uint8>(color[0]));
-  _color.setG(static_cast<uint8>(color[1]));
-  _color.setB(static_cast<uint8>(color[2]));
+  FColor fColor = _color.toFColor();
+  bool result = colorEdit(_name, fColor);
+  _color = fColor.toColor();
   return result;
 }
 
 bool
 UInterface::colorEdit(const ANSICHAR* _name, Vector3& _color)
 {
-  float color[3] = { _color.x, _color.y, _color.z };
-  bool result = ImGui::ColorEdit3(_name, color, ImGuiColorEditFlags_NoInputs);
-  _color.x = color[0];
-  _color.y = color[1];
-  _color.z = color[2];
+  FColor fColor = FColor(_color.x, _color.y, _color.z);
+  bool result = colorEdit(_name, fColor);
+  _color = Vector3(fColor.r, fColor.g, fColor.b);
   return result;
 }
 
@@ -764,13 +768,13 @@ void
 UInterface::PushStyleColor(Color _mainColor, Color _hoverColor, Color _activeColor)
 {
   // convert from [0, 255] range to [0, 1]
-  Vector4 mainCol = _mainColor / 255.0f;
-  Vector4 hoverCol = _hoverColor / 255.0f;
-  Vector4 activeCol = _activeColor / 255.0f;
+  FColor mainCol = _mainColor.toFColor();
+  FColor hoverCol = _hoverColor.toFColor();
+  FColor activeCol = _activeColor.toFColor();
   // convert to ImVec4
-  ImVec4 header = ImVec4(mainCol.x, mainCol.y, mainCol.z, mainCol.w);
-  ImVec4 hover = ImVec4(hoverCol.x, hoverCol.y, hoverCol.z, hoverCol.w);
-  ImVec4 active = ImVec4(activeCol.x, activeCol.y, activeCol.z, activeCol.w);
+  ImVec4 header = ImVec4(mainCol.r, mainCol.g, mainCol.b, mainCol.a);
+  ImVec4 hover = ImVec4(hoverCol.r, hoverCol.g, hoverCol.b, hoverCol.a);
+  ImVec4 active = ImVec4(activeCol.r, activeCol.g, activeCol.b, activeCol.a);
   // push styles
   ImGui::PushStyleColor(ImGuiCol_Header, header);
   ImGui::PushStyleColor(ImGuiCol_HeaderHovered, hover);

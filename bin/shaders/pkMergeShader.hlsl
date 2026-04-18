@@ -26,8 +26,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   }
   else
   {
-    // finalColor = lerp(finalColor, actorTransparentSample.rgb, actorTransparentSample.a);
+    finalColor = lerp(actorSample.rgb, actorTransparentSample.rgb, actorTransparentSample.a);
   }
   
-  return float4(finalColor, 0);
+  return float4(finalColor, 1.0f);
 }

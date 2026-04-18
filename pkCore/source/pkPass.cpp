@@ -201,7 +201,7 @@ Pass::beginPass(const FColor& _color, const bool& _clearRT)
   api.setViewport(m_viewPortSize);
 
   // set the sampler state
-  api.setSampler(getSamplerState());
+  api.setSampler(m_pSamplerState);
 
   // set the rasterizer state
   api.setRasterizerState(m_pRasterizerState);

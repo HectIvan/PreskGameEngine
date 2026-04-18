@@ -666,12 +666,12 @@ class UInterface : public Module<UInterface>
    */
   void
   plotLines(const ANSICHAR* _name,
-            float _values[],
-            uint32 _size,
-            int32 _valuesOffset,
+            const float _values[],
+            const uint32& _size,
+            const int32& _valuesOffset,
             const ANSICHAR* _overlayText = nullptr,
-            float _scaleMin = 0.0f,
-            float _scaleMax = 500.0f);
+            const float& _scaleMin = 0.0f,
+            const float& _scaleMax = 500.0f);
 
   /**
    * @brief Create a collapsing header.
@@ -690,14 +690,14 @@ class UInterface : public Module<UInterface>
    * @param _activeColor Color when active.
    */
   void
-  PushStyleColor(Color _mainColor, Color _hoverColor, Color _activeColor);
+  PushStyleColor(const Color& _mainColor, const Color& _hoverColor, const Color& _activeColor);
 
   /**
    * @brief Pop style colors.
    * @param _count Ammount of colors pushed.
    */
   void
-  popStyleColor(uint32 _count);
+  popStyleColor(const uint32& _count);
 
   /**
    * @brief Create a child window.
@@ -709,7 +709,7 @@ class UInterface : public Module<UInterface>
   bool
   beginChild(const ANSICHAR* _name,
              Vector2 _size = Vector2(0.0f, 0.0f),
-             const bool _border = true);
+             const bool& _border = true);
 
   /**
    * @brief Create a child window.

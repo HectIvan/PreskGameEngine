@@ -93,7 +93,7 @@ struct CBLight
   CBLight() = default;
   CBLight(const SPtr<Light>& _pLight) {
     color = Vector4(_pLight->m_color, 1.0f);
-    direction = Vector4(_pLight->m_direction, 1.0f);
+    direction = Vector4(_pLight->m_direction, 0.0f);
     position = Vector4(_pLight->m_position, 1.0f);
     shadowIntensity = _pLight->m_shadowIntensity;
     specIntensity = _pLight->m_specIntensity;

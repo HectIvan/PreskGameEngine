@@ -25,13 +25,13 @@ PKBlob::Release()
 }
 
 SIZE_T
-PKBlob::getBufferSize()
+PKBlob::getBufferSize() const
 {
   return m_blob.size();
 }
 
 const void*
-PKBlob::getBufferPointer()
+PKBlob::getBufferPointer() const
 {
   return m_blob.data();
 }

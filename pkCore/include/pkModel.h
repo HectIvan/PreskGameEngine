@@ -45,14 +45,14 @@ class PK_CORE_EXPORT Model : public Component
    * @return The bone map.
    */
   auto&
-  getBoneInfoMap() { return boneMap; }
+  getBoneInfoMap() const { return boneMap; }
 
   /**
    * @brief Get the ammount of bones in the model.
    * @return The bone count.
    */
   uint32
-  getBoneCount() { return boneCounter; }
+  getBoneCount() const { return boneCounter; }
 
   /**
    * @brief Set the data of the vertex to a default value
@@ -114,21 +114,21 @@ class PK_CORE_EXPORT Model : public Component
    * @return A vector with all the meshes.
    */
   Vector<SPtr<Mesh>>
-  getMeshes() { return meshes; }
+  getMeshes() const { return meshes; }
 
   /**
    * @brief Get the vertex buffer.
    * @return The vertex buffer.
    */
   SPtr<VertexBuffer>
-  getVertexBuffer() { return m_vertexB; }
+  getVertexBuffer() const { return m_vertexB; }
 
   /**
    * @brief Get the index buffer.
    * @return The index buffer.
    */
   SPtr<IndexBuffer>
-  getIndexBuffer() { return m_indexB; }
+  getIndexBuffer() const { return m_indexB; }
 
   /**
    * @brief Set the vertex and index data to the model.
@@ -140,7 +140,6 @@ class PK_CORE_EXPORT Model : public Component
   // vertex and index data
   Vector<SimpleVertex> vertex;
   Vector<uint32> index;
-
 
   // skeleton data
   Map<String, Bone> boneMap;

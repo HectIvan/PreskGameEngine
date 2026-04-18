@@ -54,16 +54,16 @@ public:
    * @return Size of the buffer.
    */
   SIZE_T
-  getBufferSize();
+  getBufferSize() const;
 
   /**
    * @brief Get the buffer data.
    * @return Pointer to the data.
    */
   const void*
-  getBufferPointer();
+  getBufferPointer() const;
 
  private:
-  Vector<ANSICHAR> m_blob;
+  Vector<byte> m_blob;
 };
 }

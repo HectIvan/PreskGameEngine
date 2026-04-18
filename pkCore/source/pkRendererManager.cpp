@@ -647,8 +647,6 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
   const SPtr<Pass> materialPass = rManager.getPass(PASS_TYPE::kP_Material);
 
-  const SIZE_T mat4x4Size = sizeof(Matrix4);
-
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
   // offsets
@@ -674,7 +672,13 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
     }
   }
 
-  materialPass->beginPass(Color(0, 1, 1, 0));
+  SPtr<Camera> lightCam = m_cameras[0];
+  CBWVP wvpLight;
+  wvpLight.projection = lightCam->getProjection();
+  wvpLight.view = lightCam->getView();
+
+  // materialPass->beginPass(Color(0, 1, 1, 0));
+  const uint32 sizeWVP = sizeof(CBWVP);
 
   for (uint32 i = 0; i < meshCount; ++i) {
     const SPtr<Mesh> mesh = _model->meshes[i];
@@ -687,11 +691,10 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       // update the constant buffers.
       CBWVP wvp(transform, cBCamera.view, cBCamera.projection);
 
-      basePass->updateCBuffer(0, &wvp, mat4x4Size);
+      basePass->updateCBuffer(0, &wvp, sizeWVP);
       basePass->updateCBuffer(1, &material->m_properties, sizeProps);
-      transparencyPass->updateCBuffer(0, &wvp, mat4x4Size);
+      transparencyPass->updateCBuffer(0, &wvp, sizeWVP);
       transparencyPass->updateCBuffer(1, &material->m_properties, sizeProps);
-      lightPositionsPass->updateCBuffer(0, &wvp, mat4x4Size);
 
       /**
        * Base pass to get the object data, albedo, normal, orm, positions.
@@ -712,18 +715,19 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
       /**
        * Positions from the light perspective.
        */
+      wvpLight.world = transform;
+      lightPositionsPass->updateCBuffer(0, &wvpLight, sizeWVP);
       lightPositionsPass->beginPass(FColor::CYAN);
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
       lightPositionsPass->endPass();
 
-
       /**
        * Material specific shader.
        */
-      materialPass->beginPass(false);
-      api.setPShader(material->m_shader);
+      materialPass->setPShader(material->m_shader);
       materialPass->updateCBuffers({ &cBLight, &cBCamera },
-                                   { sizeof(CBLight), sizeof(CBCamera) });
+                                   { sizeof(cBLight), sizeof(cBCamera) });
+      materialPass->beginPass(false);
       api.draw(3, 0);
       materialPass->endPass();
     }

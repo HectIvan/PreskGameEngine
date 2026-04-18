@@ -178,8 +178,37 @@ class PK_CORE_EXPORT Pass
   Vector2
   getViewportSize() { return m_viewPortSize; }
 
- private:
+  /**
+   * @brief Get the rasterizer state of the pass.
+   */
+  SPtr<RasterizerState>&
+  getRasterizerState() { return m_pRasterizerState; }
 
+  /**
+   * @brief Get the viewport size.
+   */
+  Vector2
+  getViewport() const { return m_viewPortSize; }
+
+  /**
+   * @brief Set the Vertex shader of the pass.
+   */
+  void
+  setVShader(const SPtr<Shader>& _vShader) { m_pVShader = _vShader; }
+
+  /**
+   * @brief Set the Pixel shader of the pass.
+   */
+  void
+  setPShader(const SPtr<Shader>& _pShader) { m_pPShader = _pShader; }
+
+  /**
+   * @brief Set the Compute shader of the pass.
+   */
+  void
+  setCShader(const SPtr<Shader>& _cShader) { m_pCShader = _cShader; }
+
+ private:
   /**
    * @brief Start pass based parameter setting for pixel shader passes.
    * @param _color Clear color.

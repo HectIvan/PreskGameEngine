@@ -232,12 +232,11 @@ float4 PS(PS_INPUT input) : SV_Target0
   skybox.GetDimensions(dimensions.x, dimensions.y);
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
   float targetMip = lerp(0.0, mipCount - 1.0, roughness);
-  // specular IBL
   float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
   float3 diffuseIBL = IBL * fLambert;
     
-    /**
+  /**
    * shadow mapping;
    */
   float4 lightSpacePos = mul(float4(worldPos, 1.0f), LightViewProj);

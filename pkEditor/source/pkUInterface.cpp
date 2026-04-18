@@ -124,8 +124,7 @@ UInterface::init(const WindowHandle& _hWnd)
 
   // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to
   ImGuiStyle& style = ImGui::GetStyle();
-  if (io.ConfigFlags)
-  {
+  if (io.ConfigFlags) {
     style.WindowRounding = 0.0f;
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
@@ -372,7 +371,7 @@ bool
 UInterface::createInputText(const ANSICHAR* _name, String* _param)
 {
   _param->resize(256);
-  bool changed = ImGui::InputText(_name, _param->data(), _param->size());
+  const bool changed = ImGui::InputText(_name, _param->data(), _param->size());
   _param->resize(strlen(_param->data()));
   return changed;
 }
@@ -409,7 +408,7 @@ bool
 UInterface::createInputVector2(const ANSICHAR* _name, Vector2& _param)
 {
   float v[2] = { _param.x, _param.y };
-  bool change = ImGui::InputFloat2(_name, v);
+  const bool change = ImGui::InputFloat2(_name, v);
   _param.x = v[0];
   _param.y = v[1];
   return change;
@@ -420,7 +419,7 @@ bool UInterface::createInputVector2Clamp(const ANSICHAR* _name,
                                          float _min,
                                          float _max)
 {
-  bool change = createInputVector2(_name, _param);
+  const bool change = createInputVector2(_name, _param);
   _param.clamp(_min, _max);
   return change;
 }
@@ -429,7 +428,7 @@ bool
 UInterface::createInputVector3(const ANSICHAR* _name, Vector3& _param)
 {
   float v[3] = { _param.x, _param.y, _param.z };
-  bool change = ImGui::InputFloat3(_name, v);
+  const bool change = ImGui::InputFloat3(_name, v);
   _param.x = v[0];
   _param.y = v[1];
   _param.z = v[2];
@@ -453,7 +452,7 @@ UInterface::createInputVector3Clamp(const ANSICHAR* _name,
                                     float _min,
                                     float _max)
 {
-  bool change = createInputVector3(_name, _param);
+  const bool change = createInputVector3(_name, _param);
   _param.clamp(_min, _max);
   return change;
 }
@@ -462,7 +461,7 @@ bool
 UInterface::createInputVector4(const ANSICHAR* _name, Vector4& _param)
 {
   float v[4] = { _param.x, _param.y, _param.z, _param.w };
-  bool change = ImGui::InputFloat4(_name, v);
+  const bool change = ImGui::InputFloat4(_name, v);
   _param.x = v[0];
   _param.y = v[1];
   _param.z = v[2];
@@ -476,7 +475,7 @@ UInterface::createInputVector4Clamp(const ANSICHAR* _name,
                                     float _min,
                                     float _max)
 {
-  bool change = createInputVector4(_name, _param);
+  const bool change = createInputVector4(_name, _param);
   _param.clamp(_min, _max);
   return change;
 }
@@ -554,7 +553,7 @@ UInterface::createDrag(const ANSICHAR* _name,
                         float _max)
 {
   float value[3] = { _value.x, _value.y, _value.z };
-  bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
+  const bool result = ImGui::DragFloat3(_name, value, _speed, _min, _max);
   _value.x = value[0];
   _value.y = value[1];
   _value.z = value[2];
@@ -579,18 +578,17 @@ UInterface::createButton(String _name,
   }
 
   if (_newcolor) {
-    bool result = false;
-    FColor tC = _normal.toFColor();
-    FColor hC = _hover.toFColor();
-    FColor cC = _active.toFColor();
-    ImVec4 tColor = ImVec4(tC.r, tC.g, tC.b, tC.a);
-    ImVec4 hColor = ImVec4(hC.r, hC.g, hC.b, hC.a);
-    ImVec4 cColor = ImVec4(cC.r, cC.g, cC.b, cC.a);
+    const FColor tC = _normal.toFColor();
+    const FColor hC = _hover.toFColor();
+    const FColor cC = _active.toFColor();
+    const ImVec4 tColor = ImVec4(tC.r, tC.g, tC.b, tC.a);
+    const ImVec4 hColor = ImVec4(hC.r, hC.g, hC.b, hC.a);
+    const ImVec4 cColor = ImVec4(cC.r, cC.g, cC.b, cC.a);
 
     ImGui::PushStyleColor(ImGuiCol_Button, tColor);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hColor);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, cColor);
-    result = ImGui::Button(_name.c_str());
+    const bool result = ImGui::Button(_name.c_str());
     ImGui::PopStyleColor(3);
     return result;
   }
@@ -600,14 +598,14 @@ UInterface::createButton(String _name,
 Vector2
 UInterface::getItemPosition()
 {
-  ImVec2 topLeft = ImGui::GetItemRectMin();
+  const ImVec2 topLeft = ImGui::GetItemRectMin();
   return Vector2(topLeft.x, topLeft.y);
 }
 
 Vector2 UInterface::getItemSize()
 {
-  ImVec2 topLeft = ImGui::GetItemRectMin();
-  ImVec2 bottomRight = ImGui::GetItemRectMax();
+  const ImVec2 topLeft = ImGui::GetItemRectMin();
+  const ImVec2 bottomRight = ImGui::GetItemRectMax();
 
   return Vector2(bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 }
@@ -623,10 +621,7 @@ UInterface::beginCombo(const ANSICHAR* _name,
     cstrs.push_back(option.c_str());
   }
 
-  if (ImGui::Combo(_name, &_previewVal, cstrs.data(), cstrs.size())) {
-    return true;
-  }
-  return false;
+  return ImGui::Combo(_name, &_previewVal, cstrs.data(), cstrs.size());
 }
 
 bool
@@ -637,7 +632,7 @@ UInterface::selectable2(const ANSICHAR* _name,
                         Color _active)
 {
   PushStyleColor(_base, _hover, _active);
-  bool result = ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
+  const bool result = ImGui::Selectable(_name, false, 0, ImVec2(_size.x, _size.y));
   ImGui::PopStyleColor(3);
   return result;
 }
@@ -650,7 +645,7 @@ UInterface::selectable(const ANSICHAR* _name,
                        Color _active)
 {
   PushStyleColor(_base, _hover, _active);
-  bool result = ImGui::Selectable(_name, _selected == _name);
+  const bool result = ImGui::Selectable(_name, _selected == _name);
   ImGui::PopStyleColor(3);
   return result;
 }
@@ -691,15 +686,13 @@ UInterface::popID()
   ImGui::PopID();
 }
 
-
-
 bool
 UInterface::createButtonImage(const ANSICHAR* _name,
                               const SPtr<Texture>& _pTexture,
                               const Vector2 _size)
 {
   if (_pTexture) {
-    ImTextureID texture = reinterpret_cast<ImTextureID>(_pTexture->getRawData());
+    const ImTextureID texture = reinterpret_cast<ImTextureID>(_pTexture->getRawData());
     ImVec2 size = ImVec2(_pTexture->getWidth(), _pTexture->getHeight());
     String name = "##" + String(_name);
     return ImGui::ImageButton(name.c_str(), texture, ImVec2(_size.x, _size.y));
@@ -711,7 +704,7 @@ void
 UInterface::createImage(const SPtr<Texture>& _pTexture, const Vector2 _size)
 {
   if (_pTexture) {
-    ImTextureID texture = reinterpret_cast<ImTextureID>(_pTexture->getRawData());
+    const ImTextureID texture = reinterpret_cast<ImTextureID>(_pTexture->getRawData());
     ImGui::Image(texture, ImVec2(_size.x, _size.y));
   }
 }
@@ -720,7 +713,7 @@ bool
 UInterface::colorEdit(const ANSICHAR* _name, FColor& _color)
 {
   float color[4] = { _color.r, _color.g, _color.b, _color.a };
-  bool result = ImGui::ColorEdit4(_name, color);
+  const bool result = ImGui::ColorEdit4(_name, color);
   _color.r = color[0];
   _color.g = color[1];
   _color.b = color[2];
@@ -732,7 +725,7 @@ bool
 UInterface::colorEdit(const ANSICHAR* _name, Color& _color)
 {
   FColor fColor = _color.toFColor();
-  bool result = colorEdit(_name, fColor);
+  const bool result = colorEdit(_name, fColor);
   _color = fColor.toColor();
   return result;
 }
@@ -741,19 +734,19 @@ bool
 UInterface::colorEdit(const ANSICHAR* _name, Vector3& _color)
 {
   FColor fColor = FColor(_color.x, _color.y, _color.z);
-  bool result = colorEdit(_name, fColor);
+  const bool result = colorEdit(_name, fColor);
   _color = Vector3(fColor.r, fColor.g, fColor.b);
   return result;
 }
 
 void
 UInterface::plotLines(const ANSICHAR* _name,
-                      float _values[],
-                      uint32 _size,
-                      int32 _valuesOffset,
+                      const float _values[],
+                      const uint32& _size,
+                      const int32& _valuesOffset,
                       const ANSICHAR* _overlayText,
-                      float _scaleMin,
-                      float _scaleMax)
+                      const float& _scaleMin,
+                      const float& _scaleMax)
 {
   ImGui::PlotLines(_name, _values, _size, _valuesOffset, _overlayText, _scaleMin, _scaleMax);
 }
@@ -765,16 +758,18 @@ UInterface::collapsingHeader(const ANSICHAR* _name, PK_TREENODE_FLAGS::E _flags)
 }
 
 void
-UInterface::PushStyleColor(Color _mainColor, Color _hoverColor, Color _activeColor)
+UInterface::PushStyleColor(const Color& _mainColor,
+                           const Color& _hoverColor,
+                           const Color& _activeColor)
 {
   // convert from [0, 255] range to [0, 1]
-  FColor mainCol = _mainColor.toFColor();
-  FColor hoverCol = _hoverColor.toFColor();
-  FColor activeCol = _activeColor.toFColor();
+  const FColor mainCol = _mainColor.toFColor();
+  const FColor hoverCol = _hoverColor.toFColor();
+  const FColor activeCol = _activeColor.toFColor();
   // convert to ImVec4
-  ImVec4 header = ImVec4(mainCol.r, mainCol.g, mainCol.b, mainCol.a);
-  ImVec4 hover = ImVec4(hoverCol.r, hoverCol.g, hoverCol.b, hoverCol.a);
-  ImVec4 active = ImVec4(activeCol.r, activeCol.g, activeCol.b, activeCol.a);
+  const ImVec4 header = ImVec4(mainCol.r, mainCol.g, mainCol.b, mainCol.a);
+  const ImVec4 hover = ImVec4(hoverCol.r, hoverCol.g, hoverCol.b, hoverCol.a);
+  const ImVec4 active = ImVec4(activeCol.r, activeCol.g, activeCol.b, activeCol.a);
   // push styles
   ImGui::PushStyleColor(ImGuiCol_Header, header);
   ImGui::PushStyleColor(ImGuiCol_HeaderHovered, hover);
@@ -782,13 +777,13 @@ UInterface::PushStyleColor(Color _mainColor, Color _hoverColor, Color _activeCol
 }
 
 void
-UInterface::popStyleColor(uint32 _count)
+UInterface::popStyleColor(const uint32& _count)
 {
   ImGui::PopStyleColor(_count);
 }
 
 bool
-UInterface::beginChild(const ANSICHAR* _name, Vector2 _size, const bool _border)
+UInterface::beginChild(const ANSICHAR* _name, Vector2 _size, const bool& _border)
 {
   // if the size is zero (default) use the parent size.
   if (_size == Vector2::ZERO) {
@@ -870,14 +865,14 @@ UInterface::endWindowCreate()
 Vector2
 UInterface::getWindowSize()
 {
-  ImVec2 size = ImGui::GetWindowSize();
+  const ImVec2 size = ImGui::GetWindowSize();
   return Vector2(size.x, size.y);
 }
 
 Vector2
 UInterface::getWindowPos()
 {
-  ImVec2 pos = ImGui::GetWindowPos();
+  const ImVec2 pos = ImGui::GetWindowPos();
   return Vector2(pos.x, pos.y);
 }
 

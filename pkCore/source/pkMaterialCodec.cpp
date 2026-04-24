@@ -53,30 +53,30 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   matResource->writeBaseHeader(file);
 
   // check for each texture and see if they are valid to use.
-  SPtr<Texture> albedo = _pMaterial->m_albedo.lock();
+  SPtr<Texture> albedo = _pMaterial->m_albedo;
   if (albedo) {
     matResource->m_albedoID = *albedo->getID();
     matResource->m_albedoColor = _pMaterial->m_properties.ColorMultiply;
   }
-  SPtr<Texture> normal = _pMaterial->m_normal.lock();
+  SPtr<Texture> normal = _pMaterial->m_normal;
   if (normal) {
     matResource->m_normalID = *normal->getID();
   }
-  SPtr<Texture> ao = _pMaterial->m_oclussion.lock();
+  SPtr<Texture> ao = _pMaterial->m_oclussion;
   if (ao) {
     matResource->m_aoID = *ao->getID();
   }
-  SPtr<Texture> roughness = _pMaterial->m_roughness.lock();
+  SPtr<Texture> roughness = _pMaterial->m_roughness;
   if (roughness) {
     matResource->m_roughnessID = *roughness->getID();
     matResource->m_roughValue = _pMaterial->m_properties.roughnessMultiply;
   }
-  SPtr<Texture> metallic = _pMaterial->m_metallic.lock();
+  SPtr<Texture> metallic = _pMaterial->m_metallic;
   if (metallic) {
     matResource->m_metallicID = *metallic->getID();
     matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
   }
-  SPtr<Texture> emissive = _pMaterial->m_emissive.lock();
+  SPtr<Texture> emissive = _pMaterial->m_emissive;
   if (emissive) {
     matResource->m_emissiveID = *emissive->getID();
     matResource->m_emissiveColor = _pMaterial->m_properties.EmissiveMultiply;

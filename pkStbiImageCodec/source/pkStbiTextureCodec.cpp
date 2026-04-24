@@ -35,7 +35,8 @@ loadPlugin()
 }
 
 SPtr<TextureResource>
-StbiTextureCodec::createResource(const String _name,
+StbiTextureCodec::createResource(const Path& _path,
+                                 const String _name,
                                  const int32 _width,
                                  const int32 _height,
                                  const int32 _bpp,
@@ -44,7 +45,7 @@ StbiTextureCodec::createResource(const String _name,
                                  Vector<uint8>& _data)
 {
   const String textureName = Path(_name).getFileNameWithoutExtension();
-  const String resourcePath = PK_RESOURCE_FOLDER + textureName + ".pkt";
+  const String resourcePath = _path.toString();
 
   ofstream file(resourcePath, ios::out | ios::binary | ios::trunc);
 
@@ -60,7 +61,7 @@ StbiTextureCodec::createResource(const String _name,
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
 
-  textureRes->fillBaseHeader(_name + "Texture", textureName, _name, resourcePath);
+  textureRes->fillBaseHeader(resourcePath, textureName, _name, resourcePath);
   textureRes->writeBaseHeader(file);
 
   const SIZE_T sizeInt32 = sizeof(int32);
@@ -129,7 +130,8 @@ StbiTextureCodec::createResourceFromFile(const Path _path)
   Vector<uint8> finalData(dataSize);
   memcpy(finalData.data(), data, dataSize);
 
-  SPtr<TextureResource> textureRes = createResource(fileName,
+  SPtr<TextureResource> textureRes = createResource(resourcePath,
+                                                    fileName,
                                                     width,
                                                     height,
                                                     bpp,

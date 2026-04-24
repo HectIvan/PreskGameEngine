@@ -147,18 +147,18 @@ BaseApp::messageLoop()
   g_Logger().createLogFiles();
 
   // if the program is shut down closes for any reason, close everything properly.
-  TimeManager::shutDown();
-  TextureManager::shutDown();
-  ShaderManager::shutDown();
-  SceneManager::shutDown();
   RendererManager::shutDown();
-  MaterialManager::shutDown();
-  MaterialCodec::shutDown();
   ModelManager::shutDown();
+  MaterialManager::shutDown();
+  ShaderManager::shutDown();
+  TextureManager::shutDown();
+  SceneManager::shutDown();
+  MaterialCodec::shutDown();
   EventQueue::shutDown();
   DLLManager::shutDown();
   AssetResourceManager::shutDown();
   GraphicsAPI::shutDown();
+  TimeManager::shutDown();
 }
 
 void

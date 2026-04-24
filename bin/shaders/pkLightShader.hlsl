@@ -53,6 +53,11 @@ struct PS_INPUT
   float2 TexCoord : TEXCOORD0;
 };
 
+struct PS_OUTPUT
+{
+  float4 objResult : SV_Target0; // object result
+};
+
 float2 getSkyBoxUV(float3 dir)
 {
   // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
@@ -166,8 +171,10 @@ float OrenNayarDiffuse(float3 N, float3 L, float3 V, float roughness)
   return saturate(NoL * (A + B * sin(alpha) * tan(beta)));
 }
 
-float4 PS(PS_INPUT input) : SV_Target0
+PS_OUTPUT PS(PS_INPUT input)
 {
+  
+  PS_OUTPUT output = (PS_OUTPUT) 0;
   /**
    * light data
    */
@@ -178,11 +185,6 @@ float4 PS(PS_INPUT input) : SV_Target0
    * texture data
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
-  
-  if (depthTex.r == 0.0f) {
-    discard;
-  }
-  
   float4 normalTex = normalMap.Sample(samState, input.TexCoord);
   float4 albedo = albedoMap.Sample(samState, input.TexCoord);
   
@@ -194,7 +196,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  float3 normal = normalize(normalTex.xyz * 2.0f - 1.0f);
+  float3 normal = normalize(normalTex.xyz);
   float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic.rrr);
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));
@@ -235,7 +237,7 @@ float4 PS(PS_INPUT input) : SV_Target0
   float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
   float3 diffuseIBL = IBL * fLambert;
-    
+
   /**
    * shadow mapping;
    */
@@ -257,5 +259,7 @@ float4 PS(PS_INPUT input) : SV_Target0
     // finalColor *= shadowColor.xxx;
   }
   
-  return float4(finalColor, albedo.a);
+  output.objResult = float4(finalColor, albedo.a);
+  
+  return output;
 }

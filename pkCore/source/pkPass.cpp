@@ -34,10 +34,23 @@ Pass::Pass() {
 void
 Pass::clear()
 {
-  m_cBuffers.clear();
-  m_inputTex.clear();
-  m_outputTex.clear();
-  m_uavTex.clear();
+  if (m_cBuffers.size() > 0) {
+    m_cBuffers.clear();
+  }
+  if (m_inputTex.size() > 0) {
+    for (uint32 i = 0; i < m_inputTex.size(); ++i) {
+      int32 count = m_inputTex[i].use_count();
+      const String msg = "input Tex of pass " + m_name + " index " + to_string(i) +" has " + to_string(count) + " references.";
+      LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
+    m_inputTex.clear();
+  }
+  if (m_outputTex.size() > 0) {
+    m_outputTex.clear();
+  }
+  if (m_uavTex.size() > 0) {
+    m_uavTex.clear();
+  }
 }
 
 Pass::Pass(const PixelDesc& _desc)

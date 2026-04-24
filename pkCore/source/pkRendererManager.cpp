@@ -118,7 +118,7 @@ RendererManager::init()
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
     assetMan.insertNewResource(resSky);
-    SPtr<Texture> skyboxResource = tm.loadTexture(resSky->m_id);
+    SPtr<Texture> skyboxResource = tm.createTexture(resSky->m_id);
     m_mainSkybox->copyFrom(skyboxResource);
   }
 
@@ -176,11 +176,10 @@ RendererManager::init()
 void
 RendererManager::onShutDown()
 {
+  m_passes.clear();
   m_gBuffers.clear();
   m_depthBuffers.clear();
   m_uavBuffers.clear();
-
-  m_passes.clear();
 }
 
 void
@@ -242,6 +241,7 @@ RendererManager::createPasses()
   pDesc.rSDepthClipEnable = true;
   // make the pass
   SPtr<Pass> basePass = make_shared<Pass>(pDesc);
+  basePass->m_name = "Base Pass";
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Base, basePass });
 
@@ -254,6 +254,7 @@ RendererManager::createPasses()
   pDesc.pDepth = transpDepth;
   // make the pass
   SPtr<Pass> transparencyPass = make_shared<Pass>(pDesc);
+  transparencyPass->m_name = "Transparency Pass";
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Transparency, transparencyPass });
 
@@ -265,6 +266,7 @@ RendererManager::createPasses()
   pDesc.outputs = { posLightRT };
   pDesc.pDepth = LightDepthBuffer;
   SPtr<Pass> ligtPosPass = make_shared<Pass>(pDesc);
+  ligtPosPass->m_name = "Light Positions Pass";
   m_passes.insert({ PASS_TYPE::kP_LightPositions, ligtPosPass });
   
   /****************************************************************************
@@ -286,13 +288,14 @@ RendererManager::createPasses()
   pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
+  lightQuad->m_name = "Light Quad Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Light, lightQuad });
 
   /****************************************************************************
-   * Shadow Specular Transparency Quad Pass
+   * Light Transparency Quad Pass
    ***************************************************************************/
-  LOG_REGISTER("---------Creating BRDF transparency pass.---------", __FILE__, __LINE__);
+  LOG_REGISTER("---------Creating Light transparency pass.---------", __FILE__, __LINE__);
   pDesc.inputs = { transpDepth,
                    transpPos,
                    posLightRT,
@@ -303,6 +306,7 @@ RendererManager::createPasses()
                    cubeMapRT };
   pDesc.outputs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
+  lightTranspQuad->m_name = "Light Transparency Quad Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LightTransparency, lightTranspQuad });
 
@@ -315,6 +319,7 @@ RendererManager::createPasses()
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxRT };
   SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
+  skyboxPass->m_name = "Skybox Pass";
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
@@ -328,6 +333,7 @@ RendererManager::createPasses()
   pDesc.outputs = { ssaoRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> ssaoPass = make_shared<Pass>(pDesc);
+  ssaoPass->m_name = "SSAO Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_SSAO, ssaoPass });
 
@@ -341,6 +347,7 @@ RendererManager::createPasses()
   pDesc.outputs = { emissHBlurRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> emissiveHPass = make_shared<Pass>(pDesc);
+  emissiveHPass->m_name = "Emissive Horizontal Blur Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveHBlur, emissiveHPass });
 
@@ -353,6 +360,7 @@ RendererManager::createPasses()
   pDesc.inputs = { emissHBlurRT };
   pDesc.outputs = { emissBlurRT };
   SPtr<Pass> emissivePass = make_shared<Pass>(pDesc);
+  emissivePass->m_name = "Emissive Vertical Blur Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveBlur, emissivePass });
 
@@ -365,6 +373,7 @@ RendererManager::createPasses()
   pDesc.inputs = { brdfRT };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   SPtr<Pass> lumPass = make_shared<Pass>(pDesc);
+  lumPass->m_name = "Luminance Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Luminance, lumPass });
 
@@ -378,6 +387,7 @@ RendererManager::createPasses()
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> lumBlurHPass = make_shared<Pass>(pDesc);
+  lumBlurHPass->m_name = "Luminance Horizontal Blur Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LumBlurH, lumBlurHPass });
 
@@ -390,6 +400,7 @@ RendererManager::createPasses()
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { lumBlurRT };
   SPtr<Pass> lumBlurPass = make_shared<Pass>(pDesc);
+  lumBlurPass->m_name = "Luminance Vertical Blur Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LumBlur, lumBlurPass });
 
@@ -403,6 +414,7 @@ RendererManager::createPasses()
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> TonePass = make_shared<Pass>(pDesc);
+  TonePass->m_name = "Tone Mapping Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, TonePass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
@@ -418,6 +430,7 @@ RendererManager::createPasses()
   pDesc.outputs = { m_targetRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
+  mergePass->m_name = "Merge Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Merge, mergePass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
@@ -443,8 +456,10 @@ RendererManager::createPasses()
   pDesc.pDepth = {};
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
   SPtr<Pass> matPass = make_shared<Pass>(pDesc);
+  matPass->m_name = "Material Pass";
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Material, matPass });
+  LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
 }
 
 SPtr<Pass>

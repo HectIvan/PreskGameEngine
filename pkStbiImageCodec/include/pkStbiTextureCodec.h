@@ -28,6 +28,7 @@ class StbiTextureCodec : public TextureCodec
 
   /**
    * @brief Create a texture resource.
+   * @param _path Where to create the file.
    * @param _name Name of the texture.
    * @param _width Width of the texture.
    * @param _height Height of the texture.
@@ -37,7 +38,8 @@ class StbiTextureCodec : public TextureCodec
    * @param _data Data of the texture.
    */
   SPtr<TextureResource>
-  createResource(const String _name,
+  createResource(const Path& _path,
+                 const String _name,
                  const int32 _width,
                  const int32 _height,
                  const int32 _bpp,

@@ -34,6 +34,9 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   void
   init();
 
+  void
+  onShutDown() override;
+
   /**
    * @brief Load default material textures.
    */
@@ -68,12 +71,20 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
                     const Color color);
 
   /**
-   * @brief Load texture from a texture id.
+   * @brief create texture from a texture/resource path.
+   * @param _path Path of the texture/resource.
+   * @return Pointer to the newly created texture.
+   */
+  SPtr<Texture>
+  createTexture(const Path& _path);
+
+  /**
+   * @brief create texture from a resource id.
    * @param _ID ID of the texture to load.
    * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
-  loadTexture(const UUID& _ID);
+  createTexture(const UUID& _ID);
 
   /**
    * @brief Get a saved texture via its ID.
@@ -101,17 +112,14 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   /**
    * @brief Store a loaded texture into the memory for later use.
    * @param _ID ID of the texture.
-   * @param _path Path of the texture resource.
    * @param _pTexture Texture to store.
    */
   void
-  insertTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture);
+  insertTexture(const UUID& _ID, const SPtr<Texture>& _pTexture);
 
  public:
   // save textures with the texture id
   UMap<UUID, SPtr<Texture>> m_textures;
-  // save textures with the texture path
-  UMap<String, SPtr<Texture>> m_texturesPath;
 
   // to do: allow for the texture to be generated if not found.
   // default textures

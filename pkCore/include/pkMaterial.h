@@ -181,13 +181,13 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   MaterialProps m_properties;
-  WPtr<Texture> m_albedo;
-  WPtr<Texture> m_normal;
-  WPtr<Texture> m_height;
-  WPtr<Texture> m_metallic;
-  WPtr<Texture> m_oclussion;
-  WPtr<Texture> m_roughness;
-  WPtr<Texture> m_emissive;
+  SPtr<Texture> m_albedo;
+  SPtr<Texture> m_normal;
+  SPtr<Texture> m_height;
+  SPtr<Texture> m_metallic;
+  SPtr<Texture> m_oclussion;
+  SPtr<Texture> m_roughness;
+  SPtr<Texture> m_emissive;
   SPtr<Shader> m_shader;
 };
 }

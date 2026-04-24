@@ -45,14 +45,19 @@ TextureManager::init()
 }
 
 void
+TextureManager::onShutDown()
+{
+}
+
+void
 TextureManager::loadDefaultMatTextures()
 {
-  m_defaultAlb = loadTexture(m_albID);
-  m_defaultNormal = loadTexture(m_normalID);
-  m_defaultAO = loadTexture(m_AOID);
-  m_defaultMetallic = loadTexture(m_metallicID);
-  m_defaultRough = loadTexture(m_roughID);
-  m_defaultEmissive = loadTexture(m_emissiveID);
+  m_defaultAlb = createTexture(m_albID);
+  m_defaultNormal = createTexture(m_normalID);
+  m_defaultAO = createTexture(m_AOID);
+  m_defaultMetallic = createTexture(m_metallicID);
+  m_defaultRough = createTexture(m_roughID);
+  m_defaultEmissive = createTexture(m_emissiveID);
 }
 
 SPtr<Texture>
@@ -70,8 +75,11 @@ TextureManager::createFlatTexture(const String _name,
   GraphicsAPI& api = g_GraphicAPI();
   TextureCodec& texCodec = g_TextureCodec();
 
+  const String directory = PK_RESOURCE_FOLDER + _name + ".pkt";
+
   Vector<uint8> data = { color._color.R, color._color.G, color._color.B, color._color.A };
-  SPtr<TextureResource> resource = texCodec.createResource(_name,
+  SPtr<TextureResource> resource = texCodec.createResource(directory,
+                                                           _name,
                                                            _width,
                                                            _height,
                                                            4,
@@ -87,14 +95,24 @@ TextureManager::createFlatTexture(const String _name,
 }
 
 SPtr<Texture>
-TextureManager::loadTexture(const UUID& _ID)
+TextureManager::createTexture(const Path& _path)
 {
-  GraphicsAPI& api = g_GraphicAPI();
+  const String pathStr = PK_RESOURCE_FOLDER + _path.getFileNameWithoutExtension() + ".pkt";
+  const UUID id = UUID::generateRandomUUIDFromString(pathStr);
+  return createTexture(id);
+}
+
+SPtr<Texture>
+TextureManager::createTexture(const UUID& _ID)
+{
   // check if the texture has been stored before.
   SPtr<Texture> texture = getTexture(_ID);
   if (texture) {
     return texture;
   }
+
+  GraphicsAPI& api = g_GraphicAPI();
+
   // create the texture
   uint32 bindFlags = PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
 
@@ -118,7 +136,7 @@ TextureManager::loadTexture(const UUID& _ID)
   texture->setID(resource->m_id);
 
   const Path resPath = Path(resource->m_resourcePath);
-  insertTexture(resource->m_id, resPath, texture);
+  insertTexture(resource->m_id, texture);
 
   // return the final texture
   return texture;
@@ -139,8 +157,15 @@ SPtr<Texture>
 TextureManager::getTexture(const String& _path)
 {
   // search if the texture has been stored before
-  auto it = m_texturesPath.find(_path);
-  if (it != m_texturesPath.end()) {
+  // auto it = m_texturesPath.find(_path);
+  // if (it != m_texturesPath.end()) {
+  //   return it->second;
+  // }
+  // return nullptr;
+
+  const UUID id = UUID::generateRandomUUIDFromString(_path);
+  auto it = m_textures.find(id);
+  if (it != m_textures.end()) {
     return it->second;
   }
   return nullptr;
@@ -152,21 +177,13 @@ TextureManager::deleteTexture(const UUID& _ID)
   SPtr<Texture> texture = getTexture(_ID);
   if (texture) {
     m_textures.erase(_ID);
-    // also erase from path map
-    for (auto it = m_texturesPath.begin(); it != m_texturesPath.end(); ++it) {
-      if (it->second == texture) {
-        m_texturesPath.erase(it);
-        break;
-      }
-    }
   }
 }
 
 void
-TextureManager::insertTexture(const UUID& _ID, const Path& _path, const SPtr<Texture>& _pTexture)
+TextureManager::insertTexture(const UUID& _ID, const SPtr<Texture>& _pTexture)
 {
   m_textures.insert({ _ID, _pTexture });
-  m_texturesPath.insert({ _path.toString(), _pTexture });
 }
 
 PK_CORE_EXPORT TextureManager&

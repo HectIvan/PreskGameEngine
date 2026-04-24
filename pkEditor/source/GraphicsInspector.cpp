@@ -79,7 +79,7 @@ GraphicsInspector::init(Window& _window,
       if (im.beginDragDropTarget()) {
         const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
         if (id) {
-          SPtr<Texture> texture = tm.loadTexture(*id);
+          SPtr<Texture> texture = tm.createTexture(*id);
           rm.m_mainSkybox->copyFrom(texture);
         }
         im.endDragDropTarget();

@@ -255,6 +255,9 @@ class PK_CORE_EXPORT Pass
   void
   createBasics(const PassDesc& _desc);
 
+ public:
+  String m_name;
+
  private:
   Vector2 m_viewPortSize;
 

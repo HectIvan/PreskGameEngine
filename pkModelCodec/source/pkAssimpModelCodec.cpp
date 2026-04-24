@@ -92,28 +92,6 @@ AssimpModelCodec::createResource(const Path& _path)
   return createResourceFromModel(model, _path);
 }
 
-SPtr<Texture>
-getTextureFromPath(const Path& _path)
-{
-  TextureCodec& textureCodec = g_TextureCodec();
-  TextureManager& tm = g_TextureManager();
-  AssetResourceManager& assetMan = g_AssetResourceManager();
-
-  // if a texture with this path has already been loaded.
-  SPtr<Texture> texture = tm.getTexture(_path.toString());
-  if (texture) {
-    return texture;
-  }
-
-  SPtr<BaseResource> resource = textureCodec.createResourceFromFile(_path);
-  if (!resource) {
-    return nullptr;
-  }
-  assetMan.insertNewResource(resource);
-  texture = tm.loadTexture(resource->m_id);
-  return texture;
-}
-
 Bone
 AssimpModelCodec::aiboneToBone(const String& _name, int32 _ID, const aiNodeAnim* _channel)
 {
@@ -195,6 +173,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
 {
   // modules
   MaterialManager& matMan = g_MaterialManager();
+  TextureManager& tm = g_TextureManager();
 
   // check if the mesh is already in storage
   const String meshName(_mesh->mName.C_Str());
@@ -284,7 +263,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_DIFFUSE, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -314,7 +293,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_HEIGHT, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -344,7 +323,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_AMBIENT, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -373,7 +352,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_METALNESS, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -403,7 +382,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_REFLECTION, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.
@@ -433,7 +412,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
       if (materialA->GetTexture(aiTextureType_EMISSIVE, i, &path) == AI_SUCCESS) {
         // load the texture.
         const Path newPath(path.C_Str());
-        const SPtr<Texture> texture = getTextureFromPath(newPath);
+        const SPtr<Texture> texture = tm.createTexture(newPath);
         // if a texture was loaded.
         if (texture) {
           // log registry.

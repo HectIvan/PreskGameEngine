@@ -31,12 +31,12 @@ BaseResource::softLoad(const Path& _path)
 }
 
 void
-BaseResource::fillBaseHeader(const String& _uuidString,
+BaseResource::fillBaseHeader(const UUID& _id,
                              const String& _name,
                              const String& _originalPath,
                              const String& _resourcePath)
 {
-  m_id = UUID::generateRandomUUIDFromString(_uuidString);
+  m_id = _id;
   strcpy_s(m_name, PK_RESOURCE_NAME_SIZE, _name.c_str());
   strcpy_s(m_originalPath, PK_RESOURCE_PATH_SIZE, _originalPath.c_str());
   strcpy_s(m_resourcePath, PK_RESOURCE_PATH_SIZE, _resourcePath.c_str());

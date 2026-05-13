@@ -65,4 +65,13 @@ ShaderResource::unload()
   m_isLoaded = false;
   m_data.clear();
 }
+
+UUID
+ShaderResource::generateID(const ANSICHAR* _shaderDirectory,
+                           const ANSICHAR* _sEntryPoint,
+                           const ANSICHAR* _sModel)
+{
+  const String IDSeed = String(_shaderDirectory) + String(_sEntryPoint) + String(_sModel);
+  return UUID::generateRandomUUIDFromString(IDSeed);
+}
 }

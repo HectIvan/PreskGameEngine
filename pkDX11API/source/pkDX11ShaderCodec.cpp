@@ -30,53 +30,54 @@ namespace pkEngineSDK
 SPtr<BaseResource>
 DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 {
-  PK_ASSERT(_pShader);
+  // check if the shader is not null.
+  if (!_pShader) {
+    const String msg = "Shader is null!";
+    LOG_WARNING(msg, __FILE__, __LINE__);
+    return nullptr;
+  }
 
-  auto shader = reinterpret_pointer_cast<DX11Shader>(_pShader);
+  Path shaderDir = _pShader->getShaderDirectory();
 
   // check if the DirectX shader is valid.
-  const Path shaderPath = _pShader->getShaderDirectory();
+  auto shader = reinterpret_pointer_cast<DX11Shader>(_pShader);
   if (!shader) {
     const String msg = "Failed to reinterpret a shader " +
-                       shaderPath.toString() +
+                       shaderDir.toString() +
                        " into a DirectX shader.";
     LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
-  // Necessary shader data.
-  const String shaderName = shaderPath.getFileNameWithoutExtension();
-  const String originalDirectory = shader->getShaderDirectory().toString();
-  const String shaderEntry = shader->getEntryPoint();
-  const String shaderModel = shader->getShaderModel();
-  const String resourceDirectory = PK_RESOURCE_FOLDER + shaderName + ".pks";
-
-  /* set the directory of the shader object to the directory of the resource,
-     replacing the path based of the original shader file. */
-  shader->setShaderDirectory(resourceDirectory);
-  ofstream file(resourceDirectory, ios::out | ios::binary | ios::trunc);
+  // attempt to create the shader resource.
+  const String shaderName = shaderDir.getFileNameWithoutExtension();
+  const String resourceDir = PK_RESOURCE_FOLDER + shaderName + ".pks";
+  shader->setShaderDirectory(resourceDir);
+  ofstream file(resourceDir, ios::out | ios::binary | ios::trunc);
 
   // check if the resource creation failed.
   if (!file.is_open()) {
-    const String msg = "Failed to generate the shader resource: " + resourceDirectory + ".";
+    const String msg = "Failed to generate the shader resource: " + resourceDir + ".";
     LOG_WARNING(msg, __FILE__, __LINE__);
     return nullptr;
   }
 
   SPtr<ShaderResource> resource = make_shared<ShaderResource>();
 
-  // What is used to generate a UUID for the shader resource.
-  const String UUIDSource = shaderName + shaderEntry + shaderModel;
-
+  const UUID id = ShaderResource::generateID(resourceDir.c_str(),
+                                             shader->getEntryPoint(),
+                                             shader->getShaderModel());
+  resource->fillBaseHeader(id, shaderName, shaderDir.toString(), resourceDir);
   resource->m_isLoaded = true;
-  resource->fillBaseHeader(UUIDSource, shaderName, originalDirectory, resourceDirectory);
+
   resource->writeBaseHeader(file);
 
-  strcpy_s(resource->m_shaderDirectory, PK_RESOURCE_PATH_SIZE, originalDirectory.c_str());
-  strcpy_s(resource->m_sEntryPoint, PK_RESOURCE_NAME_SIZE, shaderEntry.c_str());
-  strcpy_s(resource->m_sModel, PK_RESOURCE_NAME_SIZE, shaderModel.c_str());
+  strcpy_s(resource->m_shaderDirectory,
+           PK_RESOURCE_PATH_SIZE,
+           shader->getShaderDirectory().c_str());
+  strcpy_s(resource->m_sEntryPoint, PK_RESOURCE_NAME_SIZE, shader->getEntryPoint());
+  strcpy_s(resource->m_sModel, PK_RESOURCE_NAME_SIZE, shader->getShaderModel());
   resource->m_type = shader->getType();
-
   // write shader specific data.
   file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_shaderDirectory), PK_RESOURCE_PATH_SIZE);
   file.write(reinterpret_cast<const ANSICHAR*>(&resource->m_sEntryPoint), PK_RESOURCE_NAME_SIZE);

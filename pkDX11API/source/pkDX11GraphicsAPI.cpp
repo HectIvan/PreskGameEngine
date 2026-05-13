@@ -271,8 +271,9 @@ DX11GraphicsAPI::clearRenderTargetView(const FColor& _color,
     }
     return;
   }
+  const uint32 rtvCount = static_cast<uint32>(dxRTV->m_rTVs.size());
   // if no mipSlice is specified, clear all the slices.
-  for (uint32 i = 0; i < dxRTV->m_rTVs.size(); ++i) {
+  for (uint32 i = 0; i < rtvCount; ++i) {
     ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[i];
     if (rtv) {
       m_pDevice->m_pImmediateContext->ClearRenderTargetView(rtv, color);
@@ -360,7 +361,13 @@ DX11GraphicsAPI::createVShader(SPtr<Shader>& _pShader)
   // check if the creation was successful
   if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
-    const String msg = "Failed to create a DX Vertex Shader. Error message: " + errMsg;
+    const String msg = "Failed to create DirectX Vertex Shader " +
+                       dxVShader->getShaderDirectory().toString() +
+                       " - " +
+                       dxVShader->getEntryPoint() +
+                       " - " +
+                       dxVShader->getShaderModel() +
+                       ". Error message: " + errMsg;
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
     return nullptr;
@@ -1148,8 +1155,9 @@ DX11GraphicsAPI::pSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   const uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
+  const uint32 bufferCount = static_cast<uint32>(_pCBuffers.size());
   // set all the buffers in the array
-  for (uint32 i = 0; i < _pCBuffers.size(); ++i) {
+  for (uint32 i = 0; i < bufferCount; ++i) {
     // Recast to a DirectX Constant buffer.
     auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
     // set the buffer
@@ -1175,7 +1183,8 @@ DX11GraphicsAPI::cSSetConstantBuffers(const Vector<SPtr<ConstantBuffer>>& _pCBuf
   const uint32 count = static_cast<uint32>(_pCBuffers.size());
   Vector<ID3D11Buffer*> buffers(count);
 
-  for (uint32 i = 0; i < _pCBuffers.size(); ++i) {
+  const uint32 bufferCount = static_cast<uint32>(_pCBuffers.size());
+  for (uint32 i = 0; i < bufferCount; ++i) {
     // Recast to a DirectX Constant buffer.
     auto dxCB = reinterpret_pointer_cast<DX11ConstantBuffer>(_pCBuffers[i]);
     // set the buffer

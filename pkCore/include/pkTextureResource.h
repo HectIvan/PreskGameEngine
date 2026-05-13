@@ -61,6 +61,14 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
   String
   getTypeString() const override { return "Texture"; }
 
+  /**
+   * @brief Generate an id from the texture directory.
+   */
+  PK_NODISCARD static UUID
+  generateID(const ANSICHAR* _texDir) {
+    return UUID::generateRandomUUIDFromString(String(_texDir) + "Texture");
+  }
+
  public:
   int32 m_width;
   int32 m_height;

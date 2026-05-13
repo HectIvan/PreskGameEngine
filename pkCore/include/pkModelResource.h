@@ -65,6 +65,14 @@ class PK_CORE_EXPORT ModelResource : public BaseResource
   String
   getTypeString() const override { return "Model"; }
 
+  /**
+   * @brief Generate an id from the model directory.
+   */
+  PK_NODISCARD static UUID
+  generateID(const ANSICHAR* _modelDir) {
+    return UUID::generateRandomUUIDFromString(String(_modelDir) + "Model");
+  }
+
  public:
   Vector<SimpleVertex> m_vertex;
   Vector<uint32> m_index;

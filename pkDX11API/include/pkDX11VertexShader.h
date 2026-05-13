@@ -22,7 +22,9 @@ namespace pkEngineSDK {
 class DX11VertexShader : public DX11Shader
 {
  public:
-  DX11VertexShader() = default;
+  DX11VertexShader() {
+    m_shaderType = PK_SHADER_TYPE::kVertex;
+  }
   ~DX11VertexShader() override {
     safeRelease(m_pShader);
   }

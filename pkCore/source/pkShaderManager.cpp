@@ -25,6 +25,33 @@ namespace pkEngineSDK
 {
 
 void
+createShaderByType(SPtr<Shader>& _pShader)
+{
+  GraphicsAPI& api = g_GraphicAPI();
+  switch (_pShader->getType()) {
+  case PK_SHADER_TYPE::kVertex: {
+    api.createVShader(_pShader);
+    break;
+  }
+  case PK_SHADER_TYPE::kPixel: {
+    api.createPShader(_pShader);
+    break;
+  }
+  case PK_SHADER_TYPE::kCompute: {
+    api.createCShader(_pShader);
+    break;
+  }
+  case PK_SHADER_TYPE::kGeometry: {
+    api.createGShader(_pShader);
+    break;
+  }
+  default: {
+    break;
+  }
+  }
+}
+
+void
 ShaderManager::createShaderResources()
 {
   // insert all desired shaders here.
@@ -59,52 +86,19 @@ ShaderManager::createShaderResources()
 }
 
 void
-ShaderManager::createShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E _type)
+ShaderManager::createShaderResource(const ShaderKey& _shaderData,
+                                    const PK_SHADER_TYPE::E& _type)
 {
   GraphicsAPI& api = g_GraphicAPI();
   // create the shader base.
-  ShaderKey key(_shaderData.shaderPath, _shaderData._szEntryPoint, _shaderData._szShaderModel);
-  SPtr<Shader> tempShader = api.internalCreateShader(_type);
-  tempShader->setData(key);
-  tempShader->compileFromFile();
+  SPtr<Shader> shader = api.internalCreateShader(_type);
+  shader->setData(_shaderData);
+  shader->compileFromFile();
   // create the shader based on its type.
-  switch (_type) {
-  case PK_SHADER_TYPE::kVertex: {
-    api.createVShader(tempShader);
-    break;
-  }
-  case PK_SHADER_TYPE::kPixel: {
-    api.createPShader(tempShader);
-    break;
-  }
-  case PK_SHADER_TYPE::kCompute: {
-    api.createCShader(tempShader);
-    break;
-  }
-  case PK_SHADER_TYPE::kGeometry: {
-    api.createGShader(tempShader);
-    break;
-  }
-  default: {
-    break;
-  }
-  }
+  createShaderByType(shader);
   // create the resource from the shader.
-  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(tempShader);
-
-  key.shaderPath = res->m_resourcePath;
-  insertShader(res->m_id, tempShader);
-  insertShader(key, tempShader);
-}
-
-void
-ShaderManager::insertShader(const UUID& _id, const SPtr<Shader>& _pShader)
-{
-  // do the same with m_keyShaders.
-  if (m_shaders.contains(_id)) {
-    m_shaders.find(_id)->second = _pShader;
-  }
-  m_shaders.insert({ _id, _pShader });
+  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(shader);
+  insertShader(res->m_id, shader);
 }
 
 void
@@ -130,17 +124,30 @@ ShaderManager::createShaders()
       const ANSICHAR* model = shader->getShaderModel();
       const ShaderKey key = ShaderKey(dir, entry, model);
 
+      createShaderByType(shader);
+
       // store the shader
       insertShader(res.lock()->m_id, shader);
-      insertShader(key, shader);
     }
   }
 }
 
 void
+ShaderManager::insertShader(const UUID& _id, const SPtr<Shader>& _pShader)
+{
+  // do the same with m_keyShaders.
+  if (m_shaders.contains(_id)) {
+    m_shaders.find(_id)->second = _pShader;
+  }
+  m_shaders.insert({ _id, _pShader });
+}
+
+
+void
 ShaderManager::insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader)
 {
-  m_keyShaders.insert({ _key, _pShader });
+  const UUID id = ShaderResource::generateID(_key);
+  insertShader(id, _pShader);
 }
 
 SPtr<Shader>
@@ -156,12 +163,13 @@ ShaderManager::getShader(const UUID& _id)
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
-  auto it = m_keyShaders.find(_key);
-  if (it == m_keyShaders.end()) {
-    return nullptr;
+  const UUID id = ShaderResource::generateID(_key);
+  SPtr<Shader> shader = m_shaders.find(id)->second;
+  if (shader) {
+    return shader;
   }
 
-  return it->second.lock();
+  return nullptr;
 }
 
 Vector<SPtr<Shader>>

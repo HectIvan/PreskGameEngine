@@ -53,6 +53,14 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
   String
   getTypeString() const override { return "Material"; }
 
+  /**
+   * @brief Generate an ID from the material name.
+   */
+  PK_NODISCARD static UUID
+  generateID(const ANSICHAR* _matName) {
+    return UUID::generateRandomUUIDFromString(String(_matName) + "Material");
+  }
+
  public:
    UUID m_albedoID;
    Vector3 m_albedoColor;

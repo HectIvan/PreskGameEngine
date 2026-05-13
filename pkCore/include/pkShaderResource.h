@@ -54,6 +54,28 @@ class PK_CORE_EXPORT ShaderResource : public BaseResource
   String
   getTypeString() const override { return "Shader"; }
 
+  /**
+   * @brief Generate a unique ID for the shader resource based on a ShaderKey.
+   * @param _key The ShaderKey containing the shader properties.
+   * @return A unique UUID for the shader resource.
+   */
+  static UUID
+  generateID(const ShaderKey& _key) {
+    return generateID(_key.shaderPath.c_str(), _key._szEntryPoint, _key._szShaderModel);
+  }
+
+  /**
+   * @brief Generate a unique ID for the shader resource based on its properties.
+   * @param _shaderDirectory The directory of the shader file.
+   * @param _sEntryPoint The entry point of the shader.
+   * @param _sModel The shader model.
+   * @return A unique UUID for the shader resource.
+   */
+  static UUID
+  generateID(const ANSICHAR* _shaderDirectory,
+             const ANSICHAR* _sEntryPoint,
+             const ANSICHAR* _sModel);
+
  public:
   PK_SHADER_TYPE::E m_type;
 

@@ -37,10 +37,10 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
     return nullptr;
   }
 
-  auto shader = reinterpret_pointer_cast<DX11Shader>(_pShader);
+  Path shaderDir = _pShader->getShaderDirectory();
 
   // check if the DirectX shader is valid.
-  Path shaderDir = _pShader->getShaderDirectory();
+  auto shader = reinterpret_pointer_cast<DX11Shader>(_pShader);
   if (!shader) {
     const String msg = "Failed to reinterpret a shader " +
                        shaderDir.toString() +
@@ -64,7 +64,10 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
 
   SPtr<ShaderResource> resource = make_shared<ShaderResource>();
 
-  resource->fillBaseHeader(shaderName + "Shader", shaderName, shaderDir.toString(), resourceDir);
+  const UUID id = ShaderResource::generateID(resourceDir.c_str(),
+                                             shader->getEntryPoint(),
+                                             shader->getShaderModel());
+  resource->fillBaseHeader(id, shaderName, shaderDir.toString(), resourceDir);
   resource->m_isLoaded = true;
 
   resource->writeBaseHeader(file);

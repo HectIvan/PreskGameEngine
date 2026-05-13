@@ -23,8 +23,10 @@ namespace pkEngineSDK
 
 class DX11ComputeShader : public DX11Shader
 {
-public:
-  DX11ComputeShader() = default;
+ public:
+  DX11ComputeShader() {
+    m_shaderType = PK_SHADER_TYPE::kCompute;
+  }
   ~DX11ComputeShader() override {
     safeRelease(m_pShader);
   }

@@ -288,3 +288,14 @@
 # pragma warning (disable : 4996)
 # pragma warning (disable : 4503)
 #endif
+
+/*******************************************************************/
+/**
+ * No discarding results
+**/
+/*******************************************************************/
+#if __has_cpp_attribute(nodiscard)
+# define PK_NODISCARD [[nodiscard]]
+#else
+# define PK_NODISCARD
+#endif

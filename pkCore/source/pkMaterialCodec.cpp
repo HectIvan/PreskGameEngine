@@ -45,7 +45,8 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
 
   SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
 
-  matResource->fillBaseHeader(materialName + "Material", materialName, "", filePath);
+  const UUID id = MaterialResource::generateID(materialName.c_str());
+  matResource->fillBaseHeader(id, materialName, "", filePath);
   matResource->writeBaseHeader(file);
 
   // check for each texture and see if they are valid to use.

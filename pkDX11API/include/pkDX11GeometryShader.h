@@ -22,7 +22,9 @@ namespace pkEngineSDK {
 class DX11GeometryShader : public DX11Shader
 {
  public:
-  DX11GeometryShader() = default;
+   DX11GeometryShader() {
+     m_shaderType = PK_SHADER_TYPE::kGeometry;
+   }
   ~DX11GeometryShader() override {
     safeRelease(m_pShader);
   }

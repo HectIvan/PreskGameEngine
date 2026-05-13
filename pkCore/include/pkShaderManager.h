@@ -53,7 +53,13 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
    * @param _type Type of shader to create.
    */
   void
-  createShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E _type);
+  createShaderResource(const ShaderKey& _shaderData, const PK_SHADER_TYPE::E& _type);
+
+  /**
+   * @brief Create the shaders from the shader resources.
+   */
+  void
+  createShaders();
 
   /**
    * @brief Insert a shader into the map.
@@ -63,11 +69,6 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
   void
   insertShader(const UUID& _id, const SPtr<Shader>& _pShader);
 
-  /**
-   * @brief Create the shaders from the shader resources.
-   */
-  void
-  createShaders();
 
   /**
    * @brief Insert a shader into the map.
@@ -111,7 +112,6 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
 
  private:
   UMap<UUID, SPtr<Shader>> m_shaders;
-  UMap<ShaderKey, WPtr<Shader>> m_keyShaders;
 };
 
 PK_CORE_EXPORT ShaderManager&

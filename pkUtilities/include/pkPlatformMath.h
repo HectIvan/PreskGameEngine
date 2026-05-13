@@ -48,7 +48,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Number to calculate the absolute value.
    * @return Absolute value of the parameter.
    */
-  static float
+  PK_NODISCARD static float
   abs(const float& _x);
 
   /**
@@ -57,7 +57,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Number of times _x will be multiplied by itself.
    * @return Result of _x elevated by the power of _y.
    */
-  static float
+  PK_NODISCARD static float
   pow(const float& _x, const float& _y);
 
   /**
@@ -65,7 +65,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Number to elevate Euler.
    * @return Result of Euler elevated by _x.
    */
-  static float
+  PK_NODISCARD static float
   exp(const float& _x);
 
   /**
@@ -73,7 +73,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Number to calculate the square root.
    * @return Square root of _x.
    */
-  static float
+  PK_NODISCARD static float
   sqrt(const float& _x);
 
   /**
@@ -82,7 +82,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Second number to compare.
    * @return Whichever value is the smallest.
    */
-  static float
+  PK_NODISCARD static float
   min(const float& _x, const float& _y);
 
   /**
@@ -90,7 +90,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x First uint32 to compare.
    * @param _y Second uint32 to compare.
    */
-  static uint32
+  PK_NODISCARD static uint32
   max(const uint32& _x, const uint32& _y);
 
   /**
@@ -99,7 +99,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Second number to compare.
    * @return Whichever value is the largest.
    */
-  static float
+  PK_NODISCARD static float
   max(const float& _x, const float& _y);
 
   /**
@@ -107,7 +107,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x First float to compare.
    * @param _y Second float to compare.
    */
-  static float
+  PK_NODISCARD static float
   maxf(const float& _x, const float& _y);
 
   /**
@@ -115,7 +115,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate sin.
    * @return sin of _x.
    */
-  static float
+  PK_NODISCARD static float
   sin(const float& _x);
 
   /**
@@ -123,7 +123,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate sin.
    * @return sin of _x.
    */
-  static float
+  PK_NODISCARD static float
   sinf(const float& _x);
 
   /**
@@ -131,7 +131,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate asin.
    * @return asin of _x.
    */
-  static float
+  PK_NODISCARD static float
   asin(const float& _x);
 
   /**
@@ -139,7 +139,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate cos.
    * @return cos of _x.
    */
-  static float
+  PK_NODISCARD static float
   cos(const float& _x);
 
   /**
@@ -147,7 +147,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate acos.
    * @return acos of _x.
    */
-  static float
+  PK_NODISCARD static float
   acos(const float& _x);
 
   /**
@@ -155,7 +155,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate tan.
    * @return tan of _x.
    */
-  static float
+  PK_NODISCARD static float
   tan(const float& _x);
 
   /**
@@ -163,7 +163,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _x Value to calculate atan.
    * @return atan of _x.
    */
-  static float
+  PK_NODISCARD static float
   atan(const float& _x);
 
   /**
@@ -172,7 +172,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Second value to calculate atan2.
    * @return atan2 of _x and _y.
    */
-  static float
+  PK_NODISCARD static float
   atan2(const float& _x, const float& _y);
 
   /**
@@ -182,7 +182,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Maximum clamping value.
    * @return Clamped float.
    */
-  static float
+  PK_NODISCARD static float
   clamp(const float& _t, const float& _x, const float& _y);
 
   /**
@@ -192,7 +192,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Maximum clamping value.
    * @return Clamped float.
    */
-  static Vector2
+  PK_NODISCARD static Vector2
   clamp(const Vector2& _t, const float& _x, const float& _y);
 
   /**
@@ -202,7 +202,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y Maximum clamping value.
    * @return Clamped float.
    */
-  static Vector3
+  PK_NODISCARD static Vector3
   clamp(const Vector3& _t, const float& _x, const float& _y);
 
   /**
@@ -212,7 +212,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y maximum value.
    * @return If it's in range or not.
    */
-  static bool
+  PK_NODISCARD static bool
   isInRange(const float& _t, const float& _x, const float& _y);
 
   /**
@@ -222,7 +222,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _y maximum value.
    * @return If it's in range or not.
    */
-  static bool
+  PK_NODISCARD static bool
   isInRange(const uint32& _t, const uint32& _x, const uint32& _y);
 
   /**
@@ -232,7 +232,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _t Timestamp.
    * @return The lerped number.
    */
-  static float
+  PK_NODISCARD static float
   lerp(const float& _x, const float& _y, const float& _t);
 
   /**
@@ -242,7 +242,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _t Timestamp.
    * @return The lerped Vector.
    */
-  static Vector3
+  PK_NODISCARD static Vector3
   lerp(const Vector3& _x, const Vector3& _y, const float& _t);
 
   /**
@@ -252,7 +252,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _t Timestamp.
    * @return The lerped Vector.
    */
-  static Vector4
+  PK_NODISCARD static Vector4
   lerp(const Vector4& _x, const Vector4& _y, const float& _t);
 
   /**
@@ -261,21 +261,21 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _displacement Difference in distance.
    * @return The force applied.
    */
-  static float
+  PK_NODISCARD static float
   hookeLaw(const float& _elasticity, const float& _displacement);
 
   /**
    * @brief Check if the value is nan.
    * @param _x Value to check.
    */
-  static bool
+  PK_NODISCARD static bool
   isNan(const float& _x);
 
   /**
    * @brief get the base 2 log of the number.
    * @param _x Value to calculate the log.
    */
-  static float
+  PK_NODISCARD static float
   log2(const float& _x);
 
   /***************************************************************************

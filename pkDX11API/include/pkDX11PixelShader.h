@@ -23,7 +23,9 @@ namespace pkEngineSDK {
 class DX11PixelShader : public DX11Shader
 {
  public:
-  DX11PixelShader() = default;
+  DX11PixelShader() {
+    m_shaderType = PK_SHADER_TYPE::kPixel;
+  }
   ~DX11PixelShader() override {
     safeRelease(m_pShader);
   }

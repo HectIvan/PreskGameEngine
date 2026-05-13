@@ -50,7 +50,8 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _pat
    */
   SPtr<ModelResource> modelRes = make_shared<ModelResource>();
 
-  modelRes->fillBaseHeader(fileName + "Model", fileName, _path.toString(), filePath);
+  const UUID id = ModelResource::generateID(filePath.c_str());
+  modelRes->fillBaseHeader(id, fileName, _path.toString(), filePath);
   modelRes->writeBaseHeader(file);
 
   modelRes->m_meshes = _pModel->meshes;

@@ -76,13 +76,13 @@ class PK_CORE_EXPORT BaseResource
 
   /**
    * @brief Fill the base resource header with the necessary data.
-   * @param _uuidString String from where the UUID will b generated.
+   * @param _id Resource ID.
    * @param _name Name of the resource.
    * @param _originalPath Path of the original resource (if one exists).
    * @param _resourcePath Path of the current resource.
    */
   void
-  fillBaseHeader(const String& _uuidString,
+  fillBaseHeader(const UUID& _id,
                  const String& _name,
                  const String& _originalPath,
                  const String& _resourcePath);

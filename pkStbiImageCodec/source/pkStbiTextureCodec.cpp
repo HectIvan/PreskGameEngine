@@ -60,7 +60,8 @@ StbiTextureCodec::createResource(const String _name,
   // create texture resource.
   SPtr<TextureResource> textureRes = make_shared<TextureResource>();
 
-  textureRes->fillBaseHeader(_name + "Texture", textureName, _name, resourcePath);
+  const UUID id = TextureResource::generateID(resourcePath.c_str());
+  textureRes->fillBaseHeader(id, textureName, _name, resourcePath);
   textureRes->writeBaseHeader(file);
 
   const SIZE_T sizeInt32 = sizeof(int32);

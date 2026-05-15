@@ -322,6 +322,7 @@ class DX11GraphicsAPI : public GraphicsAPI
 
   /**
    * @brief Create a texture.
+   * @param _name Name of the texture.
    * @param _width How wide is the texture.
    * @param _height How tall is the texture.
    * @param _format Format of the texture.
@@ -332,7 +333,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _isCube If the texture is a cube map.
    */
   SPtr<Texture>
-  createTexture(const uint32 _width,
+  createTexture(const ANSICHAR* _name,
+                const uint32 _width,
                 const uint32 _height,
                 const int32 _format,
                 const int32 _usage,

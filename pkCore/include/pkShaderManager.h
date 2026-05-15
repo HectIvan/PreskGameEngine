@@ -110,6 +110,9 @@ class PK_CORE_EXPORT ShaderManager : public Module<ShaderManager>
   Vector<String> 
   getShaderNames(const bool _getEntry = false, const bool _getModel = false);
 
+ public:
+  ShaderKey m_defaultShaderKey = ShaderKey("resources/pkPShader.pks", "PS", "ps_5_0");
+
  private:
   UMap<UUID, SPtr<Shader>> m_shaders;
 };

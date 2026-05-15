@@ -237,6 +237,27 @@ BaseApp::update()
   tonePass->updateCBuffer(0, &exposureCBuffer, v2x2Size);
 
   ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v2x2Size, v2x2Size });
+
+  /**
+   *  to do: temporary.
+   */
+  const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
+  rm.m_lights.clear();
+  const uint32 actorCount = static_cast<uint32>(actors.size());
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Light> light = actors[i]->getComponent<Light>();
+    if (light) {
+      rm.m_lights.push_back(light);
+    }
+  }
+
+  rm.m_cameras.clear();
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
+    if (camera) {
+      rm.m_cameras.push_back(camera);
+    }
+  }
 }
 
 void
@@ -249,11 +270,10 @@ BaseApp::render()
   // get all passes
   // const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   // const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
-  // const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   const SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
   const SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
-  // const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
-  // const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
+  const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
+  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
   const SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
   const SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
   const SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
@@ -265,40 +285,24 @@ BaseApp::render()
   // Get all actors
   const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
-
-  /**
-   *  to do: temporary.
-   */
-  renderManager.m_lights.clear();
-  const uint32 actorCount = static_cast<uint32>(actors.size());
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Light> light = actors[i]->getComponent<Light>();
-    if (light) {
-      renderManager.m_lights.push_back(light);
-    }
-  }
-
-  renderManager.m_cameras.clear();
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
-    if (camera) {
-      renderManager.m_cameras.push_back(camera);
-    }
-  }
-
-  renderManager.renderActors(actors);
+  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
   // first shadow pass
-  // lightPositions->beginPass();
-  // lightPositions->endPass();
-  // 
-  // // base pass
-  // basePass->beginPass(Color::BLACK);
-  // renderManager.renderActors(actors);
-  // basePass->endPass();
-  // 
+
+  const SPtr<Pass> basePass = renderManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<Pass> transparencyPass = renderManager.getPass(PASS_TYPE::kP_Transparency);
+
+  basePass->beginPass(Color::BLACK);
+  renderManager.renderActors(actors);
+  basePass->endPass();
+
   // transparencyPass->beginPass(Color::BLACK);
   // renderManager.renderActors(actors);
   // transparencyPass->endPass();
+  // 
+  // lightPositions->beginPass(Color::BLACK);
+  // renderManager.renderActors(actors);
+  // lightPositions->endPass();
+
 
   // get texel size of compute passes
 
@@ -308,13 +312,13 @@ BaseApp::render()
   // const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   // const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
-  // BRDF->beginPass(Color::WHITE);
-  // api.draw(3, 0);
-  // BRDF->endPass();
-  // 
-  // transparencyBRDF->beginPass(Color::WHITE);
-  // api.draw(3, 0);
-  // transparencyBRDF->endPass();
+  BRDF->beginPass(Color::WHITE);
+  api.draw(3, 0);
+  BRDF->endPass();
+  
+  transparencyBRDF->beginPass(Color::WHITE);
+  api.draw(3, 0);
+  transparencyBRDF->endPass();
 
   // render the skybox
   skyBoxPass->beginPass(FColor::CYAN);

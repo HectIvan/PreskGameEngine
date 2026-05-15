@@ -5,6 +5,30 @@
 
 namespace pkEngineSDK
 {
+void
+DX11Texture::setName(const String& _name)
+{
+  m_t2d->SetPrivateData(WKPDID_D3DDebugObjectName,
+                        static_cast<UINT>(_name.size()),
+                        _name.c_str());
+}
+
+String
+DX11Texture::getName()
+{
+  if (!m_t2d) { return String(); }
+
+  char name[256];
+  UINT nameSize = sizeof(name);
+  HRESULT hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, name);
+  if (FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
+    const String msg = "Failed to get the texture name. Error message: " + errMsg;
+    LOG_ERROR(msg, __FILE__, __LINE__);
+    return String();
+  }
+  return String(name);
+}
 
 bool
 DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
@@ -15,13 +39,12 @@ DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
   // comvert to DirectX Texture.
   const auto dxTx = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!dxTx) {
-    const String msg = "Failed to copy texture: '" + _pTexture->getNameString() + "'.";
+    const String msg = "Failed to copy texture";
     LOG_WARNING(msg, __FILE__, __LINE__);
     return false;
   }
   // copy the values.
   setSize(dxTx->getSize());
-  setName(dxTx->getName());
 
   if (dxTx->m_t2d) { m_t2d = dxTx->getTexture2D(); }
   if (dxTx->m_sRV) { m_sRV = dxTx->getSRV(); };

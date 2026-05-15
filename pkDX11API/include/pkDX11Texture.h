@@ -64,6 +64,20 @@ class DX11Texture : public Texture
   setTexture2D(ID3D11Texture2D* _t2d) { m_t2d = _t2d; }
 
   /**
+   * @brief Set the name of the texture.
+   * @param _name New name of the texture.
+   */
+  void
+  setName(const String& _name) override;
+
+  /**
+   * @brief Get the name of the texture.
+   * @return Name of the texture.
+   */
+  String
+  getName() override;
+
+  /**
    * @brief Get the render target view.
    * @param _index Index of the RTV to get.
    * @return Pointer to the target.

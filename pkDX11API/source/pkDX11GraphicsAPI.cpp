@@ -1041,7 +1041,8 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
 SPtr<Texture>
 DX11GraphicsAPI::createTexture(const TextureDesc& _desc)
 {
-  return createTexture(_desc.width,
+  return createTexture(_desc.name,
+                       _desc.width,
                        _desc.height,
                        _desc.format,
                        _desc.usage,
@@ -1373,7 +1374,8 @@ DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
   resource->load();
 
   // create a default texture using the received parameters
-  SPtr<Texture> tempTexture = createTexture(resource->m_width,
+  SPtr<Texture> tempTexture = createTexture(resource->m_name,
+                                            resource->m_width,
                                             resource->m_height,
                                             resource->m_format,
                                             PK_USAGE::kPK_USAGE_DEFAULT,
@@ -1432,7 +1434,7 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
   }
 
   const String msg = "Created a DirectX 11 texture from a DSS directory. Texture name: " +
-                     texture->getName().toString();
+                     texture->getName();
   LOG_REGISTER(msg, __FILE__, __LINE__);
   return texture;
 }
@@ -1443,7 +1445,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!texture) {
     const String msg = "Failed to generate mips for texture: " +
-                       _pTexture->getName().getPath();
+                       _pTexture->getName();
     LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
@@ -1452,7 +1454,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   if (srv) {
     m_pDevice->m_pImmediateContext->GenerateMips(srv);
   }
-  const String msg = "Generated mips for the texture: " + _pTexture->getName().toString();
+  const String msg = "Generated mips for the texture: " + _pTexture->getName();
   LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
@@ -1531,7 +1533,8 @@ DX11GraphicsAPI::createEmptyTexture()
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTexture(const uint32 _width,
+DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
+                               const uint32 _width,
                                const uint32 _height,
                                const int32 _format,
                                const int32 _usage,
@@ -1728,8 +1731,9 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
     }
   }
 
+  dxTex->setName(_name);
   const String msg = "Created a DirectX 11 texture. Texture name: " +
-                      dxTex->getName().toString() +
+                      dxTex->getName() +
                       " Width: " + to_string(_width) +
                       " Height: " + to_string(_height) +
                       " Format: " + to_string(_format) +
@@ -1739,7 +1743,6 @@ DX11GraphicsAPI::createTexture(const uint32 _width,
                       " Mip levels: " + to_string(_mipLevels) +
                       " Is cube: " + to_string(_isCube);
   LOG_REGISTER(msg, __FILE__, __LINE__);
-
   return dxTex;
 }
 

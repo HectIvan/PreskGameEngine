@@ -68,6 +68,7 @@ ShaderManager::createShaderResources()
   ShaderKey toneMap("shaders/pkToneMap.hlsl", "PS", "ps_5_0");
   ShaderKey cubeMap("shaders/pkCubeMapShader.hlsl", "PS", "ps_5_0");
   ShaderKey transparency("shaders/pkPSTransparency.hlsl", "PS", "ps_5_0");
+  ShaderKey merge("shaders/pkMergeShader.hlsl", "PS", "ps_5_0");
 
   // initialize all shaders and create the resources.
   createShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
@@ -83,6 +84,7 @@ ShaderManager::createShaderResources()
   createShaderResource(toneMap, PK_SHADER_TYPE::kPixel);
   createShaderResource(cubeMap, PK_SHADER_TYPE::kPixel);
   createShaderResource(transparency, PK_SHADER_TYPE::kPixel);
+  createShaderResource(merge, PK_SHADER_TYPE::kPixel);
 }
 
 void
@@ -127,6 +129,7 @@ ShaderManager::createShaders()
       createShaderByType(shader);
 
       // store the shader
+      shader->m_id = res.lock()->m_id;
       insertShader(res.lock()->m_id, shader);
     }
   }
@@ -153,23 +156,20 @@ ShaderManager::insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader)
 SPtr<Shader>
 ShaderManager::getShader(const UUID& _id)
 {
-  SPtr<Shader> shader = m_shaders.find(_id)->second;
-  if (shader) {
-    return shader;
+  if (!m_shaders.contains(_id)) {
+    return nullptr;
   }
-  return nullptr;
+  return m_shaders.find(_id)->second;
 }
 
 SPtr<Shader>
 ShaderManager::getShader(const ShaderKey& _key)
 {
   const UUID id = ShaderResource::generateID(_key);
-  SPtr<Shader> shader = m_shaders.find(id)->second;
-  if (shader) {
-    return shader;
+  if (!m_shaders.contains(id)) {
+    return nullptr;
   }
-
-  return nullptr;
+  return m_shaders.find(id)->second;
 }
 
 Vector<SPtr<Shader>>

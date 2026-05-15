@@ -228,6 +228,7 @@ struct TextureDesc
   int32 bindFlags;
   int32 mipLevels = 1;
   int32 shaderResourceFormat;
+  const ANSICHAR* name;
   bool isCube = false;
 };
 
@@ -291,22 +292,15 @@ class PK_CORE_EXPORT Texture
    * @brief Set the texture name.
    * @param _name Name of the texture
    */
-  void
-  setName(Path _name) { m_name = _name; }
+  virtual void
+  setName(const String& _name) = 0;
 
   /**
    * @brief Get the texture name.
-   * @return Name of the texture.
+   * @return Texture name.
    */
-  Path& // to do: change this to the actual name.
-  getName() { return m_name; }
-
-  /**
-   * @brief Get the texture name as a string.
-   * @return Name of the texture;
-   */
-  String
-  getNameString() { return m_name.toString(); }
+  virtual String
+  getName() = 0;
 
   /**
    * @brief Get the texture name as a const ANSICHAR*.
@@ -348,7 +342,6 @@ class PK_CORE_EXPORT Texture
   getID() { return &m_id; }
 
  private:
-  Path m_name;
   UUID m_id;
   uint32 m_width;
   uint32 m_height;

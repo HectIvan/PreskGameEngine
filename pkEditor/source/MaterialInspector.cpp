@@ -74,7 +74,7 @@ MaterialInspector::createMaterialWindow()
   /*------------------------albedo button-----------------------*/
   /***************************************************************/
   if (albedo) {
-    const String albName = albedo->getNameString() + "diff";
+    const String albName = albedo->getName() + "diff";
     if (im.createButtonImage(albName.c_str(), albedo, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + albName;
@@ -118,7 +118,7 @@ MaterialInspector::createMaterialWindow()
   /***************************************************************/
 
   if (normal) {
-    const String norName = normal->getNameString() + "norm";
+    const String norName = normal->getName() + "norm";
     if (im.createButtonImage(norName.c_str(), normal, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + norName;
@@ -160,7 +160,7 @@ MaterialInspector::createMaterialWindow()
   /***************************************************************/
 
   if (oclussion) {
-    const String occName = oclussion->getNameString() + "ao";
+    const String occName = oclussion->getName() + "ao";
     if (im.createButtonImage(occName.c_str(), oclussion, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + occName;
@@ -202,7 +202,7 @@ MaterialInspector::createMaterialWindow()
   /***************************************************************/
 
   if (rough) {
-    const String roughName = rough->getNameString() + "rough";
+    const String roughName = rough->getName() + "rough";
     if (im.createButtonImage(roughName.c_str(), rough, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + roughName;
@@ -246,7 +246,7 @@ MaterialInspector::createMaterialWindow()
   /***************************************************************/
 
   if (metallic) {
-    const String metName = metallic->getNameString() + "metal";
+    const String metName = metallic->getName() + "metal";
     if (im.createButtonImage(metName.c_str(), metallic, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + metName;
@@ -290,7 +290,7 @@ MaterialInspector::createMaterialWindow()
   /***************************************************************/
 
   if (emissive) {
-    const String emissName = emissive->getNameString() + "emissive";
+    const String emissName = emissive->getName() + "emissive";
     if (im.createButtonImage(emissName.c_str(), emissive, texSize)) {}
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + emissName;

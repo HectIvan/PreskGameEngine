@@ -78,8 +78,7 @@ TextureManager::createFlatTexture(const String _name,
   const String directory = PK_RESOURCE_FOLDER + _name + ".pkt";
 
   Vector<uint8> data = { color._color.R, color._color.G, color._color.B, color._color.A };
-  SPtr<TextureResource> resource = texCodec.createResource(directory,
-                                                           _name,
+  SPtr<TextureResource> resource = texCodec.createResource(_name,
                                                            _width,
                                                            _height,
                                                            4,

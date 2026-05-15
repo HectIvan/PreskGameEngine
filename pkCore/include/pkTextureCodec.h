@@ -41,8 +41,7 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
    * @param _data Data of the texture.
    */
   virtual SPtr<TextureResource>
-  createResource(const Path& _path,
-                 const String _name,
+  createResource(const String _name,
                  const int32 _width,
                  const int32 _height,
                  const int32 _bpp,

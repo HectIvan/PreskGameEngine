@@ -291,7 +291,7 @@ BaseApp::render()
   const SPtr<Pass> basePass = renderManager.getPass(PASS_TYPE::kP_Base);
   const SPtr<Pass> transparencyPass = renderManager.getPass(PASS_TYPE::kP_Transparency);
 
-  basePass->beginPass(Color::BLACK);
+  basePass->beginPass(FColor::BLACK);
   renderManager.renderActors(actors);
   basePass->endPass();
 
@@ -312,11 +312,11 @@ BaseApp::render()
   // const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
   // const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
 
-  BRDF->beginPass(Color::WHITE);
+  BRDF->beginPass(FColor::WHITE);
   api.draw(3, 0);
   BRDF->endPass();
   
-  transparencyBRDF->beginPass(Color::WHITE);
+  transparencyBRDF->beginPass(FColor::WHITE);
   api.draw(3, 0);
   transparencyBRDF->endPass();
 
@@ -339,30 +339,30 @@ BaseApp::render()
   //   ssaoPass->endPass();
   // }
   // 
-  // // emissive Horizontal Blur pass
-  // emissHBlurPass->beginPass();
-  // api.draw(3, 0);
-  // emissHBlurPass->endPass();
-  // 
-  // // emissive pass
-  // emissBlurPass->beginPass();
-  // api.draw(3, 0);
-  // emissBlurPass->endPass();
-  // 
-  // // Quad luminosity pass.
-  // lumPass->beginPass();
-  // api.draw(3, 0);
-  // lumPass->endPass();
-  // 
-  // // quad lum blur Horizontal pass.
-  // lumBlurHPass->beginPass();
-  // api.draw(3, 0);
-  // lumBlurHPass->endPass();
-  // 
-  // // Quad lum blur Vertical pass.
-  // lumBlurPass->beginPass();
-  // api.draw(3, 0);
-  // lumBlurPass->endPass();
+  // emissive Horizontal Blur pass
+  emissHBlurPass->beginPass();
+  api.draw(3, 0);
+  emissHBlurPass->endPass();
+  
+  // emissive pass
+  emissBlurPass->beginPass();
+  api.draw(3, 0);
+  emissBlurPass->endPass();
+  
+  // Quad luminosity pass.
+  lumPass->beginPass();
+  api.draw(3, 0);
+  lumPass->endPass();
+  
+  // quad lum blur Horizontal pass.
+  lumBlurHPass->beginPass();
+  api.draw(3, 0);
+  lumBlurHPass->endPass();
+  
+  // Quad lum blur Vertical pass.
+  lumBlurPass->beginPass();
+  api.draw(3, 0);
+  lumBlurPass->endPass();
 
   // Quad Tone pass
   tonePass->beginPass(FColor::CYAN);

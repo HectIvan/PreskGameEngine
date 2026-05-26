@@ -2,6 +2,8 @@
 Texture2D actorsRender : register(t0);
 Texture2D actorsTransparentRender : register(t1);
 Texture2D skyboxRender : register(t2);
+Texture2D emissiveRender : register(t3);
+Texture2D luminanceRender : register(t4);
 
 // sampler
 SamplerState samState : register(s0);
@@ -17,6 +19,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   float4 actorSample = actorsRender.Sample(samState, input.TexCoord);
   float4 actorTransparentSample = actorsTransparentRender.Sample(samState, input.TexCoord);
   float3 skyboxSample = skyboxRender.Sample(samState, input.TexCoord).rgb;
+  float3 emissSample = emissiveRender.Sample(samState, input.TexCoord).rgb;
+  float3 luminanceSample = luminanceRender.Sample(samState, input.TexCoord).rgb;
   
   float3 finalColor = float3(0, 0, 0);
   
@@ -28,6 +32,8 @@ float4 PS(PS_INPUT input) : SV_Target0
   {
     finalColor = lerp(actorSample.rgb, actorTransparentSample.rgb, actorTransparentSample.a);
   }
+  
+  finalColor += emissSample + luminanceSample;
   
   return float4(finalColor, 1.0f);
 }

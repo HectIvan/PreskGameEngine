@@ -139,12 +139,6 @@ class PK_CORE_EXPORT Pass
   beginPass(const FColor& _color = FColor::CYAN, const bool& _clearRT = true);
 
   /**
-   * @brief Start pass based parameter setting without clearing the render targets.
-   */
-  void
-  beginPass(const bool& _clearRT = false);
-
-  /**
    * @brief Set all parameters to null;
    */
   void

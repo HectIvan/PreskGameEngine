@@ -221,12 +221,6 @@ Pass::beginPass(const FColor& _color, const bool& _clearRT)
 }
 
 void
-Pass::beginPass(const bool& _clearRT)
-{
-  beginPass(FColor::CYAN, _clearRT);
-}
-
-void
 Pass::endPass()
 {
   // get managers

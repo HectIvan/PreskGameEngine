@@ -438,7 +438,7 @@ RendererManager::createPasses()
   LOG_REGISTER("---------Creating Merge pass.---------", __FILE__, __LINE__);
   pDesc.pSKey = ShaderKey("resources/pkMergeShader.pks", "PS", "ps_5_0");
   pDesc.cBSizes = {};
-  pDesc.inputs = { brdfRT, brdfTranspRT, skyboxRT };
+  pDesc.inputs = { brdfRT, brdfTranspRT, skyboxRT, emissBlurRT, lumBlurRT };
   pDesc.outputs = { m_targetRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
@@ -687,21 +687,12 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
   const SPtr<Pass> transparencyPass = rManager.getPass(PASS_TYPE::kP_Transparency);
   const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
-  const SPtr<Pass> materialPass = rManager.getPass(PASS_TYPE::kP_Material);
 
-  // offsets
-  uint32 currentVertexOrigin = 0;
-  uint32 currentIndexOrigin = 0;
   // for each mesh in the model
   const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
   const uint32 sizeProps = sizeof(CBMaterialProps);
 
-  // CBLight cBLight;
-  // SPtr<Light> light = m_lights[0];
-  // if (light) {
-  //   cBLight = CBLight(light);
-  // }
-
+  // get the main camera.
   CBCamera cBCamera;
   const uint32 cameracount = static_cast<uint32>(m_cameras.size());
   for (uint32 i = 0; i < cameracount; ++i) {
@@ -712,14 +703,13 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
     }
   }
 
-  // SPtr<Camera> lightCam = m_cameras[0];
-  // CBWVP wvpLight;
-  // wvpLight.projection = lightCam->getProjection();
-  // wvpLight.view = lightCam->getView();
-
   const uint32 sizeWVP = sizeof(CBWVP);
   api.setVertexBuffer(_model->m_vertexB);
   api.setIndexBuffer(_model->m_indexB);
+
+  // offsets
+  uint32 currentVertexOrigin = 0;
+  uint32 currentIndexOrigin = 0;
 
   for (uint32 i = 0; i < meshCount; ++i) {
     const SPtr<Mesh> mesh = _model->meshes[i];
@@ -731,14 +721,16 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
 
       // update the constant buffers.
       CBWVP wvp(transform, cBCamera.view, cBCamera.projection);
-
+    
+      // set resources to the pixel shader.
+      api.pSSetShaderResourceViews(material->getTextures());
+      // update the constant buffers.
       basePass->updateCBuffer(0, &wvp, sizeWVP);
       basePass->updateCBuffer(1, &material->m_properties, sizeProps);
       transparencyPass->updateCBuffer(0, &wvp, sizeWVP);
       transparencyPass->updateCBuffer(1, &material->m_properties, sizeProps);
       lightPositionsPass->updateCBuffer(0, &wvp, sizeWVP);
-
-      api.pSSetShaderResourceViews(material->getTextures());
+      // render the mesh.
       api.drawIndexed(mesh->numIndex, currentIndexOrigin, currentVertexOrigin);
     }
     // update the offsets

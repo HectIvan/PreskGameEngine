@@ -541,6 +541,8 @@ RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
   return m_uavBuffers.find(_type)->second;
 }
 
+
+
 void
 RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput)
 {
@@ -548,52 +550,69 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   PK_ASSERT(_pOutput);
 
   GraphicsAPI& api = g_GraphicAPI();
-  AssetResourceManager& assetMan = g_AssetResourceManager();
   ShaderManager& shaderMan = g_ShaderManager();
 
-  // get vertex shader resource.
-  SPtr<BaseResource> vShadRes = assetMan.getResourceByDirectory("resources/pkQuadShader.pks");
-  SPtr<BaseResource> pShadRes = assetMan.getResourceByDirectory("resources/pkCubeMapShader.pks");
-
-  PK_ASSERT(vShadRes);
-  PK_ASSERT(pShadRes);
-
-  vShadRes->load();
-  pShadRes->load();
-
-  // create the vertex shader.
-  SPtr<Shader> vShader = api.internalCreateShader(PK_SHADER_TYPE::kVertex);
-  if (!vShader) {
-    const String msg = "Could not create vertex shader to generate cubeMap.";
-    LOG_FATAL(msg, __FILE__, __LINE__);
-    return;
-  }
-  vShader->compileFromResource(vShadRes);
-  vShader = api.createVShader(vShader);
+  const ShaderKey vShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
+  const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "PS", "ps_5_0");
+  SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
+  SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
   const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
-
-  // save shader
-  const ShaderKey vShaderKey("resources/pkQuadShader.pks", "vs_5_0", "VS");
-  shaderMan.insertShader(vShaderKey, vShader);
-
-  // create the pixel shader.
-  SPtr<Shader> pShader = api.internalCreateShader(PK_SHADER_TYPE::kPixel);
-  if (!pShader) {
-    const String msg = "Could not create pixel shader to generate cubeMap.";
-    LOG_FATAL(msg, __FILE__, __LINE__);
-    THROW_ERROR(msg);
-    return;
-  }
-  pShader->compileFromResource(pShadRes);
-  pShader = api.createPShader(pShader);
-
-  // save shader
-  const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "ps_5_0", "PS");
-  shaderMan.insertShader(pShaderKey, pShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
                                                            PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear);
+
+  const Vector2 viewportSize = _pOutput->getSize();
+
+  // create constant buffer.
+  const uint32 CBFloatSize = sizeof(CBFloat);
+  SPtr<ConstantBuffer> cBuffer = api.createConstantBuffer(CBFloatSize);
+
+  // set the necessary resources.
+  api.setViewport(viewportSize);
+  api.setInputLayout(iLayout);
+  api.setVShader(vShader);
+  api.setPShader(pShader);
+  api.setSampler(samplerState);
+  api.pSSetShaderResourceViews({ _pInput });
+  api.pSSetConstantBuffers({ cBuffer }, 0);
+
+  // iterate through each face of the cubemap.
+  api.clearRenderTargetView(FColor::BLACK, _pOutput);
+  for (uint32 i = 0; i < 6; ++i) {
+    api.setRenderTarget(_pOutput, nullptr, i);
+    const CBFloat data(static_cast<float>(i));
+    api.updateConstantBuffer(cBuffer, &data, CBFloatSize);
+    api.draw(3, 0);
+  }
+
+  // unbind resources.
+  api.waitDevice();
+  api.pSUnbindShaderResourceViews(1);
+  api.unbindRenderTargets(1);
+
+  LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
+}
+
+void
+RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
+                                           const SPtr<Texture>& _pOutput)
+{
+  PK_ASSERT(_pInput);
+  PK_ASSERT(_pOutput);
+
+  GraphicsAPI& api = g_GraphicAPI();
+  ShaderManager& shaderMan = g_ShaderManager();
+
+  const ShaderKey vShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
+  const ShaderKey pShaderKey("resources/pkIrradianceShader.pks", "PS", "ps_5_0");
+  SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
+  SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
+  const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
+
+  // create the sampler state.
+  SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
+    PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear);
 
   const Vector2 viewportSize = _pOutput->getSize();
 

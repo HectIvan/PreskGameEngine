@@ -112,10 +112,10 @@ ShaderManager::createShaders()
   UMap<UUID, SPtr<BaseResource>>& resources = assetMan.getAllResources();
   // iterate through all resources.
   for (auto& resource : resources) {
-    WPtr<BaseResource> res = resource.second;
+    SPtr<BaseResource> res = resource.second;
     // if the resource is a shader resource, create the shader and compile it.
-    if (RESOURCE_TYPE::kShader == res.lock()->getType()) {
-      SPtr<ShaderResource> shaderRes = reinterpret_pointer_cast<ShaderResource>(res.lock());
+    if (RESOURCE_TYPE::kShader == res->getType()) {
+      SPtr<ShaderResource> shaderRes = reinterpret_pointer_cast<ShaderResource>(res);
       shaderRes->load();
       SPtr<Shader> shader = api.internalCreateShader(shaderRes->m_type);
       shader->compileFromResource(shaderRes);
@@ -129,8 +129,8 @@ ShaderManager::createShaders()
       createShaderByType(shader);
 
       // store the shader
-      shader->m_id = res.lock()->m_id;
-      insertShader(res.lock()->m_id, shader);
+      shader->m_id = res->m_id;
+      insertShader(res->m_id, shader);
     }
   }
 }
@@ -150,7 +150,10 @@ void
 ShaderManager::insertShader(const ShaderKey& _key, const SPtr<Shader>& _pShader)
 {
   const UUID id = ShaderResource::generateID(_key);
-  insertShader(id, _pShader);
+  if (!m_shaders.contains(id)) {
+    m_shaders.insert({ id, _pShader });
+  }
+  m_shaders.find(id)->second = _pShader;
 }
 
 SPtr<Shader>

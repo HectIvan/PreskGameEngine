@@ -197,7 +197,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float3 viewDir = normalize(Eye.xyz - worldPos);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
   float3 normal = normalize(normalTex.xyz);
-  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic.rrr);
+  float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, float3(metallic, metallic, metallic));
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));
   float3 F = Fresnel(F0, max(VoH, 0.0f));
@@ -224,19 +224,22 @@ PS_OUTPUT PS(PS_INPUT input)
    * IBL calculations
    */
   
-  float3 V = normalize(worldPos - Eye.xyz);
-  float3 view = reflect(V, normal);
+  float3 view = reflect(viewDir, normal);
   view.z *= -1.0f;
-  float2 skyboxUV = getSkyBoxUV(view);
   
   // get the skybox sample depending on roughness levels.
   float2 dimensions = 0.0f.xx;
   skybox.GetDimensions(dimensions.x, dimensions.y);
+  
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
   float targetMip = lerp(0.0, mipCount - 1.0, roughness);
-  float3 IBL = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
   
-  float3 diffuseIBL = IBL * fLambert;
+  float2 skyboxUV = getSkyBoxUV(view);
+  float3 ambient = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
+  
+  // diffuse ibl should use the irradiance map, and use the normal vector, not the reflected vector.
+  // float3 diffuseIBL = irradiance * albedo.rgb * (1.0f - metallic);
+  float3 diffuseIBL = ambient * albedo.rgb;
 
   /**
    * shadow mapping;

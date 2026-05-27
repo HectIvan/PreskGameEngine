@@ -180,6 +180,14 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput);
 
   /**
+   * @brief Generate an irradiance cubemap from a cubemap texture.
+   * @param _pInput Cubemap to convert.
+   * @param _pOutput Output irradiance cubemap texture.
+   */
+  void
+  generateIrradianceCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput);
+
+  /**
    * @brief Generate a LUT.
    * @param _pOutput Texture output.
    */

@@ -69,6 +69,7 @@ ShaderManager::createShaderResources()
   ShaderKey cubeMap("shaders/pkCubeMapShader.hlsl", "PS", "ps_5_0");
   ShaderKey transparency("shaders/pkPSTransparency.hlsl", "PS", "ps_5_0");
   ShaderKey merge("shaders/pkMergeShader.hlsl", "PS", "ps_5_0");
+  ShaderKey irradiance("shaders/pkIrradianceShader.hlsl", "PS", "ps_5_0");
 
   // initialize all shaders and create the resources.
   createShaderResource(baseVertex, PK_SHADER_TYPE::kVertex);
@@ -85,6 +86,7 @@ ShaderManager::createShaderResources()
   createShaderResource(cubeMap, PK_SHADER_TYPE::kPixel);
   createShaderResource(transparency, PK_SHADER_TYPE::kPixel);
   createShaderResource(merge, PK_SHADER_TYPE::kPixel);
+  createShaderResource(irradiance, PK_SHADER_TYPE::kPixel);
 }
 
 void

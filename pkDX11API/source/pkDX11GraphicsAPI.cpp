@@ -1732,9 +1732,9 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
   }
 
   dxTex->setName(_name);
-  const String msg = "Created a DirectX 11 texture. Texture name: " +
+  const String msg = "Created a DirectX 11 texture. Texture name: '" +
                       dxTex->getName() +
-                      " Width: " + to_string(_width) +
+                      "' Width: " + to_string(_width) +
                       " Height: " + to_string(_height) +
                       " Format: " + to_string(_format) +
                       " Usage: " + to_string(_usage) +

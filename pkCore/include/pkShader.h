@@ -145,13 +145,13 @@ class PK_CORE_EXPORT Shader
    * @param _pBlob Info blob.
    */
   void
-  setBlob(PKBlob _pBlob) { m_pSBlob = _pBlob; }
+  setBlob(const PKBlob& _pBlob) { m_pSBlob = _pBlob; }
 
   /**
    * @brief Get the shader blob.
    * @return the shader blob.
    */
-  PKBlob
+  const PKBlob
   getBlob() const { return m_pSBlob; }
 
   /**

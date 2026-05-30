@@ -15,15 +15,6 @@ struct PS_INPUT
   float2 TexCoord : TEXCOORD0;
 };
 
-float2 SampleEquirectangular(float3 dir)
-{
-  float2 uv;
-  uv.x = atan2(dir.z, dir.x) / (2.0 * PI) + 0.5;
-  uv.y = acos(dir.y) / PI;
-  uv.y = 1.0f - uv.y;
-  return uv;
-}
-
 float3 GetCubemapDirection(uint face, float2 uv)
 {
     // Transform UV from [0,1] to [-1,1]
@@ -62,17 +53,34 @@ float3 GetCubemapDirection(uint face, float2 uv)
 
 float4 PS(PS_INPUT input) : SV_Target
 {
-  float3 dir = GetCubemapDirection(faceID, input.TexCoord);
-  float2 eqUV = SampleEquirectangular(dir);
-  float3 color = hdrTexture.Sample(samState, eqUV).rgb;
-  return float4(color, 1.0);
-}
+  float3 irradiance = float3(0, 0, 0);
+  float numSamples = 0;
 
-// ask what this does
-// technique11 CubemapConversion
-// {
-//   pass P0
-//   {
-//     SetPixelShader( CompileShader( ps_5_0, PS() ) );
-//   }
-// }
+  float3 N = normalize(GetCubemapDirection(faceID, input.TexCoord));
+  float3 up = abs(N.y) < 0.999f ? float3(0, 1, 0) : float3(1, 0, 0);
+  float3 right = normalize(cross(up, N));
+  up = normalize(cross(N, right));
+
+  for (float phi = 0.0f; phi < 2.0f * PI; phi += 0.05f)
+  {
+    for (float theta = 0.0f; theta < 0.5f * PI; theta += 0.05f)
+    {
+      float3 tangentSample;
+
+      tangentSample.x = sin(theta) * cos(phi);
+      tangentSample.y = sin(theta) * sin(phi);
+      tangentSample.z = cos(theta);
+
+      float3 sampleVec = normalize(tangentSample.x * right +
+                                   tangentSample.y * up +
+                                   tangentSample.z * N);
+
+      irradiance += environmentMap.Sample( samState, sampleVec).rgb * cos(theta) * sin(theta);
+      numSamples += 1.0f;
+    }
+  }
+
+  irradiance = PI * irradiance * (1.0f / numSamples);
+
+  return float4(irradiance, 1.0f);
+}

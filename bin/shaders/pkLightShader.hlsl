@@ -14,7 +14,8 @@ Texture2D albedoMap : register(t3); // albedo
 Texture2D normalMap : register(t4); // normals
 Texture2D ormMap : register(t5); // occlusion (R), roughness (G), metallic (B)
 Texture2D skybox : register(t6); // skybox texture
-Texture2D cubeMap : register(t7); // skybox texture
+Texture2D cubeMap : register(t7); // cube map texture
+TextureCube irradianceMap : register(t8); // irradiance map texture
 // sampler state
 SamplerState samState : register(s0);
 
@@ -107,8 +108,7 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
 // F = F0 + (1 - F0) * (1 - VoH)^5
 float3 Fresnel(float3 F0, float VoH) // float refraction
 {
-  float3 F = F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
-  return F;
+  return F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
 }
 
 float3 cookTorranceSpecular(float3 normal,
@@ -185,7 +185,8 @@ PS_OUTPUT PS(PS_INPUT input)
    * texture data
    */
   float4 depthTex = depthMap.Sample(samState, input.TexCoord);
-  float4 normalTex = normalMap.Sample(samState, input.TexCoord);
+  float3 normalTex = normalMap.Sample(samState, input.TexCoord).xyz;
+  float3 normal = normalize(normalTex);
   float4 albedo = albedoMap.Sample(samState, input.TexCoord);
   
   float3 ormValues = ormMap.Sample(samState, input.TexCoord).rgb;
@@ -194,12 +195,12 @@ PS_OUTPUT PS(PS_INPUT input)
   float metallic = ormValues.b;
   float3 worldPos = posMap.Sample(samState, input.TexCoord).xyz;
   
-  float3 viewDir = normalize(Eye.xyz - worldPos);
+  float3 viewDir = normalize(worldPos - Eye.xyz);
   float3 lightDir = normalize(mul(float4(-LightDir, 0.0f), lightTransform).xyz);
-  float3 normal = normalize(normalTex.xyz);
   float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, float3(metallic, metallic, metallic));
   float3 Half = normalize(viewDir + lightDir);
   float VoH = saturate(dot(viewDir, Half));
+  float NoV = saturate(dot(normal, viewDir));
   float3 F = Fresnel(F0, max(VoH, 0.0f));
 
   // Diffuse BRDF
@@ -207,8 +208,8 @@ PS_OUTPUT PS(PS_INPUT input)
   float orenNaya = OrenNayarDiffuse(normal, lightDir, viewDir, roughness);
   
   // Diffuse energy weight
-  float3 kD = (1.0f - F) * (1.0f - metallic);
-  float3 fLambert = albedo.rgb / PI;
+  float3 kS = Fresnel(F0, VoH);
+  float3 kD = (1.0f - kS) * (1.0f - metallic);
   
   float3 specCookTorrance = cookTorranceSpecular(normal,
                                                  viewDir,
@@ -217,6 +218,7 @@ PS_OUTPUT PS(PS_INPUT input)
                                                  metallic,
                                                  F0);
   
+  float3 fLambert = albedo.rgb / PI;
   float3 specularBRDF = (specCookTorrance * LightColor);
   float3 diffuseBRDF = orenNaya * fLambert * kD;
   
@@ -224,8 +226,7 @@ PS_OUTPUT PS(PS_INPUT input)
    * IBL calculations
    */
   
-  float3 view = reflect(viewDir, normal);
-  view.z *= -1.0f;
+  float3 view = reflect(-viewDir, normal);
   
   // get the skybox sample depending on roughness levels.
   float2 dimensions = 0.0f.xx;
@@ -233,13 +234,13 @@ PS_OUTPUT PS(PS_INPUT input)
   
   float mipCount = log2(max(dimensions.x, dimensions.y)) + 1;
   float targetMip = lerp(0.0, mipCount - 1.0, roughness);
-  
   float2 skyboxUV = getSkyBoxUV(view);
-  float3 ambient = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
+  float3 reflective = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
+  float3 irradiance = irradianceMap.Sample(samState, float3(normal.x, -normal.y, normal.z)).rgb;
   
   // diffuse ibl should use the irradiance map, and use the normal vector, not the reflected vector.
-  // float3 diffuseIBL = irradiance * albedo.rgb * (1.0f - metallic);
-  float3 diffuseIBL = ambient * albedo.rgb;
+  float3 diffuseIBL = irradiance * albedo.rgb * kD;
+  float3 specularIBL = reflective * F;
 
   /**
    * shadow mapping;
@@ -254,8 +255,8 @@ PS_OUTPUT PS(PS_INPUT input)
   float lightHit = magnitude(worldPos - LightPos);
   float worldHit = magnitude(lightWorldPos - LightPos);
   
-  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL * ao;
-    
+  float3 finalColor = diffuseBRDF + specularBRDF + diffuseIBL + specularIBL;
+  
   // float NoL = max(dot(normal, lightDir), 0.0f);
   // float bias = SMALL_NUMBER * tan(acos(NoL));
   if (lightHit > worldHit + SMALL_NUMBER) {

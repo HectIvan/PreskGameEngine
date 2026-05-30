@@ -147,11 +147,16 @@ RendererManager::init()
 
   // Cube map for the skybox
   txDesc.name = "CubeMapRT";
-  txDesc.width = 2048;
-  txDesc.height = 2048;
+  txDesc.width = 512;
+  txDesc.height = 512;
   txDesc.isCube = true;
   SPtr<Texture> cubeMapRT = api.createTexture(txDesc);
+  txDesc.width = 64;
+  txDesc.height = 64;
   m_gBuffers.insert({ G_BUFFERS::kGB_CubeMap, cubeMapRT });
+  txDesc.name = "irradianceMap";
+  SPtr<Texture> irradianceRT = api.createTexture(txDesc);
+  m_gBuffers.insert({ G_BUFFERS::kGB_IrradianceMap, irradianceRT });
   txDesc.isCube = false;
 
   txDesc.name = "LUTRT";
@@ -196,6 +201,7 @@ RendererManager::init()
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
   generateCubeMap(m_mainSkybox, cubeMapRT);
+  generateIrradianceCubeMap(cubeMapRT, irradianceRT);
   
   // create the passes needed
   createPasses();
@@ -233,13 +239,14 @@ RendererManager::createPasses()
 
   // Skybox pass
   const SPtr<Texture> skyboxRT = getGBuffer(G_BUFFERS::kGB_Skybox);
+  const SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
+  const SPtr<Texture> irradianceRT = getGBuffer(G_BUFFERS::kGB_IrradianceMap);
 
   // Post Process passes
   const SPtr<Texture> ssaoRT = getGBuffer(G_BUFFERS::kGB_SSAO);
   const SPtr<Texture> emissHBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveHBlur);
   const SPtr<Texture> emissBlurRT = getGBuffer(G_BUFFERS::kGB_EmissiveBlur);
   const SPtr<Texture> lumBlurRT = getGBuffer(G_BUFFERS::kGB_LumBlur);
-  const SPtr<Texture> cubeMapRT = getGBuffer(G_BUFFERS::kGB_CubeMap);
 
   // Depth textures
   const SPtr<Texture> DepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Base);
@@ -312,7 +319,8 @@ RendererManager::createPasses()
                    normalRT,
                    ormRT,
                    m_mainSkybox,
-                   cubeMapRT };
+                   cubeMapRT,
+                   irradianceRT };
   pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
   SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
@@ -331,7 +339,8 @@ RendererManager::createPasses()
                    transpNormal,
                    transpORM,
                    m_mainSkybox,
-                   cubeMapRT };
+                   cubeMapRT,
+                   irradianceRT };
   pDesc.outputs = { brdfTranspRT };
   SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
   lightTranspQuad->m_name = "Light Transparency Quad Pass";
@@ -580,9 +589,9 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   // iterate through each face of the cubemap.
   api.clearRenderTargetView(FColor::BLACK, _pOutput);
   for (uint32 i = 0; i < 6; ++i) {
+    const CBFloat face(static_cast<float>(i));
     api.setRenderTarget(_pOutput, nullptr, i);
-    const CBFloat data(static_cast<float>(i));
-    api.updateConstantBuffer(cBuffer, &data, CBFloatSize);
+    api.updateConstantBuffer(cBuffer, &face, CBFloatSize);
     api.draw(3, 0);
   }
 
@@ -632,9 +641,9 @@ RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
   // iterate through each face of the cubemap.
   api.clearRenderTargetView(FColor::BLACK, _pOutput);
   for (uint32 i = 0; i < 6; ++i) {
+    const CBFloat face(static_cast<float>(i));
     api.setRenderTarget(_pOutput, nullptr, i);
-    const CBFloat data(static_cast<float>(i));
-    api.updateConstantBuffer(cBuffer, &data, CBFloatSize);
+    api.updateConstantBuffer(cBuffer, &face, CBFloatSize);
     api.draw(3, 0);
   }
 
@@ -643,7 +652,7 @@ RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
   api.pSUnbindShaderResourceViews(1);
   api.unbindRenderTargets(1);
 
-  LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
+  LOG_REGISTER("Generated Irradiance map from cube texture.", __FILE__, __LINE__);
 }
 
 void

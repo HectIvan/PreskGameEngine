@@ -171,9 +171,28 @@ BaseApp::update()
   const Vector2 winSize = api.getSwapChain()->getSize();
   const SPtr<Scene> activeScene = g_SceneManager().getActiveScene();
 
-  // if there's no actor camera, search the scene for an actor with a camera.
-  if (!m_camera) {
-    m_camera = activeScene->getActorWithComponent<Camera>();
+  /**
+   *  to do: temporary.
+   */
+  const Vector<SPtr<Actor>> actors = activeScene->getAllActors();
+  rm.m_lights.clear();
+  const uint32 actorCount = static_cast<uint32>(actors.size());
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Light> light = actors[i]->getComponent<Light>();
+    if (light) {
+      rm.m_lights.push_back(light);
+    }
+  }
+
+  rm.m_cameras.clear();
+  for (uint32 i = 0; i < actorCount; ++i) {
+    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
+    if (camera) {
+      rm.m_cameras.push_back(camera);
+      if (camera->m_isMain) {
+        m_camera = actors[i];
+      }
+    }
   }
   SPtr<Camera> camera = m_camera->getComponent<Camera>();
 
@@ -192,6 +211,8 @@ BaseApp::update()
   const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
   const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
   const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
+  const SPtr<Pass> brdfPass = rm.getPass(kP_Light);
+  const SPtr<Pass> brdfTranspPass = rm.getPass(kP_LightTransparency);
 
   // constant buffers.
   CBVector2x2 lum(winSize, Vector2(90.0f));
@@ -219,10 +240,18 @@ BaseApp::update()
   const uint32 m4x4Size = sizeof(Matrix4);
   const uint32 v2x2Size = sizeof(CBVector2x2);
   const uint32 cBlurSize = sizeof(CBBlur);
+  const SIZE_T cbCamSize = sizeof(CBCamera);
+  const SIZE_T cbLightSize = sizeof(CBLight);
 
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
+
+  CBLight lightCBuffer(light);
+  CBCamera camCBuffer(camera);
+
+  brdfPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
+  brdfTranspPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
   // luminance constant buffers.
   lumPass->updateCBuffer(0, &lum, sizeof(CBFloat));
   // Emissive blur constant buffers;
@@ -237,27 +266,6 @@ BaseApp::update()
   tonePass->updateCBuffer(0, &exposureCBuffer, v2x2Size);
 
   ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v2x2Size, v2x2Size });
-
-  /**
-   *  to do: temporary.
-   */
-  const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
-  rm.m_lights.clear();
-  const uint32 actorCount = static_cast<uint32>(actors.size());
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Light> light = actors[i]->getComponent<Light>();
-    if (light) {
-      rm.m_lights.push_back(light);
-    }
-  }
-
-  rm.m_cameras.clear();
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
-    if (camera) {
-      rm.m_cameras.push_back(camera);
-    }
-  }
 }
 
 void
@@ -316,9 +324,9 @@ BaseApp::render()
   api.draw(3, 0);
   BRDF->endPass();
   
-  transparencyBRDF->beginPass(FColor::WHITE);
-  api.draw(3, 0);
-  transparencyBRDF->endPass();
+  // transparencyBRDF->beginPass(FColor(0, 0, 0, 1));
+  // api.draw(3, 0);
+  // transparencyBRDF->endPass();
 
   // render the skybox
   skyBoxPass->beginPass(FColor::CYAN);

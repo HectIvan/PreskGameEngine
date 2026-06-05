@@ -236,7 +236,7 @@ PS_OUTPUT PS(PS_INPUT input)
   float targetMip = lerp(0.0, mipCount - 1.0, roughness);
   float2 skyboxUV = getSkyBoxUV(view);
   float3 reflective = skybox.SampleLevel(samState, skyboxUV, targetMip).rgb;
-  float3 irradiance = irradianceMap.Sample(samState, float3(normal.x, -normal.y, normal.z)).rgb;
+  float3 irradiance = irradianceMap.Sample(samState, normal).rgb;
   
   // diffuse ibl should use the irradiance map, and use the normal vector, not the reflected vector.
   float3 diffuseIBL = irradiance * albedo.rgb * kD;

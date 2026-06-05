@@ -257,8 +257,14 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor rotation.
    * @return The actor rotation.
    */
+#if PK_ROT == PK_ROT_QUATERNION
   PKFORCEINLINE Quaternion&
   getRotation() { return m_rotation; }
+#endif
+#if PK_ROT == PK_ROT_EULER
+  PKFORCEINLINE Vector3&
+  getRotation() { return m_rotation; }
+#endif
 
   /**
    * @brief Get the actor name.
@@ -443,7 +449,14 @@ class PK_CORE_EXPORT Actor
   /**
    * Transform info. used to generate the transform matrix.
    */
+#if PK_ROT == PK_ROT_QUATERNION
   Quaternion m_rotation = Quaternion::IDENTITY;
+#endif
+
+#if PK_ROT == PK_ROT_EULER
+  Vector3 m_rotation = Vector3::ZERO;
+#endif
+
   Vector3 m_scale = Vector3(1.0f);
   Vector3 m_position = Vector3(0.0f);
 

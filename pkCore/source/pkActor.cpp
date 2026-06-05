@@ -28,6 +28,7 @@ Actor::moveVerlet(const Vector3& _direction, const float& _force)
 void
 Actor::setRotation(const float& _x, const float& _y, const float& _z)
 {
+#if PK_ROT == PK_ROT_QUATERNION
   // Create and normalize rotation.
   m_rotation = Quaternion::fromEuler(_x, _y, _z).normalized();
   
@@ -36,13 +37,13 @@ Actor::setRotation(const float& _x, const float& _y, const float& _z)
     LOG_ERROR("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
     m_rotation = Quaternion::IDENTITY;
   }
+#endif
 
+#if PK_ROT == PK_ROT_EULER
   // m_rotation = Vector3(_x, _y, _z);
   // Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
-
-  // Vector3 rot = Vector3(_x, _y, _z);
-  // 
-  // m_rotation = rot;
+  m_rotation = Vector3(_x, _y, _z);
+#endif
 
   recalculateDirections(m_rotation);
 }
@@ -50,6 +51,7 @@ Actor::setRotation(const float& _x, const float& _y, const float& _z)
 void
 Actor::rotate(const float& _x, const float& _y, const float& _z)
 {
+#if PK_ROT == PK_ROT_QUATERNION
   // world up rotation.
   const Vector3 localUp = m_rotation * Vector3::UP;
   const Quaternion yaw = Quaternion::fromAxisAngle(localUp, _x);
@@ -66,12 +68,14 @@ Actor::rotate(const float& _x, const float& _y, const float& _z)
   m_rotation = roll * m_rotation;
   
   m_rotation.normalize();
+#endif
 
-  // Vector3 addRot = Vector3(_x, _y, _z);
-  // 
-  // m_rotation += addRot;
+#if PK_ROT == PK_ROT_EULER
+  Vector3 addRot = Vector3(_x, _y, _z);
+  
+  m_rotation += addRot;
+#endif
 
-  recalculateDirections(m_rotation);
 }
 
 void
@@ -96,6 +100,7 @@ Actor::update(float)
     m_components[i]->update(*this);
   }
   generateNewTransform();
+  recalculateDirections(m_rotation);
 }
 
 const SPtr<Actor>

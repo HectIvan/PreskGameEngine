@@ -50,7 +50,7 @@ namespace G_BUFFERS
     kGB_Luminance, // luminance buffer
     kGB_LumBlurH, // luminance horizontal blur
     kGB_LumBlur, // luminance full blur
-    kGB_CubeMap, // luminance full blur
+    kGB_CubeMap, // skybox cube map
     kGB_IrradianceMap, // irradianceMap
     kGB_LUT, // Look-Up Table
     kGB_TranspAlbedo, // transparency albedo

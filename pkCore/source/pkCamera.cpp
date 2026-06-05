@@ -171,11 +171,18 @@ Camera::rotation(const Quaternion& _rotation)
 void
 Camera::updateView()
 {
+#if PK_ROT == PK_ROT_QUATERNION
   const Quaternion invRot = m_rotation.conjugate();
-  
-  const Matrix4 rot = Matrix4::rotation(invRot);
   const Matrix4 translation = Matrix4::translation(-m_eye.xyz()).getTransposed();
+  const Matrix4 rot = Matrix4::rotation(invRot);
   m_view = rot * translation;// Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+#endif
+
+#if PK_ROT == PK_ROT_EULER
+  const Matrix4 rot = Matrix4::rotation(m_rotation);
+  const Matrix4 translation = Matrix4::translation(-m_eye.xyz()).getTransposed();
+  m_view = rot * translation; // m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);
+#endif
 
   /* note: i seem to have accidentally implemented an orbit camera, something that i did intend on doing in the future,
      but not now, this was intended to be a first person camera, either way, i'll be saving this code for later.*/

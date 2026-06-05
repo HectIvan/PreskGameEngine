@@ -22,7 +22,13 @@ TransformInspector::inspect(SPtr<Actor>& _pActor)
     _pActor->setPosition(newTranslation);
   }
   // change the rotation
+#if PK_ROT == PK_ROT_QUATERNION
   Vector3 newRotation = _pActor->m_rotation.toEuler() * Math::RAD2DEG;
+#endif
+
+#if PK_ROT == PK_ROT_EULER
+  Vector3 newRotation = _pActor->m_rotation * Math::RAD2DEG;
+#endif
   im.createText("Rotation");
   im.sameLine();
   if (im.createDrag("##Rotation", newRotation, 1.0f)) {

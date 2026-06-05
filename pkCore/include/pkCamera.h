@@ -323,7 +323,14 @@ class PK_CORE_EXPORT Camera : public Component
   Vector3 m_up;
 
   // camera rotation and start position
+#if PK_ROT == PK_ROT_QUATERNION
   Quaternion m_rotation = Quaternion::IDENTITY;
+#endif
+
+#if PK_ROT == PK_ROT_EULER
+  Vector3 m_rotation = Vector3::ZERO;
+#endif
+
   Vector2 m_startPos = Vector2(0.0f);
 
   Vector2 m_farNear;

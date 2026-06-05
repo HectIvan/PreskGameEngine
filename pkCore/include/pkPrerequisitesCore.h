@@ -31,6 +31,11 @@
 #define MAX_BONE_INFLUENCE 4
 #define MAX_BONE_WEIGHT 100
 
+#define PK_ROT_QUATERNION 1
+#define PK_ROT_EULER 2
+
+#define PK_ROT PK_ROT_EULER
+
 namespace pkEngineSDK
 {
 

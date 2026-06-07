@@ -52,20 +52,36 @@ namespace PK_TREENODE_FLAGS
 }
 
 struct UIWindow {
+ public:
+  UIWindow() = default;
+  UIWindow(const Vector2& _size, const Vector2& _position, const ANSICHAR* _name) :
+    size(_size), position(_position), name(_name) {
+  };
+  UIWindow(const Vector2& _size, const Vector2& _position, const String& _name) :
+    size(_size), position(_position), name(_name.c_str())
+  {};
+  ~UIWindow() = default;
+
+  void
+  setNewPos(const Vector2& _newPos) {
+    position = _newPos;
+  }
+
+  void
+  setNewSize(const Vector2& _size) {
+    size = _size;
+  }
+
+  void
+  setNewSizePos(const Vector2& _newPos, const Vector2& _newSize) {
+    position = _newPos;
+    size = _newSize;
+  }
+
+ public:
   Vector2 size;
   Vector2 position;
   const ANSICHAR* name;
-
-  void
-  setNewSizePos(Vector2 _newPos, Vector2 _newSize, Vector2 _winRect) {
-    Vector2 newPos = _newPos;
-    // newPos.clampEach(0, _winRect.x, 0, size.y);
-    Vector2 newSize = _newSize;
-    newSize.clampEach(1, _winRect.x, 1, _winRect.y);
-
-    position = newPos;
-    size = newSize;
-  }
 };
 
 class UInterface : public Module<UInterface>
@@ -340,6 +356,13 @@ class UInterface : public Module<UInterface>
    */
   void
   startWindowCreate(const ANSICHAR* _name);
+
+  /**
+   * @brief Create a new window in the User interface.
+   * @param winDesc Window Description struct.
+   */
+  void
+  startWindowCreate(const UIWindow& _winDesc);
 
   /**
    * @brief Create a text in the User interface window.

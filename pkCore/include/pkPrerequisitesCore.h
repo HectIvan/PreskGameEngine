@@ -34,7 +34,7 @@
 #define PK_ROT_QUATERNION 1
 #define PK_ROT_EULER 2
 
-#define PK_ROT PK_ROT_EULER
+#define PK_ROT PK_ROT_QUATERNION
 
 namespace pkEngineSDK
 {

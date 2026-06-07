@@ -27,7 +27,7 @@ void
 SceneManager::createScene(const String& _name)
 {
   SPtr<Scene> scene = make_shared<Scene>();
-  scene->m_name = _name;
+  scene->setName(_name);
   scene->setActive(false);
   m_scenes.push_back(scene);
   LOG_REGISTER("Created scene '" + _name + "'.", __FILE__, __LINE__);
@@ -41,7 +41,7 @@ SceneManager::deleteScene(const uint32& _index)
     SPtr<Scene> scene = m_scenes[_index];
     scene->clear();
     m_scenes.erase(m_scenes.begin() + _index);
-    LOG_REGISTER("Deleted Scene " + scene->m_name + ".", __FILE__, __LINE__);
+    LOG_REGISTER("Deleted Scene " + scene->getName() + ".", __FILE__, __LINE__);
   }
   else {
     const String msg = "Trying to delete an out of range scene.";
@@ -73,7 +73,7 @@ SceneManager::getActiveScene() const
 {
   const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
   for (uint32 i = 0; i < sceneCount; ++i) {
-    if (m_scenes[i]->m_isActive) {
+    if (m_scenes[i]->isActive()) {
       return m_scenes[i];
     }
   }

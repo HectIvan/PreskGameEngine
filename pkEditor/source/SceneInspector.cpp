@@ -29,31 +29,27 @@ using pkEngineSDK::ModelManager;
 using pkEngineSDK::to_string;
 
 void
-SceneInspector::setScene(const SPtr<Scene>& _pScene)
+SceneInspector::createSceneGraphWindow(const SPtr<Scene>& _pScene)
 {
-  m_pScene = _pScene;
-}
+  PK_ASSERT(_pScene);
 
-void
-SceneInspector::createSceneGraphWindow()
-{
   UInterface& im = g_uInterface();
   ModelManager& modelMan = g_ModelManager();
 
   if (im.createButton("+")) {
-    m_pScene->instantiate("Actor");
-    m_sActorIndex = m_pScene->getActorCount() - 1;
-    m_pSelectedActor = m_pScene->getActor(m_sActorIndex);
+    _pScene->instantiate("Actor");
+    m_sActorIndex = _pScene->getLastIndex();
+    m_pSelectedActor = _pScene->getActor(m_sActorIndex);
   }
   if (im.beginDragDropTarget()) {
     const UUID* id = reinterpret_cast<UUID*>(im.acceptDragDropPayload("RESOURCE_PAYLOAD"));
     if (id) {
       SPtr<Model> model = modelMan.createModel(*id);
       if (model) {
-        SPtr<Actor> newActor = m_pScene->instantiate(model->getName());
+        SPtr<Actor> newActor = _pScene->instantiate(model->getName());
         newActor->addComponent(model);
         m_pSelectedActor = newActor;
-        m_sActorIndex = m_pScene->getActorCount() - 1;
+        m_sActorIndex = _pScene->getLastIndex();
       }
     }
     im.endDragDropTarget();
@@ -61,9 +57,7 @@ SceneInspector::createSceneGraphWindow()
   if (m_pSelectedActor) {
     im.sameLine();
     if (im.createButton("Delete")) {
-      m_pSelectedActor->~Actor();
-      m_pSelectedActor = nullptr;
-      m_pScene->m_actors.erase(m_pScene->m_actors.begin() + m_sActorIndex);
+      _pScene->deleteActor(m_sActorIndex);
       m_sActorIndex = 0;
     }
     im.sameLine();
@@ -73,9 +67,9 @@ SceneInspector::createSceneGraphWindow()
     }
   }
   // iterate through all actors in the scene.
-  const uint32 actorCount = m_pScene->getActorCount();
+  const uint32 actorCount = _pScene->getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Actor> currentActor = m_pScene->getActor(i);
+    SPtr<Actor> currentActor = _pScene->getActor(i);
     Color baseColor = Color(255, 10);
     // highlight selected actor.
     if (m_sActorIndex == i && m_pSelectedActor) {

@@ -86,7 +86,7 @@ class EditorApp : public BaseApp
    * @brief Show the log type in the UI.
    */
   void
-  showLogType(bool& _active, uint32 _type);
+  showLogType(const bool& _active, const uint32& _type);
 
   /**
    * @brief Update the shader test.

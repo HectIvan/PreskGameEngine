@@ -350,6 +350,14 @@ UInterface::startWindowCreate(const ANSICHAR* _name)
 }
 
 void
+UInterface::startWindowCreate(const UIWindow& _winDesc)
+{
+  ImGui::SetNextWindowSize(ImVec2(_winDesc.size.x, _winDesc.size.y), ImGuiCond_Always);
+  ImGui::SetNextWindowPos(ImVec2(_winDesc.position.x, _winDesc.position.y), ImGuiCond_Always);
+  ImGui::Begin(_winDesc.name, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+}
+
+void
 UInterface::createText(const ANSICHAR* _text)
 {
   ImGui::Text(_text);

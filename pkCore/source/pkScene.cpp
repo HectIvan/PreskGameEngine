@@ -89,10 +89,18 @@ Scene::instantiate(const String& _name,
   
 }
 
+void
+Scene::deleteActor(const uint32& _index)
+{
+  m_actors[_index]->~Actor();
+  m_actors[_index] = nullptr;
+  m_actors.erase(m_actors.begin() + _index);
+}
+
 SPtr<Actor>
 Scene::actorFind(const String& _actorName)
 {
-  const uint32 actorCount = static_cast<uint32>(getAllActors().size());
+  const uint32 actorCount = getActorCount();
   // for each actor in the list
   for (uint32 i = 0; i < actorCount; ++i) {
     // check if the name is the one we're looking for
@@ -106,9 +114,9 @@ Scene::actorFind(const String& _actorName)
 }
 
 void
-Scene::update(const float& _deltaTime)
+Scene::update(const float& _deltaTime) const
 {
-  const uint32 actorCount = static_cast<uint32>(getAllActors().size());
+  const uint32 actorCount = getActorCount();
   for (uint32 i = 0; i < actorCount; ++i) {
     const SPtr<Actor> actor = getActor(i);
     if (actor->isActive()) {
@@ -130,7 +138,7 @@ Scene::clear()
 }
 
 void
-Scene::updateActor(const SPtr<Actor>& _pActor, const float& _deltaTime)
+Scene::updateActor(const SPtr<Actor>& _pActor, const float& _deltaTime) const
 {
   _pActor->update(_deltaTime);
   const uint32 childCount = _pActor->getChildCount();

@@ -85,14 +85,13 @@ EditorApp::onInit()
 
   SceneManager& sceneMan = g_SceneManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
-  m_sceneInspector.setScene(activeScene);
 
   // create camera
   const Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
   CameraDesc camDescription;
-  camDescription.width   = m_window.getWidth();
-  camDescription.height  = m_window.getHeight();
-  camDescription.eye     = camPos;
+  camDescription.width  = m_window.getWidth();
+  camDescription.height = m_window.getHeight();
+  camDescription.eye    = camPos;
 
   m_camera = activeScene->instantiate("Main Camera");
   m_camera->setPosition(camPos);
@@ -119,28 +118,22 @@ EditorApp::onInit()
    */
   // scene graph
   const Vector2 winRect = m_window.getClientWidthHeight();
-  m_sceneGraphWin.name = activeScene->m_name.c_str();
-  m_sceneGraphWin.position = Vector2(0.0f, 0.0f);
-  m_sceneGraphWin.size = Vector2(winRect.x * 0.1f, winRect.y * 0.8f);
+  Vector2 sceneWinSize(winRect.x * 0.1f, winRect.y * 0.8f);
+  m_sceneGraphWin = UIWindow(sceneWinSize, Vector2::ZERO, activeScene->getName());
   // logger window
-  m_loggerWin.name = "Logger";
-  m_loggerWin.size = Vector2(winRect.x, winRect.y * 0.2f);
-  m_loggerWin.position = Vector2(0.0f, winRect.y * 0.8f);
+  m_loggerWin = UIWindow(Vector2(winRect.x, winRect.y * 0.2f),
+                         Vector2(0.0f, winRect.y * 0.8f),
+                         "Logger");
   // right window
-  m_rightWin.name = "Inspector";
-  m_rightWin.size = Vector2(400.0f, winRect.y * 0.8f);
-  m_rightWin.position = Vector2(winRect.x - 400.0f, 0.0f);
+  m_rightWin = UIWindow(Vector2(400.0f, winRect.y * 0.8f),
+                        Vector2(winRect.x - 400.0f, 0.0f),
+                        "Inspector");
 }
 
 void
 EditorApp::initWin()
 {
-  PKWindowDesc desc;
-  desc.width = 1920;
-  desc.height = 1080;
-  desc.posX = 0;
-  desc.posY = 0;
-  desc.name = "Presk Editor App";
+  PKWindowDesc desc(1920, 1080, 0, 0, "Presk Editor App");
   // imgui input
 #if PK_PLATFORM == PK_PLATFORM_WIN32
   desc.funct = [](PlatformPointer _hwnd,
@@ -196,7 +189,7 @@ EditorApp::input()
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
       Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
       posDif *= Vector2(m_sensX, m_sensY);
-      m_camera->rotate(posDif.y, posDif.x, 0.0f);
+      m_camera->rotate(posDif.x, posDif.y, 0.0f);
     }
   }
   m_lastCursorPos = eventQueue.mousePosition;
@@ -213,28 +206,19 @@ EditorApp::uInterfaceUpdate()
   im.windowNewFrame();
   im.uINewFrame();
 
-  const Vector2 winRect = m_window.getClientWidthHeight();
   const SPtr<Scene> currentScene = sm.getActiveScene();
 
   // --- Scene graph window --- //
-  im.setNextWindowParams(m_sceneGraphWin);
-  im.startWindowCreate(m_sceneGraphWin.name);
-  m_sceneGraphWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
-
-  m_sceneInspector.setScene(currentScene);
-  m_sceneInspector.createSceneGraphWindow();
+  im.startWindowCreate(m_sceneGraphWin);
+  m_sceneInspector.createSceneGraphWindow(currentScene);
   im.endWindowCreate();
   // -------------------------- //
 
   // -------------------------- //
   // Create log window
-  im.setNextWindowParams(m_loggerWin);
-  im.startWindowCreate(m_loggerWin.name);
+  im.startWindowCreate(m_loggerWin);
   SPtr<Actor> selectedActor = m_sceneInspector.getActor();
-  m_loggerWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
-
   // Vector2 logWinSize = im.getItemSize(); // to do: there is an error when getting the height of the window.
-
   // -------------------------- //
   im.sameLine();
   // -------------------------- //
@@ -256,9 +240,7 @@ EditorApp::uInterfaceUpdate()
   im.endWindowCreate();
 
   // --- Transform window --- //
-  im.setNextWindowParams(m_rightWin);
-  im.startWindowCreate(m_rightWin.name);
-  m_rightWin.setNewSizePos(im.getWindowPos(), im.getWindowSize(), winRect);
+  im.startWindowCreate(m_rightWin);
   if (im.beginTabBar("InspectorTab")) {
     // -------------------------- //
     // Actor tab
@@ -328,12 +310,12 @@ EditorApp::uInterfaceUpdate()
 }
 
 void
-EditorApp::showLogType(bool& _active, uint32 _type)
+EditorApp::showLogType(const bool& _active, const uint32& _type)
 {
   UInterface& im = g_uInterface();
   Logger& log = g_Logger();
   if (_active) {
-    Vector<LogMSG> messages = g_Logger().getMessageLogOfType(static_cast<E>(_type));
+    Vector<LogMSG> messages = log.getMessageLogOfType(static_cast<E>(_type));
     const uint32 messageCount = static_cast<uint32>(messages.size());
     for (uint32 i = 0; i < messageCount; ++i) {
       const String msg = log.getStringFromLog(messages[i]);

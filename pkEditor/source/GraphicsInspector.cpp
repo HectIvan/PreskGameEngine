@@ -21,6 +21,7 @@
 #include "pkUUID.h"
 #include "pkTextureManager.h"
 #include "pkShaderManager.h"
+#include "pkPrerequisitesCore.h"
 
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_RenderManager;
@@ -31,6 +32,7 @@ using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::Shader;
 using pkEngineSDK::ShaderManager;
+using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::TextureManager;

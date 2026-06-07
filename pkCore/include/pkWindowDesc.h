@@ -34,6 +34,18 @@ namespace pkEngineSDK
 
 struct PK_CORE_EXPORT PKWindowDesc
 {
+  PKWindowDesc() = default;
+  PKWindowDesc(const uint32& _width,
+               const uint32& _height,
+               const int32& _posX,
+               const int32& _posY,
+               const String& _name) {
+     width = _width;
+     height = _height;
+     posX = _posX;
+     posY = _posY;
+     name = _name;
+  }
   uint32 width;
   uint32 height;
 

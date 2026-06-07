@@ -141,8 +141,8 @@ RendererManager::init()
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
     assetMan.insertNewResource(resSky);
-    SPtr<Texture> skyboxResource = tm.createTexture(resSky->m_id);
-    m_mainSkybox->copyFrom(skyboxResource);
+    SPtr<Texture> skyboxTexture = tm.createTexture(resSky->m_id);
+    m_mainSkybox = skyboxTexture;
   }
 
   // Cube map for the skybox

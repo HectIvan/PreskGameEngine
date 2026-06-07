@@ -54,30 +54,30 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   matResource->writeBaseHeader(file);
 
   // check for each texture and see if they are valid to use.
-  SPtr<Texture> albedo = _pMaterial->m_albedo;
+  SPtr<Texture> albedo = _pMaterial->m_albedo.lock();
   if (albedo) {
     matResource->m_albedoID = *albedo->getID();
     matResource->m_albedoColor = _pMaterial->m_properties.ColorMultiply;
   }
-  SPtr<Texture> normal = _pMaterial->m_normal;
+  SPtr<Texture> normal = _pMaterial->m_normal.lock();
   if (normal) {
     matResource->m_normalID = *normal->getID();
   }
-  SPtr<Texture> ao = _pMaterial->m_oclussion;
+  SPtr<Texture> ao = _pMaterial->m_oclussion.lock();
   if (ao) {
     matResource->m_aoID = *ao->getID();
   }
-  SPtr<Texture> roughness = _pMaterial->m_roughness;
+  SPtr<Texture> roughness = _pMaterial->m_roughness.lock();
   if (roughness) {
     matResource->m_roughnessID = *roughness->getID();
     matResource->m_roughValue = _pMaterial->m_properties.roughnessMultiply;
   }
-  SPtr<Texture> metallic = _pMaterial->m_metallic;
+  SPtr<Texture> metallic = _pMaterial->m_metallic.lock();
   if (metallic) {
     matResource->m_metallicID = *metallic->getID();
     matResource->m_metallicValue = _pMaterial->m_properties.metallicMultiply;
   }
-  SPtr<Texture> emissive = _pMaterial->m_emissive;
+  SPtr<Texture> emissive = _pMaterial->m_emissive.lock();
   if (emissive) {
     matResource->m_emissiveID = *emissive->getID();
     matResource->m_emissiveColor = _pMaterial->m_properties.EmissiveMultiply;
@@ -88,11 +88,12 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   const SIZE_T FSize = sizeof(float);
 
   // if there isnt a shader assigned, search and assign the default shader.
-  if (!_pMaterial->m_shader) {
+  SPtr<Shader> shader = _pMaterial->m_shader.lock();
+  if (!shader) {
     SPtr<Shader> shader = sm.getShader(sm.m_defaultShaderKey);
     _pMaterial->setShader(shader);
   }
-  file.write(reinterpret_cast<const ANSICHAR*>(&_pMaterial->m_shader->m_id), sizeof(UUID));
+  file.write(reinterpret_cast<const ANSICHAR*>(&shader->m_id), sizeof(UUID));
 
   // albedo write
   file.write(reinterpret_cast<const ANSICHAR*>(&matResource->m_albedoID), IDSize);

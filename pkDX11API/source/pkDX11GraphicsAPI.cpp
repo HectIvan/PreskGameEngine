@@ -152,6 +152,18 @@ DX11GraphicsAPI::init(const Window& _window)
   LOG_REGISTER("DirectX 11 swap chain & device initialized.", __FILE__, __LINE__);
 }
 
+void
+DX11GraphicsAPI::debugDevice()
+{
+  ID3D11Debug* debug = nullptr;
+  m_pDevice->m_pd3dDevice->QueryInterface(__uuidof(ID3D11Debug),
+                                          (void**)&debug);
+
+  debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+
+  debug->Release();
+}
+
 SPtr<ConstantBuffer>
 DX11GraphicsAPI::createConstantBuffer(const uint32 _size,
                                       const void* _pData,

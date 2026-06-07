@@ -71,7 +71,16 @@ class Material : public Component
   /**
    * @brief Default material destructor.
    */
-  virtual ~Material() = default;
+  ~Material() {
+    m_albedo.reset();
+    m_normal.reset();
+    m_height.reset();
+    m_oclussion.reset();
+    m_roughness.reset();
+    m_metallic.reset();
+    m_emissive.reset();
+    m_shader.reset();
+  }
 
   /**
    * @brief Update the material.
@@ -181,13 +190,13 @@ class Material : public Component
   bool m_castShadow;
   bool m_receiveShadows;
   MaterialProps m_properties;
-  SPtr<Texture> m_albedo;
-  SPtr<Texture> m_normal;
-  SPtr<Texture> m_height;
-  SPtr<Texture> m_metallic;
-  SPtr<Texture> m_oclussion;
-  SPtr<Texture> m_roughness;
-  SPtr<Texture> m_emissive;
-  SPtr<Shader> m_shader;
+  WPtr<Texture> m_albedo;
+  WPtr<Texture> m_normal;
+  WPtr<Texture> m_height;
+  WPtr<Texture> m_metallic;
+  WPtr<Texture> m_oclussion;
+  WPtr<Texture> m_roughness;
+  WPtr<Texture> m_emissive;
+  WPtr<Shader> m_shader;
 };
 }

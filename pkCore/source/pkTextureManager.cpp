@@ -47,6 +47,20 @@ TextureManager::init()
 void
 TextureManager::onShutDown()
 {
+  LOG_REGISTER("Shutting down Texture Manager.", __FILE__, __LINE__);
+  String msg = "Unloading " + to_string(m_textures.size()) + " textures.";
+  LOG_REGISTER(msg, __FILE__, __LINE__);
+  m_defaultAlb.reset();
+  m_defaultNormal.reset();
+  m_defaultAO.reset();
+  m_defaultRough.reset();
+  m_defaultMetallic.reset();
+  m_defaultEmissive.reset();
+  m_defaultHeight.reset();
+
+  m_textures.clear();
+  msg = "Finished unloading textures. Remaining textures: " + to_string(m_textures.size());
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 void

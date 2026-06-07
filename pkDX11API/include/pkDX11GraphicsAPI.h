@@ -47,6 +47,9 @@ class DX11GraphicsAPI : public GraphicsAPI
   void
   init(const Window& _window) override;
 
+  void
+  debugDevice() override;
+
   /**
    * @brief Create the device and swap chain.
    * @param _width Client width.

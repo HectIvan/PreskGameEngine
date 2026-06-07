@@ -56,6 +56,9 @@ public:
   virtual void
   init(const Window& _window) = 0;
 
+  virtual void
+  debugDevice() = 0;
+
   /**
    * @brief Get the API Swap chain
    * @return Swap chain.

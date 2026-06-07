@@ -17,6 +17,7 @@
 #include "pkDX11Prerequisites.h"
 #include "pkDX11Device.h"
 #include "pkTexture.h"
+#include "pkLogger.h"
 
 namespace pkEngineSDK
 {
@@ -41,6 +42,8 @@ class DX11Texture : public Texture
     m_owner(false)
   {}
   ~DX11Texture() override {
+    LOG_REGISTER("Releasing texture: " + getName(), __FILE__, __LINE__);
+
     m_rTVs.clear();
     m_uAVs.clear();
 

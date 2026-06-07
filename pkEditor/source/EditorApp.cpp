@@ -101,9 +101,9 @@ EditorApp::onInit()
   // create light
   const Vector3 lightPos = Vector3(0.0f, 1000.0f, 0.0f);
   CameraDesc lightCamDesc;
-  lightCamDesc.width   = 1920 * 2.0f;
-  lightCamDesc.height  = 1080 * 2.0f;
-  lightCamDesc.eye     = lightPos;
+  lightCamDesc.width  = 1920 * 2.0f;
+  lightCamDesc.height = 1080 * 2.0f;
+  lightCamDesc.eye    = lightPos;
 
   m_light = activeScene->instantiate("Light");
   m_light->setPosition(lightPos);

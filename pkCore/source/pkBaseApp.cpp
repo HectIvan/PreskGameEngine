@@ -157,6 +157,7 @@ BaseApp::messageLoop()
   EventQueue::shutDown();
   DLLManager::shutDown();
   AssetResourceManager::shutDown();
+  g_GraphicAPI().debugDevice();
   GraphicsAPI::shutDown();
   TimeManager::shutDown();
 }

@@ -17,6 +17,7 @@ using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::MaterialProps;
 using pkEngineSDK::Path;
+using pkEngineSDK::Shader;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
 using pkEngineSDK::TextureManager;
@@ -46,16 +47,17 @@ MaterialInspector::createMaterialWindow()
   im.sameLine();
   im.createInputText("##MaterialName: ", &matName);
 
-  if (m_material->m_shader) {
+  SPtr<Shader> shader = m_material->m_shader.lock();
+  if (shader) {
     im.createText("Shader - ");
     im.sameLine();
-    im.createText(m_material->m_shader->getShaderName().c_str());
+    im.createText(shader->getShaderName().c_str());
     im.createText("Model - ");
     im.sameLine();
-    im.createText(m_material->m_shader->getShaderModel());
+    im.createText(shader->getShaderModel());
     im.createText("Entry Point - ");
     im.sameLine();
-    im.createText(m_material->m_shader->getEntryPoint());
+    im.createText(shader->getEntryPoint());
   }
   else {
     im.createText("Warning!!! No shader assigned to this material.");
@@ -64,12 +66,12 @@ MaterialInspector::createMaterialWindow()
   // get material
   MaterialProps& matProps = m_material->m_properties;
   // get the textures
-  const SPtr<Texture>& albedo = m_material->m_albedo;
-  const SPtr<Texture>& normal = m_material->m_normal;
-  const SPtr<Texture>& oclussion = m_material->m_oclussion;
-  const SPtr<Texture>& rough = m_material->m_roughness;
-  const SPtr<Texture>& metallic = m_material->m_metallic;
-  const SPtr<Texture>& emissive = m_material->m_emissive;
+  const SPtr<Texture> albedo = m_material->m_albedo.lock();
+  const SPtr<Texture> normal = m_material->m_normal.lock();
+  const SPtr<Texture> oclussion = m_material->m_oclussion.lock();
+  const SPtr<Texture> rough = m_material->m_roughness.lock();
+  const SPtr<Texture> metallic = m_material->m_metallic.lock();
+  const SPtr<Texture> emissive = m_material->m_emissive.lock();
   /***************************************************************/
   /*------------------------albedo button-----------------------*/
   /***************************************************************/

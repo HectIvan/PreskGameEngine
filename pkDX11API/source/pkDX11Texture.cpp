@@ -18,16 +18,27 @@ DX11Texture::getName()
 {
   if (!m_t2d) { return String(); }
 
-  char name[256];
-  UINT nameSize = sizeof(name);
-  HRESULT hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, name);
-  if (FAILED(hr)) {
+  UINT nameSize = 0;
+  HRESULT hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, nullptr);
+
+  if (PK_FAILED(hr)) {
+    const String errMsg = LOG_GET_ERR_MSG(hr);
+    const String msg = "Failed to get the texture name size. Error message: " + errMsg;
+    LOG_ERROR(msg, __FILE__, __LINE__);
+    return String();
+  }
+
+  Vector<ANSICHAR> nameVec(nameSize);
+  hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, nameVec.data());
+
+  if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to get the texture name. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
     return String();
   }
-  return String(name);
+
+  return String(nameVec.data(), nameSize);
 }
 
 bool

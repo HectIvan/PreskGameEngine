@@ -34,6 +34,9 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
   void
   init();
 
+  /**
+   * @brief on shut down of the module.
+   */
   void
   onShutDown() override;
 
@@ -49,12 +52,6 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    */
   SPtr<Texture>
   createEmptyTexture();
-
-  // /**
-  //  * @brief on shut down of the module.
-  //  */
-  // virtual void
-  // onShutDown();
 
   /**
    * @brief Create a flat color texture.

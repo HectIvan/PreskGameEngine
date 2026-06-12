@@ -47,7 +47,7 @@ TextureManager::init()
 void
 TextureManager::onShutDown()
 {
-  LOG_REGISTER("Shutting down Texture Manager.", __FILE__, __LINE__);
+  LOG_REGISTER("------------------Shutting down Texture Manager.", __FILE__, __LINE__);
   String msg = "Unloading " + to_string(m_textures.size()) + " textures.";
   LOG_REGISTER(msg, __FILE__, __LINE__);
   m_defaultAlb.reset();
@@ -58,8 +58,23 @@ TextureManager::onShutDown()
   m_defaultEmissive.reset();
   m_defaultHeight.reset();
 
+  const uint32 textureCount = toUint32(m_textures.size());
+  for (uint32 i = 0; i < textureCount; ++i) {
+    auto it = m_textures.begin();
+    const int32 count = it->second.use_count();
+    const String name = it->second->getName();
+    it->second.reset();
+
+    if (count - 1 > 0) {
+      const String msg = "Texture " + name + " has " + to_string(count - 1) + " references.";
+      LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
+
+    m_textures.erase(it);
+  }
   m_textures.clear();
-  msg = "Finished unloading textures. Remaining textures: " + to_string(m_textures.size());
+  msg = "------------------Texture Manager shut down. Remaining textures: " +
+        to_string(m_textures.size());
   LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 

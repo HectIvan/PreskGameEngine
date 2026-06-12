@@ -210,10 +210,17 @@ RendererManager::init()
 void
 RendererManager::onShutDown()
 {
+  LOG_REGISTER("------------------Shutting down Renderer Manager.", __FILE__, __LINE__);
   m_passes.clear();
   m_gBuffers.clear();
   m_depthBuffers.clear();
   m_uavBuffers.clear();
+
+  m_mainSkybox.reset();
+  m_targetRT.reset();
+  m_actorsRT.reset();
+  m_transpActorsRT.reset();
+  LOG_REGISTER("------------------Renderer Manager shut down.", __FILE__, __LINE__);
 }
 
 void

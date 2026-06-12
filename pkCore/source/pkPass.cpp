@@ -34,23 +34,136 @@ Pass::Pass() {
 void
 Pass::clear()
 {
-  if (m_cBuffers.size() > 0) {
-    m_cBuffers.clear();
-  }
-  if (m_inputTex.size() > 0) {
-    for (uint32 i = 0; i < m_inputTex.size(); ++i) {
-      int32 count = m_inputTex[i].use_count();
-      const String msg = "input Tex of pass " + m_name + " index " + to_string(i) +" has " + to_string(count) + " references.";
+  LOG_REGISTER(">---Clearing Pass " + m_name + "---<", __FILE__, __LINE__);
+  const uint32 cBuffersCount = toUint32(m_cBuffers.size());
+  LOG_REGISTER("Clearing " + to_string(cBuffersCount) + " cBuffers", __FILE__, __LINE__);
+  for (uint32 i = 0; i < cBuffersCount; ++i) {
+    const int32 count = m_cBuffers[i].use_count();
+    m_cBuffers[i].reset();
+    if (count - 1 > 0) {
+      const String msg = "CBuffer of pass " +
+                         m_name +
+                         " index " +
+                         to_string(i) +
+                         " has " +
+                         to_string(count) +
+                         " references.";
       LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
+  }
+  m_cBuffers.clear();
+
+  const uint32 inputTexCount = toUint32(m_inputTex.size());
+  LOG_REGISTER("Clearing " + to_string(inputTexCount) + " input textures", __FILE__, __LINE__);
+  if (inputTexCount > 0) {
+    for (uint32 i = 0; i < inputTexCount; ++i) {
+      const int32 count = m_inputTex[i].use_count();
+      const String name = m_inputTex[i].lock()->getName();
+      m_inputTex[i].reset();
+      
+      if (count - 1 > 0) {
+        const String msg = "input Texture " +
+                           name +
+                           " of pass " +
+                           m_name +
+                           " index " +
+                           to_string(i) +
+                           " has " +
+                           to_string(count) +
+                           " references.";
+        LOG_REGISTER(msg, __FILE__, __LINE__);
+      }
     }
     m_inputTex.clear();
   }
-  if (m_outputTex.size() > 0) {
-    m_outputTex.clear();
+
+  const uint32 outputTexCount = toUint32(m_outputTex.size());
+  LOG_REGISTER("Clearing " + to_string(outputTexCount) + " output textures", __FILE__, __LINE__);
+  for (uint32 i = 0; i < outputTexCount; ++i) {
+    const int32 count = m_outputTex[i].use_count();
+    const String name = m_outputTex[i].lock()->getName();
+    m_outputTex[i].reset();
+    if (count - 1 > 0) {
+      const String msg = "output Texture: " +
+                         name +
+                         " of pass " +
+                         m_name +
+                         " index " +
+                         to_string(i) +
+                         " has " +
+                         to_string(count) +
+                         " references.";
+      LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
   }
-  if (m_uavTex.size() > 0) {
-    m_uavTex.clear();
+  m_outputTex.clear();
+
+  const uint32 uavTexCount = toUint32(m_uavTex.size());
+  LOG_REGISTER("Clearing " + to_string(uavTexCount) + " UAV textures", __FILE__, __LINE__);
+  for (uint32 i = 0; i < uavTexCount; ++i) {
+    const int32 count = m_uavTex[i].use_count();
+    const String name = m_uavTex[i]->getName();
+    m_uavTex[i].reset();
+    if (count - 1 > 0) {
+      const String msg = "uav Tex: " +
+                         name +
+                         " of pass " +
+                         m_name +
+                         " index " +
+                         to_string(i) +
+                         " has " +
+                         to_string(count) +
+                         " references.";
+      LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
   }
+  m_uavTex.clear();
+
+  if (m_depthTex) {
+    LOG_REGISTER("Clearing depth texture: " + m_depthTex->getName(), __FILE__, __LINE__);
+  }
+  m_depthTex.reset();
+
+  if (!m_pVShader.expired()) {
+    LOG_REGISTER("Clearing vertex shader: " +
+                 m_pVShader.lock()->getShaderName(),
+                 __FILE__,
+                 __LINE__);
+  }
+  m_pVShader.reset();
+
+  if (!m_pPShader.expired()) {
+    LOG_REGISTER("Clearing pixel shader: " +
+                 m_pPShader.lock()->getShaderName(),
+                 __FILE__,
+                 __LINE__);
+  }
+  m_pPShader.reset();
+
+  if (!m_pCShader.expired()) {
+    LOG_REGISTER("Clearing compute shader: " +
+                 m_pCShader.lock()->getShaderName(),
+                 __FILE__,
+                 __LINE__);
+  }
+  m_pCShader.reset();
+
+  if (m_pInputLayout) {
+    LOG_REGISTER("Clearing input layout", __FILE__, __LINE__);
+  }
+  m_pInputLayout.reset();
+
+  if (m_pSamplerState) {
+    LOG_REGISTER("Clearing sampler state", __FILE__, __LINE__);
+  }
+  m_pSamplerState.reset();
+
+  if (m_pRasterizerState) {
+    LOG_REGISTER("Clearing rasterizer state", __FILE__, __LINE__);
+  }
+  m_pRasterizerState.reset();
+
+  LOG_REGISTER("<---Finished clearing Pass " + m_name + "--->", __FILE__, __LINE__);
 }
 
 Pass::Pass(const PixelDesc& _desc)
@@ -125,8 +238,8 @@ Pass::Pass(const ComputeDesc& _desc)
   // verify if the shader was created correctly.
   if (shaderDirty && m_pCShader.expired()) {
     const String msg = "Failed to internally create compute shader for pass. Path: " +
-      _desc.cSKey.shaderPath +
-      ". Shader is expired.";
+                       _desc.cSKey.shaderPath +
+                       ". Shader is expired.";
     LOG_FATAL(msg, __FILE__, __LINE__);
     THROW_ERROR(msg);
     return;
@@ -171,7 +284,7 @@ Pass::updateCBuffers(const Vector<const void*>& _data,
   // assert that all data counts are the same.
   const SIZE_T blobCount = _data.size();
   PK_ASSERT(blobCount == _sizes.size() && "CBuffer blob count & sizes count do not match.");
-  const uint32 CBufferCount = static_cast<uint32>(m_cBuffers.size());
+  const uint32 CBufferCount = toUint32(m_cBuffers.size());
   PK_ASSERT(CBufferCount == blobCount && "CBuffer update count does not match pass CBuffer count.");
 
   GraphicsAPI& api = g_GraphicAPI();
@@ -349,9 +462,9 @@ Pass::createBasics(const PassDesc& _desc)
   // create the sampler state
   m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
   // create a buffer for each size in the vector
-  const uint32 cBufferCount = static_cast<uint32>(_desc.cBSizes.size());
+  const uint32 cBufferCount = toUint32(_desc.cBSizes.size());
   for (uint32 i = 0; i < cBufferCount; ++i) {
-    m_cBuffers.push_back(api.createConstantBuffer(static_cast<uint32>(_desc.cBSizes[i])));
+    m_cBuffers.push_back(api.createConstantBuffer(toUint32(_desc.cBSizes[i])));
   }
 
   if (_desc.rSExists) {

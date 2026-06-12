@@ -147,6 +147,7 @@ BaseApp::messageLoop()
   g_Logger().createLogFiles();
 
   // if the program is shut down closes for any reason, close everything properly.
+  g_GraphicAPI().debugDevice();
   RendererManager::shutDown();
   ModelManager::shutDown();
   MaterialManager::shutDown();
@@ -157,7 +158,6 @@ BaseApp::messageLoop()
   EventQueue::shutDown();
   DLLManager::shutDown();
   AssetResourceManager::shutDown();
-  g_GraphicAPI().debugDevice();
   GraphicsAPI::shutDown();
   TimeManager::shutDown();
 }

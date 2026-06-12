@@ -122,6 +122,11 @@ stringToWString(const String& str)
 
 #endif
 
+template<typename T> PKFORCEINLINE uint32
+toUint32(const T& _x) {
+  return static_cast<uint32>(_x);
+}
+
 template<class _Kty, class _Ty>
 using UMap = std::unordered_map<_Kty, _Ty>;
 

@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /**
  * @file    pkStbiTextureCodec.h
- * @author  Héctor  Iván Muñoz Ceballos
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    24/10/2025
  * @brief   Codec for creating pkt Texures.
  *
@@ -16,31 +16,32 @@
 /*********************************************/
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ENABLE_OPENEXR
+
 #include "stb_image.h"
 
 #include "pkAssetResourceManager.h"
-#include "pkUUID.h"
 #include "pkFileSystem.h"
 #include "pkLogger.h"
 #include "pkStbiTextureCodec.h"
 #include "pkTexture.h"
+#include "pkUUID.h"
 
 namespace pkEngineSDK
 {
 
-extern "C" __declspec(dllexport) void
+PK_EXTERN PK_PLUGIN_EXPORT void
 loadPlugin()
 {
   TextureCodec::startUp<StbiTextureCodec>();
 }
 
 SPtr<TextureResource>
-StbiTextureCodec::createResource(const String _name,
-                                 const int32 _width,
-                                 const int32 _height,
-                                 const int32 _bpp,
-                                 const uint32 _format,
-                                 const uint32 _mipCount,
+StbiTextureCodec::createResource(const String& _name,
+                                 const int32& _width,
+                                 const int32& _height,
+                                 const int32& _bpp,
+                                 const uint32& _format,
+                                 const uint32& _mipCount,
                                  Vector<uint8>& _data)
 {
   const String textureName = Path(_name).getFileNameWithoutExtension();
@@ -64,22 +65,20 @@ StbiTextureCodec::createResource(const String _name,
   textureRes->fillBaseHeader(id, textureName, _name, resourcePath);
   textureRes->writeBaseHeader(file);
 
-  const SIZE_T sizeInt32 = sizeof(int32);
-  const SIZE_T sizeUint32 = sizeof(uint32);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeInt32);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeInt32);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeInt32);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeUint32);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeUint32);
+  const SIZE_T sizeInt = sizeof(int32);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeInt);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeInt);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeInt);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeInt);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeInt);
   file.write(reinterpret_cast<ANSICHAR*>(&_data[0]), dataSize);
-
   file.close();
 
   return textureRes;
 }
 
 SPtr<TextureResource>
-StbiTextureCodec::createResourceFromFile(const Path _path)
+StbiTextureCodec::createResource(const Path& _path)
 {
   const String fileName = _path.getFileNameWithoutExtension();
   const String resourcePath = PK_RESOURCE_FOLDER + fileName + ".pkt";

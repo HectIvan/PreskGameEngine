@@ -93,6 +93,13 @@ using byte = uint8;
 
 /**************************************************************/
 /**
+ * Max path length
+**/
+/**************************************************************/
+#define PK_MAX_PATH          260
+
+/**************************************************************/
+/**
  * Platform pointer
 **/
 /**************************************************************/
@@ -114,4 +121,19 @@ typedef _Return_type_success_(return >= 0) long PKRESULT;
 #endif
 
 #define PK_FAILED(hr) (((PKRESULT)(hr)) < 0)
+#define _PKRESULT_TYPEDEF_(_sc) ((PKRESULT)_sc)
+#define PKNOERROR             0
+
+#define PK_OK                                   ((PKRESULT)0L)
+#define PK_FALSE                                ((PKRESULT)1L)
+
+#define PK_NOTIMPL                        _PKRESULT_TYPEDEF_(0x80004001L)
+#define PK_OUTOFMEMORY                    _PKRESULT_TYPEDEF_(0x8007000EL)
+#define PK_INVALIDARG                     _PKRESULT_TYPEDEF_(0x80070057L)
+#define PK_NOINTERFACE                    _PKRESULT_TYPEDEF_(0x80004002L)
+#define PK_POINTER                        _PKRESULT_TYPEDEF_(0x80004003L)
+#define PK_HANDLE                         _PKRESULT_TYPEDEF_(0x80070006L)
+#define PK_ABORT                          _PKRESULT_TYPEDEF_(0x80004004L)
+#define PK_FAIL                           _PKRESULT_TYPEDEF_(0x80004005L)
+#define PK_ACCESSDENIED                   _PKRESULT_TYPEDEF_(0x80070005L)
 }

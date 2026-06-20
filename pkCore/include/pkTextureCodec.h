@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /**
  * @file    pkStbiTextureCodec.h
- * @author  Héctor  Iván Muñoz Ceballos
+ * @author  Héctor Iván Muñoz Ceballos
  * @date    24/10/2025
  * @brief   Codec for creating pkt Texures.
  *
@@ -41,12 +41,12 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
    * @param _data Data of the texture.
    */
   virtual SPtr<TextureResource>
-  createResource(const String _name,
-                 const int32 _width,
-                 const int32 _height,
-                 const int32 _bpp,
-                 const uint32 _format,
-                 const uint32 _mipCount,
+  createResource(const String& _name,
+                 const int32& _width,
+                 const int32& _height,
+                 const int32& _bpp,
+                 const uint32& _format,
+                 const uint32& _mipCount,
                  Vector<uint8>& _data) = 0;
 
   /**
@@ -55,7 +55,7 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
    * @return texture resource.
    */
   virtual SPtr<TextureResource>
-  createResourceFromFile(const Path _path) = 0;
+  createResource(const Path& _path) = 0;
 
   /**
    * @brief Get the possible extensions for texture search in folders.

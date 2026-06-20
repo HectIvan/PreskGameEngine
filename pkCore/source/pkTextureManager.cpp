@@ -13,6 +13,7 @@ void
 TextureManager::init()
 {
   AssetResourceManager& assetMan = g_AssetResourceManager();
+  TextureManager& texMan = g_TextureManager();
 
   const Vector<String> paths = { "resources/FlatDiff.pkt",
                                  "resources/FlatNormal.pkt",
@@ -41,7 +42,8 @@ TextureManager::init()
 
   loadDefaultMatTextures();
 
-  // createFlatTexture("FlatRed", 1, 1, Color::RED);
+  auto flatTex = createTexture("FlatRed", 1, 1, 4, Color::RED);
+  texMan.insertTexture(*flatTex->getID(), flatTex);
 }
 
 void
@@ -96,29 +98,35 @@ TextureManager::createEmptyTexture()
 }
 
 SPtr<Texture>
-TextureManager::createFlatTexture(const String _name,
-                                  const int32 _width,
-                                  const int32 _height,
-                                  const Color color)
+TextureManager::createTexture(const String& _name,
+                              const int32& _width,
+                              const int32& _height,
+                              const uint32& _bpp,
+                              const Color& _color)
 {
   GraphicsAPI& api = g_GraphicAPI();
   TextureCodec& texCodec = g_TextureCodec();
+  
+  Vector<byte> data;
+  PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_UNKNOWN;
 
-  const String directory = PK_RESOURCE_FOLDER + _name + ".pkt";
+  // check for bpp and fill the data vector accordingly.
+  if (_bpp == 3) {
+    data = { _color._color.R, _color._color.G, _color._color.B};
+    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
+  }
+  if (_bpp == 4) {
+    data = { _color._color.R, _color._color.G, _color._color.B, 255 };
+    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+  }
 
-  Vector<uint8> data = { color._color.R, color._color.G, color._color.B, color._color.A };
-  SPtr<TextureResource> resource = texCodec.createResource(_name,
-                                                           _width,
-                                                           _height,
-                                                           4,
-                                                           PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT,
-                                                           1,
-                                                           data);
+  // create and store the resource in the resource manager.
+  auto resource = texCodec.createResource(_name, _width, _height, _bpp, format, 1, data);
   g_AssetResourceManager().insertNewResource(resource);
 
-  SPtr<Texture> texture = api.createTextureFromResource(resource,
-                                                        PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE);
-
+  // create the final texture and return it.
+  SPtr<Texture> texture = api.createTexture(resource, PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE);
+  
   return texture;
 }
 
@@ -139,8 +147,6 @@ TextureManager::createTexture(const UUID& _ID)
     return texture;
   }
 
-  GraphicsAPI& api = g_GraphicAPI();
-
   // create the texture
   uint32 bindFlags = PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
 
@@ -154,7 +160,7 @@ TextureManager::createTexture(const UUID& _ID)
   
   resource->load();
 
-  texture = api.createTextureFromResource(resource, bindFlags);
+  texture = g_GraphicAPI().createTexture(resource, bindFlags);
 
   // if the texture failed to load
   if (!texture) {
@@ -184,13 +190,6 @@ TextureManager::getTexture(const UUID& _ID)
 SPtr<Texture>
 TextureManager::getTexture(const String& _path)
 {
-  // search if the texture has been stored before
-  // auto it = m_texturesPath.find(_path);
-  // if (it != m_texturesPath.end()) {
-  //   return it->second;
-  // }
-  // return nullptr;
-
   const UUID id = UUID::generateRandomUUIDFromString(_path);
   auto it = m_textures.find(id);
   if (it != m_textures.end()) {
@@ -199,7 +198,7 @@ TextureManager::getTexture(const String& _path)
   return nullptr;
 }
 
-PKFORCEINLINE void
+void
 TextureManager::deleteTexture(const UUID& _ID)
 {
   SPtr<Texture> texture = getTexture(_ID);

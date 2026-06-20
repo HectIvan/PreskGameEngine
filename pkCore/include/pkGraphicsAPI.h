@@ -333,7 +333,7 @@ public:
                 const int32 _format,
                 const int32 _usage,
                 int32 _bindFlags,
-                const int32 _shaderResourceFormat,
+                const int32& _shaderResourceFormat,
                 int32 _mipLevels = 1,
                 const bool _isCube = false) = 0;
 
@@ -344,8 +344,7 @@ public:
    * @return Pointer to the texture.
    */
   virtual SPtr<Texture>
-  createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                            uint32 _bindFlags) = 0;
+  createTexture(const SPtr<BaseResource>& _pResource, const uint32& _bindFlags) = 0;
 
   /**
    * @brief Create a texture from a DDS file.
@@ -370,7 +369,7 @@ public:
    */
   virtual SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     const uint32 _usage = 0) = 0;
+                     const uint32& _usage = 0) = 0;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -381,9 +380,9 @@ public:
    */
   virtual void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  const uint32 _start = 0,
-                  const uint32 _bufferCount = 1,
-                  const uint32 _offset = 0) = 0;
+                  const uint32& _start = 0,
+                  const uint32& _bufferCount = 1,
+                  const uint32& _offset = 0) = 0;
 
   /**
    * @brief Create an IndexBuffer.
@@ -393,7 +392,7 @@ public:
    */
   virtual SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    const uint32 _usage = 0) = 0;
+                    const uint32& _usage = 0) = 0;
 
   /**
    * @brief Set the index buffer.
@@ -402,8 +401,8 @@ public:
    */
   virtual void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 const uint32 _format = 42, // kPK_FORMAT_R32_UINT
-                 const uint32 _offset = 0) = 0;
+                 const uint32& _format = 42, // kPK_FORMAT_R32_UINT
+                 const uint32& _offset = 0) = 0;
 
   /**
    * @brief Create the constant buffer.
@@ -413,9 +412,9 @@ public:
    * @return Pointer to the constant buffer
    */
   virtual SPtr<ConstantBuffer>
-  createConstantBuffer(const uint32 _size,
+  createConstantBuffer(const uint32& _size,
                        const void* _pData = nullptr,
-                       const uint32 _usage = 0) = 0;
+                       const uint32& _usage = 0) = 0;
 
   /**
    * @brief Update the constant buffer.

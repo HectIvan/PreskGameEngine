@@ -320,14 +320,6 @@ class PK_CORE_EXPORT Texture
   getRawData() { return nullptr; }
 
   /**
-   * @brief Copy the content of the derived class from another class.
-   * @param _pTexture Other texture.
-   * @return If the conversion was successful.
-   */
-  virtual bool
-  copyFrom(SPtr<Texture>& _pTexture) = 0;
-
-  /**
    * @brief Set the texture ID.
    * @param _ID ID for the texture.
    */

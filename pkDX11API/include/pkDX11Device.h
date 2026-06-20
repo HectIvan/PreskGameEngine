@@ -53,7 +53,7 @@ class DX11Device : public Device
    * @param _pFeatureLevel Feature levels of the device.
    * @return What was the end result of the creation.
    */
-  HRESULT
+  PKRESULT
   init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel);
 
   /**

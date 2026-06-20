@@ -62,7 +62,7 @@ ResourceInspector::createResourceWindow(const Window& _window)
     const Path path = _window.openFileFromExplorer("Texture Files",
                                                    textureCodec.getPossibleExtensions());
     if (path.toString() != "") {
-      SPtr<BaseResource> resource = textureCodec.createResourceFromFile(path);
+      SPtr<BaseResource> resource = textureCodec.createResource(path);
       if (resource) {
         assetMan.insertNewResource(resource);
       }

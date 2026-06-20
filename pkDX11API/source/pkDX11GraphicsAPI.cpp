@@ -48,12 +48,12 @@ namespace pkEngineSDK
 class ShaderInclude : public ID3DInclude
 {
  public:
-  HRESULT __stdcall
+  PKRESULT __stdcall
   Open(D3D_INCLUDE_TYPE, LPCSTR pFileName,
        LPCVOID, LPCVOID* ppData, UINT* pBytes) noexcept override {
     String workingDirectory;
-    workingDirectory.resize(MAX_PATH);
-    GetCurrentDirectoryA(MAX_PATH, &workingDirectory[0]);
+    workingDirectory.resize(PK_MAX_PATH);
+    GetCurrentDirectoryA(PK_MAX_PATH, &workingDirectory[0]);
     workingDirectory.resize(strlen(workingDirectory.c_str()));
     if (workingDirectory.back() != '\\' && workingDirectory.back() != '/') {
       workingDirectory.append("\\");
@@ -63,31 +63,31 @@ class ShaderInclude : public ID3DInclude
 
     ifstream file(workingDirectory.c_str(), ios::binary | ios::ate);
     if (!file.is_open()) {
-      return E_FAIL;
+      return PK_FAIL;
     }
 
-    size_t size = file.tellg();
+    SIZE_T size = file.tellg();
     file.seekg(0, ios::beg);
 
     if (size == 0) {
-      return E_FAIL;
+      return PK_FAIL;
     }
     ANSICHAR* buffer = new ANSICHAR[size];
     file.read(buffer, size);
 
     *ppData = buffer;
-    *pBytes = static_cast<UINT>(size);
-    return S_OK;
+    *pBytes = static_cast<uint32>(size);
+    return PK_OK;
   }
 
-  HRESULT __stdcall Close(LPCVOID pData) noexcept override {
+  PKRESULT __stdcall Close(LPCVOID pData) noexcept override {
     delete[] static_cast<const ANSICHAR*>(pData);
     return S_OK;
   }
 };
 
 PKFORCEINLINE void
-throwIfFailed(const HRESULT& hr) {
+throwIfFailed(const PKRESULT& hr) {
   if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
     LOG_FATAL("Error in creation. Error message: " + errMsg, __FILE__, __LINE__);
@@ -165,9 +165,9 @@ DX11GraphicsAPI::debugDevice()
 }
 
 SPtr<ConstantBuffer>
-DX11GraphicsAPI::createConstantBuffer(const uint32 _size,
+DX11GraphicsAPI::createConstantBuffer(const uint32& _size,
                                       const void* _pData,
-                                      const uint32 _usage)
+                                      const uint32& _usage)
 {
   // buffer description.
   D3D11_BUFFER_DESC bDesc;
@@ -760,6 +760,7 @@ DX11GraphicsAPI::waitDevice()
   m_pDevice->m_pd3dDevice->CreateQuery(&desc, &query);
   m_pDevice->m_pImmediateContext->End(query);
 
+  // to do: remove the windows S_FALSE reference.
   while (m_pDevice->m_pImmediateContext->GetData(query, nullptr, 0, 0) == S_FALSE) {
     Sleep(0);
   }
@@ -1368,8 +1369,7 @@ DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 }
 
 SPtr<Texture>
-DX11GraphicsAPI::createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                                           uint32 _bindFlags)
+DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint32& _bindFlags)
 {
   if (_pResource->getType() != RESOURCE_TYPE::kTexture) {
     const String msg = "Failed to create texture from resource: " +
@@ -1551,7 +1551,7 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
                                const int32 _format,
                                const int32 _usage,
                                int32 _bindFlags,
-                               const int32 _shaderResourceFormat,
+                               const int32& _shaderResourceFormat,
                                int32 _mipLevels,
                                const bool _isCube)
 {
@@ -1778,7 +1778,7 @@ DX11GraphicsAPI::setInputLayout(const SPtr<InputLayout>& _pInputLayout)
 
 SPtr<VertexBuffer>
 DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                                    const uint32 _usage)
+                                    const uint32& _usage)
 {
   auto dxVB = make_shared<DX11VertexBuffer>();
   /***************************************************************/
@@ -1818,9 +1818,9 @@ DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
 
 void
 DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                                 const uint32 _start,
-                                 const uint32 _bufferCount,
-                                 const uint32 _offset)
+                                 const uint32& _start,
+                                 const uint32& _bufferCount,
+                                 const uint32& _offset)
 {
   // reinterpret vertex buffer.
   const auto dxVB = reinterpret_pointer_cast<DX11VertexBuffer>(_pVertexB);
@@ -1842,7 +1842,7 @@ DX11GraphicsAPI::setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
 
 SPtr<IndexBuffer>
 DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
-                                   const uint32 _usage)
+                                   const uint32& _usage)
 {
   auto dxIB = make_shared<DX11IndexBuffer>();
   // Define and create the buffer
@@ -1875,8 +1875,8 @@ DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
 
 void
 DX11GraphicsAPI::setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                                const uint32 _format,
-                                const uint32 _offset)
+                                const uint32& _format,
+                                const uint32& _offset)
 {
   // reinterpret pointer
   const auto dxIB = reinterpret_pointer_cast<DX11IndexBuffer>(_pIndexB);

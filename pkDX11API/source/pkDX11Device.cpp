@@ -20,12 +20,12 @@ DX11Device::getDeviceContext()
   return m_pImmediateContext;
 }
 
-HRESULT
+PKRESULT
 DX11Device::init(D3D_DRIVER_TYPE* _pDriverType, D3D_FEATURE_LEVEL* _pFeatureLevel)
 {
   *m_pDriverType = *_pDriverType;
   m_featureLevel = *_pFeatureLevel;
-  return S_OK;
+  return PK_OK;
 }
 
 void

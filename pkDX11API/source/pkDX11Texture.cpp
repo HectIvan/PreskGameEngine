@@ -18,8 +18,8 @@ DX11Texture::getName()
 {
   if (!m_t2d) { return String(); }
 
-  UINT nameSize = 0;
-  HRESULT hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, nullptr);
+  uint32 nameSize = 0;
+  PKRESULT hr = m_t2d->GetPrivateData(WKPDID_D3DDebugObjectName, &nameSize, nullptr);
 
   if (PK_FAILED(hr)) {
     const String errMsg = LOG_GET_ERR_MSG(hr);
@@ -39,29 +39,5 @@ DX11Texture::getName()
   }
 
   return String(nameVec.data(), nameSize);
-}
-
-bool
-DX11Texture::copyFrom(SPtr<Texture>& _pTexture)
-{
-  if (!_pTexture) {
-    return false;
-  }
-  // comvert to DirectX Texture.
-  const auto dxTx = reinterpret_pointer_cast<DX11Texture>(_pTexture);
-  if (!dxTx) {
-    const String msg = "Failed to copy texture";
-    LOG_WARNING(msg, __FILE__, __LINE__);
-    return false;
-  }
-  // copy the values.
-  setSize(dxTx->getSize());
-
-  if (dxTx->m_t2d) { m_t2d = dxTx->getTexture2D(); }
-  if (dxTx->m_sRV) { m_sRV = dxTx->getSRV(); };
-  if (!dxTx->m_uAVs.empty()) { m_uAVs = dxTx->getUAVs(); };
-  if (!dxTx->m_rTVs.empty()) { m_rTVs = dxTx->getRTVs(); };
-
-  return true;
 }
 }

@@ -4,6 +4,9 @@
  * @author  Héctor  Iván Muñoz Ceballos
  * @date    24/10/2025
  * @brief   Codec for creating pkt Texures.
+ * 
+ * @changes 6/13/2026 - Modified the creation of a resource from a path to be an overload
+ *                      of the original createResource function.
  *
  * @bug    No known bugs.
  */
@@ -37,12 +40,12 @@ class StbiTextureCodec : public TextureCodec
    * @param _data Data of the texture.
    */
   SPtr<TextureResource>
-  createResource(const String _name,
-                 const int32 _width,
-                 const int32 _height,
-                 const int32 _bpp,
-                 const uint32 _format,
-                 const uint32 _mipCount,
+  createResource(const String& _name,
+                 const int32& _width,
+                 const int32& _height,
+                 const int32& _bpp,
+                 const uint32& _format,
+                 const uint32& _mipCount,
                  Vector<uint8>& _data) override;
 
   /**
@@ -51,6 +54,6 @@ class StbiTextureCodec : public TextureCodec
    * @return texture resource.
    */
   SPtr<TextureResource>
-  createResourceFromFile(const Path _path) override;
-}; 
+  createResource(const Path& _path) override;
+};
 }

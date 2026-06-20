@@ -342,7 +342,7 @@ class DX11GraphicsAPI : public GraphicsAPI
                 const int32 _format,
                 const int32 _usage,
                 int32 _bindFlags,
-                const int32 _shaderResourceFormat,
+                const int32& _shaderResourceFormat,
                 int32 _mipLevels = 1,
                 const bool _isCube = false) override;
 
@@ -354,8 +354,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @return Pointer to the texture.
    */
   SPtr<Texture>
-  createTextureFromResource(const SPtr<BaseResource>& _pResource,
-                            uint32 _bindFlags) override;
+  createTexture(const SPtr<BaseResource>& _pResource, const uint32& _bindFlags) override;
 
   /**
    * @brief Create a texture from a DDS file.
@@ -379,7 +378,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<VertexBuffer>
   createVertexBuffer(const Vector<SimpleVertex>& _vertex,
-                     const uint32 _usage = 0) override;
+                     const uint32& _usage = 0) override;
 
   /**
    * @brief Set data to the vertex buffer.
@@ -390,9 +389,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setVertexBuffer(const SPtr<VertexBuffer>& _pVertexB,
-                  const uint32 _start = 0,
-                  const uint32 _bufferCount = 1,
-                  const uint32 _offset = 0) override;
+                  const uint32& _start = 0,
+                  const uint32& _bufferCount = 1,
+                  const uint32& _offset = 0) override;
 
   /**
    * @brief Create an IndexBuffer.
@@ -401,7 +400,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   SPtr<IndexBuffer>
   createIndexBuffer(const Vector<uint32>& _index,
-                    const uint32 _usage = 0) override;
+                    const uint32& _usage = 0) override;
 
   /**
    * @brief Set the index buffer.
@@ -410,8 +409,8 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   setIndexBuffer(const SPtr<IndexBuffer>& _pIndexB,
-                 const uint32 _format = 42,
-                 const uint32 _offset = 0) override;
+                 const uint32& _format = 42,
+                 const uint32& _offset = 0) override;
 
   /**
    * @brief Create the constant buffer.
@@ -421,9 +420,9 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _usage What usage will be given to the buffer.
    */
   SPtr<ConstantBuffer>
-  createConstantBuffer(const uint32 _size,
+  createConstantBuffer(const uint32& _size,
                        const void* _pData = nullptr,
-                       const uint32 _usage = 0) override;
+                       const uint32& _usage = 0) override;
 
   /**
    * @brief Update the constant buffer.

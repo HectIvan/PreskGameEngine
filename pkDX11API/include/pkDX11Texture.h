@@ -38,18 +38,19 @@ class DX11Texture : public Texture
     m_rTVs(_rTVs),
     m_dSV(_dSV),
     m_sRV(_Srv),
-    m_uAVs(_uAVs),
-    m_owner(false)
+    m_uAVs(_uAVs)
   {}
   ~DX11Texture() override {
-    LOG_REGISTER("Releasing texture: " + getName(), __FILE__, __LINE__);
+    const String msg = "Releasing texture: " + getName();
+    LOG_REGISTER(msg, __FILE__, __LINE__);
+    LOG_PRINT(msg);
 
     m_rTVs.clear();
     m_uAVs.clear();
 
     safeRelease(m_sRV);
     safeRelease(m_dSV);
-    if (m_owner) { safeRelease(m_t2d); }
+    safeRelease(m_t2d);
   }
 
   /**
@@ -160,14 +161,6 @@ class DX11Texture : public Texture
   void*
   getRawData() override { return reinterpret_cast<void*>(m_sRV); }
 
-  /**
-   * @brief Copy the content of the derived class from another class.
-   * @param _pTexture Other texture.
-   * @return If the conversion was successful.
-   */
-  bool
-  copyFrom(SPtr<Texture>& _pTexture) override;
-
  public:
   ID3D11Texture2D* m_t2d = nullptr;
 
@@ -178,7 +171,5 @@ class DX11Texture : public Texture
   ID3D11ShaderResourceView* m_sRV = nullptr;
 
   Vector<ID3D11UnorderedAccessView*> m_uAVs;
-
-  bool m_owner = true;
 };
 }

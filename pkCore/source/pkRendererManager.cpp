@@ -136,7 +136,7 @@ RendererManager::init()
 
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   
-  g_TextureCodec().createResourceFromFile(Path("textures/Skybox_papermill.hdr"));
+  g_TextureCodec().createResource(Path("textures/Skybox_papermill.hdr"));
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
   if (success) {
@@ -572,7 +572,7 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "PS", "ps_5_0");
   SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
   SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
-  const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
+  SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
@@ -607,6 +607,9 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   api.pSUnbindShaderResourceViews(1);
   api.unbindRenderTargets(1);
 
+  iLayout.reset();
+  samplerState.reset();
+  cBuffer.reset();
   LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
 }
 
@@ -624,7 +627,7 @@ RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
   const ShaderKey pShaderKey("resources/pkIrradianceShader.pks", "PS", "ps_5_0");
   SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
   SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
-  const SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
+  SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // create the sampler state.
   SPtr<SamplerState> samplerState = api.createSamplerState(PK_SAM_STATE_ADRESS::kWrap,
@@ -659,6 +662,9 @@ RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
   api.pSUnbindShaderResourceViews(1);
   api.unbindRenderTargets(1);
 
+  iLayout.reset();
+  samplerState.reset();
+  cBuffer.reset();
   LOG_REGISTER("Generated Irradiance map from cube texture.", __FILE__, __LINE__);
 }
 

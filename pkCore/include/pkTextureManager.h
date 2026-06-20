@@ -62,10 +62,11 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @return Pointer to the newly created texture.
    */
   SPtr<Texture>
-  createFlatTexture(const String _name,
-                    const int32 _width,
-                    const int32 _height,
-                    const Color color);
+  createTexture(const String& _name,
+                const int32& _width,
+                const int32& _height,
+                const uint32& _bpp,
+                const Color& _color);
 
   /**
    * @brief create texture from a texture/resource path.
@@ -103,7 +104,7 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    * @brief Delete a texture from the texture manager.
    * @param _ID ID of the texture.
    */
-  PKFORCEINLINE void
+  void
   deleteTexture(const UUID& _ID);
   
   /**

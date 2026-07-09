@@ -117,17 +117,12 @@ EditorApp::onInit()
    * User Interface.
    */
   // scene graph
-  const Vector2 winRect = m_window.getClientWidthHeight();
-  Vector2 sceneWinSize(winRect.x * 0.1f, winRect.y * 0.8f);
-  m_sceneGraphWin = UIWindow(sceneWinSize, Vector2::ZERO, activeScene->getName());
-  // logger window
-  m_loggerWin = UIWindow(Vector2(winRect.x, winRect.y * 0.2f),
-                         Vector2(0.0f, winRect.y * 0.8f),
-                         "Logger");
-  // right window
-  m_rightWin = UIWindow(Vector2(400.0f, winRect.y * 0.8f),
-                        Vector2(winRect.x - 400.0f, 0.0f),
-                        "Inspector");
+  g_uInterface().m_window = m_window;
+  const Vector2 winSize = m_window.getSize();
+
+  m_sceneGraphWin = UIWindow(Vector2(0.1f, 0.8f), Vector2::ZERO, activeScene->getName());
+  m_loggerWin = UIWindow(Vector2(1.0f, 0.2f), Vector2(0.0f, 0.8f), "Logger");
+  m_rightWin = UIWindow(Vector2(0.2, 0.8f), Vector2(0.8f, 0.0f), "Inspector");
 }
 
 void
@@ -189,7 +184,7 @@ EditorApp::input()
     if (eventQueue.iskeyPressed(pkEngineSDK::KEY::kLButton)) {
       Vector2 posDif = (m_lastCursorPos - eventQueue.mousePosition) * Math::DEG2RAD;
       posDif *= Vector2(m_sensX, m_sensY);
-      m_camera->rotate(posDif.x, posDif.y, 0.0f);
+      m_camera->rotate(-posDif.y, -posDif.x, 0.0f);
     }
   }
   m_lastCursorPos = eventQueue.mousePosition;

@@ -34,6 +34,28 @@ class PK_UTILITY_EXPORT Vector4
   ~Vector4() = default;
 
   /**
+   * @brief Check if this vector is the same as another.
+   */
+  PKFORCEINLINE bool
+  operator==(const Vector4& _other) {
+    return ((x == _other.x) ||
+            (y == _other.y) ||
+            (z == _other.z) ||
+            (w == _other.w)) ? true : false;
+  }
+
+  /**
+   * @brief Check if this vector is different from another.
+   */
+  PKFORCEINLINE bool
+  operator!=(const Vector4& _other) {
+    return ((x != _other.x) ||
+            (y != _other.y) ||
+            (z != _other.z) ||
+            (w != _other.w)) ? true : false;
+  }
+
+  /**
    * @brief multiply a Vector to this Vector.
    * @param _other Vector with which the multiplication will be made.
    * @return This vector with the multiplication done.
@@ -196,19 +218,21 @@ class PK_UTILITY_EXPORT Vector4
     return !operator==(_other);
   }
 
-  Vector4
-  operator*(const Matrix4& other) const;
-  
   /**
-   * @brief Calculate the cross product of this vector.
-   * @param _other Vector with which the cross product will be calculated.
-   * @return The final result of the cross product as a Vector.
+   * @brief Multiply the vector with a matrix4.
    */
-  PKFORCEINLINE const Vector4
-  operator^(const Vector4& _other) const
-  {
-    return vector3Cross(_other);
-  }
+  Vector4
+  operator*(const Matrix4& _other) const;
+
+  /**
+   * @brief Multiply the vector with a matrix4.
+   */
+  // Vector4
+  // operator*=(const Matrix4& _other) const
+  // {
+  //   *this = *this * _other; 
+  //   return *this;
+  // }
 
   /**
    * @brief Negates the values of this vector.
@@ -219,30 +243,14 @@ class PK_UTILITY_EXPORT Vector4
   {
     return Vector4(-x, -y, -z, -w);
   }
-
-  /**
-   * @brief Calculate the dot product between 2 vectors.
-   * @param _other The vector with which the dot product will be performed.
-   * @return The final result of the dot product as a Vector.
-   */
-  float
-  dotProd(const Vector4& _other) const;
-
+  
   /**
    * @brief Calculate the cross product of this vector.
    * @param _other Vector with which the cross product will be calculated.
    * @return The final result of the cross product as a Vector.
    */
-  float
-  dotProd3(const Vector4& _other) const;
-
-  /**
-   * @brief Calculate the cross product between 2 vectors.
-   * @param _other The vector with which the cross product will be performed.
-   * @return The final result of the cross product as a Vector.
-   */
-  Vector4
-  vector3Cross(const Vector4& _other) const;
+  PKFORCEINLINE const Vector4
+  operator^(const Vector4& _other) const;
 
   /**
    * @brief Calculate the square multiplication of this vector.
@@ -267,48 +275,8 @@ class PK_UTILITY_EXPORT Vector4
   /**
    * @brief returns a copy of this normalized vector.
    */
-  Vector4
+  const Vector4
   normalized() const;
-
-  /**
-   * @brief Get the distance between this vector and another.
-   * @param _other the vector to be targeted for distance measuring.
-   * @return the distance between the 2 vectors
-   */
-  PKFORCEINLINE float
-  distanceTo(const Vector4& _other) const;
-
-  /**
-    * @brief Clamp the values of the Vector4.
-    * @param _x Minimum clamp range.
-    * @param _y Maximum clamp range.
-    */
-  PKFORCEINLINE void
-  clamp(const float& _x, const float& _y);
-
-  /**
-   * @brief Compare 2 vectors to see if their values differ.
-   * @param _other The vector with which the comparison will be performed.
-   * @return A boolean determining if any value changes.
-   */
-  bool
-  isDifferent(const Vector4& _other) const;
-
-  /**
-   * @brief Set a vector to one single value.
-   * @param _val The value that all parts of the vector will be set to.
-   * @return A Vector4 with all of its parts set to a single value.
-   */
-  static const Vector4
-  vectorSplatValue(const float& _val);
-
-  /**
-   * @brief Calculate the dot product of one vector with this one.
-   * @param _other The other vector4.
-   * @return The final dot product.
-   */
-  static float
-  dotProd(const Vector4& _this, const Vector4& _other);
 
   /**
    * @brief Get vector3 from this vector.

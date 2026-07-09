@@ -9,10 +9,10 @@
 
 namespace pkEngineSDK {
 
-const Matrix4 Matrix4::IDENTITY = Matrix4(Vector4(1.0f, 0.0f, 0.0f, 0.0f),
-                                          Vector4(0.0f, 1.0f, 0.0f, 0.0f),
-                                          Vector4(0.0f, 0.0f, 1.0f, 0.0f),
-                                          Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+const Matrix4 Matrix4::IDENTITY = Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                          0.0f, 1.0f, 0.0f, 0.0f,
+                                          0.0f, 0.0f, 1.0f, 0.0f,
+                                          0.0f, 0.0f, 0.0f, 1.0f);
 const Matrix4 Matrix4::ZERO = Matrix4(0);
 
 Matrix4
@@ -125,10 +125,12 @@ Matrix4::operator*(const Vector4& _other) const
   const float w23 = matrix[2][3] * _other.w;
   const float w33 = matrix[3][3] * _other.w;
 
-  return Vector4(x00 + y01 + z02 + w03,
-                 x10 + y11 + z12 + w13,
-                 x20 + y21 + z22 + w23,
-                 x30 + y31 + z32 + w33);
+  const float x = x00 + y01 + z02 + w03;
+  const float y = x10 + y11 + z12 + w13;
+  const float z = x20 + y21 + z22 + w23;
+  const float w = x30 + y31 + z32 + w33;
+
+  return Vector4(x, y, z, w);
 }
 
 Matrix4
@@ -406,15 +408,6 @@ Matrix4::getTransposed() const
 }
 
 const Matrix4
-Matrix4::matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ)
-{
-  return Matrix4(Vector4(_scaleX, 0.0f, 0.0f, 0.0f),
-                 Vector4(0.0f, _scaleY, 0.0f, 0.0f),
-                 Vector4(0.0f, 0.0f, _scaleZ, 0.0f),
-                 Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-}
-
-const Matrix4
 Matrix4::translation(const Vector3& _position)
 {
   return translation(_position.x, _position.y, _position.z);
@@ -466,8 +459,16 @@ const Matrix4
 Matrix4::scale(const Vector3& _scale)
 {
   Matrix4 M = Matrix4::IDENTITY;
-  M.setScale(_scale);
+  M.matrix[0][0] = _scale.x;
+  M.matrix[1][1] = _scale.y;
+  M.matrix[2][2] = _scale.z;
   return M;
+}
+
+const Matrix4
+Matrix4::scale(const float& _scaleX, const float& _scaleY, const float& _scaleZ)
+{
+  return scale(Vector3(_scaleX, _scaleY, _scaleZ));
 }
 
 const Matrix4
@@ -475,18 +476,16 @@ Matrix4::getScale()
 {
   Matrix4 M = Matrix4::IDENTITY;
   const Vector3 scale = getScale3();
-  M.matrix[0][3] = scale.x;
-  M.matrix[1][3] = scale.y;
-  M.matrix[2][3] = scale.z;
+  M.matrix[0][0] = scale.x;
+  M.matrix[1][1] = scale.y;
+  M.matrix[2][2] = scale.z;
   return M;
 }
 
 const Vector3
 Matrix4::getScale3() const
 {
-  return Vector3(matrix[0][3],
-                 matrix[1][3],
-                 matrix[2][3]);
+  return Vector3(matrix[0][0], matrix[1][1], matrix[2][2]);
 }
 
 void
@@ -519,7 +518,7 @@ Matrix4
 Matrix4::MatrixRotationAxis(const Vector3& _axis, const float& _angle)
 {
   PK_ASSERT(!_axis.isZero());
-  PK_ASSERT(!_axis.hasNan());
+  PK_ASSERT(!Math::isNan(_axis));
 
   const Vector3 axis = _axis.normalized();
   
@@ -579,7 +578,7 @@ Matrix4::getRotation() const
 }
 
 const Matrix4
-Matrix4::getRotationNoScale(const Vector3& _scale) const
+Matrix4::getRotation(const Vector3& _scale) const
 {
   Matrix4 rotMat = getRotation();
   rotMat.matrix[0][0] /= _scale.x;
@@ -630,14 +629,20 @@ Matrix4::rotation(const Quaternion& _quat)
 const Matrix4
 Matrix4::rotation(const float& _angleX, const float& _angleY, const float& _angleZ)
 {
-  Matrix4 M = Matrix4::IDENTITY;
   const Matrix4 X = rotationX(_angleX);
   const Matrix4 Y = rotationY(_angleY);
   const Matrix4 Z = rotationZ(_angleZ);
-  M = Z * X * Y;
-  return M;
+  return Z * X * Y;
 }
 
+/**
+
+Rz(A) =   | cos(A) -sin(A)  0  0 |
+          | sin(A)  cos(A)  0  0 |
+          |   0       0     1  0 |
+          |   0       0     0  1 |
+
+*/
 Matrix4
 Matrix4::rotationZ(const float& _angle)
 {
@@ -654,6 +659,15 @@ Matrix4::rotationZ(const float& _angle)
   return M;
 }
 
+
+/**
+
+Ry(B) =  | cos(B)  0  sin(B)  0 |
+         |   0     1    0     0 |
+         | -sin(B) 0  cos(B)  0 |
+         |   0     0    0     1 |
+
+*/
 Matrix4
 Matrix4::rotationY(const float& _angle)
 {
@@ -671,6 +685,14 @@ Matrix4::rotationY(const float& _angle)
   return M;
 }
 
+/**
+
+Rx(Y) =  | 1    0         0     0 |
+         | 0  cos(Y)   -sin(Y)  0 |
+         | 0  sin(Y)    cos(Y)  0 |
+         | 0    0         0     1 |
+
+*/
 Matrix4
 Matrix4::rotationX(const float& _angle)
 {
@@ -727,14 +749,14 @@ Matrix4::lookToLH(const Vector4& _eyePos, const Vector4& _eyeDir, const Vector4&
   R1 = R2 ^ R0;
 
   // get the rows dot product
-  float R0Dot = -Vector4::dotProd(_eyePos, R0);
-  float R1Dot = Vector4::dotProd(_eyePos, R1);
-  float R2Dot = Vector4::dotProd(_eyePos, R2);
+  float R0Dot = -Math::dotProd(_eyePos, R0);
+  float R1Dot =  Math::dotProd(_eyePos, R1);
+  float R2Dot =  Math::dotProd(_eyePos, R2);
 
-  return Matrix4(Vector4(R0.x, R0.y, R0.z, 0.0f),
-                 Vector4(R1.x, R1.y, R1.z, 0.0f),
-                 Vector4(R2.x, R2.y, R2.z, 0.0f),
-                 Vector4(R0Dot, R1Dot, R2Dot, 1.0f));
+  return Matrix4(Vector4(R0.x, R0.y, R0.z, R0Dot),
+                 Vector4(R1.x, R1.y, R1.z, R1Dot),
+                 Vector4(R2.x, R2.y, R2.z, R2Dot),
+                 Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 const Matrix4

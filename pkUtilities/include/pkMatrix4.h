@@ -238,17 +238,7 @@ class PK_UTILITY_EXPORT Matrix4
    */
   const Matrix4
   getTransposed() const;
-  
-  /**
-   * @brief Scale a matrix to the desired scales.
-   * @param _scaleX The scale on the X coordinate.
-   * @param _scaleY The scale on the Y coordinate.
-   * @param _scaleZ The scale on the Z coordinate.
-   * @return This matrix transposed.
-   */
-  static const Matrix4
-  matrixScaling(const float& _scaleX, const float& _scaleY, const float& _scaleZ) ;
-  
+
   /**
    * @brief The translation matrix that is created from
    * the Vector3 given to it.
@@ -309,6 +299,16 @@ class PK_UTILITY_EXPORT Matrix4
   scale(const Vector3& _scale);
 
   /**
+   * @brief The scale matrix that is created from 3 values.
+   * @param _scaleX Scale at X.
+   * @param _scaleY Scale at Y.
+   * @param _scaleZ Scale at Z.
+   * @return The scale matrix at the scales given to it.
+   */
+  static const Matrix4
+  scale(const float& _scaleX, const float& _scaleY, const float& _scaleZ);
+
+  /**
    * @brief Get the current scale matrix.
    * @return The scale matrix.
    */
@@ -356,14 +356,14 @@ class PK_UTILITY_EXPORT Matrix4
    * Get a matrix rotation from an axis and an angle
    * 
    */
-  static Matrix4
+  PK_NODISCARD static Matrix4
   MatrixRotationAxis(const Vector3& _axis, const float& _angle);
 
   /**
    * @brief Get the rotation matrix.
    * @return The rotation matrix.
    */
-  const Matrix4
+  PK_NODISCARD const Matrix4
   getRotation() const;
 
   /**
@@ -371,8 +371,8 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _scale Scale to extract from the rotation matrix.
    * @return The rotation matrix.
    */
-  const Matrix4
-  getRotationNoScale(const Vector3& _scale) const;
+  PK_NODISCARD const Matrix4
+  getRotation(const Vector3& _scale) const;
   
   /**
    * @brief The rotation matrix that is created from
@@ -382,7 +382,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _angleZ Angle at Z.
    * @return The rotation matrix at the rotations given to it.
    */
-  static const Matrix4
+  PK_NODISCARD static const Matrix4
   rotation(const float& _angleX, const float& _angleY, const float& _angleZ);
 
   /**
@@ -391,7 +391,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _rot Vector rotations.
    * @return The rotation matrix at the rotations given to it.
    */
-  static const Matrix4
+  PK_NODISCARD static const Matrix4
   rotation(const Vector3& _rot);
 
   /**
@@ -399,7 +399,7 @@ class PK_UTILITY_EXPORT Matrix4
    * @param _quat Rotation quaternion.
    * @return The rotation matrix at the rotations given to it.
    */
-  static const Matrix4
+  PK_NODISCARD static const Matrix4
   rotation(const Quaternion& _quat);
   
   /**

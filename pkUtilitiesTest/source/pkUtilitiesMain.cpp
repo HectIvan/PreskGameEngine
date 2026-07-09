@@ -160,7 +160,7 @@ TEST_CASE("Vector2 Test") {
   REQUIRE(vecTest0.y == 3.0f);
   REQUIRE(vecTest1.x == 4.0f);
   REQUIRE(vecTest1.y == 5.0f);
-  REQUIRE(vecTest0.dotProd(vecTest1) == 23.0f);
+  REQUIRE(Math::dotProd(vecTest0, vecTest1) == 23.0f);
 
   /**
    * Magnitude test
@@ -219,7 +219,13 @@ TEST_CASE("Vector3 Test") {
   REQUIRE(vecTest1.x == 5.0f);
   REQUIRE(vecTest1.y == 6.0f);
   REQUIRE(vecTest1.z == 7.0f);
-  REQUIRE(vecTest0.dotProd(vecTest1) == 56);
+  REQUIRE(Math::dotProd(vecTest0, vecTest1) == 56);
+
+  /**
+   * xy and yz test.
+   */
+  REQUIRE(vecTest0.xy() == Vector2(2.0f, 3.0f));
+  REQUIRE(vecTest0.yz() == Vector2(3.0f, 4.0f));
 
   /**
    * Magnitude square test
@@ -243,7 +249,7 @@ TEST_CASE("Vector3 Test") {
    * Clamp test
   **/
   vecTest0 = Vector3(3.0f, 0.5f, 0.1f);
-  vecTest0.clamp(0.0f, 1.0f);
+  vecTest0 = Math::clamp(vecTest0, 0.0f, 1.0f);
   REQUIRE(vecTest0.x == 1.0f);
   REQUIRE(vecTest0.y == 0.5f);
   REQUIRE(vecTest0.z == 0.1f);
@@ -282,12 +288,7 @@ TEST_CASE("Vector4 Test") {
   REQUIRE(vecTest1.y == 6.0f);
   REQUIRE(vecTest1.z == 7.0f);
   REQUIRE(vecTest1.w == 8.0f);
-  REQUIRE(vecTest0.dotProd(vecTest1) == 70.0f);
-
-  /**
-   * Dot Product 3 test
-  **/
-  REQUIRE(vecTest0.dotProd3(vecTest1) == 38.0f);
+  REQUIRE(Math::dotProd(vecTest0, vecTest1) == 70.0f);
 
   /**
    * Vector 3 Cross
@@ -321,7 +322,7 @@ TEST_CASE("Vector4 Test") {
    * Clamp test
   **/
   vecTest0 = Vector4(3.0f, 0.5f, 0.1f, -2.0f);
-  vecTest0.clamp(0.0f, 1.0f);
+  vecTest0 = Math::clamp(vecTest0, 0.0f, 1.0f);
   REQUIRE(vecTest0.x == 1.0f);
   REQUIRE(vecTest0.y == 0.5f);
   REQUIRE(vecTest0.z == 0.1f);
@@ -347,16 +348,7 @@ TEST_CASE("Vector4 Test") {
   REQUIRE(vecTest3.y == 1.0f);
   REQUIRE(vecTest3.z == 1.0f);
   REQUIRE(vecTest3.w == 1.0f);
-  REQUIRE(vecTest2.isDifferent(vecTest3) == false);
-
-  /**
-   * Vector splat value
-  **/
-  Vector4 vsvt = Vector4::vectorSplatValue(5.0f);
-  REQUIRE(vsvt.x == 5.0f);
-  REQUIRE(vsvt.y == 5.0f);
-  REQUIRE(vsvt.z == 5.0f);
-  REQUIRE(vsvt.w == 5.0f);
+  REQUIRE((vecTest2 == vecTest3) == false);
 }
 
 /**************************************************************/
@@ -424,7 +416,7 @@ TEST_CASE("Matrix4 test") {
    * Matrix scaling test
   **/
   float scale = 5.0f;
-  matTest0 = Matrix4::matrixScaling(scale, scale, scale);
+  matTest0 = Matrix4::scale(scale, scale, scale);
   REQUIRE(matTest0.matrix[0][0] == 5.0f);
   REQUIRE(matTest0.matrix[1][0] == 0.0f);
   REQUIRE(matTest0.matrix[2][0] == 0.0f);

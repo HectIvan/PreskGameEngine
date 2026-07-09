@@ -41,7 +41,7 @@ class PK_CORE_EXPORT InverseKinematics
    * @param _pActor Actor to insert (Optional).
    */
   void
-  insertNodeLocal(Vector3 _position, SPtr<Actor> _pActor = nullptr);
+  insertNodeLocal(const Vector3& _position, const SPtr<Actor>& _pActor = nullptr);
 
   /**
    * @brief Insert a new node to the inverse kinematic chain.
@@ -50,21 +50,21 @@ class PK_CORE_EXPORT InverseKinematics
    * @param _pActor Actor to insert (Optional).
    */
   void
-  insertNodeGlobal(Vector3 _position, SPtr<Actor> _pActor = nullptr);
+  insertNodeGlobal(const Vector3& _position, const SPtr<Actor>& _pActor = nullptr);
 
   /**
    * @brief delete a specific node.
    * @param _index Index of the node to delete
    */
   void
-  deleteNode(uint32 _index);
+  deleteNode(const uint32& _index);
 
   /**
    * @brief delete a specific bone.
    * @param _index Index of the bone to delete
    */
   void
-  deleteBone(uint32 _index);
+  deleteBone(const uint32& _index);
 
   /**
    * @brief delete the last node in the chain.
@@ -112,7 +112,7 @@ class PK_CORE_EXPORT InverseKinematics
    * @brief
    */
   void
-  fabrik(Vector3 _target);
+  fabrik(const Vector3& _target);
 
  public:
   Vector<SPtr<Actor>> m_nodes;

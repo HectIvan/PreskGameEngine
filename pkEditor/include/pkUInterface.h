@@ -855,6 +855,7 @@ class UInterface : public Module<UInterface>
  public:
   Vector2 m_winSize;
   Vector2 m_winPos;
+  Window m_window;
 };
 
 UInterface&

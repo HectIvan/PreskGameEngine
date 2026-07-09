@@ -23,11 +23,14 @@
 #include "pkPlane.h"
 #include "pkPrerequisitesUtilities.h"
 #include "pkSphere.h"
-#include "pkVector2.h"
 
 
 namespace pkEngineSDK 
 {
+
+class Vector2;
+class Vector4;
+class Quaternion;
 
 namespace PK_ROT_TYPE
 {
@@ -75,6 +78,15 @@ class PK_UTILITY_EXPORT PlatformMath
    */
   PK_NODISCARD static float
   sqrt(const float& _x);
+
+  /**
+   * @brief Get the lowest of 2 parameters.
+   * @param _x First number to compare.
+   * @param _y Second number to compare.
+   * @return Whichever value is the smallest.
+   */
+  PK_NODISCARD static uint32
+  min(const uint32& _x, const uint32& _y);
 
   /**
    * @brief Get the lowest of 2 parameters.
@@ -176,6 +188,73 @@ class PK_UTILITY_EXPORT PlatformMath
   atan2(const float& _x, const float& _y);
 
   /**
+   * @brief Check if the value is nan.
+   */
+  PK_NODISCARD static bool
+  isNan(const float& _x);
+
+  /**
+   * @brief Check if the vector is nan.
+   */
+  PK_NODISCARD static bool
+  isNan(const Vector2& _x);
+
+  /**
+   * @brief Check if the vector is nan.
+   */
+  PK_NODISCARD static bool
+  isNan(const Vector3& _x);
+
+  /**
+   * @brief Check if the vector is nan.
+   */
+  PK_NODISCARD static bool
+  isNan(const Vector4& _x);
+
+  /**
+   * @brief Check if the quaternion is nan.
+   */
+  PK_NODISCARD static bool
+  isNan(const Quaternion& _x);
+
+  /**
+   * @brief check if a number is inf.
+   */
+  PK_NODISCARD static bool
+  isInf(const float& _x);
+
+  /**
+   * @brief check if a Vector is inf.
+   */
+  PK_NODISCARD static bool
+  isInf(const Vector2& _x);
+
+  /**
+   * @brief check if a Vector is inf.
+   */
+  PK_NODISCARD static bool
+  isInf(const Vector3& _x);
+
+  /**
+   * @brief check if a Vector is inf.
+   */
+  PK_NODISCARD static bool
+  isInf(const Vector4& _x);
+
+  /**
+   * @brief check if a Quaternion is inf.
+   */
+  PK_NODISCARD static bool
+  isInf(const Quaternion& _x);
+
+  /**
+   * @brief get the base 2 log of the number.
+   * @param _x Value to calculate the log.
+   */
+  PK_NODISCARD static float
+  log2(const float& _x);
+
+  /**
    * @brief clamps a float between 2 functions.
    * @param _t Float to clamp.
    * @param _x Minimum clamping value.
@@ -186,8 +265,8 @@ class PK_UTILITY_EXPORT PlatformMath
   clamp(const float& _t, const float& _x, const float& _y);
 
   /**
-   * @brief clamps a Vector2 between 2 functions.
-   * @param _t Vector2 to clamp.
+   * @brief clamps a Vector2 between 2 values.
+   * @param _t Vector to clamp.
    * @param _x Minimum clamping value.
    * @param _y Maximum clamping value.
    * @return Clamped float.
@@ -196,14 +275,24 @@ class PK_UTILITY_EXPORT PlatformMath
   clamp(const Vector2& _t, const float& _x, const float& _y);
 
   /**
-   * @brief clamps a Vector3 between 2 functions.
-   * @param _t Vector3 to clamp.
+   * @brief clamps a Vector3 between 2 values.
+   * @param _t Vector to clamp.
    * @param _x Minimum clamping value.
    * @param _y Maximum clamping value.
    * @return Clamped float.
    */
   PK_NODISCARD static Vector3
   clamp(const Vector3& _t, const float& _x, const float& _y);
+
+  /**
+   * @brief Clamp a Vector4 between 2 values.
+   * @param _t Vector to clamp.
+   * @param _x Minimum clamping value.
+   * @param _y Maximum clamping value.
+   * @return Clamped float.
+   */
+  PK_NODISCARD static Vector4
+  clamp(const Vector4& _t, const float& _x, const float& _y);
 
   /**
    * @brief Check if a float number is in range of 2 values.
@@ -236,9 +325,19 @@ class PK_UTILITY_EXPORT PlatformMath
   lerp(const float& _x, const float& _y, const float& _t);
 
   /**
-   * @brief Gets the lerped number between 2 Vector3 in a specific timestamp.
+   * @brief Gets the lerped number between 2 Vectors in a specific timestamp.
    * @param _x The first Vector.
    * @param _y The second Vector.
+   * @param _t Timestamp.
+   * @return The lerped Vector.
+   */
+  PK_NODISCARD static Vector2
+  lerp(const Vector2& _x, const Vector2& _y, const float& _t);
+
+  /**
+   * @brief Gets the lerped number between 2 Vectors in a specific timestamp.
+   * @param _x First Vector.
+   * @param _y Second Vector.
    * @param _t Timestamp.
    * @return The lerped Vector.
    */
@@ -247,8 +346,8 @@ class PK_UTILITY_EXPORT PlatformMath
 
   /**
    * @brief Gets the lerped number between 2 Vector4 in a specific timestamp.
-   * @param _x The first Vector.
-   * @param _y The second Vector.
+   * @param _x First Vector.
+   * @param _y Second Vector.
    * @param _t Timestamp.
    * @return The lerped Vector.
    */
@@ -265,18 +364,142 @@ class PK_UTILITY_EXPORT PlatformMath
   hookeLaw(const float& _elasticity, const float& _displacement);
 
   /**
-   * @brief Check if the value is nan.
-   * @param _x Value to check.
-   */
-  PK_NODISCARD static bool
-  isNan(const float& _x);
-
-  /**
-   * @brief get the base 2 log of the number.
-   * @param _x Value to calculate the log.
+   * @brief Dot product between 2 vectors.
+   * @param _x Target.
+   * @param _y Other.
    */
   PK_NODISCARD static float
-  log2(const float& _x);
+  dotProd(const Vector2& _x, const Vector2& _y);
+
+  /**
+   * @brief Dot product between 2 vectors.
+   * @param _x Target.
+   * @param _y Other.
+   */
+  PK_NODISCARD static float
+  dotProd(const Vector3& _x, const Vector3& _y);
+
+  /**
+   * @brief Dot product between 2 vectors.
+   * @param _x Target.
+   * @param _y Other.
+   */
+  PK_NODISCARD static float
+  dotProd(const Vector4& _x, const Vector4& _y);
+
+  /**
+   * @brief Cross product between 2 vectors.
+   */
+  PK_NODISCARD static Vector3
+  cross(const Vector3& _x, const Vector3& _y);
+
+  /**
+   * @brief Cross product between 2 vectors.
+   */
+  PK_NODISCARD static Vector4
+  cross(const Vector4& _x, const Vector4& _y);
+
+  /**
+   * @brief Reflect a vector on a normal.
+   * @param _direction Direction to reflect.
+   * @param _normal Normal upon which to reflect.
+   * @return Reflected vector.
+   */
+  PK_NODISCARD static Vector2
+  reflect(const Vector2& _direction, const Vector3& _normal);
+
+  /**
+   * @brief Reflect a vector on a normal.
+   * @param _direction Direction to reflect.
+   * @param _normal Normal upon which to reflect.
+   * @return Reflected vector.
+   */
+  PK_NODISCARD static Vector3
+  reflect(const Vector3& _direction, const Vector3& _normal);
+
+  /**
+   * @brief Distance between 2 positions.
+   * @param _x First distance.
+   * @param _y Second distance.
+   * @return Distance.
+   */
+  PK_NODISCARD static float
+  distance(const Vector2& _x, const Vector2& _y);
+
+  /**
+   * @brief Distance between 2 positions.
+   * @param _x First distance.
+   * @param _y Second distance.
+   * @return Distance.
+   */
+  PK_NODISCARD static float
+  distance(const Vector3& _x, const Vector3& _y);
+
+  /**
+   * @brief Distance between 2 positions.
+   * @param _x First distance.
+   * @param _y Second distance.
+   * @return Distance.
+   */
+  PK_NODISCARD static float
+  distance(const Vector4& _x, const Vector4& _y);
+
+  /**
+   * @brief Get a random number.
+   */
+  PK_NODISCARD static float
+  random();
+
+  /**
+   * @brief Get a random number.
+   */
+  PK_NODISCARD static int32
+  randomInt32();
+
+  /**
+   * @brief get a random number in range.
+   * @param _x Minimum value.
+   * @param _y Maximum value.
+   * @return Random number.
+   */
+  PK_NODISCARD static float
+  randomRange(const float& _x, const float& _y);
+
+  /**
+   * @brief Get a random Vector2.
+   */
+  PK_NODISCARD static Vector2
+  random2();
+
+  /**
+   * @brief Get a random Vector2 in range.
+   */
+  PK_NODISCARD static Vector2
+  random2Range(const float& _x, const float& _y);
+
+  /**
+   * @brief Get a random Vector3.
+   */
+  PK_NODISCARD static Vector3
+  random3();
+
+  /**
+   * @brief Get a random Vector3.
+   */
+  PK_NODISCARD static Vector3
+  random3Range(const float& _x, const float& _y);
+
+  /**
+   * @brief Get a random Vector4.
+   */
+  PK_NODISCARD static Vector4
+  random4();
+
+  /**
+   * @brief Get a random Vector4.
+   */
+  PK_NODISCARD static Vector4
+  random4Range(const float& _x, const float& _y);
 
   /***************************************************************************
   * 
@@ -296,7 +519,9 @@ class PK_UTILITY_EXPORT PlatformMath
   * @return A bool confirming or denying if there is a collision.
   **/
   static bool
-  intersectSphereSphere(Sphere& _sphere, const Sphere& _other, CollisionInfo& _cInfo);
+  intersectSphereSphere(const Sphere& _sphere,
+                        const Sphere& _other,
+                        CollisionInfo& _cInfo);
 
   /**
    * @brief Check if there is a collision between 2 spheres.
@@ -306,7 +531,9 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectSpherePoint(Sphere& _sphere, const Vector3& _other, CollisionInfo& _cInfo);
+  intersectSpherePoint(const Sphere& _sphere,
+                       const Vector3& _other,
+                       CollisionInfo& _cInfo);
 
   /***************************************************************************
   * Capsule
@@ -329,7 +556,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCapsulePoint(Capsule& _capsule, Vector3& _other, CollisionInfo& _cInfo);
+  intersectCapsulePoint(const Capsule& _capsule, const Vector3& _other, CollisionInfo& _cInfo);
 
   /**
    * @brief Check if there is a collision between a capsule and a sphere.
@@ -339,7 +566,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCapsuleSphere(Capsule& _capsule, Sphere& _sphere, CollisionInfo& _cInfo);
+  intersectCapsuleSphere(const Capsule& _capsule, const Sphere& _sphere, CollisionInfo& _cInfo);
 
   /***************************************************************************
   * Cube
@@ -352,7 +579,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCubeCube(Cube& _cube, const Cube& _other);
+  intersectCubeCube(const Cube& _cube, const Cube& _other);
 
   /**
    * @brief Check for a collision between a Cube and a Point.
@@ -361,7 +588,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return A bool confirming or denying if there is a collision.
    */
   static bool
-  intersectCubePoint(Cube& _cube, const Vector3& _other);
+  intersectCubePoint(const Cube& _cube, const Vector3& _other);
 
   /**
    * @brief Check for a collision between a Cube and a Sphere.
@@ -370,7 +597,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return Wether there was an intersection or not.
    */
   static bool
-  intersectCubeSphere(Cube& _cube, Sphere& _sphere);
+  intersectCubeSphere(const Cube& _cube, const Sphere& _sphere);
 
   /**
    * @brief Get a signed value.
@@ -378,7 +605,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The signed value.
    */
   static float
-  sign(float _val);
+  sign(const float& _val);
 
   /**
    * @brief Get a signed direction.
@@ -386,7 +613,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The new signed direction.
    */
   static Vector3
-  sign3(Vector3& _direction);
+  sign(const Vector3& _direction);
 
   /**
    * @brief Get the support point of an Object Bounding Box.
@@ -395,7 +622,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The support point of the box.
    */
   static Vector3
-  supportPointOBB(OBB& _box, Vector3& _dir);
+  supportPointOBB(const OBB& _box, const Vector3& _dir);
 
   /**
    * @brief Get the support point of a collection of points from a convex shape in a direction.
@@ -403,7 +630,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @param _points Group of points of  the shape.
    */
   static Vector3
-  supportPointConvex(Vector3& _direction, Vector<Vector3>& _points);
+  supportPointConvex(const Vector3& _direction, const Vector<Vector3>& _points);
 
   /**
    * @brief Get the support point from a sphere.
@@ -412,7 +639,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The support point.
    */
   static Vector3
-  supportPointSphere(Vector3& _direction, Sphere& _sphere);
+  supportPointSphere(const Vector3& _direction, const Sphere& _sphere);
 
   /**
    * @brief Get the support point from a capsule.
@@ -421,7 +648,7 @@ class PK_UTILITY_EXPORT PlatformMath
    * @return The support point.
    */
   static Vector3
-  supportPointCapsule(Vector3& _direction, Capsule& _capsule);
+  supportPointCapsule(const Vector3& _direction, const Capsule& _capsule);
 
   /**
    * Static variables

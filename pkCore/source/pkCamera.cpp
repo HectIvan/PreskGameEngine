@@ -43,7 +43,7 @@ Camera::init(const uint32& _width,
                             _farZ, _eye, _forward, _right, _camMode);
   m_eye = Vector4(_eye, 1.0f);
   m_at = Vector4(_eye + _forward, 0.0f);
-  m_up = _forward.cross(_right);
+  m_up = Math::cross(_forward, _right);
   m_forward = _forward;
   m_right = _right;
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
@@ -115,8 +115,9 @@ Camera::moveRight(const float& _offset)
 void
 Camera::moveRightLocal(const float& _offset)
 {
+  const Vector3 up = m_view.getUpVector();
   const Vector3 forward = (m_at.xyz() - m_eye.xyz()).normalized();
-  const Vector3 right = m_view.getUpVector().cross(forward);
+  const Vector3 right = Math::cross(up, forward);
   m_at += right * _offset;
   m_eye += right * _offset;
   m_view = Matrix4::lookAtLH(m_eye, m_at, Vector3::UP);

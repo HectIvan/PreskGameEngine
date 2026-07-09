@@ -90,7 +90,7 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
   // if there isnt a shader assigned, search and assign the default shader.
   SPtr<Shader> shader = _pMaterial->m_shader.lock();
   if (!shader) {
-    SPtr<Shader> shader = sm.getShader(sm.m_defaultShaderKey);
+    shader = sm.getShader(sm.m_defaultShaderKey);
     _pMaterial->setShader(shader);
   }
   file.write(reinterpret_cast<const ANSICHAR*>(&shader->m_id), sizeof(UUID));

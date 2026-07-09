@@ -20,6 +20,7 @@
 namespace pkEngineSDK {
 
 class Matrix4;
+class Vector2;
 class Vector4;
 class Quaternion;
 
@@ -30,6 +31,28 @@ class PK_UTILITY_EXPORT Vector3
   PKFORCEINLINE explicit Vector3(float _val) : x(_val), y(_val), z(_val) {};
   PKFORCEINLINE Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
   ~Vector3() = default;
+
+  /**
+   * @brief Check if this vector is the same as another.
+   */
+  PKFORCEINLINE bool
+  operator==(const Vector3& _other)
+  {
+    return ((x == _other.x) ||
+            (y == _other.y) ||
+            (z == _other.z)) ? true : false;
+  }
+
+  /**
+   * @brief Check if this vector is different from another.
+   */
+  PKFORCEINLINE bool
+  operator!=(const Vector3& _other)
+  {
+    return ((x != _other.x) ||
+            (y != _other.y) ||
+            (z != _other.z)) ? true : false;
+  }
 
   /**
   * @brief Multiply a vector to this vector.
@@ -276,23 +299,6 @@ class PK_UTILITY_EXPORT Vector3
   operator^(const Vector3& other) const;
 
   /**
-   * @brief Get the cross product between this vector and another.
-   * @param _other The other vector.
-   * @return The cross Vector.
-   */
-  const Vector3
-  cross(const Vector3& _other) const;
-
-  /**
-   * @brief This function calculates the dot product between this vector
-   * and the vector parameter.
-   * @param _other The vector with which the dot product will be performed.
-   * @return The final result of the dot product as a Vector.
-   */
-  float 
-  dotProd(const Vector3& _other) const;
-
-  /**
    * @brief This function calculates the square result of this vectors values.
    * @return The final result of the square operation.
    */
@@ -327,61 +333,11 @@ class PK_UTILITY_EXPORT Vector3
   normalized() const;
 
   /**
-   * @Brief This function gets the distance between this vector and
-   * another vector
-   * @param _other the vector to be targeted for distance measuring
-   * @return the distance between the 2 vectors
-   */
-  PKFORCEINLINE float
-  distanceTo(const Vector3& _other);
-
-  /**
-   * @Brief This function clamps the vector between one value and the other
-   * @param _x Minimum clamp range.
-   * @param _y Maximum clamp range.
-   */
-  PKFORCEINLINE void
-  clamp(const float& _x, const float& _y);
-
-  /**
-   * @Brief Gets the reflected vector off a normal.
-   * @param _direction The vector to reflect.
-   * @param _normal The normal of the surface collision.
-   * @return The reflected vector.
-   */
-  static const Vector3
-  reflect(const Vector3& _direction, const Vector3& _normal);
-
-  /**
-   * @Brief Calculate the dot product of one vector with this one.
-   * @param _this The vector where the dot product is performed.
-   * @param _other The other vector3.
-   * @return The final dot product.
-   */
-  PKFORCEINLINE static float
-  dotProd(const Vector3& _this, const Vector3& _other);
-
-  /**
-   * @Brief Calculate the dot product of one vector with this one.
-   * @param _other The other vector4.
-   * @return The final dot product.
-   */
-  PKFORCEINLINE static float
-  dotProd(const Vector3& _this, const Vector4& _other);
-
-  /**
    * @brief Check if the vector is a zero vector.
    * @return Wether the vector is 0 or not.
    */
   PKFORCEINLINE bool
   isZero() const;
-
-  /**
-   * @brief Check if the vector has a non number.
-   * @return wether the vector has or does not have a nan.
-   */
-  PKFORCEINLINE bool
-  hasNan() const;
 
   /**
    * @brief Get a Vector3 with random values.
@@ -407,6 +363,18 @@ class PK_UTILITY_EXPORT Vector3
    */
   Vector3
   randomRange(float _x, float _y);
+
+  /**
+   * @brief Get the XY values of the vector.
+   */
+  PK_NODISCARD const Vector2
+  xy() const;
+
+  /**
+   * @brief Get the YZ values of the vector.
+   */
+  PK_NODISCARD const Vector2
+  yz() const;
 
  public:
   float x;

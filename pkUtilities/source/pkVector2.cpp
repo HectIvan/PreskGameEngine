@@ -11,12 +11,6 @@ namespace pkEngineSDK
 
 const Vector2 Vector2::ZERO(0.0f, 0.0f);
 
-float 
-Vector2::dotProd(const Vector2& _other)
-{
-  return (x * _other.x) + (y * _other.y);
-}
-
 float
 Vector2::magnitudeSquare() const
 {
@@ -44,26 +38,5 @@ Vector2::normalized() const
   float mag = magnitude();
   mag = 1.0f / mag;
   return Vector2(x * mag, y * mag);
-}
-
-void
-Vector2::clamp(float _x, float _y)
-{
-  x = Math::clamp(x, _x, _y);
-  y = Math::clamp(y, _x, _y);
-}
-
-void
-Vector2::clampEach(float _xMin, float _xMax, float _yMin, float _yMax)
-{
-  x = Math::clamp(x, _xMin, _xMax);
-  y = Math::clamp(y, _yMin, _yMax);
-}
-
-float
-Vector2::distanceTo(const Vector2& _other)
-{
-  return Math::sqrt(Math::pow((_other.x - x), 2) +
-                    Math::pow((_other.y - y), 2));
 }
 }

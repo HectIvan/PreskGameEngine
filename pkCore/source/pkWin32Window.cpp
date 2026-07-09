@@ -198,7 +198,13 @@ Window::setHeight(const uint32& _height)
 Vector2
 Window::getSize() const
 {
-  return Vector2(m_width, m_height);
+  RECT rect;
+  if (GetWindowRect(m_windowH, &rect)) {
+    float width =  static_cast<float>(rect.right - rect.left);
+    float height = static_cast<float>(rect.bottom - rect.top);
+    return Vector2(width, height);
+  }
+  return Vector2(0.0f);
 }
 
 void

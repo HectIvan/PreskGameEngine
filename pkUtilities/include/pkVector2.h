@@ -32,6 +32,26 @@ class PK_UTILITY_EXPORT Vector2
   ~Vector2() = default;
 
   /**
+   * @brief Check if this vector is the same as another.
+   */
+  PKFORCEINLINE bool
+  operator==(const Vector2& _other)
+  {
+    return ((x == _other.x) ||
+            (y == _other.y)) ? true : false;
+  }
+
+  /**
+   * @brief Check if this vector is different from another.
+   */
+  PKFORCEINLINE bool
+  operator!=(const Vector2& _other)
+  {
+    return ((x != _other.x) ||
+            (y != _other.y)) ? true : false;
+  }
+
+  /**
    * @brief Multiplies a Vector to this Vector.
    * @param other Vector with which the multiplication will be made.
    * @return This vector with the multiplication done.
@@ -236,14 +256,6 @@ class PK_UTILITY_EXPORT Vector2
   }
 
   /**
-   * @brief Calculate the dot product between this and another vector.
-   * @param _other The vector with which the dot product will be performed.
-   * @return The final result of the dot product as a Vector.
-   */
-  float
-  dotProd(const Vector2& _other);
-
-  /**
    * @brief Calculate the square multiplication of this vector.
    * @return The final result of the square operation.
    */
@@ -269,32 +281,6 @@ class PK_UTILITY_EXPORT Vector2
    */
   const Vector2
   normalized() const;
-
-  /**
-   * @brief Clamp the vector between 2 values.
-   * @param _x Minimum clamp range.
-   * @param _y Maximum clamp range.
-   */
-  void
-  clamp(float _x, float _y);
-
-  /**
-   * @brief Clamp the vector between 2 values.
-   * @param _xMin Minimum clamp range for X.
-   * @param _xMax Maximum clamp range for X.
-   * @param _yMin Maximum clamp range for Y.
-   * @param _yMax Maximum clamp range for Y.
-   */
-  void
-  clampEach(float _xMin, float _xMax, float _yMin, float _yMax);
-
-  /**
-   * @brief Get the distance between this vector and another.
-   * @param _other The vector to be targeted for distance measuring.
-   * @return The distance between the 2 vectors.
-   */
-  float
-  distanceTo(const Vector2& _other);
 
  public:
   float x, y;

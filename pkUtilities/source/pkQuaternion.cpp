@@ -24,11 +24,11 @@ const Quaternion Quaternion::IDENTITY(1.0f, 0.0f, 0.0f, 0.0f);
 
 Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
 {
-  // float a = 1 + _vTo.dotProd(_vFrom);
+  // float a = 1 + Math::dotProd(_vTo, _vFrom);
   const Vector3 f = _vFrom.normalized();
   const Vector3 t = _vTo.normalized();
 
-  const float FdT = f.dotProd(t);
+  const float FdT = Math::dotProd(f, t);
 
   if (FdT >= 1.0f) {
     // vectors are the same
@@ -39,9 +39,9 @@ Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
   }
   // if vectors are opposite.
   else if (FdT <= -1.0f) {
-    Vector3 ortho = Vector3::RIGHT.cross(f);
+    Vector3 ortho = Math::cross(Vector3::RIGHT, f);
     if (ortho.magnitudeSquare() < 0.0001f) {
-      ortho = Vector3::UP.cross(f);
+      ortho = Math::cross(Vector3::UP, f);
     }
     ortho.normalize();
     w = 0.0f;
@@ -50,7 +50,7 @@ Quaternion::Quaternion(const Vector3& _vFrom, const Vector3& _vTo)
     z = ortho.z;
   }
   else {
-    const Vector3 cross = f.cross(t);
+    const Vector3 cross = Math::cross(f, t);
     w = 1.0f + FdT;
     x = cross.x;
     y = cross.y;
@@ -167,8 +167,8 @@ const Vector3
 Quaternion::operator*(const Vector3& _other) const
 {
   Vector3 vectQuat(x, y, z);
-  Vector3 t = vectQuat.cross(_other) * 2.0f;
-  return _other + t * w + vectQuat.cross(t);
+  Vector3 t = Math::cross(vectQuat, _other) * 2.0f;
+  return _other + t * w + Math::cross(vectQuat, t);
 }
 
 const Quaternion
@@ -194,12 +194,6 @@ Quaternion::operator*=(const Quaternion& _other)
 {
   *this = *this * _other;
   return *this;
-}
-
-bool
-Quaternion::hasNan() const
-{
-  return Math::isNan(w) || Math::isNan(x) || Math::isNan(y) || Math::isNan(z);
 }
 
 // https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion

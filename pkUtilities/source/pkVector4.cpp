@@ -33,50 +33,35 @@ Vector4::Vector4(const Vector2& _v1, const Vector2& _v2)
 }
 
 Vector4
-Vector4::operator*(const Matrix4& other) const
+Vector4::operator*(const Matrix4& _other) const
 {
-  float X = x * other.matrix[0][0] +
-            y * other.matrix[1][0] +
-            z * other.matrix[2][0] +
-            w * other.matrix[3][0];
+  float X = x * _other.matrix[0][0] +
+            y * _other.matrix[1][0] +
+            z * _other.matrix[2][0] +
+            w * _other.matrix[3][0];
 
-  float Y = x * other.matrix[0][1] +
-            y * other.matrix[1][1] +
-            z * other.matrix[2][1] +
-            w * other.matrix[3][1];
+  float Y = x * _other.matrix[0][1] +
+            y * _other.matrix[1][1] +
+            z * _other.matrix[2][1] +
+            w * _other.matrix[3][1];
 
-  float Z = x * other.matrix[0][2] +
-            y * other.matrix[1][2] +
-            z * other.matrix[2][2] +
-            w * other.matrix[3][2];
+  float Z = x * _other.matrix[0][2] +
+            y * _other.matrix[1][2] +
+            z * _other.matrix[2][2] +
+            w * _other.matrix[3][2];
 
-  float W = x * other.matrix[0][3] +
-            y * other.matrix[1][3] +
-            z * other.matrix[2][3] +
-            w * other.matrix[3][3];
+  float W = x * _other.matrix[0][3] +
+            y * _other.matrix[1][3] +
+            z * _other.matrix[2][3] +
+            w * _other.matrix[3][3];
 
   return Vector4(X, Y, Z, W);
 }
 
-float
-Vector4::dotProd(const Vector4& _other) const
+PKFORCEINLINE const Vector4
+Vector4::operator^(const Vector4& _other) const
 {
-  return (x * _other.x) + (y * _other.y) + (z * _other.z) + (w * _other.w);
-}
-
-float
-Vector4::dotProd3(const Vector4& _other) const
-{
-  return (x * _other.x) + (y * _other.y) + (z * _other.z);
-}
-
-Vector4 
-Vector4::vector3Cross(const Vector4& _other) const
-{
-  return Vector4((y * _other.z) - (z * _other.y),
-                 (z * _other.x) - (x * _other.z),
-                 (x * _other.y) - (y * _other.x),
-                 0.0f);
+  return Math::cross(*this, _other);
 }
 
 float 
@@ -103,63 +88,12 @@ Vector4::normalize()
   w *= mag;
 }
 
-Vector4
+const Vector4
 Vector4::normalized() const
 {
   float mag = magnitude();
   if (mag == 0.0f) { return Vector4(0.0f); }
   mag = 1.0f / mag;
   return Vector4(x * mag, y * mag, z * mag, w * mag);
-}
-
-float
-Vector4::distanceTo(const Vector4& _other) const
-{
-  return Math::sqrt(Math::pow((_other.x - x), 2) +
-                    Math::pow((_other.y - y), 2) +
-                    Math::pow((_other.z - z), 2) +
-                    Math::pow((_other.w - w), 2));
-}
-
-void
-Vector4::clamp(const float& _x, const float& _y)
-{
-  x = Math::clamp(x, _x, _y);
-  y = Math::clamp(y, _x, _y);
-  z = Math::clamp(z, _x, _y);
-  w = Math::clamp(w, _x, _y);
-}
-
-bool
-Vector4::isDifferent(const Vector4& _other) const
-{
-  if ((x != _other.x) ||
-      (y != _other.y) ||
-      (z != _other.z) ||
-      (w != _other.w))
-  { 
-    return true;
-  }
-  return false;
-}
-
-const Vector4
-Vector4::vectorSplatValue(const float& _val)
-{
-  Vector4 result;
-  result.x = _val;
-  result.y = _val;
-  result.z = _val;
-  result.w = _val;
-  return result;
-}
-
-float
-Vector4::dotProd(const Vector4& _this, const Vector4& _other)
-{
-  return (_this.x * _other.x) +
-         (_this.y * _other.y) +
-         (_this.z * _other.z) + 
-         (_this.w * _other.w);
 }
 }

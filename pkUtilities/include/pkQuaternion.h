@@ -125,13 +125,6 @@ class PK_UTILITY_EXPORT Quaternion
   Quaternion(const float& _angleRadian, const Vector3& _axis);
 
   /**
-   * @brief Check if the quaternion has a NaN value.
-   * @return True if it has a NaN value, false otherwise.
-   */
-  bool
-  hasNan() const;
-  
-  /**
    * @brief create quaternion from axis and angle.
    * @param _axis Axis from where the quaternion will be created.
    * @param _angle angle of the quaternion (in radians).

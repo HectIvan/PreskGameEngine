@@ -352,8 +352,12 @@ UInterface::startWindowCreate(const ANSICHAR* _name)
 void
 UInterface::startWindowCreate(const UIWindow& _winDesc)
 {
-  ImGui::SetNextWindowSize(ImVec2(_winDesc.size.x, _winDesc.size.y), ImGuiCond_Always);
-  ImGui::SetNextWindowPos(ImVec2(_winDesc.position.x, _winDesc.position.y), ImGuiCond_Always);
+  const Vector2 winSize = m_window.getSize();
+  const Vector2 size = winSize * _winDesc.size;
+  const Vector2 pos =  winSize * _winDesc.position;
+
+  ImGui::SetNextWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
+  ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y), ImGuiCond_Always);
   ImGui::Begin(_winDesc.name, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 }
 
@@ -461,7 +465,7 @@ UInterface::createInputVector3Clamp(const ANSICHAR* _name,
                                     float _max)
 {
   const bool change = createInputVector3(_name, _param);
-  _param.clamp(_min, _max);
+  _param = Math::clamp(_param, _min, _max);
   return change;
 }
 
@@ -484,7 +488,7 @@ UInterface::createInputVector4Clamp(const ANSICHAR* _name,
                                     float _max)
 {
   const bool change = createInputVector4(_name, _param);
-  _param.clamp(_min, _max);
+  _param = Math::clamp(_param, _min, _max);
   return change;
 }
 

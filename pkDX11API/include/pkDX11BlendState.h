@@ -30,6 +30,6 @@ class DX11BlendState : public BlendState
   }
 
  public:
-  ID3D11BlendState* m_pBlendState;
+  PKBlendState* m_pBlendState;
 };
 }

@@ -33,6 +33,6 @@ class DX11DepthStencilView : public DepthStencilView
   }
 
  public:
-  ID3D11DepthStencilView* pDepthSV = nullptr;
+  PKDepthStencilView* pDepthSV = nullptr;
 };
 }

@@ -23,9 +23,9 @@ class PK_UTILITY_EXPORT Vector2
 {
  public:
   Vector2() = default;
-  PKFORCEINLINE explicit Vector2(float _val) : x(_val), y(_val) {};
-  PKFORCEINLINE Vector2(float _x, float _y) : x(_x), y(_y) {};
-  PKFORCEINLINE Vector2(uint32 _x, uint32 _y) : 
+  PKFORCEINLINE explicit Vector2(const float& _val) : x(_val), y(_val) {};
+  PKFORCEINLINE Vector2(const float& _x, const float& _y) : x(_x), y(_y) {};
+  PKFORCEINLINE Vector2(const uint32& _x, const uint32& _y) : 
     x(static_cast<float>(_x)),
     y(static_cast<float>(_y))
   {};

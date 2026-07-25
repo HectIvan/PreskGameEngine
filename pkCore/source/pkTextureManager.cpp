@@ -43,7 +43,7 @@ TextureManager::init()
   loadDefaultMatTextures();
 
   auto flatTex = createTexture("FlatRed", 1, 1, 4, Color::RED);
-  texMan.insertTexture(*flatTex->getID(), flatTex);
+  texMan.insertTexture(flatTex->getID(), flatTex);
 }
 
 void

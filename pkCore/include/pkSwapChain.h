@@ -34,14 +34,14 @@ class SwapChain
    * @return Texture of the back buffer.
    */
   virtual SPtr<Texture>&
-  getBuffer(const uint32 _index) = 0;
+  getBuffer(const uint32& _index) = 0;
 
   /**
    * @brief Resize the buffers.
    * @param _size New size of the buffers.
    */
   virtual void
-  resizebuffers(const Vector2 _size) = 0;
+  resizebuffers(const Vector2& _size) = 0;
 
   /**
    * @brief Get the back buffer width.
@@ -61,7 +61,7 @@ class SwapChain
    * @brief Get the swap chain size.
    * @return The swap chain size.
    */
-  PKFORCEINLINE Vector2
+  PKFORCEINLINE const Vector2
   getSize() const
   {
     return Vector2(static_cast<float>(m_width), static_cast<float>(m_height));
@@ -72,8 +72,8 @@ class SwapChain
    * @param _index Index to search for.
    * @return Buffer size.
    */
-  PKFORCEINLINE Vector2
-  getSize(const uint32 _index) const
+  PKFORCEINLINE const Vector2
+  getSize(const uint32& _index) const
   {
     return m_buffers[_index]->getSize();
   }

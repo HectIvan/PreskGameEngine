@@ -64,8 +64,8 @@ class DX11Device : public Device
   setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
  public:
-  ID3D11Device* m_pd3dDevice = nullptr;
-  ID3D11DeviceContext* m_pImmediateContext = nullptr;
+  D3DDevice* m_pd3dDevice = nullptr;
+  D3DDeviceContext* m_pImmediateContext = nullptr;
   D3D_DRIVER_TYPE* m_pDriverType;
   D3D_FEATURE_LEVEL m_featureLevel;
 };

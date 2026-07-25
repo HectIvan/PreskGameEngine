@@ -31,6 +31,6 @@ class DX11RasterizerState : public RasterizerState
   }
 
 public:
-  ID3D11RasterizerState* m_pRasterizer = nullptr;
+  PKRasterizerState* m_pRasterizer = nullptr;
 };
 }

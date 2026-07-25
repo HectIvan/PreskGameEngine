@@ -2,19 +2,20 @@
 #include "pkLogger.h"
 #include "pkDX11Texture.h"
 #include "pkGraphicsAPI.h"
+#include "pkDX11Device.h"
 
 namespace pkEngineSDK
 {
 
 void
-DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
+DX11SwapChain::createRenderTargetView(const SPtr<DX11Device>& _pDevice)
 {
   for (uint32 i = 0; i < m_bufferCount; ++i) {
     // get buffer data
-    ID3D11Texture2D* pBackBuffer = nullptr;
+    D3DTexture2D* pBackBuffer = nullptr;
     D3D11_TEXTURE2D_DESC* tDesc = new D3D11_TEXTURE2D_DESC();
     // Get the buffers in the swap chain
-    int32 hr = m_pSch->GetBuffer(i, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+    int32 hr = m_pSch->GetBuffer(i, __uuidof(D3DTexture2D), (LPVOID*)&pBackBuffer);
     // if the buffer is not correct
     if (PK_FAILED(hr)) {
       String msg = "Failed to get the buffer to create a render target view. Error: " +
@@ -47,27 +48,19 @@ DX11SwapChain::createRenderTargetView(SPtr<Device> _pDevice)
       return;
     }
 
-    rTargetView->setSize(Vector2(static_cast<float>(tDesc->Width),
-                                 static_cast<float>(tDesc->Height)));
+    rTargetView->setSize(Vector2(tDesc->Width, tDesc->Height));
 
     m_buffers.push_back(rTargetView);
     pBackBuffer->Release();
   }
-
-}
-
-SPtr<Texture>&
-DX11SwapChain::getBuffer(const uint32 _index)
-{
-  return m_buffers[_index];
 }
 
 void
-DX11SwapChain::resizebuffers(const Vector2 _size)
+DX11SwapChain::resizebuffers(const Vector2& _size)
 {
   const uint32 hr = m_pSch->ResizeBuffers(m_bufferCount,
-                                          static_cast<uint32>(_size.x),
-                                          static_cast<uint32>(_size.y),
+                                          toUint32(_size.x),
+                                          toUint32(_size.y),
                                           DXGI_FORMAT_UNKNOWN,
                                           0);
 
@@ -78,7 +71,7 @@ DX11SwapChain::resizebuffers(const Vector2 _size)
     return;
   }
 
-  m_width = static_cast<uint32>(_size.x);
-  m_height = static_cast<uint32>(_size.y);
+  m_width = toUint32(_size.x);
+  m_height = toUint32(_size.y);
 }
 }

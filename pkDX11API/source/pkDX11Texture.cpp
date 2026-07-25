@@ -13,8 +13,8 @@ DX11Texture::setName(const String& _name)
                         _name.c_str());
 }
 
-String
-DX11Texture::getName()
+const String
+DX11Texture::getName() const
 {
   if (!m_t2d) { return String(); }
 

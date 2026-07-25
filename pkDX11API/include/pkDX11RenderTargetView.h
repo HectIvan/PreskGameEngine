@@ -33,6 +33,6 @@ class DX11RenderTargetView : public RenderTargetView
   }
 
  public:
-  ID3D11RenderTargetView* pRtv;
+  PKRenderTargetView* pRtv;
 };
 }

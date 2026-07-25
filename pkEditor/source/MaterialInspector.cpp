@@ -81,8 +81,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + albName;
       im.createText(dragText.c_str());
-      const UUID* textureID = albedo->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = albedo->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {
@@ -125,8 +125,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + norName;
       im.createText(dragText.c_str());
-      const UUID* textureID = normal->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = normal->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {
@@ -167,8 +167,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + occName;
       im.createText(dragText.c_str());
-      const UUID* textureID = oclussion->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = oclussion->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {
@@ -209,8 +209,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + roughName;
       im.createText(dragText.c_str());
-      const UUID* textureID = rough->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = rough->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {
@@ -253,8 +253,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + metName;
       im.createText(dragText.c_str());
-      const UUID* textureID = metallic->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = metallic->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {
@@ -297,8 +297,8 @@ MaterialInspector::createMaterialWindow()
     if (im.beginDragDropSource()) {
       const String dragText = "Dragging " + emissName;
       im.createText(dragText.c_str());
-      const UUID* textureID = emissive->getID();
-      im.setDragDropPayload("RESOURCE_PAYLOAD", textureID, sizeof(UUID));
+      const UUID textureID = emissive->getID();
+      im.setDragDropPayload("RESOURCE_PAYLOAD", &textureID, sizeof(UUID));
       im.endDragDropSource();
     }
     if (im.beginDragDropTarget()) {

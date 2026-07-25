@@ -65,7 +65,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
  * @return Converted Matrix4.
  */
 Matrix4
-aiTransformToMatrix4(aiMatrix4x4 _transform);
+aiTransformToMatrix4(const aiMatrix4x4& _transform);
 
 SPtr<BaseResource>
 AssimpModelCodec::createResource(const Path& _path)
@@ -158,14 +158,12 @@ processNode(Model& _model, const aiNode* _node, const aiScene* _scene)
 }
 
 Matrix4
-aiTransformToMatrix4(aiMatrix4x4 _transform)
+aiTransformToMatrix4(const aiMatrix4x4& _transform)
 {
-  Matrix4 M(_transform.a1, _transform.a2, _transform.a3, _transform.a4,
-            _transform.b1, _transform.b2, _transform.b3, _transform.b4,
-            _transform.c1, _transform.c2, _transform.c3, _transform.c4,
-            _transform.d1, _transform.d2, _transform.d3, _transform.d4);
-
-  return M;
+  return Matrix4(_transform.a1, _transform.a2, _transform.a3, _transform.a4,
+                 _transform.b1, _transform.b2, _transform.b3, _transform.b4,
+                 _transform.c1, _transform.c2, _transform.c3, _transform.c4,
+                 _transform.d1, _transform.d2, _transform.d3, _transform.d4);
 }
 
 SPtr<Mesh>

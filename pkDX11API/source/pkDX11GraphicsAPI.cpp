@@ -155,13 +155,16 @@ DX11GraphicsAPI::init(const Window& _window)
 void
 DX11GraphicsAPI::debugDevice()
 {
+#if defined (_DEBUG)
   ID3D11Debug* debug = nullptr;
   m_pDevice->m_pd3dDevice->QueryInterface(__uuidof(ID3D11Debug),
                                           (void**)&debug);
 
-  debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+  // debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+  debug->ReportLiveDeviceObjects(D3D11_RLDO_IGNORE_INTERNAL);
 
   debug->Release();
+#endif
 }
 
 SPtr<ConstantBuffer>
@@ -277,7 +280,7 @@ DX11GraphicsAPI::clearRenderTargetView(const FColor& _color,
 
   // if there is a mip slice specified to be cleared, clear said slice only and return.
   if (_mipSlice > -1) {
-    ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[_mipSlice];
+    PKRenderTargetView* rtv = dxRTV->m_rTVs[_mipSlice];
     if (rtv) {
       m_pDevice->m_pImmediateContext->ClearRenderTargetView(rtv, color);
     }
@@ -286,7 +289,7 @@ DX11GraphicsAPI::clearRenderTargetView(const FColor& _color,
   const uint32 rtvCount = static_cast<uint32>(dxRTV->m_rTVs.size());
   // if no mipSlice is specified, clear all the slices.
   for (uint32 i = 0; i < rtvCount; ++i) {
-    ID3D11RenderTargetView* rtv = dxRTV->m_rTVs[i];
+    PKRenderTargetView* rtv = dxRTV->m_rTVs[i];
     if (rtv) {
       m_pDevice->m_pImmediateContext->ClearRenderTargetView(rtv, color);
     }
@@ -320,7 +323,7 @@ DX11GraphicsAPI::clearUnorderedAccessView(const SPtr<Texture>& _uav, const FColo
 
   const uint32 uavCount = static_cast<uint32>(dxUAV->m_uAVs.size());
   for (uint32 i = 0; i < uavCount; ++i) {
-    ID3D11UnorderedAccessView* uav = dxUAV->m_uAVs[i];
+    PKUnorderedAccessView* uav = dxUAV->m_uAVs[i];
     if (uav) {
       m_pDevice->m_pImmediateContext->ClearUnorderedAccessViewFloat(uav, color);
     }
@@ -644,14 +647,14 @@ DX11GraphicsAPI::setRenderTargets(const Vector<WPtr<Texture>> _rTargets,
   // reinterpret the depth stencil view to a DirectX texture
   auto pDSV = reinterpret_pointer_cast<DX11Texture>(_pDepthSV);
   // render target vector
-  Vector<ID3D11RenderTargetView*> rTVector;
+  Vector<PKRenderTargetView*> rTVector;
   // get the vector size
   const uint32 RTCount = static_cast<uint32>(_rTargets.size());
   // reinterpret each of the targets as a DX11 texture and store in the texture vector
   for (uint32 i = 0; i < RTCount; ++i) {
     SPtr<DX11Texture> dxTx = reinterpret_pointer_cast<DX11Texture>(_rTargets[i].lock());
     // if target is valid, store it
-    ID3D11RenderTargetView* rTView = dxTx->m_rTVs[_mipLevel];
+    PKRenderTargetView* rTView = dxTx->m_rTVs[_mipLevel];
     if (dxTx && rTView) {
       rTVector.push_back(rTView);
     }
@@ -667,7 +670,7 @@ DX11GraphicsAPI::setRenderTargets(const Vector<WPtr<Texture>> _rTargets,
 void
 DX11GraphicsAPI::unbindRenderTargets(const SIZE_T _count)
 {
-  static Vector<ID3D11RenderTargetView*> unbindRT;
+  static Vector<PKRenderTargetView*> unbindRT;
   unbindRT.resize(_count, nullptr);
 
   // const uint32 size = static_cast<uint32>(unbindRT.size());
@@ -1264,7 +1267,7 @@ DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
                                           const uint32 _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
-  Vector<ID3D11ShaderResourceView*> vResourceVector(count);
+  Vector<PKShaderResourceView*> vResourceVector(count);
 
   for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
@@ -1278,7 +1281,7 @@ DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 void
 DX11GraphicsAPI::pSUnbindShaderResourceViews(const SIZE_T _count)
 {
-  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
 
   const uint32 size = static_cast<uint32>(unbindSRV.size());
@@ -1290,7 +1293,7 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
                                           const uint32 _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
-  Vector<ID3D11ShaderResourceView*> vResourceVector(count);
+  Vector<PKShaderResourceView*> vResourceVector(count);
 
   for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
@@ -1304,7 +1307,7 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 void
 DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T _count)
 {
-  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
 
   const uint32 size = static_cast<uint32>(unbindSRV.size());
@@ -1316,7 +1319,7 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
                                           const uint32 _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
-  Vector<ID3D11ShaderResourceView*> uavVector(count);
+  Vector<PKShaderResourceView*> uavVector(count);
 
   for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
@@ -1330,7 +1333,7 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 void
 DX11GraphicsAPI::cSUnbindShaderResourceViews(const SIZE_T _count)
 {
-  static Vector<ID3D11ShaderResourceView*> unbindSRV;
+  static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
 
   const uint32 size = static_cast<uint32>(unbindSRV.size());
@@ -1344,7 +1347,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextur
                                            const uint32 _mipLevel)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
-  Vector<ID3D11UnorderedAccessView*> uavVector(count);
+  Vector<PKUnorderedAccessView*> uavVector(count);
 
   for (uint32 i = 0; i < count; ++i) {
     // Recast to a DirectX Texture
@@ -1362,7 +1365,7 @@ DX11GraphicsAPI::cSSetUnorderedAccessViews(const Vector<SPtr<Texture>>& _pTextur
 void
 DX11GraphicsAPI::cSUnbindUnorderedAccessViews(const SIZE_T _count)
 {
-  static Vector<ID3D11UnorderedAccessView*> unbindUAV;
+  static Vector<PKUnorderedAccessView*> unbindUAV;
   unbindUAV.resize(_count, nullptr);
 
   const uint32 numViews = static_cast<uint32>(unbindUAV.size());
@@ -1466,7 +1469,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
     return;
   }
 
-  ID3D11ShaderResourceView* srv = texture->getSRV();
+  PKShaderResourceView* srv = texture->getSRV();
   if (srv) {
     m_pDevice->m_pImmediateContext->GenerateMips(srv);
   }
@@ -1561,16 +1564,6 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
 {
   PK_ASSERT(m_pDevice);
 
-  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
-  if (generateMips) {
-    _bindFlags |= D3D11_BIND_RENDER_TARGET;
-    _bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-    if (_mipLevels == 0) {
-      _mipLevels = static_cast<uint32>(Math::log2(Math::max(_width, _height)) + 1);
-    }
-  }
-
   // create the texture
   SPtr<DX11Texture> dxTex = make_shared<DX11Texture>();
   dxTex->setSize(Vector2(_width, _height));
@@ -1589,6 +1582,16 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
   desc.BindFlags = _bindFlags;
   desc.CPUAccessFlags = _usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
   desc.MiscFlags = 0;
+
+  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  if (generateMips) {
+    _bindFlags |= D3D11_BIND_RENDER_TARGET;
+    _bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+    if (_mipLevels == 0) {
+      _mipLevels = static_cast<uint32>(Math::log2(Math::max(_width, _height)) + 1);
+    }
+  }
 
   if (generateMips) {
     desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;

@@ -250,43 +250,43 @@ class PK_CORE_EXPORT Texture
    * @brief Set the texture width.
    * @param _width Window width.
    */
-  void
-  setWidth(uint32 _width) { m_width = _width; }
+  PKFORCEINLINE void
+  setWidth(const uint32& _width) { m_width = _width; }
 
   /**
    * @brief Set the texture height.
    * @param _height Window Height.
    */
-  void
-  setHeight(uint32 _height) { m_height = _height; }
+  PKFORCEINLINE void
+  setHeight(const uint32& _height) { m_height = _height; }
 
   /**
    * @brief Set the texture size.
    * @param _size Size of the texture.
    */
   void
-  setSize(const Vector2 _size);
+  setSize(const Vector2& _size);
 
   /**
    * @brief Get the texture width.
    * @return the texture width.
    */
-  uint32
-  getWidth() { return m_width; }
+  PKFORCEINLINE uint32
+  getWidth() const { return m_width; }
 
   /**
    * @brief Get the texture height.
    * @return the texture height.
    */
-  uint32
-  getHeight() { return m_height; }
+  PKFORCEINLINE uint32
+  getHeight() const { return m_height; }
 
   /**
    * @brief Get the texture size.
    * @return Texture size.
    */
-  Vector2
-  getSize() { return Vector2(m_width, m_height); }
+  PKFORCEINLINE const Vector2
+  getSize() const { return Vector2(m_width, m_height); }
 
   /**
    * @brief Set the texture name.
@@ -299,18 +299,8 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture name.
    * @return Texture name.
    */
-  virtual String
-  getName() = 0;
-
-  /**
-   * @brief Get the texture name as a const ANSICHAR*.
-   * @return Name of the texture;
-   */
-  // const ANSICHAR*
-  // getNameCSTR() {
-  //   const ANSICHAR* name = m_name.toString().c_str();
-  //   return name;
-  // }
+  virtual const String
+  getName() const = 0;
 
   /**
    * @brief Get the raw texture data.
@@ -330,8 +320,8 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture ID.
    * @return The texture ID.
    */
-  UUID*
-  getID() { return &m_id; }
+  PKFORCEINLINE UUID
+  getID() const { return m_id; }
 
  private:
   UUID m_id;

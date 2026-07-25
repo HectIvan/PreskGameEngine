@@ -131,6 +131,11 @@ toUint32(const T& _x) {
   return static_cast<uint32>(_x);
 }
 
+template<typename T> PKFORCEINLINE float
+toFloat(const T& _x) {
+  return static_cast<float>(_x);
+}
+
 template<class _Kty, class _Ty>
 using UMap = std::unordered_map<_Kty, _Ty>;
 

@@ -23,39 +23,41 @@
 namespace pkEngineSDK
 {
 
-  class DX11SwapChain : public SwapChain
+class DX11Device;
+
+class DX11SwapChain : public SwapChain
+{
+public:
+  DX11SwapChain() = default;
+  virtual ~DX11SwapChain()
   {
-  public:
-    DX11SwapChain() = default;
-    virtual ~DX11SwapChain()
-    {
-      safeRelease(m_pSch);
-      m_buffers.clear();
-    }
+    safeRelease(m_pSch);
+    m_buffers.clear();
+  }
 
-  /**
-   * @brief Create the back buffers for the swaap chain.
-   * @param _pDevice API specific device.
-   */
-  void
-  createRenderTargetView(SPtr<Device> _pDevice);
+/**
+ * @brief Create the back buffers for the swaap chain.
+ * @param _pDevice API specific device.
+ */
+void
+createRenderTargetView(const SPtr<DX11Device>& _pDevice);
 
-  /**
-   * @get the back buffer texture.
-   * @param _index Position of the buffer.
-   * @return Texture of the back buffer.
-   */
-  SPtr<Texture>&
-  getBuffer(const uint32 _index) override;
+/**
+ * @get the back buffer texture.
+ * @param _index Position of the buffer.
+ * @return Texture of the back buffer.
+ */
+PKFORCEINLINE SPtr<Texture>&
+getBuffer(const uint32& _index) override { return m_buffers[_index]; }
 
-  /**
-   * @brief Resize the buffers.
-   * @param _size New size of the buffers.
-   */
-  void
-  resizebuffers(const Vector2 _size) override;
+/**
+ * @brief Resize the buffers.
+ * @param _size New size of the buffers.
+ */
+void
+resizebuffers(const Vector2& _size) override;
 
  public:
-  IDXGISwapChain* m_pSch;
+  PKSwapChain* m_pSch;
 };
 }

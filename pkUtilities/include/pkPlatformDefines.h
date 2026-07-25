@@ -110,6 +110,11 @@
 # endif
 #endif
 
+#ifndef  PKDEPRECATED
+# define PKDEPRECATED [[deprecated]]
+#endif // ! PKDEPRECATED
+
+
 /*******************************************************************/
 /**
  * Find current platform
@@ -123,6 +128,21 @@
 # define PK_PLATFORM PK_PLATFORM_LINUX
 #else
 #   pragma error "no platform found."
+#endif
+
+/*******************************************************************/
+/**
+ * Find current platform
+**/
+/*******************************************************************/
+#if PK_PLATFORM == PK_PLATFORM_WIN32
+struct HWND__;
+typedef HWND__* HWND;
+using WindowHandle = HWND;
+
+struct HINSTANCE__;
+typedef HINSTANCE__* HINST;
+using InstanceHandle = HINST;
 #endif
 
 /*******************************************************************/

@@ -14,7 +14,10 @@ namespace pkEngineSDK
 void
 DX11Shader::compileFromFile()
 {
-  m_pSBlob = *g_GraphicAPI().compileShaderFromFile(m_shaderDirectory, m_sEntryPoint, m_sModel);
+  auto blob = g_GraphicAPI().compileShaderFromFile(m_shaderDirectory, m_sEntryPoint, m_sModel);
+  if (blob) {
+    m_pSBlob = *blob;
+  }
 }
 
 void

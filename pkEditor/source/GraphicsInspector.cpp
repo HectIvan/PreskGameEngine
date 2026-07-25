@@ -19,6 +19,7 @@
 #include "pkRendererManager.h"
 #include "pkUInterface.h"
 #include "pkUUID.h"
+#include "pkTextureCodec.h"
 #include "pkTextureManager.h"
 #include "pkShaderManager.h"
 #include "pkPrerequisitesCore.h"
@@ -26,6 +27,7 @@
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_RenderManager;
 using pkEngineSDK::g_ShaderManager;
+using pkEngineSDK::g_TextureCodec;
 using pkEngineSDK::g_TextureManager;
 using pkEngineSDK::Path;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
@@ -35,7 +37,9 @@ using pkEngineSDK::ShaderManager;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::String;
 using pkEngineSDK::Texture;
+using pkEngineSDK::TextureCodec;
 using pkEngineSDK::TextureManager;
+using pkEngineSDK::toUint32;
 using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UUID;
@@ -61,6 +65,7 @@ GraphicsInspector::init(Window& _window,
   UInterface& im = g_uInterface();
   RendererManager& rm = g_RenderManager();
   ShaderManager& shaderMan = g_ShaderManager();
+  TextureCodec& textureCod = g_TextureCodec();
   TextureManager& tm = g_TextureManager();
   // table parameters
   if (im.beginTable("Graphics")) {
@@ -71,11 +76,13 @@ GraphicsInspector::init(Window& _window,
     if (_ibl) {
       // Slider for IBL intensity.
       if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
-        Path path = _window.openFileFromExplorer("Texture Files",
-          "*.png;*.jpeg;*.jpg;*.tga;*.hdr;*.exr");
-        if (path.toString() != "") {
-          // SPtr<Texture> texture = tm.loadTexture(path);
-          // rm.m_mainSkybox->copyFrom(texture);
+        Vector<Path> path = _window.openFileFromExplorer("Texture Files",
+                                                         textureCod.getPossibleExtensions());
+        const uint32 fileCount = toUint32(path.size());
+        for (uint32 i = 0; i < fileCount; ++i) {
+          Path file = path[i];
+          if (file.toString() != "") {
+          }
         }
       }
       if (im.beginDragDropTarget()) {

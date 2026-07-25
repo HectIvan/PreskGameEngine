@@ -29,7 +29,7 @@ class PK_CORE_EXPORT DLLManager : public Module<DLLManager>
   /**
    * @brief run a dll by name.
    */
-  void
+  bool
   runDll(const String _name);
 };
 

@@ -27,6 +27,7 @@ using pkEngineSDK::UUID;
 using pkEngineSDK::Model;
 using pkEngineSDK::ModelManager;
 using pkEngineSDK::to_string;
+using pkEngineSDK::Vector3;
 
 void
 SceneInspector::createSceneGraphWindow(const SPtr<Scene>& _pScene)
@@ -37,7 +38,7 @@ SceneInspector::createSceneGraphWindow(const SPtr<Scene>& _pScene)
   ModelManager& modelMan = g_ModelManager();
 
   if (im.createButton("+")) {
-    _pScene->instantiate("Actor");
+    _pScene->instantiate("Actor", Vector3(0));
     m_sActorIndex = _pScene->getLastIndex();
     m_pSelectedActor = _pScene->getActor(m_sActorIndex);
   }
@@ -46,7 +47,7 @@ SceneInspector::createSceneGraphWindow(const SPtr<Scene>& _pScene)
     if (id) {
       SPtr<Model> model = modelMan.createModel(*id);
       if (model) {
-        SPtr<Actor> newActor = _pScene->instantiate(model->getName());
+        SPtr<Actor> newActor = _pScene->instantiate(model->getName(), Vector3(0));
         newActor->addComponent(model);
         m_pSelectedActor = newActor;
         m_sActorIndex = _pScene->getLastIndex();

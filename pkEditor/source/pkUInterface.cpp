@@ -432,7 +432,7 @@ bool UInterface::createInputVector2Clamp(const ANSICHAR* _name,
                                          float _max)
 {
   const bool change = createInputVector2(_name, _param);
-  _param.clamp(_min, _max);
+  _param = Math::clamp(_param, _min, _max);
   return change;
 }
 

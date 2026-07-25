@@ -34,14 +34,12 @@ Actor::setRotation(const float& _x, const float& _y, const float& _z)
   
   // verify that the rotation does not contain NaN values.
   if (m_rotation.hasNan()) {
-    LOG_ERROR("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
+    LOG_WARNING("Rotation contains NaN values. Resetting to identity.", __FILE__, __LINE__);
     m_rotation = Quaternion::IDENTITY;
   }
 #endif
 
 #if PK_ROT == PK_ROT_EULER
-  // m_rotation = Vector3(_x, _y, _z);
-  // Matrix4 rotMat = Matrix4::rotation(_x, _y, _z);
   m_rotation = Vector3(_x, _y, _z);
 #endif
 
@@ -95,7 +93,7 @@ Actor::setScale(const float& _x, const float& _y, const float& _z)
 void
 Actor::update(float)
 {
-  const uint32 compCount = static_cast<uint32>(m_components.size());
+  const uint32 compCount = getComponentCount();
   for (uint32 i = 0; i < compCount; ++i) {
     m_components[i]->update(*this);
   }
@@ -217,5 +215,4 @@ Actor::recalculateDirections(const Vector3& _rot)
   m_right = (Vector4::RIGHT * rotMat).xyz().normalized();
   m_up = (Vector4::UP * rotMat).xyz().normalized();
 }
-
 }

@@ -22,12 +22,13 @@
 #include "pkEventQueue.h"
 #include "TransformInspector.h"
 
-using pkEngineSDK::Quaternion;
+using pkEngineSDK::AssetResourceManager;
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::Camera;
 using pkEngineSDK::CameraDesc;
 using pkEngineSDK::Color;
 using pkEngineSDK::EventQueue;
+using pkEngineSDK::g_AssetResourceManager;
 using pkEngineSDK::g_EventManager;
 using pkEngineSDK::g_Logger;
 using pkEngineSDK::g_ModelManager;
@@ -52,7 +53,9 @@ using pkEngineSDK::ModelManager;
 using pkEngineSDK::ModelResource;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::Quaternion;
 using pkEngineSDK::TextureManager;
+using pkEngineSDK::TextureResource;
 using pkEngineSDK::to_string;
 using pkEngineSDK::RendererManager;
 using pkEngineSDK::SceneManager;
@@ -84,19 +87,9 @@ EditorApp::onInit()
   g_uInterface().init(m_window.getWindowHandle());
 
   SceneManager& sceneMan = g_SceneManager();
+  RendererManager& rManager = g_RenderManager();
   SPtr<Scene> activeScene = sceneMan.getActiveScene();
-
-  // create camera
-  const Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
-  CameraDesc camDescription;
-  camDescription.width  = m_window.getWidth();
-  camDescription.height = m_window.getHeight();
-  camDescription.eye    = camPos;
-
-  m_camera = activeScene->instantiate("Main Camera");
-  m_camera->setPosition(camPos);
-  m_camera->addComponent(make_shared<Camera>(camDescription));
-  m_camera->getComponent<Camera>()->m_isMain = true;
+  AssetResourceManager& assetMan = g_AssetResourceManager();
 
   // create light
   const Vector3 lightPos = Vector3(0.0f, 1000.0f, 0.0f);
@@ -105,20 +98,25 @@ EditorApp::onInit()
   lightCamDesc.height = 1080 * 2.0f;
   lightCamDesc.eye    = lightPos;
 
-  m_light = activeScene->instantiate("Light");
-  m_light->setPosition(lightPos);
-  m_light->setRotation(90.0f, 0.0f, 0.0f);
-  m_light->addComponent(make_shared<Light>());
-  m_light->addComponent(make_shared<Camera>(lightCamDesc));
+  m_light = activeScene->instantiate("Light", lightPos, Vector3(90, 0, 0));
+  m_light->addComponent(rManager.createLight());
+  m_light->addComponent(rManager.createCamera(lightCamDesc));
 
   // m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
+
+  SPtr<TextureResource> resSky = make_shared<TextureResource>();
+  const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
+
+  if (success) {
+    assetMan.insertNewResource(resSky);
+    rManager.setSkybox(resSky->m_id);
+  }
 
   /**
    * User Interface.
    */
   // scene graph
   g_uInterface().m_window = m_window;
-  const Vector2 winSize = m_window.getSize();
 
   m_sceneGraphWin = UIWindow(Vector2(0.1f, 0.8f), Vector2::ZERO, activeScene->getName());
   m_loggerWin = UIWindow(Vector2(1.0f, 0.2f), Vector2(0.0f, 0.8f), "Logger");

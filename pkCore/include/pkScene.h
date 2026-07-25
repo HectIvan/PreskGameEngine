@@ -51,17 +51,36 @@ class PK_CORE_EXPORT Scene
   setName(const String& _name) { m_name = _name; }
 
   /**
-   * @brief Insert a new actor into the scene or as
-   * a child of another actor.
-   * @param _name Name of the scene.
-   * @param _pParent If the actor will be the child of another actor.
-   * @param _tranform Transform of the actor.
-   * @return The actor created.
+   * @brief Create a new actor on the scene.
+   * @param _name Actor name.
+   * @param _pParent Parent if there is to be one.
+   * @param _tranform Actor Transform Matrix.
+   * @return The created actor.
    */
   SPtr<Actor>
-  instantiate(const String& _name = "",
+  instantiate(const ANSICHAR* _name = "",
               const SPtr<Actor>& _pParent = nullptr,
               const Matrix4& _transform = Matrix4::IDENTITY);
+
+  /**
+   * @brief Create a new actor on the scene.
+   * @param _name Actor name.
+   * @param _position New actor position.
+   * @param _rotation New actor rotation.
+   * @param _rotation New actor Rotation.
+   * @param _pParent Parent if there is to be one.
+   * @return The created actor.
+   */
+  SPtr<Actor>
+  instantiate(const ANSICHAR* _name = "",
+              const Vector3& _position = Vector3(0),
+#if PK_ROT == PK_ROT_QUATERNION
+              const Quaternion& _rotation = Quaternion::IDENTITY,
+#elif PK_ROT == PK_ROT_EULER
+              const Vector3& _rotation = Vector3::ZERO,
+#endif
+              const Vector3& _scale = Vector3(1),
+              const SPtr<Actor>& _pParent = nullptr);
 
   /**
    * @brief Get the last inserted actor of the scene.
@@ -96,14 +115,14 @@ class PK_CORE_EXPORT Scene
    * @brief Get the last index of the actors vector.
    */
   PKFORCEINLINE uint32
-  getLastIndex() const { return static_cast<uint32>(m_actors.size() - 1); }
+  getLastIndex() const { return toUint32(m_actors.size() - 1); }
 
   /**
    * @brief Get the actor count.
    * @return The ammount of actors in this scene.
    */
   PKFORCEINLINE uint32
-  getActorCount() const { return static_cast<uint32>(m_actors.size()); }
+  getActorCount() const { return toUint32(m_actors.size()); }
 
   /**
    * @brief Find an actor by name.

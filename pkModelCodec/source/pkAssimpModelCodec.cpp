@@ -72,7 +72,7 @@ AssimpModelCodec::createResource(const Path& _path)
 {
   SPtr<Model> model = make_shared<Model>();
 
-  const String modelPath = FileSystem::getAbsolutePath(_path).string();
+  const String modelPath = FileSystem::getAbsolutePath(_path).toString();
   model->path = _path;
   Assimp::Importer importer;
   const aiScene* scene = importer.ReadFile(modelPath.c_str(),

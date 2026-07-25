@@ -178,8 +178,8 @@ class PK_CORE_EXPORT Logger : public Module<Logger>
   void
   registerMessage(const String& _msg,
                   const ANSICHAR* _file,
-                  const uint32 _line,
-                  const LOG_MSG_TYPE::E _type = LOG_MSG_TYPE::kLog);
+                  const uint32& _line,
+                  const LOG_MSG_TYPE::E& _type = LOG_MSG_TYPE::kLog);
 
   /**
    * @brief Print a log into the console.

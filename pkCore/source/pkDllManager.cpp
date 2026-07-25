@@ -19,7 +19,7 @@
 
 namespace pkEngineSDK
 {
-void
+bool
 DLLManager::runDll(const String _name)
 {
   DllLoader dll;
@@ -27,7 +27,9 @@ DLLManager::runDll(const String _name)
   auto dllSymbol = reinterpret_cast<void(*)()>(dll.getMethod("loadPlugin"));
   if (dllSymbol) {
     dllSymbol();
+    return true;
   }
+  return false;
 }
 
 PK_CORE_EXPORT DLLManager&

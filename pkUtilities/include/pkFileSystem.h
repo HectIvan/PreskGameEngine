@@ -41,7 +41,19 @@ namespace FileSystem
 PKFORCEINLINE static bool
 fileExists(const Path& _path)
 {
-  path fsPath(_path.toString());
+  const path fsPath(_path.toString());
+  return exists(fsPath) && is_regular_file(fsPath);
+}
+
+/**
+ * @brief Check if the path exists.
+ * @param _path Path to check for.
+ * @return If the path exists or not.
+ */
+PKFORCEINLINE static bool
+fileExists(const ANSICHAR _path[])
+{
+  const path fsPath(_path);
   return exists(fsPath) && is_regular_file(fsPath);
 }
 
@@ -50,11 +62,23 @@ fileExists(const Path& _path)
  * @param _path Path to use.
  * @return Absolute path.
  */
-PKFORCEINLINE static path
+PKFORCEINLINE static Path
 getAbsolutePath(const Path& _path)
 {
-  path fsPath(_path.toString());
-  return absolute(fsPath);
+  const path fsPath(_path.toString());
+  return absolute(fsPath).string();
+}
+
+/**
+ * @brief Get the absolute path of a provided path.
+ * @param _path Path to use.
+ * @return Absolute path.
+ */
+PKFORCEINLINE static Path
+getAbsolutePath(const ANSICHAR _path[])
+{
+  const path fsPath(_path);
+  return absolute(fsPath).string();
 }
 
 /**
@@ -77,9 +101,9 @@ getAbsolutePathWStr(const Path& _path)
 PKFORCEINLINE static Vector<Path>
 getFilesFromFolder(const Path _path)
 {
-  path absPath = getAbsolutePath(_path);
+  Path absPath = getAbsolutePath(_path);
   Vector<Path> paths;
-  for (const auto& entry : directory_iterator(absPath.string())) {
+  for (const auto& entry : directory_iterator(absPath.toString())) {
     path entryPath = entry.path();
     if (is_regular_file(entryPath)) {
       paths.push_back(entryPath.string());

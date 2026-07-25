@@ -27,7 +27,9 @@ namespace pkEngineSDK
 class PK_CORE_EXPORT Actor
 {
  public:
-  Actor() = default;
+  Actor(const String& _name = "", const Matrix4& _transform = Matrix4::IDENTITY) :
+    m_transform(_transform), m_name(_name)
+  {}
   ~Actor() {
     clear();
   }
@@ -89,7 +91,7 @@ class PK_CORE_EXPORT Actor
    * @brief Modify the actor translation with a new value.
    * @param _addPos Vector with the positon increase values.
    */
-  [[deprecated]] PKFORCEINLINE void
+  PKDEPRECATED PKFORCEINLINE void
   move(const Vector3& _addPos)
   {
     move(_addPos.x, _addPos.y, _addPos.z);
@@ -101,7 +103,7 @@ class PK_CORE_EXPORT Actor
    * @param _addY Increase in the Y axis.
    * @param _addZ Increase in the Z axis.
    */
-  [[deprecated]] PKFORCEINLINE void
+  PKDEPRECATED PKFORCEINLINE void
   move(const float& _addX, const float& _addY, const float& _addZ)
   {
     m_position += Vector3(_addX, _addY, _addZ);
@@ -112,7 +114,7 @@ class PK_CORE_EXPORT Actor
    * @param _direction Direction in which the object will move.
    * @param _force Force that the object will move with.
    */
-  [[deprecated]] void
+  PKDEPRECATED void
   moveVerlet(const Vector3& _direction, const float& _force);
   
   /**
@@ -250,8 +252,8 @@ class PK_CORE_EXPORT Actor
    * @brief Get the actor scale.
    * @return The actor scale.
    */
-  PKFORCEINLINE Vector3&
-  getScale() { return m_scale; }
+  PKFORCEINLINE const Vector3
+  getScale() const { return m_scale; }
 
   /**
    * @brief Get the actor rotation.
@@ -262,16 +264,16 @@ class PK_CORE_EXPORT Actor
   getRotation() { return m_rotation; }
 #endif
 #if PK_ROT == PK_ROT_EULER
-  PKFORCEINLINE Vector3&
-  getRotation() { return m_rotation; }
+  PKFORCEINLINE const Vector3
+  getRotation() const { return m_rotation; }
 #endif
 
   /**
    * @brief Get the actor name.
    * @return Name of the actor
    */
-  String&
-  getName() { return m_name; }
+  const String
+  getName() const { return m_name; }
 
   /**
    * @brief Set the actor name.
@@ -285,7 +287,7 @@ class PK_CORE_EXPORT Actor
    * @return Name as a const char*
    */
   const ANSICHAR*
-  getNameCSTR() { return m_name.c_str(); }
+  getNameCSTR() const { return m_name.c_str(); }
 
   /**
    * @brief Update the actor.
@@ -307,7 +309,7 @@ class PK_CORE_EXPORT Actor
    * @return Number of children.
    */
   uint32
-  getChildCount() const { return static_cast<uint32>(m_children.size()); }
+  getChildCount() const { return toUint32(m_children.size()); }
 
   /**
    * @brief Get all the children of the actor.
@@ -322,6 +324,12 @@ class PK_CORE_EXPORT Actor
    */
   bool
   hasChildren() const { return !m_children.empty(); }
+
+  /**
+   * @brief Check if the actor has a parent.
+   */
+  bool
+  hasParent() const { return (m_parent) ? true : false; }
 
   /**
    * @brief Set the parent of the actor.
@@ -356,7 +364,7 @@ class PK_CORE_EXPORT Actor
    * @return Number of components.
    */
   uint32
-  getComponentCount() const { return static_cast<uint32>(m_components.size()); }
+  getComponentCount() const { return toUint32(m_components.size()); }
 
   /**
    * @brief Get a specific component of the actor.
@@ -372,16 +380,17 @@ class PK_CORE_EXPORT Actor
    */
   template <typename T>
   SPtr<T>
-  getComponent()
-  {
-    // for each component in the components vector
-    for (auto& comp : m_components) {
-      // if the conversion was successful, it means the component was found
+  getComponent() const {
+    const uint32 compCount = getComponentCount();
+    // for each component in the components vector.
+    for (uint32 i = 0; i < compCount; ++i) {
+      // if the conversion was successful, it means the component was found.
+      SPtr<Component> comp = m_components[i];
       if (comp->getType() == T::getObjType()) {
         return reinterpret_pointer_cast<T>(comp);
       }
     }
-    // otherwise, the component was not found, return a null pointer
+    // otherwise, the component was not found, return a null pointer.
     return nullptr;
   }
 
@@ -391,8 +400,7 @@ class PK_CORE_EXPORT Actor
    */
   template<typename T>
   Vector<SPtr<T>>
-  getComponents()
-  {
+  getComponents() const {
     Vector<SPtr<T>> comps;
     for (auto& comp : m_components) {
       if (T::getObjType() == comp->getType()) {
@@ -474,8 +482,8 @@ class PK_CORE_EXPORT Actor
   /**
    * Actor parts, these can be modified in runtime.
    */
-  Vector<SPtr<Component>> m_components;
-  Vector<SPtr<Actor>> m_children;
+  Vector<SPtr<Component>> m_components = {};
+  Vector<SPtr<Actor>> m_children = {};
   SPtr<Actor> m_parent = nullptr;
 };
 }

@@ -34,8 +34,10 @@ using RES_TYPE = pkEngineSDK::RESOURCE_TYPE::E;
 using pkEngineSDK::SPtr;
 using pkEngineSDK::stringToLower;
 using pkEngineSDK::TextureCodec;
+using pkEngineSDK::toUint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UUID;
+using pkEngineSDK::Vector;
 using pkEngineSDK::Vector2;
 using pkEngineSDK::UMap;
 
@@ -48,23 +50,32 @@ ResourceInspector::createResourceWindow(const Window& _window)
   TextureCodec& textureCodec = g_TextureCodec();
   
   if (im.createButton("Model Resource")) {
-    const Path path = _window.openFileFromExplorer("Model Files",
-                                                   modelCodec.getPossibleExtensions());
-    if (path.toString() != "") {
-      SPtr<BaseResource> resource = modelCodec.createResource(path);
-      if (resource) {
-        assetMan.insertNewResource(resource);
+    const Vector<Path> path = _window.openFileFromExplorer("Model Files",
+                                                           modelCodec.getPossibleExtensions());
+    const uint32 fileCount = toUint32(path.size());
+    for (uint32 i = 0; i < fileCount; ++i) {
+      Path file = path[i];
+      if (file.toString() != "") {
+        SPtr<BaseResource> resource = modelCodec.createResource(file);
+        if (resource) {
+          assetMan.insertNewResource(resource);
+        }
       }
     }
   }
   im.sameLine();
   if (im.createButton("Texture Resource")) {
-    const Path path = _window.openFileFromExplorer("Texture Files",
-                                                   textureCodec.getPossibleExtensions());
-    if (path.toString() != "") {
-      SPtr<BaseResource> resource = textureCodec.createResource(path);
-      if (resource) {
-        assetMan.insertNewResource(resource);
+    const Vector<Path> path = _window.openFileFromExplorer("Texture Files",
+                                                          textureCodec.getPossibleExtensions());
+
+    const uint32 fileCount = toUint32(path.size());
+    for (uint32 i = 0; i < fileCount; ++i) {
+      Path file = path[i];
+      if (file.toString() != "") {
+        SPtr<BaseResource> resource = textureCodec.createResource(file);
+        if (resource) {
+          assetMan.insertNewResource(resource);
+        }
       }
     }
   }

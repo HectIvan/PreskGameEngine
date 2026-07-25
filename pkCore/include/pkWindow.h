@@ -17,6 +17,7 @@
 /*********************************************/
 #include "pkPrerequisitesCore.h"
 #include "pkVector2.h"
+#include "pkPath.h"
 
 /*********************************************/
 /**
@@ -140,7 +141,7 @@ class PK_CORE_EXPORT Window
    * @brief Open a file in a file explorer window.
    */
   // const String& _filter = "All Files\0*.*\0Text Files\0*.TXT\0"
-  String
+  Vector<Path>
   openFileFromExplorer(const String& _filterName = "All Files",
                        const String& _extensions = "*.*") const;
 

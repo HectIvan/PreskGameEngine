@@ -32,7 +32,7 @@ struct PK_UTILITY_EXPORT Color final
 {
   Color() = default;
   // constructor with select colors
-  Color(uint8 _r, uint8 _g, uint8 _b, uint8 _a = 255)
+  Color(const uint8& _r, const uint8& _g, const uint8& _b, const uint8& _a = 255)
   {
     _color.R = _r;
     _color.G = _g;
@@ -40,7 +40,8 @@ struct PK_UTILITY_EXPORT Color final
     _color.A = _a;
   }
   // constructor with one set color & alpha
-  explicit Color(uint8 _rgb, uint8 _a)
+  explicit
+  Color(const uint8& _rgb, const uint8& _a)
   {
     _color.R = _rgb;
     _color.G = _rgb;
@@ -48,7 +49,8 @@ struct PK_UTILITY_EXPORT Color final
     _color.A = _a;
   }
   // constructor with a vector3 & alpha.
-  explicit Color(const Vector3 _rgb, const uint8 _a = 255)
+  explicit
+  Color(const Vector3& _rgb, const uint8& _a = 255)
   {
     _color.R = _rgb.x;
     _color.G = _rgb.y;
@@ -101,6 +103,33 @@ struct PK_UTILITY_EXPORT Color final
     newColor._color.B = static_cast<uint8>(_other.z);
     newColor._color.A = 255;
     return newColor;
+  }
+
+  const Color
+  operator-(const Color& _other) const
+  {
+    return Color(_color.R - _other._color.R,
+                 _color.G - _other._color.G,
+                 _color.B - _other._color.B,
+                 _color.A - _other._color.A);
+  }
+
+  friend Color
+  operator*(const float& _scalar, const Color& _color)
+  {
+    return Color(static_cast<uint8>(_color._color.R * _scalar),
+                 static_cast<uint8>(_color._color.G * _scalar),
+                 static_cast<uint8>(_color._color.B * _scalar),
+                 static_cast<uint8>(_color._color.A * _scalar));
+  }
+
+  const Color
+  operator+(const Color& _other) const
+  {
+    return Color(_color.R + _other._color.R,
+                 _color.G + _other._color.G,
+                 _color.B + _other._color.B,
+                 _color.A + _other._color.A);
   }
 
   /**

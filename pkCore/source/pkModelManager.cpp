@@ -68,7 +68,7 @@ ModelManager::createModel(const UUID& _ID)
 SPtr<Mesh>
 ModelManager::searchMesh(const String& _name)
 {
-  const uint32 meshCount = static_cast<uint32>(m_meshes.size());
+  const uint32 meshCount = toUint32(m_meshes.size());
   for (uint32 i = 0; i < meshCount; ++i) {
     SPtr<Mesh> mesh = m_meshes[i];
     if (_name == mesh->getName()) {

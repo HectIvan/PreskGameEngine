@@ -96,7 +96,7 @@ StbiTextureCodec::createResource(const Path& _path)
   PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
   const String extension = _path.getExtension();
-  const String fullPath = FileSystem::getAbsolutePath(_path).string();
+  const String fullPath = FileSystem::getAbsolutePath(_path).toString();
 
   // load float data for exr and hdr files.
   uint32 mipcount = 1;

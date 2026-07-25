@@ -79,6 +79,13 @@ TEST_CASE("Platform Math") {
   REQUIRE(Math::isInRange(inRangeTest, inRangeMin, inRangeMax) == Approx(false));
 
   /**
+   * floor a number
+   */
+
+  const float floorTest = 5.4f;
+  REQUIRE(Math::floor(floorTest) == Approx(5));
+
+  /**
   * lerp
   **/
   float timeDif = 0.16f;
@@ -183,7 +190,7 @@ TEST_CASE("Vector2 Test") {
    * Clamp test
   **/
   vecTest0 = Vector2(3.0f, -0.5f);
-  vecTest0.clamp(0.0f, 1.0f);
+  vecTest0 = Math::clamp(vecTest0, 0.0f, 1.0f);
   REQUIRE(vecTest0.x == 1.0f);
   REQUIRE(vecTest0.y == 0.0f);
 
@@ -192,7 +199,7 @@ TEST_CASE("Vector2 Test") {
   **/
   vecTest0 = Vector2(1.0f, 0.0f);
   Vector2 vecTest2 = Vector2(-5.0f, 0.0f);
-  REQUIRE(vecTest0.distanceTo(vecTest2) == 6.0f);
+  REQUIRE(Math::distance(vecTest0, vecTest2) == 6.0f);
 }
 
 /**************************************************************/
@@ -259,7 +266,7 @@ TEST_CASE("Vector3 Test") {
   **/
   vecTest0 = Vector3(1.0f, 0.0f, 0.0f);
   Vector3 vecTest2 = Vector3(-1.0f, 0.0f, 0.0f);
-  REQUIRE(vecTest0.distanceTo(vecTest2) == 2.0f);
+  REQUIRE(Math::distance(vecTest0, vecTest2) == 2.0f);
 }
 
 /**************************************************************/
@@ -293,7 +300,7 @@ TEST_CASE("Vector4 Test") {
   /**
    * Vector 3 Cross
   **/
-  Vector4 crossTest = vecTest0.vector3Cross(vecTest1);
+  Vector4 crossTest = Math::cross(vecTest0, vecTest1);
   REQUIRE(crossTest.x == -4.0f);
   REQUIRE(crossTest.y == 8.0f);
   REQUIRE(crossTest.z == -4.0f);
@@ -333,7 +340,7 @@ TEST_CASE("Vector4 Test") {
   **/
   vecTest0 = Vector4(1.0f, 0.0f, 0.0f, 5.0f);
   Vector4 vecTest2 = Vector4(-1.0f, 0.0f, 0.0f, 8.0f);
-  REQUIRE(vecTest0.distanceTo(vecTest2) == Approx(3.60555f));
+  REQUIRE(Math::distance(vecTest0, vecTest2) == Approx(3.60555f));
 
   /**
    * Is different test

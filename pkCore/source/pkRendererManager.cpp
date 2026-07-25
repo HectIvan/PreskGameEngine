@@ -15,9 +15,7 @@ namespace pkEngineSDK
 void
 RendererManager::init()
 {
-  AssetResourceManager& assetMan = g_AssetResourceManager();
   GraphicsAPI& api = g_GraphicAPI();
-  TextureManager& tm = g_TextureManager();
 
   const uint32 winHeight = api.getSwapChain()->getHeight();
   const uint32 winWidth = api.getSwapChain()->getWidth();
@@ -136,14 +134,7 @@ RendererManager::init()
 
   SPtr<BaseResource> resSky = make_shared<TextureResource>();
   
-  g_TextureCodec().createResource(Path("textures/Skybox_papermill.hdr"));
-  const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
   m_mainSkybox = api.createEmptyTexture();
-  if (success) {
-    assetMan.insertNewResource(resSky);
-    SPtr<Texture> skyboxTexture = tm.createTexture(resSky->m_id);
-    m_mainSkybox = skyboxTexture;
-  }
 
   // Cube map for the skybox
   txDesc.name = "CubeMapRT";
@@ -199,9 +190,6 @@ RendererManager::init()
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
   txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
-
-  generateCubeMap(m_mainSkybox, cubeMapRT);
-  generateIrradianceCubeMap(cubeMapRT, irradianceRT);
   
   // create the passes needed
   createPasses();
@@ -505,6 +493,63 @@ RendererManager::createPasses()
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
 }
 
+SPtr<Camera>
+RendererManager::createCamera(const CameraDesc& _desc)
+{
+  const SPtr<Camera> cam = make_shared<Camera>(_desc);
+  m_cameras.push_back(cam);
+  return cam;
+}
+
+SPtr<Camera>
+RendererManager::getMainCamera() const
+{
+  for (auto& camera : m_cameras) {
+    if (camera->m_isMain) {
+      return camera;
+    }
+  }
+  return nullptr;
+}
+
+SPtr<Camera>
+RendererManager::getCamera(const uint32& _index) const
+{
+  const uint32 camCount = toUint32(m_cameras.size());
+  if (_index < 0 || _index >= camCount) {
+    LOG_WARNING("getCamera index is out of range", __FILE__, __LINE__);
+    return nullptr;
+  }
+  return m_cameras[_index];
+}
+
+SPtr<Light>
+RendererManager::createLight(const LightDesc& _desc)
+{
+  SPtr<Light> light = make_shared<Light>(_desc);
+  m_lights.push_back(light);
+  return light;
+}
+
+SPtr<Light>
+RendererManager::createLight()
+{
+  SPtr<Light> light = make_shared<Light>();
+  m_lights.push_back(light);
+  return light;
+}
+
+SPtr<Light>
+RendererManager::getLight(const uint32& _index) const
+{
+  const uint32 lightCount = toUint32(m_lights.size());
+  if (_index < 0 || _index >= lightCount) {
+    LOG_WARNING("getLight index is out of range", __FILE__, __LINE__);
+    return nullptr;
+  }
+  return m_lights[_index];
+}
+
 SPtr<Pass>
 RendererManager::getPass(const PASS_TYPE::E _type)
 {
@@ -557,7 +602,30 @@ RendererManager::getUAVBuffer(const UAV_BUFFERS::E _type)
   return m_uavBuffers.find(_type)->second;
 }
 
+void
+RendererManager::setSkybox(const SPtr<Texture>& _pTexture)
+{
+  m_mainSkybox = _pTexture;
 
+  generateCubeMap(m_mainSkybox, getGBuffer(G_BUFFERS::kGB_CubeMap));
+  generateLUT(getGBuffer(G_BUFFERS::kGB_LUT));
+}
+
+void
+RendererManager::setSkybox(const UUID& _id)
+{
+  TextureManager& tm = g_TextureManager();
+
+  SPtr<Texture> texture = tm.getTexture(_id);
+  if (!texture) {
+    texture = tm.createTexture(_id);
+    tm.insertTexture(_id, texture);
+  }
+  m_mainSkybox = texture;
+
+  generateCubeMap(m_mainSkybox, getGBuffer(G_BUFFERS::kGB_CubeMap));
+  generateLUT(getGBuffer(G_BUFFERS::kGB_LUT));
+}
 
 void
 RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Texture>& _pOutput)
@@ -572,6 +640,12 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
   const ShaderKey pShaderKey("resources/pkCubeMapShader.pks", "PS", "ps_5_0");
   SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
   SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
+
+  if (!pShader || !vShader) {
+    const String msg = "Failed to find a necesary shader of the cube map generation.";
+    LOG_WARNING(msg, __FILE__, __LINE__);
+    return;
+  }
   SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // create the sampler state.
@@ -627,6 +701,12 @@ RendererManager::generateIrradianceCubeMap(const SPtr<Texture>& _pInput,
   const ShaderKey pShaderKey("resources/pkIrradianceShader.pks", "PS", "ps_5_0");
   SPtr<Shader> pShader = shaderMan.getShader(pShaderKey);
   SPtr<Shader> vShader = shaderMan.getShader(vShaderKey);
+
+  if (!pShader || !vShader) {
+    const String msg = "Failed to find a necesary shader of the cube map generation.";
+    LOG_WARNING(msg, __FILE__, __LINE__);
+    return;
+  }
   SPtr<InputLayout> iLayout = api.createInputLayoutFromVShader(vShader);
 
   // create the sampler state.
@@ -686,7 +766,7 @@ void
 RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
 {
   // iterate through each actor.
-  const uint32 actorCount = static_cast<uint32>(_gameActors.size());
+  const uint32 actorCount = toUint32(_gameActors.size());
   for (uint32 i = 0; i < actorCount; ++i) {
     const SPtr<Actor> currActor = _gameActors[i];
     // if actor is not active
@@ -703,7 +783,7 @@ RendererManager::renderActors(const Vector<SPtr<Actor>>& _gameActors)
 
     // render model components in the actor.
     const Vector<SPtr<Model>> models = currActor->getComponents<Model>();
-    const uint32 modelCount = static_cast<uint32>(models.size());
+    const uint32 modelCount = toUint32(models.size());
     for (uint32 i = 0; i < modelCount; ++i) {
       const SPtr<Model> model = models[i];
       if (model && model->isActive()) {
@@ -730,12 +810,12 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
 
   // for each mesh in the model
-  const uint32 meshCount = static_cast<uint32>(_model->meshes.size());
+  const uint32 meshCount = toUint32(_model->meshes.size());
   const uint32 sizeProps = sizeof(CBMaterialProps);
 
   // get the main camera.
   CBCamera cBCamera;
-  const uint32 cameracount = static_cast<uint32>(m_cameras.size());
+  const uint32 cameracount = toUint32(m_cameras.size());
   for (uint32 i = 0; i < cameracount; ++i) {
     SPtr<Camera> cam = m_cameras[i];
     if (cam->m_isMain) {

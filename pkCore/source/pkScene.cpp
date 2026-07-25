@@ -23,9 +23,7 @@ namespace pkEngineSDK
 SPtr<Actor>
 createActor()
 {
-  SPtr<Actor> gActor = make_shared<Actor>();
-  gActor->setTransform();
-  gActor->setName("");
+  SPtr<Actor> gActor = make_shared<Actor>("", Matrix4::IDENTITY);
   return gActor;
 }
 
@@ -41,7 +39,7 @@ insertActor(const SPtr<Actor>& _pActor, Vector<SPtr<Actor>>& _vector)
 }
 
 SPtr<Actor>
-Scene::instantiate(const String& _name,
+Scene::instantiate(const ANSICHAR* _name,
                    const SPtr<Actor>& _pParent,
                    const Matrix4& _transform)
 {
@@ -82,11 +80,29 @@ Scene::instantiate(const String& _name,
   // otherwise, the actor is part of the scene.
   else { insertActor(actor, m_actors); }
   // log registry.
-  const String message = "Instantiated actor of name: " + _name;
+  const String message = "Instantiated actor of name: " + String(_name);
   LOG_REGISTER(message, __FILE__, __LINE__);
   // return the actor created.
   return actor;
   
+}
+
+SPtr<Actor>
+Scene::instantiate(const ANSICHAR* _name,
+                   const Vector3& _position,
+#if PK_ROT == PK_ROT_QUATERNION
+                   const Quaternion& _rotation,
+#elif PK_ROT == PK_ROT_EULER
+                   const Vector3& _rotation,
+#endif
+                   const Vector3& _scale,
+                   const SPtr<Actor>& _pParent)
+{
+  Matrix4 transform = Matrix4::rotation(_rotation);
+  transform.setTranslation(_position);
+  transform.setScale(_scale);
+
+  return instantiate(_name, _pParent, transform);
 }
 
 void
@@ -128,7 +144,7 @@ Scene::update(const float& _deltaTime) const
 void
 Scene::clear()
 {
-  const uint32 actorCount = static_cast<uint32>(m_actors.size());
+  const uint32 actorCount = toUint32(m_actors.size());
   for (uint32 i = 0; i < actorCount; ++i) {
     m_actors[i]->clear();
   }

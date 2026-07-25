@@ -76,7 +76,7 @@ class ShaderInclude : public ID3DInclude
     file.read(buffer, size);
 
     *ppData = buffer;
-    *pBytes = static_cast<uint32>(size);
+    *pBytes = toUint32(size);
     return PK_OK;
   }
 
@@ -129,8 +129,8 @@ DX11GraphicsAPI::init(const Window& _window)
   uint32 numFeatureLevels = ARRAYSIZE(featureLevels);
 
   WindowHandle winHandle = _window.getWindowHandle();
-  uint32 width = static_cast<uint32>(_window.getClientWidthHeight().x);
-  uint32 height = static_cast<uint32>(_window.getClientWidthHeight().y);
+  uint32 width = toUint32(_window.getClientWidthHeight().x);
+  uint32 height = toUint32(_window.getClientWidthHeight().y);
 
   createDeviceAndSwapChain(width,
                            height,
@@ -952,7 +952,11 @@ DX11GraphicsAPI::compileShaderFromFile(Path _szFileName,
 SPtr<InputLayout>
 DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
 {
-  PK_ASSERT(_pShader);
+  if (!_pShader) {
+    const String msg = "Trying to generate an Input Layout from a null shader.";
+    LOG_WARNING(msg, __FILE__, __LINE__);
+    return nullptr;
+  }
 
   // create the input layout pointer
   SPtr<DX11InputLayout> pLayout = make_shared<DX11InputLayout>();

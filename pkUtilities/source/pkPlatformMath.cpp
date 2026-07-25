@@ -14,6 +14,8 @@
 * Includes
 **/
 /*********************************************/
+#include "pkColor.h"
+#include "pkFColor.h"
 #include "pkPlatformMath.h"
 #include "pkVector4.h"
 #include "pkMatrix4.h"
@@ -48,6 +50,12 @@ const float Math::DEG2RAD = PI / 180.0f;
 
 const float Math::RAD2DEG = 180.0f / PI;
 
+int32
+PlatformMath::abs(const int32& _x)
+{
+  return static_cast<int32>(std::abs(_x));
+}
+
 float
 PlatformMath::abs(const float& _x)
 {
@@ -72,10 +80,28 @@ PlatformMath::sqrt(const float& _x)
   return static_cast<float>(std::sqrt(_x));
 }
 
+float
+PlatformMath::fmod(const float& _x, const float& _y)
+{
+  return static_cast<float>(std::fmod(_x,_y));
+}
+
+int32
+PlatformMath::floor(const float& _x)
+{
+  return static_cast<int32>(std::floor(_x));
+}
+
 uint32
 PlatformMath::min(const uint32& _x, const uint32& _y)
 {
   return static_cast<uint32>(std::min(_x, _y));
+}
+
+int32
+PlatformMath::min(const int32& _x, const int32& _y)
+{
+  return static_cast<int32>(std::min(_x, _y));
 }
 
 float
@@ -317,6 +343,26 @@ PlatformMath::lerp(const Vector4& _x, const Vector4& _y, const float& _t)
   float z = std::lerp(_x.z, _y.z, _t);
   float w = std::lerp(_x.w, _y.w, _t);
   return Vector4(x, y, z, w);
+}
+
+FColor
+PlatformMath::lerp(const FColor& _x, const FColor& _y, const float& _t)
+{
+  float r = std::lerp(_x.r, _y.r, _t);
+  float g = std::lerp(_x.g, _y.g, _t);
+  float b = std::lerp(_x.b, _y.b, _t);
+  float a = std::lerp(_x.a, _y.a, _t);
+  return FColor(r, g, b, a);
+}
+
+Color
+PlatformMath::lerp(const Color& _x, const Color& _y, const float& _t)
+{
+  int8 r = static_cast<int8>(std::lerp(_x._color.R, _y._color.R, _t));
+  int8 g = static_cast<int8>(std::lerp(_x._color.G, _y._color.G, _t));
+  int8 b = static_cast<int8>(std::lerp(_x._color.B, _y._color.B, _t));
+  int8 a = static_cast<int8>(std::lerp(_x._color.A, _y._color.A, _t));
+  return Color(r, g, b, a);
 }
 
 float

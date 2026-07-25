@@ -8,6 +8,7 @@
 #include "pkWindowDesc.h"
 #include "pkEventQueue.h"
 #include "pkPlatformMath.h"
+#include "pkFileSystem.h"
 
 #if PK_PLATFORM == PK_PLATFORM_WIN32
 #include <Windows.h>
@@ -110,7 +111,7 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   WinFunctEvent* winEvent = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
   if (winEvent) {
     PlatformPointer result = (*winEvent)(reinterpret_cast<PlatformPointer>(hWnd),
-                                         static_cast<uint32>(message),
+                                         toUint32(message),
                                          reinterpret_cast<PlatformPointer>(wParam),
                                          reinterpret_cast<PlatformPointer>(lParam));
     if (result) {
@@ -152,13 +153,9 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 }
 
-// #if PK_PLATFORM == PK_PLATFORM_OSX
-// for a future file specific to IOS
-// #endif // PK_PLATFORM_OSX
-
 /**
-* General function definitions
-**/
+ * General function definitions
+ */
 namespace pkEngineSDK
 {
 
@@ -172,7 +169,7 @@ Window::setSize(const uint32& _width, const uint32& _height)
 void
 Window::setSize(const Vector2& _size)
 {
-  setSize(static_cast<uint32>(_size.x), static_cast<uint32>(_size.y));
+  setSize(toUint32(_size.x), toUint32(_size.y));
 }
 
 void
@@ -182,7 +179,7 @@ Window::setWidth(const uint32& _width)
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
   String msg = "Set window width to: " + to_string(_width);
-  g_Logger().registerMessage(msg, __FILE__, __LINE__);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 void
@@ -192,7 +189,7 @@ Window::setHeight(const uint32& _height)
   RECT rc = { 0, 0, static_cast<LONG>(m_width), static_cast<LONG>(m_height) };
   AdjustWindowRect(&rc, GetWindowLong(m_windowH, GWL_STYLE), false);
   String msg = "Set window height to: " + to_string(_height);
-  g_Logger().registerMessage(msg, __FILE__, __LINE__);
+  LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
 Vector2
@@ -213,11 +210,10 @@ appendToCSTR(Vector<ANSICHAR>& _array, const String& _string)
   _array.insert(_array.end(), _string.begin(), _string.end());
 }
 
-String
+Vector<Path>
 Window::openFileFromExplorer(const String& _filterName, const String& _extensions) const
 {
-  OPENFILENAME ofn = { 0 };       // common dialog box structure
-  ANSICHAR szFile[256] = {0}; // buffer for file name
+  ANSICHAR szFile[1024] = {0}; // buffer for file name
 
   Vector<ANSICHAR> filter;
 
@@ -228,6 +224,8 @@ Window::openFileFromExplorer(const String& _filterName, const String& _extension
   filter.push_back('\0');
 
   // Initialize OPENFILENAME
+  OPENFILENAME ofn = { sizeof ofn };       // common dialog box structure
+  szFile[0] = '\0';
   ZeroMemory(&ofn, sizeof(ofn));
   ofn.lStructSize = sizeof(ofn);
   ofn.hwndOwner = NULL; // or your window handle
@@ -241,25 +239,50 @@ Window::openFileFromExplorer(const String& _filterName, const String& _extension
               OFN_ALLOWMULTISELECT |
               OFN_EXPLORER;
 
+  uint32 fCount = 0;
+
+  Vector<Path> selectedFiles = {};
+
   // Display the Open dialog box
   if (GetOpenFileNameA(&ofn) == TRUE)
   {
-    // WCHAR* path = szFile;
-    // const SIZE_T pathLen = wcslen(path);
-    // Multiple files selected.
-    // if (ofn.nFileOffset > pathLen) {
-      // WCHAR* file = path + pathLen + 1;
-      // while (*file) {
-      //   // Process each selected file.
-      //   file += wcslen(file) + 1;
-      // }
-    // }
+    ANSICHAR* ptr = ofn.lpstrFile;
+
+    // directory.
+    const Path directory(ptr);
+
+    // move past the directory.
+    ptr += lstrlenA(ptr) + 1;
+
     // one file selected.
-    // else {
-      return String(ofn.lpstrFile);
-    // }
+    if (*ptr == '\0') {
+      const Path file = FileSystem::getAbsolutePath(directory);
+      LOG_REGISTER("File: " + file.toString(), __FILE__, __LINE__);
+      selectedFiles.push_back(file);
+    }
+    else {
+      while (*ptr) {
+        fCount++;
+
+        const Path file = directory.toString() + "\\" + ptr;
+        LOG_REGISTER("File: " + to_string(fCount) + " " + file.toString(), __FILE__, __LINE__);
+        selectedFiles.push_back(file);
+        ptr += lstrlen(ptr) + 1;
+      }
+
+      const String msg = "Selected files: " + to_string(fCount);
+      LOG_REGISTER(msg, __FILE__, __LINE__);
+    }
+
+    return selectedFiles;
   }
-  return String("");
+
+  LOG_REGISTER("No files selected.", __FILE__, __LINE__);
+  return {};
 }
 }
 #endif
+
+#if PK_PLATFORM == PK_PLATFORM_OSX
+// for a future file specific to IOS
+#endif // PK_PLATFORM_OSX

@@ -62,7 +62,7 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _pat
 
   // get and write model header.
   ModelAssetHeader mHeader;
-  const uint32 meshCount = static_cast<uint32>(_pModel->meshes.size());
+  const uint32 meshCount = toUint32(_pModel->meshes.size());
   mHeader.meshCount = meshCount;
   file.write(reinterpret_cast<const ANSICHAR*>(&mHeader.meshCount), sizeof(uint32));
   // for each mesh in the model.
@@ -70,8 +70,8 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _pat
     // aquire needed objects
     const SPtr<Mesh> mesh = _pModel->meshes[i];
     MeshAssetHeader meshHeader;
-    const uint32 indicesCount = static_cast<uint32>(mesh->indexVector.size());
-    const uint32 verticesCount = static_cast<uint32>(mesh->vertexVector.size());
+    const uint32 indicesCount = toUint32(mesh->indexVector.size());
+    const uint32 verticesCount = toUint32(mesh->vertexVector.size());
     const String name = mesh->getName();
     meshHeader.indexCount = indicesCount;
     meshHeader.vertexCount = verticesCount;

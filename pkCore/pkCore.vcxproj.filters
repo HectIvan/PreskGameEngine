@@ -279,6 +279,12 @@
     <ClInclude Include="include\pkShaderKey.h">
       <Filter>include\managers</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkActorCodec.h">
+      <Filter>include\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkActorResource.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -409,6 +415,12 @@
     </ClCompile>
     <ClCompile Include="source\pkCamera.cpp">
       <Filter>source\components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkActorCodec.cpp">
+      <Filter>source\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkActorResource.cpp">
+      <Filter>source\resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

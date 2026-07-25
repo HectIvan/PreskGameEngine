@@ -128,8 +128,8 @@ Logger::throwError(const String& _errorMSG) const
 void
 Logger::registerMessage(const String& _msg,
                         const ANSICHAR* _file,
-                        const uint32 _line,
-                        const LOG_MSG_TYPE::E _type)
+                        const uint32& _line,
+                        const LOG_MSG_TYPE::E& _type)
 {
   // register the message.
   const String time = g_TimeManager().getCurrentTime();
@@ -162,7 +162,7 @@ Vector<LogMSG>
 Logger::getMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 {
   Vector<LogMSG> messages;
-  const uint32 logCount = static_cast<uint32>(m_messages.size());
+  const uint32 logCount = toUint32(m_messages.size());
   for (uint32 i = 0; i < logCount; ++i) {
     const LogMSG& msg = m_messages[i];
     if (msg.type == _type) {
@@ -176,7 +176,7 @@ void
 Logger::printMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 {
   const Vector<LogMSG> messages = getMessageLogOfType(_type);
-  const uint32 logCount = static_cast<uint32>(messages.size());
+  const uint32 logCount = toUint32(messages.size());
   for (uint32 i = 0; i < logCount; ++i) {
     printMessage(messages[i]);
   }
@@ -185,7 +185,7 @@ Logger::printMessageLogOfType(const LOG_MSG_TYPE::E& _type)
 void
 Logger::clearLogsOfType(const LOG_MSG_TYPE::E& _type)
 {
-  uint32 logCount = static_cast<uint32>(m_messages.size());
+  uint32 logCount = toUint32(m_messages.size());
   for (uint32 i = 0; i < logCount; ++i) {
     if (m_messages[i].type == _type) {
       m_messages.erase(m_messages.begin() + i);
@@ -202,7 +202,7 @@ Logger::createLogFiles() const
 
   // create log file
   ofstream logFile("log/Log.txt", ios::out | ios::trunc);
-  const uint32 logCount = static_cast<uint32>(logs.size());
+  const uint32 logCount = toUint32(logs.size());
   for (uint32 i = 0; i < logCount; ++i) {
     const LogMSG& msg = logs[i];
     String message = "";

@@ -13,6 +13,14 @@ const FColor FColor::GREEN =   FColor(0.0f, 1.0f, 0.0f, 0.0f);
 const FColor FColor::MAGENTA = FColor(1.0f, 0.0f, 1.0f, 0.0f);
 const FColor FColor::CYAN =    FColor(0.0f, 1.0f, 1.0f, 0.0f);
 
+FColor::FColor(const Color& _color)
+{
+  r = static_cast<float>(_color._color.R) / 255.0f;
+  g = static_cast<float>(_color._color.G) / 255.0f;
+  b = static_cast<float>(_color._color.B) / 255.0f;
+  a = static_cast<float>(_color._color.A) / 255.0f;
+}
+
 Color
 FColor::toColor() const
 {

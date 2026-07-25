@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkFileManager.h" />
     <ClInclude Include="include\pkAABB.h" />
     <ClInclude Include="include\pkBlob.h" />
     <ClInclude Include="include\pkCapsule.h" />

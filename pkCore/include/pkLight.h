@@ -35,11 +35,32 @@ namespace LIGHT_TYPE
   };
 }
 
+struct LightDesc
+{
+  Vector3 dir;
+  float spotCutoff;
+  Vector3 pos;
+  float spotExp;
+  Vector3 color;
+  float shadowInt;
+  float specInt;
+  LIGHT_TYPE::E type;
+  Matrix4 transf;
+  Matrix4 viewProj;
+};
+
 class PK_CORE_EXPORT Light : public Component
 {
  public:
+  explicit
+  Light(const LightDesc& _desc) :
+    m_direction(_desc.dir), m_spotCutoff(_desc.spotCutoff), m_position(_desc.pos),
+    m_spotExponent(_desc.spotExp), m_color(_desc.color), m_shadowIntensity(_desc.shadowInt),
+    m_specIntensity(_desc.specInt), m_type(_desc.type), m_transform(_desc.transf),
+    m_viewProj(_desc.viewProj)
+  { }
   Light() {
-    m_type = pkEngineSDK::LIGHT_TYPE::kDirectional;
+    m_type = LIGHT_TYPE::kDirectional;
     m_spotCutoff = 0.10f;
     m_spotExponent = 32.0f;
     m_direction = Vector3(0, -1.0f, 0);
@@ -80,14 +101,14 @@ class PK_CORE_EXPORT Light : public Component
   getObjType() { return COMPONENT_TYPE::kLight; }
 
  public:
-  float m_type;
+  Vector3 m_direction = Vector3::FORWARD;
   float m_spotCutoff;
+  Vector3 m_position;
   float m_spotExponent;
+  Vector3 m_color = Vector3(1.0f);
   float m_shadowIntensity;
   float m_specIntensity;
-  Vector3 m_direction = Vector3::FORWARD;
-  Vector3 m_position;
-  Vector3 m_color = Vector3(1.0f);
+  float m_type;
 
   Matrix4 m_transform;
   Matrix4 m_viewProj;

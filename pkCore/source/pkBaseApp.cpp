@@ -59,16 +59,32 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
 
   DLLManager& dllManager = g_DLLManager();
   AssetResourceManager& assetResource = g_AssetResourceManager();
+  RendererManager& renderMan = g_RenderManager();
 
   initWin();
-  initAPI(_argv, _count);
+  // initAPI(_argv, _count);
 
+  Vector<const ANSICHAR*> dlls = { "pkModelCodec", "pkStbiImageCodec", "pkDX11API" };
+
+  const uint32 dllCount = toUint32(dlls.size());
 #if PK_DEBUG_MODE
-  dllManager.runDll("pkModelCodecd");
-  dllManager.runDll("pkStbiImageCodecd");
+  for (uint32 i = 0; i < dllCount; ++i) {
+    const String dllName = String(dlls[i]) + "d";
+    if (!dllManager.runDll(dllName)) {
+      const String msg = "Failed to load " + dllName;
+      LOG_FATAL(msg, __FILE__, __LINE__);
+      THROW_ERROR(msg);
+    }
+  }
 #else
-  dllManager.runDll("pkModelCodec");
-  dllManager.runDll("pkStbiImageCodec");
+  for (uint32 i = 0; i < dllCount; ++i) {
+    const ANSICHAR* dllName = dlls[i];
+    if (!dllManager.runDll(dllName)) {
+      const String msg = "Failed to load " + String(dllName);
+      LOG_FATAL(msg, __FILE__, __LINE__);
+      THROW_ERROR(msg);
+    }
+  }
 #endif
 
   g_GraphicAPI().init(m_window);
@@ -78,9 +94,24 @@ BaseApp::init(const ANSICHAR** _argv, int32 _count)
   g_ShaderManager().createShaders();
   g_MaterialManager().init();
   g_SceneManager().init();
-  g_RenderManager().init();
+  renderMan.init();
   g_TextureManager().init();
   g_ModelManager().init();
+
+  SceneManager& sceneMan = g_SceneManager();
+  SPtr<Scene> activeScene = sceneMan.getActiveScene();
+
+  // create camera
+  const Vector3 camPos = Vector3(0.0f, 0.0f, -30.0f);
+  CameraDesc camDescription;
+  camDescription.width = m_window.getWidth();
+  camDescription.height = m_window.getHeight();
+  camDescription.eye = camPos;
+  camDescription.isMain = true;
+
+  m_camera = activeScene->instantiate("Main Camera", camPos);
+  m_camera->setPosition(camPos);
+  m_camera->addComponent(renderMan.createCamera(camDescription));
 
   onInit();
 }
@@ -177,7 +208,7 @@ BaseApp::update()
    */
   const Vector<SPtr<Actor>> actors = activeScene->getAllActors();
   rm.m_lights.clear();
-  const uint32 actorCount = static_cast<uint32>(actors.size());
+  const uint32 actorCount = toUint32(actors.size());
   for (uint32 i = 0; i < actorCount; ++i) {
     SPtr<Light> light = actors[i]->getComponent<Light>();
     if (light) {
@@ -185,23 +216,32 @@ BaseApp::update()
     }
   }
 
-  rm.m_cameras.clear();
-  for (uint32 i = 0; i < actorCount; ++i) {
-    SPtr<Camera> camera = actors[i]->getComponent<Camera>();
-    if (camera) {
-      rm.m_cameras.push_back(camera);
-      if (camera->m_isMain) {
-        m_camera = actors[i];
-      }
-    }
+  // camera data.
+  Matrix4 view = Matrix4::IDENTITY;
+  Matrix4 proj = Matrix4::IDENTITY;
+  Matrix4 viewTransp = Matrix4::IDENTITY;
+  Matrix4 projTransp = Matrix4::IDENTITY;
+
+  SPtr<Camera> camera = rm.getMainCamera();
+  CBCamera camCBuffer;
+  if (camera) {
+    view = camera->getView();
+    proj = camera->getProjection();
+    viewTransp = view.getTransposed();
+    projTransp = proj.getTransposed();
+    camCBuffer = CBCamera(camera);
   }
-  SPtr<Camera> camera = m_camera->getComponent<Camera>();
 
   // if there's no actor light, search the scene for an actor with a light.
+  SPtr<Light> light = nullptr;
+  CBLight lightCBuffer;
   if (!m_light) {
     m_light = activeScene->getActorWithComponent<Light>();
   }
- SPtr<Light> light = m_light->getComponent<Light>();
+  if (m_light) {
+    light = m_light->getComponent<Light>();
+    lightCBuffer = CBLight(light);
+  }
 
   // get all passes.
   const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
@@ -224,19 +264,6 @@ BaseApp::update()
   const CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
   const CBVector2x2 ssao(m_ssaoSRad, m_ssaoScale, m_ssaoBias, m_ssaoInt);
 
-  // camera data.
-  Matrix4 view = Matrix4::IDENTITY;
-  Matrix4 proj = Matrix4::IDENTITY;
-  Matrix4 viewTransp = Matrix4::IDENTITY;
-  Matrix4 projTransp = Matrix4::IDENTITY;
-
-  if (camera) {
-    view = camera->getView();
-    proj = camera->getProjection();
-    viewTransp = view.getTransposed();
-    projTransp = proj.getTransposed();
-  }
-
   // data type sizes.
   const uint32 m4x4Size = sizeof(Matrix4);
   const uint32 v2x2Size = sizeof(CBVector2x2);
@@ -247,9 +274,6 @@ BaseApp::update()
   // skybox constant buffers.
   skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
-
-  CBLight lightCBuffer(light);
-  CBCamera camCBuffer(camera);
 
   brdfPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
   brdfTranspPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
@@ -318,8 +342,8 @@ BaseApp::render()
   // const Vector2 texSize = api.getSwapChain()->getSize();
   // const uint32 threadWidth = 16;
   // const uint32 threadHeight = 16;
-  // const uint32 x = static_cast<uint32>((texSize.x + threadWidth - 1) / threadWidth);
-  // const uint32 y = static_cast<uint32>((texSize.y + threadHeight - 1) / threadHeight);
+  // const uint32 x = toUint32((texSize.x + threadWidth - 1) / threadWidth);
+  // const uint32 y = toUint32((texSize.y + threadHeight - 1) / threadHeight);
 
   BRDF->beginPass(FColor::WHITE);
   api.draw(3, 0);

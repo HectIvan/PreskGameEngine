@@ -50,7 +50,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   const Vector3 scale = _pActor->m_scale;
   const bool isActive = _pActor->isActive();
   const uint8 isActiveRaw = isActive ? 1 : 0;
-  const uint32 componentCount = static_cast<uint32>(_pActor->m_components.size());
+  const uint32 componentCount = _pActor->getComponentCount();
 
   SPtr<ActorResource> actorRes = make_shared<ActorResource>();
   actorRes->m_position = position;
@@ -58,8 +58,8 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   actorRes->m_scale = scale;
   actorRes->m_isActive = isActive;
   
-  const String id = UUID::generateRandomUUIDFromString(actorName);
-  actorRes->writeBaseHeader(file, id, "", actorName + ".pka");
+  const UUID id = UUID::generateRandomUUIDFromString(actorName);
+  actorRes->writeBaseHeader(file);
 
   file.write(reinterpret_cast<const ANSICHAR*>(&position), v3Size);
   file.write(reinterpret_cast<const ANSICHAR*>(&rotation), v3Size);
@@ -68,23 +68,19 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   file.write(reinterpret_cast<const ANSICHAR*>(&componentCount), sizeof(uint32));
 
   // if the actor has a parent, save its ID.
-  if (_pActor->m_parent) {
-    const String parentID = UUID::generateRandomUUIDFromString(_pActor->m_parent->getName());
-    const SIZE_T idSize = parentID.length();
+  if (_pActor->hasParent()) {
+    const UUID parentID = UUID::generateRandomUUIDFromString(_pActor->getParent()->getName());
     file.write(reinterpret_cast<const ANSICHAR*>(true), sizeof(bool));
-    file.write(reinterpret_cast<const ANSICHAR*>(&idSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const ANSICHAR*>(&parentID), idSize);
+    file.write(reinterpret_cast<const ANSICHAR*>(&parentID), sizeof(UUID));
   }
   else {
-    const SIZE_T idSize = UUID::PK_DEFAULT_UUID.length();
     file.write(reinterpret_cast<const ANSICHAR*>(0), sizeof(uint32));
-    file.write(reinterpret_cast<const ANSICHAR*>(&idSize), sizeof(SIZE_T));
-    file.write(reinterpret_cast<const ANSICHAR*>(&UUID::PK_DEFAULT_UUID), sizeof(ANSICHAR));
+    file.write(reinterpret_cast<const ANSICHAR*>(&UUID::PK_DEFAULT_UUID), sizeof(UUID));
   }
 
   // iterate through the components and save them.
   for (uint32 i = 0; i < componentCount; ++i) {
-    SPtr<Component> pComp = _pActor->m_components[i];
+    SPtr<Component> pComp = _pActor->getComponent(i);
 
     const COMPONENT_TYPE::E compType = pComp->getType();
     file.write(reinterpret_cast<const ANSICHAR*>(&compType), sizeof(COMPONENT_TYPE::E));
@@ -100,9 +96,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
       SPtr<BaseResource> modelRes = modelCodec.createResourceFromModel(model, resourcePath);
 
       // save the resource id.
-      const SIZE_T idSize = modelRes->m_id.length();
-      file.write(reinterpret_cast<const ANSICHAR*>(idSize), sizeof(SIZE_T));
-      file.write(reinterpret_cast<const ANSICHAR*>(modelRes->m_id.c_str()), idSize);
+      file.write(reinterpret_cast<const ANSICHAR*>(&modelRes->m_id), sizeof(UUID));
     }
     // if the component is a light, save it in the actor itself.
     if (compType == COMPONENT_TYPE::kLight) {
@@ -116,9 +110,9 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   file.close();
 
   // recursive saving of children.
-  const uint32 childCount = static_cast<uint32>(_pActor->m_children.size());
+  const uint32 childCount = _pActor->getChildCount();
   for (uint32 i = 0; i < childCount; ++i) {
-    createResource(_pActor->m_children[i]);
+    createResource(_pActor->getChild(i));
   }
 
 

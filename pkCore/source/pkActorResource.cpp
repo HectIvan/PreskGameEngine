@@ -34,7 +34,7 @@ ActorResource::load()
   
   // if the direcory cannot be opened.
   if (!file.is_open()) {
-    const String msg = "Failed to open actor resource at directory " + m_resourcePath + ".";
+    const String msg = "Failed to open actor resource at directory " + String(m_resourcePath) + ".";
     log.registerMessage(msg, __FILE__, __LINE__, LOG_MSG_TYPE::kError);
     return;
   }
@@ -72,5 +72,15 @@ ActorResource::load()
   }
 
   file.close();
+}
+
+void
+ActorResource::unload()
+{
+  m_position = Vector3::ZERO;
+  m_rotation = Vector3::ZERO;
+  m_scale = Vector3(1);
+  m_isActive = true;
+  m_componentCount = 0;
 }
 }

@@ -98,11 +98,14 @@ ShaderManager::createShaderResource(const ShaderKey& _shaderData,
   SPtr<Shader> shader = api.internalCreateShader(_type);
   shader->setData(_shaderData);
   shader->compileFromFile();
-  // create the shader based on its type.
-  createShaderByType(shader);
-  // create the resource from the shader.
-  SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(shader);
-  insertShader(res->m_id, shader);
+  // if the shader managed to be compiled.
+  if (!shader->m_pSBlob.empty()) {
+    // create the shader based on its type.
+    createShaderByType(shader);
+    // create the resource from the shader.
+    SPtr<BaseResource> res = g_ShaderCodec().createResourceFromShader(shader);
+    insertShader(res->m_id, shader);
+  }
 }
 
 void

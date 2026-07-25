@@ -53,10 +53,10 @@ void
 SceneManager::setActive(const uint32& _index) const
 {
   // check if the index is inside the range of existing scenes.
-  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  const uint32 sceneCount = toUint32(m_scenes.size());
   if (_index > sceneCount - 1 && !(_index < 0)) {
     String errMsg = "setActive call out of bounds. index accesed: " + to_string(_index);
-    errMsg += ". Current scene count: " + to_string(static_cast<uint32>(m_scenes.size()));
+    errMsg += ". Current scene count: " + to_string(toUint32(m_scenes.size()));
     LOG_WARNING(errMsg, __FILE__, __LINE__);
     return;
   }
@@ -71,7 +71,7 @@ SceneManager::setActive(const uint32& _index) const
 SPtr<Scene>
 SceneManager::getActiveScene() const
 {
-  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  const uint32 sceneCount = toUint32(m_scenes.size());
   for (uint32 i = 0; i < sceneCount; ++i) {
     if (m_scenes[i]->isActive()) {
       return m_scenes[i];
@@ -83,7 +83,7 @@ SceneManager::getActiveScene() const
 void
 SceneManager::clear()
 {
-  const uint32 sceneCount = static_cast<uint32>(m_scenes.size());
+  const uint32 sceneCount = toUint32(m_scenes.size());
   for (uint32 i = 0; i < sceneCount; ++i) {
     m_scenes[i]->clear();
   }

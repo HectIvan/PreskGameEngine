@@ -126,6 +126,46 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   createPasses();
 
   /**
+   * @brief Create a camera and store it in the memory.
+   * @param _desc Camera description.
+   */
+  SPtr<Camera>
+  createCamera(const CameraDesc& _desc);
+  
+  /**
+   * @brief Get the main camera.
+   */
+  SPtr<Camera>
+  getMainCamera() const;
+
+  /**
+   * @brief Get a specific camera.
+   * @param _index Index of the camera.
+   */
+  PK_NODISCARD SPtr<Camera>
+  getCamera(const uint32& _index) const;
+
+  /**
+   * @brief Create a light based on a description.
+   * @param _desc Light description.
+   */
+  SPtr<Light>
+  createLight(const LightDesc& _desc);
+
+  /**
+   * @brief Create a basic light.
+   */
+  SPtr<Light>
+  createLight();
+
+  /**
+   * @brief Get a specific light.
+   * @param _index Index of the light.
+   */
+  PK_NODISCARD SPtr<Light>
+  getLight(const uint32& _index) const;
+
+  /**
    * @brief Get a pass from the map.
    * @param _type Pass type to search for.
    * @return Pointer to the pass.
@@ -171,6 +211,20 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    */
   SPtr<Texture>
   getUAVBuffer(const UAV_BUFFERS::E _type);
+
+  /**
+   * @brief Set the renderer skybox.
+   * @param _pTexture New skybox texture.
+   */
+  void
+  setSkybox(const SPtr<Texture>& _pTexture);
+
+  /**
+   * @brief Set the skybox from a uuid.
+   * @param _id UUID of the new texture.
+   */
+  void
+  setSkybox(const UUID& _id);
 
   /**
    * @brief Generate a cubemap from a texture.

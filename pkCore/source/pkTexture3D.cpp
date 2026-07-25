@@ -31,7 +31,7 @@ Texture3D::Texture3D(const uint32 _width,
                      const Vector<SPtr<Texture>> _textures)
 {
   // check if the texture slices meet the width and height sent as parameters.
-  const uint32 texCount = static_cast<uint32>(_textures.size());
+  const uint32 texCount = toUint32(_textures.size());
   for (uint32 i = 0; i < texCount; ++i) {
     SPtr<Texture> texture = _textures[i];
     if (texture->getWidth() != _width || texture->getHeight() != _height) {

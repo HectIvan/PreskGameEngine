@@ -32,13 +32,10 @@ struct PK_UTILITY_EXPORT FColor final
 {
   FColor() = default;
   // constructor with select colors
-  FColor(const float& _r, const float& _g, const float& _b, const float& _a = 1.0f)
-  {
-    r = _r;
-    g = _g;
-    b = _b;
-    a = _a;
-  }
+  FColor(const float& _r, const float& _g, const float& _b, const float _a = 1.0f) :
+    r(_r), g(_g), b(_b), a(_a)
+  {}
+  FColor(const Color& _color);
   // constructor with one set color & alpha
   explicit FColor(const float& _rgb, const float& _a)
   {
@@ -129,6 +126,12 @@ struct PK_UTILITY_EXPORT FColor final
   {
     *this = *this + _other;
     return *this;
+  }
+
+  FColor
+  operator-(const FColor& _other) const
+  {
+    return FColor(r - _other.r, g - _other.g, b - _other.b, a - _other.a);
   }
 
   /**

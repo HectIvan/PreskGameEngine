@@ -179,9 +179,11 @@ Pass::Pass(const PixelDesc& _desc)
    */
   if (!_desc.vSKey.isEmpty()) {
     m_pVShader = shaderMan.getShader(_desc.vSKey);
-    // create the input layout for the shader.
-    m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader.lock());
-    shaderDirty = true;
+    if (m_pVShader.lock()) {
+      // create the input layout for the shader.
+      m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader.lock());
+      shaderDirty = true;
+    }
   };
   // verify if the shader was created correctly.
   if (shaderDirty && m_pVShader.expired()) {
@@ -198,7 +200,9 @@ Pass::Pass(const PixelDesc& _desc)
   shaderDirty = false;
   if (!_desc.pSKey.isEmpty()) {
     m_pPShader = shaderMan.getShader(_desc.pSKey);
-    shaderDirty = true;
+    if (m_pPShader.lock()) {
+      shaderDirty = true;
+    }
   }
   // verify if the shader was created correctly.
   if (shaderDirty && m_pPShader.expired()) {
@@ -233,7 +237,9 @@ Pass::Pass(const ComputeDesc& _desc)
   bool shaderDirty = false;
   if (!_desc.cSKey.isEmpty()) {
     m_pCShader = shaderMan.getShader(_desc.cSKey);
-    shaderDirty = true;
+    if (m_pCShader.lock()) {
+      shaderDirty = true;
+    }
   }
   // verify if the shader was created correctly.
   if (shaderDirty && m_pCShader.expired()) {

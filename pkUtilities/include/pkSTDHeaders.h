@@ -32,20 +32,31 @@
 namespace pkEngineSDK
 {
 
+using Exception = std::exception;
+
+using String = std::string;
+
+// to do: change for linux too
+using WString = std::wstring;
+
 template<class T>
 using Function = std::function<T>;
 
-using std::make_unique;
+template<class T>
+using Queue = std::queue<T>;
 
-using std::make_shared;
+template<class T>
+using SPtr = std::shared_ptr<T>;
 
-using std::reinterpret_pointer_cast;
+template<class T>
+using Stack = std::stack<T>;
 
-using std::move;
+template<class T>
+using UPtr = std::unique_ptr<T>;
 
-using std::rand;
+using std::cout;
 
-using std::to_string;
+using std::endl;
 
 using std::fstream;
 
@@ -55,32 +66,25 @@ using std::ifstream;
 
 using std::ios;
 
+using std::make_unique;
+
+using std::make_shared;
+
 using std::ofstream;
 
-using std::cout;
+using std::ios_base;
 
-using std::endl;
+using std::move;
 
-using Exception = std::exception;
+using std::rand;
+
+using std::reinterpret_pointer_cast;
+
+using std::to_string;
+
+using std::swap;
 
 using Runtime_error = std::runtime_error;
-
-template <class T>
-using Queue = std::queue<T>;
-
-template<class T>
-using SPtr = std::shared_ptr<T>;
-
-template <class T>
-using Stack = std::stack<T>;
-
-using String = std::string;
-
-template<class T>
-using UPtr = std::unique_ptr<T>;
-
-// to do: change for linux too
-using WString = std::wstring;
 
 PKFORCEINLINE String
 stringToLower(const String& _string)

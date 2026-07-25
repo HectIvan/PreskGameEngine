@@ -169,6 +169,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\pkActorCodec.h" />
+    <ClInclude Include="include\pkActorResource.h" />
     <ClInclude Include="include\pkShaderKey.h" />
     <ClInclude Include="include\pkTexture3D.h" />
     <ClInclude Include="include\pkAssetResourceManager.h" />
@@ -236,6 +238,8 @@
     <ClInclude Include="include\pkSceneManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\pkActorCodec.cpp" />
+    <ClCompile Include="source\pkActorResource.cpp" />
     <ClCompile Include="source\pkLight.cpp" />
     <ClCompile Include="source\pkTexture3D.cpp" />
     <ClCompile Include="source\pkActor.cpp" />

@@ -25,11 +25,18 @@ class PK_CORE_EXPORT ActorResource : public BaseResource
  public:
   ActorResource() = default;
   virtual ~ActorResource() = default;
+
   /**
    * @brief Load the actor resource.
    */
   void
   load() override;
+
+  /**
+   * @brief Unload the actor resource.
+   */
+  void
+  unload() override;
 
   /**
    * @brief Get the resource type.

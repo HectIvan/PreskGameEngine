@@ -129,6 +129,9 @@
     <ClInclude Include="include\pkFColor.h">
       <Filter>include\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkFileManager.h">
+      <Filter>include\system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkPlatformMath.cpp">

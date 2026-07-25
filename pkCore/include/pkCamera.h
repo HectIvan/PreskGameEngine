@@ -49,7 +49,8 @@ struct CameraDesc
              const Vector3& _eye,
              const Vector3& _forward,
              const Vector3& _right,
-             const CAMERA_PROJ::E& _camMode) {
+             const CAMERA_PROJ::E& _camMode,
+             const bool _isMain = false) {
     width = _width;
     height = _height;
     halfFOV = _halfFOV;
@@ -59,6 +60,7 @@ struct CameraDesc
     forward = _forward;
     right = _right;
     camMode = _camMode;
+    isMain = _isMain;
   }
   uint32 width = 1920;
   uint32 height = 1080;
@@ -69,6 +71,7 @@ struct CameraDesc
   Vector3 forward = Vector3::FORWARD;
   Vector3 right = Vector3::RIGHT;
   CAMERA_PROJ::E camMode = CAMERA_PROJ::E::kPerspective;
+  bool isMain = false;
 };
 
 class PK_CORE_EXPORT Camera : public Component

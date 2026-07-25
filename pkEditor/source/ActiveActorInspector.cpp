@@ -15,6 +15,7 @@
 **/
 /*********************************************/
 #include "ActiveActorInspector.h"
+#include "pkModelCodec.h"
 #include "pkModelManager.h"
 #include "pkModelResource.h"
 #include "pkModel.h"
@@ -26,15 +27,19 @@
 using pkEngineSDK::BaseResource;
 using pkEngineSDK::Component;
 using pkEngineSDK::g_uInterface;
+using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_ModelManager;
 using pkEngineSDK::make_shared;
 using pkEngineSDK::int32;
 using pkEngineSDK::Model;
+using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelManager;
 using pkEngineSDK::ModelResource;
 using pkEngineSDK::Path;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::String;
+using pkEngineSDK::toUint32;
+using pkEngineSDK::uint32;
 using pkEngineSDK::UInterface;
 using pkEngineSDK::UUID;
 using pkEngineSDK::Vector;
@@ -44,6 +49,7 @@ ActiveActorInspector::init(Window& _window, SPtr<Actor>& _pActor)
 {
   UInterface& im = g_uInterface();
   ModelManager& modelMan = g_ModelManager();
+  ModelCodec& modelCod = g_ModelCodec();
   // transform window
   if (im.collapsingHeader("Transform", kPK_DefaultOpen)) {
     String name = _pActor->getName();
@@ -74,13 +80,18 @@ ActiveActorInspector::init(Window& _window, SPtr<Actor>& _pActor)
       }
       // if a model component is to be added.
       if (val == 0) {
-        Path path = _window.openFileFromExplorer("Model Files", "*.fbx;*.obj;*.gltf");
-        if (path.toString() != "") {
-          SPtr<BaseResource> resource = make_shared<ModelResource>();
-          resource->softLoad(path);
-          const SPtr<Model> model = modelMan.createModel(resource->m_id);
-          modelMan.insertModel(resource->m_id, model);
-          _pActor->addComponent(model);
+        Vector<Path> path = _window.openFileFromExplorer("Model Files",
+                                                         modelCod.getPossibleExtensions());
+        const uint32 fileCount = toUint32(path.size());
+        for (uint32 i = 0; i < fileCount; ++i) {
+          Path file = path[i];
+          if (file.toString() != "") {
+            SPtr<BaseResource> resource = make_shared<ModelResource>();
+            resource->softLoad(file);
+            const SPtr<Model> model = modelMan.createModel(resource->m_id);
+            modelMan.insertModel(resource->m_id, model);
+            _pActor->addComponent(model);
+          }
         }
       }
     }

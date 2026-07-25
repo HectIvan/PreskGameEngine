@@ -28,6 +28,8 @@
 namespace pkEngineSDK 
 {
 
+struct Color;
+struct FColor;
 class Vector2;
 class Vector4;
 class Quaternion;
@@ -48,8 +50,12 @@ class PK_UTILITY_EXPORT PlatformMath
 
   /**
    * @brief Get the absolute value of _x.
-   * @param _x Number to calculate the absolute value.
-   * @return Absolute value of the parameter.
+   */
+  PK_NODISCARD static int32
+  abs(const int32& _x);
+
+  /**
+   * @brief Get the absolute value of _x.
    */
   PK_NODISCARD static float
   abs(const float& _x);
@@ -65,19 +71,27 @@ class PK_UTILITY_EXPORT PlatformMath
 
   /**
    * @brief Get Euler elevated by _x.
-   * @param _x Number to elevate Euler.
-   * @return Result of Euler elevated by _x.
    */
   PK_NODISCARD static float
   exp(const float& _x);
 
   /**
    * @brief Get the square root of _x.
-   * @param _x Number to calculate the square root.
-   * @return Square root of _x.
    */
   PK_NODISCARD static float
   sqrt(const float& _x);
+
+  /**
+   * @brief Compute the floating-point remainder of a division operation x / y
+   */
+  PK_NODISCARD static float
+  fmod(const float& _x, const float& _y);
+
+  /**
+   * @brief Floor a float number down to its closest integer.
+   */
+  PK_NODISCARD static int32
+  floor(const float& _x);
 
   /**
    * @brief Get the lowest of 2 parameters.
@@ -87,6 +101,15 @@ class PK_UTILITY_EXPORT PlatformMath
    */
   PK_NODISCARD static uint32
   min(const uint32& _x, const uint32& _y);
+
+  /**
+   * @brief Get the lowest of 2 parameters.
+   * @param _x First number to compare.
+   * @param _y Second number to compare.
+   * @return Whichever value is the smallest.
+   */
+  PK_NODISCARD static int32
+  min(const int32& _x, const int32& _y);
 
   /**
    * @brief Get the lowest of 2 parameters.
@@ -315,7 +338,7 @@ class PK_UTILITY_EXPORT PlatformMath
   isInRange(const uint32& _t, const uint32& _x, const uint32& _y);
 
   /**
-   * @brief Gets the lerped number between 2 numbers in a specific timestamp.
+   * @brief Lerp a number in a specific timestamp.
    * @param _x The first number.
    * @param _y The second number.
    * @param _t Timestamp.
@@ -325,7 +348,7 @@ class PK_UTILITY_EXPORT PlatformMath
   lerp(const float& _x, const float& _y, const float& _t);
 
   /**
-   * @brief Gets the lerped number between 2 Vectors in a specific timestamp.
+   * @brief Lerp a Vector in a specific timestamp.
    * @param _x The first Vector.
    * @param _y The second Vector.
    * @param _t Timestamp.
@@ -335,7 +358,7 @@ class PK_UTILITY_EXPORT PlatformMath
   lerp(const Vector2& _x, const Vector2& _y, const float& _t);
 
   /**
-   * @brief Gets the lerped number between 2 Vectors in a specific timestamp.
+   * @brief Lerp a Vector in a specific timestamp.
    * @param _x First Vector.
    * @param _y Second Vector.
    * @param _t Timestamp.
@@ -345,7 +368,7 @@ class PK_UTILITY_EXPORT PlatformMath
   lerp(const Vector3& _x, const Vector3& _y, const float& _t);
 
   /**
-   * @brief Gets the lerped number between 2 Vector4 in a specific timestamp.
+   * @brief Lerp a Vector in a specific timestamp.
    * @param _x First Vector.
    * @param _y Second Vector.
    * @param _t Timestamp.
@@ -353,6 +376,24 @@ class PK_UTILITY_EXPORT PlatformMath
    */
   PK_NODISCARD static Vector4
   lerp(const Vector4& _x, const Vector4& _y, const float& _t);
+
+  /**
+   * @brief Lerp an FColor in a specific timestamp.
+   * @param _x FColor to lerp.
+   * @param _y Target FColor.
+   * @return Lerped FColor.
+   */
+  PK_NODISCARD static FColor
+  lerp(const FColor& _x, const FColor& _y, const float& _t);
+
+  /**
+   * @brief Lerp a Color in a specific timestamp.
+   * @param _x Color to lerp.
+   * @param _y Target Color.
+   * @return Lerped Color.
+   */
+  PK_NODISCARD static Color
+  lerp(const Color& _x, const Color& _y, const float& _t);
 
   /**
    * @brief Hooke's law of elasticity.

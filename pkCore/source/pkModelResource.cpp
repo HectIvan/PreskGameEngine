@@ -99,7 +99,7 @@ ModelResource::unload()
   m_vertex.clear();
   m_index.clear();
 
-  const uint32 meshCount = static_cast<uint32>(m_meshes.size());
+  const uint32 meshCount = toUint32(m_meshes.size());
   for (uint32 i = 0; i < meshCount; ++i) {
     m_meshes[i]->clean();
   }

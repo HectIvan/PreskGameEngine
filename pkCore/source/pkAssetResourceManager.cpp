@@ -66,7 +66,7 @@ AssetResourceManager::loadAssetsFromResourcesFolder()
   m_allResources.clear();
 
   const Vector<Path> paths = FileSystem::getFilesFromFolder(m_resourcesFolder);
-  const uint32 pathCount = static_cast<uint32>(paths.size());
+  const uint32 pathCount = toUint32(paths.size());
 
   // iterate through all found resources.
   for (uint32 i = 0; i < pathCount; ++i) {

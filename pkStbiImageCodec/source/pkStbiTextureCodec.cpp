@@ -40,7 +40,7 @@ StbiTextureCodec::createResource(const String& _name,
                                  const int32& _width,
                                  const int32& _height,
                                  const int32& _bpp,
-                                 const uint32& _format,
+                                 const PK_GRAPHICS_FORMAT::E& _format,
                                  const uint32& _mipCount,
                                  Vector<uint8>& _data)
 {
@@ -59,7 +59,7 @@ StbiTextureCodec::createResource(const String& _name,
   const SIZE_T dataSize = static_cast<SIZE_T>(_width * _height * _bpp);
 
   // create texture resource.
-  SPtr<TextureResource> textureRes = make_shared<TextureResource>();
+  SPtr<TextureResource> textureRes = pk_shared_ptr_new<TextureResource>();
 
   const UUID id = TextureResource::generateID(resourcePath.c_str());
   textureRes->fillBaseHeader(id, textureName, _name, resourcePath);
@@ -69,7 +69,7 @@ StbiTextureCodec::createResource(const String& _name,
   file.write(reinterpret_cast<const ANSICHAR*>(&_width), sizeInt);
   file.write(reinterpret_cast<const ANSICHAR*>(&_height), sizeInt);
   file.write(reinterpret_cast<const ANSICHAR*>(&_bpp), sizeInt);
-  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeInt);
+  file.write(reinterpret_cast<const ANSICHAR*>(&_format), sizeof(PK_GRAPHICS_FORMAT::E));
   file.write(reinterpret_cast<const ANSICHAR*>(&_mipCount), sizeInt);
   file.write(reinterpret_cast<ANSICHAR*>(&_data[0]), dataSize);
   file.close();
@@ -93,7 +93,7 @@ StbiTextureCodec::createResource(const Path& _path)
   int32 width, height, bpp;
 
   UANSICHAR* data;
-  PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  PK_GRAPHICS_FORMAT::E format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
 
   const String extension = _path.getExtension();
   const String fullPath = FileSystem::getAbsolutePath(_path).toString();
@@ -104,7 +104,7 @@ StbiTextureCodec::createResource(const Path& _path)
     float* dataF = stbi_loadf(fullPath.c_str(), &width, &height, &bpp, 4);
     data = reinterpret_cast<UANSICHAR*>(dataF);
     bpp = 4 * sizeof(float);
-    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+    format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
     mipcount = 0;
   }
   // load normal data for other file types.
@@ -126,16 +126,10 @@ StbiTextureCodec::createResource(const Path& _path)
   }
 
   const SIZE_T dataSize = static_cast<SIZE_T>(width * height * bpp);
-  Vector<uint8> finalData(dataSize);
+  Vector<byte> finalData(dataSize);
   memcpy(finalData.data(), data, dataSize);
 
-  SPtr<TextureResource> textureRes = createResource(fileName,
-                                                    width,
-                                                    height,
-                                                    bpp,
-                                                    static_cast<uint32>(format),
-                                                    mipcount,
-                                                    finalData);
+  auto textureRes = createResource(fileName, width, height, bpp, format, mipcount, finalData);
 
   if (data) { stbi_image_free(data); }
 

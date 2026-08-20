@@ -22,12 +22,17 @@
 namespace pkEngineSDK
 {
 
-struct Color;
-
 class DX11Texture : public Texture
 {
  public:
   DX11Texture() = default;
+  DX11Texture(const Vector2& _size) {
+    setSize(_size);
+  }
+  DX11Texture(const uint32& _width, const uint32& _height) {
+    setWidth(_width);
+    setHeight(_height);
+  }
   DX11Texture(D3DTexture2D* _t2d,
               const Vector<PKRenderTargetView*>& _rTVs = { nullptr },
               PKDepthStencilView* _dSV = nullptr,
@@ -55,7 +60,7 @@ class DX11Texture : public Texture
    * @brief Get the DirectX texture.
    * @return Pointer to the resource.
    */
-  PKFORCEINLINE D3DTexture2D*
+  PK_NODISCARD PKFORCEINLINE D3DTexture2D*
   getTexture2D() const { return m_t2d; }
 
   /**
@@ -84,15 +89,8 @@ class DX11Texture : public Texture
    * @param _index Index of the RTV to get.
    * @return Pointer to the target.
    */
-  PKFORCEINLINE PKRenderTargetView*
+  PK_NODISCARD PKFORCEINLINE const PKRenderTargetView*
   getRTV(const int32& _index = 0) const { return m_rTVs[_index]; }
-
-  /**
-   * @brief Get the render target view.
-   * @return Vect of render target views.
-   */
-  PKFORCEINLINE Vector<PKRenderTargetView*>
-  getRTVs() const { return m_rTVs; }
 
   /**
    * @brief Set the render target view.
@@ -101,6 +99,13 @@ class DX11Texture : public Texture
    */
   PKFORCEINLINE void
   setRTV(PKRenderTargetView* _rTV, const int32& _index) { m_rTVs[_index] = _rTV; }
+
+  /**
+   * @brief Get the render target view.
+   * @return Vect of render target views.
+   */
+  PK_NODISCARD PKFORCEINLINE const Vector<PKRenderTargetView*>&
+  getRTVs() const { return m_rTVs; }
 
   /**
    * @brief Set the render target views.
@@ -113,7 +118,7 @@ class DX11Texture : public Texture
    * @brief Get the shader resource view.
    * @return Pointer to the resource.
    */
-  PKFORCEINLINE PKShaderResourceView*
+  PK_NODISCARD PKFORCEINLINE PKShaderResourceView*
   getSRV() const { return m_sRV; }
 
   /**
@@ -127,14 +132,14 @@ class DX11Texture : public Texture
    * @brief Get the unordered access view of an index.
    * @return Pointer to the view.
    */
-  PKFORCEINLINE PKUnorderedAccessView*
+  PK_NODISCARD PKFORCEINLINE const PKUnorderedAccessView*
   getUAV(const int32& _index) const { return m_uAVs[_index]; }
 
   /**
    * @brief Get the unordered access views.
    * @return Vector of UAVs.
    */
-  PKFORCEINLINE Vector<PKUnorderedAccessView*>
+  PK_NODISCARD PKFORCEINLINE const Vector<PKUnorderedAccessView*>&
   getUAVs() const { return m_uAVs; }
 
   /**

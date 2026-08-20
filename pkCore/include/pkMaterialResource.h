@@ -61,6 +61,22 @@ class PK_CORE_EXPORT MaterialResource : public BaseResource
     return UUID::generateRandomUUIDFromString(String(_matName) + "Material");
   }
 
+  /**
+   * @brief Generate an ID from the material name.
+   */
+  PK_NODISCARD static UUID
+  generateID(const String& _matName) {
+    return UUID::generateRandomUUIDFromString(_matName + "Material");
+  }
+
+  /**
+   * @brief Generate an ID from the material name.
+   */
+  PK_NODISCARD static UUID
+  generateID(const Path& _matName) {
+    return UUID::generateRandomUUIDFromString(_matName.toString() + "Material");
+  }
+
  public:
   UUID m_shaderID;
   UUID m_albedoID;

@@ -29,13 +29,13 @@ using pkEngineSDK::Component;
 using pkEngineSDK::g_uInterface;
 using pkEngineSDK::g_ModelCodec;
 using pkEngineSDK::g_ModelManager;
-using pkEngineSDK::make_shared;
 using pkEngineSDK::int32;
 using pkEngineSDK::Model;
 using pkEngineSDK::ModelCodec;
 using pkEngineSDK::ModelManager;
 using pkEngineSDK::ModelResource;
 using pkEngineSDK::Path;
+using pkEngineSDK::pk_shared_ptr_new;
 using pkEngineSDK::PK_TREENODE_FLAGS::kPK_DefaultOpen;
 using pkEngineSDK::String;
 using pkEngineSDK::toUint32;
@@ -86,7 +86,7 @@ ActiveActorInspector::init(Window& _window, SPtr<Actor>& _pActor)
         for (uint32 i = 0; i < fileCount; ++i) {
           Path file = path[i];
           if (file.toString() != "") {
-            SPtr<BaseResource> resource = make_shared<ModelResource>();
+            SPtr<BaseResource> resource = pk_shared_ptr_new<ModelResource>();
             resource->softLoad(file);
             const SPtr<Model> model = modelMan.createModel(resource->m_id);
             modelMan.insertModel(resource->m_id, model);

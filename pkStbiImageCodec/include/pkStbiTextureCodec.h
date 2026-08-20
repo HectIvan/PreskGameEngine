@@ -39,21 +39,21 @@ class StbiTextureCodec : public TextureCodec
    * @param _mipCount Mip map count of the texture.
    * @param _data Data of the texture.
    */
-  SPtr<TextureResource>
+  PK_NODISCARD SPtr<TextureResource>
   createResource(const String& _name,
                  const int32& _width,
                  const int32& _height,
                  const int32& _bpp,
-                 const uint32& _format,
+                 const PK_GRAPHICS_FORMAT::E& _format,
                  const uint32& _mipCount,
-                 Vector<uint8>& _data) override;
+                 Vector<byte>& _data) override;
 
   /**
    * @brief Create a texture resource from a file using STBI.
    * @param _path Where to look for the file.
    * @return texture resource.
    */
-  SPtr<TextureResource>
+  PK_NODISCARD SPtr<TextureResource>
   createResource(const Path& _path) override;
 };
 }

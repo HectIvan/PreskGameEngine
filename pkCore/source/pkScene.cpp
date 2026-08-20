@@ -23,7 +23,7 @@ namespace pkEngineSDK
 SPtr<Actor>
 createActor()
 {
-  SPtr<Actor> gActor = make_shared<Actor>("", Matrix4::IDENTITY);
+  SPtr<Actor> gActor = pk_shared_ptr_new<Actor>("", Matrix4::IDENTITY);
   return gActor;
 }
 

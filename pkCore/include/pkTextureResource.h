@@ -20,15 +20,6 @@
 namespace pkEngineSDK
 {
 
-struct TextureAssetHeader
-{
-  int32 width;
-  int32 height;
-  int32 bpp;
-  uint32 format;
-  uint32 mipMapCount;
-};
-
 class PK_CORE_EXPORT TextureResource : public BaseResource
 {
  public:
@@ -69,11 +60,27 @@ class PK_CORE_EXPORT TextureResource : public BaseResource
     return UUID::generateRandomUUIDFromString(String(_texDir) + "Texture");
   }
 
+  /**
+   * @brief Generate an id from the texture directory.
+   */
+  PK_NODISCARD static UUID
+  generateID(const String& _texDir) {
+    return UUID::generateRandomUUIDFromString(_texDir + "Texture");
+  }
+
+  /**
+   * @brief Generate an id from the texture directory.
+   */
+  PK_NODISCARD static UUID
+  generateID(const Path& _texDir) {
+    return UUID::generateRandomUUIDFromString(_texDir.toString() + "Texture");
+  }
+
  public:
   int32 m_width;
   int32 m_height;
   int32 m_bpp;
-  uint32 m_format;
+  PK_GRAPHICS_FORMAT::E m_format;
   uint32 m_mipMapCount;
   Vector<uint8> m_data;
 };

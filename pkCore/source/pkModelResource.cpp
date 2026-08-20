@@ -40,7 +40,7 @@ ModelResource::load()
   for (uint32 i = 0; i < modelHeader.meshCount; ++i) {
     MeshAssetHeader meshHeader;
     // create the mesh
-    SPtr<Mesh> mesh = make_shared<Mesh>();
+    SPtr<Mesh> mesh = pk_shared_ptr_new<Mesh>();
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.name), PK_RESOURCE_NAME_SIZE);
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.vertexCount), sizeof(uint32));
     file.read(reinterpret_cast<ANSICHAR*>(&meshHeader.indexCount), sizeof(uint32));

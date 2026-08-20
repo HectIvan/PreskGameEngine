@@ -37,7 +37,7 @@ MaterialManager::newMaterial(String _name)
   if (_name == m_defaultMatName) {
     _name = "<Invalid Name>";
   }
-  SPtr<Material> pMatComp = make_shared<Material>(_name);
+  SPtr<Material> pMatComp = pk_shared_ptr_new<Material>(_name);
   // return the material.
   return pMatComp;
 }
@@ -70,7 +70,7 @@ MaterialManager::loadMaterial(const UUID& _ID)
     return nullptr;
   }
 
-  material = make_shared<Material>();
+  material = pk_shared_ptr_new<Material>();
 
   const UUID diffId = matResource->m_albedoID;
   const UUID normId = matResource->m_normalID;

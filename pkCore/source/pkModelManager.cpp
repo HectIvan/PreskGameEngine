@@ -47,7 +47,7 @@ ModelManager::createModel(const UUID& _ID)
   }
 
   // save the model data.
-  model = make_shared<Model>();
+  model = pk_shared_ptr_new<Model>();
   model->setName(modelRes->m_name);
   model->index = modelRes->m_index;
   model->vertex = modelRes->m_vertex;

@@ -52,7 +52,7 @@ ActorCodec::createResource(const SPtr<Actor>& _pActor)
   const uint8 isActiveRaw = isActive ? 1 : 0;
   const uint32 componentCount = _pActor->getComponentCount();
 
-  SPtr<ActorResource> actorRes = make_shared<ActorResource>();
+  SPtr<ActorResource> actorRes = pk_shared_ptr_new<ActorResource>();
   actorRes->m_position = position;
   actorRes->m_rotation = rotation;
   actorRes->m_scale = scale;

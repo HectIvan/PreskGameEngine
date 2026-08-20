@@ -33,4 +33,10 @@ DX11Device::setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology)
 {
   m_pImmediateContext->IASetPrimitiveTopology(_topology);
 }
+
+PKRESULT
+DX11Device::checkFormatSupport(const DXGI_FORMAT& _format, uint32* _formatsupport)
+{
+  return m_pd3dDevice->CheckFormatSupport(_format, _formatsupport);
+}
 }

@@ -102,7 +102,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _size Size of the viewport.
    */
   void
-  setViewport(Vector2 _size) override;
+  setViewport(const Vector2& _size) override;
 
   /**
    * @brief Set the Client viewport.
@@ -110,14 +110,14 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _height Client height.
    */
   void
-  setViewport(float _width, float _height) override;
+  setViewport(const float& _width, const float& _height) override;
 
   /**
    * @brief Get the client viewport size.
    * @param _vpPos What viewport to get.
    */
-  Vector2
-  getViewportSize(uint32 _vpPos) override;
+  PK_NODISCARD PKFORCEINLINE const Vector2
+  getViewportSize(uint32& _vpPos) const override;
 
   /**
    * @brief Create the blend state.
@@ -339,7 +339,7 @@ class DX11GraphicsAPI : public GraphicsAPI
   createTexture(const ANSICHAR* _name,
                 const uint32 _width,
                 const uint32 _height,
-                const int32 _format,
+                const PK_GRAPHICS_FORMAT::E& _format,
                 const int32 _usage,
                 int32 _bindFlags,
                 const int32& _shaderResourceFormat,
@@ -449,7 +449,7 @@ class DX11GraphicsAPI : public GraphicsAPI
    * @param _count How many resources will be unbound.
    */
   void
-  vSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
+  vSUnbindShaderResourceViews(const SIZE_T& _count = 8) override;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -458,14 +458,14 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                           const uint32 _start = 0) override;
+                           const uint32& _start = 0) override;
 
   /**
    * @brief Unbind resources from a pixel shader.
    * @param _count How many resources will be unbound.
    */
   void
-  pSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
+  pSUnbindShaderResourceViews(const SIZE_T& _count = 8) override;
 
   /**
    * @brief Set resources to a compute shader.
@@ -474,14 +474,14 @@ class DX11GraphicsAPI : public GraphicsAPI
    */
   void
   cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                           const uint32 _start = 0) override;
+                           const uint32& _start = 0) override;
 
   /**
    * @brief Unbind resources of a compute shader.
    * @param _count How many resources will be unbound.
    */
   void
-  cSUnbindShaderResourceViews(const SIZE_T _count = 8) override;
+  cSUnbindShaderResourceViews(const SIZE_T& _count = 8) override;
 
   /**
    * @brief Set unordered views to a compute shader.

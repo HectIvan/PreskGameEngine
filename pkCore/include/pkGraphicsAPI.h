@@ -16,7 +16,9 @@
 **/
 /*********************************************/
 #include "pkBlendState.h"
+#include "pkColor.h"
 #include "pkDepthStencilView.h"
+#include "pkFColor.h"
 #include "pkGraphicTypes.h"
 #include "pkInputLayout.h"
 #include "pkInputLayoutDesc.h"
@@ -91,7 +93,7 @@ public:
    * @param _size Size of the viewport.
    */
   virtual void
-  setViewport(Vector2 _size) = 0;
+  setViewport(const Vector2& _size) = 0;
 
   /**
    * @brief Set the Client viewport.
@@ -99,14 +101,14 @@ public:
    * @param _height Client height.
    */
   virtual void
-  setViewport(float _width, float _height) = 0;
+  setViewport(const float& _width, const float& _height) = 0;
 
   /**
    * @brief Get the client viewport size.
    * @param _vpPos What viewport to get.
    */
-  virtual Vector2
-  getViewportSize(uint32 _vpPos) = 0;
+  PK_NODISCARD PKFORCEINLINE virtual const Vector2
+  getViewportSize(uint32& _vpPos) const = 0;
 
   /**
    * @brief Create the blend state.
@@ -330,7 +332,7 @@ public:
   createTexture(const ANSICHAR* _name,
                 const uint32 _width,
                 const uint32 _height,
-                const int32 _format,
+                const PK_GRAPHICS_FORMAT::E& _format,
                 const int32 _usage,
                 int32 _bindFlags,
                 const int32& _shaderResourceFormat,
@@ -441,7 +443,7 @@ public:
    * @param _count How many resources will be unbound.
    */
   virtual void
-  vSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
+  vSUnbindShaderResourceViews(const SIZE_T& _count = 8) = 0;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -450,14 +452,14 @@ public:
    */
   virtual void
   pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                           const uint32 _start = 0) = 0;
+                           const uint32& _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a pixel shader.
    * @param _count How many resources will be unbound.
    */
   virtual void
-  pSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
+  pSUnbindShaderResourceViews(const SIZE_T& _count = 8) = 0;
 
   /**
    * @brief Set resources to a pixel shader.
@@ -466,14 +468,14 @@ public:
    */
   virtual void
   cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                           const uint32 _start = 0) = 0;
+                           const uint32& _start = 0) = 0;
 
   /**
    * @brief Unbind resources from a compute shader.
    * @param _count How many resources will be unbound.
    */
   virtual void
-  cSUnbindShaderResourceViews(const SIZE_T _count = 8) = 0;
+  cSUnbindShaderResourceViews(const SIZE_T& _count = 8) = 0;
 
   /**
    * @brief Set unordered views to a compute shader.

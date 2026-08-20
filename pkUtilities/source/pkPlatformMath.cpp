@@ -95,37 +95,37 @@ PlatformMath::floor(const float& _x)
 uint32
 PlatformMath::min(const uint32& _x, const uint32& _y)
 {
-  return static_cast<uint32>(std::min(_x, _y));
+  return (_x > _y) ? _y : _x;
 }
 
 int32
 PlatformMath::min(const int32& _x, const int32& _y)
 {
-  return static_cast<int32>(std::min(_x, _y));
+  return (_x > _y) ? _y : _x;
 }
 
 float
 PlatformMath::min(const float& _x, const float& _y)
 {
-  return static_cast<float>(std::min(_x, _y));
+  return (_x > _y) ? _y : _x;
 }
 
 uint32
 PlatformMath::max(const uint32& _x, const uint32& _y)
 {
-  return static_cast<uint32>(std::max(_x, _y));
+  return (_x > _y) ? _x : _y;
+}
+
+int32
+PlatformMath::max(const int32& _x, const int32& _y)
+{
+  return (_x > _y) ? _x : _y;
 }
 
 float
 PlatformMath::max(const float& _x, const float& _y)
 {
-  return std::max(_x, _y);
-}
-
-float
-PlatformMath::maxf(const float& _x, const float& _y)
-{
-  return static_cast<float>(std::max(_x, _y));
+  return (_x > _y) ? _x : _y;
 }
 
 float

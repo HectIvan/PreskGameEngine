@@ -24,7 +24,7 @@ TextureManager::init()
   ids.resize(paths.size(), UUID::PK_DEFAULT_UUID);
 
   for (uint32 i = 0; i < paths.size(); ++i) {
-    SPtr<BaseResource> resource = make_shared<TextureResource>();
+    SPtr<BaseResource> resource = pk_shared_ptr_new<TextureResource>();
     bool status = resource->softLoad(Path(paths[i]));
 
     if (status) {
@@ -108,16 +108,16 @@ TextureManager::createTexture(const String& _name,
   TextureCodec& texCodec = g_TextureCodec();
   
   Vector<byte> data;
-  PK_TEXTURE_FORMAT::E format = PK_TEXTURE_FORMAT::kPK_FORMAT_UNKNOWN;
+  PK_GRAPHICS_FORMAT::E format = PK_GRAPHICS_FORMAT::kPK_FORMAT_UNKNOWN;
 
   // check for bpp and fill the data vector accordingly.
   if (_bpp == 3) {
     data = { _color._color.R, _color._color.G, _color._color.B};
-    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
+    format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
   }
   if (_bpp == 4) {
     data = { _color._color.R, _color._color.G, _color._color.B, 255 };
-    format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+    format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
   }
 
   // create and store the resource in the resource manager.

@@ -62,15 +62,14 @@ DX11ShaderCodec::createResourceFromShader(const SPtr<Shader>& _pShader)
     return nullptr;
   }
 
-  SPtr<ShaderResource> resource = make_shared<ShaderResource>();
+  SPtr<ShaderResource> resource = pk_shared_ptr_new<ShaderResource>();
 
   const UUID id = ShaderResource::generateID(resourceDir.c_str(),
                                              shader->getEntryPoint(),
                                              shader->getShaderModel());
   resource->fillBaseHeader(id, shaderName, shaderDir.toString(), resourceDir);
-  resource->m_isLoaded = true;
-
   resource->writeBaseHeader(file);
+  resource->m_isLoaded = true;
 
   strcpy_s(resource->m_shaderDirectory,
            PK_RESOURCE_PATH_SIZE,

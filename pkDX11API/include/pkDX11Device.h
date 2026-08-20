@@ -63,6 +63,9 @@ class DX11Device : public Device
   void
   setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+  PKRESULT
+  checkFormatSupport(const DXGI_FORMAT& _format, uint32* _formatsupport);
+
  public:
   D3DDevice* m_pd3dDevice = nullptr;
   D3DDeviceContext* m_pImmediateContext = nullptr;

@@ -27,8 +27,8 @@ namespace pkEngineSDK
 {
 
 Pass::Pass() {
-  m_pInputLayout = make_shared<InputLayout>();
-  m_pSamplerState = make_shared<SamplerState>();
+  m_pInputLayout = pk_shared_ptr_new<InputLayout>();
+  m_pSamplerState = pk_shared_ptr_new<SamplerState>();
 }
 
 void
@@ -213,7 +213,7 @@ Pass::Pass(const PixelDesc& _desc)
     THROW_ERROR(msg);
     return;
   }
-
+  m_name = _desc.name;
   createBasics(_desc);
 
   // set input, output and depth.
@@ -258,7 +258,7 @@ Pass::Pass(const ComputeDesc& _desc)
   m_inputTex = _desc.inputs;
   m_outputTex = _desc.outputs;
   m_uavTex = _desc.uavs;
-
+  m_name = _desc.name;
   m_passModel = PASS_MODEL::kPass_Compute;
 }
 
@@ -285,7 +285,7 @@ Pass::compileShaders()
 
 void
 Pass::updateCBuffers(const Vector<const void*>& _data,
-                     const Vector<SIZE_T>& _sizes)
+                     const Vector<SIZE_T>& _sizes) const
 {
   // assert that all data counts are the same.
   const SIZE_T blobCount = _data.size();
@@ -301,23 +301,23 @@ Pass::updateCBuffers(const Vector<const void*>& _data,
 }
 
 void
-Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size)
+Pass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const
 {
   PK_ASSERT(_index < m_cBuffers.size() && "CBuffer update index out of range.");
   g_GraphicAPI().updateConstantBuffer(m_cBuffers[_index], _data, _size);
 }
 
 void
-Pass::beginPass(const FColor& _color, const bool& _clearRT)
+Pass::beginPass(const FColor& _color, const PK_PASS_CLEAR_FLAGS::E& _clearFlags) const
 {
   GraphicsAPI& api = g_GraphicAPI();
 
   // check what type of pass it is and call the corresponding begin function.
   if (PASS_MODEL::kPass_Pixel == m_passModel) {
-    beginPixel(_color, _clearRT);
+    beginPixel(_color, _clearFlags);
   }
   else if (PASS_MODEL::kPass_Compute == m_passModel) {
-    beginCompute(_color, _clearRT);
+    beginCompute(_color, _clearFlags);
   }
   else if (PASS_MODEL::kPass_Geometry == m_passModel) {
     beginGeometry(_color);
@@ -340,11 +340,8 @@ Pass::beginPass(const FColor& _color, const bool& _clearRT)
 }
 
 void
-Pass::endPass()
+Pass::endPass() const
 {
-  // get managers
-  GraphicsAPI& api = g_GraphicAPI();
-
   // check what type of pass it is and call the corresponding end function.
   if (PASS_MODEL::kPass_Pixel == m_passModel) {
     endPixel();
@@ -355,7 +352,6 @@ Pass::endPass()
   else if (PASS_MODEL::kPass_Geometry == m_passModel) {
     endGeometry();
   }
-
   else {
     const String msg = "Pass model not set correctly.";
     LOG_FATAL(msg, __FILE__, __LINE__);
@@ -363,17 +359,18 @@ Pass::endPass()
     return;
   }
   
+  GraphicsAPI& api = g_GraphicAPI();
   api.setSampler(nullptr);
   api.setRasterizerState(nullptr);
 }
 
 void
-Pass::beginPixel(const FColor& _color, const bool& _clearRT)
+Pass::beginPixel(const FColor& _color, const PK_PASS_CLEAR_FLAGS::E& _clearFlags) const
 {
   // get managers
   GraphicsAPI& api = g_GraphicAPI();
   // clear RTVs and Depth stencil
-  if (_clearRT) { // to do: temporary. maybe it should have a flag for depth and another for render targets.
+  if (_clearFlags & PK_PASS_CLEAR_FLAGS::kPass_RT) { // to do: temporary. maybe it should have a flag for depth and another for render targets.
     api.clearRenderTargetViews(_color, m_outputTex);
     api.clearDepthBuffer(1.0f, m_depthTex);
   }
@@ -397,7 +394,7 @@ Pass::beginPixel(const FColor& _color, const bool& _clearRT)
 }
 
 void
-Pass::endPixel()
+Pass::endPixel() const
 {
   GraphicsAPI& api = g_GraphicAPI();
 
@@ -417,11 +414,11 @@ Pass::endPixel()
 }
 
 void
-Pass::beginCompute(const FColor& _color, const bool& _clearUAV)
+Pass::beginCompute(const FColor& _color, const PK_PASS_CLEAR_FLAGS::E& _clearFlags) const
 {
   GraphicsAPI& api = g_GraphicAPI();
 
-  if (_clearUAV) {
+  if (_clearFlags & PK_PASS_CLEAR_FLAGS::kPass_UAV) {
     api.clearUnorderedAccessViews(m_uavTex, _color);
   }
 
@@ -434,7 +431,7 @@ Pass::beginCompute(const FColor& _color, const bool& _clearUAV)
 }
 
 void
-Pass::endCompute()
+Pass::endCompute() const
 {
   GraphicsAPI& api = g_GraphicAPI();
 
@@ -451,12 +448,12 @@ Pass::endCompute()
 }
 
 void
-Pass::beginGeometry(const FColor&)
+Pass::beginGeometry(const FColor&) const
 {
 }
 
 void
-Pass::endGeometry()
+Pass::endGeometry() const
 {
 }
 

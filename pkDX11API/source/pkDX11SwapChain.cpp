@@ -27,7 +27,7 @@ DX11SwapChain::createRenderTargetView(const SPtr<DX11Device>& _pDevice)
     pBackBuffer->GetDesc(tDesc);
 
     // reinterpret as a directX texture
-    SPtr<DX11Texture> rTargetView = make_shared<DX11Texture>(pBackBuffer);
+    SPtr<DX11Texture> rTargetView = pk_shared_ptr_new<DX11Texture>(pBackBuffer);
 
     // create the render target view
     auto device = reinterpret_pointer_cast<DX11Device>(_pDevice);

@@ -28,8 +28,8 @@
 * Usings
 **/
 /*********************************************/
-using pkEngineSDK::PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
-using pkEngineSDK::PK_USAGE::kPK_USAGE_DEFAULT;
+using pkEngineSDK::PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+using pkEngineSDK::PK_RESOURCE_USAGE::kUSAGE_DEFAULT;
 
 using pkEngineSDK::PK_BIND_FLAG::kPK_BIND_DEPTH_STENCIL;
 using pkEngineSDK::PK_BIND_FLAG::kPK_BIND_RENDER_TARGET;
@@ -52,6 +52,7 @@ struct PassDesc
   
   Vector<WPtr<Texture>> inputs;
   Vector<WPtr<Texture>> outputs;
+  String name;
   // rasterizer state
   bool rSExists;
   RS_CULL_MODE::E rSCullMode;

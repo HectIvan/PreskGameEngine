@@ -28,7 +28,7 @@ RendererManager::init()
   txDesc.height = winHeight;  
   txDesc.format = kPK_FORMAT_R32G32B32A32_FLOAT;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_RENDER_TARGET;
-  txDesc.usage = kPK_USAGE_DEFAULT;
+  txDesc.usage = PK_RESOURCE_USAGE::kUSAGE_DEFAULT;
   txDesc.mipLevels = 1;
   txDesc.shaderResourceFormat = kPK_FORMAT_R32G32B32A32_FLOAT;
 
@@ -132,7 +132,7 @@ RendererManager::init()
   SPtr<Texture> lumBlurRT = api.createTexture(txDesc);
   m_gBuffers.insert({ G_BUFFERS::kGB_LumBlur, lumBlurRT });
 
-  SPtr<BaseResource> resSky = make_shared<TextureResource>();
+  SPtr<BaseResource> resSky = pk_shared_ptr_new<TextureResource>();
   
   m_mainSkybox = api.createEmptyTexture();
 
@@ -162,9 +162,9 @@ RendererManager::init()
   // DEPTH TARGETS
   // ---------------------------------------------------------- //
   // depth buffer description
-  txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R32_TYPELESS;
+  txDesc.format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32_TYPELESS;
   txDesc.bindFlags = kPK_BIND_SHADER_RESOURCE | kPK_BIND_DEPTH_STENCIL;
-  txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R32_FLOAT;
+  txDesc.shaderResourceFormat = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32_FLOAT;
   // camera depth buffer
   txDesc.name = "Depth";
   SPtr<Texture> depthBuffer = api.createTexture(txDesc);
@@ -188,8 +188,8 @@ RendererManager::init()
   // ---------------------------------------------------------- //
   // shadows
   txDesc.bindFlags = kPK_BIND_UNORDERED_ACCESS | kPK_BIND_SHADER_RESOURCE;
-  txDesc.format = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
-  txDesc.shaderResourceFormat = PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  txDesc.format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
+  txDesc.shaderResourceFormat = PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM;
   
   // create the passes needed
   createPasses();
@@ -269,9 +269,9 @@ RendererManager::createPasses()
   pDesc.rSFillMode = RS_FILL_MODE::kPK_FILL_SOLID;
   pDesc.rSFrontCounterClockwise = false;
   pDesc.rSDepthClipEnable = true;
+  pDesc.name = "Base Pass";
   // make the pass
-  SPtr<Pass> basePass = make_shared<Pass>(pDesc);
-  basePass->m_name = "Base Pass";
+  SPtr<Pass> basePass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Base, basePass });
 
@@ -282,9 +282,9 @@ RendererManager::createPasses()
   pDesc.pSKey = ShaderKey("resources/pkPSTransparency.pks", "PS", "ps_5_0");
   pDesc.outputs = { transpAlbedo, transpNormal, transpORM, transpEmiss, transpPos };
   pDesc.pDepth = transpDepth;
+  pDesc.name = "Transparency Pass";
   // make the pass
-  SPtr<Pass> transparencyPass = make_shared<Pass>(pDesc);
-  transparencyPass->m_name = "Transparency Pass";
+  SPtr<Pass> transparencyPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the pass map.
   m_passes.insert({ PASS_TYPE::kP_Transparency, transparencyPass });
 
@@ -295,8 +295,8 @@ RendererManager::createPasses()
   pDesc.pSKey = ShaderKey("resources/pkPShaderDepth.pks", "PS", "ps_5_0");
   pDesc.outputs = { posLightRT };
   pDesc.pDepth = LightDepthBuffer;
-  SPtr<Pass> ligtPosPass = make_shared<Pass>(pDesc);
-  ligtPosPass->m_name = "Light Positions Pass";
+  pDesc.name = "Light Positions Pass";
+  SPtr<Pass> ligtPosPass = pk_shared_ptr_new<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_LightPositions, ligtPosPass });
   
   /****************************************************************************
@@ -318,8 +318,8 @@ RendererManager::createPasses()
                    irradianceRT };
   pDesc.outputs = { brdfRT };
   pDesc.pDepth = {};
-  SPtr<Pass> lightQuad = make_shared<Pass>(pDesc);
-  lightQuad->m_name = "Light Quad Pass";
+  pDesc.name = "Light Quad Pass";
+  SPtr<Pass> lightQuad = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Light, lightQuad });
 
@@ -337,8 +337,8 @@ RendererManager::createPasses()
                    cubeMapRT,
                    irradianceRT };
   pDesc.outputs = { brdfTranspRT };
-  SPtr<Pass> lightTranspQuad = make_shared<Pass>(pDesc);
-  lightTranspQuad->m_name = "Light Transparency Quad Pass";
+  pDesc.name = "Light Transparency Quad Pass";
+  SPtr<Pass> lightTranspQuad = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LightTransparency, lightTranspQuad });
 
@@ -350,8 +350,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxRT };
-  SPtr<Pass> skyboxPass = make_shared<Pass>(pDesc);
-  skyboxPass->m_name = "Skybox Pass";
+  pDesc.name = "Skybox Pass";
+  SPtr<Pass> skyboxPass = pk_shared_ptr_new<Pass>(pDesc);
   m_passes.insert({ PASS_TYPE::kP_SkyBox, skyboxPass });
 
   /****************************************************************************
@@ -364,8 +364,8 @@ RendererManager::createPasses()
                    normalRT };
   pDesc.outputs = { ssaoRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
-  SPtr<Pass> ssaoPass = make_shared<Pass>(pDesc);
-  ssaoPass->m_name = "SSAO Pass";
+  pDesc.name = "SSAO Pass";
+  SPtr<Pass> ssaoPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_SSAO, ssaoPass });
 
@@ -378,8 +378,8 @@ RendererManager::createPasses()
   pDesc.inputs = { emissRT };
   pDesc.outputs = { emissHBlurRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
-  SPtr<Pass> emissiveHPass = make_shared<Pass>(pDesc);
-  emissiveHPass->m_name = "Emissive Horizontal Blur Pass";
+  pDesc.name = "Emissive Horizontal Blur Pass";
+  SPtr<Pass> emissiveHPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveHBlur, emissiveHPass });
 
@@ -391,8 +391,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissHBlurRT };
   pDesc.outputs = { emissBlurRT };
-  SPtr<Pass> emissivePass = make_shared<Pass>(pDesc);
-  emissivePass->m_name = "Emissive Vertical Blur Pass";
+  pDesc.name = "Emissive Vertical Blur Pass";
+  SPtr<Pass> emissivePass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_EmissiveBlur, emissivePass });
 
@@ -404,8 +404,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBVector2x2) };
   pDesc.inputs = { brdfRT };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
-  SPtr<Pass> lumPass = make_shared<Pass>(pDesc);
-  lumPass->m_name = "Luminance Pass";
+  pDesc.name = "Luminance Pass";
+  SPtr<Pass> lumPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Luminance, lumPass });
 
@@ -418,8 +418,8 @@ RendererManager::createPasses()
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
-  SPtr<Pass> lumBlurHPass = make_shared<Pass>(pDesc);
-  lumBlurHPass->m_name = "Luminance Horizontal Blur Pass";
+  pDesc.name = "Luminance Horizontal Blur Pass";
+  SPtr<Pass> lumBlurHPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LumBlurH, lumBlurHPass });
 
@@ -431,8 +431,8 @@ RendererManager::createPasses()
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { lumBlurRT };
-  SPtr<Pass> lumBlurPass = make_shared<Pass>(pDesc);
-  lumBlurPass->m_name = "Luminance Vertical Blur Pass";
+  pDesc.name = "Luminance Vertical Blur Pass";
+  SPtr<Pass> lumBlurPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_LumBlur, lumBlurPass });
 
@@ -445,8 +445,8 @@ RendererManager::createPasses()
   pDesc.inputs = { brdfRT, brdfTranspRT, skyboxRT, emissBlurRT, lumBlurRT };
   pDesc.outputs = { m_targetRT };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
-  SPtr<Pass> mergePass = make_shared<Pass>(pDesc);
-  mergePass->m_name = "Merge Pass";
+  pDesc.name = "Merge Pass";
+  SPtr<Pass> mergePass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Merge, mergePass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
@@ -460,8 +460,8 @@ RendererManager::createPasses()
   pDesc.inputs = { m_targetRT};
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
-  SPtr<Pass> TonePass = make_shared<Pass>(pDesc);
-  TonePass->m_name = "Tone Mapping Pass";
+  pDesc.name = "Tone Mapping Pass";
+  SPtr<Pass> TonePass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Tone, TonePass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
@@ -486,8 +486,8 @@ RendererManager::createPasses()
   pDesc.outputs = { m_actorsRT };
   pDesc.pDepth = {};
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kClamp;
-  SPtr<Pass> matPass = make_shared<Pass>(pDesc);
-  matPass->m_name = "Material Pass";
+  pDesc.name = "Material Pass";
+  SPtr<Pass> matPass = pk_shared_ptr_new<Pass>(pDesc);
   // insert to the passes
   m_passes.insert({ PASS_TYPE::kP_Material, matPass });
   LOG_REGISTER("-----------------------------------------", __FILE__, __LINE__);
@@ -496,7 +496,7 @@ RendererManager::createPasses()
 SPtr<Camera>
 RendererManager::createCamera(const CameraDesc& _desc)
 {
-  const SPtr<Camera> cam = make_shared<Camera>(_desc);
+  const SPtr<Camera> cam = pk_shared_ptr_new<Camera>(_desc);
   m_cameras.push_back(cam);
   return cam;
 }
@@ -526,7 +526,7 @@ RendererManager::getCamera(const uint32& _index) const
 SPtr<Light>
 RendererManager::createLight(const LightDesc& _desc)
 {
-  SPtr<Light> light = make_shared<Light>(_desc);
+  SPtr<Light> light = pk_shared_ptr_new<Light>(_desc);
   m_lights.push_back(light);
   return light;
 }
@@ -534,7 +534,7 @@ RendererManager::createLight(const LightDesc& _desc)
 SPtr<Light>
 RendererManager::createLight()
 {
-  SPtr<Light> light = make_shared<Light>();
+  SPtr<Light> light = pk_shared_ptr_new<Light>();
   m_lights.push_back(light);
   return light;
 }

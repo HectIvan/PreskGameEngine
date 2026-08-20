@@ -28,7 +28,7 @@ TextureResource::load()
   file.read(reinterpret_cast<ANSICHAR*>(&m_width), sizeof(int32));
   file.read(reinterpret_cast<ANSICHAR*>(&m_height), sizeof(int32));
   file.read(reinterpret_cast<ANSICHAR*>(&m_bpp), sizeof(int32));
-  file.read(reinterpret_cast<ANSICHAR*>(&m_format), sizeof(uint32));
+  file.read(reinterpret_cast<ANSICHAR*>(&m_format), sizeof(PK_GRAPHICS_FORMAT::E));
   file.read(reinterpret_cast<ANSICHAR*>(&m_mipMapCount), sizeof(uint32));
 
   const SIZE_T dataSize = static_cast<SIZE_T>(m_width * m_height * m_bpp);
@@ -49,7 +49,7 @@ TextureResource::unload()
   m_width = 0;
   m_height = 0;
   m_bpp = 0;
-  m_format = 0;
+  m_format = PK_GRAPHICS_FORMAT::kPK_FORMAT_UNKNOWN;
   m_mipMapCount = 0;
   m_data.clear();
 }

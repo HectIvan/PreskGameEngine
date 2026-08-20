@@ -18,6 +18,8 @@
 **/
 /*********************************************/
 #include "imgui.h"
+#include "pkColor.h"
+#include "pkFColor.h"
 #include "pkModule.h"
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"

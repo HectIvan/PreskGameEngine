@@ -22,7 +22,7 @@ void
 InverseKinematics::insertNodeLocal(const Vector3& _position, const SPtr<Actor>& _pActor)
 {
   // create the actor and set its transform to an identity.
-  SPtr<Actor> actor = make_shared<Actor>();
+  SPtr<Actor> actor = pk_shared_ptr_new<Actor>();
 
   // if there is no actor sent to the function.
   if (!_pActor) {
@@ -34,7 +34,7 @@ InverseKinematics::insertNodeLocal(const Vector3& _position, const SPtr<Actor>& 
   actor->setPosition(_position);
 
   // create the bone
-  SPtr<IKBone> bone = make_shared<IKBone>();
+  SPtr<IKBone> bone = pk_shared_ptr_new<IKBone>();
 
   // if there are nodes in the chain.
   if (!m_bones.empty()) {
@@ -56,7 +56,7 @@ void
 InverseKinematics::insertNodeGlobal(const Vector3& _position, const SPtr<Actor>& _pActor)
 {
   // create the actor and set its transform to an identity.
-  SPtr<Actor> actor = make_shared<Actor>();
+  SPtr<Actor> actor = pk_shared_ptr_new<Actor>();
 
   // if there is no actor sent to the function.
   if (!_pActor) {

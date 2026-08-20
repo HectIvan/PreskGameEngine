@@ -45,7 +45,6 @@ using pkEngineSDK::LOG_MSG_TYPE::E;
 using pkEngineSDK::LOG_MSG_TYPE::kError;
 using pkEngineSDK::LOG_MSG_TYPE::kWarning;
 using pkEngineSDK::LOG_MSG_TYPE::kLog;
-using pkEngineSDK::make_shared;
 using pkEngineSDK::PK_ROT_TYPE::kDegrees;
 using pkEngineSDK::Math;
 using pkEngineSDK::Model;
@@ -53,6 +52,7 @@ using pkEngineSDK::ModelManager;
 using pkEngineSDK::ModelResource;
 using pkEngineSDK::PlatformPointer;
 using pkEngineSDK::PKWindowDesc;
+using pkEngineSDK::pk_shared_ptr_new;
 using pkEngineSDK::Quaternion;
 using pkEngineSDK::TextureManager;
 using pkEngineSDK::TextureResource;
@@ -104,7 +104,7 @@ EditorApp::onInit()
 
   // m_eyeIcon = g_TextureManager().loadTexture(Path("resources/white-eye-icon.pkt"));
 
-  SPtr<TextureResource> resSky = make_shared<TextureResource>();
+  SPtr<TextureResource> resSky = pk_shared_ptr_new<TextureResource>();
   const bool success = resSky->softLoad(Path("resources/Skybox_papermill.pkt"));
 
   if (success) {

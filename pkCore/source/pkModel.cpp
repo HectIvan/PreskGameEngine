@@ -10,8 +10,8 @@ namespace pkEngineSDK
 Model::Model()
 {
   boneCounter = 0;
-  m_vertexB = make_shared<VertexBuffer>();
-  m_indexB = make_shared<IndexBuffer>();
+  m_vertexB = pk_shared_ptr_new<VertexBuffer>();
+  m_indexB = pk_shared_ptr_new<IndexBuffer>();
 }
 
 void

@@ -129,21 +129,21 @@ class PK_UTILITY_EXPORT PlatformMath
   max(const uint32& _x, const uint32& _y);
 
   /**
-   * @brief Get the highest of 2 parameters.
+   * @brief Get the maximum value between 2 int32.
+   * @param _x First uint32 to compare.
+   * @param _y Second uint32 to compare.
+   */
+  PK_NODISCARD static int32
+  max(const int32& _x, const int32& _y);
+
+  /**
+   * @brief Get the highest of 2 floats.
    * @param _x First number to compare.
    * @param _y Second number to compare.
    * @return Whichever value is the largest.
    */
   PK_NODISCARD static float
   max(const float& _x, const float& _y);
-
-  /**
-   * @brief Get the maximum value between 2 floats.
-   * @param _x First float to compare.
-   * @param _y Second float to compare.
-   */
-  PK_NODISCARD static float
-  maxf(const float& _x, const float& _y);
 
   /**
    * @brief Get the sin of _x.
@@ -457,6 +457,17 @@ class PK_UTILITY_EXPORT PlatformMath
    */
   PK_NODISCARD static Vector3
   reflect(const Vector3& _direction, const Vector3& _normal);
+
+  /**
+   * @brief Swap 2 values around by bit swapping.
+   * @param _x First value.
+   * @param _y Second Value.
+   */
+  template<typename T>
+  PK_NODISCARD static T
+  swap(const T& _x, const T& _y) {
+    return { (_x)^=(_y)^=(_x)^=(_y) };
+  }
 
   /**
    * @brief Distance between 2 positions.

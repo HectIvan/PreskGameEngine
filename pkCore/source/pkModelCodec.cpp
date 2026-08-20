@@ -48,9 +48,9 @@ ModelCodec::createResourceFromModel(const SPtr<Model>& _pModel, const Path& _pat
   /**
    * Create the model resource.
    */
-  SPtr<ModelResource> modelRes = make_shared<ModelResource>();
+  SPtr<ModelResource> modelRes = pk_shared_ptr_new<ModelResource>();
 
-  const UUID id = ModelResource::generateID(filePath.c_str());
+  const UUID id = ModelResource::generateID(filePath);
   modelRes->fillBaseHeader(id, fileName, _path.toString(), filePath);
   modelRes->writeBaseHeader(file);
 

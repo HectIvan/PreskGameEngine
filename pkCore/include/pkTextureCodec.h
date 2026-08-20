@@ -45,9 +45,9 @@ class PK_CORE_EXPORT TextureCodec : public Module<TextureCodec>
                  const int32& _width,
                  const int32& _height,
                  const int32& _bpp,
-                 const uint32& _format,
+                 const PK_GRAPHICS_FORMAT::E& _format,
                  const uint32& _mipCount,
-                 Vector<uint8>& _data) = 0;
+                 Vector<byte>& _data) = 0;
 
   /**
    * @brief Create a texture resource from a file using STBI.

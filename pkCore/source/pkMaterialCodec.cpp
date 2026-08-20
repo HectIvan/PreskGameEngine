@@ -47,9 +47,9 @@ MaterialCodec::createResource(const SPtr<Material>& _pMaterial)
     return nullptr;
   }
 
-  SPtr<MaterialResource> matResource = make_shared<MaterialResource>();
+  SPtr<MaterialResource> matResource = pk_shared_ptr_new<MaterialResource>();
 
-  const UUID id = MaterialResource::generateID(materialName.c_str());
+  const UUID id = MaterialResource::generateID(materialName);
   matResource->fillBaseHeader(id, materialName, "", filePath);
   matResource->writeBaseHeader(file);
 

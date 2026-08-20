@@ -188,7 +188,7 @@ DX11GraphicsAPI::createConstantBuffer(const uint32& _size,
   }
 
   // create the constant buffer.
-  auto dxCB = make_shared<DX11ConstantBuffer>();
+  auto dxCB = pk_shared_ptr_new<DX11ConstantBuffer>();
   const int32 hr = m_pDevice->m_pd3dDevice->CreateBuffer(&bDesc,
                                                          _pData ? &subData : nullptr,
                                                          &dxCB->pCBuffer);
@@ -562,7 +562,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
                                           uint32& _numFeatureLevels)
 {
   // initialize device and swap chain
-  m_pDevice = make_shared<DX11Device>();
+  m_pDevice = pk_shared_ptr_new<DX11Device>();
   /**
   * Create the device and swap chains
   **/
@@ -581,7 +581,7 @@ DX11GraphicsAPI::createDeviceAndSwapChain(uint32& _width,
   sd.SampleDesc.Quality = 0;
   sd.Windowed = true;
 
-  SPtr<DX11SwapChain> pSwapChain = make_shared<DX11SwapChain>();
+  SPtr<DX11SwapChain> pSwapChain = pk_shared_ptr_new<DX11SwapChain>();
   pSwapChain->setHeight(_height);
   pSwapChain->setWidth(_width);
   int32 hr;
@@ -685,19 +685,19 @@ DX11GraphicsAPI::internalCreateShader(const PK_SHADER_TYPE::E& _type)
   switch (_type)
   {
   case PK_SHADER_TYPE::kVertex: {
-    return make_shared<DX11VertexShader>();
+    return pk_shared_ptr_new<DX11VertexShader>();
     break;
   }
   case PK_SHADER_TYPE::kPixel: {
-    return make_shared<DX11PixelShader>();
+    return pk_shared_ptr_new<DX11PixelShader>();
     break;
   }
   case PK_SHADER_TYPE::kCompute: {
-    return make_shared<DX11ComputeShader>();
+    return pk_shared_ptr_new<DX11ComputeShader>();
     break;
   }
   case PK_SHADER_TYPE::kGeometry: {
-    return make_shared<DX11GeometryShader>();
+    return pk_shared_ptr_new<DX11GeometryShader>();
     break;
   }
   default:
@@ -734,7 +734,7 @@ DX11GraphicsAPI::createSamplerState(const uint32 _mode, const uint32 _filter)
   sampDesc.MinLOD = 0;
   sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-  SPtr<DX11SamplerState> pSamState = make_shared<DX11SamplerState>();
+  SPtr<DX11SamplerState> pSamState = pk_shared_ptr_new<DX11SamplerState>();
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateSamplerState(&sampDesc,
                                                                 &pSamState->m_pSampler);
   if (PK_FAILED(hr)) {
@@ -770,14 +770,14 @@ DX11GraphicsAPI::waitDevice()
 }
 
 void
-DX11GraphicsAPI::setViewport(Vector2 _size)
+DX11GraphicsAPI::setViewport(const Vector2& _size)
 {
   setViewport(_size.x, _size.y);
 }
 
 void
-DX11GraphicsAPI::setViewport(float _width,
-                             float _height)
+DX11GraphicsAPI::setViewport(const float& _width,
+                             const float& _height)
 {
   PK_ASSERT(m_pDevice);
   D3D11_VIEWPORT vp;
@@ -811,7 +811,7 @@ DX11GraphicsAPI::createBlendState()
     blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
   }
 
-  SPtr<DX11BlendState> pBlendState = make_shared<DX11BlendState>();
+  SPtr<DX11BlendState> pBlendState = pk_shared_ptr_new<DX11BlendState>();
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateBlendState(&blendDesc,
                                                               &pBlendState->m_pBlendState);
 
@@ -837,7 +837,7 @@ DX11GraphicsAPI::createRasterizerState(const RASTERIZER_DESC& _desc)
   rDesc.DepthClipEnable = _desc.depthClipEnable;
 
   // create the rasterizer state.
-  SPtr<DX11RasterizerState> dxRS = make_shared<DX11RasterizerState>();
+  SPtr<DX11RasterizerState> dxRS = pk_shared_ptr_new<DX11RasterizerState>();
   const uint32 hr = m_pDevice->m_pd3dDevice->CreateRasterizerState(&rDesc,
                                                                    &dxRS->m_pRasterizer);
 
@@ -962,7 +962,7 @@ DX11GraphicsAPI::createInputLayoutFromVShader(const SPtr<Shader>& _pShader)
   }
 
   // create the input layout pointer
-  SPtr<DX11InputLayout> pLayout = make_shared<DX11InputLayout>();
+  SPtr<DX11InputLayout> pLayout = pk_shared_ptr_new<DX11InputLayout>();
   // reinterpret to a DirectX vertex shader
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pShader);
 
@@ -1079,7 +1079,7 @@ DX11GraphicsAPI::createInputLayout(const Vector<InputDesc>& _vDesc,
   PK_ASSERT(_pVShader);
 
   // make a shared DX11InputLayout pointer
-  SPtr<DX11InputLayout> pInputL = make_shared<DX11InputLayout>();
+  SPtr<DX11InputLayout> pInputL = pk_shared_ptr_new<DX11InputLayout>();
   SPtr<DX11VertexShader> dxVShader = reinterpret_pointer_cast<DX11VertexShader>(_pVShader);
   
   uint32 hr;
@@ -1236,8 +1236,8 @@ DX11GraphicsAPI::present(const uint32 _syncInterval, const uint32 _flags)
   dxSwapChain->m_pSch->Present(_syncInterval, _flags);
 }
 
-Vector2
-DX11GraphicsAPI::getViewportSize(uint32 _vpPos)
+const Vector2
+DX11GraphicsAPI::getViewportSize(uint32& _vpPos) const
 {
   D3D11_VIEWPORT viewport;
   m_pDevice->m_pImmediateContext->RSGetViewports(&_vpPos, &viewport);
@@ -1264,7 +1264,7 @@ DX11GraphicsAPI::setSampler(const SPtr<SamplerState>& _pSamLinear,
 
 void
 DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                                          const uint32 _start)
+                                          const uint32& _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<PKShaderResourceView*> vResourceVector(count);
@@ -1279,7 +1279,7 @@ DX11GraphicsAPI::pSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 }
 
 void
-DX11GraphicsAPI::pSUnbindShaderResourceViews(const SIZE_T _count)
+DX11GraphicsAPI::pSUnbindShaderResourceViews(const SIZE_T& _count)
 {
   static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
@@ -1305,7 +1305,7 @@ DX11GraphicsAPI::vSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 }
 
 void
-DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T _count)
+DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T& _count)
 {
   static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
@@ -1316,7 +1316,7 @@ DX11GraphicsAPI::vSUnbindShaderResourceViews(const SIZE_T _count)
 
 void
 DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTextures,
-                                          const uint32 _start)
+                                          const uint32& _start)
 {
   const uint32 count = static_cast<uint32>(_pTextures.size());
   Vector<PKShaderResourceView*> uavVector(count);
@@ -1331,7 +1331,7 @@ DX11GraphicsAPI::cSSetShaderResourceViews(const Vector<WPtr<Texture>>& _pTexture
 }
 
 void
-DX11GraphicsAPI::cSUnbindShaderResourceViews(const SIZE_T _count)
+DX11GraphicsAPI::cSUnbindShaderResourceViews(const SIZE_T& _count)
 {
   static Vector<PKShaderResourceView*> unbindSRV;
   unbindSRV.resize(_count, nullptr);
@@ -1397,7 +1397,7 @@ DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint3
                                             resource->m_width,
                                             resource->m_height,
                                             resource->m_format,
-                                            PK_USAGE::kPK_USAGE_DEFAULT,
+                                            PK_RESOURCE_USAGE::kUSAGE_DEFAULT,
                                             _bindFlags,
                                             resource->m_format,
                                             mipLevels);
@@ -1410,7 +1410,7 @@ DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint3
   }
 
   // add data to the texture
-  resource->m_bpp = getBytesFromFormat(static_cast<PK_TEXTURE_FORMAT::E>(resource->m_format));
+  resource->m_bpp = getBytesFromFormat(static_cast<PK_GRAPHICS_FORMAT::E>(resource->m_format));
   auto dxTex = reinterpret_pointer_cast<DX11Texture>(tempTexture);
   m_pDevice->m_pImmediateContext->UpdateSubresource(dxTex->getTexture2D(),
                                                     0,
@@ -1439,7 +1439,7 @@ DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint3
 SPtr<Texture>
 DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
 {
-  SPtr<DX11Texture> texture = make_shared<DX11Texture>();
+  SPtr<DX11Texture> texture = pk_shared_ptr_new<DX11Texture>();
 
   const uint32 hr = DirectX::CreateDDSTextureFromFile(m_pDevice->m_pd3dDevice,
                                                       _directory.getDirectoryWStr().c_str(),
@@ -1481,47 +1481,47 @@ uint32
 DX11GraphicsAPI::getBytesFromFormat(const uint32 _format)
 {
   // RGBA of value 32
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_UINT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_SINT) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_UINT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_SINT) {
     return (32 * 4) / 8;
   }
   // RGB of value 32
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_UINT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_SINT) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_FLOAT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_UINT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_SINT) {
     return (32 * 3) / 8;
   }
   // RGBA of value 16
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_FLOAT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_UINT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16B16A16_SINT) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16B16A16_FLOAT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16B16A16_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16B16A16_UINT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16B16A16_SINT) {
     return (16 * 4) / 8;
   }
   // RG of value 16
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_FLOAT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_UINT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_SINT) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16_FLOAT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16_UINT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16_SINT) {
     return (16 * 2) / 8;
   }
   // RGBA of value 8
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_UINT ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8G8B8A8_SINT || 
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_UNORM ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_B8G8R8A8_TYPELESS) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_UNORM ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_UINT ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8G8B8A8_SINT || 
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_B8G8R8A8_UNORM ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_B8G8R8A8_TYPELESS) {
     return (8 * 4) / 8;
   }
   // R of value 8
-  if (_format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_TYPELESS ||
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM || 
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_SINT || 
-      _format == PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UINT) {
+  if (_format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8_TYPELESS ||
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8_UNORM || 
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8_SINT || 
+      _format == PK_GRAPHICS_FORMAT::kPK_FORMAT_R8_UINT) {
     return 1;
   }
   return 0;
@@ -1531,16 +1531,16 @@ uint32
 DX11GraphicsAPI::getFormatFromBytes(const uint32 _bpp)
 {
   if (_bpp == 4) {
-    return PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
+    return PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32A32_FLOAT;
   }
   if (_bpp == 3) {
-    return PK_TEXTURE_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
+    return PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
   }
   if (_bpp == 2) {
-    return PK_TEXTURE_FORMAT::kPK_FORMAT_R16G16_FLOAT;
+    return PK_GRAPHICS_FORMAT::kPK_FORMAT_R16G16_FLOAT;
   }
   if (_bpp == 1) {
-    return PK_TEXTURE_FORMAT::kPK_FORMAT_R8_UNORM;
+    return PK_GRAPHICS_FORMAT::kPK_FORMAT_R8_UNORM;
   }
   return -1;
 }
@@ -1548,14 +1548,14 @@ DX11GraphicsAPI::getFormatFromBytes(const uint32 _bpp)
 SPtr<Texture>
 DX11GraphicsAPI::createEmptyTexture()
 {
-  return make_shared<DX11Texture>();
+  return pk_shared_ptr_new<DX11Texture>();
 }
 
 SPtr<Texture>
 DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
                                const uint32 _width,
                                const uint32 _height,
-                               const int32 _format,
+                               const PK_GRAPHICS_FORMAT::E& _format,
                                const int32 _usage,
                                int32 _bindFlags,
                                const int32& _shaderResourceFormat,
@@ -1565,8 +1565,28 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
   PK_ASSERT(m_pDevice);
 
   // create the texture
-  SPtr<DX11Texture> dxTex = make_shared<DX11Texture>();
-  dxTex->setSize(Vector2(_width, _height));
+  SPtr<DX11Texture> dxTex = pk_shared_ptr_new<DX11Texture>(_width, _height);
+
+  const bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
+  if (generateMips) {
+    _bindFlags |= D3D11_BIND_RENDER_TARGET;
+    _bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+  
+    if (_mipLevels == 0) {
+      _mipLevels = static_cast<uint32>(Math::log2(Math::max(_width, _height)) + 1);
+    }
+  }
+
+  // DXGI_FORMAT inFormat = TranslateUnits::get(_format);
+  // DXGI_FORMAT tex_format = inFormat;
+  // DXGI_FORMAT srv_format = tex_format;
+  // DXGI_FORMAT dsv_format = tex_format;
+
+  // uint32 reealArraysize = _arraySize * (_isCubeMap ? 6 : 1);
+  // 
+  // if (_usage == PK_RESOURCE_USAGE::kUSAGE_DYNAMIC) {
+  //   _cpuAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  // }
 
   // texture description
   D3D11_TEXTURE2D_DESC desc;
@@ -1574,22 +1594,28 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
   desc.Width = _width;
   desc.Height = _height;
   desc.MipLevels = _mipLevels;
-  desc.ArraySize = _isCube? 6 : 1;
+  desc.ArraySize = (_isCube) ? 6 : 1;
   desc.Format = static_cast<DXGI_FORMAT>(_format);
   desc.SampleDesc.Count = 1;
   desc.SampleDesc.Quality = 0;
   desc.Usage = static_cast<D3D11_USAGE>(_usage);
   desc.BindFlags = _bindFlags;
   desc.CPUAccessFlags = _usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
-  desc.MiscFlags = 0;
+  desc.MiscFlags = (_isCube) ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
 
-  bool generateMips = (_mipLevels == 0 || _mipLevels > 1);
-  if (generateMips) {
-    _bindFlags |= D3D11_BIND_RENDER_TARGET;
-    _bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-    if (_mipLevels == 0) {
-      _mipLevels = static_cast<uint32>(Math::log2(Math::max(_width, _height)) + 1);
+  // mipmap generation.
+  bool autogenMipMaps = false;
+  if (_mipLevels != 1 && _usage != PK_RESOURCE_USAGE::kUSAGE_STAGING) {
+    uint32 fmtSupport = 0;
+    HRESULT hr = m_pDevice->checkFormatSupport(tex_format, &fmtSupport);
+    if (SUCCEEDED(hr) && (fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN)) {
+      desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+      desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+  
+      if (_mipLevels == 0) {
+        _mipLevels = static_cast<uint32>(std::log2(Math::max(_width, _height)) + 1);
+        autogenMipMaps = true;
+      }
     }
   }
 
@@ -1597,18 +1623,17 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
     desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
   }
 
-  if (_isCube) {
-    desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-  }
-
   // create the texture
   int32 hr = m_pDevice->m_pd3dDevice->CreateTexture2D(&desc, nullptr, &dxTex->m_t2d);
 
   // if texture creation failed
   if (PK_FAILED(hr)) {
-    const String errMsg = LOG_GET_ERR_MSG(hr);
-    const String msg = "Failed to create a texture. Error message: " + errMsg;
-    LOG_ERROR(msg, __FILE__, __LINE__);
+    const String msg = "Failed to create a texture of name " +
+                       String(_name) +
+                       ". Error message: " +
+                       LOG_GET_ERR_MSG(hr);
+    LOG_FATAL(msg, __FILE__, __LINE__);
+    THROW_ERROR(msg);
     return nullptr;
   }
   /**
@@ -1675,7 +1700,11 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
    */
   if ((_bindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET) {
     // render target description
+#if !USING(DX_VERSION_11_3) && !USING(DX_VERSION_11_4)
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+#else
+    D3D11_RENDER_TARGET_VIEW_DESC1 rtvDesc;
+#endif
     memset(&rtvDesc, 0, sizeof(rtvDesc));
     rtvDesc.Format = desc.Format;
     rtvDesc.Texture2D.MipSlice = 0;
@@ -1787,7 +1816,7 @@ SPtr<VertexBuffer>
 DX11GraphicsAPI::createVertexBuffer(const Vector<SimpleVertex>& _vertex,
                                     const uint32& _usage)
 {
-  auto dxVB = make_shared<DX11VertexBuffer>();
+  auto dxVB = pk_shared_ptr_new<DX11VertexBuffer>();
   /***************************************************************/
   /**
   * Define and create the buffer
@@ -1851,7 +1880,7 @@ SPtr<IndexBuffer>
 DX11GraphicsAPI::createIndexBuffer(const Vector<uint32>& _index,
                                    const uint32& _usage)
 {
-  auto dxIB = make_shared<DX11IndexBuffer>();
+  auto dxIB = pk_shared_ptr_new<DX11IndexBuffer>();
   // Define and create the buffer
   D3D11_BUFFER_DESC bd;
   memset(&bd, 0, sizeof(bd));

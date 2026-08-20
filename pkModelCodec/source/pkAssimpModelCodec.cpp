@@ -70,7 +70,7 @@ aiTransformToMatrix4(const aiMatrix4x4& _transform);
 SPtr<BaseResource>
 AssimpModelCodec::createResource(const Path& _path)
 {
-  SPtr<Model> model = make_shared<Model>();
+  SPtr<Model> model = pk_shared_ptr_new<Model>();
 
   const String modelPath = FileSystem::getAbsolutePath(_path).toString();
   model->path = _path;
@@ -183,7 +183,7 @@ processMesh(const aiMesh* _mesh, const aiScene* _scene, const Matrix4 _transform
   }
 
   // create the mesh
-  meshProcess = make_shared<Mesh>();
+  meshProcess = pk_shared_ptr_new<Mesh>();
   meshProcess->setName(meshName);
   meshProcess->m_transform = _transform;
   meshProcess->vertexCount = _mesh->mNumVertices;

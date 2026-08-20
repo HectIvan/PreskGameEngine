@@ -261,7 +261,7 @@ BaseApp::update()
   CBBlur emissiveBlur(winSize, Vector2(1.0f, 0.0f), m_emissRad, m_emissStr);
   CBVector2x2 shadowsParam(winSize, Vector2(0.0f)); // will be modified later.
   const CBFloat exposureCBuffer(m_exposure);
-  const CBVector2x2 ssaoWin(ssaoPass->getViewportSize(), Vector2(0.0f));
+  const CBVector2x2 ssaoWin(ssaoPass->getViewport(), Vector2(0.0f));
   const CBVector2x2 ssao(m_ssaoSRad, m_ssaoScale, m_ssaoBias, m_ssaoInt);
 
   // data type sizes.

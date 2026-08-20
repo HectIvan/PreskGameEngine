@@ -26,7 +26,7 @@ SceneManager::init()
 void
 SceneManager::createScene(const String& _name)
 {
-  SPtr<Scene> scene = make_shared<Scene>();
+  SPtr<Scene> scene = pk_shared_ptr_new<Scene>();
   scene->setName(_name);
   scene->setActive(false);
   m_scenes.push_back(scene);

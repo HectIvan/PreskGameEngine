@@ -77,16 +77,16 @@ AssetResourceManager::loadAssetsFromResourcesFolder()
       const String extension = path.getExtension();
       SPtr<BaseResource> resource;
       if (extension == "pkm") {
-        resource = make_shared<ModelResource>();
+        resource = pk_shared_ptr_new<ModelResource>();
       }
       if (extension == "pkt") {
-        resource = make_shared<TextureResource>();
+        resource = pk_shared_ptr_new<TextureResource>();
       }
       if (extension == "pkmat") {
-        resource = make_shared<MaterialResource>();
+        resource = pk_shared_ptr_new<MaterialResource>();
       }
       if (extension == "pks") {
-        resource = make_shared<ShaderResource>();
+        resource = pk_shared_ptr_new<ShaderResource>();
       }
       resource->softLoad(path);
       insertNewResource(resource);

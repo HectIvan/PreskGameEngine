@@ -500,10 +500,7 @@ DX11GraphicsAPI::setVShader(const SPtr<Shader>& _pShader)
                                               nullptr,
                                               0);
 
-  if (dxVShader) {
-    return true;
-  }
-  return false;
+  return (dxVShader) ? true : false;
 }
 
 bool
@@ -515,10 +512,7 @@ DX11GraphicsAPI::setPShader(const SPtr<Shader>& _pShader)
   m_pDevice->m_pImmediateContext->PSSetShader(dxPShader ? dxPShader->m_pShader : nullptr,
                                               nullptr,
                                               0);
-  if (dxPShader) {
-    return true;
-  }
-  return false;
+  return (dxPShader) ? true : false;
 }
 
 bool
@@ -530,10 +524,7 @@ DX11GraphicsAPI::setCShader(const SPtr<Shader>& _pShader)
   m_pDevice->m_pImmediateContext->CSSetShader(dxCShader ? dxCShader->m_pShader : nullptr,
                                               nullptr,
                                               0);
-  if (dxCShader) {
-    return true;
-  }
-  return false;
+  return (dxCShader) ? true : false;
 }
 
 bool
@@ -1604,20 +1595,20 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
   desc.MiscFlags = (_isCube) ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
 
   // mipmap generation.
-  bool autogenMipMaps = false;
-  if (_mipLevels != 1 && _usage != PK_RESOURCE_USAGE::kUSAGE_STAGING) {
-    uint32 fmtSupport = 0;
-    HRESULT hr = m_pDevice->checkFormatSupport(tex_format, &fmtSupport);
-    if (SUCCEEDED(hr) && (fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN)) {
-      desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-      desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-  
-      if (_mipLevels == 0) {
-        _mipLevels = static_cast<uint32>(std::log2(Math::max(_width, _height)) + 1);
-        autogenMipMaps = true;
-      }
-    }
-  }
+  // bool autogenMipMaps = false;
+  // if (_mipLevels != 1 && _usage != PK_RESOURCE_USAGE::kUSAGE_STAGING) {
+  //   uint32 fmtSupport = 0;
+  //   HRESULT hr = m_pDevice->checkFormatSupport(tex_format, &fmtSupport);
+  //   if (SUCCEEDED(hr) && (fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN)) {
+  //     desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+  //     desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+  // 
+  //     if (_mipLevels == 0) {
+  //       _mipLevels = static_cast<uint32>(std::log2(Math::max(_width, _height)) + 1);
+  //       autogenMipMaps = true;
+  //     }
+  //   }
+  // }
 
   if (generateMips) {
     desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;

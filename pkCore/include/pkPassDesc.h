@@ -21,6 +21,7 @@
 #include "pkRasterizerState.h"
 #include "pkTexture.h"
 #include "pkSamplerState.h"
+#include "pkShader.h"
 #include "pkShaderKey.h"
 
 /*********************************************/
@@ -45,13 +46,9 @@ namespace pkEngineSDK
 
 struct PassDesc
 {
-  Vector<SIZE_T> cBSizes;
-  
   PK_SAM_STATE_ADRESS::E samAdress;
   PK_SAM_STATE_FILTERS::E samFilters;
   
-  Vector<WPtr<Texture>> inputs;
-  Vector<WPtr<Texture>> outputs;
   String name;
   // rasterizer state
   bool rSExists;
@@ -61,23 +58,32 @@ struct PassDesc
   bool rSDepthClipEnable;
 };
 
-struct PixelDesc : public PassDesc
+struct PixelPassDesc : public PassDesc
 {
-  ShaderKey vSKey;
-  ShaderKey pSKey;
+  WPtr<Shader> pVShader;
+  WPtr<Shader> pPShader;
+
+  Vector<SIZE_T> vSBuffers;
+  Vector<SIZE_T> pSBuffers;
+
+  Vector<WPtr<Texture>> pTex;
+  Vector<WPtr<Texture>> vTex;
+
+  Vector<WPtr<Texture>> outputs;
 
   SPtr<Texture> pDepth;
 };
 
-struct ComputeDesc : public PassDesc
+struct ComputePassDesc : public PassDesc
 {
-  ShaderKey cSKey;
+  WPtr<Shader> pCShader;
   Vector<SIZE_T> cBSizes;
 
   Vector<SPtr<Texture>> uavs;
+  Vector<WPtr<Texture>> cTex;
 };
 
-struct GeometryPass : public PassDesc
+struct GeometryPassDesc : public PassDesc
 {
 };
 }

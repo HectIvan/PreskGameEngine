@@ -8,6 +8,7 @@
 #include "pkTextureManager.h"
 #include "pkTextureCodec.h"
 #include "pkShaderManager.h"
+#include "pkPixelPass.h"
 
 namespace pkEngineSDK
 {
@@ -248,15 +249,16 @@ RendererManager::createPasses()
   const SPtr<Texture> LightDepthBuffer = getDepthBuffer(D_BUFFERS::kDB_Light);
   const SPtr<Texture> transpDepth = getDepthBuffer(D_BUFFERS::kDB_Transparency);
 
-  PixelDesc pDesc;
-  ComputeDesc cDesc;
+  PixelPassDesc pDesc;
+  ComputePassDesc cDesc;
+  ShaderManager& shaderMan = g_ShaderManager();
 
   /****************************************************************************
    * Create the base pass.
    ***************************************************************************/
   LOG_REGISTER("---------Creating base pass.---------", __FILE__, __LINE__);
-  pDesc.vSKey = ShaderKey("resources/pkVShader.pks", "VS", "vs_5_0");
-  pDesc.pSKey = ShaderKey("resources/pkPShader.pks", "PS", "ps_5_0");
+  pDesc.pVShader = shaderMan.getShader(ShaderKey("resources/pkVShader.pks", "VS", "vs_5_0"));
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkPShader.pks", "PS", "ps_5_0"));
   pDesc.samAdress = PK_SAM_STATE_ADRESS::kWrap;
   pDesc.samFilters = PK_SAM_STATE_FILTERS::kFilterMigMagMipLinear;
   pDesc.cBSizes = { sizeof(CBWVP), sizeof(CBMaterialProps)};
@@ -279,7 +281,7 @@ RendererManager::createPasses()
    * Create the transparency pass.
    ***************************************************************************/
   LOG_REGISTER("---------Creating transparency pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkPSTransparency.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkPSTransparency.pks", "PS", "ps_5_0"));
   pDesc.outputs = { transpAlbedo, transpNormal, transpORM, transpEmiss, transpPos };
   pDesc.pDepth = transpDepth;
   pDesc.name = "Transparency Pass";
@@ -292,7 +294,7 @@ RendererManager::createPasses()
    * Light positions Pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating light positions pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkPShaderDepth.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkPShaderDepth.pks", "PS", "ps_5_0"));
   pDesc.outputs = { posLightRT };
   pDesc.pDepth = LightDepthBuffer;
   pDesc.name = "Light Positions Pass";
@@ -303,8 +305,8 @@ RendererManager::createPasses()
    * BRDF Quad Pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating BRDF Quad pass.---------", __FILE__, __LINE__);
-  pDesc.vSKey = ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
-  pDesc.pSKey = ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0");
+  pDesc.pVShader = shaderMan.getShader(ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0"));
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBLight),
                     sizeof(CBCamera) };
   pDesc.inputs = { DepthBuffer,
@@ -346,7 +348,7 @@ RendererManager::createPasses()
    * Skybox Quad pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating SkyBox pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkSkyboxShader.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkSkyboxShader.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(Matrix4), sizeof(Matrix4) };
   pDesc.inputs = { m_mainSkybox };
   pDesc.outputs = { skyboxRT };
@@ -358,7 +360,7 @@ RendererManager::createPasses()
    * Screen Space Ambient Occlusion Quad pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating SSAO pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkPSAOshader.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkPSAOshader.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBSSAO), sizeof(CBVector2x2) };
   pDesc.inputs = { posRT,
                    normalRT };
@@ -373,7 +375,7 @@ RendererManager::createPasses()
    * Emissive Horizontal Blur Quad pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating Emissive Horizontal Blur pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissRT };
   pDesc.outputs = { emissHBlurRT };
@@ -387,7 +389,7 @@ RendererManager::createPasses()
    * Emissive Blur Quad pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating Emissive Vertical Blur pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { emissHBlurRT };
   pDesc.outputs = { emissBlurRT };
@@ -400,7 +402,7 @@ RendererManager::createPasses()
    * Luminance
    ***************************************************************************/
   LOG_REGISTER("---------Creating Luminance pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkLuminanceQuad.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkLuminanceQuad.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBVector2x2) };
   pDesc.inputs = { brdfRT };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
@@ -413,7 +415,7 @@ RendererManager::createPasses()
    * Luminance Horizontal Blur
    ***************************************************************************/
   LOG_REGISTER("---------Creating Luminance Horizontal Blur pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_Luminance) };
   pDesc.outputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
@@ -427,7 +429,7 @@ RendererManager::createPasses()
    * Luminance Vertical Blur
    ***************************************************************************/
   LOG_REGISTER("---------Creating Luminance Vertical Blur pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkBlur.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBBlur) };
   pDesc.inputs = { getGBuffer(G_BUFFERS::kGB_LumBlurH) };
   pDesc.outputs = { lumBlurRT };
@@ -440,7 +442,7 @@ RendererManager::createPasses()
    * Merge pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating Merge pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkMergeShader.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkMergeShader.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = {};
   pDesc.inputs = { brdfRT, brdfTranspRT, skyboxRT, emissBlurRT, lumBlurRT };
   pDesc.outputs = { m_targetRT };
@@ -455,7 +457,7 @@ RendererManager::createPasses()
    * Tone mapping Quad pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating Tone Map pass.---------", __FILE__, __LINE__);
-  pDesc.pSKey = ShaderKey("resources/pkToneMap.pks", "PS", "ps_5_0");
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkToneMap.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBFloat) };
   pDesc.inputs = { m_targetRT};
   pDesc.outputs = { g_GraphicAPI().getSwapChain()->getBuffer(0) };
@@ -471,8 +473,8 @@ RendererManager::createPasses()
    * Material Pass
    ***************************************************************************/
   LOG_REGISTER("---------Creating Material Specific pass.---------", __FILE__, __LINE__);
-  pDesc.vSKey = ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0");
-  pDesc.pSKey = ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0");
+  pDesc.pVShader = shaderMan.getShader(ShaderKey("resources/pkQuadShader.pks", "VS", "vs_5_0"));
+  pDesc.pPShader = shaderMan.getShader(ShaderKey("resources/pkLightShader.pks", "PS", "ps_5_0"));
   pDesc.cBSizes = { sizeof(CBLight),
                     sizeof(CBCamera) };
   pDesc.inputs = { DepthBuffer,
@@ -805,9 +807,9 @@ RendererManager::renderModel(const SPtr<Model>& _model, const Matrix4& _actorTra
   RendererManager& rManager = g_RenderManager();
   GraphicsAPI& api = g_GraphicAPI();
 
-  const SPtr<Pass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
-  const SPtr<Pass> transparencyPass = rManager.getPass(PASS_TYPE::kP_Transparency);
-  const SPtr<Pass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
+  const SPtr<PixelPass> basePass = rManager.getPass(PASS_TYPE::kP_Base);
+  const SPtr<PixelPass> transparencyPass = rManager.getPass(PASS_TYPE::kP_Transparency);
+  const SPtr<PixelPass> lightPositionsPass = rManager.getPass(PASS_TYPE::kP_LightPositions);
 
   // for each mesh in the model
   const uint32 meshCount = toUint32(_model->meshes.size());

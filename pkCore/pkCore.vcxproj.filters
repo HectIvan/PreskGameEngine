@@ -285,6 +285,12 @@
     <ClInclude Include="include\pkActorResource.h">
       <Filter>include\resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\pkPixelPass.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pkComputePass.h">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\pkWin32Window.cpp">
@@ -421,6 +427,12 @@
     </ClCompile>
     <ClCompile Include="source\pkActorResource.cpp">
       <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkPixelPass.cpp">
+      <Filter>source\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\pkComputePass.cpp">
+      <Filter>source\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

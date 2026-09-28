@@ -48,7 +48,7 @@ enum E
 class PK_CORE_EXPORT Pass
 {
  public:
-  Pass() = default;
+  Pass();
   ~Pass() = default;
 
   /**
@@ -96,6 +96,57 @@ class PK_CORE_EXPORT Pass
    */
   PK_NODISCARD PKFORCEINLINE const SPtr<SamplerState>&
   getSamplerState() const { return m_pSamplerState; }
+
+  // /**
+  //  * @brief Update the constant buffers of the vertex shader.
+  //  * @param _data New data to update the buffers.
+  //  * @param _sizes Sizes of the data.
+  //  */
+  // virtual void
+  // updateVCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const = 0;
+  // 
+  // /**
+  //  * @brief Update a specific constant buffer of the vertex shader.
+  //  * @param _index CBuffer index.
+  //  * @param _data New data to update the buffer.
+  //  * @param _size Size of the data.
+  //  */
+  // virtual void
+  // updateVCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const = 0;
+  // 
+  // /**
+  //  * @brief Update the constant buffers of the pixel shader.
+  //  * @param _data New data to update the buffers.
+  //  * @param _sizes Sizes of the data.
+  //  */
+  // virtual void
+  // updatePCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const = 0;
+  // 
+  // /**
+  //  * @brief Update a specific constant buffer of the pixel shader.
+  //  * @param _index CBuffer index.
+  //  * @param _data New data to update the buffer.
+  //  * @param _size Size of the data.
+  //  */
+  // virtual void
+  // updatePCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const = 0;
+  // 
+  // /**
+  //  * @brief Update the constant buffers of the compute shader.
+  //  * @param _data New data to update the buffers.
+  //  * @param _sizes Sizes of the data.
+  //  */
+  // virtual void
+  // updateCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const = 0;
+  // 
+  // /**
+  //  * @brief Update a specific constant buffer of the compute shader.
+  //  * @param _index CBuffer index.
+  //  * @param _data New data to update the buffer.
+  //  * @param _size Size of the data.
+  //  */
+  // virtual void
+  // updateCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const = 0;
 
   /**
    * @brief Begin the pass.

@@ -45,7 +45,7 @@ class DX11Texture : public Texture
     m_uAVs(_uAVs)
   {}
   ~DX11Texture() override {
-    const String msg = "Releasing texture: " + getName();
+    const String msg = "Releasing texture: " + String(getName());
     LOG_REGISTER(msg, __FILE__, __LINE__);
 
     m_rTVs.clear();
@@ -81,7 +81,7 @@ class DX11Texture : public Texture
    * @brief Get the name of the texture.
    * @return Name of the texture.
    */
-  const String
+  const ANSICHAR*
   getName() const override;
 
   /**
@@ -163,6 +163,13 @@ class DX11Texture : public Texture
    */
   PKFORCEINLINE void*
   getRawData() override { return reinterpret_cast<void*>(m_sRV); }
+
+  /**
+   * @brief Copy a pointer without changing the originals memory direction.
+   * @param _pTexture New texture source.
+   */
+  void
+  copyFromReference(SPtr<Texture>& _pTexture) override;
 
  public:
   D3DTexture2D* m_t2d = nullptr;

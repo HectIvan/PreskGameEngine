@@ -13,7 +13,7 @@ void
 Camera::init(const CameraDesc& _desc)
 {
   init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.forward,
-       _desc.right, _desc.camMode);
+       _desc.right, _desc.isMain, _desc.camMode);
 }
 
 void
@@ -36,6 +36,7 @@ Camera::init(const uint32& _width,
              const Vector3& _eye,
              const Vector3& _forward,
              const Vector3& _right,
+             const bool& _isMain,
              const CAMERA_PROJ::E& _camMode)
 {
   // creation parameters
@@ -63,6 +64,7 @@ Camera::init(const uint32& _width,
                                               _nearZ,
                                               _farZ);
   }
+  m_isMain = _isMain;
 }
 
 void

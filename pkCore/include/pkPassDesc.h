@@ -49,9 +49,10 @@ struct PassDesc
   PK_SAM_STATE_ADRESS::E samAdress;
   PK_SAM_STATE_FILTERS::E samFilters;
   
-  String name;
+  String name; // name for the pass.
+  Vector2 vpSize; // viewport Size.
   // rasterizer state
-  bool rSExists;
+  bool rSExists; // if the rasterizer exists.
   RS_CULL_MODE::E rSCullMode;
   RS_FILL_MODE::E rSFillMode;
   bool rSFrontCounterClockwise;

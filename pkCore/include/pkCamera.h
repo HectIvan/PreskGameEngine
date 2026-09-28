@@ -105,6 +105,7 @@ class PK_CORE_EXPORT Camera : public Component
    * @param _eye Position of the camera view.
    * @param _forward The forward vector of the camera.
    * @param _right The right vector of the camera.
+   * @param _isMain If the camera is a main camera.
    * @param _camMode Wether Camera perspective.
    */
   void
@@ -116,6 +117,7 @@ class PK_CORE_EXPORT Camera : public Component
        const Vector3& _eye,
        const Vector3& _forward,
        const Vector3& _right,
+       const bool& _isMain,
        const CAMERA_PROJ::E& _camMode = CAMERA_PROJ::kPerspective
   );
 

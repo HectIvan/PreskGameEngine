@@ -1444,7 +1444,7 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
   }
 
   const String msg = "Created a DirectX 11 texture from a DSS directory. Texture name: " +
-                     texture->getName();
+                     String(texture->getName());
   LOG_REGISTER(msg, __FILE__, __LINE__);
   return texture;
 }
@@ -1455,7 +1455,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!texture) {
     const String msg = "Failed to generate mips for texture: " +
-                       _pTexture->getName();
+                       String(_pTexture->getName());
     LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
@@ -1464,7 +1464,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   if (srv) {
     m_pDevice->m_pImmediateContext->GenerateMips(srv);
   }
-  const String msg = "Generated mips for the texture: " + _pTexture->getName();
+  const String msg = "Generated mips for the texture: " + String(_pTexture->getName());
   LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
@@ -1772,7 +1772,7 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
 
   dxTex->setName(_name);
   const String msg = "Created a DirectX 11 texture. Texture name: '" +
-                      dxTex->getName() +
+                      String(dxTex->getName()) +
                       "' Width: " + to_string(_width) +
                       " Height: " + to_string(_height) +
                       " Format: " + to_string(_format) +
@@ -1796,10 +1796,8 @@ DX11GraphicsAPI::setInputLayout(const SPtr<InputLayout>& _pInputLayout)
     LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
-  // get the dx11 input layout
-  const auto inputLayout = reinterpret_pointer_cast<DX11InputLayout>(_pInputLayout);
   // set the input layout
-  m_pDevice->m_pImmediateContext->IASetInputLayout(inputLayout ? inputLayout->m_pVertexLayout : 
+  m_pDevice->m_pImmediateContext->IASetInputLayout(dxIL ? dxIL->m_pVertexLayout :
                                                    nullptr);
 }
 

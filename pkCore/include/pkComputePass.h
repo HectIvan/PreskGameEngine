@@ -34,6 +34,18 @@ class ComputePass : public Pass
   void
   clear() override;
 
+  // void
+  // updateVCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const override {}
+  // 
+  // void
+  // updateVCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const override {}
+  // 
+  // void
+  // updatePCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const override {}
+  // 
+  // void
+  // updatePCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const override {}
+
   /**
    * @brief Update the constant buffers of the compute shader.
    * @param _data New data to update the buffers.
@@ -49,7 +61,7 @@ class ComputePass : public Pass
    * @param _size Size of the data.
    */
   void
-  updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const;
+  updateCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const;
 
   /**
    * @brief Begin the pass.

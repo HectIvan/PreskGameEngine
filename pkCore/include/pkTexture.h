@@ -76,6 +76,8 @@ enum E
 };
 }
 
+#include "pkPrerequisitesUtilities.h"
+
 class PK_CORE_EXPORT Texture
 {
  public:
@@ -135,7 +137,7 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture name.
    * @return Texture name.
    */
-  virtual const String
+  virtual const ANSICHAR*
   getName() const = 0;
 
   /**
@@ -159,7 +161,14 @@ class PK_CORE_EXPORT Texture
   PK_NODISCARD PKFORCEINLINE const UUID
   getID() const { return m_id; }
 
- private:
+  /**
+   * @brief Copy a pointer without changing the originals memory direction.
+   * @param _pTexture New texture source.
+   */
+  virtual void
+  copyFromReference(SPtr<Texture>& _pTexture) = 0;
+
+ protected:
   UUID m_id;
   uint32 m_width;
   uint32 m_height;

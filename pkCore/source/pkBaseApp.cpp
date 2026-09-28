@@ -244,16 +244,16 @@ BaseApp::update()
   }
 
   // get all passes.
-  const SPtr<Pass> skyBoxPass = rm.getPass(kP_SkyBox);
-  const SPtr<Pass> lumPass = rm.getPass(kP_Luminance);
-  const SPtr<Pass> lumBlurHPass = rm.getPass(kP_LumBlurH);
-  const SPtr<Pass> lumBlurPass = rm.getPass(kP_LumBlur);
-  const SPtr<Pass> emissHBlur = rm.getPass(kP_EmissiveHBlur);
-  const SPtr<Pass> emissBlur = rm.getPass(kP_EmissiveBlur);
-  const SPtr<Pass> tonePass = rm.getPass(kP_Tone);
-  const SPtr<Pass> ssaoPass = rm.getPass(kP_SSAO);
-  const SPtr<Pass> brdfPass = rm.getPass(kP_Light);
-  const SPtr<Pass> brdfTranspPass = rm.getPass(kP_LightTransparency);
+  const SPtr<PixelPass> skyboxPass = rm.getPixelPass(kP_SkyBox);
+  const SPtr<PixelPass> lumPass = rm.getPixelPass(kP_Luminance);
+  const SPtr<PixelPass> lumBlurHPass = rm.getPixelPass(kP_LumBlurH);
+  const SPtr<PixelPass> lumBlurPass = rm.getPixelPass(kP_LumBlur);
+  const SPtr<PixelPass> emissHBlur = rm.getPixelPass(kP_EmissiveHBlur);
+  const SPtr<PixelPass> emissBlur = rm.getPixelPass(kP_EmissiveBlur);
+  const SPtr<PixelPass> tonePass = rm.getPixelPass(kP_Tone);
+  const SPtr<PixelPass> ssaoPass = rm.getPixelPass(kP_SSAO);
+  const SPtr<PixelPass> brdfPass = rm.getPixelPass(kP_Light);
+  const SPtr<PixelPass> brdfTranspPass = rm.getPixelPass(kP_LightTransparency);
 
   // constant buffers.
   CBVector2x2 lum(winSize, Vector2(90.0f));
@@ -272,25 +272,23 @@ BaseApp::update()
   const SIZE_T cbLightSize = sizeof(CBLight);
 
   // skybox constant buffers.
-  skyBoxPass->updateCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
+  skyboxPass->updatePCBuffers({ &viewTransp, &projTransp }, { m4x4Size, m4x4Size });
 
-
-  brdfPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
-  brdfTranspPass->updateCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
+  brdfPass->updatePCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
+  brdfTranspPass->updatePCBuffers({ &lightCBuffer, &camCBuffer }, { cbLightSize, cbCamSize });
   // luminance constant buffers.
-  lumPass->updateCBuffer(0, &lum, sizeof(CBFloat));
+  lumPass->updatePCBuffer(0, &lum, sizeof(CBFloat));
   // Emissive blur constant buffers;
-  emissHBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
+  emissHBlur->updatePCBuffer(0, &emissiveBlur, cBlurSize);
   emissiveBlur.BlurDirection = Vector2(0.0f, 1.0f); 
-  emissBlur->updateCBuffer(0, &emissiveBlur, cBlurSize);
+  emissBlur->updatePCBuffer(0, &emissiveBlur, cBlurSize);
   // lum blur constant buffers
-  lumBlurHPass->updateCBuffer(0, &blur, cBlurSize);
+  lumBlurHPass->updatePCBuffer(0, &blur, cBlurSize);
   blur.BlurDirection = Vector2(0.0f, 1.0f);
-  lumBlurPass->updateCBuffer(0, &blur, cBlurSize);
+  lumBlurPass->updatePCBuffer(0, &blur, cBlurSize);
+  tonePass->updatePCBuffer(0, &exposureCBuffer, v2x2Size);
 
-  tonePass->updateCBuffer(0, &exposureCBuffer, v2x2Size);
-
-  ssaoPass->updateCBuffers({ &ssao, &ssaoWin }, { v2x2Size, v2x2Size });
+  ssaoPass->updatePCBuffers({ &ssao, &ssaoWin }, { v2x2Size, v2x2Size });
 }
 
 void
@@ -303,26 +301,26 @@ BaseApp::render()
   // get all passes
   // const SPtr<Pass> basePass = renderManager.getPass(kP_Base);
   // const SPtr<Pass> transparencyPass = renderManager.getPass(kP_Transparency);
-  const SPtr<Pass> skyBoxPass = renderManager.getPass(kP_SkyBox);
-  const SPtr<Pass> mergePass = renderManager.getPass(kP_Merge);
-  const SPtr<Pass> BRDF = renderManager.getPass(kP_Light);
-  const SPtr<Pass> transparencyBRDF = renderManager.getPass(kP_LightTransparency);
-  const SPtr<Pass> ssaoPass = renderManager.getPass(kP_SSAO);
-  const SPtr<Pass> emissHBlurPass = renderManager.getPass(kP_EmissiveHBlur);
-  const SPtr<Pass> emissBlurPass = renderManager.getPass(kP_EmissiveBlur);
-  const SPtr<Pass> lumPass = renderManager.getPass(kP_Luminance);
-  const SPtr<Pass> lumBlurHPass = renderManager.getPass(kP_LumBlurH);
-  const SPtr<Pass> lumBlurPass = renderManager.getPass(kP_LumBlur);
-  const SPtr<Pass> tonePass = renderManager.getPass(kP_Tone);
+  const SPtr<PixelPass> skyBoxPass = renderManager.getPixelPass(kP_SkyBox);
+  const SPtr<PixelPass> mergePass = renderManager.getPixelPass(kP_Merge);
+  const SPtr<PixelPass> BRDF = renderManager.getPixelPass(kP_Light);
+  const SPtr<PixelPass> transparencyBRDF = renderManager.getPixelPass(kP_LightTransparency);
+  const SPtr<PixelPass> ssaoPass = renderManager.getPixelPass(kP_SSAO);
+  const SPtr<PixelPass> emissHBlurPass = renderManager.getPixelPass(kP_EmissiveHBlur);
+  const SPtr<PixelPass> emissBlurPass = renderManager.getPixelPass(kP_EmissiveBlur);
+  const SPtr<PixelPass> lumPass = renderManager.getPixelPass(kP_Luminance);
+  const SPtr<PixelPass> lumBlurHPass = renderManager.getPixelPass(kP_LumBlurH);
+  const SPtr<PixelPass> lumBlurPass = renderManager.getPixelPass(kP_LumBlur);
+  const SPtr<PixelPass> tonePass = renderManager.getPixelPass(kP_Tone);
 
   // Get all actors
   const Vector<SPtr<Actor>> actors = g_SceneManager().getActiveScene()->getAllActors();
 
-  const SPtr<Pass> lightPositions = renderManager.getPass(kP_LightPositions);
+  const SPtr<PixelPass> lightPositions = renderManager.getPixelPass(kP_LightPositions);
   // first shadow pass
 
-  const SPtr<Pass> basePass = renderManager.getPass(PASS_TYPE::kP_Base);
-  const SPtr<Pass> transparencyPass = renderManager.getPass(PASS_TYPE::kP_Transparency);
+  const SPtr<PixelPass> basePass = renderManager.getPixelPass(PASS_TYPE::kP_Base);
+  const SPtr<PixelPass> transparencyPass = renderManager.getPixelPass(PASS_TYPE::kP_Transparency);
 
   basePass->beginPass(FColor::BLACK);
   renderManager.renderActors(actors);

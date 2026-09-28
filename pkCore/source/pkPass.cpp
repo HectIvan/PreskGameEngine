@@ -39,6 +39,8 @@ Pass::createBasics(const PassDesc& _desc)
   // create the sampler state
   m_pSamplerState = api.createSamplerState(_desc.samAdress, _desc.samFilters);
 
+  m_viewPortSize = _desc.vpSize;
+
   if (_desc.rSExists) {
     // rasterizer state.
     RASTERIZER_DESC rDesc = {};

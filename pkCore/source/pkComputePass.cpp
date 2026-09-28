@@ -18,11 +18,13 @@ ComputePass::ComputePass(const ComputePassDesc& _desc)
 {
   m_name = _desc.name;
 
+  createBasics(_desc);
+
   m_pCShader = _desc.pCShader;
   
   const uint32 cBufferCount = static_cast<uint32>(_desc.cBSizes.size());
   for (uint32 i = 0; i < cBufferCount; ++i) {
-    m_cCBuffers.push_back(pk_shared_ptr_new<ConstantBuffer>(_desc.cBSizes[i]));
+    m_cCBuffers.push_back(g_GraphicAPI().createConstantBuffer(_desc.cBSizes[i]));
   }
 
   m_uavTex = _desc.uavs;
@@ -57,7 +59,7 @@ ComputePass::updateCBuffers(const Vector<const void*>& _data, const Vector<SIZE_
 }
 
 void
-ComputePass::updateCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const
+ComputePass::updateCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const
 {
   PK_ASSERT(_index < m_cCBuffers.size() && "Compute CBuffer update index out of range.");
   g_GraphicAPI().updateConstantBuffer(m_cCBuffers[_index], _data, _size);

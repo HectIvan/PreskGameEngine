@@ -24,7 +24,8 @@
 #include "pkDepthStencilView.h"
 #include "pkLight.h"
 #include "pkModule.h"
-#include "pkPass.h"
+#include "pkPixelPass.h"
+#include "pkComputePass.h"
 #include "pkPrerequisitesCore.h"
 #include "pkScene.h"
 #include "pkWindow.h"
@@ -166,12 +167,20 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
   getLight(const uint32& _index) const;
 
   /**
-   * @brief Get a pass from the map.
+   * @brief Get a pixel pass from the map.
    * @param _type Pass type to search for.
-   * @return Pointer to the pass.
+   * @return Pointer to the pixel pass.
    */
-  SPtr<Pass>
-  getPass(const PASS_TYPE::E _type);
+  SPtr<PixelPass>
+  getPixelPass(const PASS_TYPE::E& _type);
+
+  /**
+   * @brief Get a compute pass from the map.
+   * @param _type Pass type to search for.
+   * @return Pointer to the compute pass.
+   */
+  SPtr<ComputePass>
+  getComputePass(const PASS_TYPE::E& _type);
 
   /**
    * @brief Get a specific G-buffer.
@@ -271,6 +280,15 @@ class PK_CORE_EXPORT RendererManager : public Module<RendererManager>
    */
   template<class T> void
   updateBuffer(const T& _data, const SPtr<ConstantBuffer>& _pCBuffer);
+
+ private:
+  /**
+   * @brief Get a pass from the map.
+   * @param _type Pass type to search for.
+   * @return Pointer to the pass.
+   */
+  SPtr<Pass>
+  getPass(const PASS_TYPE::E& _type);
 
  public:
 

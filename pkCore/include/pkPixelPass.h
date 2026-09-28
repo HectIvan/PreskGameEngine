@@ -49,7 +49,7 @@ class PixelPass : public Pass
    * @param _size Size of the data.
    */
   void
-  updateVCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const;
+  updateVCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const;
 
   /**
    * @brief Update the constant buffers of the pixel shader.
@@ -66,7 +66,13 @@ class PixelPass : public Pass
    * @param _size Size of the data.
    */
   void
-  updatePCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const;
+  updatePCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const;
+
+  // void
+  // updateCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T>& _sizes) const override {}
+  // 
+  // void
+  // updateCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const override {}
 
   /*********************************************/
   /**

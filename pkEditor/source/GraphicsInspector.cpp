@@ -75,7 +75,7 @@ GraphicsInspector::init(Window& _window,
     im.createCheckBox("IBL Active", _ibl);
     if (_ibl) {
       // Slider for IBL intensity.
-      if (im.createButtonImage("Skybox", rm.m_mainSkybox)) {
+      if (rm.m_mainSkybox && im.createButtonImage(rm.m_mainSkybox->getName(), rm.m_mainSkybox)) {
         Vector<Path> path = _window.openFileFromExplorer("Texture Files",
                                                          textureCod.getPossibleExtensions());
         const uint32 fileCount = toUint32(path.size());

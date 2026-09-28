@@ -16,22 +16,28 @@ namespace pkEngineSDK
 {
 PixelPass::PixelPass(const PixelPassDesc& _desc)
 {
+  GraphicsAPI& api = g_GraphicAPI();
+
+  createBasics(_desc);
+
   m_name = _desc.name;
 
   m_pVShader = _desc.pVShader;
   m_pPShader = _desc.pPShader;
+
+  m_pInputLayout = api.createInputLayoutFromVShader(m_pVShader.lock());
 
   /**
    * Create pass buffers for the vertex and pixel shaders.
    */
   const uint32 vBufferCount = static_cast<uint32>(_desc.vSBuffers.size());
   for (uint32 i = 0; i < vBufferCount; ++i) {
-    m_vCBuffers.push_back(pk_shared_ptr_new<ConstantBuffer>(_desc.vSBuffers[i]));
+    m_vCBuffers.push_back(api.createConstantBuffer(_desc.vSBuffers[i]));
   }
 
   const uint32 pBufferCount = static_cast<uint32>(_desc.pSBuffers.size());
   for (uint32 i = 0; i < pBufferCount; ++i) {
-    m_pCBuffers.push_back(pk_shared_ptr_new<ConstantBuffer>(_desc.pSBuffers[i]));
+    m_pCBuffers.push_back(api.createConstantBuffer(_desc.pSBuffers[i]));
   }
 
   /**
@@ -76,7 +82,7 @@ PixelPass::updateVCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T
 }
 
 void
-PixelPass::updateVCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const
+PixelPass::updateVCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const
 {
   PK_ASSERT(_index < m_vCBuffers.size() && "Vertex CBuffer update index out of range.");
   g_GraphicAPI().updateConstantBuffer(m_vCBuffers[_index], _data, _size);
@@ -99,7 +105,7 @@ PixelPass::updatePCBuffers(const Vector<const void*>& _data, const Vector<SIZE_T
 }
 
 void
-PixelPass::updatePCBuffer(const uint32 _index, const void* _data, const SIZE_T _size) const
+PixelPass::updatePCBuffer(const uint32& _index, const void* _data, const SIZE_T& _size) const
 {
   PK_ASSERT(_index < m_pCBuffers.size() && "Pixel CBuffer update index out of range.");
   g_GraphicAPI().updateConstantBuffer(m_pCBuffers[_index], _data, _size);

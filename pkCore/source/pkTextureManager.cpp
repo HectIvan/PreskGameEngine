@@ -42,7 +42,7 @@ TextureManager::init()
 
   loadDefaultMatTextures();
 
-  auto flatTex = createTexture("FlatRed", 1, 1, 4, Color::RED);
+  auto flatTex = createTexture("FlatBlue", 1, 1, 4, Color::BLUE);
   texMan.insertTexture(flatTex->getID(), flatTex);
 }
 
@@ -98,19 +98,49 @@ TextureManager::createEmptyTexture()
 }
 
 SPtr<Texture>
+TextureManager::getCreateTexture(const UUID& _ID)
+{
+  auto texture = getTexture(_ID);
+  if (texture) {
+    return texture;
+  }
+  return createTexture(_ID);
+}
+
+SPtr<Texture>
+TextureManager::getCreateTexture(const Path& _path)
+{
+  auto texture = getTexture(_path.toString());
+  if (texture) {
+    return texture;
+  }
+  return createTexture(_path);
+}
+
+SPtr<Texture>
 TextureManager::createTexture(const String& _name,
                               const int32& _width,
                               const int32& _height,
                               const uint32& _bpp,
                               const Color& _color)
 {
+  // managers
   GraphicsAPI& api = g_GraphicAPI();
   TextureCodec& texCodec = g_TextureCodec();
   
+  // base texture data
   Vector<byte> data;
   PK_GRAPHICS_FORMAT::E format = PK_GRAPHICS_FORMAT::kPK_FORMAT_UNKNOWN;
 
   // check for bpp and fill the data vector accordingly.
+  if (_bpp == 1) {
+    data = { _color._color.R };
+    format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32_FLOAT;
+  }
+  if (_bpp == 2) {
+    data = { _color._color.R, _color._color.G };
+    format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32_FLOAT;
+  }
   if (_bpp == 3) {
     data = { _color._color.R, _color._color.G, _color._color.B};
     format = PK_GRAPHICS_FORMAT::kPK_FORMAT_R32G32B32_FLOAT;
@@ -141,12 +171,6 @@ TextureManager::createTexture(const Path& _path)
 SPtr<Texture>
 TextureManager::createTexture(const UUID& _ID)
 {
-  // check if the texture has been stored before.
-  SPtr<Texture> texture = getTexture(_ID);
-  if (texture) {
-    return texture;
-  }
-
   // create the texture
   uint32 bindFlags = PK_BIND_FLAG::kPK_BIND_SHADER_RESOURCE;
 
@@ -160,7 +184,7 @@ TextureManager::createTexture(const UUID& _ID)
   
   resource->load();
 
-  texture = g_GraphicAPI().createTexture(resource, bindFlags);
+  SPtr<Texture> texture = g_GraphicAPI().createTexture(resource, bindFlags);
 
   // if the texture failed to load
   if (!texture) {
@@ -210,7 +234,7 @@ TextureManager::deleteTexture(const UUID& _ID)
 void
 TextureManager::insertTexture(const UUID& _ID, const SPtr<Texture>& _pTexture)
 {
-  m_textures.insert({ _ID, _pTexture });
+  m_textures.insert_or_assign(_ID, _pTexture);
 }
 
 PK_CORE_EXPORT TextureManager&

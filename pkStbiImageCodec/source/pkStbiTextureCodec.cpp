@@ -74,6 +74,13 @@ StbiTextureCodec::createResource(const String& _name,
   file.write(reinterpret_cast<ANSICHAR*>(&_data[0]), dataSize);
   file.close();
 
+  const String msg = "Texture resource " +
+                     textureName +
+                     " generated at path " +
+                     resourcePath +
+                     ".";
+  LOG_REGISTER(msg, __FILE__, __LINE__);
+
   return textureRes;
 }
 

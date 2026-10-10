@@ -137,7 +137,7 @@ class PK_CORE_EXPORT Texture
    * @brief Get the texture name.
    * @return Texture name.
    */
-  virtual const ANSICHAR*
+  virtual const String
   getName() const = 0;
 
   /**

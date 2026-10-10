@@ -82,12 +82,12 @@ MaterialManager::loadMaterial(const UUID& _ID)
   material->setName(resource->m_name);
   material->m_shader = g_ShaderManager().getShader(matResource->m_shaderID);
 
-  material->m_albedo = textureMan.createTexture(diffId);
-  material->m_normal = textureMan.createTexture(normId);
-  material->m_oclussion = textureMan.createTexture(aoId);
-  material->m_roughness = textureMan.createTexture(roughId);
-  material->m_metallic = textureMan.createTexture(metalId);
-  material->m_emissive = textureMan.createTexture(emissId);
+  material->m_albedo = textureMan.getCreateTexture(diffId);
+  material->m_normal = textureMan.getCreateTexture(normId);
+  material->m_oclussion = textureMan.getCreateTexture(aoId);
+  material->m_roughness = textureMan.getCreateTexture(roughId);
+  material->m_metallic = textureMan.getCreateTexture(metalId);
+  material->m_emissive = textureMan.getCreateTexture(emissId);
 
   material->m_properties.ColorMultiply = matResource->m_albedoColor;
   material->m_properties.roughnessMultiply = matResource->m_roughValue;

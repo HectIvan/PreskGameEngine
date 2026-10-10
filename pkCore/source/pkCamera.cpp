@@ -12,8 +12,8 @@ Camera::Camera(const CameraDesc& _camDescription)
 void
 Camera::init(const CameraDesc& _desc)
 {
-  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.forward,
-       _desc.right, _desc.isMain, _desc.camMode);
+  init(_desc.width, _desc.height, _desc.halfFOV, _desc.nearZ, _desc.farZ, _desc.eye, _desc.target,
+       _desc.isMain, _desc.camMode);
 }
 
 void
@@ -34,19 +34,21 @@ Camera::init(const uint32& _width,
              const float& _nearZ,
              const float& _farZ,
              const Vector3& _eye,
-             const Vector3& _forward,
-             const Vector3& _right,
+             const Vector3& _target,
              const bool& _isMain,
              const CAMERA_PROJ::E& _camMode)
 {
   // creation parameters
   m_descriptor = CameraDesc(_width, _height, _halfFOV, _nearZ,
-                            _farZ, _eye, _forward, _right, _camMode);
+                            _farZ, _eye, _target, _camMode);
   m_eye = Vector4(_eye, 1.0f);
-  m_at = Vector4(_eye + _forward, 0.0f);
-  m_up = Math::cross(_forward, _right);
-  m_forward = _forward;
-  m_right = _right;
+  m_at = Vector4(_target, 0.0f);
+
+
+  m_forward = (_target - _eye).normalized();
+  m_right = Math::cross(Vector3::UP, m_forward).normalized();
+  m_up = Math::cross(m_forward, m_right);
+
   m_view = Matrix4::lookAtLH(m_eye, m_at, m_up);
   m_farNear = Vector2(_farZ, _nearZ);
   if (_camMode == CAMERA_PROJ::kPerspective) {

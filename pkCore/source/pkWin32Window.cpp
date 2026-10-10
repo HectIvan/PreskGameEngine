@@ -129,22 +129,32 @@ CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     EndPaint(hWnd, &ps);
     break;
   }
-  case WM_DESTROY:
-  {
-    // get the function and delete it
-    WinFunctEvent* eventFunct = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
-    delete eventFunct;
-    eventFunct = nullptr;
-    PostQuitMessage(0);
-    break;
-  }
   case WM_MOUSEWHEEL:
   {
     eventManager.scrollWheel = static_cast<int8>(GET_WHEEL_DELTA_WPARAM(wParam));
     eventManager.scrollWheel = static_cast<int8>(Math::clamp(eventManager.scrollWheel,
-                                                 -1.0f,
-                                                 1.0f));
+                                                             -1.0f,
+                                                             1.0f));
     break;
+  }
+  case WM_CLOSE:
+  {
+    DestroyWindow(hWnd);
+    break;
+  }
+  case WM_DESTROY:
+  {
+    PostQuitMessage(0);
+    break;
+  }
+  case WM_NCDESTROY:
+  {
+    // get the function and delete it
+    WinFunctEvent* eventFunct = reinterpret_cast<WinFunctEvent*>(GetWindowLongPtrW(hWnd, 0));
+    SetWindowLongPtrW(hWnd, 0, 0);
+    delete eventFunct;
+    eventFunct = nullptr;
+    return DefWindowProc(hWnd, message, wParam, lParam);
   }
   default:
     return DefWindowProc(hWnd, message, wParam, lParam);

@@ -18,6 +18,7 @@
 #include "pkPrerequisitesCore.h"
 #include "pkTexture.h"
 #include "pkModule.h"
+#include "pkPath.h"
 
 namespace pkEngineSDK
 {
@@ -52,6 +53,22 @@ class PK_CORE_EXPORT TextureManager : public Module<TextureManager>
    */
   SPtr<Texture>
   createEmptyTexture();
+
+  /**
+   * @brief Get a texture if found, otherwise, create it.
+   * @param _ID ID of the texture to look for.
+   * @return Pointer to the found or newly created texture.
+   */
+  SPtr<Texture>
+  getCreateTexture(const UUID& _ID);
+
+  /**
+   * @brief Get a texture if found, otherwise, create it.
+   * @param _path Path of the texture to look for.
+   * @return Pointer to the found or newly created texture.
+   */
+  SPtr<Texture>
+  getCreateTexture(const Path& _path);
 
   /**
    * @brief Create a flat color texture.

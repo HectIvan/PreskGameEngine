@@ -137,9 +137,6 @@ Actor::addComponent(const SPtr<Component>& _pComponent)
   // if the component exists, insert it into the list.
   if (_pComponent) {
     m_components.push_back(_pComponent);
-    // log registry.
-    const String msg = "Inserted Actor component: " + String(_pComponent->getName());
-    LOG_REGISTER(msg, __FILE__, __LINE__);
   }
 }
 
@@ -212,7 +209,7 @@ Actor::recalculateDirections(const Vector3& _rot)
   Matrix4 rotMat = Matrix4::rotation(_rot);
 
   m_forward = (Vector4::FORWARD * rotMat).xyz().normalized();
-  m_right = (Vector4::RIGHT * rotMat).xyz().normalized();
-  m_up = (Vector4::UP * rotMat).xyz().normalized();
+  m_right =   (Vector4::RIGHT * rotMat).xyz().normalized();
+  m_up =      (Vector4::UP * rotMat).xyz().normalized();
 }
 }

@@ -13,7 +13,7 @@ DX11Texture::setName(const String& _name)
                         _name.c_str());
 }
 
-const ANSICHAR*
+const String
 DX11Texture::getName() const
 {
   if (!m_t2d) { return ""; }
@@ -26,7 +26,6 @@ DX11Texture::getName() const
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to get the texture name size. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
-    return name.c_str();
   }
 
   Vector<ANSICHAR> nameVec(nameSize);
@@ -36,10 +35,10 @@ DX11Texture::getName() const
     const String errMsg = LOG_GET_ERR_MSG(hr);
     const String msg = "Failed to get the texture name. Error message: " + errMsg;
     LOG_ERROR(msg, __FILE__, __LINE__);
-    return name.c_str();
   }
+
   name = String(nameVec.data(), nameSize);
-  return name.c_str();
+  return name;
 }
 void
 DX11Texture::copyFromReference(SPtr<Texture>& _pTexture)

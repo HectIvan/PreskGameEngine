@@ -1392,6 +1392,7 @@ DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint3
                                             _bindFlags,
                                             resource->m_format,
                                             mipLevels);
+  tempTexture->setID(resource->m_id);
 
   // if creating the texture failed
   if (!tempTexture) {
@@ -1415,12 +1416,7 @@ DX11GraphicsAPI::createTexture(const SPtr<BaseResource>& _pResource, const uint3
     generateMips(tempTexture);
   }
 
-  // set the path
-  tempTexture->setName(String(resource->m_name));
-  tempTexture->setID(resource->m_id);
-
-  const String msg = "Created a DirectX 11 texture from a resource. Resource name: " +
-                     String(resource->m_name);
+  const String msg = "Created a DirectX 11 texture from resource: " + String(resource->m_name);
   LOG_REGISTER(msg, __FILE__, __LINE__);
 
   // return the texture
@@ -1444,7 +1440,7 @@ DX11GraphicsAPI::createDDSTextureFromFile(const Path& _directory)
   }
 
   const String msg = "Created a DirectX 11 texture from a DSS directory. Texture name: " +
-                     String(texture->getName());
+                     texture->getName();
   LOG_REGISTER(msg, __FILE__, __LINE__);
   return texture;
 }
@@ -1454,8 +1450,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
 {
   auto texture = reinterpret_pointer_cast<DX11Texture>(_pTexture);
   if (!texture) {
-    const String msg = "Failed to generate mips for texture: " +
-                       String(_pTexture->getName());
+    const String msg = "Failed to generate mips for texture: " + _pTexture->getName();
     LOG_ERROR(msg, __FILE__, __LINE__);
     return;
   }
@@ -1464,7 +1459,7 @@ DX11GraphicsAPI::generateMips(const SPtr<Texture>& _pTexture)
   if (srv) {
     m_pDevice->m_pImmediateContext->GenerateMips(srv);
   }
-  const String msg = "Generated mips for the texture: " + String(_pTexture->getName());
+  const String msg = "Generated mips for the texture: " + texture->getName();
   LOG_REGISTER(msg, __FILE__, __LINE__);
 }
 
@@ -1772,7 +1767,7 @@ DX11GraphicsAPI::createTexture(const ANSICHAR* _name,
 
   dxTex->setName(_name);
   const String msg = "Created a DirectX 11 texture. Texture name: '" +
-                      String(dxTex->getName()) +
+                      dxTex->getName() +
                       "' Width: " + to_string(_width) +
                       " Height: " + to_string(_height) +
                       " Format: " + to_string(_format) +

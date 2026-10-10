@@ -47,8 +47,7 @@ struct CameraDesc
              const float& _nearZ,
              const float& _farZ,
              const Vector3& _eye,
-             const Vector3& _forward,
-             const Vector3& _right,
+             const Vector3& _target,
              const CAMERA_PROJ::E& _camMode,
              const bool _isMain = false) {
     width = _width;
@@ -57,8 +56,7 @@ struct CameraDesc
     nearZ = _nearZ;
     farZ = _farZ;
     eye = _eye;
-    forward = _forward;
-    right = _right;
+    target = _target;
     camMode = _camMode;
     isMain = _isMain;
   }
@@ -68,8 +66,7 @@ struct CameraDesc
   float nearZ = 3.0f;
   float farZ = 5000.0f;
   Vector3 eye = Vector3(0.0f);
-  Vector3 forward = Vector3::FORWARD;
-  Vector3 right = Vector3::RIGHT;
+  Vector3 target = Vector3::FORWARD + eye;
   CAMERA_PROJ::E camMode = CAMERA_PROJ::E::kPerspective;
   bool isMain = false;
 };
@@ -103,8 +100,7 @@ class PK_CORE_EXPORT Camera : public Component
    * @param _nearZ Nearest point to the camera.
    * @param _farZ Furthest point to the camera.
    * @param _eye Position of the camera view.
-   * @param _forward The forward vector of the camera.
-   * @param _right The right vector of the camera.
+   * @param _target Where the camera will look.
    * @param _isMain If the camera is a main camera.
    * @param _camMode Wether Camera perspective.
    */
@@ -115,8 +111,7 @@ class PK_CORE_EXPORT Camera : public Component
        const float& _nearZ,
        const float& _farZ,
        const Vector3& _eye,
-       const Vector3& _forward,
-       const Vector3& _right,
+       const Vector3& _target,
        const bool& _isMain,
        const CAMERA_PROJ::E& _camMode = CAMERA_PROJ::kPerspective
   );

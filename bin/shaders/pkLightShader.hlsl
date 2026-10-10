@@ -3,6 +3,7 @@
 ***************************************************************************************/
 
 #define PI 3.14159265359f
+#define EPSILON 1e-4f
 #define SMALL_NUMBER 1.0f
 
 // resources depth textures
@@ -59,6 +60,89 @@ struct PS_OUTPUT
   float4 objResult : SV_Target0; // object result
 };
 
+float3
+FresnelSchlick(float cosTheta, const float3 f0)
+{
+  const float factor = pow(1.0f - saturate(cosTheta), 5.0f);
+  return f0 + (float3(1.0f, 1.0f, 1.0f) - f0) * factor;
+}
+
+// source: https://graphicscompendium.com/gamedev/15-pbr
+// F0 = (n - 1)^2 / (n + 1)^2
+// F = F0 + (1 - F0) * (1 - VoH)^5
+float3 Fresnel(float3 F0, float VoH) // float refraction
+{
+  return F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
+}
+
+float
+GeometrySchlick(const float NoX, const float roughness)
+{
+  const float r = (roughness + 1.0f);
+  const float k = (r * r) / 8.0f;
+  return NoX / max(NoX * (1.0f - k) + k, 0.0001);
+}
+
+float DistributionGGX(float NoH, float r)
+{
+  const float a = r * r;
+  const float a2 = a * a;
+  const float NoH2 = NoH * NoH;
+  const float denom = (NoH2 * (a2 - 1.0f - 0.0f) + 1.0f);
+  return a2 / max(PI * denom * denom, 0.0001f);
+}
+
+float GeometrySmith(float NoV, float NoL, float roughness)
+{
+  float ggx2 = GeometrySchlick(NoV, roughness);
+  float ggx1 = GeometrySchlick(NoL, roughness);
+  
+  return ggx1 * ggx2;
+}
+
+float3
+evaluateSpecular(float NoL, float NoV, float NoH, float VoH, float m, float r, float3 F0)
+{
+  const float D = DistributionGGX(NoH, r);
+  const float G = GeometrySmith(NoV, NoL, r);
+  const float3 F = FresnelSchlick(VoH, F0);
+  
+  const float denominator = max(4.0f * NoV * NoL, EPSILON);
+  
+  return (float3(D, D, D) * float3(G, G, G) * F) / denominator;
+}
+
+float3
+evaluateDiffuse(float3 F0, float m, float transmission, float3 albedo)
+{
+  float3 white = float3(1.0f, 1.0f, 1.0f);
+  float3 kD = white - F0;
+  kD *= (white - float3(m, m, m) * (1.0f - transmission));
+  return (kD * albedo) * (1.0f / PI);
+
+}
+
+float3
+evaluatePBR(float3 n, float3 v, float3 l, float m, float r, float ior, float3 color)
+{
+  const float metallic = saturate(m);
+  const float roughness = saturate(r);
+  
+  const float3 h = normalize(v + l);
+  const float NoL = max(dot(n, l), 0.0f);
+  const float NoV = max(dot(n, v), 0.0f);
+  const float NoH = max(dot(n, h), 0.0f);
+  const float VoH = max(dot(v, h), 0.0f);
+  
+  if (NoL <= 0.0f || NoV <= 0.0f) {
+    return float3(0.0f, 0.0f, 0.0f);
+  }
+  
+  const float F0_dielectric = pow((ior - 1.0f) / (ior + 1.0f), 2.0f);
+  const float3 F0 = lerp(float3(F0_dielectric, F0_dielectric, F0_dielectric), color, m);
+
+}
+
 float2 getSkyBoxUV(float3 dir)
 {
   // https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
@@ -70,22 +154,6 @@ float2 getSkyBoxUV(float3 dir)
 float fresnelForLut(float VoH)
 {
   return pow(1.0f - VoH, 5.0f);
-}
-
-float GeometrySchlickGGX(float NoV, float roughness)
-{
-  float r = roughness + 1.0f;
-  float k = (r * r) / 8.0f;
-  float G =  NoV * (1.0f - k) + k;
-  return NoV / G;
-}
-
-float GeometrySmith(float NoV, float NoL, float roughness)
-{
-  float ggx2 = GeometrySchlickGGX(NoV, roughness);
-  float ggx1 = GeometrySchlickGGX(NoL, roughness);
-  
-  return ggx1 * ggx2;
 }
 
 // source: https://graphicscompendium.com/gamedev/15-pbr
@@ -101,14 +169,6 @@ float NormalDistribution(float3 halfView, float3 normal, float roughness)
   denom = PI * denom * denom;
   
   return a2 / denom;
-}
-
-// source: https://graphicscompendium.com/gamedev/15-pbr
-// F0 = (n - 1)^2 / (n + 1)^2
-// F = F0 + (1 - F0) * (1 - VoH)^5
-float3 Fresnel(float3 F0, float VoH) // float refraction
-{
-  return F0 + (1.0f - F0) * pow((1 - VoH), 5.0f);
 }
 
 float3 cookTorranceSpecular(float3 normal,

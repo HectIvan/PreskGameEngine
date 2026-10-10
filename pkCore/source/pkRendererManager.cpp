@@ -636,11 +636,8 @@ RendererManager::setSkybox(const UUID& _id)
 {
   TextureManager& tm = g_TextureManager();
 
-  SPtr<Texture> texture = tm.getTexture(_id);
-  if (!texture) {
-    texture = tm.createTexture(_id);
-    tm.insertTexture(_id, texture);
-  }
+  SPtr<Texture> texture = tm.getCreateTexture(_id);
+
   m_mainSkybox->copyFromReference(texture);
 
   generateCubeMap(m_mainSkybox, getGBuffer(G_BUFFERS::kGB_CubeMap));
@@ -698,13 +695,13 @@ RendererManager::generateCubeMap(const SPtr<Texture>& _pInput, const SPtr<Textur
 
   // unbind resources.
   api.waitDevice();
-  api.pSUnbindShaderResourceViews(1);
+  api.pSUnbindShaderResourceViews(1); 
   api.unbindRenderTargets(1);
 
   iLayout.reset();
   samplerState.reset();
   cBuffer.reset();
-  LOG_REGISTER("Generated Cubemap from texture.", __FILE__, __LINE__);
+  LOG_REGISTER("Generated Cubemap from texture: " + _pInput->getName(), __FILE__, __LINE__);
 }
 
 void

@@ -45,7 +45,7 @@ class DX11Texture : public Texture
     m_uAVs(_uAVs)
   {}
   ~DX11Texture() override {
-    const String msg = "Releasing texture: " + String(getName());
+    const String msg = "Releasing texture: " + getName();
     LOG_REGISTER(msg, __FILE__, __LINE__);
 
     m_rTVs.clear();
@@ -81,7 +81,7 @@ class DX11Texture : public Texture
    * @brief Get the name of the texture.
    * @return Name of the texture.
    */
-  const ANSICHAR*
+  const String
   getName() const override;
 
   /**

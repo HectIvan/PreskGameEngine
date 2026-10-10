@@ -89,7 +89,7 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   void
   insertNewResource(const SPtr<BaseResource>& _pResource)
   {
-    m_allResources.insert({_pResource->m_id, _pResource});
+    m_allResources.insert_or_assign(_pResource->m_id, _pResource);
   }
 
   /**
@@ -100,8 +100,8 @@ class PK_CORE_EXPORT AssetResourceManager : public Module<AssetResourceManager>
   void
   insertLoadedResource(const SPtr<BaseResource>& _pResource)
   {
-    m_loadedResources.insert({ _pResource->m_id, _pResource});
-    m_allResources.insert({ _pResource->m_id, _pResource });
+    m_loadedResources.insert_or_assign(_pResource->m_id, _pResource);
+    m_allResources.insert_or_assign(_pResource->m_id, _pResource);
   }
 
   /**
